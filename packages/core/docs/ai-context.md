@@ -5,8 +5,10 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. It complements, and does not replace,
 [architecture.md](./architecture.md), [pixi-alignment.md](./pixi-alignment.md),
 and [resource.md](./resource.md) — those go deeper on rendering internals and
-the resource system. Where this file and `architecture.md` disagree, prefer
-this file (see §5, item marked stale).
+the resource system. `architecture.md`'s multi-Player/HashObject/
+`experimental-webgl` sections were corrected on 2026-08-12 to match current
+(1.0.12) behavior — it is no longer stale on those points, see its own
+"补丁勘误" note at the top.
 
 Package identity: `@kurot/core@1.0.12`, TypeScript rewrite of the Egret engine
 runtime. Keeps Egret's public `DisplayObject`/event API surface, replaces the
@@ -152,8 +154,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 3. Multi-Player listener registration (`addStructureChangeListener` etc.) on
    `DisplayObject`/`DisplayObjectContainer` removed. The engine is single-
    Player by design (static hooks set directly by `Player`'s constructor).
-   **`architecture.md` §3.5 still describes this removed API as current —
-   it is stale. Trust this file / README.md / CHANGELOG.md instead.**
+   `architecture.md` §3.5 now documents this correctly (corrected 2026-08-12).
 4. `WebGLRenderContext.getInstance()` / `resetInstance()` removed — `Player`
    constructs the context directly per canvas.
 5. Internal fields are `$`-prefixed (`$x`, `$y`, `$renderDirty`, ...) to mark

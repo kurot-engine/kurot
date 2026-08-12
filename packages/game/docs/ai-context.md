@@ -7,8 +7,9 @@ and is **stale in places** — e.g. it says MovieClip registers with the
 ticker internally, but the shipped code has no such registration (matches
 the README's external-scheduler design instead). Treat `plan.md` as
 historical, not descriptive. `docs-internal/game-review.md` is a code
-review with a few real minor issues (B1–B3) referenced below. Both files
-are gitignored/local-only — don't assume they exist in every checkout.
+review; B1 was fixed in 1.0.0, B2/B3 are accepted-as-is design tradeoffs
+still referenced below. Both files are gitignored/local-only — don't
+assume they exist in every checkout.
 
 Package identity: `@kurot/game@1.0.6`. Peer-depends on `@kurot/core`.
 
@@ -196,8 +197,8 @@ lifespan / maxParticles` in its constructor, after `parseConfig()` sets
 - `URLVariables.decode()` uses a custom regex parser (not `URLSearchParams`)
   and collapses repeated query keys into an array value — behavior that
   differs subtly from `URLSearchParams` semantics.
-- `game-review.md` B1: `close()` doesn't null out internal loader references
-  after natural completion — harmless in practice, but don't rely on
+- `close()` fully cleans up all three loader paths (xhr/imageLoader/sound):
+  removes listeners, aborts, and dereferences. Still don't rely on
   inspecting internal fields as an "is it done" check; use the
   `Event.COMPLETE`/`IOErrorEvent.IO_ERROR` events instead.
 

@@ -172,11 +172,11 @@ Type-safe event listeners via `EventMap`. `EventDispatcher` now accepts an optio
 - **EventDispatcher**: Optional `<TMap extends EventMap>` generic on the class, plus type-safe overloads for `addEventListener`, `removeEventListener`, and `once` keyed by `TMap[K]`. The implementation signature uses a type-erased `AnyListener` to bypass strict-mode parameter contravariance (TS2394). Existing callers see no change.
 - **EventMap type**: Exported from `events/index.ts` (`Record<string, Event>`-compatible base for declaring event-type → subclass mappings).
 - **Typed event maps** declared at each event source:
-  - `DisplayObjectEvents` on `DisplayObject` — covers `TouchEvent.TOUCH_BEGIN/MOVE/END/TAP`, `FocusEvent.FOCUS_IN/OUT`, `Event.ADDED/REMOVED_TO_STAGE`, `Event.ENTER_FRAME`, etc.
-  - `HttpRequestEvents` on `HttpRequest` — `HTTPStatusEvent.HTTP_STATUS`, `IOErrorEvent.IO_ERROR`, `ProgressEvent.PROGRESS`, `Event.COMPLETE`.
-  - `SoundEvents` on `Sound`.
-  - `ImageLoaderEvents` on `ImageLoader`.
-  - `TimerEvents` on `Timer` — `TimerEvent.TIMER`, `TimerEvent.TIMER_COMPLETE`.
+    - `DisplayObjectEvents` on `DisplayObject` — covers `TouchEvent.TOUCH_BEGIN/MOVE/END/TAP`, `FocusEvent.FOCUS_IN/OUT`, `Event.ADDED/REMOVED_TO_STAGE`, `Event.ENTER_FRAME`, etc.
+    - `HttpRequestEvents` on `HttpRequest` — `HTTPStatusEvent.HTTP_STATUS`, `IOErrorEvent.IO_ERROR`, `ProgressEvent.PROGRESS`, `Event.COMPLETE`.
+    - `SoundEvents` on `Sound`.
+    - `ImageLoaderEvents` on `ImageLoader`.
+    - `TimerEvents` on `Timer` — `TimerEvent.TIMER`, `TimerEvent.TIMER_COMPLETE`.
 
 ### Changed
 
@@ -359,6 +359,7 @@ First stable release. From this version forward the public API surface (exports 
 
 - **WebGL2 support**: Prefers a WebGL2 context at initialization with WebGL1 fallback for older devices, via a unified GL type alias. All GLSL shaders received an explicit `#version 100` directive for WebGL1.
 - **Graphics**: `FinalizationRegistry`-based texture cleanup to prevent GPU memory leaks when `Graphics` objects are garbage-collected.
+- **Text module expansion**: `HtmlTextParser.ts` (HTML text parsing), `InputController.ts` (selection/cursor/keyboard input handling), `TextMeasurer.ts` (font metrics), `WordWrap.ts` (line-breaking).
 
 ### Fixed
 
@@ -424,6 +425,8 @@ First stable release. From this version forward the public API surface (exports 
     - Prevents double-text artifact when native input is focused.
     - Fixes canvas buffer scaling and border handling in coordinate mapping.
     - Refines `StageText` padding and clipping for better vertical alignment.
+- **TextPipe**: `TextField` WebGL rendering (offscreen canvas rasterization → `WebGLTexture` upload). `WebGLRenderer` registers `TextPipe` and routes to it by `renderObjectType`.
+- **`InstructionSet`**: Initial unit test coverage.
 - **Benchmark scenes**: `rapid-churn` and `texture-swap` scenes added to the benchmark suite with Egret comparison.
 - **Example pages**: Index page, mesh test, net test, video test, and sound test HTML examples.
 - **Video rendering**: Dynamic scaling and per-frame WebGL texture updates.
@@ -447,14 +450,16 @@ First stable release. From this version forward the public API surface (exports 
 
 ### Added
 
-- **WebGL performance benchmarking suite**: Comprehensive multi-scene benchmark with detailed logging and dynamic-transform scene.
+- **WebGL performance benchmarking suite**: Comprehensive multi-scene benchmark with detailed logging and dynamic-transform scene, covering 5 stress-test scenarios.
 - **Bounds caching**: `DisplayObject` now caches computed bounds to avoid redundant recalculation.
 - **Blend mode state management**: Explicit blend mode tracking in the render pipeline.
+- **WebGL Context Lost recovery**: full recovery path for `webglcontextlost`/`webglcontextrestored`.
 
 ### Fixed
 
 - Drop shadow padding calculation in filter pipeline.
-- Blend mode state not restored after filter/pipe passes.
+- Blend mode state not restored after filter/pipe passes (`FilterPipe` / `MaskPipe`), plus an instruction object pool for both pipes.
+- Video frame rendering.
 
 ### Changed
 

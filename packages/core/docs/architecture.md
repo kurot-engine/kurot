@@ -1,6 +1,6 @@
 # Kurot Core 架构文档
 
-> 版本：0.6.2 | 更新日期：2026-07-24
+> 当前版本：1.0.12。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
 
 ---
 
@@ -9,7 +9,7 @@
 Kurot 是对 Egret 游戏引擎的现代化翻新。在保持与 Egret 对外 API 一致性的前提下，
 完成了模块系统现代化、类型安全升级、渲染架构重构三大目标。
 
-| 指标     | 旧 Egret                    | Kurot                                   |
+| 指标     | 旧 Egret                    | Kurot                                     |
 | -------- | --------------------------- | ----------------------------------------- |
 | 源文件数 | 166                         | ~142（含 index.ts）                       |
 | 代码行数 | 42,340                      | ~18,450                                   |
@@ -18,7 +18,7 @@ Kurot 是对 Egret 游戏引擎的现代化翻新。在保持与 Egret 对外 AP
 | 编译目标 | ES5/ES3                     | ES2022                                    |
 | 渲染架构 | RenderNode 三阶段           | InstructionSet 指令驱动（借鉴 Pixi.js 8） |
 | 批处理   | 同纹理合并                  | 多纹理批处理（8张/批）                    |
-| 包管理   | 无 package.json（monolith） | `@kurot/core` workspace 包              |
+| 包管理   | 无 package.json（monolith） | `@kurot/core` workspace 包                |
 | 资源管理 | 无独立模块                  | Resource 完整资源生命周期                 |
 | WebGL    | 仅 WebGL 1                  | WebGL 1 + WebGL 2 双后端，自动选择        |
 
@@ -70,7 +70,7 @@ packages/core/src/kurot/
 │       │   ├── FilterPipe.ts         # 滤镜 push/pop 指令（含对象池）
 │       │   ├── MaskPipe.ts           # 遮罩 push/pop 指令（含对象池）
 │       │   ├── TextPipe.ts           # 文本 WebGL 渲染（offscreen canvas → 纹理上传）
-│       │   └── ParticlePipe.ts       # 粒子系统渲染（🆕 v0.5.x）
+│       │   └── ParticlePipe.ts       # 粒子系统渲染
 │       └── shaders/                  # GLSL 着色器
 │           ├── ShaderLib.ts          # GLSL ES 1.00 着色器库（WebGL1）
 │           └── ShaderLib2.ts         # GLSL ES 3.00 着色器库（WebGL2）
@@ -88,19 +88,20 @@ packages/core/src/kurot/
 │   ├── WordWrap.ts                   # 自动换行（tokenize, splitGraphemes）
 │   ├── enums/                        # HorizontalAlign, VerticalAlign, TextFieldType, TextFieldInputType
 │   └── types/                        # ITextElement, IWTextElement, ILineElement, IHitTextElement 等类型定义
-├── resource/         # 资源管理（🆕 v0.3.2）
+├── resource/         # 资源管理
 │   ├── Resource.ts                   # 资源核心（单例模式，async/await API，加载/缓存/生命周期）
 │   ├── ResourceConfig.ts             # 资源配置
 │   ├── ResourceEvent.ts              # 资源事件
 │   ├── ResourceItem.ts               # 资源项
 │   ├── ResourceLoader.ts             # 资源加载器
 │   └── analyzers/                    # 资源分析器（AnalyzerBase, ImageAnalyzer, JsonAnalyzer, SheetAnalyzer, SoundAnalyzer, TextAnalyzer）
-├── system/           # 系统能力（🆕 v0.3.2）
+├── system/           # 系统能力
 │   └── Capabilities.ts               # 运行时 WebGL 扩展/平台能力检测（UA + Client Hints）
 ├── net/              # 网络加载（HttpRequest, ImageLoader, HttpMethod, HttpResponseType）
 ├── media/            # 媒体（Sound, SoundChannel, Video）
 ├── benchmark/        # 性能基准（MetricsCollector, BenchmarkRunner, SceneRegistry, PerfPanel, ReportExporter, types）
-├── utils/            # 工具类（HashObject, ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils, toColorString）
+├── utils/            # 工具类（ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils, toColorString）
+│                     # 注：不提供 HashObject，对象身份比较用 === 或 WeakMap 键控查找
 ├── localStorage/     # 本地存储
 └── external/         # 外部接口（ExternalInterface）
 ```
@@ -122,7 +123,7 @@ Phase B — Execute（每帧）:
   按指令顺序分发到 Pipe → 无场景图遍历
 ```
 
-| 设计点   | Egret RenderNode             | Kurot InstructionSet                         | Pixi.js 8                                        |
+| 设计点   | Egret RenderNode             | Kurot InstructionSet                           | Pixi.js 8                                        |
 | -------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------ |
 | 中间表示 | RenderNode 树                | 扁平 Instruction 数组                          | 扁平 Instruction 数组                            |
 | 缓存粒度 | 每个 DisplayObject 一个 Node | 整棵树/RenderGroup 一个 Set                    | 每个 RenderGroup 一个                            |
@@ -191,19 +192,22 @@ DisplayObject 脏标记：
 ├── renderDirty   — 视觉数据变化（位置/纹理/alpha/tint），向上传播
 └── renderMode    — 渲染模式（NONE/FILTER/CLIP/SCROLLRECT）
 
-通知机制（支持多 Player 实例）：
-├── addStructureChangeListener(fn)  — 注册结构变化回调
-├── addRenderableDirtyListener(fn)  — 注册渲染脏回调
-├── addContainerStructureChangeListener(fn) — 注册容器结构变化回调
-├── markDirty()
+通知机制（单 Player 静态钩子，由 Player 构造函数赋值）：
+├── $onStructureChange?: () => void                          — 结构变化回调
+├── $onRenderableDirty?: (obj: DisplayObject) => void         — 渲染脏回调
+├── DisplayObjectContainer.$onContainerStructureChange?: (owner) => void — 容器结构变化回调
+├── $markDirty()
 │   ├── 更新 worldAlpha / worldTint 缓存（O(1) 读取）
-│   ├── 调用 _onRenderableDirty(this) → WebGLRenderer.markRenderableDirty()
+│   ├── 调用 $onRenderableDirty?.(this) → WebGLRenderer.markRenderableDirty()
 │   └── 向上传播 cacheDirty + renderDirty
-├── updateRenderMode()
-│   └── 调用 _onStructureChange() → WebGLRenderer.markStructureDirty()
+├── $updateRenderMode()
+│   └── 调用 $onStructureChange?.() → WebGLRenderer.markStructureDirty()
 └── DisplayObjectContainer.markDirtyInternal()
-    └── 调用 _onContainerStructureChange(this) → markStructureDirty(owner)
+    └── 调用 $onContainerStructureChange?.(this) → markStructureDirty(owner)
 ```
+
+引擎设计上始终是单 Player：`Player` 的构造函数直接把上述三个静态字段赋值
+为具体的闭包函数（见 `player/Player.ts`），并在 `destroy()` 里清空它们。
 
 ### 3.6 RenderObjectType 快速路由
 
@@ -225,10 +229,16 @@ DisplayObject 脏标记：
 
 ### 4.1 WebGL 版本选择
 
-WebGLRenderContext 在初始化时自动检测并选择最佳后端：
+`WebGLRenderContext` 在初始化时自动检测并选择最佳后端：
 
 - **WebGL 2 优先**：使用 `canvas.getContext('webgl2')`，加载 `ShaderLib2`（GLSL ES 3.00）
-- **WebGL 1 降级**：回退到 `canvas.getContext('webgl')` 或 `experimental-webgl`，加载 `ShaderLib`（GLSL ES 1.00）
+- **WebGL 1 降级**：回退到 `canvas.getContext('webgl')`，加载 `ShaderLib`（GLSL ES 1.00）。
+  不使用 `experimental-webgl` 前缀——该别名只有 IE11/早期 Safari/旧版
+  Android Chrome 才需要，现代浏览器的标准 `'webgl'` 已经足够。
+- **无独立探测 canvas**：`Player` 直接在应用方传入的 canvas 上依次尝试
+  `webgl2` → `webgl`，两者都失败才降级到 Canvas 2D，不额外创建临时 canvas
+  探测能力。`checkWebGLSupport()` 函数仍导出，供需要独立探测的调用方使用，
+  但 `Player` 自身不调用它。
 - 着色器库通过实例属性动态绑定：`ctx.shaders`、`ctx.blurTierFn`、`ctx.makeBlurH`、`ctx.makeBlurV`
 
 ### 4.2 渲染流程
@@ -408,39 +418,44 @@ app.start(root);
 
 ### 7.4 其他模块
 
-| 模块                                       | 状态        | 差异说明                    |
-| ------------------------------------------ | ----------- | --------------------------- |
-| geom (Matrix/Point/Rectangle)              | ✅ API 兼容 | 对象池 `create()/release()` |
-| filters (Blur/Glow/DropShadow/ColorMatrix) | ✅ API 兼容 |                             |
-| filters (CustomFilter)                     | 🆕 全新     | 自定义 WebGL 着色器滤镜     |
-| net (HttpRequest/ImageLoader)              | ✅ API 兼容 |                             |
-| media (Sound/SoundChannel/Video)           | ✅ API 兼容 |                             |
-| text (TextField/BitmapText/BitmapFont)     | ✅ API 兼容 |                             |
-| text (HtmlTextParser/InputController)      | 🆕 全新     | HTML 解析 + 输入控制        |
-| text (WordWrap/TextMeasurer)               | 🆕 全新     | 自动换行 + 文本测量         |
-| localStorage                               | ✅ API 兼容 |                             |
-| ExternalInterface                          | ✅ API 兼容 |                             |
-| utils (ByteArray/Timer/HashObject)         | ✅ API 兼容 |                             |
-| utils (Base64Util/NumberUtils/DebugLog)    | 🆕 全新     | 编码/数学/调试工具          |
-| Resource                                   | 🆕 全新     | 完整资源生命周期管理        |
-| Capabilities                               | 🆕 全新     | 运行时环境能力检测          |
+| 模块                                       | 状态        | 差异说明                                  |
+| ------------------------------------------ | ----------- | ----------------------------------------- |
+| geom (Matrix/Point/Rectangle)              | ✅ API 兼容 | 对象池 `create()/release()`               |
+| filters (Blur/Glow/DropShadow/ColorMatrix) | ✅ API 兼容 |                                           |
+| filters (CustomFilter)                     | 🆕 全新     | 自定义 WebGL 着色器滤镜                   |
+| net (HttpRequest/ImageLoader)              | ✅ API 兼容 |                                           |
+| media (Sound/SoundChannel/Video)           | ✅ API 兼容 |                                           |
+| text (TextField/BitmapText/BitmapFont)     | ✅ API 兼容 |                                           |
+| text (HtmlTextParser/InputController)      | 🆕 全新     | HTML 解析 + 输入控制                      |
+| text (WordWrap/TextMeasurer)               | 🆕 全新     | 自动换行 + 文本测量                       |
+| localStorage                               | ✅ API 兼容 |                                           |
+| ExternalInterface                          | ✅ API 兼容 |                                           |
+| utils (ByteArray/Timer)                    | ✅ API 兼容 | 不提供 `HashObject`/`.hashCode`，见第八节 |
+| utils (Base64Util/NumberUtils/DebugLog)    | 🆕 全新     | 编码/数学/调试工具                        |
+| Resource                                   | 🆕 全新     | 完整资源生命周期管理                      |
+| Capabilities                               | 🆕 全新     | 运行时环境能力检测                        |
 
 ---
 
 ## 八、Breaking Changes
 
-| 变更                                     | 影响                          | 迁移方式                                         |
-| ---------------------------------------- | ----------------------------- | ------------------------------------------------ |
-| `thisObject` 参数移除                    | 所有事件监听代码              | 使用箭头函数                                     |
-| `BlendMode` 值变化                       | `"normal"` → `"source-over"`  | 使用常量                                         |
-| `width/height` 行为变更                  | Egret 通过 scaleX/scaleY 模拟 | 使用 explicitWidth/Height 或直接设 scaleX/scaleY |
-| `matrix` getter 返回 clone               | 依赖引用修改 matrix 的代码    | 改用 `setMatrix()`                               |
-| `removeChildren()` 返回值                | `DisplayObject[]` → `void`    | 不依赖返回值                                     |
-| `getChildAt()` 越界                      | 抛异常 → 返回 `undefined`     | 检查返回值                                       |
-| hitTest 返回值                           | `null` → `undefined`          | 检查 `=== null`                                  |
-| 命名空间                                 | `egret.xxx` → ES Module       | 全量替换                                         |
-| `Texture.getPixel32/getPixels/toDataURL` | 已废弃                        | 仅 `RenderTexture.getPixel32` 可用               |
-| `Base64Util.encode` 签名                 | `string` → `ArrayBuffer`      | `encode(new TextEncoder().encode(str))`          |
+| 变更                                                                   | 影响                                         | 迁移方式                                         |
+| ---------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------ |
+| `thisObject` 参数移除                                                  | 所有事件监听代码                             | 使用箭头函数                                     |
+| `BlendMode` 值变化                                                     | `"normal"` → `"source-over"`                 | 使用常量                                         |
+| `width/height` 行为变更                                                | Egret 通过 scaleX/scaleY 模拟                | 使用 explicitWidth/Height 或直接设 scaleX/scaleY |
+| `matrix` getter 返回 clone                                             | 依赖引用修改 matrix 的代码                   | 改用 `setMatrix()`                               |
+| `removeChildren()` 返回值                                              | `DisplayObject[]` → `void`                   | 不依赖返回值                                     |
+| `getChildAt()` 越界                                                    | 抛异常 → 返回 `undefined`                    | 检查返回值                                       |
+| hitTest 返回值                                                         | `null` → `undefined`                         | 检查 `=== null`                                  |
+| 命名空间                                                               | `egret.xxx` → ES Module                      | 全量替换                                         |
+| `Texture.getPixel32/getPixels/toDataURL`                               | 已废弃                                       | 仅 `RenderTexture.getPixel32` 可用               |
+| `Base64Util.encode` 签名                                               | `string` → `ArrayBuffer`                     | `encode(new TextEncoder().encode(str))`          |
+| `HashObject` / `IHashObject` / `.hashCode` 移除                        | 依赖整数哈希做对象身份比较的代码             | 用 `===` 或 `WeakMap` 键控查找                   |
+| `Resource.instance` 单例 getter 移除                                   | 通过 `Resource.instance` 访问单例的代码      | `import { resource } from '@kurot/core'`         |
+| 多 Player 监听器注册 API 移除                                          | `addStructureChangeListener` 等（见 3.5 节） | 该 API 从未被支持的场景实际使用，无需迁移        |
+| `WebGLRenderContext.getInstance()`/`resetInstance()` 移除              | 依赖单例访问 WebGL 上下文的代码              | `Player` 直接持有 context 实例，无需手动获取     |
+| `experimental-webgl` / `webkitAudioContext` / vendor 前缀全屏 API 移除 | 依赖旧浏览器前缀降级的代码                   | 无需迁移，现代浏览器均支持标准 API               |
 
 ---
 
@@ -455,27 +470,28 @@ app.start(root);
 - 移除遗留代码：bind polyfill、手写 UTF-8、IE 兼容、vendor 前缀、typescript-plus 等
 - WebGL 2 支持：双着色器库（GLSL ES 1.00 + 3.00），运行时自动选择
 - RenderObjectType 枚举替代 instanceof，热路径零开销类型路由
-- 多 Player 实例支持：通过 listener 注册模式替代单一静态回调
+- 单 Player 设计：`Player` 直接赋值静态钩子字段（`$onStructureChange` 等，见 3.5 节）
 
 ---
 
 ## 十、测试覆盖
 
-42 个测试文件，569 个测试用例，全部通过（`pnpm run test`）。
+`test/` 下按模块组织测试文件，运行 `pnpm --dir packages/core test` 查看当前
+文件数与用例数。
 
-| 模块       | 测试文件数 | 主要覆盖内容                                                                                                                                               |
-| ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| events/    | 6          | Event, EventDispatcher, EventPropagation, TouchEvent, HTTPStatusEvent, ProgressEvent                                                                       |
-| geom/      | 3          | Matrix, Point, Rectangle                                                                                                                                   |
-| utils/     | 7          | ByteArray, HashObject, Base64Util, Logger, DebugLog, NumberUtils, toColorString                                                                            |
-| display/   | 13         | DisplayObject, DisplayObjectContainer, DisplayObjectIntegration, Bitmap, BitmapData, Sprite, Shape, Mesh, Stage, Graphics, Texture, SpriteSheet, BlendMode |
-| filters/   | 3          | Filter (全部滤镜), CustomFilter, filters（滤镜集成）                                                                                                       |
-| media/     | 3          | Sound, SoundChannel, Video                                                                                                                                 |
-| player/    | 2          | InstructionSet, TextPipe（GPU 纹理回收 destroyRenderable/FinalizationRegistry 路径）                                                                       |
-| net/       | 2          | HttpRequest, ImageLoader                                                                                                                                   |
-| resource/  | 2          | Resource（并发 loadGroup 队列化）, ResourceLoader（并发/重试/无 analyzer 场景）                                                                            |
-| benchmark/ | 1          | 性能基准测试                                                                                                                                               |
-| text/      | —          | 通过 display 集成测试覆盖                                                                                                                                  |
+| 模块       | 主要覆盖内容                                                                                                                                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| events/    | Event, EventDispatcher, EventPropagation, EventMap, TouchEvent, HTTPStatusEvent, ProgressEvent                                                                                                           |
+| geom/      | Matrix, Point, Rectangle                                                                                                                                                                                 |
+| utils/     | ByteArray, Base64Util, Logger, DebugLog, NumberUtils, toColorString                                                                                                                                      |
+| display/   | DisplayObject, DisplayObjectContainer, DisplayObjectIntegration, Bitmap, BitmapData, Sprite, Shape, Mesh, Stage, StageText, Graphics, Texture, SpriteSheet, BlendMode, DisplayList                       |
+| filters/   | Filter (全部滤镜), CustomFilter, filters（滤镜集成）, EffectTransform（离屏效果变换正确性）                                                                                                              |
+| media/     | Sound, SoundChannel, Video                                                                                                                                                                               |
+| player/    | InstructionSet, InstructionPool, RenderGroup, TextPipe, MaskPipe, WebGLRendererDirty, WebGLRendererLeaf, WebGLVertexArrayObject, WebGLRenderBuffer, WebGLBlurFramebufferPool, CreatePlayer, TouchHandler |
+| net/       | HttpRequest, ImageLoader                                                                                                                                                                                 |
+| resource/  | Resource（并发 loadGroup 队列化）, ResourceLoader（并发/重试/无 analyzer 场景）                                                                                                                          |
+| benchmark/ | 性能基准测试                                                                                                                                                                                             |
+| text/      | 通过 display 集成测试覆盖                                                                                                                                                                                |
 
 ---
 
@@ -503,172 +519,9 @@ export default defineConfig({
 ```
 
 | 维度      | 旧 Egret                                  | Kurot                     |
-| --------- | ----------------------------------------- | --------------------------- |
-| CLI 框架  | 手写参数解析                              | commander.js                |
-| TS 编译器 | typescript-plus（魔改 tsc）               | esbuild                     |
+| --------- | ----------------------------------------- | ------------------------- |
+| CLI 框架  | 手写参数解析                              | commander.js              |
+| TS 编译器 | typescript-plus（魔改 tsc）               | esbuild                   |
 | 配置文件  | egretProperties.json + index.html data-\* | kurot.config.ts           |
 | EXML 编译 | 内嵌在 tools/lib/eui/                     | 独立包 @kurot/exml-parser |
-| 模块系统  | CommonJS                                  | ESM                         |
-
----
-
-## 十二、变更日志
-
-### 0.6.2（当前版本）
-
-**GPU 资源泄漏修复**
-
-- `TextPipe` 补上与 `GraphicsPipe` 一致的 `FinalizationRegistry` 纹理回收机制：`TextField` 被 GC 时自动 `gl.deleteTexture()`，此前该缓存没有任何释放路径，长时间运行的场景（频繁刷新文字内容）会持续泄漏显存
-- `destroyRenderable()` 补充为立即释放路径（`unregister` 对应 GC token 后立即删纹理），避免手动调用和 GC 回调重复删除同一纹理
-
-**运行时问题修复**（另见 CHANGELOG.md）
-
-- `ResourceLoader` 的 `activeCount` 计数错误修复（重试路径重复递减、无 analyzer 分支永不递减，均可能导致 `start()` 挂起）
-- `Resource.loadGroup()` 并发调用不再互相覆盖回调，改为通过持久化 Promise 链串行化
-- `ByteArray` 的 `bytesAvailable`/`validate()` 读边界从物理 buffer 容量改为逻辑写入位置，避免读出未初始化内存
-- `EventDispatcher.once()` 在跨 dispatcher 重入时可能多次触发的问题修复
-
-**文档整理**
-
-- 补充 JSDoc 覆盖 `WebGLRenderer` 的构建/执行管线关键方法
-- 删除过时的迁移类文档（`$` 前缀迁移、命名审计、旧版迁移状态、开发计划快照），均已完成或被本文档取代
-
----
-
-### 0.5.18
-
-**测试覆盖大幅扩展**
-
-- 测试文件从 18 个增至 37 个，测试用例从 310 个增至 532 个
-- 新增测试模块：Bitmap, BitmapData, BlendMode, CustomFilter, DebugLog, DisplayObject, DisplayObjectContainer, DisplayObjectIntegration, EventPropagation, Graphics, HTTPStatusEvent, InstructionSet, Logger, Mesh, NumberUtils, Shape, Sprite, SpriteSheet, Stage, Texture, TouchEvent, toColorString
-- 全部 532 个测试用例通过
-
-**WebGL 2 支持**
-
-- 新增 `ShaderLib2.ts`：GLSL ES 3.00 着色器库，使用 `in`/`out` 语法、`texture()` 函数、运行时 blur 权重数组
-- `WebGLRenderContext` 初始化时自动检测 WebGL2 支持，优先使用 WebGL2 上下文
-- 双着色器库通过实例属性动态绑定（`ctx.shaders`、`ctx.blurTierFn` 等）
-
-**渲染管线增强**
-
-- 新增 `ParticlePipe`：粒子系统 WebGL 渲染指令
-- `RenderObjectType` 枚举新增 `PARTICLE = 6`
-- `WebGLRenderer._buildLeaf` 支持 PARTICLE 类型路由
-- `WebGLRenderer._executeInstructions` 支持 particle 指令执行
-
-**显示系统增强**
-
-- `DisplayObject` 新增 `addStructureChangeListener` / `addRenderableDirtyListener` 注册模式，支持多 Player 实例
-- `DisplayObjectContainer` 新增 `addContainerStructureChangeListener` 注册模式
-- `RenderObjectType` 和 `RenderMode` 作为公开枚举导出
-- `Graphics` 导出 `setGraphicsHitTest` 函数
-- `Bitmap` 导出 `setBitmapPixelHitTest` 函数
-- `BitmapData` 导出 `CompressedTextureData` 类型
-
-**文本模块增强**
-
-- `TextMeasurer` 导出 `measureText` 和 `getFontString` 公共函数
-- `WordWrap` 导出 `tokenize` 和 `splitGraphemes` 公共函数
-- `TextField` 完善输入控制（`InputController`）、HTML 解析（`HtmlTextParser`）
-
-**工具模块扩展**
-
-- 新增 `Base64Util`：ArrayBuffer ↔ Base64 编解码
-- 新增 `NumberUtils`：数值工具函数
-- 新增 `toColorString`：颜色值转 CSS 字符串
-
-**WebGL 渲染后端优化**
-
-- `WebGLRenderContext` 新增 `blurFboPool`：BlurFilter FBO 对象池，按尺寸复用
-- `WebGLRenderContext` 新增 `contextLost` / `contextRestored` 事件处理及回调注册
-- `WebGLRenderBuffer` 对象池容量限制为 6 个
-- `MultiTextureBatcher` 多纹理合批，单次 draw call 最多 8 个纹理槽位
-- `WebGLVertexArrayObject` 维护单纹理（20B stride）和多纹理（24B stride）双缓冲区
-
-**Canvas 2D 渲染后端增强**
-
-- `CanvasRenderer` 支持全部 DisplayObject 类型渲染（含 TextField 完整样式）
-- Filter 降级路径完善（CSS filter + CPU pixel 操作）
-
-**代码质量**
-
-- 全量替换显式 `undefined` 赋值为 optional property 语法
-- `DisplayObjectContainer` 显式声明 `children` 字段，移除非空断言
-
----
-
-### 0.5.2
-
-**目录结构重组**
-
-- `player/` 下新增 `canvas/` 和 `webgl/` 子目录，将两种渲染后端物理隔离
-- `pipes/` 移入 `webgl/pipes/`，`InstructionSet`、`MultiTextureBatcher` 等移入 `webgl/`
-- `shaders/` 独立为子目录，新增 `ShaderLib2.ts` 扩展着色器
-
-**text 模块扩展**
-
-- 新增 `HtmlTextParser.ts`：HTML 文本解析
-- 新增 `InputController.ts`：输入控制器
-- 新增 `TextMeasurer.ts`：文本测量
-- 新增 `WordWrap.ts`：自动换行
-
----
-
-### 0.3.3
-
-**GL 状态管理修复**
-
-- `FilterPipe` / `MaskPipe`：修正 GL 状态管理，防止滤镜和遮罩 pass 之间 blend state 泄漏
-
-**代码风格**
-
-- 全量替换显式 `undefined` 赋值为 optional property 语法
-- `DisplayObjectContainer` 显式声明 `children` 字段，移除非空断言
-
----
-
-### 0.3.2
-
-**Resource 资源管理模块**
-
-- 新增 `resource/` 模块：`Resource`、`ResourceConfig`、`ResourceEvent`、`ResourceItem`、`ResourceLoader`、`analyzers/`
-- 支持完整的资源加载、缓存、生命周期管理
-
-**Capabilities 系统能力检测**
-
-- 新增 `system/Capabilities.ts`：运行时 WebGL 扩展和平台能力检测 API
-
-**命名空间迁移**
-
-- 内部命名空间从 `Heron` 全面迁移至 `Kurot`
-
-**TextPipe 集成**
-
-- TextPipe 正式集成到 player 渲染管线
-
----
-
-### 0.2.4
-
-**TextPipe 完成**
-
-- 实现 TextField WebGL 渲染（offscreen canvas 光栅化 → WebGLTexture 上传）
-- `WebGLRenderer` 注册 TextPipe，按 `renderObjectType` 路由
-- text 模块结构完善（enums/types/StageText）
-- InstructionSet 单元测试
-
----
-
-### 0.2.3
-
-- WebGL Context Lost 恢复完善
-- FilterPipe / MaskPipe blend mode 状态恢复 + 指令对象池
-- DisplayObject bounds 计算缓存
-- Video 帧渲染修复
-- Benchmark 模块（5 种压测场景）
-
----
-
-### 0.2.1
-
-- 初始架构文档版本
+| 模块系统  | CommonJS                                  | ESM                       |
