@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { Event } from '@kurot/core';
-import { Group } from '../src/blakron/components/Group.js';
-import { Button } from '../src/blakron/components/Button.js';
-import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
+import { Group } from '../src/kurot/components/Group.js';
+import { Button } from '../src/kurot/components/Button.js';
+import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
 /**
  * Regression guard for the EventMap override added to Component and Group.

@@ -5,7 +5,7 @@
  * Focuses on the Egret-parity fix for measure(): the text field's width must
  * not be left mutated after measuring. Egret saves the text field's width,
  * temporarily constrains it to measure wrapped dimensions, then restores it.
- * Before the fix, Blakron left the text field's $explicitWidth at the
+ * Before the fix, Kurot left the text field's $explicitWidth at the
  * measurement value (100000 when the label had no explicit width).
  *
  * Note: real text measurement (Canvas measureText) is not available in the

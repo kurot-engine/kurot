@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { EventDispatcher } from '@kurot/core';
-import { Watcher } from '../src/blakron/binding/Watcher.js';
-import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
+import { Watcher } from '../src/kurot/binding/Watcher.js';
+import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
 /**
  * Minimal bindable host. Watcher reads/writes properties directly off the

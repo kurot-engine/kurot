@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ArrayCollection } from '../src/blakron/collections/ArrayCollection.js';
-import { CollectionEventKind } from '../src/blakron/events/CollectionEvent.js';
-import { CollectionEvent } from '../src/blakron/events/CollectionEvent.js';
+import { ArrayCollection } from '../src/kurot/collections/ArrayCollection.js';
+import { CollectionEventKind } from '../src/kurot/events/CollectionEvent.js';
+import { CollectionEvent } from '../src/kurot/events/CollectionEvent.js';
 
 describe('ArrayCollection', () => {
 	describe('basic access', () => {

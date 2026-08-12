@@ -262,12 +262,14 @@ class DepthQueue {
 				if (max === target.$nestLevel) {
 					if (bin.has(target)) {
 						bin.remove(target);
+						this._trimBounds();
 						return target;
 					}
 				} else {
 					const found = bin.findDescendant(target);
 					if (found) {
 						bin.remove(found);
+						this._trimBounds();
 						return found;
 					}
 				}
@@ -286,12 +288,14 @@ class DepthQueue {
 				if (min === target.$nestLevel) {
 					if (bin.has(target)) {
 						bin.remove(target);
+						this._trimBounds();
 						return target;
 					}
 				} else {
 					const found = bin.findDescendant(target);
 					if (found) {
 						bin.remove(found);
+						this._trimBounds();
 						return found;
 					}
 				}
@@ -303,6 +307,15 @@ class DepthQueue {
 
 	public isEmpty(): boolean {
 		return this._min > this._max;
+	}
+
+	private _trimBounds(): void {
+		while (this._min <= this._max && !this._bins.get(this._min)?.length) {
+			this._min++;
+		}
+		while (this._max >= this._min && !this._bins.get(this._max)?.length) {
+			this._max--;
+		}
 	}
 }
 

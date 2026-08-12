@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Validator } from '../src/blakron/core/Validator.js';
+import { Validator } from '../src/kurot/core/Validator.js';
 
 describe('Validator error recovery', () => {
 	afterEach(() => {

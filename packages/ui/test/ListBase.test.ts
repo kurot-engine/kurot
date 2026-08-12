@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { Event } from '@kurot/core';
-import { List } from '../src/blakron/components/List.js';
-import { ArrayCollection } from '../src/blakron/collections/ArrayCollection.js';
-import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
+import { List } from '../src/kurot/components/List.js';
+import { ArrayCollection } from '../src/kurot/collections/ArrayCollection.js';
+import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
 /**
  * Test-only subclass that exposes the protected setSelectedIndex so we can

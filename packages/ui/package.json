@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/ui",
 	"version": "1.1.7",
-	"description": "EUI-compatible UI component framework for the Blakron game engine — skin-based components, layouts, data binding, view states",
+	"description": "EUI-compatible UI component framework for the Kurot game engine — skin-based components, layouts, data binding, view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -29,17 +29,17 @@
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^1.0.8"
+		"@kurot/core": "^1.0.12"
 	},
 	"devDependencies": {
-		"@kurot/core": "^1.0.9",
+		"@kurot/core": "^1.0.12",
 		"@types/node": "^22.0.0",
 		"happy-dom": "^20.8.9",
 		"typescript": "^5.6.0",
 		"vitest": "^4.1.4"
 	},
 	"keywords": [
-		"blakron",
+		"kurot",
 		"ui",
 		"eui",
 		"skin",
@@ -48,7 +48,8 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/irwinmc/blakron-ui.git"
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/ui"
 	},
 	"packageManager": "pnpm@10.33.0"
 }

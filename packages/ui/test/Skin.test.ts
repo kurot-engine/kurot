@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Skin } from '../src/blakron/components/Skin.js';
-import { State } from '../src/blakron/states/State.js';
-import type { IOverride } from '../src/blakron/states/IOverride.js';
-import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
+import { Skin } from '../src/kurot/components/Skin.js';
+import { State } from '../src/kurot/states/State.js';
+import type { IOverride } from '../src/kurot/states/IOverride.js';
+import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
 /** Records apply/remove calls so we can assert state-transition behaviour. */
 class RecordingOverride implements IOverride {

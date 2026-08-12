@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { EventDispatcher } from '@kurot/core';
-import { Binding } from '../src/blakron/binding/Binding.js';
-import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
+import { Binding } from '../src/kurot/binding/Binding.js';
+import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
 /** Minimal bindable host — same shape as in Watcher.test.ts. */
 class BindableHost extends EventDispatcher {

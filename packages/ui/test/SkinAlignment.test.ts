@@ -11,6 +11,7 @@
  * If codegen behavior changes, these tests will fail first.
  */
 import { describe, it, expect } from 'vitest';
+import { Stage } from '@kurot/core';
 import {
 	Skin,
 	SetProperty,
@@ -97,6 +98,7 @@ describe('skin alignment (my-game / cli template)', () => {
 		const skin = makeToggleSwitchSkin();
 		// Use the internal skin-attach path (equivalent to the protected setSkin).
 		(ts as unknown as { _setSkin: (s: Skin) => void })._setSkin(skin);
+		new Stage().addChild(ts);
 
 		const knob = skin.getPart('knob') as Rect;
 		expect(knob).toBeInstanceOf(Rect);

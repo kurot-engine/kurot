@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { TouchEvent, Event, Stage } from '@kurot/core';
-import { ComboBox } from '../src/blakron/components/ComboBox.js';
-import { Group } from '../src/blakron/components/Group.js';
-import { Scroller } from '../src/blakron/components/Scroller.js';
-import { ArrayCollection } from '../src/blakron/collections/ArrayCollection.js';
-import { VerticalLayout } from '../src/blakron/layouts/VerticalLayout.js';
+import { ComboBox } from '../src/kurot/components/ComboBox.js';
+import { Group } from '../src/kurot/components/Group.js';
+import { Scroller } from '../src/kurot/components/Scroller.js';
+import { ArrayCollection } from '../src/kurot/collections/ArrayCollection.js';
+import { VerticalLayout } from '../src/kurot/layouts/VerticalLayout.js';
 
 function makeComboBox(items: unknown[] = []): ComboBox {
 	const cb = new ComboBox();

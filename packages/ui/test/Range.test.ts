@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Range } from '../src/blakron/components/Range.js';
+import { Range } from '../src/kurot/components/Range.js';
 
 /**
  * Test-only subclass exposing the protected nearestValidValue and setValue

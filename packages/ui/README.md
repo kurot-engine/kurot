@@ -1,8 +1,8 @@
 # @kurot/ui
 
-UI component framework for [@kurot/core](https://github.com/irwinmc/blakron-core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
+UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Stable (1.0.0).** Requires `@kurot/core@^1.0.3`. Targets ES2022 + evergreen browsers, same as core.
+> **Stable (1.1.7).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -12,7 +12,7 @@ For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md)
 pnpm add @kurot/ui @kurot/core
 ```
 
-`@kurot/ui` declares `@kurot/core` as a regular dependency, so it is installed automatically; listing it explicitly is recommended so you control the resolved core version.
+`@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
 ## Quick Start
 

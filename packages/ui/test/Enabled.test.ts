@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { Component } from '../src/blakron/components/Component.js';
-import { Button } from '../src/blakron/components/Button.js';
-import { Label } from '../src/blakron/components/Label.js';
-import { TextInput } from '../src/blakron/components/TextInput.js';
-import { Scroller } from '../src/blakron/components/Scroller.js';
-import { ItemRenderer } from '../src/blakron/components/ItemRenderer.js';
+import { Component } from '../src/kurot/components/Component.js';
+import { Button } from '../src/kurot/components/Button.js';
+import { Label } from '../src/kurot/components/Label.js';
+import { TextInput } from '../src/kurot/components/TextInput.js';
+import { Scroller } from '../src/kurot/components/Scroller.js';
+import { ItemRenderer } from '../src/kurot/components/ItemRenderer.js';
 
 /**
  * Verify egret-parity semantics of the `enabled` / `touchEnabled` cycle:

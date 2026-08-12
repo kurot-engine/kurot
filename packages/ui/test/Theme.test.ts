@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { IOErrorEvent } from '@kurot/core';
-import { Component } from '../src/blakron/components/Component.js';
-import { Theme } from '../src/blakron/core/Theme.js';
-import type { IThemeAdapter } from '../src/blakron/core/IThemeAdapter.js';
+import { Component } from '../src/kurot/components/Component.js';
+import { Theme } from '../src/kurot/core/Theme.js';
+import type { IThemeAdapter } from '../src/kurot/core/IThemeAdapter.js';
 
 describe('Theme failure lifecycle', () => {
 	it('dispatches IO_ERROR and releases delayed components after a load failure', () => {
