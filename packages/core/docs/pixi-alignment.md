@@ -32,11 +32,13 @@ Kurot 的渲染管线（InstructionSet + RenderPipe + 多纹理合批）已经�
 
 ### 1. 动态纹理槽位
 
-**现状**：`MultiTextureBatcher.MAX_TEXTURES` 硬编码为 8，注释写明"WebGL1 最小保证值"。WebGL2 设备实际支持 16+，浪费了一半合批能力。
+**现状**：`MultiTextureBatcher.MAX_TEXTURES` 硬编码为 8（`MultiTextureBatcher.ts`），注释写明"WebGL1 最小保证值"。`getOrAssignSlot()` 与 `isFull()` 都以这个常量为上限，因此实际合批槽位永远是 8。
+
+关键事实：`WebGLRenderContext` 构造函数里**已经**查询了 `gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)`，但随即被 `Math.min(..., MultiTextureBatcher.MAX_TEXTURES)` 截到 8，存入 `_maxTextureUnits`；而该字段唯一用途是在 `drawTexture()` 里当 `> 1` 的布尔门，并不参与槽位上限决策。也就是说：GPU 真实能力已查出却没被用上——WebGL2 设备（规范保证 ≥16）被强制限制在 8，浪费了一半合批能力。
 
 **PixiJS 做法**：`getMaxTexturesPerBatch()` 从 GPU 查询 `MAX_TEXTURE_IMAGE_UNITS`，动态决定批处理槽位数。
 
-**方案**：
+**方案**：GPU 查询已在 `WebGLRenderContext` 就位，无需重复。只需把"已查到却被截断"的值注入 `MultiTextureBatcher`，让槽位上限由它驱动：
 
 ```ts
 // MultiTextureBatcher.ts
@@ -46,12 +48,9 @@ export class MultiTextureBatcher {
 
 	private readonly _maxTextures: number;
 
-	public constructor(gl: GL) {
-		this._maxTextures = Math.min(
-			gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) as number,
-			16, // 安全上限，避免 shader 过大
-		);
-		this.slots = new Array(this._maxTextures);
+	public constructor(maxTextures: number) {
+		this._maxTextures = maxTextures;
+		this.slots = new Array(maxTextures);
 	}
 
 	public get maxTextures(): number {
@@ -60,13 +59,26 @@ export class MultiTextureBatcher {
 }
 ```
 
+`WebGLRenderContext` 里把 `_maxTextureUnits` 的上限从 8 提到 16，再把该值注入 batcher：
+
+```ts
+// WebGLRenderContext.ts 构造函数
+this._maxTextureUnits = Math.min(
+	gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) as number,
+	16, // 安全上限，避免 shader 过大
+);
+// 注意：_batcher 当前是字段初始化器（this._batcher = new MultiTextureBatcher()），
+// 先于构造函数体执行，那时 gl 还不存在。必须把 batcher 的创建挪进构造函数体，
+// 在 _maxTextureUnits 算出之后，再 new MultiTextureBatcher(this._maxTextureUnits)。
+```
+
 **联动**：
 
-- `ShaderLib.makeMultiTextureFrag(maxTextures)` 接受参数，不再硬编码 `uniform sampler2D uSamplers[8]`
-- `WebGLVertexArrayObject` 的 `isMultiTexture()` 检查需适配动态 slot 数
-- `_drawMultiTextureBatch` 的 shader 缓存 key 改为 `batch_multi_{N}`
+- `ShaderLib`/`ShaderLib2` 的 `multi_frag`（`ShaderLib.ts`、`ShaderLib2.ts`）的 `uniform sampler2D uSamplers[8]` 与 8 路 if/else 需参数化为 N。**注意 GLSL 约束**：GLSL ES 1.00 要求 sampler 数组下标必须是常量，因此动态生成的必须是常量下标的 if/else 链（不能直接 `uSamplers[id]`）；当前 `multi_frag` 正是这样写的，生成时须保留该模式。
+- `WebGLRenderContext._drawMultiTextureBatch()` 的 shader 缓存 key 当前是固定字符串 `'multi'`，需按 N 区分。沿用现有命名约定（`multi`/`texture`/`glow`，无前缀），建议 `multi_{N}`，而非 `batch_multi_{N}`。
+- ~~`WebGLVertexArrayObject.isMultiTexture()` 需适配动态 slot 数~~ — **无需改动**：`isMultiTexture()` 只返回布尔标志，与 slot 数无关；顶点布局固定 6 float（x, y, u, v, color, textureId），textureId 用一个 float 即可承载 0–15，8 槽与 16 槽布局完全相同。
 
-**收益**：WebGL2 设备合批能力翻倍（8→16），复杂场景 draw call 减半。
+**收益**：WebGL2 设备合批能力翻倍（8→16）。"draw call 减半"是上限而非典型值——仅当某绘制区间内唯一纹理数落在 9–16 时成立（≤8 已是一批次，无差异；>16 只是减少而非减半）。
 
 **风险**：shader 变体数量从 1 个增加到 2 个（8 纹理 + 16 纹理）。如需支持更多 tier，使用编译期常量避免运行时分支。
 
@@ -76,7 +88,9 @@ export class MultiTextureBatcher {
 
 ### 2. Shader Bits 组装
 
-**现状**：`ShaderLib.ts`（277 行）+ `ShaderLib2.ts`（294 行）两套手写 GLSL，合计约 570 行。每加一个 shader 变体都要复制粘贴修改。
+**现状**：`ShaderLib.ts`（277 行）+ `ShaderLib2.ts`（294 行）两套手写 GLSL，合计约 570 行。两文件是镜像关系：同一批 shader（default_vert / fullscreen_vert / multi_vert / multi_frag / texture_frag / primitive_frag / blur_frag / blur_h_frag / blur_v_frag / glow_frag / colorTransform_frag）各写一份，差别仅在 GLSL 版本关键字（`attribute`/`varying`/`texture2D`/`gl_FragColor` vs `in`/`out`/`texture`/`fragColor`/`#version 300 es`）。每加一个 shader 概念都要在这两份文件各实现一次。
+
+（注：blur 的 tier 变体目前已是程序化生成——`makeBlurHFrag(tier)`/`makeBlurVFrag(tier)` 及其 WebGL2 版 `…2`——而非复制粘贴；但这两个生成器本身也被复制成两份，重复问题依然存在。代码库已有 shader 生成先例，对本方案的可行性是正向信号。）
 
 **PixiJS 做法**：`compileHighShaderGlProgram({ name, bits: [colorBit, textureBit, roundPixelsBit] })`，每个 "bit" 是一个独立的 GLSL 片段，组合时拼接。
 
@@ -364,7 +378,7 @@ benchmark 场景实测"完全静态帧"在真实项目里的占比，再决定�
 
 ## TODO
 
-- [ ] **P1-1 动态纹理槽位**（1d）— `MultiTextureBatcher.MAX_TEXTURES` 改为从 GPU 查询，WebGL2 设备 8→16
+- [ ] **P1-1 动态纹理槽位**（1d）— 把 `WebGLRenderContext` 已查到却被截到 8 的 `_maxTextureUnits` 提到 16 并注入 `MultiTextureBatcher`；`multi_frag` 按 N 生成 + 缓存 key 按 N 区分。WebGL2 设备 8→16
 - [ ] **P1-2 Shader Bits 组装**（2d）— ShaderLib/ShaderLib2 改为 bit 组合拼接，消除双份手写 GLSL
 - [ ] **P2-3 Pipe 注册系统**（1d）— `RenderPipeRegistry`，为需要独立渲染路径（无法靠继承 Mesh/Bitmap 表达）的未来扩展预留接入点
 - [ ] **P2-4 压缩纹理 KTX2**（5d）— 数据结构（`CompressedTextureData`）已就位，缺 KTX2 解析器 + `WebGLRenderContext` 的 `compressedTexImage2D` 上传分支，移动端纹理内存 -80%
