@@ -169,7 +169,11 @@ Mesh`，直接写 `vertices`/`uvs`/`indices` 等公开字段）。这条路子�
 的对象（比如需要独立 shader/独立合批策略的类型），就只能改 `WebGLRenderer`
 本身，没有干净的扩展点。
 
-**PixiJS 做法**：`ExtensionType.RenderPipe` + `extensions.add(BitmapPipe)`，渲染器启动时自动发现所有 pipe。
+**PixiJS 做法**：`extensions.add(MeshPipe)` 之类的调用把 pipe 注册进对应
+后端的扩展点（`ExtensionType.WebGLPipes` / `WebGPUPipes` / `CanvasPipes`，
+每个渲染后端各有一个独立的枚举值，不是单一的通用 `RenderPipe` 类型），各
+`Renderer` 启动时通过 `extensions.handleByNamedList(ExtensionType.WebGLPipes,
+renderPipes)` 自动收集当前后端声明过的所有 pipe。
 
 **方案**：
 
@@ -238,7 +242,11 @@ function getDefaultRegistry(): RenderPipeRegistry {
 说压缩纹理数据目前存得下但传不上 GPU，实际渲染仍然是标准 RGBA8 路径。
 移动端纹理内存占用仍然是 RGBA8 的量级（4MB/1024²）。
 
-**PixiJS 做法**：`CompressedTextureResource` + `KTXParser` / `BasisParser`，加载时解析压缩纹理容器，直接上传到 GPU 不解码。
+**PixiJS 做法**：独立的 `compressed-textures/ktx2`、`compressed-textures/basis`
+模块解析对应容器格式，生成的 `CompressedSource` 交给按后端区分的 uploader
+（`glUploadCompressedTextureResource`/`gpuUploadCompressedTextureResource`），
+uploader 内部按 mip level 遍历调用 `gl.compressedTexImage2D`，不解码到
+RGBA8，直接把压缩数据传给 GPU。
 
 **方案**（分阶段）：
 
