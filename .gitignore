@@ -30,6 +30,9 @@ pnpm-debug.log*
 .claude/
 *.swp
 
-# Local reference and documentation material
+# Local reference material (read-only, not distributed)
 /reference/
-docs/
+
+# Internal-only documentation (design drafts, reviews, audits) — not
+# distributed via git. Public docs live in each package's docs/ folder.
+internal/

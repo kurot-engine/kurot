@@ -109,13 +109,23 @@ Custom EXML namespaces are explicitly mapped to module entry points via `exml.na
 
 ```text
 Kurot/
+├── AGENTS.md       Context index for AI agents / contributors — read this first
 ├── packages/       Independently published engine packages and CLI
 ├── examples/       Demo and generated project examples
+├── docs/           Contribution rules — committed
 ├── .gitignore      Shared version-control ignore rules
 └── README.md
 ```
 
-Build outputs and local editor configuration are excluded by the root `.gitignore` and are not part of this Git repository. If you obtained the repository from another source, defer to the actual checked-out contents.
+Each package (and the repo root) additionally has a `docs/` and an
+`internal/` folder: `docs/` is committed and distributed with the package —
+architecture notes, migration guides, and an `ai-context.md` map for anyone
+(human or AI) getting oriented in that package. `internal/` holds design
+drafts, code reviews, and audits that record _why_ a decision was made; it's
+excluded by `.gitignore` and stays local. Build outputs and local editor
+configuration are excluded the same way. If you obtained the repository from
+another source, defer to the actual checked-out contents rather than
+assuming `internal/` is present.
 
 ## Contribution guidelines
 
