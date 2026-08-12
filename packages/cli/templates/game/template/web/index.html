@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>Blakron Game</title>
+	<title>Kurot Game</title>
 	<style>
 		html, body {
 			margin: 0;
@@ -82,7 +82,7 @@
 			}
 		}
 	</style>
-	{{BLAKRON_IMPORT_MAP}}
+	{{KUROT_IMPORT_MAP}}
 </head>
 <body>
 	<div id="webLoading" class="web-loading" role="status" aria-label="Loading">
@@ -91,13 +91,13 @@
 		<div class="web-loading__text">LOADING</div>
 	</div>
 	<canvas id="gameCanvas"
-		data-content-width="{{BLAKRON_STAGE_WIDTH}}"
-		data-content-height="{{BLAKRON_STAGE_HEIGHT}}"
-		data-scale-mode="{{BLAKRON_SCALE_MODE}}"
-		data-orientation="{{BLAKRON_ORIENTATION}}"
-		data-frame-rate="{{BLAKRON_FRAME_RATE}}"></canvas>
+		data-content-width="{{KUROT_STAGE_WIDTH}}"
+		data-content-height="{{KUROT_STAGE_HEIGHT}}"
+		data-scale-mode="{{KUROT_SCALE_MODE}}"
+		data-orientation="{{KUROT_ORIENTATION}}"
+		data-frame-rate="{{KUROT_FRAME_RATE}}"></canvas>
 	<script type="module">
-		import './{{BLAKRON_ENTRY_SCRIPT}}';
+		import './{{KUROT_ENTRY_SCRIPT}}';
 
 		const loading = document.getElementById('webLoading');
 		requestAnimationFrame(() => {

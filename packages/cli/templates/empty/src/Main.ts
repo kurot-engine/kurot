@@ -1,5 +1,5 @@
 /**
- * Blakron 空白项目模板
+ * Kurot 空白项目模板
  *
  * 最小化入口，只依赖 @kurot/core，不含 UI 组件。
  * 适用于纯 Canvas 渲染、自定义绘制、动画实验等场景。
@@ -16,7 +16,7 @@ class Main extends Sprite {
 
 	private onAddedToStage(_event: Event): void {
 		// 在这里编写你的游戏逻辑
-		console.log('Blakron game started');
+		console.log('Kurot game started');
 	}
 }
 

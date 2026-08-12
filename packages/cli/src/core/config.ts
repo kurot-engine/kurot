@@ -117,7 +117,7 @@ const VALID_SCALE_MODES = [
 ] as const;
 
 /**
- * Loads and validates `blakron.config.ts` (or `.js`) from the current working
+ * Loads and validates `kurot.config.ts` (or `.js`) from the current working
  * directory, merging it over `DEFAULTS`. Falls back to `DEFAULTS` entirely
  * when no config file is present.
  *
@@ -125,13 +125,13 @@ const VALID_SCALE_MODES = [
  * @throws {ConfigError} If `stage.frameRate`, `stage.scaleMode`, or `entry` is invalid
  */
 export async function loadConfig(): Promise<ProjectConfig> {
-	const configPath = path.resolve('blakron.config.ts');
-	const jsConfigPath = path.resolve('blakron.config.js');
+	const configPath = path.resolve('kurot.config.ts');
+	const jsConfigPath = path.resolve('kurot.config.js');
 
 	let config: ProjectConfig;
 
 	if ((await exists(configPath)) || (await exists(jsConfigPath))) {
-		// Dynamic import of `blakron.config.ts` relies on Node's built-in
+		// Dynamic import of `kurot.config.ts` relies on Node's built-in
 		// TypeScript type-stripping support (no `tsx`/`ts-node` involved).
 		const mod = await import((await exists(configPath)) ? configPath : jsConfigPath);
 		const userConfig: ProjectConfig = mod.default ?? mod;

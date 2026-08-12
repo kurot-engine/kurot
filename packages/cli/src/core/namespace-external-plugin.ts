@@ -49,7 +49,7 @@ export function normalizeModuleKey(absolutePath: string): string {
  */
 export function namespaceModuleExternalPlugin(namespaceModules: ReadonlyMap<string, string>): esbuild.Plugin {
 	return {
-		name: 'blakron-namespace-external',
+		name: 'kurot-namespace-external',
 		setup(build): void {
 			if (namespaceModules.size === 0) return;
 

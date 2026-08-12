@@ -37,8 +37,8 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 		const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8')) as PackageJson;
 		pkg.name = path.basename(destDir);
 		const cliVersion = await readCliVersion();
-		await pinBlakronDeps(pkg.dependencies, cliVersion);
-		await pinBlakronDeps(pkg.devDependencies, cliVersion);
+		await pinKurotDeps(pkg.dependencies, cliVersion);
+		await pinKurotDeps(pkg.devDependencies, cliVersion);
 		await writeFile(pkgPath, JSON.stringify(pkg, null, '\t') + '\n');
 	}
 }
@@ -54,7 +54,7 @@ interface PackageJson {
  * Rewrites `@kurot/*` ranges: the CLI to its own version, and each engine
  * package to the concrete latest version (`^x.y.z`) resolved from the registry.
  */
-async function pinBlakronDeps(deps: Record<string, string> | undefined, cliVersion: string): Promise<void> {
+async function pinKurotDeps(deps: Record<string, string> | undefined, cliVersion: string): Promise<void> {
 	if (!deps) return;
 	await Promise.all(
 		Object.keys(deps).map(async dep => {

@@ -13,7 +13,7 @@ export class BuildError extends Error {
 }
 
 /**
- * `blakron.config.ts` failed validation (e.g. a missing entry file or an
+ * `kurot.config.ts` failed validation (e.g. a missing entry file or an
  * invalid `stage.scaleMode`).
  */
 export class ConfigError extends Error {

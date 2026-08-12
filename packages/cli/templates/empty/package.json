@@ -3,10 +3,10 @@
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"build": "blakron build",
-		"release": "blakron build --release",
-		"dev": "blakron dev",
-		"clean": "blakron clean"
+		"build": "kurot build",
+		"release": "kurot build --release",
+		"dev": "kurot dev",
+		"clean": "kurot clean"
 	},
 	"dependencies": {
 		"@kurot/core": "latest"

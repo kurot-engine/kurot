@@ -5,7 +5,7 @@ const red = '\x1b[31m';
 const cyan = '\x1b[36m';
 const dim = '\x1b[2m';
 
-const tag = `${cyan}[blakron]${reset}`;
+const tag = `${cyan}[kurot]${reset}`;
 
 export const logger = {
 	info: (msg: string): void => console.log(`${tag} ${msg}`),

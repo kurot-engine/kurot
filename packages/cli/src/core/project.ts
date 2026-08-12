@@ -28,9 +28,9 @@ export interface CustomNamespace {
 }
 
 /**
- * Resolved view of a Blakron project.
+ * Resolved view of a Kurot project.
  *
- * Loads `blakron.config.ts`, then resolves every project path to an absolute
+ * Loads `kurot.config.ts`, then resolves every project path to an absolute
  * location so plugins never have to touch `process.cwd()` or `path.resolve`
  * themselves. This is the single source of truth for the build pipeline.
  */

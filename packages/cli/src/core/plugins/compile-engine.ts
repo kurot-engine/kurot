@@ -11,7 +11,7 @@ import type { Project } from '../project.js';
  * externalizing the other engine packages so code is never duplicated.
  *
  * The resulting chunks are wired into the page via an import map (see
- * `generate-html`), e.g. `@kurot/core` → `js/blakron.core.js`. This mirrors
+ * `generate-html`), e.g. `@kurot/core` → `js/kurot.core.js`. This mirrors
  * Egret's split `egret.min.js` / `eui.min.js` layout while staying ESM, so the
  * browser-side dependency graph resolves bare specifiers to cached chunks.
  *
@@ -31,7 +31,7 @@ export function compileEngine(): BuildPlugin {
 			// Stub entry files (`export * from '<pkg>'`) keep package resolution
 			// and output naming under our control. They live inside the project's
 			// node_modules so esbuild resolves engine packages correctly.
-			const stubDir = await fs.mkdtemp(path.join(project.root, 'node_modules', '.blakron-engine-'));
+			const stubDir = await fs.mkdtemp(path.join(project.root, 'node_modules', '.kurot-engine-'));
 			try {
 				for (const pkg of project.enginePackages) {
 					const chunk = await bundlePackage(project, pkg, stubDir, jsDir, project.mode === 'release');
@@ -81,7 +81,7 @@ async function bundlePackage(
 }
 
 /**
- * `@kurot/core` → `blakron.core`.
+ * `@kurot/core` → `kurot.core`.
  */
 export function chunkBaseName(pkg: string): string {
 	return pkg.replace(/^@/, '').replace(/\//g, '.');

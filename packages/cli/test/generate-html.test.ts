@@ -13,7 +13,7 @@ describe('HTML generation', () => {
 		const template = await fs.readFile(templatePath, 'utf-8');
 		const project = createProject(templatePath);
 		const html = renderHtml(template, project, 'Main.js', {
-			'@kurot/core': 'js/blakron.core.js',
+			'@kurot/core': 'js/kurot.core.js',
 		});
 
 		expect(html).toContain('background: #000000');
@@ -22,9 +22,9 @@ describe('HTML generation', () => {
 		expect(html).toContain('data-scale-mode="showAll"');
 		expect(html).toContain('data-orientation="landscape"');
 		expect(html).toContain('data-frame-rate="60"');
-		expect(html).toContain('"@kurot/core": "./js/blakron.core.js"');
+		expect(html).toContain('"@kurot/core": "./js/kurot.core.js"');
 		expect(html).toContain("import './Main.js';");
-		expect(html).not.toContain('{{BLAKRON_');
+		expect(html).not.toContain('{{KUROT_');
 	});
 
 	it('rejects a project template with missing placeholders', () => {

@@ -8,7 +8,7 @@ import type { CustomNamespace, Project } from '../project.js';
 
 /**
  * Bundles each project-defined EXML namespace (`exml.namespaces` in
- * `blakron.config.ts`, matching Egret's `xmlns:game="game.*"` convention)
+ * `kurot.config.ts`, matching Egret's `xmlns:game="game.*"` convention)
  * into its own chunk under `js/`.
  *
  * A namespace barrel (e.g. `src/ui/index.ts` re-exporting `HeroNarrowIR`,
@@ -20,7 +20,7 @@ import type { CustomNamespace, Project } from '../project.js';
  * instance — never two copies with mismatched `instanceof` identity.
  *
  * In watch mode each barrel is rebuilt on change; the browser still needs a
- * manual refresh to pick up the new chunk, matching the rest of `blakron dev`.
+ * manual refresh to pick up the new chunk, matching the rest of `kurot dev`.
  */
 export function compileCustomNamespaces(): BuildPlugin {
 	return {

@@ -138,7 +138,7 @@ const COMPONENTS: Record<string, ComponentInfo> = {
  * `egret` prefixes below).
  *
  * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `blakron.config.ts`
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
  * @returns Component info or null if not found
  */
 export function lookupComponent(
@@ -159,7 +159,7 @@ export function lookupComponent(
  * Get the default property for a component.
  *
  * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `blakron.config.ts`
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
  * @returns The default property name, or `undefined` if the component is unknown
  */
 export function getDefaultProperty(
@@ -174,7 +174,7 @@ export function getDefaultProperty(
  * Resolve a tag name to its import module path.
  *
  * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `blakron.config.ts`
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
  * @returns The module path, or `null` if the tag could not be resolved
  */
 export function resolveModule(tagName: string, customNamespaces: readonly NamespaceModule[] = []): string | null {

@@ -6,7 +6,7 @@ import type { BuildContext, BuildPlugin } from '../pipeline.js';
  * Writes Egret-style `manifest.json` for release builds:
  *
  * ```json
- * { "initial": ["js/blakron.core.min_<hash>.js", ...], "game": ["js/main.min_<hash>.js"] }
+ * { "initial": ["js/kurot.core.min_<hash>.js", ...], "game": ["js/main.min_<hash>.js"] }
  * ```
  *
  * `initial` lists the engine chunks (loaded first), `game` the app entry. Skins

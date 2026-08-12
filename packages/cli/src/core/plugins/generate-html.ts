@@ -6,13 +6,13 @@ import type { Project } from '../project.js';
 import { BuildError } from '../errors.js';
 
 const PLACEHOLDERS = {
-	importMap: '{{BLAKRON_IMPORT_MAP}}',
-	stageWidth: '{{BLAKRON_STAGE_WIDTH}}',
-	stageHeight: '{{BLAKRON_STAGE_HEIGHT}}',
-	scaleMode: '{{BLAKRON_SCALE_MODE}}',
-	orientation: '{{BLAKRON_ORIENTATION}}',
-	frameRate: '{{BLAKRON_FRAME_RATE}}',
-	entryScript: '{{BLAKRON_ENTRY_SCRIPT}}',
+	importMap: '{{KUROT_IMPORT_MAP}}',
+	stageWidth: '{{KUROT_STAGE_WIDTH}}',
+	stageHeight: '{{KUROT_STAGE_HEIGHT}}',
+	scaleMode: '{{KUROT_SCALE_MODE}}',
+	orientation: '{{KUROT_ORIENTATION}}',
+	frameRate: '{{KUROT_FRAME_RATE}}',
+	entryScript: '{{KUROT_ENTRY_SCRIPT}}',
 } as const;
 
 const DEFAULT_TEMPLATE = `<!DOCTYPE html>
@@ -20,7 +20,7 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>Blakron Game</title>
+	<title>Kurot Game</title>
 	<style>
 		html, body {
 			margin: 0;
@@ -41,16 +41,16 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
 			display: block;
 		}
 	</style>
-	{{BLAKRON_IMPORT_MAP}}
+	{{KUROT_IMPORT_MAP}}
 </head>
 <body>
 	<canvas id="gameCanvas"
-		data-content-width="{{BLAKRON_STAGE_WIDTH}}"
-		data-content-height="{{BLAKRON_STAGE_HEIGHT}}"
-		data-scale-mode="{{BLAKRON_SCALE_MODE}}"
-		data-orientation="{{BLAKRON_ORIENTATION}}"
-		data-frame-rate="{{BLAKRON_FRAME_RATE}}"></canvas>
-	<script type="module" src="{{BLAKRON_ENTRY_SCRIPT}}"></script>
+		data-content-width="{{KUROT_STAGE_WIDTH}}"
+		data-content-height="{{KUROT_STAGE_HEIGHT}}"
+		data-scale-mode="{{KUROT_SCALE_MODE}}"
+		data-orientation="{{KUROT_ORIENTATION}}"
+		data-frame-rate="{{KUROT_FRAME_RATE}}"></canvas>
+	<script type="module" src="{{KUROT_ENTRY_SCRIPT}}"></script>
 </body>
 </html>
 `;
@@ -59,7 +59,7 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
  * Writes `index.html`.
  *
  * Engine packages are wired up through an ES module import map
- * (`@kurot/core` → `./js/blakron.core.js`), so the bundled app and engine
+ * (`@kurot/core` → `./js/kurot.core.js`), so the bundled app and engine
  * chunks resolve bare specifiers in the browser. The entry script bootstraps
  * the engine via the user's own `createPlayer()` call.
  */
@@ -108,7 +108,7 @@ async function loadTemplate(project: Project): Promise<string> {
 }
 
 /**
- * Replaces every required Blakron placeholder in the page template.
+ * Replaces every required Kurot placeholder in the page template.
  */
 export function renderHtml(
 	template: string,

@@ -15,7 +15,7 @@ const pkg = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8')
 
 const program = new Command();
 
-program.name('blakron').description('Blakron - Egret Next CLI').version(pkg.version);
+program.name('kurot').description('Kurot - Egret Next CLI').version(pkg.version);
 
 program.addCommand(buildCommand);
 program.addCommand(devCommand);

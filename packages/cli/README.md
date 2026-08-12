@@ -1,6 +1,6 @@
 # @kurot/cli
 
-CLI tool for the Blakron game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
+CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
 > Migrating from Egret? See [migration.md](docs/migration.md)
 >
@@ -39,12 +39,12 @@ pnpm add -D @kurot/cli
 
 ## Commands
 
-### `blakron create`
+### `kurot create`
 
 Scaffold a new project from a template.
 
 ```bash
-blakron create <name> [options]
+kurot create <name> [options]
 ```
 
 | Option                  | Description                 | Default |
@@ -65,12 +65,12 @@ blakron create <name> [options]
 | `game`   | `Main extends UILayer` | `createChildren` → `runGame` → `loadResource` → `loadTheme` → `createGameScene` → `startAnimation` |
 | `empty`  | `Main extends Sprite`  | constructor → `ADDED_TO_STAGE` → `onAddToStage`                                           |
 
-### `blakron build`
+### `kurot build`
 
 Compile the project into ESM application, engine, namespace, and theme bundles.
 
 ```bash
-blakron build [options]
+kurot build [options]
 ```
 
 | Option          | Description                                            | Default |
@@ -85,21 +85,21 @@ blakron build [options]
 | Mode           | Layout                                                                                                    |
 | -------------- | --------------------------------------------------------------------------------------------------------- |
 | development    | `bin-debug/` — per-file `.js` mirroring `src/` (`Main.js`, `com/.../X.js`) + engine chunks in `js/`       |
-| release (`-r`) | `bin-release/web/<timestamp>/` — `js/main.min_<hash>.js` + `js/blakron.*.min_<hash>.js` + `manifest.json` |
+| release (`-r`) | `bin-release/web/<timestamp>/` — `js/main.min_<hash>.js` + `js/kurot.*.min_<hash>.js` + `manifest.json` |
 
-Engine packages (`@kurot/*`) are bundled into separate `js/blakron.<name>.js`
+Engine packages (`@kurot/*`) are bundled into separate `js/kurot.<name>.js`
 chunks and wired up through an HTML **import map**, so the app bundle and engine
 resolve bare specifiers (`import { Sprite } from '@kurot/core'`) in the browser
 without duplicating engine code. `resource/` (including the compiled
 `default.thm.json`) is copied with fixed names, since user code references those
 paths directly. The entry script bootstraps via your own `createPlayer()` call.
 
-### `blakron dev`
+### `kurot dev`
 
 Start a development server with auto-recompilation on file changes (manual browser refresh required).
 
 ```bash
-blakron dev [options]
+kurot dev [options]
 ```
 
 | Option              | Description         | Default |
@@ -107,17 +107,17 @@ blakron dev [options]
 | `-p, --port <port>` | Port to listen      | `3000`  |
 | `--sourcemap`       | Generate sourcemaps | `false` |
 
-### `blakron clean`
+### `kurot clean`
 
 Remove the build output directories (`bin-debug` and `bin-release`).
 
 ```bash
-blakron clean
+kurot clean
 ```
 
 ## Configuration
 
-Create a `blakron.config.ts` in your project root:
+Create a `kurot.config.ts` in your project root:
 
 ```ts
 export default {
@@ -170,13 +170,13 @@ The following placeholders are required in a configured project template:
 
 | Placeholder | Generated value |
 | --- | --- |
-| `{{BLAKRON_IMPORT_MAP}}` | Engine and custom namespace import map |
-| `{{BLAKRON_STAGE_WIDTH}}` | Configured stage width |
-| `{{BLAKRON_STAGE_HEIGHT}}` | Configured stage height |
-| `{{BLAKRON_SCALE_MODE}}` | Configured scale mode |
-| `{{BLAKRON_ORIENTATION}}` | Configured orientation |
-| `{{BLAKRON_FRAME_RATE}}` | Configured frame rate |
-| `{{BLAKRON_ENTRY_SCRIPT}}` | Compiled application entry script |
+| `{{KUROT_IMPORT_MAP}}` | Engine and custom namespace import map |
+| `{{KUROT_STAGE_WIDTH}}` | Configured stage width |
+| `{{KUROT_STAGE_HEIGHT}}` | Configured stage height |
+| `{{KUROT_SCALE_MODE}}` | Configured scale mode |
+| `{{KUROT_ORIENTATION}}` | Configured orientation |
+| `{{KUROT_FRAME_RATE}}` | Configured frame rate |
+| `{{KUROT_ENTRY_SCRIPT}}` | Compiled application entry script |
 
 The template may otherwise contain any project-specific HTML, styles, loading
 screen, platform SDK, analytics, fonts, or additional containers. A build fails
@@ -184,7 +184,7 @@ with a clear error when a configured template is missing a required placeholder.
 
 ## EXML Skin Compiler
 
-The CLI includes a complete EXML skin parsing and code generation pipeline (XML → SkinIR → ESM JavaScript). `.exml` files placed in the `resource/` directory are compiled automatically during `blakron build`.
+The CLI includes a complete EXML skin parsing and code generation pipeline (XML → SkinIR → ESM JavaScript). `.exml` files placed in the `resource/` directory are compiled automatically during `kurot build`.
 
 ### Features
 
@@ -263,7 +263,7 @@ A project created with the default template (`game`) has the following structure
 
 ```
 my-game/
-├── blakron.config.ts          # Project config (includes exml options)
+├── kurot.config.ts          # Project config (includes exml options)
 ├── package.json               # Dependencies & scripts
 ├── tsconfig.json              # TypeScript config
 ├── template/

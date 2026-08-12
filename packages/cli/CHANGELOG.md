@@ -89,7 +89,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- Split Blakron engine packages into independent browser chunks.
+- Split Kurot engine packages into independent browser chunks.
 - Generated import maps and manifests to connect application, engine, and theme modules without duplication.
 
 ## 0.4.0 - 2026-06-06

@@ -107,7 +107,7 @@ async function buildSkinsModule(ctx: BuildContext, skins: CompiledSkin[]): Promi
 	const customNamespaces = project.customNamespaces.map(ns => ({ prefix: ns.prefix, specifier: ns.specifier }));
 	const isRelease = project.mode === 'release';
 
-	const stubDir = await fs.mkdtemp(path.join(os.tmpdir(), 'blakron-skins-'));
+	const stubDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
 	try {
 		const indexLines: string[] = [];
 		await Promise.all(

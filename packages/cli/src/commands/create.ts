@@ -3,7 +3,7 @@ import { scaffoldProject, TEMPLATES, type TemplateName } from '../core/template.
 import { logger } from '../utils/logger.js';
 
 export const createCommand = new Command('create')
-	.description('Create a new Blakron project')
+	.description('Create a new Kurot project')
 	.argument('<name>', 'Project name')
 	.option('--template <template>', `Project template: ${TEMPLATES.join(' | ')}`, 'game')
 	.action(async (name: string, options: { template: string }) => {
