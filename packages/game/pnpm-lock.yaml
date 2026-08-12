@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^1.0.8
-        version: 1.0.8
+        specifier: ^1.0.12
+        version: 1.0.12
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -26,11 +26,11 @@ importers:
 
 packages:
 
-  '@kurot/core@1.0.8':
-    resolution: {integrity: sha512-6DIVl/7xj8ArYcWU8MHLkqrKFZGWJlXU7TlLy7dsDOxe6R/hTCt6TVXyA5Vz48eM7Sa3rWZm7Z3wc9bDaNDnwg==}
-
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@kurot/core@1.0.12':
+    resolution: {integrity: sha512-qgTgPcrPwGK4lEC/ven6Uto+lplE4UCJK1DwzweRpiDM/hX+kWIMWK3w6s5cWjlc5QiKtX8kWys5JCd40ZAI+Q==}
 
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
@@ -477,9 +477,9 @@ packages:
 
 snapshots:
 
-  '@kurot/core@1.0.8': {}
-
   '@jridgewell/sourcemap-codec@1.5.5': {}
+
+  '@kurot/core@1.0.12': {}
 
   '@oxc-project/types@0.143.0': {}
 

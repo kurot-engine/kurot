@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Texture } from '@kurot/core';
-import { MovieClip } from '../src/blakron/display/MovieClip.js';
-import { MovieClipDataFactory } from '../src/blakron/display/MovieClipDataFactory.js';
-import { MovieClipEvent } from '../src/blakron/display/types.js';
+import { MovieClip } from '../src/kurot/display/MovieClip.js';
+import { MovieClipDataFactory } from '../src/kurot/display/MovieClipDataFactory.js';
+import { MovieClipEvent } from '../src/kurot/display/types.js';
 
 function createFactory(): MovieClipDataFactory {
 	return new MovieClipDataFactory(

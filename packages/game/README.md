@@ -1,8 +1,8 @@
 # @kurot/game
 
-Game extensions for [@kurot/core](https://github.com/irwinmc/blakron-core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
+Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Stable (1.0.1).** Requires `@kurot/core@^1.0.3`. Targets ES2022 + evergreen browsers, same as core.
+> **Stable (1.0.6).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Game extensions for [@kurot/core](https://github.com/irwinmc/blakron-core): chai
 pnpm add @kurot/game @kurot/core
 ```
 
-`@kurot/game` declares `@kurot/core` as a regular dependency, so it is installed automatically; listing it explicitly is recommended so you control the resolved core version.
+`@kurot/game` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 

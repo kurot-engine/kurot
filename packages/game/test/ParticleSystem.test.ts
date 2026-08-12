@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Texture } from '@kurot/core';
-import { ParticleSystem } from '../src/blakron/particle/ParticleSystem.js';
+import { ParticleSystem } from '../src/kurot/particle/ParticleSystem.js';
 
 describe('ParticleSystem', () => {
 	it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(

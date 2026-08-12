@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ticker } from '@kurot/core';
-import { Tween } from '../src/blakron/tween/Tween.js';
-import { Ease } from '../src/blakron/tween/Ease.js';
+import { Tween } from '../src/kurot/tween/Tween.js';
+import { Ease } from '../src/kurot/tween/Ease.js';
 
 afterEach(() => {
 	Tween.removeAllTweens();

@@ -1,16 +1,16 @@
 // ── Tween ─────────────────────────────────────────────────────────────────────
-export { Tween } from './blakron/tween/Tween.js';
-export { TweenGroup } from './blakron/tween/TweenGroup.js';
-export { Ease } from './blakron/tween/Ease.js';
-export type { TweenOptions, EaseFunction } from './blakron/tween/types.js';
+export { Tween } from './kurot/tween/Tween.js';
+export { TweenGroup } from './kurot/tween/TweenGroup.js';
+export { Ease } from './kurot/tween/Ease.js';
+export type { TweenOptions, EaseFunction } from './kurot/tween/types.js';
 
 // ── Display ───────────────────────────────────────────────────────────────────
-export { MovieClip } from './blakron/display/MovieClip.js';
-export { MovieClipData } from './blakron/display/MovieClipData.js';
-export { MovieClipDataFactory } from './blakron/display/MovieClipDataFactory.js';
-export { EgretMovieClipTextureParser } from './blakron/display/MovieClipTextureParser.js';
-export { MovieClipEvent } from './blakron/display/types.js';
-export { ScrollView, ScrollPolicy } from './blakron/display/ScrollView.js';
+export { MovieClip } from './kurot/display/MovieClip.js';
+export { MovieClipData } from './kurot/display/MovieClipData.js';
+export { MovieClipDataFactory } from './kurot/display/MovieClipDataFactory.js';
+export { EgretMovieClipTextureParser } from './kurot/display/MovieClipTextureParser.js';
+export { MovieClipEvent } from './kurot/display/types.js';
+export { ScrollView, ScrollPolicy } from './kurot/display/ScrollView.js';
 export type {
 	EgretMovieClipData,
 	EgretMovieClipDataSet,
@@ -21,22 +21,22 @@ export type {
 	MovieClipFrame,
 	MovieClipEventType,
 	MovieClipLabel,
-} from './blakron/display/types.js';
+} from './kurot/display/types.js';
 export type {
 	MovieClipTextureParser,
 	MovieClipTextureSource,
-} from './blakron/display/MovieClipTextureParser.js';
+} from './kurot/display/MovieClipTextureParser.js';
 
 // ── Particle ──────────────────────────────────────────────────────────────────
-export { Particle } from './blakron/particle/Particle.js';
-export { GravityParticle } from './blakron/particle/GravityParticle.js';
-export { ParticleSystem } from './blakron/particle/ParticleSystem.js';
-export { GravityParticleSystem } from './blakron/particle/GravityParticleSystem.js';
+export { Particle } from './kurot/particle/Particle.js';
+export { GravityParticle } from './kurot/particle/GravityParticle.js';
+export { ParticleSystem } from './kurot/particle/ParticleSystem.js';
+export { GravityParticleSystem } from './kurot/particle/GravityParticleSystem.js';
 
 // ── Net ───────────────────────────────────────────────────────────────────────
-export { URLLoader } from './blakron/net/URLLoader.js';
-export { URLRequest } from './blakron/net/URLRequest.js';
-export { URLLoaderDataFormat } from './blakron/net/URLLoaderDataFormat.js';
-export { URLRequestHeader } from './blakron/net/URLRequestHeader.js';
-export { URLRequestMethod } from './blakron/net/URLRequestMethod.js';
-export { URLVariables } from './blakron/net/URLVariables.js';
+export { URLLoader } from './kurot/net/URLLoader.js';
+export { URLRequest } from './kurot/net/URLRequest.js';
+export { URLLoaderDataFormat } from './kurot/net/URLLoaderDataFormat.js';
+export { URLRequestHeader } from './kurot/net/URLRequestHeader.js';
+export { URLRequestMethod } from './kurot/net/URLRequestMethod.js';
+export { URLVariables } from './kurot/net/URLVariables.js';

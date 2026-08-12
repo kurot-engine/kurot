@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/game",
 	"version": "1.0.6",
-	"description": "Game extensions for the Blakron engine — Tween, Ease, MovieClip, ScrollView, URLLoader",
+	"description": "Game extensions for the Kurot engine — Tween, Ease, MovieClip, ScrollView, URLLoader",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -26,17 +26,17 @@
 		"test:watch": "vitest"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^1.0.8"
+		"@kurot/core": "^1.0.12"
 	},
 	"devDependencies": {
-		"@kurot/core": "^1.0.8",
+		"@kurot/core": "^1.0.12",
 		"@types/node": "^22.0.0",
 		"happy-dom": "^20.8.9",
 		"typescript": "^5.6.0",
 		"vitest": "^4.1.4"
 	},
 	"keywords": [
-		"blakron",
+		"kurot",
 		"game",
 		"tween",
 		"movieclip",
@@ -45,7 +45,11 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/irwinmc/blakron-game.git"
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/game"
 	},
-	"packageManager": "pnpm@10.33.0"
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
+	}
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Tween } from '../src/blakron/tween/Tween.js';
-import { TweenGroup } from '../src/blakron/tween/TweenGroup.js';
+import { Tween } from '../src/kurot/tween/Tween.js';
+import { TweenGroup } from '../src/kurot/tween/TweenGroup.js';
 
 describe('TweenGroup', () => {
 	it('removeAll() removes every tween it tracks', () => {

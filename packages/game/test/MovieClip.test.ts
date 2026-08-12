@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ticker } from '@kurot/core';
-import { MovieClip } from '../src/blakron/display/MovieClip.js';
-import { MovieClipData } from '../src/blakron/display/MovieClipData.js';
-import { MovieClipEvent } from '../src/blakron/display/types.js';
+import { MovieClip } from '../src/kurot/display/MovieClip.js';
+import { MovieClipData } from '../src/kurot/display/MovieClipData.js';
+import { MovieClipEvent } from '../src/kurot/display/types.js';
 
 function createData(durations: number[]): MovieClipData {
 	const data = new MovieClipData();

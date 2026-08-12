@@ -46,7 +46,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/irwinmc/Kurot.git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
 		"directory": "packages/core"
 	},
 	"packageManager": "pnpm@10.33.0",
