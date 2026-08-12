@@ -9,10 +9,10 @@ import { TouchHandler } from './TouchHandler.js';
 import { ScreenAdapter } from './ScreenAdapter.js';
 import { setupLifecycle } from './SystemTicker.js';
 import { CanvasRenderer, RenderBuffer } from './canvas/index.js';
-import type { BlakronOptions } from './BlakronOptions.js';
+import type { KurotOptions } from './KurotOptions.js';
 import { Capabilities } from '../system/Capabilities.js';
 
-export interface BlakronApp {
+export interface KurotApp {
 	player: Player;
 	stage: Stage;
 	touchHandler: TouchHandler;
@@ -23,11 +23,11 @@ export interface BlakronApp {
 }
 
 /**
- * Creates and initializes a Blakron player from the given options.
- * This is the main entry point for starting a Blakron application.
+ * Creates and initializes a Kurot player from the given options.
+ * This is the main entry point for starting a Kurot application.
  *
  * ```ts
- * import { createPlayer, Sprite } from '@blakron/core';
+ * import { createPlayer, Sprite } from '@kurot/core';
  *
  * const app = createPlayer({
  *   canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
@@ -41,7 +41,7 @@ export interface BlakronApp {
  * app.start(root);
  * ```
  */
-export function createPlayer(options: BlakronOptions): BlakronApp {
+export function createPlayer(options: KurotOptions): KurotApp {
 	// Detect runtime environment once per session.
 	Capabilities._init();
 
@@ -89,7 +89,7 @@ export function createPlayer(options: BlakronOptions): BlakronApp {
 		touchHandler,
 		screenAdapter,
 		start(root?: DisplayObject): void {
-			if (destroyed) throw new Error('Cannot start a destroyed Blakron application.');
+			if (destroyed) throw new Error('Cannot start a destroyed Kurot application.');
 			player.start(root);
 		},
 		stop(): void {

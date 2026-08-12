@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TouchEvent, Event, Stage } from '@blakron/core';
+import { TouchEvent, Event, Stage } from '@kurot/core';
 import { ComboBox } from '../src/blakron/components/ComboBox.js';
 import { Group } from '../src/blakron/components/Group.js';
 import { Scroller } from '../src/blakron/components/Scroller.js';

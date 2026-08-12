@@ -1,4 +1,4 @@
-import type { IEventDispatcher } from '@blakron/core';
+import type { IEventDispatcher } from '@kurot/core';
 
 /**
  * Interface for collection data sources used by data-driven components

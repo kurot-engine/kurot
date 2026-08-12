@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 import { List } from '../src/blakron/components/List.js';
 import { ArrayCollection } from '../src/blakron/collections/ArrayCollection.js';
 import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';

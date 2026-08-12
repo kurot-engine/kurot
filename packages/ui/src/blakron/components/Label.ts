@@ -1,6 +1,6 @@
 import { Component } from './Component.js';
-import { TextField } from '@blakron/core';
-import type { HorizontalAlign, VerticalAlign } from '@blakron/core';
+import { TextField } from '@kurot/core';
+import type { HorizontalAlign, VerticalAlign } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 

@@ -1,4 +1,4 @@
-import { TouchEvent, Event, Rectangle, DisplayObject, type Stage } from '@blakron/core';
+import { TouchEvent, Event, Rectangle, DisplayObject, type Stage } from '@kurot/core';
 import { Component } from './Component.js';
 import type { Skin } from './Skin.js';
 import type { IViewport } from '../core/IViewport.js';

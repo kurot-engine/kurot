@@ -1,4 +1,4 @@
-import type { Texture } from '@blakron/core';
+import type { Texture } from '@kurot/core';
 
 /**
  * One logical runtime frame in MovieClipData.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Point, sharedPoint } from '../src/blakron/geom/Point.js';
+import { Point, sharedPoint } from '../src/kurot/geom/Point.js';
 
 describe('Point', () => {
 	it('defaults to (0, 0)', () => {

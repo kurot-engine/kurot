@@ -1,4 +1,4 @@
-import { DisplayObject, TouchEvent, Event, type Stage } from '@blakron/core';
+import { DisplayObject, TouchEvent, Event, type Stage } from '@kurot/core';
 import { Component } from './Component.js';
 import { Button } from './Button.js';
 import { UIEvent } from '../events/UIEvent.js';

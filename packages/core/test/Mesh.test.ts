@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Mesh } from '../src/blakron/display/Mesh.js';
-import { RenderObjectType } from '../src/blakron/display/DisplayObject.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
+import { Mesh } from '../src/kurot/display/Mesh.js';
+import { RenderObjectType } from '../src/kurot/display/DisplayObject.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
 
 describe('Mesh', () => {
 	// ── Constructor & defaults ────────────────────────────────────────────

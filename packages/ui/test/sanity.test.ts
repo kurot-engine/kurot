@@ -5,7 +5,7 @@ describe('ui package sanity', () => {
 	it('exports the public API symbols', () => {
 		// Spot-check a representative symbol from each major module.
 		// If index.ts barrel exports break, or a module fails to load under
-		// the current @blakron/core peer, this test catches it.
+		// the current @kurot/core peer, this test catches it.
 		expect(typeof ui.Validator).toBe('function');
 		expect(typeof ui.BasicLayout).toBe('function');
 		expect(typeof ui.Button).toBe('function');

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPlayer } from '../src/blakron/player/createPlayer.js';
-import { Player } from '../src/blakron/player/Player.js';
-import { ScreenAdapter } from '../src/blakron/player/ScreenAdapter.js';
-import { TouchHandler } from '../src/blakron/player/TouchHandler.js';
+import { createPlayer } from '../src/kurot/player/createPlayer.js';
+import { Player } from '../src/kurot/player/Player.js';
+import { ScreenAdapter } from '../src/kurot/player/ScreenAdapter.js';
+import { TouchHandler } from '../src/kurot/player/TouchHandler.js';
 
 describe('createPlayer lifecycle', () => {
 	beforeEach(() => {

@@ -1,4 +1,4 @@
-import { NumberUtils, Rectangle, Texture } from '@blakron/core';
+import { NumberUtils, Rectangle, Texture } from '@kurot/core';
 import { GravityParticle } from './GravityParticle.js';
 import { Particle } from './Particle.js';
 import { ParticleSystem } from './ParticleSystem.js';

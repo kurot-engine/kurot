@@ -1,4 +1,4 @@
-import { DisplayObject, DisplayObjectContainer } from '@blakron/core';
+import { DisplayObject, DisplayObjectContainer } from '@kurot/core';
 import type { IOverride } from './IOverride.js';
 import type { Component } from '../components/Component.js';
 import type { Skin } from '../components/Skin.js';

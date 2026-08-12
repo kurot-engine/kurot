@@ -1,5 +1,5 @@
 import { Group } from './Group.js';
-import { Event, DisplayObject } from '@blakron/core';
+import { Event, DisplayObject } from '@kurot/core';
 import { isUIComponent } from '../core/UIState.js';
 import type { ICollection } from '../collections/ICollection.js';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';

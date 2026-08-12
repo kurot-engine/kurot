@@ -1,7 +1,7 @@
 import type { SceneDescriptor } from './BenchmarkRunner.js';
 
 /**
- * 场景工厂接口，用于在测试中注入 mock，在 HTML 中注入真实 Blakron 对象。
+ * 场景工厂接口，用于在测试中注入 mock，在 HTML 中注入真实 Kurot 对象。
  */
 export interface SceneFactory {
 	createBitmap(texIndex?: number): unknown;

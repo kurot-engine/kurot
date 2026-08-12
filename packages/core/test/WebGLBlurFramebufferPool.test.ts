@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { WebGLRenderContext } from '../src/blakron/player/webgl/WebGLRenderContext.js';
+import { WebGLRenderContext } from '../src/kurot/player/webgl/WebGLRenderContext.js';
 
 interface BlurFramebufferEntry {
 	texture: WebGLTexture;

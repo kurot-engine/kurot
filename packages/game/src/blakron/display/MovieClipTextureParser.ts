@@ -1,4 +1,4 @@
-import type { SpriteSheet, Texture } from '@blakron/core';
+import type { SpriteSheet, Texture } from '@kurot/core';
 
 /** Validated atlas and registration data for one MovieClip frame texture. */
 export interface MovieClipTextureSource {

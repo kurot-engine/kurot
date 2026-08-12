@@ -1,4 +1,4 @@
-import { EventDispatcher, Event } from '@blakron/core';
+import { EventDispatcher, Event } from '@kurot/core';
 import { ToggleButton } from './ToggleButton.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 

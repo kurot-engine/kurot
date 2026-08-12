@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ticker } from '@blakron/core';
+import { ticker } from '@kurot/core';
 import { Tween } from '../src/blakron/tween/Tween.js';
 import { Ease } from '../src/blakron/tween/Ease.js';
 

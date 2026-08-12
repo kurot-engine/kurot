@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Egret Benchmark — 用于与 Blakron 同场景性能对比
+  Egret Benchmark — 用于与 Kurot 同场景性能对比
   基于 Egret 5.x 核心 API + Web 平台模块（纯 HTML + inline script）
   启动：cd packages/core && pnpm benchmark
   然后访问 http://localhost:5173/examples/egret-benchmark.html
@@ -326,7 +326,7 @@
 			}
 
 			function initBenchmark(stage) {
-				// ── Metrics collection (same as Blakron benchmark) ────────────────────
+				// ── Metrics collection (same as Kurot benchmark) ────────────────────
 				function percentile(arr, p) {
 					if (!arr.length) return 0;
 					return arr[Math.max(0, Math.min(Math.ceil(p * arr.length) - 1, arr.length - 1))];
@@ -470,7 +470,7 @@
 				const root = new egret.DisplayObjectContainer();
 				stage.addChild(root);
 
-				// ── Create textures (same as Blakron) ────────────────────────────────
+				// ── Create textures (same as Kurot) ────────────────────────────────
 				const textures = [];
 				for (let i = 0; i < 8; i++) {
 					const c = document.createElement('canvas');

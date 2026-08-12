@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Matrix, sharedMatrix } from '../src/blakron/geom/Matrix.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { Point } from '../src/blakron/geom/Point.js';
+import { Matrix, sharedMatrix } from '../src/kurot/geom/Matrix.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { Point } from '../src/kurot/geom/Point.js';
 
 describe('Matrix', () => {
 	it('defaults to identity', () => {

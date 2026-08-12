@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CustomFilter } from '../src/blakron/filters/CustomFilter.js';
+import { CustomFilter } from '../src/kurot/filters/CustomFilter.js';
 
 describe('CustomFilter', () => {
 	it('generates a shaderKey', () => {

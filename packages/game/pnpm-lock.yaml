@@ -8,7 +8,7 @@ importers:
 
   .:
     devDependencies:
-      '@blakron/core':
+      '@kurot/core':
         specifier: ^1.0.8
         version: 1.0.8
       '@types/node':
@@ -26,7 +26,7 @@ importers:
 
 packages:
 
-  '@blakron/core@1.0.8':
+  '@kurot/core@1.0.8':
     resolution: {integrity: sha512-6DIVl/7xj8ArYcWU8MHLkqrKFZGWJlXU7TlLy7dsDOxe6R/hTCt6TVXyA5Vz48eM7Sa3rWZm7Z3wc9bDaNDnwg==}
 
   '@jridgewell/sourcemap-codec@1.5.5':
@@ -477,7 +477,7 @@ packages:
 
 snapshots:
 
-  '@blakron/core@1.0.8': {}
+  '@kurot/core@1.0.8': {}
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 

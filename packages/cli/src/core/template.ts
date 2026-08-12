@@ -15,9 +15,9 @@ export type TemplateName = (typeof TEMPLATES)[number];
  * then writing a fresh `package.json`:
  *
  * - `name` is set to the project name.
- * - `@blakron/cli` is pinned to the version of the CLI doing the scaffolding,
+ * - `@kurot/cli` is pinned to the version of the CLI doing the scaffolding,
  *   so a project always uses the CLI that created it (never a stale template pin).
- * - `@blakron/*` engine packages are set to `latest`.
+ * - `@kurot/*` engine packages are set to `latest`.
  */
 export async function scaffoldProject(name: string, template: TemplateName): Promise<void> {
 	const templateDir = path.join(TEMPLATES_DIR, template);
@@ -51,15 +51,15 @@ interface PackageJson {
 }
 
 /**
- * Rewrites `@blakron/*` ranges: the CLI to its own version, and each engine
+ * Rewrites `@kurot/*` ranges: the CLI to its own version, and each engine
  * package to the concrete latest version (`^x.y.z`) resolved from the registry.
  */
 async function pinBlakronDeps(deps: Record<string, string> | undefined, cliVersion: string): Promise<void> {
 	if (!deps) return;
 	await Promise.all(
 		Object.keys(deps).map(async dep => {
-			if (dep === '@blakron/cli') deps[dep] = `^${cliVersion}`;
-			else if (dep.startsWith('@blakron/')) deps[dep] = await resolveLatest(dep);
+			if (dep === '@kurot/cli') deps[dep] = `^${cliVersion}`;
+			else if (dep.startsWith('@kurot/')) deps[dep] = await resolveLatest(dep);
 		}),
 	);
 }

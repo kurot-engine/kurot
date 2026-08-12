@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { Sprite } from '../src/blakron/display/Sprite.js';
-import { Filter } from '../src/blakron/filters/Filter.js';
-import { FilterPipe } from '../src/blakron/player/webgl/pipes/FilterPipe.js';
-import { MaskPipe } from '../src/blakron/player/webgl/pipes/MaskPipe.js';
+import { Sprite } from '../src/kurot/display/Sprite.js';
+import { Filter } from '../src/kurot/filters/Filter.js';
+import { FilterPipe } from '../src/kurot/player/webgl/pipes/FilterPipe.js';
+import { MaskPipe } from '../src/kurot/player/webgl/pipes/MaskPipe.js';
 
 describe('effect instruction pools', () => {
 	it('clear strong references before pooling filter instructions', () => {

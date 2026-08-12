@@ -6,7 +6,7 @@
  * phase so child components (e.g. List items) don't receive a false "click".
  */
 import { describe, it, expect } from 'vitest';
-import { Event, TouchEvent } from '@blakron/core';
+import { Event, TouchEvent } from '@kurot/core';
 import { Scroller, Group, HScrollBar, VScrollBar } from '../src/index.js';
 
 function attachPart(scroller: Scroller, partName: string, instance: unknown): void {

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { DisplayObjectContainer } from '../src/blakron/display/DisplayObjectContainer.js';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
-import { Event } from '../src/blakron/events/Event.js';
-import { EventDispatcher } from '../src/blakron/events/EventDispatcher.js';
+import { DisplayObjectContainer } from '../src/kurot/display/DisplayObjectContainer.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { EventDispatcher } from '../src/kurot/events/EventDispatcher.js';
 
 /**
  * Tests the full capture → target → bubble propagation chain.

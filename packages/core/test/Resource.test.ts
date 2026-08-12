@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Resource } from '../src/blakron/resource/Resource.js';
-import { AnalyzerBase } from '../src/blakron/resource/analyzers/AnalyzerBase.js';
-import { ResourceItem } from '../src/blakron/resource/ResourceItem.js';
-import { ResourceConfig } from '../src/blakron/resource/ResourceConfig.js';
+import { Resource } from '../src/kurot/resource/Resource.js';
+import { AnalyzerBase } from '../src/kurot/resource/analyzers/AnalyzerBase.js';
+import { ResourceItem } from '../src/kurot/resource/ResourceItem.js';
+import { ResourceConfig } from '../src/kurot/resource/ResourceConfig.js';
 
 /**
  * Minimal fake XHR — same shape as HttpRequest.test.ts — used so

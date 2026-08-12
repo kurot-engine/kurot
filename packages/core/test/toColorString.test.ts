@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toColorString } from '../src/blakron/utils/toColorString.js';
+import { toColorString } from '../src/kurot/utils/toColorString.js';
 
 describe('toColorString', () => {
 	it('red', () => expect(toColorString(0xff0000)).toBe('#FF0000'));

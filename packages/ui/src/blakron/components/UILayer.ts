@@ -1,4 +1,4 @@
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 import { Group } from './Group.js';
 
 /**

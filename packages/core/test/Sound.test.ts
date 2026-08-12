@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Event } from '../src/blakron/events/Event.js';
+import { Event } from '../src/kurot/events/Event.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -135,17 +135,17 @@ function installAudioMock() {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('Sound', () => {
-	let Sound: typeof import('../src/blakron/media/Sound.js').Sound;
-	let SoundType: typeof import('../src/blakron/media/Sound.js').SoundType;
-	let SoundChannel: typeof import('../src/blakron/media/SoundChannel.js').SoundChannel;
+	let Sound: typeof import('../src/kurot/media/Sound.js').Sound;
+	let SoundType: typeof import('../src/kurot/media/Sound.js').SoundType;
+	let SoundChannel: typeof import('../src/kurot/media/SoundChannel.js').SoundChannel;
 
 	beforeEach(async () => {
 		// Reset module state so sharedContext in Sound.ts is re-initialized
 		vi.resetModules();
-		const soundModule = await import('../src/blakron/media/Sound.js');
+		const soundModule = await import('../src/kurot/media/Sound.js');
 		Sound = soundModule.Sound;
 		SoundType = soundModule.SoundType;
-		const channelModule = await import('../src/blakron/media/SoundChannel.js');
+		const channelModule = await import('../src/kurot/media/SoundChannel.js');
 		SoundChannel = channelModule.SoundChannel;
 	});
 

@@ -1,4 +1,4 @@
-import { Event, TextFieldInputType, TextFieldType } from '@blakron/core';
+import { Event, TextFieldInputType, TextFieldType } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 import { Label } from './Label.js';

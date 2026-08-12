@@ -138,7 +138,7 @@ export class WebGLDrawCmdManager {
 	}
 
 	public pushChangeSmoothing(texture: WebGLTexture, smoothing: boolean): void {
-		(texture as Record<string, unknown>)['__blakronSmoothing'] = smoothing;
+		(texture as Record<string, unknown>)['__kurotSmoothing'] = smoothing;
 		const d = this._get();
 		d.type = DrawCmdType.SMOOTHING;
 		d.texture = texture;

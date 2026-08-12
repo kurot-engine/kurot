@@ -4,8 +4,8 @@ import {
 	Skeleton,
 	type SkeletonData as SpineSkeletonData,
 } from '@esotericsoftware/spine-core';
-import { Sprite, Event } from '@blakron/core';
-import type { Stage } from '@blakron/core';
+import { Sprite, Event } from '@kurot/core';
+import type { Stage } from '@kurot/core';
 import { SkeletonRenderer } from './SkeletonRenderer.js';
 import { Track } from './Track.js';
 import type { AnimationListener } from './Track.js';
@@ -13,7 +13,7 @@ import type { AnimationListener } from './Track.js';
 // The main public-facing display object for Spine animations.
 //
 // Implementation notes:
-//   - extends Sprite from @blakron/core
+//   - extends Sprite from @kurot/core
 //   - Constructor receives a spine.SkeletonData:
 //       1. Create a SkeletonRenderer and addChild()
 //       2. Expose renderer.state / stateData / skeleton / skeletonData as readonly

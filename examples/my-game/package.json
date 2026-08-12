@@ -9,11 +9,11 @@
 		"clean": "blakron clean"
 	},
 	"dependencies": {
-		"@blakron/core": "^1.0.7",
-		"@blakron/game": "^1.0.4",
-		"@blakron/ui": "^1.1.4"
+		"@kurot/core": "^1.0.7",
+		"@kurot/game": "^1.0.4",
+		"@kurot/ui": "^1.1.4"
 	},
 	"devDependencies": {
-		"@blakron/cli": "^1.0.0"
+		"@kurot/cli": "^1.0.0"
 	}
 }

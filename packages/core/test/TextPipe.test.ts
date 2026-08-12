@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { TextPipe } from '../src/blakron/player/webgl/pipes/TextPipe.js';
-import { TextField } from '../src/blakron/text/TextField.js';
-import type { CanvasRenderer } from '../src/blakron/player/canvas/index.js';
-import type { RenderBuffer } from '../src/blakron/player/canvas/index.js';
+import { TextPipe } from '../src/kurot/player/webgl/pipes/TextPipe.js';
+import { TextField } from '../src/kurot/text/TextField.js';
+import type { CanvasRenderer } from '../src/kurot/player/canvas/index.js';
+import type { RenderBuffer } from '../src/kurot/player/canvas/index.js';
 
 // Minimal stand-in for a WebGLTexture — the pipe never inspects its shape.
 function mockTexture(): WebGLTexture {

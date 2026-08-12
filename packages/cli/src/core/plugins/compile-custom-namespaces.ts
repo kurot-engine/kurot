@@ -13,7 +13,7 @@ import type { CustomNamespace, Project } from '../project.js';
  *
  * A namespace barrel (e.g. `src/ui/index.ts` re-exporting `HeroNarrowIR`,
  * etc.) is compiled exactly once and wired into the page via the same import
- * map used for `@blakron/*` engine chunks (see `compile-engine.ts`). Both the
+ * map used for `@kurot/*` engine chunks (see `compile-engine.ts`). Both the
  * app bundle (`compile-source.ts`) and the compiled skins bundle
  * (`compile-exml.ts`) mark the namespace specifier as external, so a class
  * referenced from EXML and from game code resolves to the same module
@@ -122,7 +122,7 @@ function toBundleResult(project: Project, result: esbuild.BuildResult, base: str
 }
 
 /**
- * `game` → `ns.game` (kept distinct from `@blakron/*` engine chunk names).
+ * `game` → `ns.game` (kept distinct from `@kurot/*` engine chunk names).
  */
 function chunkBaseName(prefix: string): string {
 	return `ns.${prefix}`;

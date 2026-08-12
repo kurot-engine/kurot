@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@blakron/cli` are documented in this file.
+All notable changes to `@kurot/cli` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -48,7 +48,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
-- **HSliderSkin / VSliderSkin**: tracks now use `width="100%"` / `height="100%"` instead of inset `left`/`right` / `top`/`bottom` constraints, aligning with the `@blakron/ui` 1.1.0 fix that positions the thumb relative to the track's layout bounds.
+- **HSliderSkin / VSliderSkin**: tracks now use `width="100%"` / `height="100%"` instead of inset `left`/`right` / `top`/`bottom` constraints, aligning with the `@kurot/ui` 1.1.0 fix that positions the thumb relative to the track's layout bounds.
 - **TextInputSkin**: `textDisplay` and `promptDisplay` use a fixed height with `verticalCenter`; `promptDisplay` sets `multiline="false"` / `wordWrap="false"` to prevent accidental wrapping of placeholder text.
 
 ## 0.7.0 - 2026-08-06
@@ -125,4 +125,4 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- Initial `@blakron/cli` release with project creation, HTML5 builds, development server, and cleaning commands.
+- Initial `@kurot/cli` release with project creation, HTML5 builds, development server, and cleaning commands.

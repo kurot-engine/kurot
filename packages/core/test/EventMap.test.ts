@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { EventDispatcher } from '../src/blakron/events/EventDispatcher.js';
-import { Event, type EventMap } from '../src/blakron/events/Event.js';
-import { TouchEvent } from '../src/blakron/events/TouchEvent.js';
+import { EventDispatcher } from '../src/kurot/events/EventDispatcher.js';
+import { Event, type EventMap } from '../src/kurot/events/Event.js';
+import { TouchEvent } from '../src/kurot/events/TouchEvent.js';
 
 // ── Test helpers ─────────────────────────────────────────────────────────
 

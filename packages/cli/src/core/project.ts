@@ -74,7 +74,7 @@ export interface Project {
 	 */
 	readonly themeFile?: string;
 	/**
-	 * `@blakron/*` engine packages this project depends on (excluding the CLI).
+	 * `@kurot/*` engine packages this project depends on (excluding the CLI).
 	 * Each is bundled into its own chunk and wired up via an HTML import map.
 	 */
 	readonly enginePackages: string[];
@@ -138,7 +138,7 @@ function resolveCustomNamespaces(root: string, namespaces: Record<string, string
 }
 
 /**
- * Reads `@blakron/*` runtime dependencies (excluding the CLI) from package.json.
+ * Reads `@kurot/*` runtime dependencies (excluding the CLI) from package.json.
  */
 function detectEnginePackages(root: string): string[] {
 	try {
@@ -146,7 +146,7 @@ function detectEnginePackages(root: string): string[] {
 			dependencies?: Record<string, string>;
 		};
 		return Object.keys(pkg.dependencies ?? {})
-			.filter(name => name.startsWith('@blakron/') && name !== '@blakron/cli')
+			.filter(name => name.startsWith('@kurot/') && name !== '@kurot/cli')
 			.sort();
 	} catch {
 		return [];

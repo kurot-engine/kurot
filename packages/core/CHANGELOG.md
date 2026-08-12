@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@blakron/core` are documented here.
+All notable changes to `@kurot/core` are documented here.
 
 ---
 
@@ -108,7 +108,7 @@ This release closes the largest architectural gap left over from the Egret port:
 
 ### Added
 
-- **`destroy()` on BlakronApp** — `createPlayer()` now returns a `destroy()` method that tears down the player, touch handler, screen adapter, and lifecycle listener in one call. `stop()` is now purely resumable (no longer disposes resources); disposal is deferred to `destroy()`. Calling `start()` after `destroy()` throws.
+- **`destroy()` on KurotApp** — `createPlayer()` now returns a `destroy()` method that tears down the player, touch handler, screen adapter, and lifecycle listener in one call. `stop()` is now purely resumable (no longer disposes resources); disposal is deferred to `destroy()`. Calling `start()` after `destroy()` throws.
 - **ResourceLoader: stable monotonic progress** — replaced the broken `activeCount` / `(total + loaded)` formula with `completedCount` / `totalCount`. Consumer callbacks (`onComplete`, `onError`, `onProgress`) are now wrapped in a `safeNotify` try/catch so exceptions in user code do not corrupt loader bookkeeping or stall the queue.
 
 ### Fixed
@@ -157,7 +157,7 @@ This release closes the largest architectural gap left over from the Egret port:
 
 ### Changed
 
-- **examples/text-test.html**: The `Input mode` test case no longer sets `tf.background` / `tf.border` on the TextField. Instead it draws the background as a sibling `Shape` (`graphics.drawRect`) at the same position and dimensions. This decouples the input background from the TextField's own texture, so it is unaffected by any future TextPipe INPUT-mode early-return (which would drop the whole texture, including a self-drawn background). Matches the skin-based pattern used by `@blakron/ui`'s `TextInput`.
+- **examples/text-test.html**: The `Input mode` test case no longer sets `tf.background` / `tf.border` on the TextField. Instead it draws the background as a sibling `Shape` (`graphics.drawRect`) at the same position and dimensions. This decouples the input background from the TextField's own texture, so it is unaffected by any future TextPipe INPUT-mode early-return (which would drop the whole texture, including a self-drawn background). Matches the skin-based pattern used by `@kurot/ui`'s `TextInput`.
 
 ---
 
@@ -410,7 +410,7 @@ First stable release. From this version forward the public API surface (exports 
 
 ### Changed
 
-- **Namespace migration**: Renamed all internal namespaces from `Heron` → `Blakron` to align with the new package identity.
+- **Namespace migration**: Renamed all internal namespaces from `Heron` → `Kurot` to align with the new package identity.
 - Fixed main entry point path in `package.json`.
 - Added comprehensive migration status and API compatibility guide (`docs/migration.md`).
 
@@ -500,4 +500,4 @@ First stable release. From this version forward the public API surface (exports 
 - **Geometry**: `Point`, `Rectangle`, `Matrix` with full Egret-compatible surface.
 - **Utilities**: `ByteArray`, `Timer`, `Base64Util`, `Logger`, `toColorString`.
 - **External interface**: Bridge for JS ↔ game communication.
-- Project initialized as `@blakron/core` (formerly `heron-core`), a modern TypeScript rewrite of the Egret game engine targeting WebGL multi-texture batching and a strict instruction-driven render pipeline.
+- Project initialized as `@kurot/core` (formerly `heron-core`), a modern TypeScript rewrite of the Egret game engine targeting WebGL multi-texture batching and a strict instruction-driven render pipeline.

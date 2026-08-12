@@ -190,7 +190,7 @@
 
 			// ── Test 7: Gradient fill ───────────────────────────────────────────
 			const gradient = new Shape();
-			const gm = new (await import('../src/blakron/geom/Matrix.js')).Matrix();
+			const gm = new (await import('../src/kurot/geom/Matrix.js')).Matrix();
 			gm.createGradientBox(100, 60, 0, 0, 0);
 			gradient.graphics.beginGradientFill('linear', [0xff0000, 0x0000ff], [1, 1], [0, 255], gm);
 			gradient.graphics.drawRect(0, 0, 100, 60);
@@ -321,8 +321,8 @@
 			animated.x = 20;
 			animated.y = 380;
 			root.addChild(animated);
-			const { Event: BlakronEvent } = await import('../src/blakron/events/Event.js');
-			animated.addEventListener(BlakronEvent.ENTER_FRAME, () => {
+			const { Event: KurotEvent } = await import('../src/kurot/events/Event.js');
+			animated.addEventListener(KurotEvent.ENTER_FRAME, () => {
 				frame++;
 				animated.x = 20 + Math.sin(frame * 0.05) * 100;
 			});
@@ -391,7 +391,7 @@
 			// These objects are transformed only after the first InstructionSet build,
 			// exercising partial updates for scrollRect, filter, mask and RenderGroup.
 			let pipelineFrame = 0;
-			root.addEventListener(BlakronEvent.ENTER_FRAME, () => {
+			root.addEventListener(KurotEvent.ENTER_FRAME, () => {
 				pipelineFrame++;
 				const wave = Math.sin(pipelineFrame * 0.025);
 				clipped.x = 370 + wave * 12;

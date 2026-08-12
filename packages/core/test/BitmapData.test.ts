@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BitmapData, CompressedTextureData } from '../src/blakron/display/texture/BitmapData.js';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
+import { BitmapData, CompressedTextureData } from '../src/kurot/display/texture/BitmapData.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 

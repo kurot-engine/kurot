@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SoundChannel } from '../src/blakron/media/SoundChannel.js';
-import { Event } from '../src/blakron/events/Event.js';
+import { SoundChannel } from '../src/kurot/media/SoundChannel.js';
+import { Event } from '../src/kurot/events/Event.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

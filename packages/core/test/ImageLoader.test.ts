@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ImageLoader } from '../src/blakron/net/ImageLoader.js';
+import { ImageLoader } from '../src/kurot/net/ImageLoader.js';
 
 class FakeImage {
 	public crossOrigin: string | null = null;

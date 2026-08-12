@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@blakron/game` are documented here.
+All notable changes to `@kurot/game` are documented here.
 
 ---
 
@@ -12,7 +12,7 @@ All notable changes to `@blakron/game` are documented here.
 
 ### Changed
 
-- `@blakron/core` moved to `peerDependencies` — prevents duplicate core instances in projects using both packages.
+- `@kurot/core` moved to `peerDependencies` — prevents duplicate core instances in projects using both packages.
 
 ### Tests
 
@@ -30,7 +30,7 @@ All notable changes to `@blakron/game` are documented here.
 
 ### Dependencies
 
-- `@blakron/core`: `^1.0.5` → `^1.0.7`
+- `@kurot/core`: `^1.0.5` → `^1.0.7`
 
 ### Tests
 
@@ -49,7 +49,7 @@ All notable changes to `@blakron/game` are documented here.
 
 ### Dependencies
 
-- `@blakron/core`: `^1.0.5` → `^1.0.7`
+- `@kurot/core`: `^1.0.5` → `^1.0.7`
 
 ### Tests
 
@@ -60,7 +60,7 @@ All notable changes to `@blakron/game` are documented here.
 
 ## [1.0.1] — 2026-07-27
 
-Type-safe event listeners, mirroring the `EventMap` work shipped in `@blakron/core` 1.0.2. The game package's own event sources now declare typed event maps so listeners receive the concrete `Event` subclass without manual `as` casts. No public API shape changes — existing `(e: Event) => void` callers keep working via the inherited fallback overload.
+Type-safe event listeners, mirroring the `EventMap` work shipped in `@kurot/core` 1.0.2. The game package's own event sources now declare typed event maps so listeners receive the concrete `Event` subclass without manual `as` casts. No public API shape changes — existing `(e: Event) => void` callers keep working via the inherited fallback overload.
 
 ### Added
 
@@ -73,13 +73,13 @@ Type-safe event listeners, mirroring the `EventMap` work shipped in `@blakron/co
 
 ### Build
 
-- **package.json**: Bumped `@blakron/core` dependency from `^1.0.1` to `^1.0.3`. Required because the typed event maps (`DisplayObjectEvents`, `EventMap` generic on `EventDispatcher`) were introduced in core 1.0.2, and core 1.0.3 carries the `TextField` width/height getter fix.
+- **package.json**: Bumped `@kurot/core` dependency from `^1.0.1` to `^1.0.3`. Required because the typed event maps (`DisplayObjectEvents`, `EventMap` generic on `EventDispatcher`) were introduced in core 1.0.2, and core 1.0.3 carries the `TextField` width/height getter fix.
 
 ---
 
 ## [1.0.0] — 2026-07-26
 
-First stable release. From this version forward the public API surface (exports from `src/index.ts`) is committed to backward-compatible evolution per semver. This release aligns `@blakron/game` with `@blakron/core` 1.0 and locks the core peer dependency to `^1.0.1`.
+First stable release. From this version forward the public API surface (exports from `src/index.ts`) is committed to backward-compatible evolution per semver. This release aligns `@kurot/game` with `@kurot/core` 1.0 and locks the core peer dependency to `^1.0.1`.
 
 ### Fixed
 

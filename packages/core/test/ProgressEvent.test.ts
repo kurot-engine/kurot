@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ProgressEvent } from '../src/blakron/events/ProgressEvent.js';
-import { Event } from '../src/blakron/events/Event.js';
-import { EventDispatcher } from '../src/blakron/events/EventDispatcher.js';
+import { ProgressEvent } from '../src/kurot/events/ProgressEvent.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { EventDispatcher } from '../src/kurot/events/EventDispatcher.js';
 
 describe('ProgressEvent', () => {
 	it('dispatchProgressEvent sends event with correct data', () => {

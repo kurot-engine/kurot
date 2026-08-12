@@ -5,7 +5,7 @@ import { RowAlign } from './RowAlign.js';
 import { TileOrientation } from './TileOrientation.js';
 import type { ILayoutTarget } from './ILayoutTarget.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
-import { Rectangle } from '@blakron/core';
+import { Rectangle } from '@kurot/core';
 
 const tmpBounds = new Rectangle();
 

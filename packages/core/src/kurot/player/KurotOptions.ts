@@ -2,10 +2,10 @@ import type { StageScaleMode } from '../display/enums/StageScaleMode.js';
 import type { OrientationMode } from '../display/enums/OrientationMode.js';
 
 /**
- * Configuration options for initializing the Blakron engine.
+ * Configuration options for initializing the Kurot engine.
  * Equivalent to Egret's `PlayerOption` + `runEgretOptions`.
  */
-export interface BlakronOptions {
+export interface KurotOptions {
 	/** The canvas element to render into. */
 	canvas: HTMLCanvasElement;
 

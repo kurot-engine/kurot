@@ -4,7 +4,7 @@
  * 在资源加载期间显示 "Loading...current/total" 文本。
  * 对应 Egret 的 LoadingUI。
  */
-import { Sprite, TextField } from '@blakron/core';
+import { Sprite, TextField } from '@kurot/core';
 
 class LoadingUI extends Sprite {
 	private textField: TextField;

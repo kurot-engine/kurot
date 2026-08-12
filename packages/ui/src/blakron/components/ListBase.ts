@@ -1,4 +1,4 @@
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 import { DataGroup } from './DataGroup.js';
 import type { ItemRenderer } from './ItemRenderer.js';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';

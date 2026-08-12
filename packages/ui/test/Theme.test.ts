@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { IOErrorEvent } from '@blakron/core';
+import { IOErrorEvent } from '@kurot/core';
 import { Component } from '../src/blakron/components/Component.js';
 import { Theme } from '../src/blakron/core/Theme.js';
 import type { IThemeAdapter } from '../src/blakron/core/IThemeAdapter.js';

@@ -19,7 +19,7 @@ export interface ParticleInstruction extends Instruction {
 
 /**
  * Handles WebGL rendering of ParticleSystem display objects.
- * The ParticleSystem lives in @blakron/game; core accesses it via duck-typing.
+ * The ParticleSystem lives in @kurot/game; core accesses it via duck-typing.
  */
 export class ParticlePipe implements RenderPipe<DisplayObject> {
 	public static readonly PIPE_ID = 'particle';

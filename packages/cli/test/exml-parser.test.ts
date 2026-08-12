@@ -101,7 +101,7 @@ describe('Component Registry', () => {
 	it('looks up Button component', () => {
 		const info = lookupComponent('eui:Button');
 		expect(info).not.toBeNull();
-		expect(info!.module).toBe('@blakron/ui');
+		expect(info!.module).toBe('@kurot/ui');
 	});
 
 	it('looks up Skin with default property', () => {
@@ -110,8 +110,8 @@ describe('Component Registry', () => {
 	});
 
 	it('resolves module from namespace prefix', () => {
-		expect(resolveModule('eui:Button')).toBe('@blakron/ui');
-		expect(resolveModule('egret:Sprite')).toBe('@blakron/core');
+		expect(resolveModule('eui:Button')).toBe('@kurot/ui');
+		expect(resolveModule('egret:Sprite')).toBe('@kurot/core');
 	});
 
 	it('extracts local names', () => {
@@ -152,7 +152,7 @@ describe('EXML Parser (full pipeline)', () => {
 		expect(ir.imports.has('Skin')).toBe(true);
 		expect(ir.imports.has('Button')).toBe(true);
 		expect(ir.imports.has('Label')).toBe(true);
-		expect(ir.imports.get('Button')).toBe('@blakron/ui');
+		expect(ir.imports.get('Button')).toBe('@kurot/ui');
 	});
 });
 
@@ -160,7 +160,7 @@ describe('Code Generator', () => {
 	it('generates valid JS for a simple skin', () => {
 		const code = compileEXML(SIMPLE_EXML, 'skins.SimpleSkin');
 		expect(code).toContain('import {');
-		expect(code).toContain('from "@blakron/ui"');
+		expect(code).toContain('from "@kurot/ui"');
 		expect(code).toContain('export function createSimpleSkin()');
 		expect(code).toContain('new Skin()');
 		expect(code).toContain('new Button()');
@@ -181,7 +181,7 @@ describe('Code Generator', () => {
 			'skins.Scale9Skin',
 		);
 
-		expect(code).toContain('import { Rectangle } from "@blakron/core"');
+		expect(code).toContain('import { Rectangle } from "@kurot/core"');
 		expect(code).toContain('scale9Grid = new Rectangle(1, 3, 8, 8)');
 	});
 

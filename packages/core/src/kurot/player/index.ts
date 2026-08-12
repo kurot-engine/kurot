@@ -1,7 +1,7 @@
 // ── Core ──────────────────────────────────────────────────────────────────────
 export { Player } from './Player.js';
-export { createPlayer, type BlakronApp } from './createPlayer.js';
-export type { BlakronOptions } from './BlakronOptions.js';
+export { createPlayer, type KurotApp } from './createPlayer.js';
+export type { KurotOptions } from './KurotOptions.js';
 
 // ── Ticker ────────────────────────────────────────────────────────────────────
 export {

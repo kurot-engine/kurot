@@ -28,7 +28,7 @@ export type ResourceEventListener = (event: ResourceEvent) => void;
  *
  * @example
  * ```ts
- * import { resource } from '@blakron/core';
+ * import { resource } from '@kurot/core';
  *
  * await resource.loadConfig('resource.json', 'assets/');
  * await resource.loadGroup('preload');

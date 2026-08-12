@@ -1,4 +1,4 @@
-import { EventDispatcher, Event, IOErrorEvent } from '@blakron/core';
+import { EventDispatcher, Event, IOErrorEvent } from '@kurot/core';
 import type { IThemeAdapter } from './IThemeAdapter.js';
 import type { Component } from '../components/Component.js';
 

@@ -1,4 +1,4 @@
-import { Rectangle } from '@blakron/core';
+import { Rectangle } from '@kurot/core';
 import { SliderBase } from './SliderBase.js';
 import { Direction } from '../core/Direction.js';
 import { isUIComponent } from '../core/UIComponent.js';

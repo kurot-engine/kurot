@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Texture } from '@blakron/core';
+import { Texture } from '@kurot/core';
 import { ParticleSystem } from '../src/blakron/particle/ParticleSystem.js';
 
 describe('ParticleSystem', () => {

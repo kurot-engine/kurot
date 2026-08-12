@@ -142,7 +142,7 @@ export class WebGLVertexArrayObject {
 	): void {
 		const alpha = Math.min(buffer.globalAlpha, 1.0);
 		const tint = buffer.globalTintColor;
-		// All Blakron textures are uploaded with UNPACK_PREMULTIPLY_ALPHA_WEBGL=1,
+		// All Kurot textures are uploaded with UNPACK_PREMULTIPLY_ALPHA_WEBGL=1,
 		// so always premultiply the vertex color.
 		const packed = premultiplyTint(tint, alpha);
 

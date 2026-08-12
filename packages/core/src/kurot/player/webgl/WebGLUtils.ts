@@ -1,8 +1,8 @@
 /** Symbol keys stored on WebGLTexture objects. */
-export const SYM_GL_CONTEXT = '__blakronGlContext';
-export const SYM_PREMULTIPLIED = '__blakronPremultiplied';
-export const SYM_DEFAULT_EMPTY = '__blakronDefaultEmpty';
-export const SYM_SMOOTHING = '__blakronSmoothing';
+export const SYM_GL_CONTEXT = '__kurotGlContext';
+export const SYM_PREMULTIPLIED = '__kurotPremultiplied';
+export const SYM_DEFAULT_EMPTY = '__kurotDefaultEmpty';
+export const SYM_SMOOTHING = '__kurotSmoothing';
 
 /**
  * Unified GL context type.

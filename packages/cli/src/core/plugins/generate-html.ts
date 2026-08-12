@@ -59,7 +59,7 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
  * Writes `index.html`.
  *
  * Engine packages are wired up through an ES module import map
- * (`@blakron/core` → `./js/blakron.core.js`), so the bundled app and engine
+ * (`@kurot/core` → `./js/blakron.core.js`), so the bundled app and engine
  * chunks resolve bare specifiers in the browser. The entry script bootstraps
  * the engine via the user's own `createPlayer()` call.
  */

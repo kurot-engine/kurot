@@ -1,5 +1,5 @@
 {
-	"name": "@blakron/spine",
+	"name": "@kurot/spine",
 	"version": "0.2.3",
 	"description": "Spine 4.x runtime for the Blakron engine",
 	"author": "",
@@ -28,10 +28,10 @@
 		"@esotericsoftware/spine-core": "^4.3.0"
 	},
 	"peerDependencies": {
-		"@blakron/core": "^1.0.8"
+		"@kurot/core": "^1.0.8"
 	},
 	"devDependencies": {
-		"@blakron/core": "^1.0.8",
+		"@kurot/core": "^1.0.8",
 		"@types/node": "^22.0.0",
 		"typescript": "^5.6.0",
 		"vite": "^8.0.8"

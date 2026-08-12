@@ -53,7 +53,7 @@ interface ThemeData {
 /**
  * Compiles `.exml` skin files into a single ESM module and rewrites the theme.
  *
- * Each skin becomes a real JS factory (`import { Skin, ... } from '@blakron/ui'`)
+ * Each skin becomes a real JS factory (`import { Skin, ... } from '@kurot/ui'`)
  * bundled into `js/default.thm.js` (dev) or `js/default.thm.min_<hash>.js`
  * (release). The module registers each factory on `globalThis` under its class
  * name. The output `default.thm.json` keeps only the `skins` mapping plus a
@@ -124,7 +124,7 @@ async function buildSkinsModule(ctx: BuildContext, skins: CompiledSkin[]): Promi
 		await fs.writeFile(path.join(stubDir, 'index.ts'), indexLines.join('\n\n') + '\n');
 
 		const engineExternal =
-			project.enginePackages.length > 0 ? project.enginePackages : ['@blakron/ui', '@blakron/core'];
+			project.enginePackages.length > 0 ? project.enginePackages : ['@kurot/ui', '@kurot/core'];
 		const result = await esbuild.build({
 			entryPoints: [path.join(stubDir, 'index.ts')],
 			outdir: jsDir,

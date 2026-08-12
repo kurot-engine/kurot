@@ -1,4 +1,4 @@
-import type { Event, IEventDispatcher } from '@blakron/core';
+import type { Event, IEventDispatcher } from '@kurot/core';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**

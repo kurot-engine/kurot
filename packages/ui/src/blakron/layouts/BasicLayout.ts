@@ -1,4 +1,4 @@
-import { Rectangle } from '@blakron/core';
+import { Rectangle } from '@kurot/core';
 import { LayoutBase } from './LayoutBase.js';
 import { isUIComponent } from '../core/UIComponent.js';
 

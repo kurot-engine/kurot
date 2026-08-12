@@ -1,4 +1,4 @@
-import { ticker } from '@blakron/core';
+import { ticker } from '@kurot/core';
 import type { EaseFunction, SetStep, TweenOptions, TweenStep } from './types.js';
 import { Ease } from './Ease.js';
 

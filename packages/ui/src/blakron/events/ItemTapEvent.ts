@@ -1,4 +1,4 @@
-import { Event, type IEventDispatcher } from '@blakron/core';
+import { Event, type IEventDispatcher } from '@kurot/core';
 import type { ItemRenderer } from '../components/ItemRenderer.js';
 
 export class ItemTapEvent extends Event {

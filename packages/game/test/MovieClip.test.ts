@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ticker } from '@blakron/core';
+import { ticker } from '@kurot/core';
 import { MovieClip } from '../src/blakron/display/MovieClip.js';
 import { MovieClipData } from '../src/blakron/display/MovieClipData.js';
 import { MovieClipEvent } from '../src/blakron/display/types.js';

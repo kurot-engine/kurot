@@ -1,7 +1,7 @@
 declare global {
 	interface Window {
 		[key: string]: unknown;
-		__blakronCallback?: (name: string, value: string) => void;
+		__kurotCallback?: (name: string, value: string) => void;
 	}
 }
 
@@ -20,11 +20,11 @@ export const ExternalInterface = {
 
 	/**
 	 * Registers a callback that can be invoked from the host page via
-	 * `window.__blakronCallback(functionName, value)`.
+	 * `window.__kurotCallback(functionName, value)`.
 	 */
 	addCallback(functionName: string, listener: (value: string) => void): void {
 		_callbacks.set(functionName, listener);
-		window.__blakronCallback = (name, value) => {
+		window.__kurotCallback = (name, value) => {
 			_callbacks.get(name)?.(value);
 		};
 	},

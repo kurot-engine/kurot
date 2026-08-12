@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
-import { DisplayObjectContainer } from '../src/blakron/display/DisplayObjectContainer.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { Point } from '../src/blakron/geom/Point.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
+import { DisplayObjectContainer } from '../src/kurot/display/DisplayObjectContainer.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { Point } from '../src/kurot/geom/Point.js';
 
 /**
  * Integration tests for spatial methods:

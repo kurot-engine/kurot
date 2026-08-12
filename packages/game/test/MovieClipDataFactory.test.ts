@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Texture } from '@blakron/core';
+import { Texture } from '@kurot/core';
 import { MovieClip } from '../src/blakron/display/MovieClip.js';
 import { MovieClipDataFactory } from '../src/blakron/display/MovieClipDataFactory.js';
 import { MovieClipEvent } from '../src/blakron/display/types.js';

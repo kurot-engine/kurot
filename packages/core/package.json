@@ -1,5 +1,5 @@
 {
-	"name": "@blakron/core",
+	"name": "@kurot/core",
 	"version": "1.0.12",
 	"description": "Modern rewrite of the Egret game engine — WebGL multi-texture batching, instruction-driven render pipeline, strict TypeScript, Egret-compatible API",
 	"author": "Kelvin <kyia.x52@gmail.com>",
@@ -38,7 +38,7 @@
 		"vitest": "^4.1.4"
 	},
 	"keywords": [
-		"blakron",
+		"kurot",
 		"h5-game",
 		"webgl",
 		"webgpu",
@@ -46,7 +46,11 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/irwinmc/blakron-core.git"
+		"url": "git+https://github.com/irwinmc/Kurot.git",
+		"directory": "packages/core"
 	},
-	"packageManager": "pnpm@10.33.0"
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
+	}
 }

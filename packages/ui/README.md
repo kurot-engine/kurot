@@ -1,23 +1,23 @@
-# @blakron/ui
+# @kurot/ui
 
-UI component framework for [@blakron/core](https://github.com/irwinmc/blakron-core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
+UI component framework for [@kurot/core](https://github.com/irwinmc/blakron-core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Stable (1.0.0).** Requires `@blakron/core@^1.0.3`. Targets ES2022 + evergreen browsers, same as core.
+> **Stable (1.0.0).** Requires `@kurot/core@^1.0.3`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## Installation
 
 ```bash
-pnpm add @blakron/ui @blakron/core
+pnpm add @kurot/ui @kurot/core
 ```
 
-`@blakron/ui` declares `@blakron/core` as a regular dependency, so it is installed automatically; listing it explicitly is recommended so you control the resolved core version.
+`@kurot/ui` declares `@kurot/core` as a regular dependency, so it is installed automatically; listing it explicitly is recommended so you control the resolved core version.
 
 ## Quick Start
 
 ```ts
-import { Group, Label, Button, Rect, BasicLayout } from '@blakron/ui';
+import { Group, Label, Button, Rect, BasicLayout } from '@kurot/ui';
 
 const group = new Group();
 group.layout = new BasicLayout();
@@ -77,7 +77,7 @@ invalidateProperties / invalidateSize / invalidateDisplayList
 ### Skin system
 
 ```ts
-import { Skin, State, SetProperty } from '@blakron/ui';
+import { Skin, State, SetProperty } from '@kurot/ui';
 
 class MyButtonSkin extends Skin {
 	constructor() {
@@ -159,7 +159,7 @@ btn.skinName = MyButtonSkin;
 ## Data Collections
 
 ```ts
-import { ArrayCollection } from '@blakron/ui';
+import { ArrayCollection } from '@kurot/ui';
 
 const data = new ArrayCollection(['Apple', 'Banana', 'Cherry']);
 
@@ -178,7 +178,7 @@ data.refresh(); // notify view after manual source changes
 For large datasets, enable virtual layout so only visible renderers are created:
 
 ```ts
-import { List, ItemRenderer, ArrayCollection, Label } from '@blakron/ui';
+import { List, ItemRenderer, ArrayCollection, Label } from '@kurot/ui';
 
 class MyRenderer extends ItemRenderer {
 	private _label: Label;
@@ -221,7 +221,7 @@ component.percentHeight = 100;
 ## View States
 
 ```ts
-import { State, SetProperty, AddItems } from '@blakron/ui';
+import { State, SetProperty, AddItems } from '@kurot/ui';
 
 class MyButtonSkin extends Skin {
 	states = [
@@ -247,12 +247,12 @@ class MyButtonSkin extends Skin {
 
 ## Differences from Egret EUI
 
-|                | Egret EUI                   | @blakron/ui                          |
+|                | Egret EUI                   | @kurot/ui                          |
 | -------------- | --------------------------- | ------------------------------------ |
 | Namespace      | `eui.*` global              | ES Module named exports              |
 | Component base | `namespace` + `mixin`       | Standard class inheritance           |
 | Layout state   | Prototype-injected          | `UIState` delegation                 |
-| EXML runtime   | Built-in parser             | Compile-time only (`@blakron/cli`)   |
+| EXML runtime   | Built-in parser             | Compile-time only (`@kurot/cli`)   |
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions     |
 | Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true` |
 | i18n           | Built-in                    | Not supported                        |

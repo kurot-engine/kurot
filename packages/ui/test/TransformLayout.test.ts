@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest';
-import { Matrix } from '@blakron/core';
+import { Matrix } from '@kurot/core';
 import { BasicLayout, Group, Image } from '../src/index.js';
 
 describe('UI transform layout invalidation', () => {

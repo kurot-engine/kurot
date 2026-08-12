@@ -83,27 +83,27 @@ class CodeGen {
 		// Also ensure we import Binding if there are any bindings
 		let hasBindings = this.hasBindingsInTree(this.ir.children);
 		if (hasBindings) {
-			if (!moduleImports.has('@blakron/ui')) {
-				moduleImports.set('@blakron/ui', new Set());
+			if (!moduleImports.has('@kurot/ui')) {
+				moduleImports.set('@kurot/ui', new Set());
 			}
-			moduleImports.get('@blakron/ui')!.add('Binding');
+			moduleImports.get('@kurot/ui')!.add('Binding');
 		}
 
 		// Egret encodes Rectangle-valued properties such as scale9Grid as a
 		// comma-separated EXML attribute (for example "1,3,8,8").
 		if (this.hasPropertyInTree('scale9Grid')) {
-			if (!moduleImports.has('@blakron/core')) {
-				moduleImports.set('@blakron/core', new Set());
+			if (!moduleImports.has('@kurot/core')) {
+				moduleImports.set('@kurot/core', new Set());
 			}
-			moduleImports.get('@blakron/core')!.add('Rectangle');
+			moduleImports.get('@kurot/core')!.add('Rectangle');
 		}
 
 		// Ensure State, AddItems, SetProperty are imported if we have states
 		if (this.ir.states.length > 0) {
-			if (!moduleImports.has('@blakron/ui')) {
-				moduleImports.set('@blakron/ui', new Set());
+			if (!moduleImports.has('@kurot/ui')) {
+				moduleImports.set('@kurot/ui', new Set());
 			}
-			const uiImports = moduleImports.get('@blakron/ui')!;
+			const uiImports = moduleImports.get('@kurot/ui')!;
 			uiImports.add('State');
 			uiImports.add('SetProperty'); // always needed for node state-specific props
 			for (const state of this.ir.states) {

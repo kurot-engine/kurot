@@ -1,4 +1,4 @@
-import type { Texture } from '@blakron/core';
+import type { Texture } from '@kurot/core';
 import type { MovieClipFrame, MovieClipLabel } from './types.js';
 
 function _validatePositiveFinite(value: number, name: string): number {

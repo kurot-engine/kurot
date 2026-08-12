@@ -38,7 +38,7 @@ function colorToString(color: number): string {
  *   Egret used a DisplayList with dirty-region tracking to only redraw changed areas.
  *   This should be added when performance becomes a concern.
  * - Egret used a RenderNode intermediate layer (BitmapNode, GraphicsNode, etc.)
- *   to cache rendering instructions. Blakron reads DisplayObject data directly,
+ *   to cache rendering instructions. Kurot reads DisplayObject data directly,
  *   which is simpler but skips the caching benefit. If profiling shows the JS-side
  *   traversal is a bottleneck, consider adding a lightweight render command cache.
  * - For high-performance scenarios, a WebGL renderer with batch rendering should

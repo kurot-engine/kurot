@@ -1,4 +1,4 @@
-import { DisplayObject, DisplayObjectContainer, Rectangle, Matrix, Event } from '@blakron/core';
+import { DisplayObject, DisplayObjectContainer, Rectangle, Matrix, Event } from '@kurot/core';
 import type { IUIComponent } from './IUIComponent.js';
 import { validator } from './Validator.js';
 import { UIEvent } from '../events/UIEvent.js';

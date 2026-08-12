@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Stage, TouchEvent } from '@blakron/core';
+import { Stage, TouchEvent } from '@kurot/core';
 import { Button, Group, HSlider, ItemRenderer, Panel, Rect, Scroller } from '../src/index.js';
 
 function expectStageCleanup(stage: Stage, component: { dispatchEvent(event: TouchEvent): boolean }): void {

@@ -1,4 +1,4 @@
-import { EventDispatcher, type EventMap } from '@blakron/core';
+import { EventDispatcher, type EventMap } from '@kurot/core';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';
 import type { ICollection } from './ICollection.js';
 

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { Sprite, TextField } from '../src/index.js';
-import { StageText } from '../src/blakron/text/StageText.js';
+import { StageText } from '../src/kurot/text/StageText.js';
 
 describe('StageText DOM overlay', () => {
 	afterEach(() => {

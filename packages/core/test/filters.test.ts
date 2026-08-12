@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { BlurFilter } from '../src/blakron/filters/BlurFilter.js';
-import { ColorMatrixFilter } from '../src/blakron/filters/ColorMatrixFilter.js';
-import { GlowFilter } from '../src/blakron/filters/GlowFilter.js';
-import { DropShadowFilter } from '../src/blakron/filters/DropShadowFilter.js';
+import { BlurFilter } from '../src/kurot/filters/BlurFilter.js';
+import { ColorMatrixFilter } from '../src/kurot/filters/ColorMatrixFilter.js';
+import { GlowFilter } from '../src/kurot/filters/GlowFilter.js';
+import { DropShadowFilter } from '../src/kurot/filters/DropShadowFilter.js';
 
 describe('BlurFilter', () => {
 	it('setter updates uniforms', () => {

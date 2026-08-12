@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Matrix } from '../src/blakron/geom/Matrix.js';
-import type { WebGLRenderBuffer } from '../src/blakron/player/webgl/WebGLRenderBuffer.js';
-import { WebGLVertexArrayObject } from '../src/blakron/player/webgl/WebGLVertexArrayObject.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
+import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
+import { WebGLVertexArrayObject } from '../src/kurot/player/webgl/WebGLVertexArrayObject.js';
 
 function buffer(): WebGLRenderBuffer {
 	return {

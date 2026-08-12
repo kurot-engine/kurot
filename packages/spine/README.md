@@ -1,28 +1,28 @@
-# @blakron/spine
+# @kurot/spine
 
 Spine 4.3 runtime for the Blakron engine.
 
-Ports the [egret-spine](https://github.com/tadazly/egret-spine) adapter to `@blakron/core`,
+Ports the [egret-spine](https://github.com/tadazly/egret-spine) adapter to `@kurot/core`,
 replacing Egret's `Mesh` / `Texture` / `RES` APIs with their Blakron equivalents.
 The Spine runtime itself is provided by the official `@esotericsoftware/spine-core` npm package.
 
 ## Installation
 
 ```bash
-pnpm add @blakron/spine
+pnpm add @kurot/spine
 ```
 
 ## Usage
 
 ```ts
-import { createPlayer } from '@blakron/core';
+import { createPlayer } from '@kurot/core';
 import {
 	SkeletonAnimation,
 	BlakronAssetManager,
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
-} from '@blakron/spine';
+} from '@kurot/spine';
 
 // 1. Create Blakron player
 const app = createPlayer({ canvas, frameRate: 60, contentWidth: 640, contentHeight: 480 });
@@ -74,7 +74,7 @@ requestAnimationFrame(waitForLoad);
 
 ### `SkeletonAnimation`
 
-The main display object. Extends `Sprite` from `@blakron/core`.
+The main display object. Extends `Sprite` from `@kurot/core`.
 
 | Method                                  | Description                                                         |
 | --------------------------------------- | ------------------------------------------------------------------- |
@@ -111,7 +111,7 @@ Returned by `SkeletonAnimation.start()`. Manages an animation queue on a single 
 
 ### `BlakronAssetManager`
 
-Loads Spine assets using `@blakron/core`'s `HttpRequest` and `ImageLoader`.
+Loads Spine assets using `@kurot/core`'s `HttpRequest` and `ImageLoader`.
 
 | Method                                     | Description                                        |
 | ------------------------------------------ | -------------------------------------------------- |
@@ -133,7 +133,7 @@ The Spine editor version must match the runtime version. This package uses
 Spine's binary/JSON export formats are not guaranteed to be backwards
 compatible across major/minor versions — assets exported from Spine 4.2 may
 fail to load (or load with corrupted data) on a 4.3 runtime, and vice versa.
-If you are upgrading from a project using `@blakron/spine` with spine-core
+If you are upgrading from a project using `@kurot/spine` with spine-core
 4.2, re-export your `.skel`/`.json` files from Spine 4.3 before upgrading
 this package.
 

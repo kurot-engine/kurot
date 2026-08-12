@@ -1,5 +1,5 @@
 import { Component } from './Component.js';
-import { Event, Rectangle } from '@blakron/core';
+import { Event, Rectangle } from '@kurot/core';
 import { Direction } from '../core/Direction.js';
 import { Animation } from './Animation.js';
 import type { Label } from './Label.js';

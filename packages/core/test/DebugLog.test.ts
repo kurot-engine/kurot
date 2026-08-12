@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DebugLog } from '../src/blakron/utils/DebugLog.js';
+import { DebugLog } from '../src/kurot/utils/DebugLog.js';
 
 describe('DebugLog', () => {
 	beforeEach(() => {

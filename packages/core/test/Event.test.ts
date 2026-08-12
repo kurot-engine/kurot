@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Event } from '../src/blakron/events/Event.js';
-import { EventPhase } from '../src/blakron/events/EventPhase.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { EventPhase } from '../src/kurot/events/EventPhase.js';
 
 describe('Event', () => {
 	it('constructor sets type/bubbles/cancelable', () => {

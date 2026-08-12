@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { WebGLRenderContext } from '../src/blakron/player/webgl/WebGLRenderContext.js';
-import { WebGLRenderBuffer } from '../src/blakron/player/webgl/WebGLRenderBuffer.js';
+import type { WebGLRenderContext } from '../src/kurot/player/webgl/WebGLRenderContext.js';
+import { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
 
 function createContext(): WebGLRenderContext {
 	const gl = {

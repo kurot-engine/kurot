@@ -102,7 +102,7 @@ class ParseContext {
 		}
 
 		// Ensure Skin is imported
-		this.addImport('Skin', '@blakron/ui');
+		this.addImport('Skin', '@kurot/ui');
 
 		// Extract root-level properties (class, width, height, etc.)
 		for (const attr of root.attributes) {

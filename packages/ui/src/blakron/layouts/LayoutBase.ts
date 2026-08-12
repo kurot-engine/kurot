@@ -1,4 +1,4 @@
-import { EventDispatcher } from '@blakron/core';
+import { EventDispatcher } from '@kurot/core';
 import type { ILayoutTarget } from './ILayoutTarget.js';
 
 /**

@@ -1,4 +1,4 @@
-import { TouchEvent, Event } from '@blakron/core';
+import { TouchEvent, Event } from '@kurot/core';
 import { ListBase } from './ListBase.js';
 import { ItemRenderer } from './ItemRenderer.js';
 import { ItemTapEvent } from '../events/ItemTapEvent.js';

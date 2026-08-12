@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { DisplayList } from '../src/blakron/player/canvas/DisplayList.js';
-import { BitmapData } from '../src/blakron/display/texture/BitmapData.js';
-import { SYM_GL_CONTEXT } from '../src/blakron/player/webgl/WebGLUtils.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { DisplayList } from '../src/kurot/player/canvas/DisplayList.js';
+import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
+import { SYM_GL_CONTEXT } from '../src/kurot/player/webgl/WebGLUtils.js';
 
 beforeEach(() => {
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({} as CanvasRenderingContext2D);

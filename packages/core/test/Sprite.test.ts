@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { Sprite } from '../src/blakron/display/Sprite.js';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
-import { RenderObjectType } from '../src/blakron/display/DisplayObject.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
+import { Sprite } from '../src/kurot/display/Sprite.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
+import { RenderObjectType } from '../src/kurot/display/DisplayObject.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
 
 describe('Sprite', () => {
 	it('$renderObjectType is SPRITE', () => {

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { Graphics } from '../src/blakron/display/Graphics.js';
-import { PathCommandType } from '../src/blakron/display/GraphicsPath.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { Matrix } from '../src/blakron/geom/Matrix.js';
+import { Graphics } from '../src/kurot/display/Graphics.js';
+import { PathCommandType } from '../src/kurot/display/GraphicsPath.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
 
 describe('Graphics', () => {
 	it('starts with empty commands', () => {

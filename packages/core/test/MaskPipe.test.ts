@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Sprite } from '../src/blakron/display/Sprite.js';
-import type { WebGLRenderBuffer } from '../src/blakron/player/webgl/WebGLRenderBuffer.js';
-import { WebGLRenderBuffer as WGLBuf } from '../src/blakron/player/webgl/WebGLRenderBuffer.js';
-import { MaskPipe } from '../src/blakron/player/webgl/pipes/MaskPipe.js';
+import { Sprite } from '../src/kurot/display/Sprite.js';
+import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
+import { WebGLRenderBuffer as WGLBuf } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
+import { MaskPipe } from '../src/kurot/player/webgl/pipes/MaskPipe.js';
 
 afterEach(() => {
 	vi.restoreAllMocks();

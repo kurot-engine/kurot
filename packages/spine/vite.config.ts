@@ -10,7 +10,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			'@blakron/spine': resolve(__dirname, 'src/index.ts'),
+			'@kurot/spine': resolve(__dirname, 'src/index.ts'),
 		},
 	},
 });

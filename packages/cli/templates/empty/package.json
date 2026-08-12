@@ -1,5 +1,5 @@
 {
-	"name": "blakron-empty",
+	"name": "kurot-empty",
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
@@ -9,9 +9,9 @@
 		"clean": "blakron clean"
 	},
 	"dependencies": {
-		"@blakron/core": "latest"
+		"@kurot/core": "latest"
 	},
 	"devDependencies": {
-		"@blakron/cli": "latest"
+		"@kurot/cli": "latest"
 	}
 }

@@ -5,7 +5,7 @@
  * and Event.CHANGE dispatch.
  */
 import { describe, it, expect } from 'vitest';
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 import { ViewStack, Group, Rect } from '../src/index.js';
 
 function makeChild(w = 100, h = 50): Rect {

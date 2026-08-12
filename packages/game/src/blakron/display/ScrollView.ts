@@ -1,4 +1,4 @@
-import { Sprite, TouchEvent, Rectangle, Event, type Stage } from '@blakron/core';
+import { Sprite, TouchEvent, Rectangle, Event, type Stage } from '@kurot/core';
 
 /**
  * Scroll policy constants for `ScrollView.horizontalScrollPolicy` and `verticalScrollPolicy`.

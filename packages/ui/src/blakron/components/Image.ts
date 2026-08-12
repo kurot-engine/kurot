@@ -1,5 +1,5 @@
 import { Component } from './Component.js';
-import { Texture, Event, Bitmap, BitmapFillMode, Rectangle } from '@blakron/core';
+import { Texture, Event, Bitmap, BitmapFillMode, Rectangle } from '@kurot/core';
 import { getAssetAdapter } from '../core/AssetAdapterRegistry.js';
 
 /**

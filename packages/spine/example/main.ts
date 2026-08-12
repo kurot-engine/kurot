@@ -1,11 +1,11 @@
-import { createPlayer } from '@blakron/core';
+import { createPlayer } from '@kurot/core';
 import {
 	SkeletonAnimation,
 	BlakronAssetManager,
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
-} from '@blakron/spine';
+} from '@kurot/spine';
 
 // ── Log helper ────────────────────────────────────────────────────────────────
 

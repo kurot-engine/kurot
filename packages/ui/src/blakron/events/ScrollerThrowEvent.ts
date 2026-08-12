@@ -1,4 +1,4 @@
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 
 /**
  * Dispatched by Scroller during throw (inertial scrolling).

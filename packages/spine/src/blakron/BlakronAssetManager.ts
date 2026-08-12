@@ -1,5 +1,5 @@
 import { AssetManagerBase, TextureAtlas } from '@esotericsoftware/spine-core';
-import { HttpRequest, HttpResponseType, ImageLoader, BitmapData, IOErrorEvent, Event } from '@blakron/core';
+import { HttpRequest, HttpResponseType, ImageLoader, BitmapData, IOErrorEvent, Event } from '@kurot/core';
 import { BlakronTexture } from './BlakronTexture.js';
 
 // AssetManagerBase marks start/success/error/toLoad/loaded/errors/cache as
@@ -18,7 +18,7 @@ interface AssetManagerRuntime {
 }
 
 /**
- * Loads Spine assets (.atlas, .json, .skel, .png) using `@blakron/core`'s
+ * Loads Spine assets (.atlas, .json, .skel, .png) using `@kurot/core`'s
  * `HttpRequest` and `ImageLoader`.
  *
  * @example

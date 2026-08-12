@@ -1,4 +1,4 @@
-import { EventDispatcher, DisplayObjectContainer, type DisplayObject } from '@blakron/core';
+import { EventDispatcher, DisplayObjectContainer, type DisplayObject } from '@kurot/core';
 import type { IUIComponent } from './IUIComponent.js';
 
 type QueueClient = IUIComponent & DisplayObject;

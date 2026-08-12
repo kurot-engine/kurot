@@ -1,4 +1,4 @@
-import { Event, type IEventDispatcher } from '@blakron/core';
+import { Event, type IEventDispatcher } from '@kurot/core';
 
 /**
  * UI event types and dispatcher for UI component lifecycle and interaction events.

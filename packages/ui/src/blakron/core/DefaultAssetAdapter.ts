@@ -1,4 +1,4 @@
-import { Texture, ImageLoader, Event } from '@blakron/core';
+import { Texture, ImageLoader, Event } from '@kurot/core';
 import type { IAssetAdapter } from './IAssetAdapter.js';
 
 /**

@@ -1,4 +1,4 @@
-import type { IEventDispatcher, Rectangle } from '@blakron/core';
+import type { IEventDispatcher, Rectangle } from '@kurot/core';
 
 /**
  * Interface implemented by all UI components.

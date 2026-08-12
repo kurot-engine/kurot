@@ -13,7 +13,7 @@ describe('HTML generation', () => {
 		const template = await fs.readFile(templatePath, 'utf-8');
 		const project = createProject(templatePath);
 		const html = renderHtml(template, project, 'Main.js', {
-			'@blakron/core': 'js/blakron.core.js',
+			'@kurot/core': 'js/blakron.core.js',
 		});
 
 		expect(html).toContain('background: #000000');
@@ -22,7 +22,7 @@ describe('HTML generation', () => {
 		expect(html).toContain('data-scale-mode="showAll"');
 		expect(html).toContain('data-orientation="landscape"');
 		expect(html).toContain('data-frame-rate="60"');
-		expect(html).toContain('"@blakron/core": "./js/blakron.core.js"');
+		expect(html).toContain('"@kurot/core": "./js/blakron.core.js"');
 		expect(html).toContain("import './Main.js';");
 		expect(html).not.toContain('{{BLAKRON_');
 	});
@@ -57,7 +57,7 @@ function createProject(htmlTemplate: string): Project {
 		outputDir: '/project/bin-debug',
 		resourceDir: '/project/resource',
 		htmlTemplate,
-		enginePackages: ['@blakron/core'],
+		enginePackages: ['@kurot/core'],
 		customNamespaces: [],
 	};
 }

@@ -1,4 +1,4 @@
-import { Event, TouchEvent } from '@blakron/core';
+import { Event, TouchEvent } from '@kurot/core';
 import { Component } from './Component.js';
 import { EditableText } from './EditableText.js';
 import { Label } from './Label.js';

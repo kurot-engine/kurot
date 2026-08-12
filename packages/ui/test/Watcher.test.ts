@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { EventDispatcher } from '@blakron/core';
+import { EventDispatcher } from '@kurot/core';
 import { Watcher } from '../src/blakron/binding/Watcher.js';
 import { PropertyEvent } from '../src/blakron/events/PropertyEvent.js';
 

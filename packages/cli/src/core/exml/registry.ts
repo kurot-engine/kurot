@@ -8,7 +8,7 @@
 
 export interface ComponentInfo {
 	/**
-	 * Module path to import from (e.g. "@blakron/ui").
+	 * Module path to import from (e.g. "@kurot/ui").
 	 */
 	module: string;
 	/**
@@ -23,7 +23,7 @@ export interface ComponentInfo {
 
 /**
  * A project-defined EXML namespace, matching Egret's `xmlns:game="game.*"`
- * convention (see `ProjectConfig.exml.namespaces` in `@blakron/cli`).
+ * convention (see `ProjectConfig.exml.namespaces` in `@kurot/cli`).
  */
 export interface NamespaceModule {
 	/**
@@ -42,10 +42,10 @@ export interface NamespaceModule {
  * Maps XML namespace prefixes to module import paths.
  */
 const NAMESPACE_MODULES: Record<string, string> = {
-	eui: '@blakron/ui',
-	egret: '@blakron/core',
-	w: '@blakron/ui',
-	core: '@blakron/core',
+	eui: '@kurot/ui',
+	egret: '@kurot/core',
+	w: '@kurot/ui',
+	core: '@kurot/core',
 };
 
 // ── Component registry ───────────────────────────────────────────────
@@ -56,74 +56,74 @@ const NAMESPACE_MODULES: Record<string, string> = {
  */
 const COMPONENTS: Record<string, ComponentInfo> = {
 	// Skins & containers
-	Skin: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
-	Group: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
-	Panel: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
-	DataGroup: { module: '@blakron/ui', defaultProperty: 'dataProvider', isArray: false },
-	Scroller: { module: '@blakron/ui', defaultProperty: 'viewport', isArray: false },
+	Skin: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
+	Group: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
+	Panel: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
+	DataGroup: { module: '@kurot/ui', defaultProperty: 'dataProvider', isArray: false },
+	Scroller: { module: '@kurot/ui', defaultProperty: 'viewport', isArray: false },
 
 	// Basic controls
-	Button: { module: '@blakron/ui' },
-	Label: { module: '@blakron/ui' },
-	Image: { module: '@blakron/ui' },
-	Rect: { module: '@blakron/ui' },
-	CheckBox: { module: '@blakron/ui' },
-	RadioButton: { module: '@blakron/ui' },
-	ToggleButton: { module: '@blakron/ui' },
-	ToggleSwitch: { module: '@blakron/ui' },
-	ProgressBar: { module: '@blakron/ui' },
-	HSlider: { module: '@blakron/ui' },
-	VSlider: { module: '@blakron/ui' },
-	HScrollBar: { module: '@blakron/ui' },
-	VScrollBar: { module: '@blakron/ui' },
-	TabBar: { module: '@blakron/ui' },
-	List: { module: '@blakron/ui', defaultProperty: 'dataProvider', isArray: false },
-	ItemRenderer: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
-	ViewStack: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
-	UILayer: { module: '@blakron/ui', defaultProperty: 'elementsContent', isArray: true },
+	Button: { module: '@kurot/ui' },
+	Label: { module: '@kurot/ui' },
+	Image: { module: '@kurot/ui' },
+	Rect: { module: '@kurot/ui' },
+	CheckBox: { module: '@kurot/ui' },
+	RadioButton: { module: '@kurot/ui' },
+	ToggleButton: { module: '@kurot/ui' },
+	ToggleSwitch: { module: '@kurot/ui' },
+	ProgressBar: { module: '@kurot/ui' },
+	HSlider: { module: '@kurot/ui' },
+	VSlider: { module: '@kurot/ui' },
+	HScrollBar: { module: '@kurot/ui' },
+	VScrollBar: { module: '@kurot/ui' },
+	TabBar: { module: '@kurot/ui' },
+	List: { module: '@kurot/ui', defaultProperty: 'dataProvider', isArray: false },
+	ItemRenderer: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
+	ViewStack: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
+	UILayer: { module: '@kurot/ui', defaultProperty: 'elementsContent', isArray: true },
 
 	// Text input controls
-	TextInput: { module: '@blakron/ui' },
-	EditableText: { module: '@blakron/ui' },
+	TextInput: { module: '@kurot/ui' },
+	EditableText: { module: '@kurot/ui' },
 
 	// Layouts
-	Layout: { module: '@blakron/ui' },
-	BasicLayout: { module: '@blakron/ui' },
-	HorizontalLayout: { module: '@blakron/ui' },
-	VerticalLayout: { module: '@blakron/ui' },
-	TileLayout: { module: '@blakron/ui' },
+	Layout: { module: '@kurot/ui' },
+	BasicLayout: { module: '@kurot/ui' },
+	HorizontalLayout: { module: '@kurot/ui' },
+	VerticalLayout: { module: '@kurot/ui' },
+	TileLayout: { module: '@kurot/ui' },
 
 	// States
-	State: { module: '@blakron/ui' },
-	AddItems: { module: '@blakron/ui' },
-	SetProperty: { module: '@blakron/ui' },
-	SetStateProperty: { module: '@blakron/ui' },
+	State: { module: '@kurot/ui' },
+	AddItems: { module: '@kurot/ui' },
+	SetProperty: { module: '@kurot/ui' },
+	SetStateProperty: { module: '@kurot/ui' },
 
 	// Collections
-	ArrayCollection: { module: '@blakron/ui', defaultProperty: 'source', isArray: true },
+	ArrayCollection: { module: '@kurot/ui', defaultProperty: 'source', isArray: true },
 
 	// Binding
-	Binding: { module: '@blakron/ui' },
+	Binding: { module: '@kurot/ui' },
 
 	// Core classes (egret namespace)
-	DisplayObject: { module: '@blakron/core' },
-	DisplayObjectContainer: { module: '@blakron/core' },
-	Sprite: { module: '@blakron/core' },
-	TextField: { module: '@blakron/core' },
-	Bitmap: { module: '@blakron/core' },
-	Shape: { module: '@blakron/core' },
-	Point: { module: '@blakron/core' },
-	Rectangle: { module: '@blakron/core' },
-	Matrix: { module: '@blakron/core' },
-	Event: { module: '@blakron/core' },
-	EventDispatcher: { module: '@blakron/core' },
-	Timer: { module: '@blakron/core' },
+	DisplayObject: { module: '@kurot/core' },
+	DisplayObjectContainer: { module: '@kurot/core' },
+	Sprite: { module: '@kurot/core' },
+	TextField: { module: '@kurot/core' },
+	Bitmap: { module: '@kurot/core' },
+	Shape: { module: '@kurot/core' },
+	Point: { module: '@kurot/core' },
+	Rectangle: { module: '@kurot/core' },
+	Matrix: { module: '@kurot/core' },
+	Event: { module: '@kurot/core' },
+	EventDispatcher: { module: '@kurot/core' },
+	Timer: { module: '@kurot/core' },
 
 	// Complex controls
-	ComboBox: { module: '@blakron/ui', defaultProperty: 'dataProvider', isArray: false },
+	ComboBox: { module: '@kurot/ui', defaultProperty: 'dataProvider', isArray: false },
 
 	// Animation
-	Animation: { module: '@blakron/ui' },
+	Animation: { module: '@kurot/ui' },
 };
 
 // ── Public API ───────────────────────────────────────────────────────

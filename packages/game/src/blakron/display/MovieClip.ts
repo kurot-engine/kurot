@@ -1,4 +1,4 @@
-import { Bitmap } from '@blakron/core';
+import { Bitmap } from '@kurot/core';
 import type { MovieClipData } from './MovieClipData.js';
 import { MovieClipEvent } from './types.js';
 

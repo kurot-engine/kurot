@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Stage } from '../src/blakron/display/Stage.js';
-import { TouchEvent } from '../src/blakron/events/TouchEvent.js';
-import { TouchHandler } from '../src/blakron/player/TouchHandler.js';
+import { Stage } from '../src/kurot/display/Stage.js';
+import { TouchEvent } from '../src/kurot/events/TouchEvent.js';
+import { TouchHandler } from '../src/kurot/player/TouchHandler.js';
 
 describe('TouchHandler DOM mouse tracking', () => {
 	it('ends a mouse interaction released outside the canvas', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { HTTPStatusEvent } from '../src/blakron/events/HTTPStatusEvent.js';
-import { Event } from '../src/blakron/events/Event.js';
-import { EventDispatcher } from '../src/blakron/events/EventDispatcher.js';
+import { HTTPStatusEvent } from '../src/kurot/events/HTTPStatusEvent.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { EventDispatcher } from '../src/kurot/events/EventDispatcher.js';
 
 describe('HTTPStatusEvent', () => {
 	it('dispatchHTTPStatusEvent sends event with status code', () => {

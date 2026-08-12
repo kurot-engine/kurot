@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { TouchEvent } from '../src/blakron/events/TouchEvent.js';
-import { Event, type EventMap } from '../src/blakron/events/Event.js';
-import { EventDispatcher } from '../src/blakron/events/EventDispatcher.js';
+import { TouchEvent } from '../src/kurot/events/TouchEvent.js';
+import { Event, type EventMap } from '../src/kurot/events/Event.js';
+import { EventDispatcher } from '../src/kurot/events/EventDispatcher.js';
 
 interface TouchTestEvents extends EventMap {
 	[TouchEvent.TOUCH_BEGIN]: TouchEvent;

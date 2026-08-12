@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { SpriteSheet } from '../src/blakron/display/texture/SpriteSheet.js';
-import { Texture } from '../src/blakron/display/texture/Texture.js';
-import { BitmapData } from '../src/blakron/display/texture/BitmapData.js';
+import { SpriteSheet } from '../src/kurot/display/texture/SpriteSheet.js';
+import { Texture } from '../src/kurot/display/texture/Texture.js';
+import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
 
 function makeSourceTexture(): Texture {
 	const bd = new BitmapData();

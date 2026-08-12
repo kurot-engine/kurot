@@ -1,4 +1,4 @@
-import { Sprite, Rectangle, Point, DisplayObject, Event, type DisplayObjectEvents, type Matrix } from '@blakron/core';
+import { Sprite, Rectangle, Point, DisplayObject, Event, type DisplayObjectEvents, type Matrix } from '@kurot/core';
 import { UIState, isUIComponent } from '../core/UIState.js';
 import type { IUIOwner } from '../core/UIState.js';
 import type { IUIComponent } from '../core/IUIComponent.js';

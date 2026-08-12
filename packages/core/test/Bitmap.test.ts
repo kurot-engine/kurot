@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { Bitmap, setBitmapPixelHitTest } from '../src/blakron/display/Bitmap.js';
-import { Texture } from '../src/blakron/display/texture/Texture.js';
-import { BitmapData } from '../src/blakron/display/texture/BitmapData.js';
-import { BitmapFillMode } from '../src/blakron/display/enums/BitmapFillMode.js';
-import { RenderObjectType } from '../src/blakron/display/DisplayObject.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
+import { Bitmap, setBitmapPixelHitTest } from '../src/kurot/display/Bitmap.js';
+import { Texture } from '../src/kurot/display/texture/Texture.js';
+import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
+import { BitmapFillMode } from '../src/kurot/display/enums/BitmapFillMode.js';
+import { RenderObjectType } from '../src/kurot/display/DisplayObject.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
 
 function mockBitmapData(): BitmapData {
 	const bd = new BitmapData();

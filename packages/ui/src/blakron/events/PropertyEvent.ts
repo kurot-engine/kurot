@@ -1,4 +1,4 @@
-import { Event, type IEventDispatcher } from '@blakron/core';
+import { Event, type IEventDispatcher } from '@kurot/core';
 
 export class PropertyEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────

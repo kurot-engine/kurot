@@ -9,7 +9,7 @@ import {
 	type SkeletonClipping,
 	type TextureAtlasRegion,
 } from '@esotericsoftware/spine-core';
-import { Mesh, Texture, BitmapData, BlendMode } from '@blakron/core';
+import { Mesh, Texture, BitmapData, BlendMode } from '@kurot/core';
 import type { BlakronTexture } from './BlakronTexture.js';
 
 const QUAD_INDICES = [0, 1, 2, 2, 3, 0];

@@ -1,6 +1,6 @@
 import { Component } from './Component.js';
-import { Event, TouchEvent, DisplayObject } from '@blakron/core';
-import type { Stage, Texture } from '@blakron/core';
+import { Event, TouchEvent, DisplayObject } from '@kurot/core';
+import type { Stage, Texture } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import type { Image } from './Image.js';
 import type { Label } from './Label.js';

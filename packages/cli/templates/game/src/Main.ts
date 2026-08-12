@@ -1,14 +1,14 @@
 /**
  * Blakron 标准游戏模板
  *
- * 使用 @blakron/core 进行 Canvas 绘制 + @blakron/game 补间动画。
+ * 使用 @kurot/core 进行 Canvas 绘制 + @kurot/game 补间动画。
  * 通过 Shape、TextField 等基础显示对象构建游戏场景。
  *
  * 生命周期：constructor → ADDED_TO_STAGE → $onAddToStage → runGame → loadResource → createGameScene → startAnimation
  */
-import { createPlayer, TextField, Shape, Event, Stage, Texture, resource } from '@blakron/core';
-import { Button, DefaultAssetAdapter, Theme, UILayer, setAssetAdapter } from '@blakron/ui';
-import { Tween } from '@blakron/game';
+import { createPlayer, TextField, Shape, Event, Stage, Texture, resource } from '@kurot/core';
+import { Button, DefaultAssetAdapter, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
+import { Tween } from '@kurot/game';
 import { LoadingUI } from './LoadingUI';
 
 class Main extends UILayer {

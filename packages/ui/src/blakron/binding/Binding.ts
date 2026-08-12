@@ -1,5 +1,5 @@
 import { Watcher } from './Watcher.js';
-import type { IEventDispatcher } from '@blakron/core';
+import type { IEventDispatcher } from '@kurot/core';
 
 /**
  * Binding — static utility class for data binding.

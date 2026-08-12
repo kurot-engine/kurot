@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { Stage } from '../src/blakron/display/Stage.js';
-import { DisplayObject } from '../src/blakron/display/DisplayObject.js';
-import { StageScaleMode } from '../src/blakron/display/enums/StageScaleMode.js';
-import { OrientationMode } from '../src/blakron/display/enums/OrientationMode.js';
-import { Event } from '../src/blakron/events/Event.js';
+import { Stage } from '../src/kurot/display/Stage.js';
+import { DisplayObject } from '../src/kurot/display/DisplayObject.js';
+import { StageScaleMode } from '../src/kurot/display/enums/StageScaleMode.js';
+import { OrientationMode } from '../src/kurot/display/enums/OrientationMode.js';
+import { Event } from '../src/kurot/events/Event.js';
 
 describe('Stage', () => {
 	afterEach(() => {

@@ -1,4 +1,4 @@
-import { TouchEvent, Event, DisplayObject, DisplayObjectContainer, Matrix } from '@blakron/core';
+import { TouchEvent, Event, DisplayObject, DisplayObjectContainer, Matrix } from '@kurot/core';
 import { Component } from './Component.js';
 import { List } from './List.js';
 import { Scroller } from './Scroller.js';

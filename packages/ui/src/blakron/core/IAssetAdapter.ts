@@ -1,4 +1,4 @@
-import type { Texture } from '@blakron/core';
+import type { Texture } from '@kurot/core';
 
 /**
  * Adapter interface for resolving asset sources (e.g. image URLs) to Texture instances.

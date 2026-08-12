@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
-import { DisplayObject, RenderMode } from '../src/blakron/display/DisplayObject.js';
-import { DisplayObjectContainer } from '../src/blakron/display/DisplayObjectContainer.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { Matrix } from '../src/blakron/geom/Matrix.js';
-import { BlurFilter } from '../src/blakron/filters/BlurFilter.js';
-import { Event } from '../src/blakron/events/Event.js';
-import { TouchEvent } from '../src/blakron/events/TouchEvent.js';
-import { FocusEvent } from '../src/blakron/events/FocusEvent.js';
+import { DisplayObject, RenderMode } from '../src/kurot/display/DisplayObject.js';
+import { DisplayObjectContainer } from '../src/kurot/display/DisplayObjectContainer.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
+import { BlurFilter } from '../src/kurot/filters/BlurFilter.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { TouchEvent } from '../src/kurot/events/TouchEvent.js';
+import { FocusEvent } from '../src/kurot/events/FocusEvent.js';
 
 class BoundedChild extends DisplayObject {
 	public override $measureContentBounds(bounds: Rectangle): void {

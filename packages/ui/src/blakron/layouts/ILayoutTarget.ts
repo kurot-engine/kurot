@@ -1,4 +1,4 @@
-import type { DisplayObject } from '@blakron/core';
+import type { DisplayObject } from '@kurot/core';
 import type { IUIComponent } from '../core/IUIComponent.js';
 
 /**

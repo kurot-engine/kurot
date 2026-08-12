@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Base64Util } from '../src/blakron/utils/Base64Util.js';
+import { Base64Util } from '../src/kurot/utils/Base64Util.js';
 
 function stringToBuffer(str: string): ArrayBuffer {
 	return new TextEncoder().encode(str).buffer as ArrayBuffer;

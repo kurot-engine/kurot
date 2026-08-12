@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ByteArray, Endian } from '../src/blakron/utils/ByteArray.js';
+import { ByteArray, Endian } from '../src/kurot/utils/ByteArray.js';
 
 describe('ByteArray', () => {
 	it('empty constructor', () => {

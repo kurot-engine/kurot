@@ -1,4 +1,4 @@
-import { SpriteSheet, Texture } from '@blakron/core';
+import { SpriteSheet, Texture } from '@kurot/core';
 import { MovieClipData } from './MovieClipData.js';
 import {
 	EgretMovieClipTextureParser,

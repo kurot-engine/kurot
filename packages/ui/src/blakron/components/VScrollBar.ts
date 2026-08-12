@@ -1,4 +1,4 @@
-import { Rectangle } from '@blakron/core';
+import { Rectangle } from '@kurot/core';
 import { ScrollBarBase } from './ScrollBarBase.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 

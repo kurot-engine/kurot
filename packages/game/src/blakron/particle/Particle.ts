@@ -1,4 +1,4 @@
-import { Matrix, NumberUtils } from '@blakron/core';
+import { Matrix, NumberUtils } from '@kurot/core';
 
 export class Particle {
 	// ── Instance fields ───────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ResourceLoader } from '../src/blakron/resource/ResourceLoader.js';
-import { ResourceItem } from '../src/blakron/resource/ResourceItem.js';
-import { AnalyzerBase } from '../src/blakron/resource/analyzers/AnalyzerBase.js';
+import { ResourceLoader } from '../src/kurot/resource/ResourceLoader.js';
+import { ResourceItem } from '../src/kurot/resource/ResourceItem.js';
+import { AnalyzerBase } from '../src/kurot/resource/analyzers/AnalyzerBase.js';
 
 /** Analyzer that always resolves with loaded=true. */
 class OkAnalyzer extends AnalyzerBase {

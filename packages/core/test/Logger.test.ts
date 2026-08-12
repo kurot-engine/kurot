@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Logger, LogLevel } from '../src/blakron/utils/Logger.js';
+import { Logger, LogLevel } from '../src/kurot/utils/Logger.js';
 
 describe('Logger', () => {
 	beforeEach(() => {

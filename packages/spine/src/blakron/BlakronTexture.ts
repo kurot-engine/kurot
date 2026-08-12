@@ -1,5 +1,5 @@
 import { Texture, TextureFilter, TextureWrap } from '@esotericsoftware/spine-core';
-import type { BitmapData } from '@blakron/core';
+import type { BitmapData } from '@kurot/core';
 
 /**
  * Wraps a Blakron `BitmapData` as a `spine.Texture` so the Spine runtime

@@ -78,7 +78,7 @@ export interface SkinNode {
 	 */
 	readonly className: string;
 	/**
-	 * Module to import from (e.g. "@blakron/ui").
+	 * Module to import from (e.g. "@kurot/ui").
 	 */
 	readonly module: string;
 	/**

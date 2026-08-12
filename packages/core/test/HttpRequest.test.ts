@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { HttpRequest } from '../src/blakron/net/HttpRequest.js';
-import { Event } from '../src/blakron/events/Event.js';
-import { IOErrorEvent } from '../src/blakron/events/IOErrorEvent.js';
-import { HTTPStatusEvent } from '../src/blakron/events/HTTPStatusEvent.js';
+import { HttpRequest } from '../src/kurot/net/HttpRequest.js';
+import { Event } from '../src/kurot/events/Event.js';
+import { IOErrorEvent } from '../src/kurot/events/IOErrorEvent.js';
+import { HTTPStatusEvent } from '../src/kurot/events/HTTPStatusEvent.js';
 
 /**
  * Minimal fake XHR: only implements what `HttpRequest.send()` touches, and

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Rectangle, sharedRectangle } from '../src/blakron/geom/Rectangle.js';
-import { Point } from '../src/blakron/geom/Point.js';
+import { Rectangle, sharedRectangle } from '../src/kurot/geom/Rectangle.js';
+import { Point } from '../src/kurot/geom/Point.js';
 
 describe('Rectangle', () => {
 	it('defaults to (0,0,0,0)', () => {

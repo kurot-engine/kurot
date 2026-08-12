@@ -7,11 +7,11 @@ import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
 
 /**
- * Bundles each `@blakron/*` engine package into its own chunk under `js/`,
+ * Bundles each `@kurot/*` engine package into its own chunk under `js/`,
  * externalizing the other engine packages so code is never duplicated.
  *
  * The resulting chunks are wired into the page via an import map (see
- * `generate-html`), e.g. `@blakron/core` → `js/blakron.core.js`. This mirrors
+ * `generate-html`), e.g. `@kurot/core` → `js/blakron.core.js`. This mirrors
  * Egret's split `egret.min.js` / `eui.min.js` layout while staying ESM, so the
  * browser-side dependency graph resolves bare specifiers to cached chunks.
  *
@@ -81,7 +81,7 @@ async function bundlePackage(
 }
 
 /**
- * `@blakron/core` → `blakron.core`.
+ * `@kurot/core` → `blakron.core`.
  */
 export function chunkBaseName(pkg: string): string {
 	return pkg.replace(/^@/, '').replace(/\//g, '.');

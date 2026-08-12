@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Shape } from '../src/blakron/display/Shape.js';
-import { RenderObjectType } from '../src/blakron/display/DisplayObject.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
+import { Shape } from '../src/kurot/display/Shape.js';
+import { RenderObjectType } from '../src/kurot/display/DisplayObject.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
 
 describe('Shape', () => {
 	it('$renderObjectType is SHAPE', () => {

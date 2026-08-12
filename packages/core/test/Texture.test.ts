@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Texture } from '../src/blakron/display/texture/Texture.js';
-import { BitmapData } from '../src/blakron/display/texture/BitmapData.js';
+import { Texture } from '../src/kurot/display/texture/Texture.js';
+import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
 
 function makeBitmapData(): BitmapData {
 	const bd = new BitmapData();

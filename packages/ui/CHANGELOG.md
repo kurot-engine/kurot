@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@blakron/ui` are documented here.
+All notable changes to `@kurot/ui` are documented here.
 
 ---
 
@@ -36,7 +36,7 @@ All notable changes to `@blakron/ui` are documented here.
 
 ### Changed
 
-- **`@blakron/core` moved to `peerDependencies`** — projects that depend on both `@blakron/core` and `@blakron/ui` now share a single core instance, preventing duplicate display lists and global state.
+- **`@kurot/core` moved to `peerDependencies`** — projects that depend on both `@kurot/core` and `@kurot/ui` now share a single core instance, preventing duplicate display lists and global state.
 
 ---
 
@@ -51,7 +51,7 @@ All notable changes to `@blakron/ui` are documented here.
 
 ### Dependencies
 
-- `@blakron/core`: `^1.0.5` → `^1.0.7`
+- `@kurot/core`: `^1.0.5` → `^1.0.7`
 
 ### Tests
 
@@ -68,7 +68,7 @@ All notable changes to `@blakron/ui` are documented here.
 
 ### Dependencies
 
-- `@blakron/core`: `^1.0.4` → `^1.0.5`
+- `@kurot/core`: `^1.0.4` → `^1.0.5`
 
 ### Tests
 

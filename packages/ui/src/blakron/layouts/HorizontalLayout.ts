@@ -2,7 +2,7 @@ import { LinearLayoutBase } from './LinearLayoutBase.js';
 import { JustifyAlign } from './JustifyAlign.js';
 import type { ILayoutTarget } from './ILayoutTarget.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
-import { Rectangle } from '@blakron/core';
+import { Rectangle } from '@kurot/core';
 
 const tmpBounds = new Rectangle();
 

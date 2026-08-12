@@ -1,4 +1,4 @@
-# @blakron/cli
+# @kurot/cli
 
 CLI tool for the Blakron game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
@@ -8,20 +8,20 @@ CLI tool for the Blakron game engine — a modern replacement for the legacy Egr
 
 ## Usage
 
-`@blakron/cli` does **not** require a global install.
+`@kurot/cli` does **not** require a global install.
 
 ### Creating a project
 
 Use `npx` to scaffold a new project — no installation needed:
 
 ```bash
-npx @blakron/cli create my-game
-npx @blakron/cli create my-lib --template empty
+npx @kurot/cli create my-game
+npx @kurot/cli create my-lib --template empty
 ```
 
 ### In-project commands
 
-Scaffolded projects include `@blakron/cli` as a devDependency and expose commands via npm scripts:
+Scaffolded projects include `@kurot/cli` as a devDependency and expose commands via npm scripts:
 
 ```bash
 cd my-game
@@ -34,7 +34,7 @@ pnpm clean    # clean output
 You can also add it to an existing project manually:
 
 ```bash
-pnpm add -D @blakron/cli
+pnpm add -D @kurot/cli
 ```
 
 ## Commands
@@ -55,8 +55,8 @@ blakron create <name> [options]
 
 | Template | Extends   | Dependencies                                      | Description                                                                      |
 | -------- | --------- | ------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `game`   | `UILayer` | `@blakron/core` + `@blakron/game` + `@blakron/ui` | Full-featured project with resource loading, scene building, and Tween animation |
-| `empty`  | `Sprite`  | `@blakron/core`                                   | Minimal project — pure Canvas rendering, no extra dependencies                   |
+| `game`   | `UILayer` | `@kurot/core` + `@kurot/game` + `@kurot/ui` | Full-featured project with resource loading, scene building, and Tween animation |
+| `empty`  | `Sprite`  | `@kurot/core`                                   | Minimal project — pure Canvas rendering, no extra dependencies                   |
 
 **Lifecycle:**
 
@@ -87,9 +87,9 @@ blakron build [options]
 | development    | `bin-debug/` — per-file `.js` mirroring `src/` (`Main.js`, `com/.../X.js`) + engine chunks in `js/`       |
 | release (`-r`) | `bin-release/web/<timestamp>/` — `js/main.min_<hash>.js` + `js/blakron.*.min_<hash>.js` + `manifest.json` |
 
-Engine packages (`@blakron/*`) are bundled into separate `js/blakron.<name>.js`
+Engine packages (`@kurot/*`) are bundled into separate `js/blakron.<name>.js`
 chunks and wired up through an HTML **import map**, so the app bundle and engine
-resolve bare specifiers (`import { Sprite } from '@blakron/core'`) in the browser
+resolve bare specifiers (`import { Sprite } from '@kurot/core'`) in the browser
 without duplicating engine code. `resource/` (including the compiled
 `default.thm.json`) is copied with fixed names, since user code references those
 paths directly. The entry script bootstraps via your own `createPlayer()` call.
@@ -191,7 +191,7 @@ The CLI includes a complete EXML skin parsing and code generation pipeline (XML 
 - **XML Parsing** — lightweight parser with namespace, CDATA, and comment support
 - **AST / IR Generation** — converts to an intermediate representation (SkinIR)
 - **Code Generation** — outputs ESM factory functions
-- **Component Registry** — built-in `eui:*` / `egret:*` namespace mapping to `@blakron/ui` / `@blakron/core`
+- **Component Registry** — built-in `eui:*` / `egret:*` namespace mapping to `@kurot/ui` / `@kurot/core`
 - **Custom Namespaces** — maps project prefixes such as `game:*` to source barrel files through `exml.namespaces`
 - **View States** — supports `<eui:states>`, shorthand `states="up,down"`, state properties, `includeIn`, and `excludeFrom`
 - **Skin Properties** — preserves root properties such as `minWidth`, `minHeight`, and state-specific values
@@ -209,7 +209,7 @@ For initialization that requires every EXML skin part to be available, override
 `childrenCreated()`:
 
 ```ts
-import { Component } from '@blakron/ui';
+import { Component } from '@kurot/ui';
 
 export class BattlePanel extends Component {
 	protected override childrenCreated(): void {
@@ -222,7 +222,7 @@ export class BattlePanel extends Component {
 The event-based equivalent is useful when initialization is composed externally:
 
 ```ts
-import { UIEvent } from '@blakron/ui';
+import { UIEvent } from '@kurot/ui';
 
 this.once(UIEvent.CREATION_COMPLETE, this.onCreationComplete);
 ```
@@ -285,12 +285,12 @@ my-game/
 
 ```bash
 # Full-featured game project (default)
-npx @blakron/cli create my-game
+npx @kurot/cli create my-game
 cd my-game && pnpm install
 pnpm dev
 
 # Minimal project
-npx @blakron/cli create my-lib --template empty
+npx @kurot/cli create my-lib --template empty
 cd my-lib && pnpm install
 pnpm dev
 ```

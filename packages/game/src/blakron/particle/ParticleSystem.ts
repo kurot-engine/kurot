@@ -8,7 +8,7 @@ import {
 	ticker,
 	getTimer,
 	type RenderObjectType,
-} from '@blakron/core';
+} from '@kurot/core';
 import { Particle } from './Particle.js';
 
 // ── Region helper for bounds calculation ──────────────────────────────────────

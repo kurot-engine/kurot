@@ -1,4 +1,4 @@
-# @blakron/core
+# @kurot/core
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
@@ -53,7 +53,7 @@ The flat InstructionSet pipeline and multi-texture batching apply to the WebGL b
 **Migrating from Egret (1.0.0 breaking changes)**
 
 - `.hashCode` and the `HashObject` base class were removed. Use `WeakMap`-keyed lookups or `===` for object identity instead of comparing integer hash codes. Internal consumers were migrated to `WeakMap` in 0.6.3.
-- `Resource.instance` (singleton getter) was removed — import the shared `resource` instance directly: `import { resource } from '@blakron/core'`.
+- `Resource.instance` (singleton getter) was removed — import the shared `resource` instance directly: `import { resource } from '@kurot/core'`.
 - The multi-Player listener registration API on `DisplayObject` / `DisplayObjectContainer` (`addStructureChangeListener` / `addRenderableDirtyListener` / `addContainerStructureChangeListener`) was removed — the engine is single-Player by design.
 - `WebGLRenderContext.getInstance()` / `resetInstance()` were removed — `Player` constructs the context directly.
 - Internal fields were renamed with a `$` prefix (e.g. `$x`, `$y`, `$renderDirty`) to separate engine state from public API.
@@ -61,7 +61,7 @@ The flat InstructionSet pipeline and multi-texture batching apply to the WebGL b
 
 **vs. Egret**
 
-| Aspect      | Egret             | Blakron                 |
+| Aspect      | Egret             | Kurot                 |
 | ----------- | ----------------- | ----------------------- |
 | Code size   | 42,340 lines      | ~18,500 lines           |
 | Modules     | `namespace egret` | ES Module               |
@@ -89,7 +89,7 @@ The rendering pipeline borrows concepts from Pixi.js 8 while keeping the Egret d
 ## Quick Start
 
 ```typescript
-import { createPlayer, Sprite, Shape } from '@blakron/core';
+import { createPlayer, Sprite, Shape } from '@kurot/core';
 
 const app = createPlayer({
 	canvas: document.getElementById('game-canvas') as HTMLCanvasElement,
@@ -129,7 +129,7 @@ pnpm run dev          # watch mode
 - [Architecture](./docs/architecture.md) — engine structure and rendering pipeline
 - [Resource system](./docs/resource.md) — resource configuration, loading, and lifecycle
 - [PixiJS alignment](./docs/pixi-alignment.md) — rendering concepts adopted from PixiJS and intentional differences
-- [Live demo](https://irwinmc.github.io/blakron-demo/) — interactive rendering examples
+- [Live demo](https://irwinmc.github.io/kurot-demo/) — interactive rendering examples
 
 ## Test Pages
 

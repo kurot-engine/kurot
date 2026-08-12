@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NumberUtils } from '../src/blakron/utils/NumberUtils.js';
+import { NumberUtils } from '../src/kurot/utils/NumberUtils.js';
 
 describe('NumberUtils', () => {
 	it('sin(0) = 0', () => expect(NumberUtils.sin(0)).toBe(0));

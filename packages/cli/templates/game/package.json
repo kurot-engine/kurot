@@ -1,5 +1,5 @@
 {
-	"name": "blakron-game",
+	"name": "kurot-game",
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
@@ -9,11 +9,11 @@
 		"clean": "blakron clean"
 	},
 	"dependencies": {
-		"@blakron/core": "latest",
-		"@blakron/game": "latest",
-		"@blakron/ui": "latest"
+		"@kurot/core": "latest",
+		"@kurot/game": "latest",
+		"@kurot/ui": "latest"
 	},
 	"devDependencies": {
-		"@blakron/cli": "latest"
+		"@kurot/cli": "latest"
 	}
 }

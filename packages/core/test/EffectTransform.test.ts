@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Sprite } from '../src/blakron/display/Sprite.js';
-import { Filter } from '../src/blakron/filters/Filter.js';
-import { Matrix } from '../src/blakron/geom/Matrix.js';
-import { Rectangle } from '../src/blakron/geom/Rectangle.js';
-import { InstructionSet } from '../src/blakron/player/webgl/InstructionSet.js';
-import type { WebGLRenderBuffer } from '../src/blakron/player/webgl/WebGLRenderBuffer.js';
-import { WebGLRenderer } from '../src/blakron/player/webgl/WebGLRenderer.js';
+import { Sprite } from '../src/kurot/display/Sprite.js';
+import { Filter } from '../src/kurot/filters/Filter.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
+import { InstructionSet } from '../src/kurot/player/webgl/InstructionSet.js';
+import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
+import { WebGLRenderer } from '../src/kurot/player/webgl/WebGLRenderer.js';
 
 interface TestTransform {
 	a: number;

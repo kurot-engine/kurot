@@ -2,7 +2,7 @@ import { Component } from './Component.js';
 import type { IViewport } from '../core/IViewport.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
-import { Event } from '@blakron/core';
+import { Event } from '@kurot/core';
 
 /**
  * Base class for scroll bars.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BlendMode, blendModeToNumber, numberToBlendMode } from '../src/blakron/display/enums/BlendMode.js';
+import { BlendMode, blendModeToNumber, numberToBlendMode } from '../src/kurot/display/enums/BlendMode.js';
 
 describe('BlendMode', () => {
 	it('blendModeToNumber returns sequential indices', () => {

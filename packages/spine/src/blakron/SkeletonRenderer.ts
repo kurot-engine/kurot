@@ -6,7 +6,7 @@ import {
 	SkeletonClipping,
 	SkeletonData,
 } from '@esotericsoftware/spine-core';
-import { Sprite } from '@blakron/core';
+import { Sprite } from '@kurot/core';
 import { SlotRenderer } from './SlotRenderer.js';
 
 /**

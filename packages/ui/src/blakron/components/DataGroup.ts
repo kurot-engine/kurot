@@ -1,4 +1,4 @@
-import { Rectangle, Event, DisplayObject } from '@blakron/core';
+import { Rectangle, Event, DisplayObject } from '@kurot/core';
 import { Group } from './Group.js';
 import { ItemRenderer } from './ItemRenderer.js';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';

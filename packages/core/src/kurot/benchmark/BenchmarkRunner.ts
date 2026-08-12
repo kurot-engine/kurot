@@ -13,7 +13,7 @@ export interface SceneDescriptor {
 
 /**
  * 纯状态机，管理 warmup/measuring/paused 状态。
- * 不依赖 Blakron 引擎，通过外部注入的回调与引擎交互。
+ * 不依赖 Kurot 引擎，通过外部注入的回调与引擎交互。
  */
 export class BenchmarkRunner {
 	private phase: Phase = 'idle';

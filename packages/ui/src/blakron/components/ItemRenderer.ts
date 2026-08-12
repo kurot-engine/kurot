@@ -1,4 +1,4 @@
-import { TouchEvent, Event, type Stage } from '@blakron/core';
+import { TouchEvent, Event, type Stage } from '@kurot/core';
 import { Component } from './Component.js';
 import { Label } from './Label.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';

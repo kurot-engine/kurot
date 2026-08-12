@@ -1,4 +1,4 @@
-import { ticker, getTimer } from '@blakron/core';
+import { ticker, getTimer } from '@kurot/core';
 
 /**
  * Simple value-tween utility used by TouchScroll for throw animations.

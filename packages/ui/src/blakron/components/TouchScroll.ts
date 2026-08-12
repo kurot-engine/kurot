@@ -1,4 +1,4 @@
-import { ticker, getTimer } from '@blakron/core';
+import { ticker, getTimer } from '@kurot/core';
 import { Animation } from './Animation.js';
 
 // ── Constants ──────────────────────────────────────────────────────────

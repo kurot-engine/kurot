@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Event, Sprite, Stage, TouchEvent } from '@blakron/core';
+import { Event, Sprite, Stage, TouchEvent } from '@kurot/core';
 import { ScrollPolicy, ScrollView } from '../src/blakron/display/ScrollView.js';
 
 function createScrollView(contentWidth = 100, contentHeight = 300): { stage: Stage; view: ScrollView; content: Sprite } {

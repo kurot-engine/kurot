@@ -9,7 +9,7 @@ import {
 	Texture,
 	Sound,
 	type EventMap,
-} from '@blakron/core';
+} from '@kurot/core';
 import type { URLRequest } from './URLRequest.js';
 import { URLLoaderDataFormat } from './URLLoaderDataFormat.js';
 import { URLRequestMethod } from './URLRequestMethod.js';

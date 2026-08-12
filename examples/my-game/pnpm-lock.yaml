@@ -8,33 +8,33 @@ importers:
 
   .:
     dependencies:
-      '@blakron/core':
+      '@kurot/core':
         specifier: ^1.0.7
         version: 1.0.7
-      '@blakron/game':
+      '@kurot/game':
         specifier: ^1.0.4
         version: 1.0.4
-      '@blakron/ui':
+      '@kurot/ui':
         specifier: ^1.1.4
         version: 1.1.4
     devDependencies:
-      '@blakron/cli':
+      '@kurot/cli':
         specifier: ^1.0.0
         version: 1.0.0
 
 packages:
 
-  '@blakron/cli@1.0.0':
+  '@kurot/cli@1.0.0':
     resolution: {integrity: sha512-NGmXY/m4vPinnXDWeGhikHrm6lx6FYef2+QlTJXgPcP+HSIGjz9o+mgOv02v69MLOQkb0yXgU6Q3E1Ij0nRuFw==}
     hasBin: true
 
-  '@blakron/core@1.0.7':
+  '@kurot/core@1.0.7':
     resolution: {integrity: sha512-dftqc6JVjMY/COyBttmYllVQsAZg5kejieRi8NVSkijCTSMFzLJMmni8xgNULuu8IEgSn3xOPATHgoEtYhnCzw==}
 
-  '@blakron/game@1.0.4':
+  '@kurot/game@1.0.4':
     resolution: {integrity: sha512-XqkXHvlpJyRVDc2590HHzKEJ+qGMkK6Y/4l21J66COdGbFvAd/QzDWPpCS1Y/O8Mm4g8MI+GJMz8/bfRb4Ot4Q==}
 
-  '@blakron/ui@1.1.4':
+  '@kurot/ui@1.1.4':
     resolution: {integrity: sha512-+bqJ/SJWAsYMKpQDsFPgEgm6TTVco110DtU9A7S99kc4NayolfxVV0EiogFAABDdyT/wZ+3pRGAHi60+kVEP5w==}
 
   '@esbuild/aix-ppc64@0.25.12':
@@ -204,20 +204,20 @@ packages:
 
 snapshots:
 
-  '@blakron/cli@1.0.0':
+  '@kurot/cli@1.0.0':
     dependencies:
       commander: 13.1.0
       esbuild: 0.25.12
 
-  '@blakron/core@1.0.7': {}
+  '@kurot/core@1.0.7': {}
 
-  '@blakron/game@1.0.4':
+  '@kurot/game@1.0.4':
     dependencies:
-      '@blakron/core': 1.0.7
+      '@kurot/core': 1.0.7
 
-  '@blakron/ui@1.1.4':
+  '@kurot/ui@1.1.4':
     dependencies:
-      '@blakron/core': 1.0.7
+      '@kurot/core': 1.0.7
 
   '@esbuild/aix-ppc64@0.25.12':
     optional: true
