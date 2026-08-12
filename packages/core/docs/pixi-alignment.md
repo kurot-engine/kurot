@@ -1,7 +1,8 @@
 # Kurot → PixiJS 8 对齐规划
 
-> 更新日期：2026-07-24
-> 当前 core 版本：0.6.2
+> 本文档是路线图/提案，不描述当前已实现的行为。当前实现请看
+> [architecture.md](./architecture.md)。下述各项截至 core 1.0.12 均尚未实现，
+> 除非条目内注明"部分完成"。
 
 ---
 
@@ -11,19 +12,19 @@ Kurot 的渲染管线（InstructionSet + RenderPipe + 多纹理合批）已经�
 
 ### 已对齐的能力
 
-| 能力                                       | 状态    |
-| ------------------------------------------ | ------- |
-| InstructionSet 扁平化指令集                | ✅ v0.5 |
-| RenderPipe 分派体系                        | ✅ v0.5 |
-| 多纹理合批（MultiTextureBatcher）          | ✅ v0.5 |
-| 脏标记系统（structureDirty / renderDirty） | ✅ v0.5 |
-| 指令/对象池复用                            | ✅ v0.5 |
-| FinalizationRegistry GPU 纹理自动回收      | ✅ v0.5 |
-| GPU buffer 预分配 + bufferSubData          | ✅ v0.5 |
-| Blur FBO 池复用                            | ✅ v0.5 |
-| RenderGroup 独立指令集                     | ✅ v0.5 |
-| WebGL 1 + 2 双后端自动选择                 | ✅ v0.5 |
-| ParticlePipe 粒子系统                      | ✅ v0.5 |
+已实现，详见 [architecture.md](./architecture.md)：
+
+- InstructionSet 扁平化指令集
+- RenderPipe 分派体系
+- 多纹理合批（MultiTextureBatcher）
+- 脏标记系统（structureDirty / renderDirty）
+- 指令/对象池复用
+- FinalizationRegistry GPU 纹理自动回收
+- GPU buffer 预分配 + bufferSubData
+- Blur FBO 池复用
+- RenderGroup 独立指令集
+- WebGL 1 + 2 双后端自动选择
+- ParticlePipe 粒子系统
 
 ---
 
@@ -210,25 +211,30 @@ function getDefaultRegistry(): RenderPipeRegistry {
 
 ---
 
-### 5. 压缩纹理支持（KTX2/Basis）
+### 5. 压缩纹理支持（KTX2/Basis）— 数据结构已预留，GPU 上传路径未接入
 
-**现状**：`BitmapData` 只支持 `HTMLImageElement` / `HTMLCanvasElement` 作为数据源。移动端纹理内存占用大（RGBA8: 4MB/1024²）。
+**现状**：`display/texture/BitmapData.ts` 已经有 `CompressedTextureData` 类
+（`glInternalFormat`/`width`/`height`/`byteArray`/`face`/`level`）和
+`BitmapData.compressedTextureData` 数组，配套
+`getCompressed2dTextureData()`/`setCompressed2dTextureData()` 读写方法——
+容器层面的数据结构已经存在。但 `WebGLRenderContext.getWebGLTexture()` 的
+实际上传路径只调用 `gl.texImage2D(..., gl.RGBA, gl.UNSIGNED_BYTE, source)`，
+从未读取 `compressedTextureData` 或调用 `gl.compressedTexImage2D`——也就是
+说压缩纹理数据目前存得下但传不上 GPU，实际渲染仍然是标准 RGBA8 路径。
+移动端纹理内存占用仍然是 RGBA8 的量级（4MB/1024²）。
 
 **PixiJS 做法**：`CompressedTextureResource` + `KTXParser` / `BasisParser`，加载时解析压缩纹理容器，直接上传到 GPU 不解码。
 
 **方案**（分阶段）：
 
-**阶段 1 — 容器解析**：新建 `TextureContainer` 抽象，支持 PNG/JPEG（现有）和 KTX2（新增）。`BitmapData` 通过 `sourceType` 区分。
+**阶段 1 — 解析器**：新建 KTX2 容器解析器，把文件解析成
+`CompressedTextureData[]`（已有的类型），填充进
+`BitmapData.setCompressed2dTextureData()`。
 
-```ts
-export const enum TextureSourceType {
-	IMAGE = 0,
-	CANVAS = 1,
-	KTX2 = 2,
-}
-```
-
-**阶段 2 — GPU 上传**：`WebGLRenderContext.updateTexture()` 根据 `sourceType` 选择 `gl.texImage2D`（RGBA8）或 `gl.compressedTexImage2D`（KTX2）。
+**阶段 2 — GPU 上传**：`WebGLRenderContext.getWebGLTexture()` 增加分支：
+若 `bitmapData.hasCompressed2d()` 为真，走
+`gl.compressedTexImage2D(gl.TEXTURE_2D, level, glInternalFormat, width, height, 0, byteArray)`；
+否则维持现有的 `gl.texImage2D` 路径。
 
 **阶段 3 — 转码 polyfill**：对于不支持压缩纹理的 GPU，使用 Basis Universal 转码器在 CPU 端解码为 RGBA8 再上传。
 
@@ -305,15 +311,15 @@ if (navigator.gpu) {
 
 ## 汇总
 
-| 优先级 | 项目             | 工期 | 收益               |
-| ------ | ---------------- | ---- | ------------------ |
-| P1     | 动态纹理槽位     | 1d   | WebGL2 合批翻倍    |
-| P1     | Shader Bits 组装 | 2d   | 维护成本大降       |
-| P3     | 帧间顶点缓存复用 | 1d   | 静态 UI 省上传带宽 |
-| P2     | Pipe 注册系统    | 1d   | 扩展性             |
-| P2     | 压缩纹理 KTX2    | 5d   | 移动端内存 -80%    |
-| P3     | WebGPU 后端      | 10d+ | 未来竞争力         |
-| P3     | 滤镜扩展         | 按需 | 表现力             |
+| 优先级 | 项目                        | 工期 | 收益               |
+| ------ | --------------------------- | ---- | ------------------ |
+| P1     | 动态纹理槽位                | 1d   | WebGL2 合批翻倍    |
+| P1     | Shader Bits 组装            | 2d   | 维护成本大降       |
+| P3     | 帧间顶点缓存复用            | 1d   | 静态 UI 省上传带宽 |
+| P2     | Pipe 注册系统               | 1d   | 扩展性             |
+| P2     | 压缩纹理 KTX2（容器已预留） | 5d   | 移动端内存 -80%    |
+| P3     | WebGPU 后端                 | 10d+ | 未来竞争力         |
+| P3     | 滤镜扩展                    | 按需 | 表现力             |
 
 **建议顺序**：1 → 4 → 2 → 5，其余按需。
 
@@ -324,7 +330,7 @@ if (navigator.gpu) {
 - [ ] **P1-1 动态纹理槽位**（1d）— `MultiTextureBatcher.MAX_TEXTURES` 改为从 GPU 查询，WebGL2 设备 8→16
 - [ ] **P1-2 Shader Bits 组装**（2d）— ShaderLib/ShaderLib2 改为 bit 组合拼接，消除双份手写 GLSL
 - [ ] **P2-4 Pipe 注册系统**（1d）— `RenderPipeRegistry`，`@kurot/spine-4.3` 可注入 `SpinePipe`
-- [ ] **P2-5 压缩纹理 KTX2**（5d）— `compressedTexImage2D`，移动端纹理内存 -80%
+- [ ] **P2-5 压缩纹理 KTX2**（5d）— 数据结构（`CompressedTextureData`）已就位，缺 KTX2 解析器 + `WebGLRenderContext` 的 `compressedTexImage2D` 上传分支，移动端纹理内存 -80%
 - [ ] **P3-6 WebGPU 后端**（10d+）— 等浏览器支持率 > 70%
 - [ ] **P3-7 滤镜扩展**（按需）— ColorOverlay / Outline / Adjustment
 - [ ] **P3-8 帧间顶点缓存复用**（1d）— CRC32 指纹，静态 UI 跳过 bufferSubData
