@@ -5,10 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. It complements, and does not replace,
 [architecture.md](./architecture.md), [pixi-alignment.md](./pixi-alignment.md),
 and [resource.md](./resource.md) — those go deeper on rendering internals and
-the resource system. `architecture.md`'s multi-Player/HashObject/
-`experimental-webgl` sections were corrected on 2026-08-12 to match current
-(1.0.12) behavior — it is no longer stale on those points, see its own
-"补丁勘误" note at the top.
+the resource system.
 
 Package identity: `@kurot/core@1.0.12`, TypeScript rewrite of the Egret engine
 runtime. Keeps Egret's public `DisplayObject`/event API surface, replaces the

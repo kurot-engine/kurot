@@ -2,9 +2,10 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from scratch
-each session. It complements `docs/architecture.md` — but where the two
-disagree, **prefer this file** (see §2, the Skin/Group discrepancy is a known
-staleness in `architecture.md`).
+each session. It complements `docs/architecture.md` — that file covers the
+_why_ (design rationale, validation cycle internals, layout algorithm
+internals, Egret comparison); this file covers the _what to watch out for_
+(gotchas, terminology, task→file lookup).
 
 Package identity: `@kurot/ui@1.1.7`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
@@ -49,7 +50,7 @@ src/kurot/
   is `class Skin extends EventDispatcher<SkinEvents>` — a plain data holder,
   not a visual container. `docs/architecture.md` §3.4 claims "a skin is a
   plain Group subclass" — **that line is stale, do not trust it.** A skin's
-  `elementsContent: DisplayObject[]` are physically parented onto the *host*
+  `elementsContent: DisplayObject[]` are physically parented onto the _host_
   `Component` by `Component._setSkin()`, not onto the skin itself. The skin
   object itself never appears in the display tree — its only job is to
   declare `skinParts`/`states`/bindings.
@@ -57,13 +58,13 @@ src/kurot/
   `states`/`currentState`/`_commitCurrentState()` itself (containers have no
   skin). `Component` delegates state application to its attached
   `Skin.currentState` setter. Both call the same `IOverride.apply/remove(host,
-  skin)` signature, but `Group._commitCurrentState()` passes `this` cast
+skin)` signature, but `Group._commitCurrentState()` passes `this` cast
   `as unknown as Skin` — a type-unsafe workaround since Group has neither a
   real Component nor a real Skin.
 - `Component._invokeSkinFactory()` distinguishes EXML-compiled **factory
   functions** (called with `.call(this)`, so `this` resolves to the host —
   required for `Binding.bindProperty(this, ...)`) from real `class extends
-  Skin` constructors (detected via regex on `Function.prototype.toString()`,
+Skin` constructors (detected via regex on `Function.prototype.toString()`,
   invoked with `new`). A hand-written class-based skin using EXML-style
   `{binding}` syntax will silently get the wrong `this` — the source comment
   explicitly warns skins with EXML bindings must be factory functions, not
@@ -75,7 +76,7 @@ src/kurot/
   forced) value, not the cached intent — easy to miss.
 - `UIState.setWidth()`/`setHeight()` write to `this._owner.$explicitWidth`, a
   **core** `DisplayObject` field — not a UIState-local field. Only the
-  *measured/actual* size lives in `UIState`. Setting `.width` is not a simple
+  _measured/actual_ size lives in `UIState`. Setting `.width` is not a simple
   property write: it triggers `invalidateProperties()` +
   `invalidateDisplayList()` + parent invalidation as side effects.
 - **Reading `.width`/`.height` can force a synchronous layout pass.**
@@ -116,18 +117,18 @@ src/kurot/
 
 ## 3. Domain-specific terminology
 
-| Term | Definition | Where defined |
-|---|---|---|
-| `UIState` | The actual layout state machine every `Group`/`Component` delegates to via `this.ui`. Owns constraint fields (left/right/top/bottom/center/percent) packed into a `Record<K, number\|boolean>` keyed by a numeric `const enum K`. Talks back to its host only through the narrow `IUIOwner` interface, decoupling it from any specific DisplayObject subclass. | `core/UIState.ts` |
-| `IUIOwner` | The callback interface `UIState` uses to talk back to its host component (`createChildren()`, `commitProperties()`, `measure()`, `updateDisplayList()`, `childrenCreated()`). Implemented by `Group` and `Component`. | `core/IUIComponent.ts` (or adjacent) |
-| Validation cycle | Three RAF-batched phases run in order: **validateProperties** (shallow→deep, `commitProperties()`), **validateSize** (deep→shallow, `measure()`), **validateDisplayList** (shallow→deep, `updateDisplayList()`). Scheduled by the global `Validator`/`validator` singleton, sorted by `$nestLevel` (a **core** `DisplayObject` field, not a UI concept — see `packages/core/src/kurot/display/DisplayObject.ts`). | `core/Validator.ts` |
-| `Validator.validateClient(target)` | Forces synchronous validation of everything at or below `target`'s depth. Used by `validateNow()` and by the re-add-to-stage path in `UIState`. | `core/Validator.ts` |
-| `Theme` | Maps a component's class name (`hostComponentKey`) to a default skin class name, loaded via `IThemeAdapter` (network fetch by default). Components created before the theme finishes loading queue into a `_delayList` and get skinned retroactively. | `core/Theme.ts` |
-| `skinParts` | `Skin.skinParts: string[]` — property names the component looks up via `skin.getPart(name)` (plain `this[name]` lookup on the skin instance) and binds via `Component.setSkinPart()`. Purely convention-based, no decorators/metadata. | `components/Skin.ts`, `components/Component.ts` |
-| Skin/State/SetProperty pattern | Declare `skinParts` + `states: State[]` in a `Skin` subclass. `Component.currentState` flows into `Skin.currentState`, which diffs old vs new `State.overrides` and calls `apply()`/`remove()` on each `IOverride`. | `states/State.ts`, `states/IOverride.ts`, `states/SetProperty.ts`, `components/Skin.ts` |
-| `IViewport` | Extends `IUIComponent` with `contentWidth`/`contentHeight` (readonly) and `scrollH`/`scrollV`/`scrollEnabled`. Implemented by `Group` (and thus `DataGroup`/`List`), consumed by `Scroller`. | `core/IViewport.ts` |
-| Virtual layout | Layout mode where only currently-visible-index item renderers are instantiated; off-screen renderers recycle into `DataGroup._freeRenderers` (a `Map<class, ItemRenderer[]>` free-list pool keyed by renderer class). Toggled via `layout.useVirtualLayout`. Off by default (unlike Egret EUI). | `layouts/LayoutBase.ts`, `components/DataGroup.ts` |
-| `childrenCreated()` vs `UIEvent.CREATION_COMPLETE` | `childrenCreated()` is the imperative override hook, called synchronously once right after `createChildren()`. `CREATION_COMPLETE` is the event fired immediately after, for external listeners. Both fire at the same instant, exactly once per instance. | `core/UIState.ts` (`$onAddToStage`), `events/UIEvent.ts` |
+| Term                                               | Definition                                                                                                                                                                                                                                                                                                                                                                                                        | Where defined                                                                           |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `UIState`                                          | The actual layout state machine every `Group`/`Component` delegates to via `this.ui`. Owns constraint fields (left/right/top/bottom/center/percent) packed into a `Record<K, number\|boolean>` keyed by a numeric `const enum K`. Talks back to its host only through the narrow `IUIOwner` interface, decoupling it from any specific DisplayObject subclass.                                                    | `core/UIState.ts`                                                                       |
+| `IUIOwner`                                         | The callback interface `UIState` uses to talk back to its host component (`createChildren()`, `commitProperties()`, `measure()`, `updateDisplayList()`, `childrenCreated()`). Implemented by `Group` and `Component`.                                                                                                                                                                                             | `core/IUIComponent.ts` (or adjacent)                                                    |
+| Validation cycle                                   | Three RAF-batched phases run in order: **validateProperties** (shallow→deep, `commitProperties()`), **validateSize** (deep→shallow, `measure()`), **validateDisplayList** (shallow→deep, `updateDisplayList()`). Scheduled by the global `Validator`/`validator` singleton, sorted by `$nestLevel` (a **core** `DisplayObject` field, not a UI concept — see `packages/core/src/kurot/display/DisplayObject.ts`). | `core/Validator.ts`                                                                     |
+| `Validator.validateClient(target)`                 | Forces synchronous validation of everything at or below `target`'s depth. Used by `validateNow()` and by the re-add-to-stage path in `UIState`.                                                                                                                                                                                                                                                                   | `core/Validator.ts`                                                                     |
+| `Theme`                                            | Maps a component's class name (`hostComponentKey`) to a default skin class name, loaded via `IThemeAdapter` (network fetch by default). Components created before the theme finishes loading queue into a `_delayList` and get skinned retroactively.                                                                                                                                                             | `core/Theme.ts`                                                                         |
+| `skinParts`                                        | `Skin.skinParts: string[]` — property names the component looks up via `skin.getPart(name)` (plain `this[name]` lookup on the skin instance) and binds via `Component.setSkinPart()`. Purely convention-based, no decorators/metadata.                                                                                                                                                                            | `components/Skin.ts`, `components/Component.ts`                                         |
+| Skin/State/SetProperty pattern                     | Declare `skinParts` + `states: State[]` in a `Skin` subclass. `Component.currentState` flows into `Skin.currentState`, which diffs old vs new `State.overrides` and calls `apply()`/`remove()` on each `IOverride`.                                                                                                                                                                                               | `states/State.ts`, `states/IOverride.ts`, `states/SetProperty.ts`, `components/Skin.ts` |
+| `IViewport`                                        | Extends `IUIComponent` with `contentWidth`/`contentHeight` (readonly) and `scrollH`/`scrollV`/`scrollEnabled`. Implemented by `Group` (and thus `DataGroup`/`List`), consumed by `Scroller`.                                                                                                                                                                                                                      | `core/IViewport.ts`                                                                     |
+| Virtual layout                                     | Layout mode where only currently-visible-index item renderers are instantiated; off-screen renderers recycle into `DataGroup._freeRenderers` (a `Map<class, ItemRenderer[]>` free-list pool keyed by renderer class). Toggled via `layout.useVirtualLayout`. Off by default (unlike Egret EUI).                                                                                                                   | `layouts/LayoutBase.ts`, `components/DataGroup.ts`                                      |
+| `childrenCreated()` vs `UIEvent.CREATION_COMPLETE` | `childrenCreated()` is the imperative override hook, called synchronously once right after `createChildren()`. `CREATION_COMPLETE` is the event fired immediately after, for external listeners. Both fire at the same instant, exactly once per instance.                                                                                                                                                        | `core/UIState.ts` (`$onAddToStage`), `events/UIEvent.ts`                                |
 
 ## 4. Public API surface (`src/index.ts`)
 
@@ -171,12 +172,12 @@ before patching core's transform code.
 
 ## 6. Task → file map
 
-| I want to... | Look at |
-|---|---|
-| Add a new skinnable widget | `components/Component.ts` for the base pattern, model on `components/Button.ts` |
-| Add a new container-only widget (no skin) | `components/Group.ts` |
-| Add a new layout algorithm | `layouts/LayoutBase.ts`, follow `layouts/VerticalLayout.ts` |
-| Debug a state not applying | `components/Skin.ts` (`currentState` setter, `_applyState`), `states/State.ts`, `states/IOverride.ts` |
-| Debug a binding not firing | Check the source property's setter actually calls `PropertyEvent.dispatchPropertyEvent` — see `binding/Watcher.ts` |
-| Add virtual-layout support to a new layout | `layouts/LayoutBase.ts` (`elementAdded`/`elementRemoved`/`getElementIndicesInView`/`clearVirtualLayoutCache`), reference `layouts/VerticalLayout.ts`'s `elementSizeTable` |
-| Understand the validation/RAF scheduling order | `core/Validator.ts` |
+| I want to...                                   | Look at                                                                                                                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add a new skinnable widget                     | `components/Component.ts` for the base pattern, model on `components/Button.ts`                                                                                           |
+| Add a new container-only widget (no skin)      | `components/Group.ts`                                                                                                                                                     |
+| Add a new layout algorithm                     | `layouts/LayoutBase.ts`, follow `layouts/VerticalLayout.ts`                                                                                                               |
+| Debug a state not applying                     | `components/Skin.ts` (`currentState` setter, `_applyState`), `states/State.ts`, `states/IOverride.ts`                                                                     |
+| Debug a binding not firing                     | Check the source property's setter actually calls `PropertyEvent.dispatchPropertyEvent` — see `binding/Watcher.ts`                                                        |
+| Add virtual-layout support to a new layout     | `layouts/LayoutBase.ts` (`elementAdded`/`elementRemoved`/`getElementIndicesInView`/`clearVirtualLayoutCache`), reference `layouts/VerticalLayout.ts`'s `elementSizeTable` |
+| Understand the validation/RAF scheduling order | `core/Validator.ts`                                                                                                                                                       |
