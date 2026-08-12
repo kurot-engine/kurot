@@ -295,7 +295,7 @@ import { resource, ResourceConfig } from '@kurot/core';
 
 ## 与 Egret RES 的对比
 
-| 维度       | Egret RES               | Kurot Resource                    |
+| 维度       | Egret RES               | Kurot Resource                      |
 | ---------- | ----------------------- | ----------------------------------- |
 | API 风格   | 回调 `compFunc(data)`   | `async/await` + Promise             |
 | 模块化     | 全局 `RES.xxx`          | ES Module 导入                      |
@@ -305,7 +305,7 @@ import { resource, ResourceConfig } from '@kurot/core';
 | XML 解析   | 内置                    | 剔除（EXML compiler 处理）          |
 | 国际化     | 内置                    | 剔除（不属于资源加载器职责）        |
 | 解析器类型 | 8 种                    | 5 种（Image/Json/Text/Sound/Sheet） |
-| 代码量     | ~3,000 行               | ~600 行                             |
+| 代码量     | ~3,000 行               | ~1,400 行                           |
 
 ### 剔除的功能
 
