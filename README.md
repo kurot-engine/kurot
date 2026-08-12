@@ -9,7 +9,7 @@ Kurot 是一个面向 Web 的 2D 游戏引擎，基于 **TypeScript、ESM 与 ES
 - WebGL 主渲染后端与 Canvas 2D 降级后端。
 - EUI 兼容的组件、布局、状态、数据绑定和主题系统。
 - 构建期 EXML → ESM 编译，运行时无需解析 XML。
-- Tween、MovieClip、ScrollView、URLLoader 和 Spine 4.x 支持。
+- Tween、MovieClip、ScrollView、URLLoader 和 Spine 4.3 支持。
 
 > **命名说明：** npm 包已迁移至 `@kurot/*`。CLI、配置文件和源码路径中的历史 `blakron` 标识将在后续迁移步骤中统一处理。
 
@@ -22,16 +22,16 @@ Kurot 由多个独立维护的 pnpm 包组成。仓库根目录目前没有 `pnp
 | [`@kurot/core`](packages/core/README.md) | `packages/core` | 显示对象、渲染、事件、几何、文本、资源、网络和媒体等引擎基础能力 | 无 |
 | [`@kurot/ui`](packages/ui/README.md) | `packages/ui` | EUI 兼容的 UI 组件、布局、皮肤、主题与数据绑定 | `@kurot/core` |
 | [`@kurot/game`](packages/game/README.md) | `packages/game` | Tween、MovieClip、ScrollView、URLLoader 等游戏扩展 | `@kurot/core` |
-| [`@kurot/spine`](packages/spine/README.md) | `packages/spine` | 基于 Spine 4.x 的骨骼动画适配运行时 | `@kurot/core` |
+| [`@kurot/spine-4.3`](packages/spine-4.3/README.md) | `packages/spine-4.3` | 基于 Spine 4.3 的骨骼动画适配运行时 | `@kurot/core` |
 | [`@kurot/cli`](packages/cli/README.md) | `packages/cli` | Node.js 构建工具、项目脚手架与 EXML 编译器 | 无 |
 
-依赖方向保持单向：`core` 是基础包；`ui`、`game` 和 `spine` 只依赖 `core`，彼此不依赖；`cli` 是纯构建期工具，不会被引入浏览器运行时。
+依赖方向保持单向：`core` 是基础包；`ui`、`game` 和 `spine-4.3` 只依赖 `core`，彼此不依赖；`cli` 是纯构建期工具，不会被引入浏览器运行时。
 
 ```text
 @kurot/core
  ├─ @kurot/ui
  ├─ @kurot/game
- └─ @kurot/spine
+ └─ @kurot/spine-4.3
 
 @kurot/cli  (build-time only)
 ```

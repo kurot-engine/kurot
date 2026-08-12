@@ -1,4 +1,4 @@
-# @kurot/spine
+# @kurot/spine-4.3
 
 Spine 4.3 runtime for the Kurot engine.
 
@@ -9,7 +9,7 @@ The Spine runtime itself is provided by the official `@esotericsoftware/spine-co
 ## Installation
 
 ```bash
-pnpm add @kurot/spine
+pnpm add @kurot/spine-4.3
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ import {
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
-} from '@kurot/spine';
+} from '@kurot/spine-4.3';
 
 // 1. Create Kurot player
 const app = createPlayer({ canvas, frameRate: 60, contentWidth: 640, contentHeight: 480 });
@@ -128,14 +128,14 @@ Loads Spine assets using `@kurot/core`'s `HttpRequest` and `ImageLoader`.
 ## Spine version compatibility
 
 The Spine editor version must match the runtime version. This package uses
-`@esotericsoftware/spine-core ^4.3`. Export your skeletons from **Spine 4.3**.
+`@esotericsoftware/spine-core ~4.3.0` and therefore stays on the 4.3.x runtime
+line. Export your skeletons from **Spine 4.3**.
 
 Spine's binary/JSON export formats are not guaranteed to be backwards
 compatible across major/minor versions — assets exported from Spine 4.2 may
 fail to load (or load with corrupted data) on a 4.3 runtime, and vice versa.
-If you are upgrading from a project using `@kurot/spine` with spine-core
-4.2, re-export your `.skel`/`.json` files from Spine 4.3 before upgrading
-this package.
+If you are migrating from a Spine 4.2 runtime, re-export your `.skel`/`.json`
+files from Spine 4.3 before switching to `@kurot/spine-4.3`.
 
 ### Migrating from 4.2
 

@@ -10,7 +10,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			'@kurot/spine': resolve(__dirname, 'src/index.ts'),
+			'@kurot/spine-4.3': resolve(__dirname, 'src/index.ts'),
 		},
 	},
 });

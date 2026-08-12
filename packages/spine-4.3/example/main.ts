@@ -5,7 +5,7 @@ import {
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
-} from '@kurot/spine';
+} from '@kurot/spine-4.3';
 
 // ── Log helper ────────────────────────────────────────────────────────────────
 
