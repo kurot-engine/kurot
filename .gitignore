@@ -5,6 +5,8 @@ node_modules/
 # Generated build artifacts
 dist/
 build/
+bin-debug/
+bin-release/
 coverage/
 *.tsbuildinfo
 
