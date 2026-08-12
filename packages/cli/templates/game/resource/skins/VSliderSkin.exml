@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.VSliderSkin" minWidth="25" minHeight="30"
+    xmlns:eui="http://ns.egret.com/eui">
+    <eui:Image id="track" source="track_png" scale9Grid="1,1,4,4"
+        width="7" height="100%" horizontalCenter="0"/>
+    <eui:Image id="thumb" source="thumb_png" horizontalCenter="0"/>
+</eui:Skin>

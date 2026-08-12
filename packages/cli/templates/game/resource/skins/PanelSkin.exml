@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.PanelSkin" minWidth="450" minHeight="230"
+    xmlns:eui="http://ns.egret.com/eui">
+    <eui:Image left="0" right="0" top="0" bottom="0"
+        source="border_png" scale9Grid="2,2,12,12"/>
+    <eui:Group id="moveArea" left="0" right="0" top="0" height="45">
+        <eui:Image left="0" right="0" top="0" bottom="0"
+            source="header_png" scale9Grid="2,2,12,12"/>
+        <eui:Label id="titleDisplay"
+            left="15" right="5" verticalCenter="0"
+            size="20" fontFamily="Tahoma" textColor="0xffffff"
+            wordWrap="false"/>
+    </eui:Group>
+    <eui:Button id="closeButton" label="close" bottom="5" horizontalCenter="0"/>
+</eui:Skin>

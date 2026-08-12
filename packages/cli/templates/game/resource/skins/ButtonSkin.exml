@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.ButtonSkin"
+    states="up,down,disabled"
+    minWidth="100" minHeight="50"
+    xmlns:eui="http://ns.egret.com/eui">
+    <eui:Image width="100%" height="100%"
+        scale9Grid="1,3,8,8"
+        alpha.disabled="0.5"
+        source="button_up_png"
+        source.down="button_down_png"/>
+    <eui:Label id="labelDisplay" left="8" right="8" top="8" bottom="8"
+        textAlign="center" verticalAlign="middle"
+        textColor="0xffffff"
+        size="20"/>
+    <eui:Image id="iconDisplay" horizontalCenter="0" verticalCenter="0"/>
+</eui:Skin>

@@ -1,0 +1,19 @@
+{
+	"name": "blakron-game",
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"build": "blakron build",
+		"release": "blakron build --release",
+		"dev": "blakron dev",
+		"clean": "blakron clean"
+	},
+	"dependencies": {
+		"@blakron/core": "latest",
+		"@blakron/game": "latest",
+		"@blakron/ui": "latest"
+	},
+	"devDependencies": {
+		"@blakron/cli": "latest"
+	}
+}

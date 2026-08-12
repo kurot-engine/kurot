@@ -1,0 +1,354 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Video Test</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			:root {
+				--sidebar-w: 300px;
+				--log-h: 320px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Video Test</span>
+			<div class="header-right">
+				<div id="fps-display" class="fps-badge">-- FPS</div>
+			</div>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<!-- Load -->
+				<div class="glass-card">
+					<h3>1. Load</h3>
+					<div class="row">
+						<label>URL</label>
+						<input type="text" id="video-url" value="https://lorem.video/1280x720" />
+					</div>
+					<div class="row">
+						<label>Poster</label>
+						<input type="text" id="poster-url" value="" placeholder="optional" />
+					</div>
+					<div class="row">
+						<label>Status</label>
+						<span id="load-status" class="status-badge badge-idle">idle</span>
+					</div>
+					<div class="row">
+						<label>Duration</label>
+						<span id="duration">&mdash;</span>
+					</div>
+					<div class="row" style="gap: 6px">
+						<button id="btn-load">Load</button>
+						<button id="btn-close" class="danger">Close</button>
+					</div>
+				</div>
+
+				<!-- Playback -->
+				<div class="glass-card">
+					<h3>2. Playback</h3>
+					<div class="row">
+						<label>Start (s)</label>
+						<input
+							type="number"
+							id="start-time"
+							value="0"
+							min="0"
+							step="0.5"
+							style="width: 70px; flex: none"
+						/>
+					</div>
+					<div class="row">
+						<label>Loop</label>
+						<input type="checkbox" id="loop-check" />
+					</div>
+					<div class="row">
+						<label>Fullscreen</label>
+						<input type="checkbox" id="fullscreen-check" />
+					</div>
+					<div class="row" style="gap: 6px">
+						<button id="btn-play">&#9654; Play</button>
+						<button id="btn-pause">&#9208; Pause</button>
+					</div>
+				</div>
+
+				<!-- Seek & Volume -->
+				<div class="glass-card">
+					<h3>3. Seek / Volume</h3>
+					<div class="row">
+						<label>Position</label>
+						<span
+							id="position-display"
+							style="color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums"
+						>
+							0.00s
+						</span>
+					</div>
+					<div class="row">
+						<label>Seek (s)</label>
+						<input type="number" id="seek-val" value="0" min="0" step="1" style="width: 70px; flex: none" />
+						<button id="btn-seek">Go</button>
+					</div>
+					<div class="row">
+						<label>Volume</label>
+						<input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" />
+						<span
+							id="volume-display"
+							style="
+								color: var(--accent);
+								font-size: 11px;
+								width: 30px;
+								flex-shrink: 0;
+								font-variant-numeric: tabular-nums;
+							"
+						>
+							1.00
+						</span>
+					</div>
+				</div>
+
+				<!-- Display size -->
+				<div class="glass-card">
+					<h3>4. Display Size</h3>
+					<div class="row">
+						<label>Width</label>
+						<input
+							type="number"
+							id="disp-w"
+							value="320"
+							min="0"
+							step="10"
+							style="width: 70px; flex: none"
+						/>
+					</div>
+					<div class="row">
+						<label>Height</label>
+						<input
+							type="number"
+							id="disp-h"
+							value="240"
+							min="0"
+							step="10"
+							style="width: 70px; flex: none"
+						/>
+					</div>
+					<div class="row">
+						<button id="btn-apply-size">Apply</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="right-panel">
+				<div id="canvas-wrap">
+					<canvas id="gameCanvas" width="640" height="480"></canvas>
+				</div>
+				<div class="log-panel">
+					<div class="log-header">
+						<span>Event Log</span>
+						<button id="btn-clear-log" style="margin-left: auto; padding: 3px 8px; font-size: 10px">
+							Clear
+						</button>
+					</div>
+					<div id="log"></div>
+				</div>
+			</div>
+		</div>
+
+		<script type="module">
+			import {
+				createPlayer,
+				Sprite,
+				Bitmap,
+				Texture,
+				BitmapData,
+				Video,
+				Event,
+				IOErrorEvent,
+			} from '../src/index.js';
+
+			// ── FPS Counter ────────────────────────────────────────────────────
+			const fpsEl = document.getElementById('fps-display');
+			let fpsFrames = 0,
+				fpsLast = performance.now();
+			(function fpsLoop() {
+				fpsFrames++;
+				const now = performance.now();
+				if (now - fpsLast >= 500) {
+					const fps = Math.round((fpsFrames / (now - fpsLast)) * 1000);
+					fpsEl.textContent = fps + ' FPS';
+					fpsEl.className = 'fps-badge' + (fps > 50 ? '' : fps > 30 ? ' warn' : ' bad');
+					fpsFrames = 0;
+					fpsLast = now;
+				}
+				requestAnimationFrame(fpsLoop);
+			})();
+
+			const logEl = document.getElementById('log');
+			const t0 = Date.now();
+
+			function log(tag, msg, cls = 'tag-info') {
+				const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+				const entry = document.createElement('div');
+				entry.className = 'log-entry';
+				entry.innerHTML =
+					`<span class="log-time">${elapsed}s</span>` +
+					`<span class="log-tag ${cls}">[${tag}]</span>` +
+					`<span class="log-msg">${msg}</span>`;
+				logEl.appendChild(entry);
+				logEl.scrollTop = logEl.scrollHeight;
+			}
+
+			document.getElementById('btn-clear-log').onclick = () => (logEl.innerHTML = '');
+
+			// ── Player setup ──────────────────────────────────────────────────
+			const canvas = document.getElementById('gameCanvas');
+			const app = createPlayer({
+				canvas,
+				contentWidth: 640,
+				contentHeight: 480,
+				scaleMode: 'createPlayer',
+				frameRate: 30,
+			});
+			const root = new Sprite();
+			app.start(root);
+
+			// ── Video + Bitmap display ────────────────────────────────────────
+			let video = new Video();
+			let videoBitmap = new Bitmap();
+			root.addChild(videoBitmap);
+
+			// Update bitmap texture each frame from video bitmapData
+			root.addEventListener(Event.ENTER_FRAME, () => {
+				const bd = video.bitmapData;
+				if (!bd) return;
+				const tex = new Texture();
+				tex.setBitmapData(bd);
+				videoBitmap.texture = tex;
+				// Scale to fit canvas (640x480) and center
+				const dw = videoBitmap.width || bd.width;
+				const dh = videoBitmap.height || bd.height;
+				if (dw > 0 && dh > 0) {
+					const scale = Math.min(640 / dw, 480 / dh, 1);
+					const sw = dw * scale;
+					const sh = dh * scale;
+					videoBitmap.scaleX = scale;
+					videoBitmap.scaleY = scale;
+					videoBitmap.x = (640 - sw) / 2;
+					videoBitmap.y = (480 - sh) / 2;
+				}
+				document.getElementById('position-display').textContent = video.position.toFixed(2) + 's';
+			});
+
+			// ── Status helpers ────────────────────────────────────────────────
+			const loadStatus = document.getElementById('load-status');
+			const durationEl = document.getElementById('duration');
+
+			function setStatus(state) {
+				const map = {
+					idle: ['idle', 'badge-idle'],
+					loading: ['loading…', 'badge-loading'],
+					ready: ['ready', 'badge-ready'],
+					playing: ['playing', 'badge-playing'],
+					paused: ['paused', 'badge-paused'],
+					ended: ['ended', 'badge-ended'],
+					error: ['error', 'badge-error'],
+				};
+				const [text, cls] = map[state] ?? ['?', 'badge-idle'];
+				loadStatus.textContent = text;
+				loadStatus.className = 'status-badge ' + cls;
+			}
+
+			function attachVideoListeners(v) {
+				v.addEventListener(Event.COMPLETE, () => {
+					log('EVENT', `COMPLETE — duration: ${v.length.toFixed(2)}s`, 'tag-event');
+					durationEl.textContent = v.length.toFixed(2) + 's';
+					setStatus('ready');
+				});
+				v.addEventListener(Event.ENDED, () => {
+					log('EVENT', 'ENDED', 'tag-event');
+					setStatus('ended');
+				});
+				v.addEventListener(IOErrorEvent.IO_ERROR, () => {
+					log('ERROR', 'IO_ERROR', 'tag-error');
+					setStatus('error');
+				});
+			}
+
+			attachVideoListeners(video);
+
+			// ── Load ──────────────────────────────────────────────────────────
+			document.getElementById('btn-load').onclick = () => {
+				const url = document.getElementById('video-url').value.trim();
+				if (!url) return;
+				video.close();
+				video = new Video();
+				attachVideoListeners(video);
+				const poster = document.getElementById('poster-url').value.trim();
+				if (poster) video.poster = poster;
+				video.fullscreen = document.getElementById('fullscreen-check').checked;
+				setStatus('loading');
+				durationEl.textContent = '—';
+				log('ACTION', `load("${url}")`, 'tag-action');
+				video.load(url);
+			};
+
+			document.getElementById('btn-close').onclick = () => {
+				video.close();
+				videoBitmap.texture = undefined;
+				setStatus('idle');
+				durationEl.textContent = '—';
+				log('ACTION', 'video.close()', 'tag-action');
+			};
+
+			// ── Playback ──────────────────────────────────────────────────────
+			document.getElementById('btn-play').onclick = () => {
+				const startTime = parseFloat(document.getElementById('start-time').value) || 0;
+				const loop = document.getElementById('loop-check').checked;
+				video.fullscreen = document.getElementById('fullscreen-check').checked;
+				log('ACTION', `play(${startTime}, loop=${loop})`, 'tag-action');
+				video.play(startTime, loop);
+				setStatus('playing');
+			};
+
+			document.getElementById('btn-pause').onclick = () => {
+				video.pause();
+				log('ACTION', 'pause()', 'tag-action');
+				setStatus('paused');
+			};
+
+			// ── Seek ──────────────────────────────────────────────────────────
+			document.getElementById('btn-seek').onclick = () => {
+				const t = parseFloat(document.getElementById('seek-val').value) || 0;
+				video.position = t;
+				log('ACTION', `position = ${t}`, 'tag-action');
+			};
+
+			// ── Volume ────────────────────────────────────────────────────────
+			document.getElementById('volume-slider').addEventListener('input', e => {
+				const v = parseFloat(e.target.value);
+				video.volume = v;
+				document.getElementById('volume-display').textContent = v.toFixed(2);
+				log('ACTION', `volume = ${v.toFixed(2)}`, 'tag-action');
+			});
+
+			// ── Display size ──────────────────────────────────────────────────
+			document.getElementById('btn-apply-size').onclick = () => {
+				const w = parseInt(document.getElementById('disp-w').value) || 320;
+				const h = parseInt(document.getElementById('disp-h').value) || 240;
+				video.width = w;
+				video.height = h;
+				videoBitmap.width = w;
+				videoBitmap.height = h;
+				videoBitmap.x = (640 - w) / 2;
+				videoBitmap.y = (480 - h) / 2;
+				log('ACTION', `size = ${w}x${h}`, 'tag-action');
+			};
+
+			log('INFO', 'Video test ready. Load a video URL to begin.', 'tag-info');
+			log('INFO', 'Note: fullscreen mode uses browser native fullscreen API.', 'tag-info');
+		</script>
+	</body>
+</html>

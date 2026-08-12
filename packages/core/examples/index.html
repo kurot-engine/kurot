@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Blakron Examples</title>
+		<style>
+			:root {
+				--bg: #0a0b14;
+				--glass: rgba(255, 255, 255, 0.04);
+				--glass-border: rgba(255, 255, 255, 0.08);
+				--glass-hover: rgba(255, 255, 255, 0.08);
+				--accent: #6c9cff;
+				--accent-glow: rgba(108, 156, 255, 0.2);
+				--text: #e0e0e8;
+				--text-muted: #8888a0;
+			}
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				background: var(--bg);
+				color: var(--text);
+				font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+				font-size: 13px;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			/* ── Header ─────────────────────────────────────────────────────── */
+			.header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 16px 24px;
+				border-bottom: 1px solid var(--glass-border);
+				background: rgba(255, 255, 255, 0.02);
+				backdrop-filter: blur(16px);
+			}
+			.header h1 {
+				font-size: 16px;
+				font-weight: 600;
+				color: var(--accent);
+				letter-spacing: 0.02em;
+			}
+			.header .logo {
+				width: 24px;
+				height: 24px;
+				border-radius: 6px;
+				background: linear-gradient(135deg, var(--accent), #a78bfa);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 14px;
+				color: #fff;
+				font-weight: bold;
+			}
+			/* ── Grid ───────────────────────────────────────────────────────── */
+			#grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+				gap: 16px;
+				padding: 24px;
+			}
+			a {
+				text-decoration: none;
+				color: inherit;
+			}
+			/* ── Card ───────────────────────────────────────────────────────── */
+			.card {
+				background: var(--glass);
+				border: 1px solid var(--glass-border);
+				border-radius: 14px;
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				transition: all 0.25s ease;
+				backdrop-filter: blur(12px);
+				height: 240px;
+			}
+			.card:hover {
+				background: var(--glass-hover);
+				border-color: rgba(108, 156, 255, 0.3);
+				transform: translateY(-3px);
+				box-shadow: 0 8px 32px rgba(108, 156, 255, 0.1);
+			}
+			.card-title {
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--text);
+			}
+			.card-desc {
+				font-size: 11px;
+				color: var(--text-muted);
+				line-height: 1.6;
+				flex: 1;
+			}
+			.card-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 5px;
+			}
+			.tag {
+				font-size: 10px;
+				padding: 2px 8px;
+				border-radius: 6px;
+				background: rgba(108, 156, 255, 0.1);
+				color: var(--accent);
+				border: 1px solid rgba(108, 156, 255, 0.15);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<div class="logo">H</div>
+			<h1>Blakron Examples</h1>
+		</div>
+		<div id="grid">
+			<a href="visual-test.html">
+				<div class="card">
+					<div class="card-title">Visual Test</div>
+					<div class="card-desc">
+						综合渲染验证：Shape、Sprite、滤镜、Mask、RenderGroup、动画等 19 个用例。
+					</div>
+					<div class="card-tags">
+						<span class="tag">Graphics</span>
+						<span class="tag">Filters</span>
+						<span class="tag">Mask</span>
+					</div>
+				</div>
+			</a>
+			<a href="text-test.html">
+				<div class="card">
+					<div class="card-title">TextField Test</div>
+					<div class="card-desc">
+						TextField 文本渲染：基础文本、富文本(textFlow)、对齐、描边、自动换行、密码模式、输入框等 20
+						个用例。
+					</div>
+					<div class="card-tags">
+						<span class="tag">TextField</span>
+						<span class="tag">TextFlow</span>
+						<span class="tag">Input</span>
+					</div>
+				</div>
+			</a>
+			<a href="bitmap-test.html">
+				<div class="card">
+					<div class="card-title">Bitmap Test</div>
+					<div class="card-desc">Bitmap 渲染：纹理缩放、旋转、SpriteSheet、scale9Grid、批处理。</div>
+					<div class="card-tags">
+						<span class="tag">Bitmap</span>
+						<span class="tag">Texture</span>
+						<span class="tag">SpriteSheet</span>
+					</div>
+				</div>
+			</a>
+			<a href="mesh-test.html">
+				<div class="card">
+					<div class="card-title">Mesh Test</div>
+					<div class="card-desc">
+						Mesh 顶点变形：Quad / Fan / Grid 预设，顶点拖拽，Wave / Ripple / Twist 动画。
+					</div>
+					<div class="card-tags">
+						<span class="tag">Mesh</span>
+						<span class="tag">Vertices</span>
+						<span class="tag">Animation</span>
+					</div>
+				</div>
+			</a>
+			<a href="sound-test.html">
+				<div class="card">
+					<div class="card-title">Sound Test</div>
+					<div class="card-desc">Sound / SoundChannel 交互测试：加载、播放、音量、循环、错误处理。</div>
+					<div class="card-tags">
+						<span class="tag">Sound</span>
+						<span class="tag">SoundChannel</span>
+						<span class="tag">Events</span>
+					</div>
+				</div>
+			</a>
+			<a href="video-test.html">
+				<div class="card">
+					<div class="card-title">Video Test</div>
+					<div class="card-desc">
+						Video 播放控制：加载、播放/暂停、seek、音量、尺寸调整，帧渲染到 canvas。
+					</div>
+					<div class="card-tags">
+						<span class="tag">Video</span>
+						<span class="tag">Bitmap</span>
+					</div>
+				</div>
+			</a>
+			<a href="net-test.html">
+				<div class="card">
+					<div class="card-title">Net Test</div>
+					<div class="card-desc">
+						HttpRequest / ImageLoader：GET / POST、responseType、timeout、abort、进度事件。
+					</div>
+					<div class="card-tags">
+						<span class="tag">HttpRequest</span>
+						<span class="tag">ImageLoader</span>
+						<span class="tag">Events</span>
+					</div>
+				</div>
+			</a>
+			<a href="benchmark.html">
+				<div class="card">
+					<div class="card-title">Benchmark (Blakron)</div>
+					<div class="card-desc">
+						Blakron WebGL 性能基准：Sprite Batch、Mixed Texture、Filter Heavy 等场景压力测试。
+					</div>
+					<div class="card-tags">
+						<span class="tag">Blakron</span>
+						<span class="tag">WebGL</span>
+						<span class="tag">Performance</span>
+					</div>
+				</div>
+			</a>
+			<a href="egret-benchmark.html">
+				<div class="card">
+					<div class="card-title">Benchmark (Egret)</div>
+					<div class="card-desc">Egret 5.x 性能基准：同场景对比，衡量 Blakron 相对 Egret 的性能差异。</div>
+					<div class="card-tags">
+						<span class="tag">Egret</span>
+						<span class="tag">Performance</span>
+						<span class="tag">Compare</span>
+					</div>
+				</div>
+			</a>
+		</div>
+	</body>
+</html>

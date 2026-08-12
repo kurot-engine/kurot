@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.ScrollerSkin" minWidth="20" minHeight="20"
+    xmlns:eui="http://ns.egret.com/eui">
+    <eui:HScrollBar id="horizontalScrollBar" left="0" right="12" bottom="0" height="12"
+        autoVisibility="false" visible="false"/>
+    <eui:VScrollBar id="verticalScrollBar" top="0" right="0" bottom="12" width="12"
+        autoVisibility="false" visible="false"/>
+</eui:Skin>

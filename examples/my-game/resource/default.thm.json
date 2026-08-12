@@ -1,0 +1,19 @@
+{
+	"skins": {
+		"Button": "skins.ButtonSkin",
+		"CheckBox": "skins.CheckBoxSkin",
+		"RadioButton": "skins.RadioButtonSkin",
+		"ToggleSwitch": "skins.ToggleSwitchSkin",
+		"Panel": "skins.PanelSkin",
+		"ProgressBar": "skins.ProgressBarSkin",
+		"HSlider": "skins.HSliderSkin",
+		"VSlider": "skins.VSliderSkin",
+		"HScrollBar": "skins.HScrollBarSkin",
+		"VScrollBar": "skins.VScrollBarSkin",
+		"TextInput": "skins.TextInputSkin",
+		"ComboBox": "skins.ComboBoxSkin",
+		"Scroller": "skins.ScrollerSkin",
+		"ItemRenderer": "skins.ItemRendererSkin"
+	},
+	"exmls": []
+}

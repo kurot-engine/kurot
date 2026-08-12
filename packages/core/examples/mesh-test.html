@@ -1,0 +1,672 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Mesh Test</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			:root {
+				--sidebar-w: 280px;
+				--log-h: 320px;
+				--glass-strong: rgba(255, 255, 255, 0.06);
+				--accent-dim: rgba(108, 156, 255, 0.15);
+				--accent-glow: rgba(108, 156, 255, 0.25);
+			}
+			body {
+				position: relative;
+			}
+			.page-title {
+				letter-spacing: 0.01em;
+			}
+			.val-display {
+				color: var(--accent);
+				font-size: 11px;
+				width: 36px;
+				text-align: right;
+				flex-shrink: 0;
+				font-variant-numeric: tabular-nums;
+			}
+			button.danger {
+				border-color: rgba(248, 113, 113, 0.25);
+				color: rgba(248, 113, 113, 0.9);
+			}
+			button.danger:hover {
+				background: rgba(248, 113, 113, 0.12);
+			}
+			.tag-action {
+				color: #fbbf24;
+			}
+			.tag-error {
+				color: #f87171;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Mesh Test</span>
+			<div class="header-right">
+				<div id="fps-display" class="fps-badge">-- FPS</div>
+			</div>
+		</div>
+
+		<div class="main">
+			<div class="sidebar">
+				<!-- Preset shapes -->
+				<div class="glass-card">
+					<h3>1. Preset Shapes</h3>
+					<div class="row" style="flex-wrap: wrap; gap: 6px">
+						<button id="btn-quad" class="active">Quad</button>
+						<button id="btn-fan">Fan (8)</button>
+						<button id="btn-grid">Grid 4x4</button>
+					</div>
+				</div>
+
+				<!-- Deform -->
+				<div class="glass-card">
+					<h3>2. Vertex Deform</h3>
+					<div class="row">
+						<label>Top-left X</label>
+						<input type="range" id="tl-x" min="-100" max="100" value="0" />
+						<span class="val-display" id="tl-x-val">0</span>
+					</div>
+					<div class="row">
+						<label>Top-left Y</label>
+						<input type="range" id="tl-y" min="-100" max="100" value="0" />
+						<span class="val-display" id="tl-y-val">0</span>
+					</div>
+					<div class="row">
+						<label>Top-right X</label>
+						<input type="range" id="tr-x" min="-100" max="100" value="0" />
+						<span class="val-display" id="tr-x-val">0</span>
+					</div>
+					<div class="row">
+						<label>Top-right Y</label>
+						<input type="range" id="tr-y" min="-100" max="100" value="0" />
+						<span class="val-display" id="tr-y-val">0</span>
+					</div>
+					<div class="row">
+						<label>Bot-right X</label>
+						<input type="range" id="br-x" min="-100" max="100" value="0" />
+						<span class="val-display" id="br-x-val">0</span>
+					</div>
+					<div class="row">
+						<label>Bot-right Y</label>
+						<input type="range" id="br-y" min="-100" max="100" value="0" />
+						<span class="val-display" id="br-y-val">0</span>
+					</div>
+					<div class="row">
+						<label>Bot-left X</label>
+						<input type="range" id="bl-x" min="-100" max="100" value="0" />
+						<span class="val-display" id="bl-x-val">0</span>
+					</div>
+					<div class="row">
+						<label>Bot-left Y</label>
+						<input type="range" id="bl-y" min="-100" max="100" value="0" />
+						<span class="val-display" id="bl-y-val">0</span>
+					</div>
+					<div class="row">
+						<button id="btn-reset-deform">Reset</button>
+					</div>
+				</div>
+
+				<!-- Animation -->
+				<div class="glass-card">
+					<h3>3. Animation</h3>
+					<div class="row" style="flex-wrap: wrap; gap: 6px">
+						<button id="btn-wave">Wave</button>
+						<button id="btn-ripple">Ripple</button>
+						<button id="btn-twist">Twist</button>
+						<button id="btn-stop-anim">Stop</button>
+					</div>
+					<div class="row">
+						<label>Speed</label>
+						<input type="range" id="anim-speed" min="0.5" max="5" step="0.1" value="1" />
+						<span class="val-display" id="anim-speed-val">1.0</span>
+					</div>
+					<div class="row">
+						<label>Amplitude</label>
+						<input type="range" id="anim-amp" min="5" max="60" step="1" value="20" />
+						<span class="val-display" id="anim-amp-val">20</span>
+					</div>
+				</div>
+
+				<!-- Transform -->
+				<div class="glass-card">
+					<h3>4. Transform</h3>
+					<div class="row">
+						<label>Alpha</label>
+						<input type="range" id="mesh-alpha" min="0" max="1" step="0.01" value="1" />
+						<span class="val-display" id="mesh-alpha-val">1.00</span>
+					</div>
+					<div class="row">
+						<label>Scale X</label>
+						<input type="range" id="mesh-sx" min="0.1" max="3" step="0.05" value="1" />
+						<span class="val-display" id="mesh-sx-val">1.00</span>
+					</div>
+					<div class="row">
+						<label>Scale Y</label>
+						<input type="range" id="mesh-sy" min="0.1" max="3" step="0.05" value="1" />
+						<span class="val-display" id="mesh-sy-val">1.00</span>
+					</div>
+					<div class="row">
+						<label>Rotation</label>
+						<input type="range" id="mesh-rot" min="-180" max="180" step="1" value="0" />
+						<span class="val-display" id="mesh-rot-val">0&deg;</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="right-panel">
+				<div id="canvas-wrap">
+					<canvas id="gameCanvas" width="640" height="480"></canvas>
+				</div>
+				<div class="log-panel">
+					<div class="log-header">
+						<span>Event Log</span>
+						<button id="btn-clear-log" style="margin-left: auto; padding: 3px 8px; font-size: 10px">
+							Clear
+						</button>
+					</div>
+					<div id="log"></div>
+				</div>
+			</div>
+		</div>
+
+		<script type="module">
+			import { createPlayer, Sprite, Mesh, Texture, BitmapData, Event } from '../src/index.js';
+
+			// ── FPS Counter ────────────────────────────────────────────────────
+			const fpsEl = document.getElementById('fps-display');
+			let fpsFrames = 0,
+				fpsLast = performance.now();
+			(function fpsLoop() {
+				fpsFrames++;
+				const now = performance.now();
+				if (now - fpsLast >= 500) {
+					const fps = Math.round((fpsFrames / (now - fpsLast)) * 1000);
+					fpsEl.textContent = fps + ' FPS';
+					fpsEl.className = 'fps-badge' + (fps > 50 ? '' : fps > 30 ? ' warn' : ' bad');
+					fpsFrames = 0;
+					fpsLast = now;
+				}
+				requestAnimationFrame(fpsLoop);
+			})();
+
+			// ── Log helper ─────────────────────────────────────────────────────
+			const logEl = document.getElementById('log');
+			const logT0 = Date.now();
+			function logMsg(tag, msg, cls = 'tag-info') {
+				const elapsed = ((Date.now() - logT0) / 1000).toFixed(1);
+				const entry = document.createElement('div');
+				entry.className = 'log-entry';
+				entry.innerHTML =
+					`<span class="log-time">${elapsed}s</span>` +
+					`<span class="log-tag ${cls}">[${tag}]</span>` +
+					`<span class="log-msg">${msg}</span>`;
+				logEl.appendChild(entry);
+				logEl.scrollTop = logEl.scrollHeight;
+			}
+			document.getElementById('btn-clear-log').onclick = () => (logEl.innerHTML = '');
+
+			// ── Player ────────────────────────────────────────────────────────
+			const canvas = document.getElementById('gameCanvas');
+			const app = createPlayer({
+				canvas,
+				contentWidth: 640,
+				contentHeight: 480,
+				scaleMode: 'noScale',
+				frameRate: 60,
+			});
+			const root = new Sprite();
+			app.start(root);
+			logMsg('INFO', 'Player initialized 640x480');
+
+			// ── Texture: checkerboard ─────────────────────────────────────────
+			function makeCheckerTexture(size = 256, cells = 8) {
+				const c = document.createElement('canvas');
+				c.width = c.height = size;
+				const ctx = c.getContext('2d');
+				const cell = size / cells;
+				for (let row = 0; row < cells; row++) {
+					for (let col = 0; col < cells; col++) {
+						ctx.fillStyle = (row + col) % 2 === 0 ? '#ff6644' : '#4466ff';
+						ctx.fillRect(col * cell, row * cell, cell, cell);
+					}
+				}
+				// Grid lines
+				ctx.strokeStyle = '#fff4';
+				ctx.lineWidth = 1;
+				for (let i = 0; i <= cells; i++) {
+					ctx.beginPath();
+					ctx.moveTo(i * cell, 0);
+					ctx.lineTo(i * cell, size);
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.moveTo(0, i * cell);
+					ctx.lineTo(size, i * cell);
+					ctx.stroke();
+				}
+				const bd = new BitmapData(c);
+				const tex = new Texture();
+				tex.setBitmapData(bd);
+				return tex;
+			}
+
+			const tex = makeCheckerTexture();
+
+			// ── Mesh ──────────────────────────────────────────────────────────
+			let mesh = new Mesh(tex);
+			mesh.x = 320;
+			mesh.y = 240;
+			mesh.anchorOffsetX = 128;
+			mesh.anchorOffsetY = 128;
+			root.addChild(mesh);
+
+			// ── Preset builders ───────────────────────────────────────────────
+			const W = 256,
+				H = 256;
+
+			// Declared here so preset builders can call resetDeformSliders()
+			const deformIds = ['tl-x', 'tl-y', 'tr-x', 'tr-y', 'br-x', 'br-y', 'bl-x', 'bl-y'];
+
+			function resetDeformSliders() {
+				deformIds.forEach(id => {
+					document.getElementById(id).value = 0;
+					document.getElementById(id + '-val').textContent = '0';
+				});
+			}
+
+			// ── Shape builders (pure: return {vertices, uvs, indices}) ───────
+			// Pure shape builders. These never touch `mesh` directly so they can
+			// be reused both for setting a preset and for producing a densified
+			// version on animation start.
+			function quadShape() {
+				return {
+					vertices: [0, 0, W, 0, W, H, 0, H],
+					indices: [0, 1, 2, 0, 2, 3],
+					uvs: [0, 0, 1, 0, 1, 1, 0, 1],
+				};
+			}
+
+			function triangleShape() {
+				return {
+					vertices: [W / 2, 0, W, H, 0, H],
+					indices: [0, 1, 2],
+					uvs: [0.5, 0, 1, 1, 0, 1],
+				};
+			}
+
+			function fanShape(n = 8) {
+				const cx = W / 2,
+					cy = H / 2,
+					r = W / 2;
+				const verts = [cx, cy];
+				const uvs = [0.5, 0.5];
+				const idx = [];
+				for (let i = 0; i <= n; i++) {
+					const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+					verts.push(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+					uvs.push(0.5 + Math.cos(a) * 0.5, 0.5 + Math.sin(a) * 0.5);
+					if (i < n) idx.push(0, i + 1, i + 2);
+				}
+				return { vertices: verts, uvs, indices: idx };
+			}
+
+			function gridShape(cols = 4, rows = 4) {
+				const verts = [],
+					uvs = [],
+					idx = [];
+				for (let r = 0; r <= rows; r++) {
+					for (let c = 0; c <= cols; c++) {
+						verts.push((c / cols) * W, (r / rows) * H);
+						uvs.push(c / cols, r / rows);
+					}
+				}
+				for (let r = 0; r < rows; r++) {
+					for (let c = 0; c < cols; c++) {
+						const i = r * (cols + 1) + c;
+						idx.push(i, i + 1, i + cols + 2, i, i + cols + 2, i + cols + 1);
+					}
+				}
+				return { vertices: verts, uvs, indices: idx };
+			}
+
+			function stripShape(segs = 8) {
+				const verts = [],
+					uvs = [],
+					idx = [];
+				for (let i = 0; i <= segs; i++) {
+					const x = (i / segs) * W;
+					const u = i / segs;
+					verts.push(x, 0, x, H);
+					uvs.push(u, 0, u, 1);
+					if (i < segs) {
+						const b = i * 2;
+						idx.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
+					}
+				}
+				return { vertices: verts, uvs, indices: idx };
+			}
+
+			// Densified triangle for animation. Emits a triangle fan from the
+			// centroid to a finely-sampled boundary loop of the triangle
+			// (W/2,0)-(W,H)-(0,H). Pure.
+			function triangleDenseShape(segsPerEdge = 16) {
+				const v0 = [W / 2, 0],
+					v1 = [W, H],
+					v2 = [0, H];
+				const cx = (v0[0] + v1[0] + v2[0]) / 3,
+					cy = (v0[1] + v1[1] + v2[1]) / 3;
+				const verts = [cx, cy];
+				const uvs = [cx / W, cy / H];
+				const idx = [];
+				const boundary = [v0, v1, v2];
+				for (let e = 0; e < 3; e++) {
+					const p0 = boundary[e],
+						p1 = boundary[(e + 1) % 3];
+					for (let s = 0; s <= segsPerEdge; s++) {
+						if (e > 0 && s === 0) continue; // skip shared corners
+						const t = s / segsPerEdge;
+						const px = p0[0] + (p1[0] - p0[0]) * t;
+						const py = p0[1] + (p1[1] - p0[1]) * t;
+						verts.push(px, py);
+						uvs.push(px / W, py / H);
+					}
+				}
+				const ringCount = verts.length / 2 - 1;
+				for (let i = 0; i < ringCount; i++) {
+					idx.push(0, 1 + i, 1 + ((i + 1) % ringCount));
+				}
+				return { vertices: verts, uvs, indices: idx };
+			}
+
+			// Densified fan (polar grid) for animation. The sparse fan has only
+			// a center vertex plus one boundary ring, so every boundary vertex is
+			// at the same distance from center — ripple degenerates to uniform
+			// scale and twist to pure rotation. Adding concentric inner rings
+			// gives vertices at different radii so both animations can manifest.
+			// Outline (outer ring) is unchanged. Pure.
+			function fanDenseShape(n = 8, rings = 6) {
+				const cx = W / 2,
+					cy = H / 2,
+					r = W / 2;
+				const verts = [],
+					uvs = [],
+					idx = [];
+				// Center vertex (index 0)
+				verts.push(cx, cy);
+				uvs.push(0.5, 0.5);
+				// ringStart[k] = vertex index where ring k begins.
+				// Ring 0 is the center (single vertex at index 0).
+				const ringStart = [0];
+				for (let ring = 1; ring <= rings; ring++) {
+					ringStart.push(verts.length / 2);
+					const ringR = (ring / rings) * r;
+					for (let i = 0; i <= n; i++) {
+						const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+						const f = ring / rings;
+						verts.push(cx + Math.cos(a) * ringR, cy + Math.sin(a) * ringR);
+						uvs.push(0.5 + Math.cos(a) * 0.5 * f, 0.5 + Math.sin(a) * 0.5 * f);
+					}
+				}
+				// Triangulate center → ring 1 as a fan.
+				const r1 = ringStart[1];
+				for (let i = 0; i < n; i++) {
+					idx.push(0, r1 + i, r1 + i + 1);
+				}
+				// Triangulate between adjacent rings as split quads.
+				for (let ring = 1; ring < rings; ring++) {
+					const inner = ringStart[ring],
+						outer = ringStart[ring + 1];
+					for (let i = 0; i < n; i++) {
+						idx.push(inner + i, outer + i, outer + i + 1);
+						idx.push(inner + i, outer + i + 1, inner + i + 1);
+					}
+				}
+				return { vertices: verts, uvs, indices: idx };
+			}
+
+			// ── Animation state ───────────────────────────────────────────────
+			// `presetShape` holds the currently-selected preset's clean shape
+			// (sparse). Animations read from a (possibly densified) copy of this
+			// so switching presets mid-animation resyncs cleanly. Stopping an
+			// animation restores `presetShape`.
+			let presetShape = quadShape();
+			let activePreset = 'quad';
+			let animMode = null;
+			let animT = 0;
+			let baseVertices = [];
+
+			// Returns a densified shape for low-vertex presets so wave/ripple/twist
+			// have enough vertices to be visible. With only 4 corners a quad's
+			// wave degenerates to rigid up-down bobbing (both top verts share the
+			// same phase since the wave period equals W), ripple degenerates to
+			// uniform scale (all corners are equidistant from the center), and
+			// twist degenerates to pure rotation (same reason). A sparse fan has
+			// the same problem: every boundary vertex is equidistant from the
+			// center, so ripple scales uniformly and twist rotates rigidly.
+			// Subdividing preserves the outline shape while giving the animation
+			// something to act on. Returns null for presets that already have
+			// enough internal vertices (grid/strip).
+			function denseShapeFor(preset) {
+				if (preset === 'quad') return gridShape(8, 8);
+				if (preset === 'triangle') return triangleDenseShape(16);
+				if (preset === 'fan') return fanDenseShape(8, 6);
+				return null;
+			}
+
+			// Apply a shape {vertices, uvs, indices} to the mesh.
+			function applyShape(shape) {
+				mesh.vertices = shape.vertices;
+				mesh.uvs = shape.uvs;
+				mesh.indices = shape.indices;
+				mesh.updateVertices();
+			}
+
+			// ── Preset setters ────────────────────────────────────────────────
+			function selectPreset(name, shape, label) {
+				presetShape = shape;
+				activePreset = name;
+				applyShape(shape);
+				resetDeformSliders();
+				if (animMode) startAnim(animMode); // resync animation to new shape
+				logMsg('ACTION', label, 'tag-action');
+			}
+
+			function setQuad() {
+				selectPreset('quad', quadShape(), 'Preset: Quad');
+			}
+			function setTriangle() {
+				selectPreset('triangle', triangleShape(), 'Preset: Triangle');
+			}
+			function setFan(n = 8) {
+				selectPreset('fan', fanShape(n), `Preset: Fan (${n})`);
+			}
+			function setGrid(cols = 4, rows = 4) {
+				selectPreset('grid', gridShape(cols, rows), `Preset: Grid ${cols}x${rows}`);
+			}
+			function setStrip(segs = 8) {
+				selectPreset('strip', stripShape(segs), `Preset: Strip (${segs})`);
+			}
+
+			// ── Preset buttons ────────────────────────────────────────────────
+			const presetBtns = ['btn-quad', 'btn-fan', 'btn-grid'];
+			function setActivePreset(id) {
+				presetBtns.forEach(b => document.getElementById(b).classList.remove('active'));
+				document.getElementById(id).classList.add('active');
+			}
+
+			document.getElementById('btn-quad').onclick = () => {
+				setQuad();
+				setActivePreset('btn-quad');
+			};
+			document.getElementById('btn-fan').onclick = () => {
+				setFan(8);
+				setActivePreset('btn-fan');
+			};
+			document.getElementById('btn-grid').onclick = () => {
+				setGrid(4, 4);
+				setActivePreset('btn-grid');
+			};
+
+			setQuad(); // default
+
+			// ── Quad deform (only meaningful for quad preset) ─────────────────
+			// Base quad corners: TL(0,0) TR(W,0) BR(W,H) BL(0,H)
+			const deformOffsets = () => deformIds.map(id => parseFloat(document.getElementById(id).value));
+
+			function applyDeform() {
+				const [tlx, tly, trx, try_, brx, bry, blx, bly] = deformOffsets();
+				mesh.vertices = [0 + tlx, 0 + tly, W + trx, 0 + try_, W + brx, H + bry, 0 + blx, H + bly];
+				mesh.indices = [0, 1, 2, 0, 2, 3];
+				mesh.uvs = [0, 0, 1, 0, 1, 1, 0, 1];
+				mesh.updateVertices();
+			}
+
+			deformIds.forEach(id => {
+				const el = document.getElementById(id);
+				const valEl = document.getElementById(id + '-val');
+				el.addEventListener('input', () => {
+					valEl.textContent = el.value;
+					applyDeform();
+				});
+			});
+
+			document.getElementById('btn-reset-deform').onclick = () => {
+				resetDeformSliders();
+				setQuad();
+				setActivePreset('btn-quad');
+			};
+
+			// ── Animation ─────────────────────────────────────────────────────
+			// animMode/animT/baseVertices are declared earlier (before the preset
+			// builders) so preset switches can resync the animation base shape.
+
+			function startAnim(mode) {
+				// Start from the clean preset shape, but use a densified version
+				// for low-vertex presets (quad/triangle) so wave/ripple/twist have
+				// enough vertices to be visible. Without densification a quad's
+				// wave is just rigid up-down bobbing, ripple is uniform scale, and
+				// twist is pure rotation (all four corners share phase / distance).
+				const dense = denseShapeFor(activePreset);
+				const shape = dense || presetShape;
+				applyShape(shape);
+				animMode = mode;
+				baseVertices = [...shape.vertices];
+				animT = 0;
+				// Disable deform sliders during animation
+				deformIds.forEach(id => {
+					document.getElementById(id).disabled = true;
+				});
+				document.getElementById('btn-reset-deform').disabled = true;
+				logMsg('ACTION', `Animation: ${mode}`, 'tag-action');
+			}
+
+			// Animate whatever preset shape is currently active instead of forcing
+			// a grid — this keeps the animated mesh consistent with the Preset
+			// Shapes selection (e.g. Fan stays a fan while animating).
+			document.getElementById('btn-wave').onclick = () => startAnim('wave');
+			document.getElementById('btn-ripple').onclick = () => startAnim('ripple');
+			document.getElementById('btn-twist').onclick = () => startAnim('twist');
+			document.getElementById('btn-stop-anim').onclick = () => {
+				animMode = null;
+				// Restore the clean (sparse) preset shape — undoing any
+				// densification applied at animation start.
+				applyShape(presetShape);
+				// Re-enable deform sliders
+				deformIds.forEach(id => {
+					document.getElementById(id).disabled = false;
+				});
+				document.getElementById('btn-reset-deform').disabled = false;
+				logMsg('ACTION', 'Animation stopped', 'tag-action');
+			};
+
+			document.getElementById('anim-speed').addEventListener('input', e => {
+				document.getElementById('anim-speed-val').textContent = parseFloat(e.target.value).toFixed(1);
+			});
+			document.getElementById('anim-amp').addEventListener('input', e => {
+				document.getElementById('anim-amp-val').textContent = e.target.value;
+			});
+
+			root.addEventListener(Event.ENTER_FRAME, () => {
+				if (!animMode) return;
+				const speed = parseFloat(document.getElementById('anim-speed').value);
+				const amp = parseFloat(document.getElementById('anim-amp').value);
+				animT += 0.05 * speed;
+
+				const verts = [...baseVertices];
+				for (let i = 0; i < verts.length; i += 2) {
+					const bx = verts[i],
+						by = verts[i + 1];
+					if (animMode === 'wave') {
+						verts[i + 1] = by + Math.sin((bx / W) * Math.PI * 2 + animT) * amp;
+					} else if (animMode === 'ripple') {
+						const dx = bx - W / 2,
+							dy = by - H / 2;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						const offset = Math.sin(dist / 20 - animT * 2) * amp * (1 - dist / (W * 0.8));
+						verts[i] = bx + (dx / (dist || 1)) * offset;
+						verts[i + 1] = by + (dy / (dist || 1)) * offset;
+					} else if (animMode === 'twist') {
+						const cx = W / 2,
+							cy = H / 2;
+						const dx = bx - cx,
+							dy = by - cy;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						// angle proportional to distance from center, oscillates with time
+						const angle = (dist / (W / 2)) * Math.sin(animT) * (amp / 20);
+						verts[i] = cx + dx * Math.cos(angle) - dy * Math.sin(angle);
+						verts[i + 1] = cy + dx * Math.sin(angle) + dy * Math.cos(angle);
+					}
+				}
+				mesh.vertices = verts;
+				mesh.updateVertices();
+			});
+
+			// ── Transform sliders ─────────────────────────────────────────────
+			function bindSlider(id, valId, fmt, apply) {
+				const el = document.getElementById(id);
+				const valEl = document.getElementById(valId);
+				el.addEventListener('input', () => {
+					valEl.textContent = fmt(parseFloat(el.value));
+					apply(parseFloat(el.value));
+				});
+			}
+
+			bindSlider(
+				'mesh-alpha',
+				'mesh-alpha-val',
+				v => v.toFixed(2),
+				v => {
+					mesh.alpha = isNaN(v) ? 1 : v;
+				},
+			);
+			bindSlider(
+				'mesh-sx',
+				'mesh-sx-val',
+				v => v.toFixed(2),
+				v => {
+					mesh.scaleX = v;
+				},
+			);
+			bindSlider(
+				'mesh-sy',
+				'mesh-sy-val',
+				v => v.toFixed(2),
+				v => {
+					mesh.scaleY = v;
+				},
+			);
+			bindSlider(
+				'mesh-rot',
+				'mesh-rot-val',
+				v => v + '\u00B0',
+				v => {
+					mesh.rotation = v;
+				},
+			);
+		</script>
+	</body>
+</html>

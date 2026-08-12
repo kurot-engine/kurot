@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.ViewStackSkin" xmlns:eui="http://ns.egret.com/eui">
+    <eui:Group id="contentGroup" width="100%" height="100%"/>
+</eui:Skin>

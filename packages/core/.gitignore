@@ -1,0 +1,15 @@
+node_modules/
+dist/
+benchmark-dist/
+build/
+*.tsbuildinfo
+
+.DS_Store
+Thumbs.db
+
+*.log
+*.local
+.env
+.env.*
+
+docs/

@@ -1,0 +1,33 @@
+# Dependencies and package-manager data
+node_modules/
+.pnpm-store/
+
+# Generated build artifacts
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor and operating-system files
+.DS_Store
+.vscode/
+.idea/
+.zed/
+.claude/
+*.swp
+
+# Local reference and documentation material
+/reference/
+docs/

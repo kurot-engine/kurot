@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>@blakron/spine — Example</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				background: #111;
+				display: flex;
+				align-items: flex-start;
+				justify-content: center;
+				gap: 16px;
+				padding: 24px;
+				min-height: 100vh;
+				font-family: monospace;
+				color: #eee;
+			}
+
+			/* Left column: canvas + buttons */
+			.left {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+				flex-shrink: 0;
+			}
+
+			canvas {
+				border: 1px solid #333;
+				background: #0f0f1a;
+				display: block;
+			}
+
+			#controls {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+
+			button {
+				padding: 6px 14px;
+				background: #2a2a4a;
+				border: 1px solid #444;
+				color: #ccc;
+				cursor: pointer;
+				border-radius: 4px;
+				font-family: monospace;
+				font-size: 12px;
+			}
+			button:hover {
+				background: #3a3a6a;
+			}
+
+			/* Right column: log */
+			.right {
+				width: 260px;
+				flex-shrink: 0;
+			}
+
+			#log-title {
+				font-size: 11px;
+				color: #555;
+				margin-bottom: 6px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			#log {
+				font-size: 11px;
+				color: #888;
+				height: 480px;
+				overflow-y: auto;
+				border: 1px solid #222;
+				padding: 8px;
+				background: #0a0a0a;
+				line-height: 1.6;
+			}
+
+			#log .entry {
+				border-bottom: 1px solid #1a1a1a;
+				padding: 2px 0;
+			}
+			#log .entry.error {
+				color: #e06c75;
+			}
+			#log .entry.info {
+				color: #98c379;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="left">
+			<canvas id="game-canvas" width="640" height="480"></canvas>
+			<div id="controls">
+				<button id="btn-idle">idle</button>
+				<button id="btn-walk">walk</button>
+				<button id="btn-run">run</button>
+				<button id="btn-jump">jump</button>
+				<button id="btn-shoot">shoot</button>
+			</div>
+		</div>
+
+		<div class="right">
+			<div id="log-title">Log</div>
+			<div id="log"></div>
+		</div>
+
+		<script type="module" src="./main.ts"></script>
+	</body>
+</html>

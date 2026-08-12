@@ -1,0 +1,11 @@
+{
+	"initial": [
+		"js/blakron.core.min_PYUZGG75.js",
+		"js/blakron.game.min_IM6YEBWK.js",
+		"js/blakron.ui.min_BBL3RT2E.js"
+	],
+	"game": [
+		"js/default.thm.min_CPDHAUXJ.js",
+		"js/main.min_2EXNZ4SU.js"
+	]
+}

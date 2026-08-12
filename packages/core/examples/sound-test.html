@@ -1,0 +1,373 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Sound / SoundChannel Test</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			:root {
+				--sidebar-w: 300px;
+				--accent-dim: rgba(108, 156, 255, 0.15);
+			}
+			body {
+				position: relative;
+			}
+			.log-panel {
+				flex: 1;
+				height: auto;
+				border-top: none;
+			}
+			.log-header {
+				padding: 8px 14px;
+			}
+			.channel-strip {
+				background: rgba(255, 255, 255, 0.02);
+				border: 1px solid var(--glass-border);
+				border-radius: 8px;
+				padding: 8px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+			.channel-strip .ch-header {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: 11px;
+				color: var(--text-muted);
+			}
+			.ch-name {
+				font-weight: 600;
+				color: var(--text);
+			}
+			.ch-pos {
+				color: var(--accent);
+				font-size: 10px;
+				margin-left: auto;
+				font-variant-numeric: tabular-nums;
+			}
+			.ch-controls {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			.vol-label {
+				color: var(--text-dim);
+				font-size: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Sound / SoundChannel Test</span>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<!-- Load -->
+				<div class="glass-card">
+					<h3>1. Load Sound</h3>
+					<div class="row">
+						<label>URL</label>
+						<input
+							type="text"
+							id="url-input"
+							value="https://cdn1.suno.ai/171aedd9-04c7-486e-ab8f-6d88aec139fc.mp3"
+						/>
+					</div>
+					<div class="row">
+						<label>Status</label>
+						<span id="load-status" class="status-badge badge-idle">idle</span>
+					</div>
+					<div class="row">
+						<label>Duration</label>
+						<span id="duration">—</span>
+					</div>
+					<div class="row" style="gap: 6px">
+						<button id="btn-load">Load</button>
+						<button id="btn-close" class="danger">Close</button>
+					</div>
+				</div>
+
+				<!-- Play -->
+				<div class="glass-card">
+					<h3>2. Play</h3>
+					<div class="row">
+						<label>Start (s)</label>
+						<input
+							type="number"
+							id="start-time"
+							value="0"
+							min="0"
+							step="0.5"
+							style="width: 70px; flex: none"
+						/>
+					</div>
+					<div class="row">
+						<label>Loops</label>
+						<input type="number" id="loops" value="1" min="0" step="1" style="width: 70px; flex: none" />
+						<span style="color: var(--text-dim); font-size: 10px">(0 = infinite)</span>
+					</div>
+					<div class="row">
+						<button id="btn-play">&#9654; Play</button>
+						<button id="btn-play-inf">&#9654; Play &#8734;</button>
+					</div>
+				</div>
+
+				<!-- Active channels -->
+				<div class="glass-card">
+					<h3>3. Active Channels</h3>
+					<div id="channels-list" style="display: flex; flex-direction: column; gap: 6px">
+						<span style="color: var(--text-dim); font-size: 10px">No active channels</span>
+					</div>
+				</div>
+
+				<!-- Error test -->
+				<div class="glass-card">
+					<h3>4. Error Cases</h3>
+					<div class="row" style="flex-wrap: wrap; gap: 6px">
+						<button id="btn-play-before-load">Play before load</button>
+						<button id="btn-load-404">Load 404 URL</button>
+						<button id="btn-load-bad">Load bad URL</button>
+					</div>
+				</div>
+
+				<!-- Stress test -->
+				<div class="glass-card">
+					<h3>5. Stress &mdash; Rapid Fire</h3>
+					<div class="row">
+						<label>Count</label>
+						<input
+							type="number"
+							id="stress-count"
+							value="5"
+							min="1"
+							max="20"
+							style="width: 60px; flex: none"
+						/>
+					</div>
+					<div class="row">
+						<button id="btn-stress">Fire N channels</button>
+						<button id="btn-stop-all" class="danger">Stop All</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="log-panel">
+				<div class="log-header">
+					<span>Event Log</span>
+					<button id="btn-clear-log" style="margin-left: auto; padding: 3px 8px; font-size: 10px">
+						Clear
+					</button>
+				</div>
+				<div id="log"></div>
+			</div>
+		</div>
+
+		<script type="module">
+			import { Sound, SoundChannel, Event, IOErrorEvent } from '../src/index.js';
+
+			// ── Logging ──────────────────────────────────────────────────────────
+			const logEl = document.getElementById('log');
+			const t0 = Date.now();
+
+			function log(tag, msg, cls = 'tag-info') {
+				const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+				const entry = document.createElement('div');
+				entry.className = 'log-entry';
+				entry.innerHTML =
+					`<span class="log-time">${elapsed}s</span>` +
+					`<span class="log-tag ${cls}">[${tag}]</span>` +
+					`<span class="log-msg">${msg}</span>`;
+				logEl.appendChild(entry);
+				logEl.scrollTop = logEl.scrollHeight;
+			}
+
+			document.getElementById('btn-clear-log').onclick = () => (logEl.innerHTML = '');
+
+			// ── State ────────────────────────────────────────────────────────────
+			let sound = new Sound();
+			let channelId = 0;
+			const activeChannels = new Map(); // id → { channel, name, intervalId }
+
+			// ── Status helpers ───────────────────────────────────────────────────
+			const loadStatus = document.getElementById('load-status');
+			const durationEl = document.getElementById('duration');
+
+			function setStatus(state) {
+				const map = {
+					idle: ['idle', 'badge-idle'],
+					loading: ['loading…', 'badge-loading'],
+					ready: ['ready', 'badge-ready'],
+					playing: ['playing', 'badge-playing'],
+					error: ['error', 'badge-error'],
+				};
+				const [text, cls] = map[state] ?? ['?', 'badge-idle'];
+				loadStatus.textContent = text;
+				loadStatus.className = 'status-badge ' + cls;
+			}
+
+			function attachSoundListeners(snd, label = '') {
+				snd.addEventListener(Event.COMPLETE, () => {
+					log('EVENT', `${label} COMPLETE — duration: ${snd.length.toFixed(2)}s`, 'tag-event');
+					durationEl.textContent = snd.length.toFixed(2) + 's';
+					setStatus('ready');
+				});
+				snd.addEventListener(IOErrorEvent.IO_ERROR, () => {
+					log('ERROR', `${label} IO_ERROR`, 'tag-error');
+					setStatus('error');
+				});
+			}
+
+			attachSoundListeners(sound, 'Sound');
+
+			// ── Channel list UI ──────────────────────────────────────────────────
+			const channelsList = document.getElementById('channels-list');
+
+			function renderChannels() {
+				channelsList.innerHTML = '';
+				if (activeChannels.size === 0) {
+					channelsList.innerHTML =
+						'<span style="color:var(--text-dim);font-size:10px">No active channels</span>';
+					return;
+				}
+				for (const [id, entry] of activeChannels) {
+					const strip = document.createElement('div');
+					strip.className = 'channel-strip';
+					strip.id = `ch-strip-${id}`;
+					strip.innerHTML = `
+						<div class="ch-header">
+							<span class="ch-name">#${id} ${entry.name}</span>
+							<span class="ch-pos" id="ch-pos-${id}">0.00s</span>
+						</div>
+						<div class="ch-controls">
+							<span class="vol-label">Vol</span>
+							<input type="range" min="0" max="1" step="0.01" value="${entry.channel.volume}"
+								id="ch-vol-${id}" style="flex:1" />
+							<button data-stop="${id}" class="danger" style="padding:3px 8px">&#9632; Stop</button>
+						</div>`;
+					channelsList.appendChild(strip);
+
+					document.getElementById(`ch-vol-${id}`).addEventListener('input', e => {
+						entry.channel.volume = parseFloat(e.target.value);
+						log('ACTION', `#${id} volume → ${entry.channel.volume.toFixed(2)}`, 'tag-action');
+					});
+				}
+
+				channelsList.querySelectorAll('[data-stop]').forEach(btn => {
+					btn.addEventListener('click', () => stopChannel(parseInt(btn.dataset.stop)));
+				});
+			}
+
+			function stopChannel(id) {
+				const entry = activeChannels.get(id);
+				if (!entry) return;
+				clearInterval(entry.intervalId);
+				entry.channel.stop();
+				activeChannels.delete(id);
+				log('ACTION', `#${id} stopped`, 'tag-action');
+				renderChannels();
+			}
+
+			function addChannel(channel, name) {
+				const id = ++channelId;
+				const intervalId = setInterval(() => {
+					const posEl = document.getElementById(`ch-pos-${id}`);
+					if (posEl) posEl.textContent = channel.position.toFixed(2) + 's';
+				}, 100);
+
+				channel.addEventListener(Event.SOUND_COMPLETE, () => {
+					log('EVENT', `#${id} SOUND_COMPLETE`, 'tag-event');
+					clearInterval(intervalId);
+					activeChannels.delete(id);
+					renderChannels();
+				});
+
+				activeChannels.set(id, { channel, name, intervalId });
+				log('ACTION', `#${id} started — ${name}`, 'tag-action');
+				renderChannels();
+				return id;
+			}
+
+			// ── Load ─────────────────────────────────────────────────────────────
+			document.getElementById('btn-load').onclick = () => {
+				const url = document.getElementById('url-input').value.trim();
+				if (!url) return;
+				sound.close();
+				sound = new Sound();
+				attachSoundListeners(sound, 'Sound');
+				setStatus('loading');
+				durationEl.textContent = '—';
+				log('ACTION', `load("${url}")`, 'tag-action');
+				sound.load(url);
+			};
+
+			document.getElementById('btn-close').onclick = () => {
+				sound.close();
+				setStatus('idle');
+				durationEl.textContent = '—';
+				log('ACTION', 'sound.close()', 'tag-action');
+			};
+
+			// ── Play ─────────────────────────────────────────────────────────────
+			document.getElementById('btn-play').onclick = () => {
+				const startTime = parseFloat(document.getElementById('start-time').value) || 0;
+				const loops = parseInt(document.getElementById('loops').value) || 1;
+				log('ACTION', `play(startTime=${startTime}, loops=${loops})`, 'tag-action');
+				const ch = sound.play(startTime, loops);
+				addChannel(ch, `loops=${loops}`);
+				setStatus('playing');
+			};
+
+			document.getElementById('btn-play-inf').onclick = () => {
+				log('ACTION', 'play(0, 0) — infinite loop', 'tag-action');
+				const ch = sound.play(0, 0);
+				addChannel(ch, 'loops=∞');
+				setStatus('playing');
+			};
+
+			// ── Error cases ──────────────────────────────────────────────────────
+			document.getElementById('btn-play-before-load').onclick = () => {
+				const fresh = new Sound();
+				attachSoundListeners(fresh, 'FreshSound');
+				log('ACTION', 'play() on unloaded Sound — expect IOErrorEvent', 'tag-action');
+				const ch = fresh.play();
+				addChannel(ch, 'no-op');
+			};
+
+			document.getElementById('btn-load-404').onclick = () => {
+				const s = new Sound();
+				attachSoundListeners(s, '404Sound');
+				log('ACTION', 'load() with 404 URL', 'tag-action');
+				s.load('https://example.com/nonexistent-audio-file-404.mp3');
+			};
+
+			document.getElementById('btn-load-bad').onclick = () => {
+				const s = new Sound();
+				attachSoundListeners(s, 'BadSound');
+				log('ACTION', 'load() with bad URL (not audio)', 'tag-action');
+				s.load('https://example.com/');
+			};
+
+			// ── Stress test ──────────────────────────────────────────────────────
+			document.getElementById('btn-stress').onclick = () => {
+				const n = parseInt(document.getElementById('stress-count').value) || 5;
+				log('ACTION', `Firing ${n} channels simultaneously`, 'tag-action');
+				for (let i = 0; i < n; i++) {
+					const ch = sound.play(i * 0.1, 1);
+					addChannel(ch, `stress-${i}`);
+				}
+			};
+
+			document.getElementById('btn-stop-all').onclick = () => {
+				log('ACTION', `Stopping all ${activeChannels.size} channels`, 'tag-action');
+				for (const id of [...activeChannels.keys()]) stopChannel(id);
+			};
+
+			// ── Init log ─────────────────────────────────────────────────────────
+			log('INFO', 'Sound test page ready. Load a sound to begin.', 'tag-info');
+			log('INFO', 'AudioContext will be created on first play (browser policy).', 'tag-info');
+		</script>
+	</body>
+</html>

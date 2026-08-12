@@ -1,0 +1,379 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Net Test — HttpRequest / ImageLoader</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			:root {
+				--sidebar-w: 320px;
+			}
+			.row label {
+				width: 100px;
+			}
+			textarea {
+				min-height: 60px;
+			}
+			.progress-bar {
+				height: 4px;
+				background: rgba(255, 255, 255, 0.04);
+				border-radius: 2px;
+				overflow: hidden;
+				margin-top: 6px;
+			}
+			.progress-fill {
+				height: 100%;
+				background: var(--accent);
+				width: 0%;
+				transition: width 0.15s;
+				border-radius: 2px;
+			}
+			#image-preview {
+				margin-top: 8px;
+				max-width: 100%;
+				max-height: 140px;
+				border: 1px solid var(--glass-border);
+				border-radius: 6px;
+				display: none;
+			}
+			.log-panel {
+				flex: 1;
+				height: auto;
+				border-top: none;
+			}
+			.log-header {
+				padding: 8px 14px;
+			}
+			.log-msg {
+				word-break: break-all;
+			}
+			.response-panel {
+				height: 200px;
+				border-top: 1px solid var(--glass-border);
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				background: rgba(6, 7, 16, 0.4);
+				backdrop-filter: blur(12px);
+			}
+			.response-header {
+				padding: 6px 14px;
+				border-bottom: 1px solid var(--glass-border);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--text-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				flex-shrink: 0;
+			}
+			#response-body {
+				flex: 1;
+				overflow-y: auto;
+				padding: 8px 14px;
+				white-space: pre-wrap;
+				word-break: break-all;
+				font-size: 11px;
+				color: rgba(141, 221, 136, 0.85);
+			}
+			#response-body::-webkit-scrollbar {
+				width: 4px;
+			}
+			#response-body::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			#response-body::-webkit-scrollbar-thumb {
+				background: rgba(255, 255, 255, 0.06);
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Net Test &mdash; HttpRequest / ImageLoader</span>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<!-- HttpRequest -->
+				<div class="glass-card">
+					<h3>1. HttpRequest</h3>
+					<div class="row">
+						<label>URL</label>
+						<input type="text" id="http-url" value="https://jsonplaceholder.typicode.com/todos/1" />
+					</div>
+					<div class="row">
+						<label>Method</label>
+						<select id="http-method">
+							<option value="GET">GET</option>
+							<option value="POST">POST</option>
+						</select>
+					</div>
+					<div class="row">
+						<label>Response Type</label>
+						<select id="http-resp-type">
+							<option value="text">text</option>
+							<option value="arraybuffer">arraybuffer</option>
+						</select>
+					</div>
+					<div class="row">
+						<label>Timeout (ms)</label>
+						<input type="text" id="http-timeout" value="0" style="width: 70px; flex: none" />
+					</div>
+					<div class="row">
+						<label>Body (POST)</label>
+						<textarea id="http-body">{"title":"foo","body":"bar","userId":1}</textarea>
+					</div>
+					<div class="row" style="gap: 6px">
+						<button id="btn-http-send">Send</button>
+						<button id="btn-http-abort" class="danger">Abort</button>
+					</div>
+					<div class="progress-bar"><div class="progress-fill" id="http-progress"></div></div>
+				</div>
+
+				<!-- ImageLoader -->
+				<div class="glass-card">
+					<h3>2. ImageLoader</h3>
+					<div class="row">
+						<label>URL</label>
+						<input type="text" id="img-url" value="https://picsum.photos/200/150" />
+					</div>
+					<div class="row">
+						<label>crossOrigin</label>
+						<select id="img-cors">
+							<option value="">none</option>
+							<option value="anonymous" selected>anonymous</option>
+							<option value="use-credentials">use-credentials</option>
+						</select>
+					</div>
+					<div class="row">
+						<button id="btn-img-load">Load Image</button>
+						<button id="btn-img-error" class="danger">Load 404</button>
+					</div>
+					<img id="image-preview" alt="loaded image" />
+				</div>
+
+				<!-- Quick tests -->
+				<div class="glass-card">
+					<h3>3. Quick Tests</h3>
+					<div class="row" style="flex-wrap: wrap; gap: 6px">
+						<button id="btn-get-json">GET JSON</button>
+						<button id="btn-get-text">GET Text</button>
+						<button id="btn-post-json">POST JSON</button>
+						<button id="btn-get-arraybuffer">GET ArrayBuffer</button>
+						<button id="btn-timeout">Timeout (1s)</button>
+						<button id="btn-404">404 Error</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="right-panel">
+				<div class="log-panel">
+					<div class="log-header">
+						<span>Event Log</span>
+						<button id="btn-clear-log" style="margin-left: auto; padding: 3px 8px; font-size: 10px">
+							Clear
+						</button>
+					</div>
+					<div id="log"></div>
+				</div>
+				<div class="response-panel">
+					<div class="response-header">Response</div>
+					<div id="response-body">&mdash;</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="module">
+			import {
+				HttpRequest,
+				HttpMethod,
+				HttpResponseType,
+				ImageLoader,
+				Event,
+				IOErrorEvent,
+				ProgressEvent,
+			} from '../src/index.js';
+
+			const logEl = document.getElementById('log');
+			const t0 = Date.now();
+
+			function log(tag, msg, cls = 'tag-info') {
+				const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+				const entry = document.createElement('div');
+				entry.className = 'log-entry';
+				entry.innerHTML =
+					`<span class="log-time">${elapsed}s</span>` +
+					`<span class="log-tag ${cls}">[${tag}]</span>` +
+					`<span class="log-msg">${msg}</span>`;
+				logEl.appendChild(entry);
+				logEl.scrollTop = logEl.scrollHeight;
+			}
+
+			document.getElementById('btn-clear-log').onclick = () => (logEl.innerHTML = '');
+
+			const responseBody = document.getElementById('response-body');
+			const progressFill = document.getElementById('http-progress');
+
+			// ── Active request ────────────────────────────────────────────────
+			let activeReq;
+
+			function sendRequest(url, method, responseType, body, timeout) {
+				if (activeReq) activeReq.abort();
+
+				const req = new HttpRequest();
+				activeReq = req;
+				req.responseType = responseType;
+				req.timeout = timeout;
+
+				req.addEventListener(Event.COMPLETE, () => {
+					const r = req.response;
+					if (r instanceof ArrayBuffer) {
+						log('EVENT', `COMPLETE — ArrayBuffer ${r.byteLength} bytes`, 'tag-event');
+						responseBody.textContent =
+							`ArrayBuffer: ${r.byteLength} bytes\n\n` +
+							Array.from(new Uint8Array(r).slice(0, 64))
+								.map(b => b.toString(16).padStart(2, '0'))
+								.join(' ') +
+							(r.byteLength > 64 ? ' …' : '');
+					} else {
+						const preview = typeof r === 'string' ? r.slice(0, 2000) : String(r);
+						log('EVENT', `COMPLETE — ${typeof r}, ${String(r).length} chars`, 'tag-event');
+						try {
+							responseBody.textContent = JSON.stringify(JSON.parse(preview), null, 2);
+						} catch {
+							responseBody.textContent = preview;
+						}
+					}
+					progressFill.style.width = '100%';
+					setTimeout(() => {
+						progressFill.style.width = '0%';
+					}, 800);
+				});
+
+				req.addEventListener(IOErrorEvent.IO_ERROR, () => {
+					log('ERROR', `IO_ERROR — ${url}`, 'tag-error');
+					responseBody.textContent = 'IO_ERROR';
+					progressFill.style.width = '0%';
+				});
+
+				req.addEventListener(ProgressEvent.PROGRESS, e => {
+					const pct = e.bytesTotal > 0 ? ((e.bytesLoaded / e.bytesTotal) * 100).toFixed(0) : '?';
+					progressFill.style.width = (e.bytesTotal > 0 ? (e.bytesLoaded / e.bytesTotal) * 100 : 30) + '%';
+					log('EVENT', `PROGRESS ${e.bytesLoaded}/${e.bytesTotal} (${pct}%)`, 'tag-event');
+				});
+
+				req.open(url, method);
+				if (method === HttpMethod.POST && body) {
+					req.setRequestHeader('Content-Type', 'application/json');
+				}
+				log(
+					'ACTION',
+					`${method} ${url} [${responseType}]${timeout ? ` timeout=${timeout}ms` : ''}`,
+					'tag-action',
+				);
+				responseBody.textContent = 'loading…';
+				req.send(method === HttpMethod.POST ? body : undefined);
+			}
+
+			// ── HttpRequest controls ──────────────────────────────────────────
+			document.getElementById('btn-http-send').onclick = () => {
+				sendRequest(
+					document.getElementById('http-url').value.trim(),
+					document.getElementById('http-method').value,
+					document.getElementById('http-resp-type').value,
+					document.getElementById('http-body').value,
+					parseInt(document.getElementById('http-timeout').value) || 0,
+				);
+			};
+
+			document.getElementById('btn-http-abort').onclick = () => {
+				if (activeReq) {
+					activeReq.abort();
+					log('ACTION', 'abort()', 'tag-action');
+					responseBody.textContent = 'aborted';
+					progressFill.style.width = '0%';
+				}
+			};
+
+			// ── Quick tests ───────────────────────────────────────────────────
+			document.getElementById('btn-get-json').onclick = () =>
+				sendRequest(
+					'https://jsonplaceholder.typicode.com/posts/1',
+					HttpMethod.GET,
+					HttpResponseType.TEXT,
+					null,
+					0,
+				);
+
+			document.getElementById('btn-get-text').onclick = () =>
+				sendRequest(
+					'https://jsonplaceholder.typicode.com/todos/1',
+					HttpMethod.GET,
+					HttpResponseType.TEXT,
+					null,
+					0,
+				);
+
+			document.getElementById('btn-post-json').onclick = () =>
+				sendRequest(
+					'https://jsonplaceholder.typicode.com/posts',
+					HttpMethod.POST,
+					HttpResponseType.TEXT,
+					'{"title":"test","body":"hello","userId":1}',
+					0,
+				);
+
+			document.getElementById('btn-get-arraybuffer').onclick = () =>
+				sendRequest('https://picsum.photos/50/50', HttpMethod.GET, HttpResponseType.ARRAY_BUFFER, null, 0);
+
+			document.getElementById('btn-timeout').onclick = () =>
+				sendRequest('https://httpbin.org/delay/5', HttpMethod.GET, HttpResponseType.TEXT, null, 1000);
+
+			document.getElementById('btn-404').onclick = () =>
+				sendRequest(
+					'https://jsonplaceholder.typicode.com/nonexistent/999',
+					HttpMethod.GET,
+					HttpResponseType.TEXT,
+					null,
+					0,
+				);
+
+			// ── ImageLoader ───────────────────────────────────────────────────
+			let imgLoader;
+			const imgPreview = document.getElementById('image-preview');
+
+			function loadImage(url) {
+				imgLoader = new ImageLoader();
+				imgLoader.crossOrigin = document.getElementById('img-cors').value || undefined;
+
+				imgLoader.addEventListener(Event.COMPLETE, () => {
+					const bd = imgLoader.data;
+					log('EVENT', `ImageLoader COMPLETE — ${bd.width}x${bd.height}`, 'tag-event');
+					const c = document.createElement('canvas');
+					c.width = bd.width;
+					c.height = bd.height;
+					c.getContext('2d').drawImage(bd.source, 0, 0);
+					imgPreview.src = c.toDataURL();
+					imgPreview.style.display = 'block';
+				});
+
+				imgLoader.addEventListener(IOErrorEvent.IO_ERROR, () => {
+					log('ERROR', `ImageLoader IO_ERROR — ${url}`, 'tag-error');
+					imgPreview.style.display = 'none';
+				});
+
+				log('ACTION', `ImageLoader.load("${url}")`, 'tag-action');
+				imgLoader.load(url);
+			}
+
+			document.getElementById('btn-img-load').onclick = () =>
+				loadImage(document.getElementById('img-url').value.trim());
+
+			document.getElementById('btn-img-error').onclick = () =>
+				loadImage('https://example.com/nonexistent-image-404.png');
+
+			log('INFO', 'Net test ready.', 'tag-info');
+		</script>
+	</body>
+</html>

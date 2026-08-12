@@ -1,0 +1,898 @@
+<!doctype html>
+<!--
+  Egret Benchmark — 用于与 Blakron 同场景性能对比
+  基于 Egret 5.x 核心 API + Web 平台模块（纯 HTML + inline script）
+  启动：cd packages/core && pnpm benchmark
+  然后访问 http://localhost:5173/examples/egret-benchmark.html
+-->
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Egret Benchmark (对比用)</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			/* ── Egret Benchmark-specific ─────────────────────────────────── */
+			:root {
+				--sidebar-w: 300px;
+			}
+			.engine-badge {
+				margin-left: 8px;
+				font-size: 10px;
+				padding: 2px 8px;
+				border-radius: 6px;
+				background: rgba(217, 119, 6, 0.12);
+				color: var(--warning);
+				font-weight: 600;
+			}
+			#status-badge {
+				display: inline-block;
+				font-size: 10px;
+				padding: 2px 8px;
+				border-radius: 6px;
+				font-weight: 600;
+			}
+			#status-badge.warmup {
+				background: rgba(217, 119, 6, 0.12);
+				color: var(--warning);
+			}
+			#status-badge.measuring {
+				background: rgba(22, 163, 74, 0.12);
+				color: var(--success);
+			}
+			#status-badge.paused {
+				background: rgba(220, 38, 38, 0.12);
+				color: var(--error);
+			}
+			#fps-graph {
+				border: none;
+				margin: 6px 0 0 0;
+				width: 100%;
+				height: 60px;
+				display: block;
+			}
+			.scene-radio-group {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+			.scene-radio-group label {
+				display: flex;
+				align-items: center;
+				gap: 7px;
+				font-size: 11px;
+				cursor: pointer;
+				padding: 3px 5px;
+				border-radius: 4px;
+				transition: background 0.15s;
+			}
+			.scene-radio-group label:hover {
+				background: var(--glass-hover);
+			}
+			.scene-radio-group input[type='radio'] {
+				accent-color: var(--accent);
+			}
+			.slider-row {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				font-size: 11px;
+			}
+			.slider-row .slider-label {
+				display: flex;
+				justify-content: space-between;
+				color: var(--text-muted);
+			}
+			.slider-row input[type='range'] {
+				width: 100%;
+				accent-color: var(--accent);
+			}
+			/* Egret container — override Egret's position:absolute on the player div */
+			#egret-container {
+				position: relative !important;
+				overflow: hidden !important;
+				width: 800px;
+				height: 600px;
+				border: 1px solid var(--glass-border);
+				border-radius: 4px;
+			}
+			#egret-container canvas {
+				position: absolute !important;
+				top: 0 !important;
+				left: 0 !important;
+				width: 100% !important;
+				height: 100% !important;
+				border-radius: 4px;
+			}
+			#loading-error {
+				display: none;
+				position: absolute;
+				inset: 0;
+				background: var(--bg-deep);
+				color: var(--error);
+				font-size: 14px;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+				padding: 20px;
+				z-index: 100;
+			}
+			#fallback-textarea-wrap {
+				display: none;
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: var(--bg);
+				border: 1px solid var(--glass-border);
+				border-radius: 10px;
+				padding: 16px;
+				backdrop-filter: blur(12px);
+				z-index: 9999;
+				width: 500px;
+			}
+			#fallback-textarea-wrap h5 {
+				margin: 0 0 8px 0;
+				color: var(--accent);
+				font-size: 12px;
+			}
+			#fallback-textarea-wrap textarea {
+				width: 100%;
+				height: 120px;
+				background: rgba(255, 255, 255, 0.04);
+				border: 1px solid var(--glass-border);
+				color: var(--text);
+				font-family: inherit;
+				font-size: 11px;
+				padding: 6px;
+				resize: vertical;
+			}
+			#fallback-textarea-wrap button {
+				margin-top: 8px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Benchmark</span>
+			<span class="engine-badge">Egret 5.x WebGL</span>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<div class="glass-card">
+					<h3>Scene</h3>
+					<div class="scene-radio-group" id="scene-radios">
+						<label>
+							<input type="radio" name="scene" value="sprite-batch" />
+							Sprite Batch
+						</label>
+						<label>
+							<input type="radio" name="scene" value="mixed-texture" />
+							Mixed Texture
+						</label>
+						<label>
+							<input type="radio" name="scene" value="filter-heavy" />
+							Filter Heavy
+						</label>
+						<label>
+							<input type="radio" name="scene" value="dynamic-transform" checked />
+							Dynamic Transform
+						</label>
+						<label>
+							<input type="radio" name="scene" value="deep-container" />
+							Deep Container
+						</label>
+						<label>
+							<input type="radio" name="scene" value="rapid-churn" />
+							Rapid Churn
+						</label>
+						<label>
+							<input type="radio" name="scene" value="texture-swap" />
+							Texture Swap
+						</label>
+					</div>
+				</div>
+				<div class="glass-card">
+					<h3>Object Count</h3>
+					<div class="slider-row">
+						<div class="slider-label">
+							<span>Count</span>
+							<span id="count-display">500</span>
+						</div>
+						<input type="range" id="count-slider" min="50" max="5000" step="10" value="500" />
+					</div>
+				</div>
+				<div class="glass-card">
+					<h3>
+						Metrics
+						<span id="status-badge" class="warmup">Warmup</span>
+					</h3>
+					<div class="metric-row">
+						<span class="label">FPS</span>
+						<span class="value dimmed" id="m-fps">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Draw Calls</span>
+						<span class="value dimmed" id="m-dc">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Render</span>
+						<span class="value dimmed" id="m-render">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Avg Render</span>
+						<span class="value dimmed" id="m-avg-render">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">p95 Render</span>
+						<span class="value dimmed" id="m-p95-render">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Frames</span>
+						<span class="value dimmed" id="m-frames">--</span>
+					</div>
+					<canvas id="fps-graph" width="200" height="60"></canvas>
+				</div>
+				<div class="glass-card">
+					<h3>Actions</h3>
+					<div class="btn-row">
+						<button id="btn-reset">Reset</button>
+						<button id="btn-pause">Pause</button>
+					</div>
+					<div class="btn-row" style="margin-top: 6px">
+						<button id="btn-export-json">Export JSON</button>
+						<button id="btn-copy-md">Copy Markdown</button>
+					</div>
+				</div>
+			</div>
+			<div class="right-panel">
+				<div id="canvas-wrap">
+					<div
+						class="egret-player"
+						id="egret-container"
+						data-content-width="800"
+						data-content-height="600"
+						data-scale-mode="exactFit"
+						data-frame-rate="60"
+					></div>
+					<div id="loading-error">
+						<div>
+							<div style="font-size: 32px; margin-bottom: 12px">&#x26A0;</div>
+							<strong>Failed to load Egret engine</strong>
+							<br />
+							<span id="error-msg"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="toast"></div>
+		<div id="fallback-textarea-wrap">
+			<h5>Copy the Markdown below</h5>
+			<textarea id="fallback-textarea" readonly></textarea>
+			<button id="btn-close-fallback">Close</button>
+		</div>
+
+		<script>
+			// ── Load Egret engine ──────────────────────────────────────────────────
+			const EGRET_CORE = 'egret.min.js';
+			const EGRET_WEB = 'egret.web.min.js';
+
+			function loadScript(src) {
+				return new Promise((resolve, reject) => {
+					const s = document.createElement('script');
+					s.src = src;
+					s.onload = resolve;
+					s.onerror = () => reject(new Error('Failed to load: ' + src));
+					document.head.appendChild(s);
+				});
+			}
+
+			async function main() {
+				try {
+					await loadScript(EGRET_CORE);
+					await loadScript(EGRET_WEB);
+				} catch (e) {
+					document.getElementById('loading-error').style.display = 'flex';
+					document.getElementById('error-msg').textContent = e.message;
+					return;
+				}
+
+				if (typeof egret === 'undefined') {
+					document.getElementById('loading-error').style.display = 'flex';
+					document.getElementById('error-msg').textContent = 'egret global not found';
+					return;
+				}
+
+				// ── Initialize Egret via runEgret ─────────────────────────────────
+				// egret.runEgret sets up sys.RenderBuffer, sys.systemRenderer, ticker loop, etc.
+				egret.runEgret({ renderMode: 'webgl' });
+
+				// Wait for Egret to finish initializing the player
+				await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+				// Access the stage created by WebPlayer
+				const container = document.getElementById('egret-container');
+				const webPlayer = container['egret-player'];
+				if (!webPlayer || !webPlayer.stage) {
+					document.getElementById('loading-error').style.display = 'flex';
+					document.getElementById('error-msg').textContent = 'Egret stage not initialized';
+					return;
+				}
+
+				const stage = webPlayer.stage;
+				initBenchmark(stage);
+			}
+
+			function initBenchmark(stage) {
+				// ── Metrics collection (same as Blakron benchmark) ────────────────────
+				function percentile(arr, p) {
+					if (!arr.length) return 0;
+					return arr[Math.max(0, Math.min(Math.ceil(p * arr.length) - 1, arr.length - 1))];
+				}
+
+				class MetricsCollector {
+					constructor(ws = 300) {
+						this.ws = ws;
+						this.buf = new Array(ws);
+						this.wi = 0;
+						this.fc = 0;
+					}
+					record(f) {
+						this.buf[this.wi] = f;
+						this.wi = (this.wi + 1) % this.ws;
+						if (this.fc < this.ws) this.fc++;
+					}
+					reset() {
+						this.wi = 0;
+						this.fc = 0;
+						this.buf.fill(undefined);
+					}
+					getStats() {
+						if (!this.fc)
+							return {
+								fc: 0,
+								fps: { cur: 0, avg: 0, p95: 0, max: 0 },
+								rt: { cur: 0, avg: 0, p95: 0, max: 0 },
+								dc: { cur: 0, avg: 0 },
+							};
+						const fps = [],
+							rt = [],
+							dc = [];
+						for (let i = 0; i < this.fc; i++) {
+							const f = this.buf[(this.wi - this.fc + i + this.ws * 2) % this.ws];
+							if (f) {
+								fps.push(f.fps);
+								rt.push(f.rt);
+								dc.push(f.dc);
+							}
+						}
+						const latest = this.buf[(this.wi - 1 + this.ws) % this.ws];
+						const sf = [...fps].sort((a, b) => a - b),
+							sr = [...rt].sort((a, b) => a - b);
+						return {
+							fc: this.fc,
+							fps: {
+								cur: latest?.fps ?? 0,
+								avg: fps.reduce((a, b) => a + b, 0) / fps.length,
+								p95: percentile(sf, 0.95),
+								max: sf[sf.length - 1] ?? 0,
+							},
+							rt: {
+								cur: latest?.rt ?? 0,
+								avg: rt.reduce((a, b) => a + b, 0) / rt.length,
+								p95: percentile(sr, 0.95),
+								max: sr[sr.length - 1] ?? 0,
+							},
+							dc: { cur: latest?.dc ?? 0, avg: dc.reduce((a, b) => a + b, 0) / dc.length },
+						};
+					}
+				}
+
+				class ReportExporter {
+					buildReport(sceneId, count, stats) {
+						return {
+							timestamp: new Date().toISOString(),
+							engine: 'egret',
+							scene: sceneId,
+							objectCount: count,
+							fps: { avg: stats.fps.avg, p95: stats.fps.p95, max: stats.fps.max },
+							renderTimeMs: { avg: stats.rt.avg, p95: stats.rt.p95, max: stats.rt.max },
+							drawCallsAvg: stats.dc.avg,
+						};
+					}
+					exportJSON(report) {
+						const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+						const a = document.createElement('a');
+						a.href = URL.createObjectURL(blob);
+						a.download = `benchmark-egret-${report.scene}-${report.timestamp.replace(/[:.]/g, '-').slice(0, 19)}.json`;
+						a.click();
+					}
+					formatMarkdown(report) {
+						const h =
+							'| Engine | Scene | Objects | FPS avg | FPS p95 | FPS max | Render avg (ms) | Render p95 (ms) | Draw Calls avg |';
+						const s = '|---|---|---|---|---|---|---|---|---|';
+						const r = `| Egret | ${report.scene} | ${report.objectCount} | ${report.fps.avg.toFixed(1)} | ${report.fps.p95.toFixed(1)} | ${report.fps.max.toFixed(1)} | ${report.renderTimeMs.avg.toFixed(2)} | ${report.renderTimeMs.p95.toFixed(2)} | ${report.drawCallsAvg.toFixed(1)} |`;
+						return [h, s, r].join('\n');
+					}
+					async copyMarkdown(report, fb) {
+						try {
+							await navigator.clipboard.writeText(this.formatMarkdown(report));
+						} catch {
+							fb?.(this.formatMarkdown(report));
+						}
+					}
+				}
+
+				// ── Intercept render for metrics ────────────────────────────────────
+				// Monkey-patch drawToSurface on the stage's DisplayList to capture
+				// draw call count and render time per frame.
+				const collector = new MetricsCollector();
+				const exporter = new ReportExporter();
+				let currentFps = 0,
+					currentRenderTime = 0,
+					currentDrawCalls = 0;
+
+				const displayList = stage.$displayList;
+				if (displayList) {
+					const origDrawToSurface = displayList.drawToSurface.bind(displayList);
+					displayList.drawToSurface = function () {
+						const t0 = performance.now();
+						const dc = origDrawToSurface();
+						const t1 = performance.now();
+						currentRenderTime = t1 - t0;
+						currentDrawCalls = dc || 0;
+						return dc;
+					};
+				}
+
+				// ── Phase & FPS state ───────────────────────────────────────────────
+				let phase = 'idle',
+					warmupFrames = 0;
+				let currentSceneId = 'dynamic-transform',
+					currentCount = 500;
+
+				const $ = id => document.getElementById(id);
+				const fpsGraphCanvas = $('fps-graph');
+				const fpsGraphCtx = fpsGraphCanvas.getContext('2d');
+				const fpsHistory = new Array(200).fill(0);
+				let historyIdx = 0;
+
+				let fpsFrames = 0,
+					fpsLast = performance.now();
+
+				function fpsColorClass(fps) {
+					return fps >= 55 ? 'good' : fps >= 30 ? 'warn' : 'bad';
+				}
+
+				// ── Root container for scenes ──────────────────────────────────────
+				const root = new egret.DisplayObjectContainer();
+				stage.addChild(root);
+
+				// ── Create textures (same as Blakron) ────────────────────────────────
+				const textures = [];
+				for (let i = 0; i < 8; i++) {
+					const c = document.createElement('canvas');
+					c.width = c.height = 32;
+					const ctx = c.getContext('2d');
+					ctx.fillStyle = `hsl(${(i / 8) * 360}, 80%, 60%)`;
+					ctx.fillRect(0, 0, 32, 32);
+					const bd = new egret.BitmapData(c);
+					bd.$deleteSource = false;
+					const tex = new egret.Texture();
+					tex._setBitmapData(bd);
+					textures.push(tex);
+				}
+
+				// ── Scene builders ──────────────────────────────────────────────────
+				const scenes = [
+					{
+						id: 'sprite-batch',
+						min: 50,
+						max: 5000,
+						build(container, count) {
+							const children = [];
+							for (let i = 0; i < count; i++) {
+								const bmp = new egret.Bitmap(textures[0]);
+								bmp.x = Math.random() * 760;
+								bmp.y = Math.random() * 560;
+								container.addChild(bmp);
+								children.push(bmp);
+							}
+							return () => children.forEach(ch => container.removeChild(ch));
+						},
+					},
+					{
+						id: 'mixed-texture',
+						min: 50,
+						max: 5000,
+						build(container, count) {
+							const children = [],
+								nt = 8,
+								pt = Math.floor(count / nt);
+							for (let t = 0; t < nt; t++) {
+								for (let i = 0; i < pt; i++) {
+									const bmp = new egret.Bitmap(textures[t]);
+									bmp.x = Math.random() * 760;
+									bmp.y = Math.random() * 560;
+									container.addChild(bmp);
+									children.push(bmp);
+								}
+							}
+							return () => children.forEach(ch => container.removeChild(ch));
+						},
+					},
+					{
+						id: 'filter-heavy',
+						min: 50,
+						max: 200,
+						build(container, count) {
+							const children = [];
+							for (let i = 0; i < count; i++) {
+								const sp = new egret.Shape();
+								sp.graphics.beginFill(Math.floor(Math.random() * 0xffffff));
+								sp.graphics.drawRect(0, 0, 40, 40);
+								sp.graphics.endFill();
+								sp.x = (i % 10) * 75 + 10;
+								sp.y = Math.floor(i / 10) * 75 + 10;
+								// Egret blur filter
+								sp.filters = [new egret.BlurFilter(4, 4)];
+								container.addChild(sp);
+								children.push(sp);
+							}
+							return () => children.forEach(ch => container.removeChild(ch));
+						},
+					},
+					{
+						id: 'dynamic-transform',
+						min: 50,
+						max: 5000,
+						build(container, count) {
+							const holder = new egret.DisplayObjectContainer();
+							container.addChild(holder);
+							const objects = [];
+							for (let i = 0; i < count; i++) {
+								const bmp = new egret.Bitmap(textures[0]);
+								bmp.x = Math.random() * 760;
+								bmp.y = Math.random() * 560;
+								holder.addChild(bmp);
+								objects.push({
+									bmp,
+									phase: Math.random() * Math.PI * 2,
+									speed: 0.02 + Math.random() * 0.03,
+									rx: 100 + Math.random() * 250,
+									ry: 80 + Math.random() * 180,
+								});
+							}
+							const onFrame = () => {
+								for (const o of objects) {
+									o.phase += o.speed;
+									o.bmp.x = 380 + Math.cos(o.phase) * o.rx;
+									o.bmp.y = 280 + Math.sin(o.phase) * o.ry;
+									o.bmp.rotation += 1.5;
+									o.bmp.alpha = 0.8;
+								}
+							};
+							holder.addEventListener(egret.Event.ENTER_FRAME, onFrame);
+							return () => {
+								holder.removeEventListener(egret.Event.ENTER_FRAME, onFrame);
+								container.removeChild(holder);
+							};
+						},
+					},
+					{
+						id: 'deep-container',
+						min: 50,
+						max: 2000,
+						build(container, count) {
+							const holder = new egret.DisplayObjectContainer();
+							container.addChild(holder);
+							const md = 10,
+								bf = Math.max(2, Math.ceil(Math.pow(count, 1 / md)));
+							function buildTree(parent, depth) {
+								if (depth >= md) {
+									const b = new egret.Bitmap(textures[0]);
+									parent.addChild(b);
+									return;
+								}
+								for (let i = 0; i < bf; i++) {
+									const c = new egret.DisplayObjectContainer();
+									c.x = i * 10;
+									c.y = depth * 5;
+									parent.addChild(c);
+									buildTree(c, depth + 1);
+								}
+							}
+							buildTree(holder, 0);
+							return () => container.removeChild(holder);
+						},
+					},
+					{
+						// Rapid Churn — continuously add & remove objects every frame.
+						// Stresses: GC, display list rebuild, instruction invalidation.
+						id: 'rapid-churn',
+						min: 50,
+						max: 3000,
+						build(container, count) {
+							const holder = new egret.DisplayObjectContainer();
+							container.addChild(holder);
+							const pool = [];
+							for (let i = 0; i < count; i++) {
+								const bmp = new egret.Bitmap(textures[i % 8]);
+								bmp.x = Math.random() * 760;
+								bmp.y = Math.random() * 560;
+								pool.push(bmp);
+							}
+							// Initially add half
+							const half = Math.floor(count / 2);
+							for (let i = 0; i < half; i++) holder.addChild(pool[i]);
+
+							let tick = 0;
+							const onFrame = () => {
+								tick++;
+								// Every 3 frames, churn a batch of objects
+								if (tick % 3 === 0) {
+									const churnCount = Math.min(
+										Math.floor(count * 0.2),
+										holder.numChildren,
+										pool.length - holder.numChildren,
+									);
+									// Remove from front
+									for (let i = 0; i < churnCount; i++) {
+										if (holder.numChildren > 0) holder.removeChildAt(0);
+									}
+									// Add from pool (ones not currently on stage)
+									let added = 0;
+									for (let i = 0; i < pool.length && added < churnCount; i++) {
+										if (!pool[i].parent) {
+											pool[i].x = Math.random() * 760;
+											pool[i].y = Math.random() * 560;
+											holder.addChild(pool[i]);
+											added++;
+										}
+									}
+								}
+							};
+							holder.addEventListener(egret.Event.ENTER_FRAME, onFrame);
+							return () => {
+								holder.removeEventListener(egret.Event.ENTER_FRAME, onFrame);
+								container.removeChild(holder);
+							};
+						},
+					},
+					{
+						// Texture Swap — randomly reassign texture every frame.
+						// Stresses: batch breaking, GPU texture binding, draw call count.
+						id: 'texture-swap',
+						min: 50,
+						max: 3000,
+						build(container, count) {
+							const holder = new egret.DisplayObjectContainer();
+							container.addChild(holder);
+							const objects = [];
+							for (let i = 0; i < count; i++) {
+								const bmp = new egret.Bitmap(textures[i % 8]);
+								bmp.x = Math.random() * 760;
+								bmp.y = Math.random() * 560;
+								holder.addChild(bmp);
+								objects.push(bmp);
+							}
+							const onFrame = () => {
+								for (const o of objects) {
+									// Randomly swap texture ~30% of the time
+									if (Math.random() < 0.3) {
+										o.texture = textures[Math.floor(Math.random() * 8)];
+									}
+									// Small movement to also dirty transforms
+									o.x += (Math.random() - 0.5) * 2;
+									o.y += (Math.random() - 0.5) * 2;
+								}
+							};
+							holder.addEventListener(egret.Event.ENTER_FRAME, onFrame);
+							return () => {
+								holder.removeEventListener(egret.Event.ENTER_FRAME, onFrame);
+								container.removeChild(holder);
+							};
+						},
+					},
+				];
+
+				function getScene(id) {
+					return scenes.find(s => s.id === id);
+				}
+
+				let cleanup = null;
+
+				function switchToScene(sceneId, count) {
+					if (cleanup) {
+						cleanup();
+						cleanup = null;
+					}
+					// Clear root
+					while (root.numChildren) root.removeChildAt(0);
+					const scene = getScene(sceneId);
+					if (scene) {
+						try {
+							cleanup = scene.build(root, count);
+						} catch (e) {
+							console.error('Scene build error:', e);
+						}
+					}
+					currentSceneId = sceneId;
+					currentCount = count;
+					warmupFrames = 0;
+					phase = 'warmup';
+					collector.reset();
+					if (scene) {
+						const slider = $('count-slider');
+						slider.min = scene.min;
+						slider.max = scene.max;
+						const clamped = Math.max(scene.min, Math.min(scene.max, parseInt(slider.value)));
+						slider.value = clamped;
+						$('count-display').textContent = clamped;
+						currentCount = clamped;
+					}
+				}
+
+				// ── FPS measurement loop (independent rAF) ──────────────────────────
+				function fpsLoop() {
+					fpsFrames++;
+					const now = performance.now();
+					if (now - fpsLast >= 500) {
+						currentFps = Math.round((fpsFrames / (now - fpsLast)) * 1000);
+						fpsFrames = 0;
+						fpsLast = now;
+					}
+
+					if (phase === 'warmup') {
+						warmupFrames++;
+						if (warmupFrames >= 60) {
+							phase = 'measuring';
+							collector.reset();
+						}
+					} else if (phase === 'measuring') {
+						collector.record({ fps: currentFps, rt: currentRenderTime, dc: currentDrawCalls });
+					}
+					updatePanel();
+					requestAnimationFrame(fpsLoop);
+				}
+				requestAnimationFrame(fpsLoop);
+
+				// ── Panel update ────────────────────────────────────────────────────
+				function updatePanel() {
+					const stats = collector.getStats();
+					const badge = $('status-badge');
+					if (phase === 'warmup') {
+						badge.textContent = 'Warmup';
+						badge.className = 'warmup';
+						[
+							$('m-fps'),
+							$('m-dc'),
+							$('m-render'),
+							$('m-avg-render'),
+							$('m-p95-render'),
+							$('m-frames'),
+						].forEach(el => {
+							el.textContent = '--';
+							el.className = 'value dimmed';
+						});
+					} else if (phase === 'measuring') {
+						badge.textContent = 'Measuring';
+						badge.className = 'measuring';
+						$('m-fps').textContent = stats.fps.cur.toFixed(1);
+						$('m-fps').className = 'value ' + fpsColorClass(stats.fps.cur);
+						$('m-dc').textContent = String(stats.dc.cur);
+						$('m-dc').className = 'value';
+						$('m-render').textContent = stats.rt.cur.toFixed(2) + ' ms';
+						$('m-render').className =
+							'value ' + (stats.rt.cur < 4 ? 'good' : stats.rt.cur < 8 ? 'warn' : 'bad');
+						$('m-avg-render').textContent = stats.rt.avg.toFixed(2) + ' ms';
+						$('m-avg-render').className = 'value';
+						$('m-p95-render').textContent = stats.rt.p95.toFixed(2) + ' ms';
+						$('m-p95-render').className = 'value';
+						$('m-frames').textContent = String(stats.fc);
+						$('m-frames').className = 'value';
+						fpsHistory[historyIdx] = stats.fps.cur;
+						historyIdx = (historyIdx + 1) % 200;
+					} else if (phase === 'paused') {
+						badge.textContent = 'Paused';
+						badge.className = 'paused';
+					}
+					// Draw FPS graph
+					const w = fpsGraphCanvas.width,
+						h = fpsGraphCanvas.height;
+					fpsGraphCtx.fillStyle = '#f0f2f7';
+					fpsGraphCtx.fillRect(0, 0, w, h);
+					fpsGraphCtx.strokeStyle = '#c8ccd8';
+					fpsGraphCtx.beginPath();
+					fpsGraphCtx.moveTo(0, h - (60 / 70) * h);
+					fpsGraphCtx.lineTo(w, h - (60 / 70) * h);
+					fpsGraphCtx.stroke();
+					for (let i = 0; i < 200; i++) {
+						const si = (historyIdx + i) % 200;
+						const fps = fpsHistory[si];
+						const x = i,
+							y = h - Math.min(fps / 70, 1) * h;
+						const cc = fpsColorClass(fps);
+						fpsGraphCtx.strokeStyle = cc === 'good' ? '#16a34a' : cc === 'warn' ? '#d97706' : '#dc2626';
+						if (i === 0) {
+							fpsGraphCtx.beginPath();
+							fpsGraphCtx.moveTo(x, y);
+						} else {
+							const prevCc = fpsColorClass(fpsHistory[(historyIdx + i - 1) % 200]);
+							if (prevCc !== cc) {
+								fpsGraphCtx.lineTo(x, y);
+								fpsGraphCtx.stroke();
+								fpsGraphCtx.beginPath();
+								fpsGraphCtx.moveTo(x, y);
+							} else fpsGraphCtx.lineTo(x, y);
+						}
+						if (i === 199) fpsGraphCtx.stroke();
+					}
+				}
+
+				// ── Controls ─────────────────────────────────────────────────────────
+				document.querySelectorAll('input[name="scene"]').forEach(radio => {
+					radio.addEventListener('change', () => {
+						if (radio.checked) switchToScene(radio.value, currentCount);
+					});
+				});
+
+				$('count-slider').addEventListener('input', function () {
+					const val = parseInt(this.value);
+					$('count-display').textContent = val;
+					currentCount = val;
+					switchToScene(currentSceneId, val);
+				});
+
+				$('btn-reset').addEventListener('click', () => {
+					warmupFrames = 0;
+					phase = 'warmup';
+					collector.reset();
+				});
+
+				const btnPause = $('btn-pause');
+				btnPause.addEventListener('click', () => {
+					if (phase === 'measuring') {
+						phase = 'paused';
+						btnPause.textContent = 'Resume';
+					} else if (phase === 'paused') {
+						phase = 'measuring';
+						btnPause.textContent = 'Pause';
+					}
+				});
+
+				$('btn-export-json').addEventListener('click', () => {
+					const stats = collector.getStats();
+					exporter.exportJSON(exporter.buildReport(currentSceneId, currentCount, stats));
+				});
+
+				$('btn-copy-md').addEventListener('click', async () => {
+					const stats = collector.getStats();
+					await exporter.copyMarkdown(exporter.buildReport(currentSceneId, currentCount, stats), text => {
+						$('fallback-textarea').value = text;
+						$('fallback-textarea-wrap').style.display = 'block';
+					});
+					showToast('Copied to clipboard');
+				});
+
+				$('btn-close-fallback').addEventListener('click', () => {
+					$('fallback-textarea-wrap').style.display = 'none';
+				});
+
+				function showToast(msg) {
+					const toast = $('toast');
+					toast.textContent = msg;
+					toast.classList.add('show');
+					setTimeout(() => toast.classList.remove('show'), 2000);
+				}
+
+				// ── Start initial scene ─────────────────────────────────────────────
+				switchToScene('dynamic-transform', 500);
+			}
+
+			main();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+		"isolatedDeclarations": true,
+		"jsx": "react-jsx",
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": ["src/**/*", "types/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.ts", "reference"]
+}

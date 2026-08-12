@@ -1,0 +1,492 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Visual Test</title>
+		<link rel="stylesheet" href="style.css" />
+		<style>
+			:root {
+				--sidebar-w: 240px;
+				--log-h: 180px;
+			}
+			#pf-graph {
+				border: none;
+				width: 100%;
+				height: 40px;
+				margin-top: 6px;
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Visual Test</span>
+			<div class="header-right">
+				<div id="fps-display" class="fps-badge">-- FPS</div>
+			</div>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<div class="glass-card">
+					<h3>Performance</h3>
+					<div class="perf-row">
+						<span class="label">FPS</span>
+						<span class="value" id="pf-fps">--</span>
+					</div>
+					<div class="perf-row">
+						<span class="label">Draw Calls</span>
+						<span class="value" id="pf-dc">--</span>
+					</div>
+					<div class="perf-row">
+						<span class="label">Render</span>
+						<span class="value" id="pf-rt">--</span>
+					</div>
+					<div class="perf-row">
+						<span class="label">Avg Render</span>
+						<span class="value" id="pf-art">--</span>
+					</div>
+					<div class="perf-row">
+						<span class="label">Max Render</span>
+						<span class="value" id="pf-mrt">--</span>
+					</div>
+					<div class="perf-row">
+						<span class="label">Frames</span>
+						<span class="value" id="pf-fc">--</span>
+					</div>
+					<canvas id="pf-graph" width="200" height="40"></canvas>
+				</div>
+			</div>
+			<div class="right-panel">
+				<div id="canvas-wrap">
+					<canvas id="gameCanvas" width="640" height="480"></canvas>
+				</div>
+				<div class="log-panel">
+					<div class="log-header"><span>Event Log</span></div>
+					<div id="log"></div>
+				</div>
+			</div>
+		</div>
+
+		<script type="module">
+			import {
+				createPlayer,
+				Sprite,
+				Shape,
+				BlurFilter,
+				GlowFilter,
+				DropShadowFilter,
+				ColorMatrixFilter,
+				Rectangle,
+			} from '../src/index.js';
+
+			const logEl = document.getElementById('log');
+			const logT0 = Date.now();
+			function info(msg) {
+				const elapsed = ((Date.now() - logT0) / 1000).toFixed(1);
+				const entry = document.createElement('div');
+				entry.className = 'log-entry';
+				entry.innerHTML =
+					`<span class="log-time">${elapsed}s</span>` +
+					`<span class="log-tag tag-event">[TEST]</span>` +
+					`<span class="log-msg">${msg}</span>`;
+				logEl.appendChild(entry);
+				logEl.scrollTop = logEl.scrollHeight;
+				console.log(msg);
+			}
+
+			const canvas = document.getElementById('gameCanvas');
+			const app = createPlayer({
+				canvas,
+				contentWidth: 640,
+				contentHeight: 480,
+				scaleMode: 'noScale',
+				frameRate: 60,
+			});
+			info(`Player created, WebGL: ${app.player.isWebGL}`);
+
+			const root = new Sprite();
+			app.start(root);
+			info('Player started');
+
+			// ── Test 1: Shape rect ─────────────────────────────────────────────
+			const shape = new Shape();
+			shape.graphics.beginFill(0xff0000, 1);
+			shape.graphics.drawRect(0, 0, 80, 80);
+			shape.graphics.endFill();
+			shape.x = 20;
+			shape.y = 20;
+			root.addChild(shape);
+			info('1: Red rectangle');
+
+			// ── Test 2: Shape circle ────────────────────────────────────────────
+			const circle = new Shape();
+			circle.graphics.beginFill(0x00ff00, 1);
+			circle.graphics.drawCircle(50, 50, 40);
+			circle.graphics.endFill();
+			circle.x = 120;
+			circle.y = 20;
+			root.addChild(circle);
+			info('2: Green circle');
+
+			// ── Test 3: Sprite with children ────────────────────────────────────
+			const container = new Sprite();
+			container.x = 260;
+			container.y = 20;
+			for (let i = 0; i < 5; i++) {
+				const s = new Shape();
+				s.graphics.beginFill(0x3366ff + i * 0x111100, 0.8);
+				s.graphics.drawRect(0, 0, 30, 30);
+				s.graphics.endFill();
+				s.x = i * 20;
+				s.y = i * 15;
+				container.addChild(s);
+			}
+			root.addChild(container);
+			info('3: 5 overlapping children');
+
+			// ── Test 4: Alpha + Rotation ────────────────────────────────────────
+			const rotated = new Shape();
+			rotated.graphics.beginFill(0xff00ff, 1);
+			rotated.graphics.drawRect(0, 0, 60, 60);
+			rotated.graphics.endFill();
+			rotated.x = 450;
+			rotated.y = 50;
+			rotated.rotation = 30;
+			rotated.alpha = 0.6;
+			rotated.anchorOffsetX = 30;
+			rotated.anchorOffsetY = 30;
+			root.addChild(rotated);
+			info('4: Rotated 30° + alpha 0.6');
+
+			// ── Test 5: Nested + scale ──────────────────────────────────────────
+			const outer = new Sprite();
+			outer.x = 540;
+			outer.y = 20;
+			outer.scaleX = 1.5;
+			outer.scaleY = 1.5;
+			const inner = new Shape();
+			inner.graphics.beginFill(0xffff00, 1);
+			inner.graphics.drawRoundRect(0, 0, 40, 40, 10);
+			inner.graphics.endFill();
+			outer.addChild(inner);
+			root.addChild(outer);
+			info('5: Nested, scale 1.5x');
+
+			// ── Test 6: Line drawing ────────────────────────────────────────────
+			const lines = new Shape();
+			lines.graphics.lineStyle(3, 0xffffff, 1);
+			lines.graphics.moveTo(0, 0);
+			lines.graphics.lineTo(100, 0);
+			lines.graphics.lineTo(100, 50);
+			lines.graphics.lineTo(0, 50);
+			lines.graphics.lineTo(0, 0);
+			lines.graphics.endFill();
+			lines.x = 20;
+			lines.y = 140;
+			root.addChild(lines);
+			info('6: White line rect');
+
+			// ── Test 7: Gradient fill ───────────────────────────────────────────
+			const gradient = new Shape();
+			const gm = new (await import('../src/blakron/geom/Matrix.js')).Matrix();
+			gm.createGradientBox(100, 60, 0, 0, 0);
+			gradient.graphics.beginGradientFill('linear', [0xff0000, 0x0000ff], [1, 1], [0, 255], gm);
+			gradient.graphics.drawRect(0, 0, 100, 60);
+			gradient.graphics.endFill();
+			gradient.x = 140;
+			gradient.y = 140;
+			root.addChild(gradient);
+			info('7: Gradient red→blue');
+
+			// ── Test 8: Ellipse ─────────────────────────────────────────────────
+			const ellipse = new Shape();
+			ellipse.graphics.beginFill(0x00ffff, 1);
+			ellipse.graphics.drawEllipse(0, 0, 80, 40);
+			ellipse.graphics.endFill();
+			ellipse.x = 260;
+			ellipse.y = 150;
+			root.addChild(ellipse);
+			info('8: Cyan ellipse');
+
+			// ── Test 9: scrollRect clipping ─────────────────────────────────────
+			const clipped = new Sprite();
+			clipped.x = 370;
+			clipped.y = 140;
+			clipped.scrollRect = new Rectangle(0, 0, 60, 60);
+			const bigShape = new Shape();
+			bigShape.graphics.beginFill(0xff8800, 1);
+			bigShape.graphics.drawRect(0, 0, 120, 120);
+			bigShape.graphics.endFill();
+			bigShape.graphics.beginFill(0x0066ff, 1);
+			bigShape.graphics.drawCircle(60, 60, 45);
+			bigShape.graphics.endFill();
+			clipped.addChild(bigShape);
+			root.addChild(clipped);
+			info('9: scrollRect clipping');
+
+			// ── Test 10: BlurFilter ─────────────────────────────────────────────
+			const blurred = new Shape();
+			blurred.graphics.beginFill(0xffffff, 1);
+			blurred.graphics.drawRect(0, 0, 60, 60);
+			blurred.graphics.endFill();
+			blurred.x = 20;
+			blurred.y = 250;
+			blurred.filters = [new BlurFilter(4, 4)];
+			root.addChild(blurred);
+			info('10: BlurFilter(4,4)');
+
+			// ── Test 11: GlowFilter ─────────────────────────────────────────────
+			const glowed = new Shape();
+			glowed.graphics.beginFill(0x00ff00, 1);
+			glowed.graphics.drawCircle(30, 30, 25);
+			glowed.graphics.endFill();
+			glowed.x = 110;
+			glowed.y = 255;
+			glowed.filters = [new GlowFilter(0x00ff00, 1, 8, 8, 2)];
+			root.addChild(glowed);
+			info('11: GlowFilter');
+
+			// ── Test 12: DropShadowFilter ───────────────────────────────────────
+			const shadowed = new Shape();
+			shadowed.graphics.beginFill(0x6666ff, 1);
+			shadowed.graphics.drawRect(0, 0, 60, 40);
+			shadowed.graphics.endFill();
+			shadowed.x = 200;
+			shadowed.y = 260;
+			shadowed.filters = [new DropShadowFilter(4, 45, 0x000000, 0.8, 4, 4)];
+			root.addChild(shadowed);
+			info('12: DropShadowFilter');
+
+			// ── Test 13: ColorMatrixFilter ──────────────────────────────────────
+			const grayscale = new Shape();
+			grayscale.graphics.beginFill(0xff0000, 1);
+			grayscale.graphics.drawRect(0, 0, 60, 40);
+			grayscale.graphics.endFill();
+			grayscale.x = 300;
+			grayscale.y = 260;
+			grayscale.filters = [
+				new ColorMatrixFilter([0.3, 0.6, 0.1, 0, 0, 0.3, 0.6, 0.1, 0, 0, 0.3, 0.6, 0.1, 0, 0, 0, 0, 0, 1, 0]),
+			];
+			root.addChild(grayscale);
+			info('13: Grayscale ColorMatrixFilter');
+
+			// ── Test 14: Mask ───────────────────────────────────────────────────
+			const masked = new Sprite();
+			masked.x = 440;
+			masked.y = 290;
+			masked.anchorOffsetX = 40;
+			masked.anchorOffsetY = 40;
+			const maskedContent = new Shape();
+			maskedContent.graphics.beginFill(0xff00ff, 1);
+			maskedContent.graphics.drawRect(0, 0, 80, 80);
+			maskedContent.graphics.endFill();
+			masked.addChild(maskedContent);
+			const rotationMarker = new Shape();
+			rotationMarker.graphics.lineStyle(4, 0xffff00, 1);
+			rotationMarker.graphics.moveTo(40, 40);
+			rotationMarker.graphics.lineTo(68, 40);
+			rotationMarker.graphics.endFill();
+			rotationMarker.graphics.beginFill(0x00ffff, 1);
+			rotationMarker.graphics.drawCircle(68, 40, 5);
+			rotationMarker.graphics.endFill();
+			masked.addChild(rotationMarker);
+			const maskShape = new Shape();
+			maskShape.graphics.beginFill(0xffffff, 1);
+			maskShape.graphics.drawCircle(40, 40, 30);
+			maskShape.graphics.endFill();
+			masked.addChild(maskShape);
+			masked.mask = maskShape;
+			root.addChild(masked);
+			info('14: Circle mask');
+
+			// ── Test 15: Tint ───────────────────────────────────────────────────
+			const tinted = new Shape();
+			tinted.graphics.beginFill(0xffffff, 1);
+			tinted.graphics.drawRect(0, 0, 50, 50);
+			tinted.graphics.endFill();
+			tinted.x = 510;
+			tinted.y = 260;
+			tinted.tint = 0xff8800;
+			root.addChild(tinted);
+			info('15: Orange tint');
+
+			// ── Test 16: Animation ──────────────────────────────────────────────
+			let frame = 0;
+			const animated = new Shape();
+			animated.graphics.beginFill(0x00ffff, 1);
+			animated.graphics.drawCircle(15, 15, 15);
+			animated.graphics.endFill();
+			animated.x = 20;
+			animated.y = 380;
+			root.addChild(animated);
+			const { Event: BlakronEvent } = await import('../src/blakron/events/Event.js');
+			animated.addEventListener(BlakronEvent.ENTER_FRAME, () => {
+				frame++;
+				animated.x = 20 + Math.sin(frame * 0.05) * 100;
+			});
+			info('16: Animated sin wave');
+
+			// ── Test 17: RenderGroup ────────────────────────────────────────────
+			const renderGroup = new Sprite();
+			renderGroup.isRenderGroup = true;
+			renderGroup.x = 200;
+			renderGroup.y = 380;
+			for (let i = 0; i < 3; i++) {
+				const s = new Shape();
+				s.graphics.beginFill(0xaa00aa + i * 0x003300, 1);
+				s.graphics.drawRect(0, 0, 25, 25);
+				s.graphics.endFill();
+				s.x = i * 30;
+				renderGroup.addChild(s);
+			}
+			root.addChild(renderGroup);
+			info('17: RenderGroup');
+
+			// ── Test 18: Bezier curve ───────────────────────────────────────────
+			const bezier = new Shape();
+			bezier.graphics.lineStyle(2, 0xffff00, 1);
+			bezier.graphics.moveTo(0, 40);
+			bezier.graphics.curveTo(40, -20, 80, 40);
+			bezier.graphics.endFill();
+			bezier.x = 380;
+			bezier.y = 380;
+			root.addChild(bezier);
+			info('18: Quadratic bezier');
+
+			// ── Test 19: Complex mask subtree ─────────────────────────────────────
+			// The mask contains a scrollRect child. The old direct traversal ignored
+			// that nested effect and revealed the full 100px-wide content. The shared
+			// instruction pipeline must reveal only the left 45px window.
+			const complexMasked = new Sprite();
+			complexMasked.x = 510;
+			complexMasked.y = 380;
+			const complexContent = new Shape();
+			complexContent.graphics.beginFill(0x00ccff, 1);
+			complexContent.graphics.drawRect(0, 0, 100, 60);
+			complexContent.graphics.endFill();
+			complexContent.graphics.lineStyle(4, 0xffffff, 1);
+			complexContent.graphics.moveTo(10, 10);
+			complexContent.graphics.lineTo(90, 50);
+			complexContent.graphics.moveTo(90, 10);
+			complexContent.graphics.lineTo(10, 50);
+			complexContent.graphics.endFill();
+			complexMasked.addChild(complexContent);
+			const complexMask = new Sprite();
+			const maskViewport = new Sprite();
+			maskViewport.scrollRect = new Rectangle(0, 0, 45, 60);
+			const maskFill = new Shape();
+			maskFill.graphics.beginFill(0xffffff, 1);
+			maskFill.graphics.drawRect(0, 0, 100, 60);
+			maskFill.graphics.endFill();
+			maskViewport.addChild(maskFill);
+			complexMask.addChild(maskViewport);
+			complexMasked.addChild(complexMask);
+			complexMasked.mask = complexMask;
+			root.addChild(complexMasked);
+			info('19: Nested scrollRect mask (45px cyan window)');
+
+			// ── Incremental pipeline regression animation ─────────────────────────
+			// These objects are transformed only after the first InstructionSet build,
+			// exercising partial updates for scrollRect, filter, mask and RenderGroup.
+			let pipelineFrame = 0;
+			root.addEventListener(BlakronEvent.ENTER_FRAME, () => {
+				pipelineFrame++;
+				const wave = Math.sin(pipelineFrame * 0.025);
+				clipped.x = 370 + wave * 12;
+				blurred.x = 20 + wave * 10;
+				masked.x = 440 + wave * 12;
+				masked.rotation = wave * 8;
+				renderGroup.x = 200 + wave * 18;
+				renderGroup.scaleX = 1 + wave * 0.15;
+				renderGroup.alpha = 0.75 + (wave + 1) * 0.125;
+			});
+			globalThis.__visualTestState = {
+				app,
+				clipped,
+				blurred,
+				masked,
+				complexMasked,
+				maskViewport,
+				renderGroup,
+				get pipelineFrame() {
+					return pipelineFrame;
+				},
+			};
+			info('Incremental animation: scrollRect + filter + mask + RenderGroup');
+
+			info(`--- All 19 tests rendered (${app.player.isWebGL ? 'WebGL' : 'Canvas 2D'}) ---`);
+
+			// ── Perf + FPS ─────────────────────────────────────────────────────
+			const $ = id => document.getElementById(id);
+			const pfFps = $('pf-fps'),
+				pfDc = $('pf-dc'),
+				pfRt = $('pf-rt');
+			const pfArt = $('pf-art'),
+				pfMrt = $('pf-mrt'),
+				pfFc = $('pf-fc');
+			const graphCanvas = $('pf-graph');
+			const graphCtx = graphCanvas.getContext('2d');
+			const fpsHistory = new Array(200).fill(0);
+			let graphIdx = 0;
+
+			function fpsClass(fps) {
+				if (fps >= 55) return 'good';
+				if (fps >= 30) return 'warn';
+				return 'bad';
+			}
+
+			const fpsEl = $('fps-display');
+			let fpsFrames = 0,
+				fpsLast = performance.now();
+			(function fpsLoop() {
+				fpsFrames++;
+				const now = performance.now();
+				if (now - fpsLast >= 500) {
+					const fps = Math.round((fpsFrames / (now - fpsLast)) * 1000);
+					fpsEl.textContent = fps + ' FPS';
+					fpsEl.className = 'fps-badge' + (fps > 50 ? '' : fps > 30 ? ' warn' : ' bad');
+					fpsFrames = 0;
+					fpsLast = now;
+				}
+				requestAnimationFrame(fpsLoop);
+			})();
+
+			function updatePerfPanel() {
+				const p = app.player.perf;
+				pfFps.textContent = p.fps.toFixed(1);
+				pfFps.className = 'value ' + fpsClass(p.fps);
+				pfDc.textContent = p.drawCalls;
+				pfRt.textContent = p.renderTimeMs.toFixed(2) + ' ms';
+				pfRt.className = 'value ' + (p.renderTimeMs < 4 ? 'good' : p.renderTimeMs < 8 ? 'warn' : 'bad');
+				pfArt.textContent = p.avgRenderTimeMs.toFixed(2) + ' ms';
+				pfMrt.textContent = p.maxRenderTimeMs.toFixed(2) + ' ms';
+				pfFc.textContent = p.frameCount;
+
+				fpsHistory[graphIdx % 200] = p.fps;
+				graphIdx++;
+				const w = graphCanvas.width,
+					h = graphCanvas.height;
+				graphCtx.fillStyle = '#f0f2f7';
+				graphCtx.fillRect(0, 0, w, h);
+				graphCtx.strokeStyle = '#c8ccd8';
+				graphCtx.beginPath();
+				graphCtx.moveTo(0, h * (1 - 60 / 70));
+				graphCtx.lineTo(w, h * (1 - 60 / 70));
+				graphCtx.stroke();
+				graphCtx.strokeStyle = '#16a34a';
+				graphCtx.beginPath();
+				for (let i = 0; i < 200; i++) {
+					const idx = (graphIdx + i) % 200;
+					const x = (i / 200) * w;
+					const y = h * (1 - Math.min(fpsHistory[idx], 70) / 70);
+					i === 0 ? graphCtx.moveTo(x, y) : graphCtx.lineTo(x, y);
+				}
+				graphCtx.stroke();
+				requestAnimationFrame(updatePerfPanel);
+			}
+			requestAnimationFrame(updatePerfPanel);
+		</script>
+	</body>
+</html>
