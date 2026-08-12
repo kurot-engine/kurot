@@ -57,7 +57,7 @@ pnpm --dir packages/<package> test   # core, cli, ui, game only — spine has no
 pnpm --dir packages/<package> dev    # TS compile watch
 ```
 
-## docs/ vs internal/
+## docs/ vs docs-internal/
 
 Every package (and the repo root) has two documentation folders with a
 strict split:
@@ -65,22 +65,23 @@ strict split:
 - **`docs/`** — committed to git, distributed with the package. Architecture
   docs, migration guides, `ai-context.md`. Anything a user, contributor, or
   another AI session should be able to read.
-- **`internal/`** — excluded via `.gitignore`, local-only. Design drafts,
-  code reviews, audits, superseded plans. Records of _why_ a decision was
-  made, not meant for distribution. Don't assume `internal/` exists in a
-  fresh checkout from another source, and don't rely on it being present —
-  treat anything inside as optional extra context, never as the source of
-  truth for current behavior (`docs/` and the source code are).
+- **`docs-internal/`** — excluded via `.gitignore`, local-only. Design
+  drafts, code reviews, audits, superseded plans. Records of _why_ a
+  decision was made, not meant for distribution. Don't assume
+  `docs-internal/` exists in a fresh checkout from another source, and
+  don't rely on it being present — treat anything inside as optional extra
+  context, never as the source of truth for current behavior (`docs/` and
+  the source code are).
 
 ## Repository layout
 
 ```
 Kurot/
-├── AGENTS.md       This file
-├── README.md       Human-facing overview (English)
-├── docs/           Contribution rules (docs/code-rules.md) — committed
-├── internal/       Design drafts / research notes — local-only, gitignored
-├── packages/       The 5 packages above, each with its own docs/ + internal/
-├── examples/       demo (Vite + hand-written EXML) and my-game (CLI-scaffolded)
-└── reference/      Local read-only reference sources — not distributed via git
+├── AGENTS.md          This file
+├── README.md          Human-facing overview (English)
+├── docs/              Contribution rules (docs/code-rules.md) — committed
+├── docs-internal/     Design drafts / research notes — local-only, gitignored
+├── packages/          The 5 packages above, each with its own docs/ + docs-internal/
+├── examples/          demo (Vite + hand-written EXML) and my-game (CLI-scaffolded)
+└── reference/         Local read-only reference sources — not distributed via git
 ```

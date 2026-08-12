@@ -2,13 +2,13 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from
-scratch each session. `internal/plan.md` is the original design plan and is
-**stale in places** — e.g. it says MovieClip registers with the ticker
-internally, but the shipped code has no such registration (matches the
-README's external-scheduler design instead). Treat `plan.md` as historical,
-not descriptive. `internal/game-review.md` is a code review with a few real
-minor issues (B1–B3) referenced below. Both files are gitignored/local-only
-— don't assume they exist in every checkout.
+scratch each session. `docs-internal/plan.md` is the original design plan
+and is **stale in places** — e.g. it says MovieClip registers with the
+ticker internally, but the shipped code has no such registration (matches
+the README's external-scheduler design instead). Treat `plan.md` as
+historical, not descriptive. `docs-internal/game-review.md` is a code
+review with a few real minor issues (B1–B3) referenced below. Both files
+are gitignored/local-only — don't assume they exist in every checkout.
 
 Package identity: `@kurot/game@1.0.6`. Peer-depends on `@kurot/core`.
 

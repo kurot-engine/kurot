@@ -2,8 +2,8 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from
-scratch each session. `internal/plan.md` (Chinese, gitignored/local-only) is
-an internal dev-status log that documents the same key design decisions
+scratch each session. `docs-internal/plan.md` (Chinese, gitignored/local-only)
+is an internal dev-status log that documents the same key design decisions
 covered here, plus a "shelved" (搁置) list: WebGL texture filter/wrap
 support (no-op under Canvas 2D),
 premultiplied-alpha support, debug mesh rendering, and unit tests for
@@ -112,8 +112,8 @@ One `SlotRenderer` (`extends Mesh`) per Spine `Slot`, instantiated by
    then `this.updateVertices()` is called to mark render-dirty. This is a
    deliberate departure from the old egret-spine adapter, which wrote into
    an internal/private render node (`mesh.$renderNode.vertices`) —
-   documented in `internal/plan.md` as an intentional design decision to use
-   only Kurot's public Mesh API.
+   documented in `docs-internal/plan.md` as an intentional design decision
+   to use only Kurot's public Mesh API.
 7. Texture is only reassigned if the underlying `BitmapData` actually
    differs (`this.texture.bitmapData !== bd`) — avoids unnecessary
    texture/GPU state churn when the same atlas page is reused frame to
@@ -203,7 +203,7 @@ directly, and does not use a custom `RenderObjectType`** the way
   `loadText`** — each manages its own `start`/`success` counter pair
   directly, because double-delegating would double-count `toLoad`/`loaded`
   and make `isLoadingComplete()` never return true (documented in
-  `internal/plan.md`).
+  `docs-internal/plan.md`).
 - `loadTextureAtlas` computes the page-image directory prefix from the
   **original** `path` argument, before `pathPrefix` is applied — so page
   texture paths resolve relative to the atlas file, not double-prefixed.
@@ -215,7 +215,7 @@ directly, and does not use a custom `RenderObjectType`** the way
       `Nearest`/`MipMapNearestNearest`), read later by `SlotRenderer.
 _applyTexture()`.
     - `setWraps()` **is a no-op** — Canvas 2D doesn't need wrap modes; WebGL
-      wrap-hint support is explicitly deferred (see `internal/plan.md`).
+      wrap-hint support is explicitly deferred (see `docs-internal/plan.md`).
     - Note the two-`Texture`-class naming collision: spine-core's `Texture`
       (subclassed by `KurotTexture`) vs. `@kurot/core`'s `Texture` (the actual
       render texture used inside `SlotRenderer`) are different classes,
