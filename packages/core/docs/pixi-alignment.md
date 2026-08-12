@@ -76,7 +76,7 @@ export class MultiTextureBatcher {
 
 ### 2. Shader Bits 组装
 
-**现状**：ShaderLib.ts + ShaderLib2.ts 两套手写 GLSL，约 300 行。每加一个 shader 变体都要复制粘贴修改。
+**现状**：`ShaderLib.ts`（277 行）+ `ShaderLib2.ts`（294 行）两套手写 GLSL，合计约 570 行。每加一个 shader 变体都要复制粘贴修改。
 
 **PixiJS 做法**：`compileHighShaderGlProgram({ name, bits: [colorBit, textureBit, roundPixelsBit] })`，每个 "bit" 是一个独立的 GLSL 片段，组合时拼接。
 
@@ -145,18 +145,29 @@ export function compileShaderProgram(bits: ShaderBit[]): { vertex: string; fragm
 
 ## P2：架构增强
 
-### 4. Pipe 注册系统
+### 3. Pipe 注册系统
 
-**现状**：`WebGLRenderer` 构造函数硬编码 7 个 pipe：
+**现状**：`WebGLRenderer` 的 7 个 pipe（bitmap/graphics/mesh/text/mask/filter/
+particle）在构造函数和字段初始化里直接 `new` 出来，不经过任何注册表：
 
 ```ts
 this._bitmapPipe = new BitmapPipe();
-this._graphicsPipe = new GraphicsPipe();
+this._graphicsPipe = new GraphicsPipe(this._canvasRenderer);
 this._meshPipe = new MeshPipe();
-// ...
+this._textPipe = new TextPipe(this._canvasRenderer);
+this._maskPipe = new MaskPipe(...);
+private readonly _filterPipe = new FilterPipe();
+private readonly _particlePipe = new ParticlePipe();
 ```
 
-第三方扩展（如 `@kurot/spine-4.3`）无法注入自己的 pipe。
+第三方要新增一类渲染对象（自己的 `renderObjectType` + 对应 pipe），目前唯一
+的办法是要么直接修改 `WebGLRenderer` 源码加一个字段，要么走 `@kurot/spine-4.3`
+现在采用的路子：**完全不新增 pipe**，让新的显示对象继承已有的 `Mesh`（或
+`Bitmap`/`Shape`），复用现成的 `MeshPipe` 渲染路径（`SlotRenderer extends
+Mesh`，直接写 `vertices`/`uvs`/`indices` 等公开字段）。这条路子对"几何形态
+能用现有几种基元表达"的场景很好用，但如果未来要接入一种渲染方式完全不同
+的对象（比如需要独立 shader/独立合批策略的类型），就只能改 `WebGLRenderer`
+本身，没有干净的扩展点。
 
 **PixiJS 做法**：`ExtensionType.RenderPipe` + `extensions.add(BitmapPipe)`，渲染器启动时自动发现所有 pipe。
 
@@ -205,13 +216,17 @@ function getDefaultRegistry(): RenderPipeRegistry {
 }
 ```
 
-**收益**：`@kurot/spine-4.3` 可注册 `SpinePipe`，不再需要 hack 核心代码。
+**收益**：为将来需要独立渲染路径的扩展（不能靠继承 Mesh/Bitmap 表达的对象
+类型）预留一个不用改 `WebGLRenderer` 本身的接入点。目前唯一的第三方扩展
+（`@kurot/spine-4.3`）走的是复用现有 `MeshPipe` 的路子，暂时没有触发这个
+需求，所以这一项的优先级判断应基于"是否已有/ 预期会有需要独立 pipe 的
+扩展"，不是当前的阻塞项。
 
 **工期**：~1 天
 
 ---
 
-### 5. 压缩纹理支持（KTX2/Basis）— 数据结构已预留，GPU 上传路径未接入
+### 4. 压缩纹理支持（KTX2/Basis）— 数据结构已预留，GPU 上传路径未接入
 
 **现状**：`display/texture/BitmapData.ts` 已经有 `CompressedTextureData` 类
 （`glInternalFormat`/`width`/`height`/`byteArray`/`face`/`level`）和
@@ -252,7 +267,7 @@ function getDefaultRegistry(): RenderPipeRegistry {
 
 ## P3：长期投入
 
-### 6. WebGPU 后端
+### 5. WebGPU 后端
 
 **现状**：渲染器只支持 WebGL1/WebGL2。
 
@@ -273,15 +288,17 @@ if (navigator.gpu) {
 
 **风险**：
 
-- WebGPU API 仍在演进，当前浏览器支持率 ~30%
+- WebGPU API 仍在演进；具体浏览器支持率会随时间变化，投入前应查当前
+  [Can I Use](https://caniuse.com/webgpu) 数据而非依赖本文档里的旧数字
 - 维护两套后端成本高
-- H5 游戏场景 WebGL2 性能已足够
+- H5 游戏场景 WebGL2 性能通常已足够
 
-**建议**：等待 WebGPU 浏览器支持率 > 70% 后再投入。
+**建议**：等 WebGPU 浏览器支持率达到多数目标用户覆盖后再投入，具体阈值
+需结合项目的目标平台/机型分布判断。
 
 ---
 
-### 7. 滤镜扩展
+### 6. 滤镜扩展
 
 **现状**：4 个滤镜（Blur、Glow、DropShadow、ColorMatrix）。
 
@@ -297,31 +314,43 @@ if (navigator.gpu) {
 
 ---
 
-### 8. 帧间顶点缓存复用
+### 7. 帧间顶点缓存复用
 
-**现状**：每帧都调 `gl.bufferSubData()` 上传顶点数据，即使场景完全静态。Canvas 每帧被浏览器清掉所以 draw call 必须重发，但顶点数据可以复用。
+**现状**：每帧都调 `gl.bufferSubData()` 上传顶点数据。WebGL 的 draw call
+必须每帧重发（GPU 不会记住上一帧画了什么），但如果场景结构和渐染数据都
+没变，顶点数据本身是可以复用的，理论上能省掉一次 CPU→GPU 的数据传输。
 
-**方案**：`InstructionSet` 维护 CRC32 指纹。连续两帧 structure 没变 + dirtyRenderableCount === 0 + 指纹一致 → 跳过 `bufferSubData`。
+**方案**：`InstructionSet` 维护一个内容指纹（如 CRC32）。当连续两帧
+structure 未变 + `dirtyRenderableCount === 0` + 指纹一致时，跳过
+`bufferSubData`，只重发 draw call。
 
-**局限**：任何动画/tween/滚动都会让 dirtyRenderableCount > 0，优化失效。仅对完全静态 UI 有效。
+**这条优化的价值需要先验证再投入**：`dirtyRenderableCount === 0` 意味着
+没有任何对象的视觉数据发生变化，这种"完全静态"的帧在实际游戏场景里出现
+频率可能很低（哪怕只有一个循环播放的小动画、一个呼吸光效、一个 UI
+过渡，整帧就不再是"完全静态"）。如果这种帧确实罕见，维护指纹计算本身的
+开销可能超过它节省的 `bufferSubData` 开销。建议先用 `Player.perf` 或
+benchmark 场景实测"完全静态帧"在真实项目里的占比，再决定是否投入。
 
-**工期**：~1 天
+**工期**：~1 天（不含前置的实测验证）
 
 ---
 
 ## 汇总
 
-| 优先级 | 项目                        | 工期 | 收益               |
-| ------ | --------------------------- | ---- | ------------------ |
-| P1     | 动态纹理槽位                | 1d   | WebGL2 合批翻倍    |
-| P1     | Shader Bits 组装            | 2d   | 维护成本大降       |
-| P3     | 帧间顶点缓存复用            | 1d   | 静态 UI 省上传带宽 |
-| P2     | Pipe 注册系统               | 1d   | 扩展性             |
-| P2     | 压缩纹理 KTX2（容器已预留） | 5d   | 移动端内存 -80%    |
-| P3     | WebGPU 后端                 | 10d+ | 未来竞争力         |
-| P3     | 滤镜扩展                    | 按需 | 表现力             |
+| 优先级 | 项目                        | 工期          | 收益                               |
+| ------ | --------------------------- | ------------- | ---------------------------------- |
+| P1     | 动态纹理槽位                | 1d            | WebGL2 合批翻倍                    |
+| P1     | Shader Bits 组装            | 2d            | 维护成本大降                       |
+| P2     | Pipe 注册系统               | 1d            | 为未来独立渲染路径的扩展预留接入点 |
+| P2     | 压缩纹理 KTX2（容器已预留） | 5d            | 移动端内存 -80%                    |
+| P3     | WebGPU 后端                 | 10d+          | 未来竞争力                         |
+| P3     | 滤镜扩展                    | 按需          | 表现力                             |
+| P3     | 帧间顶点缓存复用            | 1d + 前置实测 | 待验证是否有实际收益               |
 
-**建议顺序**：1 → 4 → 2 → 5，其余按需。
+**建议顺序**：1 → 2 → 3 → 4，其余按需。P2 的 Pipe 注册系统优先级取决于是否
+已有/预期会有需要独立渲染路径的扩展需求（目前唯一的第三方扩展
+`@kurot/spine-4.3` 复用现有 `MeshPipe`，没有触发这个需求）。P3 的顶点缓存
+复用应先做实测再决定是否投入，见该条目说明。
 
 ---
 
@@ -329,8 +358,8 @@ if (navigator.gpu) {
 
 - [ ] **P1-1 动态纹理槽位**（1d）— `MultiTextureBatcher.MAX_TEXTURES` 改为从 GPU 查询，WebGL2 设备 8→16
 - [ ] **P1-2 Shader Bits 组装**（2d）— ShaderLib/ShaderLib2 改为 bit 组合拼接，消除双份手写 GLSL
-- [ ] **P2-4 Pipe 注册系统**（1d）— `RenderPipeRegistry`，`@kurot/spine-4.3` 可注入 `SpinePipe`
-- [ ] **P2-5 压缩纹理 KTX2**（5d）— 数据结构（`CompressedTextureData`）已就位，缺 KTX2 解析器 + `WebGLRenderContext` 的 `compressedTexImage2D` 上传分支，移动端纹理内存 -80%
-- [ ] **P3-6 WebGPU 后端**（10d+）— 等浏览器支持率 > 70%
-- [ ] **P3-7 滤镜扩展**（按需）— ColorOverlay / Outline / Adjustment
-- [ ] **P3-8 帧间顶点缓存复用**（1d）— CRC32 指纹，静态 UI 跳过 bufferSubData
+- [ ] **P2-3 Pipe 注册系统**（1d）— `RenderPipeRegistry`，为需要独立渲染路径（无法靠继承 Mesh/Bitmap 表达）的未来扩展预留接入点
+- [ ] **P2-4 压缩纹理 KTX2**（5d）— 数据结构（`CompressedTextureData`）已就位，缺 KTX2 解析器 + `WebGLRenderContext` 的 `compressedTexImage2D` 上传分支，移动端纹理内存 -80%
+- [ ] **P3-5 WebGPU 后端**（10d+）— 等浏览器支持率达到多数目标用户覆盖，投入前查当前实际支持率数据
+- [ ] **P3-6 滤镜扩展**（按需）— ColorOverlay / Outline / Adjustment
+- [ ] **P3-7 帧间顶点缓存复用**（1d + 前置实测）— 先用 benchmark 验证"完全静态帧"在真实场景的占比，再决定是否投入 CRC32 指纹方案
