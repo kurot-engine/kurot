@@ -1,8 +1,7 @@
-# Kurot Game 架构文档
+# @kurot/game 架构文档
 
 > 当前版本：1.0.6。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
-> 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（反直觉行为、
-> 术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与整体结构。
+> 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---
 
@@ -222,21 +221,11 @@ lifespan / maxParticles` 时的必要输入——缺失该字段会导致除零�
 `application/x-www-form-urlencoded`——需要发送 JSON body 的调用方应传入
 普通字符串而不是 `URLVariables`。
 
----
-
-## 九、与 Egret 对应模块的差异
-
-| 模块 | Egret 行为 | Kurot 行为 |
-| ---- | ---------- | ---------- |
-| Tween | 通常由第三方库（如 CreateJS TweenJS）提供，无官方内置 | 内置，`repeat` 语义是"额外周期数"而非"总次数" |
-| MovieClip | 内部持有 ticker，`play()` 后自驱动 | 不持有 ticker，必须外部调用 `advanceFrame()` |
-| ScrollView | EUI `Scroller` 组件驱动 | 独立的 `ScrollView` 类，非 UI 组件树的一部分 |
-| ParticleSystem | 无内置实现 | 内置模板方法基类 + Particle-Designer 风格实现 |
-| URLLoader | callback 风格，`data` 类型随 `dataFormat` 变化 | 事件驱动，`data` 类型语义保持一致（见第八节表格） |
+与 Egret 对应模块的差异见根目录 [egret-migration.md](../../../docs/egret-migration.md)。
 
 ---
 
-## 十、测试覆盖
+## 九、测试覆盖
 
 `test/` 下按子系统组织：`Tween.test.ts`、`TweenGroup.test.ts`、
 `MovieClip.test.ts`、`MovieClipDataFactory.test.ts`、`ScrollView.test.ts`、

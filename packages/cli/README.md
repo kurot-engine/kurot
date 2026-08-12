@@ -2,7 +2,7 @@
 
 CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
-> Migrating from Egret? See [migration.md](docs/migration.md)
+> Migrating from Egret? See [egret-migration.md](../../docs/egret-migration.md)
 >
 > Release history: [CHANGELOG.md](CHANGELOG.md)
 

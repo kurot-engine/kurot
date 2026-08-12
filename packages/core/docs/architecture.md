@@ -1,26 +1,26 @@
-# Kurot Core 架构文档
+# @kurot/core 架构文档
 
 > 当前版本：1.0.12。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
+> 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---
 
 ## 一、项目概述
 
-Kurot 是对 Egret 游戏引擎的现代化翻新。在保持与 Egret 对外 API 一致性的前提下，
-完成了模块系统现代化、类型安全升级、渲染架构重构三大目标。
+`@kurot/core` 是 Kurot 引擎的核心运行时，提供显示对象、渲染、事件、几何、文本、资源、网络与媒体能力。对外 API 沿用 Egret 的 `DisplayObject`/事件模型，渲染内核则重写为 Pixi.js 8 风格的扁平 "InstructionSet + RenderPipe" 管线。
 
-| 指标     | 旧 Egret                    | Kurot                                     |
-| -------- | --------------------------- | ----------------------------------------- |
-| 源文件数 | 166                         | ~142（含 index.ts）                       |
-| 代码行数 | 42,340                      | ~18,450                                   |
-| 模块系统 | `namespace egret`           | ES Module                                 |
-| 类型系统 | `strict` 未开启，大量 `any` | `strict: true`，全量类型安全，零 `any`    |
-| 编译目标 | ES5/ES3                     | ES2022                                    |
-| 渲染架构 | RenderNode 三阶段           | InstructionSet 指令驱动（借鉴 Pixi.js 8） |
-| 批处理   | 同纹理合并                  | 多纹理批处理（8张/批）                    |
-| 包管理   | 无 package.json（monolith） | `@kurot/core` workspace 包                |
-| 资源管理 | 无独立模块                  | Resource 完整资源生命周期                 |
-| WebGL    | 仅 WebGL 1                  | WebGL 1 + WebGL 2 双后端，自动选择        |
+| 维度     | 说明                                            |
+| -------- | ----------------------------------------------- |
+| 模块系统 | ES Module（`@kurot/core` npm 包）              |
+| 类型系统 | `strict: true`，全量类型安全，零 `any`         |
+| 编译目标 | ES2022，仅支持现代浏览器                        |
+| 渲染架构 | InstructionSet 指令驱动（借鉴 Pixi.js 8）       |
+| 批处理   | 多纹理批处理（8 张/批）                         |
+| 包管理   | `@kurot/core` workspace 包，pnpm               |
+| 资源管理 | Resource 完整资源生命周期                       |
+| WebGL    | WebGL 1 + WebGL 2 双后端，运行时自动选择        |
+
+与 Egret 的差异、Breaking Changes 及迁移方式见根目录 [egret-migration.md](../../../docs/egret-migration.md)。
 
 ---
 
@@ -123,14 +123,6 @@ Phase B — Execute（每帧）:
   按指令顺序分发到 Pipe → 无场景图遍历
 ```
 
-| 设计点   | Egret RenderNode             | Kurot InstructionSet                           | Pixi.js 8                                        |
-| -------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------ |
-| 中间表示 | RenderNode 树                | 扁平 Instruction 数组                          | 扁平 Instruction 数组                            |
-| 缓存粒度 | 每个 DisplayObject 一个 Node | 整棵树/RenderGroup 一个 Set                    | 每个 RenderGroup 一个                            |
-| 脏检查   | $renderDirty 跳过子树重建    | structureDirty 全量重建 / renderDirty 局部更新 | structureDidChange + childrenRenderablesToUpdate |
-| 分发方式 | node.type switch             | renderPipeId 字符串分发                        | renderPipeId 字符串分发                          |
-| 批处理   | 同纹理合并                   | 多纹理批处理（8张/批）                         | Batcher 多纹理                                   |
-
 ### 3.2 RenderPipe 体系
 
 ```
@@ -165,18 +157,6 @@ backgroundLayer.isRenderGroup = true;
 - 使用 `WeakRef` 跟踪 group 生命周期，便于 GC
 
 ### 3.4 多纹理批处理
-
-```
-旧 Egret：纹理切换 = 打断批处理
-  Bitmap A (tex1) → drawCall 1
-  Bitmap B (tex2) → drawCall 2
-  Bitmap C (tex1) → drawCall 3
-
-Kurot：一个 drawCall 绑定多张纹理
-  Bitmap A (tex1, slot 0) ─┐
-  Bitmap B (tex2, slot 1)  ├→ drawCall 1
-  Bitmap C (tex1, slot 0) ─┘
-```
 
 - `MultiTextureBatcher` 管理最多 8 个纹理槽位（WebGL1 最小保证纹理单元数）
 - 顶点格式扩展：增加 `aTextureId` float 属性（stride 从 20B 增至 24B）
@@ -367,114 +347,7 @@ app.start(root);
 
 ---
 
-## 七、与 Egret 的 API 对比
-
-### 7.1 显示对象 API
-
-| Egret API                                                                | 状态                                        |
-| ------------------------------------------------------------------------ | ------------------------------------------- |
-| `x/y/scaleX/scaleY/rotation/alpha/visible/touchEnabled`                  | ✅ 完全一致                                 |
-| `anchorOffsetX/Y`                                                        | ✅ 完全一致                                 |
-| `width/height`                                                           | ⚠️ 行为变更：使用 explicitWidth/Height 模式 |
-| `mask` (DisplayObject/Rectangle) / `scrollRect`                          | ✅ 完全一致                                 |
-| `cacheAsBitmap` / `filters`                                              | ✅ 完全一致                                 |
-| `getBounds()` / `globalToLocal()` / `localToGlobal()` / `hitTestPoint()` | ✅ 完全一致                                 |
-| `addChild/removeChild/swapChildren/setChildIndex`                        | ✅ 完全一致                                 |
-| `getChildAt`                                                             | ⚠️ 越界返回 `undefined`（Egret 可能抛异常） |
-| `removeChildAt`                                                          | ⚠️ 越界返回 `undefined`（Egret 可能抛异常） |
-| `removeChildren`                                                         | ⚠️ 返回 `void`（Egret 返回数组）            |
-| `bitmap.texture/smoothing/fillMode/scale9Grid/pixelHitTest`              | ✅ 完全一致                                 |
-| `bitmap.width/height`                                                    | ⚠️ 使用 explicitBitmapWidth/Height 模式     |
-| `mesh.vertices/indices/uvs`                                              | ✅ 完全一致                                 |
-| `graphics.beginFill/lineStyle/drawRect/drawCircle/...`                   | ✅ 完全一致                                 |
-| `stage.stageWidth/stageHeight/frameRate/scaleMode/orientation`           | ✅ 完全一致                                 |
-| `blendMode`                                                              | ⚠️ 值从 `"normal"` 改为 `"source-over"`     |
-| `matrix` getter                                                          | ⚠️ 返回 clone（Egret 返回引用）             |
-
-### 7.2 新增 API（Egret 无对应）
-
-| 属性/方法                                    | 说明                            |
-| -------------------------------------------- | ------------------------------- |
-| `displayObject.tint`                         | 着色（0xRRGGBB）                |
-| `displayObject.zIndex` / `sortableChildren`  | 排序                            |
-| `displayObject.skewX/skewY`                  | 斜切变换                        |
-| `displayObject.measuredWidth/measuredHeight` | 内容测量尺寸（只读）            |
-| `container.isRenderGroup`                    | 独立渲染组标记                  |
-| `graphics.drawArc()`                         | 原生弧线绘制                    |
-| `graphics.lineStyle(..., lineDash?)`         | 虚线参数                        |
-| `CustomFilter`                               | 自定义 WebGL 着色器滤镜         |
-| `EventDispatcher.once()`                     | 一级公开方法                    |
-| `Player.perf`                                | 性能指标（fps/drawCalls 等）    |
-| `createPlayer(options)`                      | 统一创建入口                    |
-| `RenderObjectType` enum                      | 快速类型路由（替代 instanceof） |
-| `tokenize()` / `splitGraphemes()`            | 文本分词/字素分割               |
-| `measureText()` / `getFontString()`          | 文本测量/字体字符串构建         |
-
-### 7.3 事件系统
-
-11 个事件类 + EventPhase 枚举 + IEventDispatcher 接口，导出名称与 Egret 一致。内部优化：存储改为 `Map`，对象池改为 `WeakMap`，移除 `thisObject` 参数。
-
-事件类列表：Event, EventPhase, FocusEvent, HTTPStatusEvent, IOErrorEvent, ProgressEvent, StageOrientationEvent, TextEvent, TimerEvent, TouchEvent, IEventDispatcher
-
-### 7.4 其他模块
-
-| 模块                                       | 状态        | 差异说明                                  |
-| ------------------------------------------ | ----------- | ----------------------------------------- |
-| geom (Matrix/Point/Rectangle)              | ✅ API 兼容 | 对象池 `create()/release()`               |
-| filters (Blur/Glow/DropShadow/ColorMatrix) | ✅ API 兼容 |                                           |
-| filters (CustomFilter)                     | 🆕 全新     | 自定义 WebGL 着色器滤镜                   |
-| net (HttpRequest/ImageLoader)              | ✅ API 兼容 |                                           |
-| media (Sound/SoundChannel/Video)           | ✅ API 兼容 |                                           |
-| text (TextField/BitmapText/BitmapFont)     | ✅ API 兼容 |                                           |
-| text (HtmlTextParser/InputController)      | 🆕 全新     | HTML 解析 + 输入控制                      |
-| text (WordWrap/TextMeasurer)               | 🆕 全新     | 自动换行 + 文本测量                       |
-| localStorage                               | ✅ API 兼容 |                                           |
-| ExternalInterface                          | ✅ API 兼容 |                                           |
-| utils (ByteArray/Timer)                    | ✅ API 兼容 | 不提供 `HashObject`/`.hashCode`，见第八节 |
-| utils (Base64Util/NumberUtils/DebugLog)    | 🆕 全新     | 编码/数学/调试工具                        |
-| Resource                                   | 🆕 全新     | 完整资源生命周期管理                      |
-| Capabilities                               | 🆕 全新     | 运行时环境能力检测                        |
-
----
-
-## 八、Breaking Changes
-
-| 变更                                                                   | 影响                                         | 迁移方式                                         |
-| ---------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------ |
-| `thisObject` 参数移除                                                  | 所有事件监听代码                             | 使用箭头函数                                     |
-| `BlendMode` 值变化                                                     | `"normal"` → `"source-over"`                 | 使用常量                                         |
-| `width/height` 行为变更                                                | Egret 通过 scaleX/scaleY 模拟                | 使用 explicitWidth/Height 或直接设 scaleX/scaleY |
-| `matrix` getter 返回 clone                                             | 依赖引用修改 matrix 的代码                   | 改用 `setMatrix()`                               |
-| `removeChildren()` 返回值                                              | `DisplayObject[]` → `void`                   | 不依赖返回值                                     |
-| `getChildAt()` 越界                                                    | 抛异常 → 返回 `undefined`                    | 检查返回值                                       |
-| hitTest 返回值                                                         | `null` → `undefined`                         | 检查 `=== null`                                  |
-| 命名空间                                                               | `egret.xxx` → ES Module                      | 全量替换                                         |
-| `Texture.getPixel32/getPixels/toDataURL`                               | 已废弃                                       | 仅 `RenderTexture.getPixel32` 可用               |
-| `Base64Util.encode` 签名                                               | `string` → `ArrayBuffer`                     | `encode(new TextEncoder().encode(str))`          |
-| `HashObject` / `IHashObject` / `.hashCode` 移除                        | 依赖整数哈希做对象身份比较的代码             | 用 `===` 或 `WeakMap` 键控查找                   |
-| `Resource.instance` 单例 getter 移除                                   | 通过 `Resource.instance` 访问单例的代码      | `import { resource } from '@kurot/core'`         |
-| 多 Player 监听器注册 API 移除                                          | `addStructureChangeListener` 等（见 3.5 节） | 该 API 从未被支持的场景实际使用，无需迁移        |
-| `WebGLRenderContext.getInstance()`/`resetInstance()` 移除              | 依赖单例访问 WebGL 上下文的代码              | `Player` 直接持有 context 实例，无需手动获取     |
-| `experimental-webgl` / `webkitAudioContext` / vendor 前缀全屏 API 移除 | 依赖旧浏览器前缀降级的代码                   | 无需迁移，现代浏览器均支持标准 API               |
-
----
-
-## 九、架构级变更（相对 Egret）
-
-- RenderNode 中间层 → InstructionSet 指令驱动，12 个 nodes/paths 文件移除
-- Graphics 从 `sys.GraphicsNode` + `sys.Path2D` → `GraphicsCommand[]` 扁平命令数组
-- "接口 + Web 实现 + Native 实现"三文件模式合并为单一实现，每模块减少 60-85% 代码
-- Native 渲染路径（`egret.nativeRender`、`egret_native.*`）全部移除
-- 全局变量（`global.egret`）→ ES Module 导入
-- `$field` / `$method()` → `private _field` / `@internal`
-- 移除遗留代码：bind polyfill、手写 UTF-8、IE 兼容、vendor 前缀、typescript-plus 等
-- WebGL 2 支持：双着色器库（GLSL ES 1.00 + 3.00），运行时自动选择
-- RenderObjectType 枚举替代 instanceof，热路径零开销类型路由
-- 单 Player 设计：`Player` 直接赋值静态钩子字段（`$onStructureChange` 等，见 3.5 节）
-
----
-
-## 十、测试覆盖
+## 七、测试覆盖
 
 `test/` 下按模块组织测试文件，运行 `pnpm --dir packages/core test` 查看当前
 文件数与用例数。
@@ -493,35 +366,4 @@ app.start(root);
 | benchmark/ | 性能基准测试                                                                                                                                                                                             |
 | text/      | 通过 display 集成测试覆盖                                                                                                                                                                                |
 
----
 
-## 十一、CLI 工具链
-
-```
-packages/cli/
-├── src/
-│   ├── index.ts              # 入口（commander.js）
-│   ├── commands/             # build / create / clean
-│   ├── core/                 # config / compiler / exml-compiler / template
-│   └── utils/
-└── templates/game/           # 项目模板
-```
-
-`kurot.config.ts` 替代旧的 `egretProperties.json` + `index.html data-*`：
-
-```typescript
-import { defineConfig } from '@kurot/cli';
-export default defineConfig({
-	target: 'html5',
-	entry: 'src/Main.ts',
-	stage: { width: 640, height: 1136, scaleMode: 'showAll', frameRate: 60 },
-});
-```
-
-| 维度      | 旧 Egret                                  | Kurot                     |
-| --------- | ----------------------------------------- | ------------------------- |
-| CLI 框架  | 手写参数解析                              | commander.js              |
-| TS 编译器 | typescript-plus（魔改 tsc）               | esbuild                   |
-| 配置文件  | egretProperties.json + index.html data-\* | kurot.config.ts           |
-| EXML 编译 | 内嵌在 tools/lib/eui/                     | 独立包 @kurot/exml-parser |
-| 模块系统  | CommonJS                                  | ESM                       |
