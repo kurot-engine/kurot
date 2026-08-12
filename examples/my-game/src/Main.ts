@@ -1,5 +1,5 @@
 /**
- * Blakron 标准游戏模板
+ * Kurot 标准游戏模板
  *
  * 使用 @kurot/core 进行 Canvas 绘制 + @kurot/game 补间动画。
  * 通过 Shape、TextField 等基础显示对象构建游戏场景。
@@ -104,7 +104,7 @@ class Main extends UILayer {
 		colorLabel.textColor = 0xffffff;
 		colorLabel.width = stageW;
 		colorLabel.textAlign = 'center';
-		colorLabel.text = 'Hello Blakron';
+		colorLabel.text = 'Hello Kurot';
 		colorLabel.size = 36;
 		colorLabel.x = 0;
 		colorLabel.y = 80;

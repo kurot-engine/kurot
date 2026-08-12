@@ -1,5 +1,5 @@
 {
-	"name": "my-game",
+	"name": "demo",
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
@@ -9,9 +9,7 @@
 		"clean": "kurot clean"
 	},
 	"dependencies": {
-		"@kurot/core": "^1.0.12",
-		"@kurot/game": "^1.0.6",
-		"@kurot/ui": "^1.1.7"
+		"@kurot/core": "^1.0.12"
 	},
 	"devDependencies": {
 		"@kurot/cli": "^1.0.2"
