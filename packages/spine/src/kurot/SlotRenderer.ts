@@ -10,12 +10,12 @@ import {
 	type TextureAtlasRegion,
 } from '@esotericsoftware/spine-core';
 import { Mesh, Texture, BitmapData, BlendMode } from '@kurot/core';
-import type { BlakronTexture } from './BlakronTexture.js';
+import type { KurotTexture } from './KurotTexture.js';
 
 const QUAD_INDICES = [0, 1, 2, 2, 3, 0];
 
 /**
- * A Blakron `Mesh` subclass that renders a single Spine slot each frame.
+ * A Kurot `Mesh` subclass that renders a single Spine slot each frame.
  * One `SlotRenderer` is created per slot by `SkeletonRenderer`.
  */
 export class SlotRenderer extends Mesh {
@@ -131,15 +131,15 @@ export class SlotRenderer extends Mesh {
 	}
 
 	private _applyTexture(region: TextureAtlasRegion | null): void {
-		const blakronTexture = region?.page?.texture as BlakronTexture | undefined;
-		if (!blakronTexture?.bitmapData) return;
+		const kurotTexture = region?.page?.texture as KurotTexture | undefined;
+		if (!kurotTexture?.bitmapData) return;
 
-		const bd = blakronTexture.bitmapData;
+		const bd = kurotTexture.bitmapData;
 		if (!this.texture || (this.texture as Texture).bitmapData !== bd) {
 			const t = new Texture();
 			t.setBitmapData(bd as BitmapData);
 			this.texture = t;
-			this.smoothing = blakronTexture.smoothing;
+			this.smoothing = kurotTexture.smoothing;
 		}
 	}
 

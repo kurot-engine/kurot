@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/spine",
 	"version": "0.2.3",
-	"description": "Spine 4.x runtime for the Blakron engine",
+	"description": "Spine 4.3 runtime for the Kurot engine",
 	"author": "",
 	"license": "MIT",
 	"type": "module",
@@ -11,8 +11,7 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
+			"import": "./dist/index.js"
 		}
 	},
 	"files": [
@@ -22,25 +21,34 @@
 		"build": "tsc --build",
 		"dev": "tsc --watch",
 		"example": "vite --config vite.config.ts",
-		"clean": "rm -rf dist"
+		"clean": "rm -rf dist",
+		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"dependencies": {
 		"@esotericsoftware/spine-core": "^4.3.0"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^1.0.8"
+		"@kurot/core": "^1.0.12"
 	},
 	"devDependencies": {
-		"@kurot/core": "^1.0.8",
+		"@kurot/core": "^1.0.12",
 		"@types/node": "^22.0.0",
 		"typescript": "^5.6.0",
 		"vite": "^8.0.8"
 	},
 	"keywords": [
-		"blakron",
+		"kurot",
 		"spine",
 		"h5-game",
 		"typescript"
 	],
-	"packageManager": "pnpm@10.33.0"
+	"packageManager": "pnpm@10.33.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/spine"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }

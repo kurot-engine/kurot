@@ -2,10 +2,10 @@ import { Texture, TextureFilter, TextureWrap } from '@esotericsoftware/spine-cor
 import type { BitmapData } from '@kurot/core';
 
 /**
- * Wraps a Blakron `BitmapData` as a `spine.Texture` so the Spine runtime
+ * Wraps a Kurot `BitmapData` as a `spine.Texture` so the Spine runtime
  * can reference it when building `TextureAtlas` pages.
  */
-export class BlakronTexture extends Texture {
+export class KurotTexture extends Texture {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	public smoothing = false;

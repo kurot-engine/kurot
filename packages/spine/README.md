@@ -1,9 +1,9 @@
 # @kurot/spine
 
-Spine 4.3 runtime for the Blakron engine.
+Spine 4.3 runtime for the Kurot engine.
 
 Ports the [egret-spine](https://github.com/tadazly/egret-spine) adapter to `@kurot/core`,
-replacing Egret's `Mesh` / `Texture` / `RES` APIs with their Blakron equivalents.
+replacing Egret's `Mesh` / `Texture` / `RES` APIs with their Kurot equivalents.
 The Spine runtime itself is provided by the official `@esotericsoftware/spine-core` npm package.
 
 ## Installation
@@ -18,17 +18,17 @@ pnpm add @kurot/spine
 import { createPlayer } from '@kurot/core';
 import {
 	SkeletonAnimation,
-	BlakronAssetManager,
+	KurotAssetManager,
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
 } from '@kurot/spine';
 
-// 1. Create Blakron player
+// 1. Create Kurot player
 const app = createPlayer({ canvas, frameRate: 60, contentWidth: 640, contentHeight: 480 });
 
 // 2. Load assets
-const mgr = new BlakronAssetManager('assets/spine/');
+const mgr = new KurotAssetManager('assets/spine/');
 mgr.loadTextureAtlas('hero.atlas');
 mgr.loadBinary('hero.skel');
 
@@ -109,7 +109,7 @@ Returned by `SkeletonAnimation.start()`. Manages an animation queue on a single 
 | `waitEvent()`                | Promise — resolves on the next Spine frame event  |
 | `waitNamedEvent(name)`       | Promise — resolves when a named frame event fires |
 
-### `BlakronAssetManager`
+### `KurotAssetManager`
 
 Loads Spine assets using `@kurot/core`'s `HttpRequest` and `ImageLoader`.
 
@@ -156,7 +156,7 @@ note the following renames:
 | `clipper.clipEndWithSlot(slot)`  | `clipper.clipEnd(slot)`                         |
 | `clipper.clipTriangles(...)`     | `clipper.clipTrianglesUnpacked(...)`            |
 
-`SkeletonAnimation`, `Track`, and `BlakronAssetManager` public APIs are
+`SkeletonAnimation`, `Track`, and `KurotAssetManager` public APIs are
 unaffected — only code touching `Skeleton`/`Slot`/`SkeletonClipping`
 directly needs to change.
 

@@ -10,7 +10,7 @@ import { Sprite } from '@kurot/core';
 import { SlotRenderer } from './SlotRenderer.js';
 
 /**
- * A Blakron `Sprite` container that holds one `SlotRenderer` (Mesh) per Spine slot.
+ * A Kurot `Sprite` container that holds one `SlotRenderer` (Mesh) per Spine slot.
  * Drives the animation state and updates all slot meshes each frame.
  */
 export class SkeletonRenderer extends Sprite {

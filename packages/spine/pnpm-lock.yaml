@@ -13,8 +13,8 @@ importers:
         version: 4.3.10
     devDependencies:
       '@kurot/core':
-        specifier: ^1.0.8
-        version: 1.0.8
+        specifier: ^1.0.12
+        version: 1.0.12
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -27,9 +27,6 @@ importers:
 
 packages:
 
-  '@kurot/core@1.0.8':
-    resolution: {integrity: sha512-6DIVl/7xj8ArYcWU8MHLkqrKFZGWJlXU7TlLy7dsDOxe6R/hTCt6TVXyA5Vz48eM7Sa3rWZm7Z3wc9bDaNDnwg==}
-
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
 
@@ -41,6 +38,9 @@ packages:
 
   '@esotericsoftware/spine-core@4.3.10':
     resolution: {integrity: sha512-cS/tln3klBipdLKx7EBIOh/llwf4F24NX+7p7HOPMZrM7oPj4NEo2YXhLeXnXoX2CJHLWsl2CljlCqBEb0kvRg==}
+
+  '@kurot/core@1.0.12':
+    resolution: {integrity: sha512-qgTgPcrPwGK4lEC/ven6Uto+lplE4UCJK1DwzweRpiDM/hX+kWIMWK3w6s5cWjlc5QiKtX8kWys5JCd40ZAI+Q==}
 
   '@napi-rs/wasm-runtime@1.1.6':
     resolution: {integrity: sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg==}
@@ -332,8 +332,6 @@ packages:
 
 snapshots:
 
-  '@kurot/core@1.0.8': {}
-
   '@emnapi/core@1.11.1':
     dependencies:
       '@emnapi/wasi-threads': 1.2.2
@@ -351,6 +349,8 @@ snapshots:
     optional: true
 
   '@esotericsoftware/spine-core@4.3.10': {}
+
+  '@kurot/core@1.0.12': {}
 
   '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:

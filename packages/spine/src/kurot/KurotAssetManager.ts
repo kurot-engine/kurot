@@ -1,6 +1,6 @@
 import { AssetManagerBase, TextureAtlas } from '@esotericsoftware/spine-core';
 import { HttpRequest, HttpResponseType, ImageLoader, BitmapData, IOErrorEvent, Event } from '@kurot/core';
-import { BlakronTexture } from './BlakronTexture.js';
+import { KurotTexture } from './KurotTexture.js';
 
 // AssetManagerBase marks start/success/error/toLoad/loaded/errors/cache as
 // private in its .d.ts, but they are public at runtime. This interface
@@ -23,7 +23,7 @@ interface AssetManagerRuntime {
  *
  * @example
  * ```ts
- * const mgr = new BlakronAssetManager('assets/spine/');
+ * const mgr = new KurotAssetManager('assets/spine/');
  * mgr.loadTextureAtlas('hero.atlas');
  * mgr.loadJson('hero.json');
  *
@@ -31,7 +31,7 @@ interface AssetManagerRuntime {
  * if (mgr.isLoadingComplete()) { ... }
  * ```
  */
-export class BlakronAssetManager extends AssetManagerBase {
+export class KurotAssetManager extends AssetManagerBase {
 	// ── Constructor ───────────────────────────────────────────────────────────
 
 	public constructor(pathPrefix = '') {
@@ -41,7 +41,7 @@ export class BlakronAssetManager extends AssetManagerBase {
 				bd.width = image.naturalWidth || image.width;
 				bd.height = image.naturalHeight || image.height;
 			}
-			return new BlakronTexture(bd);
+			return new KurotTexture(bd);
 		}, pathPrefix);
 	}
 
@@ -55,7 +55,7 @@ export class BlakronAssetManager extends AssetManagerBase {
 
 	public override loadTexture(
 		path: string,
-		success?: (path: string, texture: BlakronTexture) => void,
+		success?: (path: string, texture: KurotTexture) => void,
 		error?: (path: string, message: string) => void,
 	): void {
 		const resolvedPath = this._rt.start(path);
@@ -67,7 +67,7 @@ export class BlakronAssetManager extends AssetManagerBase {
 				this._rt.error(error ?? null, path, `Failed to load image: ${path}`);
 				return;
 			}
-			this._rt.success(success ?? null, resolvedPath, new BlakronTexture(bd));
+			this._rt.success(success ?? null, resolvedPath, new KurotTexture(bd));
 		});
 
 		loader.addEventListener(IOErrorEvent.IO_ERROR, () => {

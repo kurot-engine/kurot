@@ -1,11 +1,11 @@
-// ── Blakron adapters ──────────────────────────────────────────────────────────
-export { SkeletonAnimation } from './blakron/SkeletonAnimation.js';
-export { SkeletonRenderer } from './blakron/SkeletonRenderer.js';
-export { SlotRenderer } from './blakron/SlotRenderer.js';
-export { BlakronTexture } from './blakron/BlakronTexture.js';
-export { BlakronAssetManager } from './blakron/BlakronAssetManager.js';
-export { Track, SpineEvent } from './blakron/Track.js';
-export type { AnimationListener } from './blakron/Track.js';
+// ── Kurot adapters ──────────────────────────────────────────────────────────
+export { SkeletonAnimation } from './kurot/SkeletonAnimation.js';
+export { SkeletonRenderer } from './kurot/SkeletonRenderer.js';
+export { SlotRenderer } from './kurot/SlotRenderer.js';
+export { KurotTexture } from './kurot/KurotTexture.js';
+export { KurotAssetManager } from './kurot/KurotAssetManager.js';
+export { Track, SpineEvent } from './kurot/Track.js';
+export type { AnimationListener } from './kurot/Track.js';
 
 // ── Spine core re-exports (commonly needed by consumers) ──────────────────────
 export {

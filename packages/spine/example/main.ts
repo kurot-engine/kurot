@@ -1,7 +1,7 @@
 import { createPlayer } from '@kurot/core';
 import {
 	SkeletonAnimation,
-	BlakronAssetManager,
+	KurotAssetManager,
 	SkeletonBinary,
 	AtlasAttachmentLoader,
 	TextureAtlas,
@@ -17,7 +17,7 @@ function log(msg: string, type: 'info' | 'error' | 'default' = 'default'): void 
 	logEl.prepend(line);
 }
 
-// ── Setup Blakron player ──────────────────────────────────────────────────────
+// ── Setup Kurot player ──────────────────────────────────────────────────────
 
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const app = createPlayer({
@@ -32,7 +32,7 @@ const app = createPlayer({
 
 log('Loading assets...');
 
-const mgr = new BlakronAssetManager('assets/');
+const mgr = new KurotAssetManager('assets/');
 mgr.loadTextureAtlas('spineboy.atlas');
 mgr.loadBinary('spineboy-pro.skel');
 
