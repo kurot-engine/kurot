@@ -73,7 +73,7 @@ function watchResources(project: Project, ctx: BuildContext): void {
 					await compileExml().apply(ctx);
 					await copyAssets().apply(ctx);
 				} catch (err) {
-					logger.warn(`EXML recompile failed: ${err instanceof Error ? err.message : err}`);
+					logger.error(`EXML recompile failed: ${err instanceof Error ? err.message : err}`);
 				}
 			}, 100);
 		});

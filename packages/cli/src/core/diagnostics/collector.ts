@@ -39,6 +39,18 @@ export class DiagnosticCollector {
 		return [...this._diagnostics.values()].some(diagnostic => diagnostic.severity === 'error');
 	}
 
+	/**
+	 * Removes diagnostics whose codes belong to a refreshed build scope.
+	 */
+	public removeByCodes(codes: readonly string[]): void {
+		const codeSet = new Set(codes);
+		for (const [key, diagnostic] of this._diagnostics) {
+			if (codeSet.has(diagnostic.code)) {
+				this._diagnostics.delete(key);
+			}
+		}
+	}
+
 	// ── Private methods ───────────────────────────────────────────────
 
 	private _normalize(diagnostic: Diagnostic): Diagnostic {

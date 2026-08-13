@@ -24,6 +24,12 @@ describe('build pipeline diagnostics', () => {
 		expect(ctx.diagnostics.all()[0]?.severity).toBe('error');
 	});
 
+	it('uses strict policy by default for release builds', () => {
+		const ctx = createContext({ ...createProject(), mode: 'release' });
+
+		expect(ctx.strict).toBe(true);
+	});
+
 	it('continues after a plugin reports warnings', async () => {
 		const ctx = createContext(createProject());
 		const secondApply = vi.fn(async (): Promise<void> => undefined);

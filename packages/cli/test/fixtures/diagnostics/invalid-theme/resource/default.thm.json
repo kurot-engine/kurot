@@ -1,0 +1,5 @@
+{
+	"skins": {
+		"kurot.ui.Button": "resource/skins/InvalidSkin.exml"
+	},
+}

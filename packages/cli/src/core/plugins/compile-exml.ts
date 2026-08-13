@@ -1,42 +1,14 @@
-import * as esbuild from 'esbuild';
-import * as os from 'node:os';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { ensureDir, writeFile } from '../../utils/fs.js';
+import { writeFile } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
-import { generateCode, parseToIR } from '../exml/index.js';
-import { createUnresolvedTagDiagnostics } from '../exml/exml-diagnostics.js';
+import { DIAGNOSTIC_CODES } from '../diagnostics/index.js';
+import { buildSkinsModule } from '../exml/skin-module-builder.js';
+import { BuildError } from '../errors.js';
+import type { Diagnostic } from '../diagnostics/index.js';
+import type { CompiledSkin, ExmlFile } from '../exml/skin-module-builder.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
-
-interface ExmlFile {
-	/**
-	 * Absolute path to the `.exml` file.
-	 */
-	path: string;
-	/**
-	 * Path relative to `resource/`, using forward slashes.
-	 */
-	relPath: string;
-	/**
-	 * Raw EXML source text.
-	 */
-	contents: string;
-}
-
-/**
- * A resolved skin: its source file plus the class name declared in the EXML.
- */
-interface CompiledSkin {
-	/**
-	 * The source `.exml` file this skin was compiled from.
-	 */
-	file: ExmlFile;
-	/**
-	 * The skin's class name, from its `class="..."` attribute.
-	 */
-	className: string;
-}
 
 /**
  * Theme file, kept compatible with Egret's `default.thm.json` on input:
@@ -68,15 +40,29 @@ export function compileExml(): BuildPlugin {
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
 			if (!project.config.exml || !project.themeFile) return;
+			ctx.diagnostics.removeByCodes([
+				DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+				DIAGNOSTIC_CODES.EXML_COMPILE_FAILED,
+				DIAGNOSTIC_CODES.EXML_DECLARED_FILE_NOT_FOUND,
+				DIAGNOSTIC_CODES.THEME_FILE_NOT_FOUND,
+				DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+				DIAGNOSTIC_CODES.THEME_SKIN_NOT_FOUND,
+			]);
 
-			const theme = await loadTheme(project);
-			const files = await resolveExmlFiles(project, theme);
+			const theme = await loadTheme(ctx);
+			if (!theme) {
+				throwIfInputInvalid(ctx);
+				return;
+			}
+			const { files, missingDeclaredPaths } = await resolveExmlFiles(ctx, theme);
+			const skins: CompiledSkin[] = files.map(file => ({ file, className: extractClassName(file) }));
+			reportMissingThemeSkins(ctx, theme, skins, missingDeclaredPaths);
+			throwIfInputInvalid(ctx);
 			if (files.length === 0) {
 				logger.step('no .exml files found, skipping');
 				return;
 			}
 
-			const skins: CompiledSkin[] = files.map(file => ({ file, className: extractClassName(file) }));
 			const skinsFile = await buildSkinsModule(ctx, skins);
 			ctx.outputs.skinsScript = `js/${skinsFile}`;
 
@@ -94,104 +80,35 @@ export function compileExml(): BuildPlugin {
 }
 
 /**
- * Generates one ESM module per skin in a temp dir, plus an index that imports
- * and registers them, then bundles to `js/default.thm[.min_<hash>].js`.
- *
- * Engine packages and custom namespaces stay external (resolved by the page
- * import map — see `compile-engine.ts` and `compile-custom-namespaces.ts`).
- */
-async function buildSkinsModule(ctx: BuildContext, skins: CompiledSkin[]): Promise<string> {
-	const { project } = ctx;
-	const jsDir = path.join(project.outputDir, 'js');
-	await ensureDir(jsDir);
-
-	const customNamespaces = project.customNamespaces.map(ns => ({ prefix: ns.prefix, specifier: ns.specifier }));
-	const isRelease = project.mode === 'release';
-
-	const stubDir = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
-	try {
-		const indexLines: string[] = [];
-		await Promise.all(
-			skins.map(async (skin, i) => {
-				const code = generateSkinModule(ctx, skin, customNamespaces, isRelease);
-				await fs.writeFile(path.join(stubDir, `skin${i}.ts`), code);
-				const funcName = factoryName(skin.className);
-				indexLines.push(
-					`import { ${funcName} as s${i} } from './skin${i}.js';\n` +
-						`globalThis[${JSON.stringify(skin.className)}] = s${i};`,
-				);
-			}),
-		);
-		await fs.writeFile(path.join(stubDir, 'index.ts'), indexLines.join('\n\n') + '\n');
-
-		const engineExternal =
-			project.enginePackages.length > 0 ? project.enginePackages : ['@kurot/ui', '@kurot/core'];
-		const result = await esbuild.build({
-			entryPoints: [path.join(stubDir, 'index.ts')],
-			outdir: jsDir,
-			entryNames: isRelease ? 'default.thm.min_[hash]' : 'default.thm',
-			bundle: true,
-			format: 'esm',
-			platform: 'browser',
-			target: 'es2022',
-			minify: isRelease,
-			metafile: true,
-			logLevel: 'warning',
-			external: [...engineExternal, ...project.customNamespaces.map(ns => ns.specifier)],
-		});
-
-		const output = Object.keys(result.metafile!.outputs).find(f => f.endsWith('.js'));
-		return path.basename(output ?? 'default.thm.js');
-	} finally {
-		await fs.rm(stubDir, { recursive: true, force: true });
-	}
-}
-
-/**
- * Generates an ESM skin factory, returning a stub on parse failure.
- */
-function generateSkinModule(
-	ctx: BuildContext,
-	skin: CompiledSkin,
-	customNamespaces: readonly { prefix: string; specifier: string }[],
-	strict: boolean,
-): string {
-	try {
-		const ir = parseToIR(skin.file.contents, skin.className, customNamespaces);
-		const diagnostics = createUnresolvedTagDiagnostics(skin.file.relPath, skin.file.contents, ir.unresolvedTags);
-		for (const diagnostic of diagnostics) {
-			ctx.diagnostics.report(diagnostic);
-			logger.warn(`${diagnostic.location?.file}: ${diagnostic.message}`);
-		}
-		return generateCode(ir, { format: 'esm' });
-	} catch (err) {
-		const message = err instanceof Error ? err.message : String(err);
-		if (strict) {
-			throw new Error(`EXML compile failed for ${skin.file.relPath}: ${message}`, { cause: err });
-		}
-		logger.warn(`EXML compile failed for ${skin.file.relPath}: ${message}`);
-		return `// Failed to compile ${skin.file.relPath}: ${message}\nexport function ${factoryName(skin.className)}() { return {}; }\n`;
-	}
-}
-
-/**
  * Determines which `.exml` files to compile (honours `autoGenerateExmlsList`).
  */
-async function resolveExmlFiles(project: Project, theme: ThemeData): Promise<ExmlFile[]> {
+async function resolveExmlFiles(
+	ctx: BuildContext,
+	theme: ThemeData,
+): Promise<{ files: ExmlFile[]; missingDeclaredPaths: ReadonlySet<string> }> {
+	const { project } = ctx;
 	const declared = (theme.exmls ?? []).map(e => (typeof e === 'string' ? e : e?.path)).filter(Boolean) as string[];
 
 	if (theme.autoGenerateExmlsList === false && declared.length > 0) {
 		const files: ExmlFile[] = [];
+		const missingDeclaredPaths = new Set<string>();
 		for (const rel of declared) {
 			try {
 				files.push(await readExmlAt(project.resourceDir, resolveExmlPath(project, rel)));
 			} catch {
-				logger.warn(`declared EXML not found, skipping: ${rel}`);
+				missingDeclaredPaths.add(toResourceRelativePath(project, rel));
+				reportDiagnostic(ctx, {
+					code: DIAGNOSTIC_CODES.EXML_DECLARED_FILE_NOT_FOUND,
+					severity: 'warning',
+					message: `Theme-declared EXML file was not found: ${rel}`,
+					location: { file: project.config.exml!.themeFile },
+					suggestions: ['Correct the path or remove it from the theme exmls list.'],
+				});
 			}
 		}
-		return files;
+		return { files, missingDeclaredPaths };
 	}
-	return collectExmlFiles(project.resourceDir);
+	return { files: await collectExmlFiles(project.resourceDir), missingDeclaredPaths: new Set() };
 }
 
 /**
@@ -240,14 +157,78 @@ async function readExmlAt(resourceDir: string, absolute: string): Promise<ExmlFi
 }
 
 /**
- * Reads the existing theme file, or returns an empty theme on miss.
+ * Reads and parses the configured theme file.
  */
-async function loadTheme(project: Project): Promise<ThemeData> {
+async function loadTheme(ctx: BuildContext): Promise<ThemeData | undefined> {
+	const { project } = ctx;
+	let source: string;
 	try {
-		return JSON.parse(await fs.readFile(project.themeFile!, 'utf-8')) as ThemeData;
+		source = await fs.readFile(project.themeFile!, 'utf-8');
 	} catch {
-		return { skins: {} };
+		reportDiagnostic(ctx, {
+			code: DIAGNOSTIC_CODES.THEME_FILE_NOT_FOUND,
+			severity: 'warning',
+			message: `Theme file could not be read: ${project.config.exml!.themeFile}`,
+			location: { file: project.config.exml!.themeFile },
+			suggestions: ['Create the theme file or correct exml.themeFile in kurot.config.ts.'],
+		});
+		return undefined;
 	}
+
+	try {
+		return JSON.parse(source) as ThemeData;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		reportDiagnostic(ctx, {
+			code: DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+			severity: 'error',
+			message: `Theme file is not valid JSON: ${message}`,
+			location: { file: project.config.exml!.themeFile },
+			suggestions: ['Correct the JSON syntax in the theme file.'],
+		});
+		return undefined;
+	}
+}
+
+function reportMissingThemeSkins(
+	ctx: BuildContext,
+	theme: ThemeData,
+	compiled: readonly CompiledSkin[],
+	missingDeclaredPaths: ReadonlySet<string>,
+): void {
+	const { project } = ctx;
+	const compiledPaths = new Set(compiled.map(skin => skin.file.relPath));
+	for (const value of Object.values(theme.skins ?? {})) {
+		if (!isSkinPath(value)) continue;
+		const relPath = toResourceRelativePath(project, value);
+		if (compiledPaths.has(relPath) || missingDeclaredPaths.has(relPath)) continue;
+		reportDiagnostic(ctx, {
+			code: DIAGNOSTIC_CODES.THEME_SKIN_NOT_FOUND,
+			severity: 'warning',
+			message: `Theme skin was not compiled: ${value}`,
+			location: { file: project.config.exml!.themeFile },
+			suggestions: ['Correct the skin path or add the EXML file to the compilation list.'],
+		});
+	}
+}
+
+function toResourceRelativePath(project: Project, value: string): string {
+	return toPosix(path.relative(project.resourceDir, resolveExmlPath(project, value)));
+}
+
+function reportDiagnostic(ctx: BuildContext, diagnostic: Diagnostic): void {
+	ctx.diagnostics.report(diagnostic);
+	const location = diagnostic.location ? `${diagnostic.location.file}: ` : '';
+	if (diagnostic.severity === 'error') {
+		logger.error(`${location}${diagnostic.message}`);
+	} else {
+		logger.warn(`${location}${diagnostic.message}`);
+	}
+}
+
+function throwIfInputInvalid(ctx: BuildContext): void {
+	if (!ctx.diagnostics.hasErrors()) return;
+	throw new BuildError('EXML input validation failed.');
 }
 
 /**
@@ -260,7 +241,7 @@ function remapSkins(project: Project, skins: Record<string, string>, compiled: C
 	const result: Record<string, string> = {};
 
 	for (const [host, value] of Object.entries(skins)) {
-		if (/\.exml$/i.test(value) || value.includes('/')) {
+		if (isSkinPath(value)) {
 			const relPath = toPosix(path.relative(project.resourceDir, resolveExmlPath(project, value)));
 			result[host] = byRelPath.get(relPath) ?? value;
 		} else {
@@ -270,19 +251,16 @@ function remapSkins(project: Project, skins: Record<string, string>, compiled: C
 	return result;
 }
 
+function isSkinPath(value: string): boolean {
+	return /\.exml$/i.test(value) || value.includes('/');
+}
+
 /**
  * Reads the `class="..."` attribute, falling back to the file name.
  */
 function extractClassName(file: ExmlFile): string {
 	const match = file.contents.match(/class="([^"]+)"/);
 	return match ? match[1] : path.basename(file.path, '.exml');
-}
-
-/**
- * `skins.ButtonSkin` → `createButtonSkin` (matches the EXML codegen).
- */
-function factoryName(className: string): string {
-	return `create${className.split('.').pop()}`;
 }
 
 /**

@@ -77,7 +77,7 @@ export function createContext(
 	project: Project,
 	options: { sourcemap?: boolean; analyze?: boolean; watch?: boolean; strict?: boolean } = {},
 ): BuildContext {
-	const strict = options.strict ?? false;
+	const strict = options.strict ?? project.mode === 'release';
 	return {
 		project,
 		sourcemap: options.sourcemap ?? false,

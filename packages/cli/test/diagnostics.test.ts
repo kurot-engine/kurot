@@ -92,6 +92,22 @@ describe('DiagnosticCollector', () => {
 
 		expect(JSON.parse(JSON.stringify(collector.all()))).toEqual(collector.all());
 	});
+
+	it('removes diagnostics from a refreshed code scope', () => {
+		const collector = new DiagnosticCollector({ strict: false });
+		collector.report(makeUnknownTagDiagnostic());
+		collector.report({
+			code: DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+			severity: 'error',
+			message: 'Invalid theme.',
+		});
+
+		collector.removeByCodes([DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG]);
+
+		expect(collector.all().map(diagnostic => diagnostic.code)).toEqual([
+			DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+		]);
+	});
 });
 
 function makeUnknownTagDiagnostic(): Diagnostic {
