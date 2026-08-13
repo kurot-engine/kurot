@@ -1,55 +1,48 @@
-import { DisplayObject } from '../display/DisplayObject.js';
+import { Bitmap } from '../display/Bitmap.js';
 import { BitmapData } from '../display/texture/BitmapData.js';
+import { Texture } from '../display/texture/Texture.js';
 import { Event } from '../events/Event.js';
 import { IOErrorEvent } from '../events/IOErrorEvent.js';
-import { Rectangle } from '../geom/Rectangle.js';
 import { ImageLoader } from '../net/ImageLoader.js';
 
-export class Video extends DisplayObject {
+export class Video extends Bitmap {
 	// ── Instance fields ───────────────────────────────────────────────────────
-
 	public fullscreen = true;
 
-	private _video: HTMLVideoElement;
+	private readonly _video: HTMLVideoElement;
 	private _src = '';
 	private _poster = '';
 	private _posterData?: BitmapData;
-	private _loop = false;
+	private _videoData?: BitmapData;
+	private _videoTexture?: Texture;
 	private _loaded = false;
-	private _bitmapData?: BitmapData;
-	private _widthSet = NaN;
-	private _heightSet = NaN;
 	private _waiting = false;
 	private _userPause = false;
 	private _userPlay = false;
 	private _isPlayed = false;
+	private _frameCallbackId?: number;
+	private _usesAnimationFrame = false;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
-
 	public constructor(url?: string) {
 		super();
 		this._video = document.createElement('video');
-		this._video.setAttribute('playsinline', '');
+		this._video.playsInline = true;
 		this._video.setAttribute('webkit-playsinline', 'true');
 		this._video.controls = false;
 
 		this._video.addEventListener('canplaythrough', this.onVideoLoaded);
 		this._video.addEventListener('ended', this.onVideoEnded);
 		this._video.addEventListener('error', this.onVideoError);
-		this._video.addEventListener('waiting', () => {
-			this._waiting = true;
-		});
-		this._video.addEventListener('canplay', () => {
-			this._waiting = false;
-			if (this._userPause) this.pause();
-			else if (this._userPlay) this.videoPlay();
-		});
+		this._video.addEventListener('waiting', this.onVideoWaiting);
+		this._video.addEventListener('canplay', this.onVideoCanPlay);
 
-		if (url) this.load(url);
+		if (url) {
+			this.load(url);
+		}
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
-
 	public get src(): string {
 		return this._src;
 	}
@@ -62,9 +55,13 @@ export class Video extends DisplayObject {
 		return this._poster;
 	}
 	public set poster(value: string) {
-		if (this._poster === value) return;
+		if (this._poster === value) {
+			return;
+		}
 		this._poster = value;
-		if (value) this.loadPoster(value);
+		if (value) {
+			this.loadPoster(value);
+		}
 	}
 
 	public get volume(): number {
@@ -72,6 +69,28 @@ export class Video extends DisplayObject {
 	}
 	public set volume(value: number) {
 		this._video.volume = Math.max(0, Math.min(1, value));
+	}
+
+	public get muted(): boolean {
+		return this._video.muted;
+	}
+	public set muted(value: boolean) {
+		this._video.muted = value;
+		this._video.defaultMuted = value;
+	}
+
+	public get loop(): boolean {
+		return this._video.loop;
+	}
+	public set loop(value: boolean) {
+		this._video.loop = value;
+	}
+
+	public get playsInline(): boolean {
+		return this._video.playsInline;
+	}
+	public set playsInline(value: boolean) {
+		this._video.playsInline = value;
 	}
 
 	public get position(): number {
@@ -89,47 +108,19 @@ export class Video extends DisplayObject {
 		return this._video.duration || 0;
 	}
 
-	public get bitmapData(): BitmapData | undefined {
-		if (!this._video || !this._loaded) return this._posterData;
-		if (!this._bitmapData) {
-			this._video.width = this._video.videoWidth;
-			this._video.height = this._video.videoHeight;
-			this._bitmapData = new BitmapData(this._video);
-			this._bitmapData.deleteSource = false;
-		}
-		// Invalidate each access so dependent Bitmaps redraw the current video frame
-		BitmapData.invalidate(this._bitmapData);
-		return this._bitmapData;
-	}
-
-	public override get width(): number {
-		return isNaN(this._widthSet) ? this.getPlayWidth() : this._widthSet;
-	}
-	public override set width(value: number) {
-		this._widthSet = value;
-		this.$renderDirty = true;
-	}
-
-	public override get height(): number {
-		return isNaN(this._heightSet) ? this.getPlayHeight() : this._heightSet;
-	}
-	public override set height(value: number) {
-		this._heightSet = value;
-		this.$renderDirty = true;
-	}
-
 	// ── Public methods ────────────────────────────────────────────────────────
-
 	public load(url: string): void {
+		this.cancelFrameUpdates();
 		this._src = url;
 		this._loaded = false;
+		this._isPlayed = false;
+		this.texture = this.makePosterTexture();
 
-		const video = this._video;
 		if (url.startsWith('http://') || url.startsWith('https://')) {
-			video.crossOrigin = 'anonymous';
+			this._video.crossOrigin = 'anonymous';
 		}
-		video.src = url;
-		video.load();
+		this._video.src = url;
+		this._video.load();
 	}
 
 	public play(startTime?: number, loop = false): void {
@@ -139,9 +130,11 @@ export class Video extends DisplayObject {
 			return;
 		}
 		this._isPlayed = true;
-		this._loop = loop;
-		this._video.loop = loop;
-		if (startTime !== undefined) this._video.currentTime = startTime;
+		this.loop = loop;
+		this.texture = this._videoTexture;
+		if (startTime !== undefined) {
+			this._video.currentTime = startTime;
+		}
 
 		if (this.fullscreen) {
 			this.enterFullscreen();
@@ -152,6 +145,7 @@ export class Video extends DisplayObject {
 
 	public pause(): void {
 		this._userPlay = false;
+		this.cancelFrameUpdates();
 		if (this._waiting) {
 			this._userPause = true;
 			return;
@@ -161,27 +155,23 @@ export class Video extends DisplayObject {
 	}
 
 	public close(): void {
+		this.cancelFrameUpdates();
+		this._video.pause();
 		this._video.removeEventListener('canplaythrough', this.onVideoLoaded);
 		this._video.removeEventListener('ended', this.onVideoEnded);
 		this._video.removeEventListener('error', this.onVideoError);
-		this._video.pause();
-		this._video.src = '';
+		this._video.removeEventListener('waiting', this.onVideoWaiting);
+		this._video.removeEventListener('canplay', this.onVideoCanPlay);
+		this._video.removeAttribute('src');
+		this._video.load();
 		this._loaded = false;
-		this._bitmapData = undefined;
 		this._isPlayed = false;
-	}
-
-	// ── Internal methods ──────────────────────────────────────────────────────
-
-	override $measureContentBounds(bounds: Rectangle): void {
-		const w = this.getPlayWidth();
-		const h = this.getPlayHeight();
-		if (w > 0 && h > 0) bounds.setTo(0, 0, w, h);
-		else bounds.setEmpty();
+		this.texture = this.makePosterTexture();
+		this._videoData = undefined;
+		this._videoTexture = undefined;
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────
-
 	private videoPlay(): void {
 		this._userPause = false;
 		if (this._waiting) {
@@ -189,72 +179,122 @@ export class Video extends DisplayObject {
 			return;
 		}
 		this._userPlay = false;
-		this._video.play();
+		void this._video.play().then(() => this.scheduleFrameUpdate()).catch(() => {
+			IOErrorEvent.dispatchIOErrorEvent(this);
+		});
 	}
 
 	private enterFullscreen(): void {
-		const video = this._video;
-		// Append to body so fullscreen API works
-		if (!video.parentElement) document.body.appendChild(video);
-
-		void video.requestFullscreen();
-
+		if (!this._video.parentElement) {
+			document.body.appendChild(this._video);
+		}
+		void this._video.requestFullscreen();
 		this.videoPlay();
 	}
 
 	private exitFullscreen(): void {
-		if (document.fullscreenElement) void document.exitFullscreen();
-
-		if (this._video.parentElement) {
-			this._video.parentElement.removeChild(this._video);
+		if (document.fullscreenElement) {
+			void document.exitFullscreen();
 		}
+		this._video.remove();
 	}
 
 	private loadPoster(url: string): void {
 		const loader = new ImageLoader();
 		loader.once(Event.COMPLETE, () => {
-			if (loader.data) {
-				this._posterData = loader.data;
-				this._posterData.width = this.getPlayWidth() || loader.data.width;
-				this._posterData.height = this.getPlayHeight() || loader.data.height;
-				this.$renderDirty = true;
-				this.$markDirty();
+			if (!loader.data) return;
+			this._posterData = loader.data;
+			if (!this._isPlayed) {
+				this.texture = this.makePosterTexture();
 			}
 		});
 		loader.load(url);
 	}
 
-	private getPlayWidth(): number {
-		if (!isNaN(this._widthSet)) return this._widthSet;
-		if (this._bitmapData) return this._bitmapData.width;
-		if (this._posterData) return this._posterData.width;
-		if (this._video.videoWidth) return this._video.videoWidth;
-		return 0;
+	private makePosterTexture(): Texture | undefined {
+		if (!this._posterData) return undefined;
+		const texture = new Texture();
+		texture.disposeBitmapData = false;
+		texture.setBitmapData(this._posterData);
+		return texture;
 	}
 
-	private getPlayHeight(): number {
-		if (!isNaN(this._heightSet)) return this._heightSet;
-		if (this._bitmapData) return this._bitmapData.height;
-		if (this._posterData) return this._posterData.height;
-		if (this._video.videoHeight) return this._video.videoHeight;
-		return 0;
+	private scheduleFrameUpdate(): void {
+		if (!this._isPlayed || this._frameCallbackId !== undefined) return;
+		if (typeof this._video.requestVideoFrameCallback === 'function') {
+			this._usesAnimationFrame = false;
+			this._frameCallbackId = this._video.requestVideoFrameCallback(this.onVideoFrame);
+		} else {
+			this._usesAnimationFrame = true;
+			this._frameCallbackId = requestAnimationFrame(this.onAnimationFrame);
+		}
+	}
+
+	private cancelFrameUpdates(): void {
+		if (this._frameCallbackId === undefined) return;
+		if (this._usesAnimationFrame) {
+			cancelAnimationFrame(this._frameCallbackId);
+		} else {
+			this._video.cancelVideoFrameCallback(this._frameCallbackId);
+		}
+		this._frameCallbackId = undefined;
+	}
+
+	private updateVideoFrame(): void {
+		BitmapData.invalidate(this._videoData);
 	}
 
 	private onVideoLoaded = (): void => {
 		this._loaded = true;
-		this._video.width = this._video.videoWidth;
-		this._video.height = this._video.videoHeight;
+		const bitmapData = new BitmapData(this._video);
+		bitmapData.deleteSource = false;
+		bitmapData.width = this._video.videoWidth;
+		bitmapData.height = this._video.videoHeight;
+
+		const texture = new Texture();
+		texture.disposeBitmapData = false;
+		texture.setBitmapData(bitmapData);
+		this._videoData = bitmapData;
+		this._videoTexture = texture;
+		this.texture = texture;
 		this.dispatchEventWith(Event.COMPLETE);
 	};
 
 	private onVideoEnded = (): void => {
-		this.pause();
+		this.cancelFrameUpdates();
 		this._isPlayed = false;
-		if (this.fullscreen) this.exitFullscreen();
+		if (this.fullscreen) {
+			this.exitFullscreen();
+		}
 		this.dispatchEventWith(Event.ENDED);
 	};
 
 	private onVideoError = (): void => {
 		IOErrorEvent.dispatchIOErrorEvent(this);
+	};
+
+	private onVideoWaiting = (): void => {
+		this._waiting = true;
+	};
+
+	private onVideoCanPlay = (): void => {
+		this._waiting = false;
+		if (this._userPause) {
+			this.pause();
+		} else if (this._userPlay) {
+			this.videoPlay();
+		}
+	};
+
+	private onVideoFrame = (): void => {
+		this._frameCallbackId = undefined;
+		this.updateVideoFrame();
+		this.scheduleFrameUpdate();
+	};
+
+	private onAnimationFrame = (): void => {
+		this._frameCallbackId = undefined;
+		this.updateVideoFrame();
+		this.scheduleFrameUpdate();
 	};
 }

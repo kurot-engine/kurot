@@ -6,10 +6,15 @@ import { Event } from '../src/kurot/events/Event.js';
 
 function makeVideoElement() {
 	const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+	const frameCallbacks = new Map<number, () => void>();
+	let nextFrameCallbackId = 1;
 	const video = {
 		src: '',
 		controls: false,
 		loop: false,
+		muted: false,
+		defaultMuted: false,
+		playsInline: false,
 		volume: 1,
 		currentTime: 0,
 		duration: 0,
@@ -20,6 +25,8 @@ function makeVideoElement() {
 		paused: true,
 		parentElement: null as HTMLElement | null,
 		setAttribute: vi.fn(),
+		removeAttribute: vi.fn(),
+		remove: vi.fn(),
 		addEventListener: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
 			if (!listeners[event]) {
 				listeners[event] = [];
@@ -31,11 +38,29 @@ function makeVideoElement() {
 				listeners[event] = listeners[event].filter(h => h !== handler);
 			}
 		}),
-		play: vi.fn(() => Promise.resolve()),
-		pause: vi.fn(),
+		play: vi.fn(() => {
+			video.paused = false;
+			return Promise.resolve();
+		}),
+		pause: vi.fn(() => {
+			video.paused = true;
+		}),
 		load: vi.fn(),
+		requestVideoFrameCallback: vi.fn((callback: () => void) => {
+			const id = nextFrameCallbackId++;
+			frameCallbacks.set(id, callback);
+			return id;
+		}),
+		cancelVideoFrameCallback: vi.fn((id: number) => {
+			frameCallbacks.delete(id);
+		}),
 		emit(event: string) {
 			listeners[event]?.forEach(h => h());
+		},
+		emitFrame() {
+			const callbacks = [...frameCallbacks.values()];
+			frameCallbacks.clear();
+			callbacks.forEach(callback => callback());
 		},
 	};
 	return video;
@@ -89,6 +114,18 @@ describe('Video', () => {
 		expect(v.volume).toBe(1);
 		v.volume = -1;
 		expect(v.volume).toBe(0);
+	});
+
+	it('maps muted, loop, and playsInline to the video element', () => {
+		const v = new Video();
+		v.muted = true;
+		v.loop = true;
+		v.playsInline = false;
+
+		expect(v.muted).toBe(true);
+		expect(videoEl.defaultMuted).toBe(true);
+		expect(v.loop).toBe(true);
+		expect(v.playsInline).toBe(false);
 	});
 
 	it('position getter/setter maps to currentTime', () => {
@@ -148,6 +185,42 @@ describe('Video', () => {
 
 		expect(v.width).toBe(640);
 		expect(v.height).toBe(480);
+	});
+
+	it('becomes directly renderable after load', () => {
+		const v = new Video();
+		videoEl.emit('canplaythrough');
+
+		expect(v.texture?.bitmapData?.source).toBe(videoEl);
+		expect(v.bitmapData).toBe(v.texture?.bitmapData);
+	});
+
+	it('invalidates the video texture when a decoded frame arrives', async () => {
+		const v = new Video();
+		v.fullscreen = false;
+		videoEl.emit('canplaythrough');
+		const bitmapData = v.bitmapData!;
+		const initialVersion = bitmapData.contentVersion;
+
+		v.play();
+		await Promise.resolve();
+		videoEl.emitFrame();
+
+		expect(bitmapData.contentVersion).toBe(initialVersion + 1);
+		expect(videoEl.requestVideoFrameCallback).toHaveBeenCalled();
+	});
+
+	it('restores the video texture when playback starts', async () => {
+		const v = new Video();
+		v.fullscreen = false;
+		videoEl.emit('canplaythrough');
+		const videoTexture = v.texture;
+		v.texture = undefined;
+
+		v.play();
+		await Promise.resolve();
+
+		expect(v.texture).toBe(videoTexture);
 	});
 
 	it('explicit width/height override video dimensions', () => {

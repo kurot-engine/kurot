@@ -64,6 +64,15 @@ describe('BitmapData', () => {
 		expect(obj.$renderDirty).toBe(true);
 	});
 
+	it('invalidate increments the content version without registered display objects', () => {
+		const bd = new BitmapData();
+		const initialVersion = bd.contentVersion;
+
+		BitmapData.invalidate(bd);
+
+		expect(bd.contentVersion).toBe(initialVersion + 1);
+	});
+
 	it('removeDisplayObject unregisters display object', () => {
 		const bd = new BitmapData();
 		const obj = mockDisplayObject();

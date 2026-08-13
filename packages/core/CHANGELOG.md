@@ -4,6 +4,31 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.14] — 2026-08-13
+
+This release turns `Video` into a directly renderable display object and modernizes video-frame texture updates. Applications can now add a `Video` straight to the display list without manually bridging it through `BitmapData`, `Texture`, and `Bitmap`; WebGL uploads occur only when the browser produces a new decoded frame.
+
+### Added
+
+- **Directly renderable `Video`** — `Video` now extends `Bitmap` and internally owns the `BitmapData`/`Texture` bridge for its `HTMLVideoElement`. It can be positioned, sized, and added to any `DisplayObjectContainer` like other display objects.
+- **Decoded-frame scheduling** — video textures are invalidated through `HTMLVideoElement.requestVideoFrameCallback()`, matching texture uploads to decoded video frames instead of the engine's display refresh rate. `requestAnimationFrame()` is used when the video-frame callback API is unavailable.
+- **Media playback properties** — added public `muted`, `loop`, and `playsInline` accessors backed by the native video element. Setting `muted` also sets `defaultMuted`, enabling standards-compliant muted autoplay.
+
+### Changed
+
+- **Versioned dynamic textures** — `BitmapData.invalidate()` now advances its single `contentVersion`, while each `WebGLRenderContext` privately tracks the uploaded version for each resource in a `WeakMap`. Backend synchronization state no longer leaks into `BitmapData`, and an existing video texture is updated only when the resource content changes.
+- **Stable GPU texture identity** — video playback reuses the same `WebGLTexture` handle and updates its pixels in place. It no longer uploads the same frame again merely because the display object is drawn in another engine frame.
+- **Poster/video switching** — poster textures remain available before playback, while starting playback explicitly restores the decoded video texture even if poster loading completed later.
+- **Playback rejection handling** — a rejected native `HTMLVideoElement.play()` promise now dispatches `IOErrorEvent` instead of becoming an unhandled promise rejection.
+
+### Tests
+
+- Expanded `test/Video.test.ts` with direct-renderability, media-property forwarding, decoded-frame invalidation, and video-texture restoration coverage.
+- Expanded `test/BitmapData.test.ts` with content-version invalidation coverage.
+- Full Core suite: 56 test files, 639 tests passing.
+
+---
+
 ## [1.0.13] — 2026-08-13
 
 This release prepares the render pipeline for future backend swapping (e.g. WebGPU) **without changing any rendered output**. The execution layer is decoupled from concrete WebGL types behind two backend-neutral interfaces, so the leaf render pipes no longer import anything under `webgl/`. Behavior is identical to 1.0.12; the changes are purely structural.

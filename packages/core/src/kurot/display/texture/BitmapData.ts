@@ -73,6 +73,7 @@ export class BitmapData {
 		if (!bitmapData) {
 			return;
 		}
+		bitmapData.contentVersion++;
 		const list = BitmapData._displayList.get(bitmapData);
 		if (!list) {
 			return;
@@ -108,6 +109,7 @@ export class BitmapData {
 	debugCompressedTextureURL = '';
 	etcAlphaMask?: BitmapData;
 	webGLTexture?: WebGLTexture;
+	contentVersion = 0;
 
 	private _source?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ArrayBuffer;
 

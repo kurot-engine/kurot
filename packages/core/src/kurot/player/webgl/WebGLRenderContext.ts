@@ -74,6 +74,7 @@ export class WebGLRenderContext implements RenderContext {
 	private _maxTextureUnits = MultiTextureBatcher.MAX_TEXTURES;
 	private readonly _contextRestoredCallbacks: Array<() => void> = [];
 	private readonly _trackedBitmapDatas: Set<WeakRef<BitmapData>> = new Set();
+	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
 
 	// ── Blur FBO pool ─────────────────────────────────────────────────────────
 	// Key: "${width}x${height}", Value: stack of reusable { texture, fbo } pairs.
@@ -329,11 +330,15 @@ export class WebGLRenderContext implements RenderContext {
 		if (!bitmapData.webGLTexture) {
 			const tex = this.createTexture(source as HTMLImageElement);
 			bitmapData.webGLTexture = tex;
+			this._uploadedVersions.set(bitmapData, bitmapData.contentVersion);
 			(tex as Record<string, unknown>)[SYM_SMOOTHING] = true;
 			this._trackedBitmapDatas.add(new WeakRef(bitmapData));
-		} else if (source instanceof HTMLVideoElement) {
-			// Video frames change every tick — re-upload the current frame
+		} else if (
+			source instanceof HTMLVideoElement &&
+			this._uploadedVersions.get(bitmapData) !== bitmapData.contentVersion
+		) {
 			this.updateTexture(bitmapData.webGLTexture, source);
+			this._uploadedVersions.set(bitmapData, bitmapData.contentVersion);
 		}
 		return bitmapData.webGLTexture;
 	}
