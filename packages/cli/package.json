@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/cli",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "Kurot CLI - build tool for the Kurot game engine",
 	"type": "module",
 	"bin": {

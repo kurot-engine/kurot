@@ -3,12 +3,10 @@
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the pipeline from scratch
 each session. `docs/architecture.md` covers the same plugin pipeline in
-prose/tables and is a good cross-reference — but it doesn't document the
-dev/release skin-compile-failure asymmetry noted in §2, so don't assume that
-doc is exhaustive. Egret↔Kurot differences/migration live in the root
+prose/tables and is a good cross-reference. Egret↔Kurot differences/migration live in the root
 [`docs/egret-migration.md`](../../../docs/egret-migration.md), not here.
 
-Package identity: `@kurot/cli@1.0.2`. Node.js build tool, esbuild-powered,
+Package identity: `@kurot/cli@1.1.0`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
 via `npx` (scaffolding) or as a devDependency with npm scripts.
 
