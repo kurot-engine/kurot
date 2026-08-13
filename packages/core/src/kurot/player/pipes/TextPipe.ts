@@ -26,7 +26,9 @@ export interface TextInstruction extends Instruction {
  */
 interface TextCache {
 	renderBuffer: RenderBuffer;
-	texture: WebGLTexture | undefined;
+	// Opaque backend texture handle — its concrete type (WebGLTexture, GPUTexture, ...)
+	// is backend-specific; this pipe only passes it back to RenderContext methods.
+	texture: unknown;
 	textureWidth: number;
 	textureHeight: number;
 	canvasScaleX: number;
@@ -125,8 +127,8 @@ export class TextPipe implements RenderPipe<TextField> {
 		const tf = inst.renderable;
 		tf.getLinesArr(); // ensure lines are computed
 
-		// Cache the render context for use in destroyRenderable.
-		if (!this._context) this._context = buffer.context;
+		// Resolve the render context once (also cached for destroyRenderable).
+		const renderCtx: RenderContext = this._context ?? (this._context = buffer.context);
 
 		// ── INPUT mode while focused: HTML input element owns the display ────
 		// Don't render the canvas texture — the native <input>/<textarea>
@@ -152,7 +154,7 @@ export class TextPipe implements RenderPipe<TextField> {
 		let canvasScaleX = /* devicePixelRatio || */ 1;
 		let canvasScaleY = /* devicePixelRatio || */ 1;
 
-		const maxTexSize = buffer.context.maxTextureSize;
+		const maxTexSize = renderCtx.maxTextureSize;
 		if (logicalW * canvasScaleX > maxTexSize) {
 			canvasScaleX *= maxTexSize / (logicalW * canvasScaleX);
 		}
@@ -212,18 +214,18 @@ export class TextPipe implements RenderPipe<TextField> {
 			// Upload to WebGL texture.
 			const surface = cache.renderBuffer.surface;
 			if (!cache.texture) {
-				cache.texture = buffer.context.createTexture(surface);
+				cache.texture = renderCtx.createTexture(surface);
 				// Register for GC-based cleanup.
 				const token = {};
-				buffer.context.registerTextureForGC(tf, cache.texture, token);
+				renderCtx.registerTextureForGC(tf, cache.texture, token);
 				this._registryTokens.set(tf, token);
 			} else {
 				// Unregister old texture, create new registration for updated texture.
 				const oldToken = this._registryTokens.get(tf);
-				if (oldToken) buffer.context.unregisterTextureGC(oldToken);
-				buffer.context.updateTexture(cache.texture, surface);
+				if (oldToken) renderCtx.unregisterTextureGC(oldToken);
+				renderCtx.updateTexture(cache.texture, surface);
 				const token = {};
-				buffer.context.registerTextureForGC(tf, cache.texture, token);
+				renderCtx.registerTextureForGC(tf, cache.texture, token);
 				this._registryTokens.set(tf, token);
 			}
 			cache.textureWidth = pixelW;
@@ -235,7 +237,7 @@ export class TextPipe implements RenderPipe<TextField> {
 		// ── 4. Draw cached texture ───────────────────────────────────────────
 		// Following Egret: draw the full texture but scale the destination by
 		// 1/canvasScale so the on-screen size matches the logical dimensions.
-		buffer.context.drawTexture(
+		renderCtx.drawTexture(
 			cache.texture,
 			0,
 			0,
