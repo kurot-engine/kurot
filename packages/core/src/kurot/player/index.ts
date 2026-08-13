@@ -20,7 +20,7 @@ export {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 export { InstructionSet, type Instruction } from './InstructionSet.js';
 export type { RenderPipe } from './RenderPipe.js';
-export { RenderBuffer, hitTestBuffer, CanvasRenderer, DisplayList } from './canvas/index.js';
+export { CanvasBuffer, hitTestBuffer, CanvasRenderer, DisplayList } from './canvas/index.js';
 
 // ── Input & Layout ────────────────────────────────────────────────────────────
 export { TouchHandler } from './TouchHandler.js';

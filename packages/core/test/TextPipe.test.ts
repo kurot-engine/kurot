@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { TextPipe } from '../src/kurot/player/pipes/TextPipe.js';
 import { TextField } from '../src/kurot/text/TextField.js';
 import type { CanvasRenderer } from '../src/kurot/player/canvas/index.js';
-import type { RenderBuffer } from '../src/kurot/player/canvas/index.js';
+import type { CanvasBuffer } from '../src/kurot/player/canvas/index.js';
 
 // Minimal stand-in for a WebGLTexture — the pipe never inspects its shape.
 function mockTexture(): WebGLTexture {
@@ -18,7 +18,7 @@ function mockContext(): { deleteTexture: ReturnType<typeof vi.fn>; unregisterTex
 // implement one, so this mirrors the `as unknown as {...}` pattern already
 // used in InstructionSet.test.ts for whitebox access.
 interface TextPipeInternals {
-	_cache: WeakMap<TextField, { texture: WebGLTexture | undefined; renderBuffer: RenderBuffer }>;
+	_cache: WeakMap<TextField, { texture: WebGLTexture | undefined; canvasBuffer: CanvasBuffer }>;
 	_registryTokens: WeakMap<TextField, object>;
 	// Untyped on purpose: real code assigns a `RenderContext` instance, tests
 	// assign a vi.fn()-based mock. Both only need to support
@@ -33,7 +33,7 @@ function internals(pipe: TextPipe): TextPipeInternals {
 function seedCache(pipe: TextPipe, tf: TextField, texture: WebGLTexture | undefined): void {
 	internals(pipe)._cache.set(tf, {
 		texture,
-		renderBuffer: {} as RenderBuffer,
+		canvasBuffer: {} as CanvasBuffer,
 	});
 }
 

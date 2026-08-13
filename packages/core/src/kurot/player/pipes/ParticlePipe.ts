@@ -1,5 +1,5 @@
 import type { DisplayObject } from '../../display/DisplayObject.js';
-import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
+import type { RenderBuffer } from '../RenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
@@ -40,7 +40,7 @@ export class ParticlePipe implements RenderPipe<DisplayObject> {
 
 	// ── Execute ───────────────────────────────────────────────────────────────
 
-	public execute(inst: ParticleInstruction, buffer: WebGLRenderBuffer): void {
+	public execute(inst: ParticleInstruction, buffer: RenderBuffer): void {
 		const ps = inst.renderable as unknown as {
 			readonly particles: readonly {
 				x: number;

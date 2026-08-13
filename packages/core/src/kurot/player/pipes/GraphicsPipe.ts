@@ -1,13 +1,13 @@
 import type { Graphics } from '../../display/Graphics.js';
 import type { DisplayObject } from '../../display/DisplayObject.js';
 import { Rectangle } from '../../geom/Rectangle.js';
-import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
-import type { RenderContext } from '../RenderContext.js';
+import type { RenderContext, TextureHandle } from '../RenderContext.js';
+import type { RenderBuffer } from '../RenderBuffer.js';
 import type { CanvasRenderer } from '../canvas/index.js';
-import { RenderBuffer } from '../canvas/index.js';
+import { CanvasBuffer } from '../canvas/index.js';
 
 // Shared scratch rectangle — avoids per-execute allocation.
 const _scratchBounds = new Rectangle();
@@ -26,10 +26,10 @@ export interface GraphicsInstruction extends Instruction {
 // ── Cache entry ───────────────────────────────────────────────────────────────
 
 interface GraphicsCache {
-	renderBuffer: RenderBuffer;
+	canvasBuffer: CanvasBuffer;
 	// Opaque backend texture handle — its concrete type (WebGLTexture, GPUTexture, ...)
 	// is backend-specific; this pipe only passes it back to RenderContext methods.
-	texture: unknown;
+	texture: TextureHandle;
 	textureWidth: number;
 	textureHeight: number;
 	/** Bounds origin in local space — needed to position the texture. */
@@ -114,14 +114,14 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 
 	// ── Execute ───────────────────────────────────────────────────────────────
 
-	public execute(inst: GraphicsInstruction, buffer: WebGLRenderBuffer): void {
+	public execute(inst: GraphicsInstruction, buffer: RenderBuffer): void {
 		const { graphics } = inst;
 		if (graphics.commands.length === 0) {
 			return;
 		}
 
-		// Resolve the render context once (also cached for destroyRenderable).
-		const renderCtx: RenderContext = this._context ?? (this._context = buffer.context);
+		// Cache the render context for use in destroyRenderable.
+		if (!this._context) this._context = buffer.context;
 
 		const bounds = _scratchBounds;
 		bounds.setEmpty();
@@ -141,7 +141,7 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		let cache = this._cache.get(graphics);
 		if (!cache) {
 			cache = {
-				renderBuffer: new RenderBuffer(w, h),
+				canvasBuffer: new CanvasBuffer(w, h),
 				texture: undefined,
 				textureWidth: 0,
 				textureHeight: 0,
@@ -154,34 +154,34 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		const needsRebuild = graphics.canvasCacheDirty || cache.textureWidth !== w || cache.textureHeight !== h;
 
 		if (needsRebuild) {
-			if (cache.renderBuffer.width !== w || cache.renderBuffer.height !== h) {
-				cache.renderBuffer.resize(w, h);
+			if (cache.canvasBuffer.width !== w || cache.canvasBuffer.height !== h) {
+				cache.canvasBuffer.resize(w, h);
 			}
-			cache.renderBuffer.clear();
+			cache.canvasBuffer.clear();
 			// skipCache=true: we are the cache owner, bypass CanvasRenderer's own
 			// offscreen canvas layer to avoid a redundant intermediate rasterization.
 			this._canvasRenderer.renderGraphicsToContext(
 				graphics,
-				cache.renderBuffer.context,
+				cache.canvasBuffer.context,
 				-bounds.x,
 				-bounds.y,
 				false,
 				true,
 			);
-			const surface = cache.renderBuffer.surface;
+			const surface = cache.canvasBuffer.surface;
 			if (!cache.texture) {
-				cache.texture = renderCtx.createTexture(surface);
+				cache.texture = buffer.context.createTexture(surface);
 				// Register for GC-based cleanup.
 				const token = {};
-				renderCtx.registerTextureForGC(graphics, cache.texture, token);
+				buffer.context.registerTextureForGC(graphics, cache.texture, token);
 				this._registryTokens.set(graphics, token);
 			} else {
 				// Unregister old texture, create new registration for updated texture.
 				const oldToken = this._registryTokens.get(graphics);
-				if (oldToken) renderCtx.unregisterTextureGC(oldToken);
-				renderCtx.updateTexture(cache.texture, surface);
+				if (oldToken) buffer.context.unregisterTextureGC(oldToken);
+				buffer.context.updateTexture(cache.texture, surface);
 				const token = {};
-				renderCtx.registerTextureForGC(graphics, cache.texture, token);
+				buffer.context.registerTextureForGC(graphics, cache.texture, token);
 				this._registryTokens.set(graphics, token);
 			}
 			cache.textureWidth = w;
@@ -204,7 +204,7 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			buffer.globalMatrix.append(1, 0, 0, 1, cache.boundsX, cache.boundsY);
 		}
 
-		renderCtx.drawTexture(cache.texture, 0, 0, w, h, 0, 0, w, h, w, h);
+		buffer.context.drawTexture(cache.texture, 0, 0, w, h, 0, 0, w, h, w, h);
 
 		buffer.restoreTransform();
 	}

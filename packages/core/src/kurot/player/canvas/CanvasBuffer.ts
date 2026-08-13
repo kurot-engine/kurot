@@ -3,7 +3,7 @@
  * Wraps an HTMLCanvasElement + CanvasRenderingContext2D for offscreen drawing,
  * hit testing, and pixel readback.
  */
-export class RenderBuffer {
+export class CanvasBuffer {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	public readonly surface: HTMLCanvasElement;
@@ -81,8 +81,8 @@ export class RenderBuffer {
 }
 
 /** @internal Shared buffer for hit testing — lazily created on first use. */
-let _hitTestBuffer: RenderBuffer | undefined;
-export function hitTestBuffer(): RenderBuffer {
-	if (!_hitTestBuffer) _hitTestBuffer = new RenderBuffer(3, 3);
+let _hitTestBuffer: CanvasBuffer | undefined;
+export function hitTestBuffer(): CanvasBuffer {
+	if (!_hitTestBuffer) _hitTestBuffer = new CanvasBuffer(3, 3);
 	return _hitTestBuffer;
 }

@@ -52,7 +52,7 @@ describe('createPlayer lifecycle', () => {
 		expect(getContext).toHaveBeenNthCalledWith(1, 'webgl2');
 		expect(getContext).toHaveBeenNthCalledWith(2, 'webgl');
 		expect(getContext).toHaveBeenNthCalledWith(3, '2d');
-		// Canvas fallback creates one RenderBuffer; there is no additional
+		// Canvas fallback creates one CanvasBuffer; there is no additional
 		// temporary canvas used solely to probe WebGL support.
 		expect(createElement).toHaveBeenCalledOnce();
 		expect(player.isWebGL).toBe(false);

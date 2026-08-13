@@ -956,12 +956,12 @@ export class WebGLRenderer {
 
 		if (obj.$cacheDirty || obj.$renderDirty) {
 			if ($displayList.updateSurfaceSize(buffer.context.maxTextureSize)) {
-				$displayList.renderBuffer.clear();
+				$displayList.canvasBuffer.clear();
 				const resolution = $displayList.actualResolution;
-				$displayList.renderBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
+				$displayList.canvasBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
 				this._canvasRenderer.renderToContext(
 					obj,
-					$displayList.renderBuffer.context,
+					$displayList.canvasBuffer.context,
 					$displayList.offsetX,
 					$displayList.offsetY,
 				);
@@ -985,8 +985,8 @@ export class WebGLRenderer {
 		if (!$displayList.bitmapData?.source) return;
 
 		const bd = $displayList.bitmapData;
-		const w = $displayList.renderBuffer.width;
-		const h = $displayList.renderBuffer.height;
+		const w = $displayList.canvasBuffer.width;
+		const h = $displayList.canvasBuffer.height;
 		const resolution = $displayList.actualResolution;
 		// offsetX/Y already in globalMatrix via _applyTransform.
 		if (offsetX !== 0 || offsetY !== 0) {

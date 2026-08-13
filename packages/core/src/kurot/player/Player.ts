@@ -2,7 +2,7 @@ import { Stage } from '../display/Stage.js';
 import { DisplayObject } from '../display/DisplayObject.js';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer.js';
 import { Matrix } from '../geom/Matrix.js';
-import { RenderBuffer, CanvasRenderer } from './canvas/index.js';
+import { CanvasBuffer, CanvasRenderer } from './canvas/index.js';
 import { ticker, type Renderable } from './SystemTicker.js';
 import { WebGLRenderContext, WebGLRenderBuffer, WebGLRenderer } from './webgl/index.js';
 
@@ -18,7 +18,7 @@ export class Player implements Renderable {
 	public readonly stage: Stage;
 	private _isPlaying = false;
 	private _root?: DisplayObject;
-	private _canvas2dBuffer?: RenderBuffer;
+	private _canvas2dBuffer?: CanvasBuffer;
 	private _canvas2dRenderer?: CanvasRenderer;
 	private _webglBuffer?: WebGLRenderBuffer;
 	private _webglRenderer?: WebGLRenderer;
@@ -82,7 +82,7 @@ export class Player implements Renderable {
 
 		const ctx = canvas.getContext('2d');
 		if (!ctx) throw new Error('Failed to get Canvas 2D context');
-		this._canvas2dBuffer = new RenderBuffer();
+		this._canvas2dBuffer = new CanvasBuffer();
 		(this._canvas2dBuffer as { surface: HTMLCanvasElement }).surface = canvas;
 		(this._canvas2dBuffer as { context: CanvasRenderingContext2D }).context = ctx;
 		this._canvas2dRenderer = new CanvasRenderer();

@@ -1,5 +1,5 @@
 import type { Bitmap } from '../../display/Bitmap.js';
-import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
+import type { RenderBuffer } from '../RenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
@@ -70,7 +70,7 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 	 * Issue the draw call for a BitmapInstruction.
 	 * Called by WebGLRenderer._executeInstructions().
 	 */
-	public execute(inst: BitmapInstruction, buffer: WebGLRenderBuffer): void {
+	public execute(inst: BitmapInstruction, buffer: RenderBuffer): void {
 		const bitmap = inst.renderable;
 		const bd = bitmap.bitmapData;
 		if (!bd?.source) return;
@@ -113,7 +113,7 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 		grid: import('../../geom/Rectangle.js').Rectangle,
 		destW: number,
 		destH: number,
-		buffer: WebGLRenderBuffer,
+		buffer: RenderBuffer,
 	): void {
 		const bx = bitmap.bitmapX;
 		const by = bitmap.bitmapY;

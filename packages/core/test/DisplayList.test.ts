@@ -26,8 +26,8 @@ describe('DisplayList texture cache', () => {
 		displayList.configure({ resolution: 2, scaleMode: 'nearest' });
 
 		expect(displayList.updateSurfaceSize()).toBe(true);
-		expect(displayList.renderBuffer.width).toBe(200);
-		expect(displayList.renderBuffer.height).toBe(100);
+		expect(displayList.canvasBuffer.width).toBe(200);
+		expect(displayList.canvasBuffer.height).toBe(100);
 		expect(displayList.offsetX).toBe(5);
 		expect(displayList.offsetY).toBe(10);
 		expect(displayList.actualResolution).toBe(2);
@@ -42,8 +42,8 @@ describe('DisplayList texture cache', () => {
 
 		displayList.updateSurfaceSize(120);
 		expect(displayList.actualResolution).toBeCloseTo(1.2);
-		expect(displayList.renderBuffer.width).toBe(120);
-		expect(displayList.renderBuffer.height).toBe(60);
+		expect(displayList.canvasBuffer.width).toBe(120);
+		expect(displayList.canvasBuffer.height).toBe(60);
 
 		DisplayList.release(displayList);
 	});

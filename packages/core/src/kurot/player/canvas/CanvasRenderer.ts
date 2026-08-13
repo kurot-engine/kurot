@@ -17,7 +17,7 @@ import { HorizontalAlign } from '../../text/enums/HorizontalAlign.js';
 import { VerticalAlign } from '../../text/enums/VerticalAlign.js';
 import { TextFieldType } from '../../text/enums/TextFieldType.js';
 import { getFontString } from '../../text/TextMeasurer.js';
-import { RenderBuffer, hitTestBuffer } from './RenderBuffer.js';
+import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 
 const CAPS_MAP: Record<string, CanvasLineCap> = { none: 'butt', square: 'square', round: 'round' };
 
@@ -54,7 +54,7 @@ export class CanvasRenderer {
 	/**
 	 * Renders a display object tree into the given buffer.
 	 */
-	public render(displayObject: DisplayObject, buffer: RenderBuffer, matrix?: Matrix): number {
+	public render(displayObject: DisplayObject, buffer: CanvasBuffer, matrix?: Matrix): number {
 		const ctx = buffer.context;
 		if (matrix) {
 			ctx.save();
@@ -122,12 +122,12 @@ export class CanvasRenderer {
 		if ($displayList && !_isStage) {
 			if (displayObject.$cacheDirty || displayObject.$renderDirty) {
 				if ($displayList.updateSurfaceSize()) {
-					$displayList.renderBuffer.clear();
+					$displayList.canvasBuffer.clear();
 					const resolution = $displayList.actualResolution;
-					$displayList.renderBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
+					$displayList.canvasBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
 					this.drawDisplayObject(
 						displayObject,
-						$displayList.renderBuffer.context,
+						$displayList.canvasBuffer.context,
 						$displayList.offsetX,
 						$displayList.offsetY,
 						true,
@@ -146,8 +146,8 @@ export class CanvasRenderer {
 					$displayList.bitmapData.source as CanvasImageSource,
 					offsetX - $displayList.offsetX,
 					offsetY - $displayList.offsetY,
-					$displayList.renderBuffer.width / resolution,
-					$displayList.renderBuffer.height / resolution,
+					$displayList.canvasBuffer.width / resolution,
+					$displayList.canvasBuffer.height / resolution,
 				);
 				ctx.imageSmoothingEnabled = previousSmoothing;
 				drawCalls++;
@@ -299,7 +299,7 @@ export class CanvasRenderer {
 		// ── CPU fallback: ColorMatrixFilter or mixed ──────────────────────────
 		const bufferW = Math.ceil(bounds.width);
 		const bufferH = Math.ceil(bounds.height);
-		const offscreen = new RenderBuffer(bufferW, bufferH);
+		const offscreen = new CanvasBuffer(bufferW, bufferH);
 		const offCtx = offscreen.context;
 
 		// Apply CSS-capable filters on the offscreen context before drawing.
@@ -375,7 +375,7 @@ export class CanvasRenderer {
 			const by = bounds.y;
 
 			// Render content to offscreen buffer
-			const contentBuffer = new RenderBuffer(bw, bh);
+			const contentBuffer = new CanvasBuffer(bw, bh);
 			const contentCtx = contentBuffer.context;
 			const drawCalls = this.drawDisplayObject(displayObject, contentCtx, -bx, -by);
 

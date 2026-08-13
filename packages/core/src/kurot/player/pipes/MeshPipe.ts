@@ -1,6 +1,6 @@
 import type { Mesh } from '../../display/Mesh.js';
 import type { DisplayObject } from '../../display/DisplayObject.js';
-import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
+import type { RenderBuffer } from '../RenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
@@ -57,7 +57,7 @@ export class MeshPipe implements RenderPipe<Mesh> {
 
 	// ── Execute ───────────────────────────────────────────────────────────────
 
-	public execute(inst: MeshInstruction, buffer: WebGLRenderBuffer): void {
+	public execute(inst: MeshInstruction, buffer: RenderBuffer): void {
 		const mesh = inst.renderable;
 		const bd = mesh.bitmapData;
 		if (!bd?.source || mesh.vertices.length === 0 || mesh.indices.length === 0) {

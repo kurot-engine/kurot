@@ -8,7 +8,7 @@ import { Player } from './Player.js';
 import { TouchHandler } from './TouchHandler.js';
 import { ScreenAdapter } from './ScreenAdapter.js';
 import { setupLifecycle } from './SystemTicker.js';
-import { CanvasRenderer, RenderBuffer } from './canvas/index.js';
+import { CanvasRenderer, CanvasBuffer } from './canvas/index.js';
 import type { KurotOptions } from './KurotOptions.js';
 import { Capabilities } from '../system/Capabilities.js';
 
@@ -49,7 +49,7 @@ export function createPlayer(options: KurotOptions): KurotApp {
 	if (!RenderTexture.renderer) {
 		const _renderer = new CanvasRenderer();
 		RenderTexture.renderer = (displayObject, width, height, offsetX, offsetY) => {
-			const buffer = new RenderBuffer(width, height);
+			const buffer = new CanvasBuffer(width, height);
 			const m = new Matrix();
 			m.translate(offsetX, offsetY);
 			_renderer.render(displayObject, buffer, m);

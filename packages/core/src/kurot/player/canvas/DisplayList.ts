@@ -1,7 +1,7 @@
 import { BitmapData } from '../../display/texture/BitmapData.js';
 import type { CacheAsTextureOptions, DisplayObject } from '../../display/DisplayObject.js';
 import { deleteWebGLTexture, SYM_GL_CONTEXT, type GL } from '../webgl/WebGLUtils.js';
-import { RenderBuffer } from './RenderBuffer.js';
+import { CanvasBuffer } from './CanvasBuffer.js';
 
 /**
  * DisplayList provides per-object offscreen caching for DisplayObjects with
@@ -18,7 +18,7 @@ export class DisplayList {
 	public root: DisplayObject;
 	public offsetX = 0;
 	public offsetY = 0;
-	public renderBuffer: RenderBuffer;
+	public canvasBuffer: CanvasBuffer;
 	public bitmapData?: BitmapData;
 	public resolution = 1;
 	public scaleMode: 'linear' | 'nearest' = 'linear';
@@ -27,7 +27,7 @@ export class DisplayList {
 	// ── Constructor ───────────────────────────────────────────────────────────
 	private constructor(root: DisplayObject) {
 		this.root = root;
-		this.renderBuffer = new RenderBuffer();
+		this.canvasBuffer = new CanvasBuffer();
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ export class DisplayList {
 			deleteWebGLTexture(gl, texture);
 			dl.bitmapData!.webGLTexture = undefined;
 		}
-		dl.renderBuffer.resize(0, 0);
+		dl.canvasBuffer.resize(0, 0);
 		dl.bitmapData = undefined;
 		if (DisplayList._pool.length < 8) DisplayList._pool.push(dl);
 	}
@@ -83,8 +83,8 @@ export class DisplayList {
 		this.offsetX = -bounds.x;
 		this.offsetY = -bounds.y;
 
-		if (this.renderBuffer.width !== w || this.renderBuffer.height !== h) {
-			this.renderBuffer.resize(w, h);
+		if (this.canvasBuffer.width !== w || this.canvasBuffer.height !== h) {
+			this.canvasBuffer.resize(w, h);
 		}
 		return true;
 	}
@@ -93,7 +93,7 @@ export class DisplayList {
 	 * Updates the BitmapData reference after rendering into the buffer.
 	 */
 	public updateBitmapData(): void {
-		const surface = this.renderBuffer.surface;
+		const surface = this.canvasBuffer.surface;
 		if (!this.bitmapData) {
 			this.bitmapData = new BitmapData(surface);
 			this.bitmapData.deleteSource = false;

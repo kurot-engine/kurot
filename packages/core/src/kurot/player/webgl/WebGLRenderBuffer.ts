@@ -2,10 +2,11 @@ import { Matrix } from '../../geom/Matrix.js';
 import { Rectangle } from '../../geom/Rectangle.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { WebGLRenderContext } from './WebGLRenderContext.js';
+import type { RenderBuffer } from '../RenderBuffer.js';
 
 const _pool: WebGLRenderBuffer[] = [];
 
-export class WebGLRenderBuffer {
+export class WebGLRenderBuffer implements RenderBuffer {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
 	public static create(context: WebGLRenderContext, width: number, height: number): WebGLRenderBuffer {

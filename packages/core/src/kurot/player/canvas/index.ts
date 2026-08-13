@@ -1,3 +1,3 @@
 export { CanvasRenderer } from './CanvasRenderer.js';
-export { RenderBuffer, hitTestBuffer } from './RenderBuffer.js';
+export { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 export { DisplayList } from './DisplayList.js';
