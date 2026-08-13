@@ -15,11 +15,9 @@
 		}
 	},
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"LICENSE"
 	],
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"build": "tsc --build",
 		"dev": "tsc --watch",
@@ -51,5 +49,8 @@
 		"url": "git+https://github.com/kurot-engine/kurot.git",
 		"directory": "packages/ui"
 	},
-	"packageManager": "pnpm@10.33.0"
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
+	}
 }

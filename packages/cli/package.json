@@ -2,21 +2,21 @@
 	"name": "@kurot/cli",
 	"version": "1.1.0",
 	"description": "Kurot CLI - build tool for the Kurot game engine",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
 	"type": "module",
+	"main": "./dist/define.js",
+	"types": "./dist/define.d.ts",
 	"bin": {
 		"kurot": "./dist/index.js"
 	},
-	"main": "./dist/define.js",
-	"types": "./dist/define.d.ts",
 	"files": [
 		"dist",
 		"templates",
 		"README.md",
-		"CHANGELOG.md"
+		"CHANGELOG.md",
+		"LICENSE"
 	],
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"build": "tsc --build",
 		"dev": "tsc --watch",
@@ -36,10 +36,20 @@
 		"typescript": "^5.6.0",
 		"vitest": "^4.1.4"
 	},
-	"packageManager": "pnpm@10.33.0",
+	"keywords": [
+		"kurot",
+		"cli",
+		"game-engine",
+		"exml",
+		"typescript"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/kurot-engine/kurot.git",
 		"directory": "packages/cli"
+	},
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
 	}
 }

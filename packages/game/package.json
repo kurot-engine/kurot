@@ -15,15 +15,16 @@
 		}
 	},
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"LICENSE"
 	],
 	"scripts": {
 		"build": "tsc --build",
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
-		"prepublishOnly": "npm run clean && npm run build",
 		"test": "vitest run",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"peerDependencies": {
 		"@kurot/core": "^1.0.12"

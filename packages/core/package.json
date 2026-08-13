@@ -15,16 +15,17 @@
 		}
 	},
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"LICENSE"
 	],
 	"scripts": {
 		"build": "tsc --build && npm run build:types",
 		"build:types": "tsc --emitDeclarationOnly --declaration --declarationMap",
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
-		"prepublishOnly": "npm run clean && npm run build",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"prepublishOnly": "npm run clean && npm run build",
 		"benchmark": "vite --config vite.config.ts --open /index.html",
 		"build:benchmark": "vite --config vite.config.ts build && cp examples/egret.min.js examples/egret.web.min.js benchmark-dist/",
 		"preview:benchmark": "vite preview --config vite.config.ts --host 0.0.0.0 --port 4173"
