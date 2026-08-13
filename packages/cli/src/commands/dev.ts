@@ -1,25 +1,45 @@
 import { Command } from 'commander';
 import { loadProject } from '../core/project.js';
 import { startDevServer } from '../core/dev-server.js';
-import { logger } from '../utils/logger.js';
+import { ConfigError } from '../core/errors.js';
+import { parseDevDiagnosticsFormat, writeMachineOutput } from '../core/diagnostics/index.js';
+import { logger, setLoggerEnabled } from '../utils/logger.js';
+
+interface DevOptions {
+	readonly port: string;
+	readonly sourcemap: boolean;
+	readonly strict: boolean;
+	readonly diagnostics: string;
+}
 
 export const devCommand = new Command('dev')
 	.description('Start a development server with rebuild on change')
 	.option('-p, --port <port>', 'Port to listen on', '3000')
 	.option('--sourcemap', 'Generate sourcemaps', false)
-	.action(async (options: { port: string; sourcemap: boolean }) => {
+	.option('--strict', 'Treat supported warnings as build errors', false)
+	.option('--diagnostics <format>', 'Diagnostic output: human or jsonl', 'human')
+	.action(async (options: DevOptions) => {
+		const format = parseDevDiagnosticsFormat(options.diagnostics);
+		const machine = format === 'jsonl';
+		setLoggerEnabled(!machine);
 		const port = Number.parseInt(options.port, 10);
 		if (!Number.isInteger(port) || port < 1 || port > 65535) {
-			logger.error(`Invalid port: ${options.port}`);
-			process.exit(1);
+			setLoggerEnabled(true);
+			throw new ConfigError(`Invalid port: ${options.port}`);
 		}
 
 		try {
 			const project = await loadProject('development');
 			logger.info(`Starting dev server on port ${port}...`);
-			await startDevServer(project, { port, sourcemap: options.sourcemap });
+			await startDevServer(project, {
+				port,
+				sourcemap: options.sourcemap,
+				strict: options.strict,
+				onEvent: machine ? writeMachineOutput : undefined,
+			});
 		} catch (err) {
 			logger.error(`Dev server failed: ${err instanceof Error ? err.message : String(err)}`);
-			process.exit(1);
+			process.exitCode = 1;
+			if (machine) setLoggerEnabled(true);
 		}
 	});

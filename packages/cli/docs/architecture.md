@@ -31,6 +31,7 @@ packages/cli/
 │   │   ├── template.ts                # scaffoldProject()，模板列表
 │   │   ├── namespace-external-plugin.ts  # 共享 esbuild 插件，防 namespace 类重复打包
 │   │   ├── errors.ts                  # BuildError / ConfigError
+│   │   ├── diagnostics/               # 诊断模型、策略、稳定 code 和机器输出协议
 │   │   ├── exml/                      # EXML → SkinIR → ESM 编译器
 │   │   │   ├── xml-parser.ts          # 手写递归下降 XML 解析器（XElement/XText）
 │   │   │   ├── registry.ts            # namespace 前缀表 + 组件标签注册表
@@ -157,21 +158,28 @@ bin-release/web/260806143805/
 ### `kurot build`
 
 ```text
-kurot build [-r|--release] [--sourcemap] [--watch] [--analyze]
+kurot build [-r|--release] [--sourcemap] [--watch] [--analyze] [--strict] [--diagnostics human|json]
 ```
 
 - 默认执行 development build。
 - `--release` 开启压缩、hash 文件名和 release 目录。
 - `--watch` 始终使用 development 模式；与 `--release` 同时使用时会忽略 release。
 - `--analyze` 输出 release 应用 bundle 的 esbuild 分析。
+- `--strict` 将可恢复的 EXML/theme warning 提升为 error；release 默认启用严格策略。
+- `--diagnostics json` 静音普通日志，在 stdout 输出单个构建结果 JSON。
 
 ### `kurot dev`
 
 ```text
-kurot dev [-p|--port <port>] [--sourcemap]
+kurot dev [-p|--port <port>] [--sourcemap] [--strict] [--diagnostics human|jsonl]
 ```
 
 执行开发构建并启动静态服务器。esbuild 监听应用源码和自定义 namespace；`resource/` 监听器在 `.exml` 变化时重新编译主题并复制资源。引擎依赖或其他静态资源变化后应重新启动 dev server。当前没有浏览器自动刷新，需要手动刷新页面。
+
+`--diagnostics jsonl` 将每个 `build-start`、`diagnostic`、
+`build-complete` 和 `server-ready` 事件作为独立 JSON 行写入 stdout。它与
+build 的单结果 JSON 不同，适合长生命周期 Agent 逐行消费。机器模式不会混入 ANSI
+或 human logger 输出，失败会设置非零退出码。
 
 ### `kurot create` 与 `kurot clean`
 
@@ -223,4 +231,15 @@ XML source → XElement tree → SkinIR → per-skin ESM factory
 
 编译器支持常用组件、属性节点、百分比尺寸、数据绑定、根 Skin 属性、`<eui:states>`、states 简写、状态属性、`includeIn` 和 `excludeFrom`。内置 namespace 按前缀解析；`http://ns.egret.com/eui` 只是 XML namespace 标识符，不会发起网络请求。
 
-当前解析器面向 EXML 子集，不支持 DTD、ENTITY 和带 namespace 的属性。未知组件会被警告并丢弃，单个皮肤编译失败时会生成空工厂并继续构建，因此迁移大型 Egret 项目时应检查全部构建警告和页面行为。
+当前解析器面向 EXML 子集，不支持 DTD、ENTITY 和带 namespace 的属性。未知组件在普通模式下报告 warning 并从生成树中丢弃；strict/release 将其提升为 error。真实的 Skin 解析或代码生成失败在所有模式下都会停止本次构建，不再生成空工厂。dev watch 进程会继续运行并保留最后一次成功的 Skin bundle，修复文件后可以恢复。
+
+## 九、结构化诊断
+
+插件通过 `BuildContext.diagnostics` 报告问题。collector 负责去重、稳定排序和 strict
+提升；插件不会在 `report()` 时立即抛错，因此一次校验可以收集多条诊断。每个诊断均可
+直接序列化，并包含稳定 `code`、`severity`、`message`，以及可选的
+`location` 和 `suggestions`。
+
+首批诊断覆盖未知 EXML 标签、Skin 编译失败、主题文件缺失/非法 JSON、显式声明的
+EXML 缺失，以及 theme skin 映射未参与编译。普通模式只允许设计为可恢复的 warning
+继续；语法或 JSON 错误始终失败。

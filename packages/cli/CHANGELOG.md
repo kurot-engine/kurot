@@ -11,11 +11,16 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Project-owned HTML templates through `html.template`, with explicit placeholders for the import map, entry script, and stage settings.
 - Editable `template/web/index.html` files in both the `game` and `empty` project templates.
+- Structured EXML and theme diagnostics with stable codes, source locations, and suggestions.
+- `--strict` support for `build` and `dev`.
+- Machine-readable `build --diagnostics json` and `dev --diagnostics jsonl` output.
 
 ### Changed
 
 - The default page centers the game canvas horizontally and vertically.
 - Development builds clear the previous output before compiling and place shared application chunks under `js/chunks/`.
+- EXML compilation failures no longer emit empty development Skin factories; dev watch keeps the last successful bundle and can recover after the source is fixed.
+- Release builds enable strict diagnostic policy by default.
 
 ## 1.0.0 — 2026-08-06
 

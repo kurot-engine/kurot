@@ -20,8 +20,8 @@ src/
 ├── define.ts                      Pure type re-export (ProjectConfig etc.) for
 │                                   kurot.config.ts authoring — no runtime logic.
 ├── commands/
-│   ├── build.ts                   build: -r/--release, --sourcemap, --watch, --analyze
-│   ├── dev.ts                     dev: -p/--port, --sourcemap. Always development mode.
+│   ├── build.ts                   build: release/watch/strict + human/JSON diagnostics
+│   ├── dev.ts                     dev: port/sourcemap/strict + human/JSONL diagnostics
 │   ├── create.ts                  create: scaffolds a project from templates/
 │   └── clean.ts                   clean: removes BOTH bin-debug and bin-release
 ├── core/
@@ -33,6 +33,7 @@ src/
 │   ├── namespace-external-plugin.ts  Shared esbuild plugin, see §2
 │   ├── template.ts                 scaffoldProject(), TEMPLATES list
 │   ├── errors.ts                   BuildError, ConfigError
+│   ├── diagnostics/                Serializable diagnostics, strict policy, JSON/JSONL protocol
 │   ├── exml/                       The EXML → SkinIR → ESM compiler (see §3)
 │   │   ├── xml-parser.ts           Hand-rolled recursive-descent XML parser
 │   │   ├── registry.ts             Namespace prefix map + component tag registry
@@ -53,13 +54,16 @@ Templates actually scaffolded by `create` live in `templates/game/` and
 
 - **`--watch` silently forces development mode**, even if `--release` is also
   passed (with a warning) — there is no release watch mode.
-- **Release-mode skin compile failures throw and abort the whole build**;
-  **dev-mode failures only warn and emit a stub factory returning `{}`** for
-  that one skin. This asymmetry comes from `generateSkinModule(skin, ns,
-  isRelease)`'s third parameter doubling as a `strict` flag fed `isRelease`
-  — it is **not documented in the README or architecture.md**.
-  Worth remembering when debugging "why did my EXML typo silently work in dev
-  but break the release build."
+- **Real Skin compilation failures abort both development and release builds.**
+  Dev watch catches the failure at the watcher boundary, keeps the process and
+  last successful Skin bundle alive, then retries after the next change. It
+  never emits a stub factory returning `{}`.
+- **Unknown EXML tags are intentionally recoverable only in normal mode.** They
+  produce located `KUROT_EXML_UNKNOWN_TAG` warnings and are omitted from the
+  generated tree. `--strict` and release policy promote them to errors.
+- **Machine output owns stdout.** `build --diagnostics json` emits one result;
+  `dev --diagnostics jsonl` emits one lifecycle event per line. Ordinary logger
+  output is disabled so agents do not need to remove colors or status text.
 - `xmlns:eui="http://ns.egret.com/eui"`-style URIs are **purely cosmetic**.
   Only the literal prefix string (`eui`) is ever inspected against
   `registry.ts`'s `NAMESPACE_MODULES` map — the URI value is never
@@ -84,11 +88,9 @@ Templates actually scaffolded by `create` live in `templates/game/` and
   deliberately **not** in `compile-exml.ts`'s skin bundler — generated skin
   code only ever imports via the virtual `#ns/*` specifier, never a relative
   path, so the plain `external:` list is sufficient there.
-- `factoryName()` (converts a skin class name like `"skins.ButtonSkin"` to
-  `createButtonSkin`) is implemented **twice independently** — once in
-  `exml/codegen.ts`, once in `plugins/compile-exml.ts` — with identical logic
-  but no shared import. A maintenance hazard: if one changes, the other
-  silently drifts.
+- `skin-module-builder.ts` generates every Skin module in a temporary staging
+  directory and installs the completed bundle only after all Skin code has
+  compiled. This is what preserves the previous bundle during failed watches.
 - `parseValue()` in `exml-parser.ts` coerces EXML attribute values in this
   order: binding (`{...}`) → percent (trailing `%`) → boolean literal → `null`
   literal → numeric literal → fallback string. This means literal strings
@@ -121,7 +123,7 @@ Templates actually scaffolded by `create` live in `templates/game/` and
   into a temp dir **inside the project's own `node_modules`**
   (`node_modules/.kurot-engine-<random>/`) so esbuild's normal Node resolution
   can find the real package — always cleaned up in a `finally`.
-  `compile-exml.ts`'s skin bundler instead uses an OS temp dir
+  `skin-module-builder.ts` instead uses an OS temp dir
   (`os.tmpdir()/kurot-skins-*`) — the two compile steps intentionally use
   different temp-file strategies.
 
@@ -154,8 +156,8 @@ AST-to-AST transform).
   `AddItems` state overrides — nodes carrying either attribute are excluded
   from the default `elementsContent` list entirely and only appear via
   per-state `AddItems`.
-- Unknown tags are silently dropped from the tree (collected into
-  `unresolvedTags`, surfaced as a build warning, never a hard failure).
+- Unknown tags are dropped from the tree and retained as located records in
+  `unresolvedTags`; normal builds warn, while strict/release builds fail.
   Duplicate `id` attributes on two nodes in the same skin **do** throw a hard
   error.
 - Codegen: a node with an `id` gets both a local `const varName = new X()`
@@ -207,9 +209,10 @@ compileExml → compileEngine → compileCustomNamespaces
 → compileSource → generateHtml → copyAssets
 ```
 
-`runPipeline` just iterates the array in order and logs each step name —
-nothing in the type system enforces the `compileCustomNamespaces`-before-
-`compileSource` dependency; it's convention + code comments only.
+`runPipeline` iterates the array in order, logs each step name, and stops after
+a plugin finishes if the diagnostic collector contains errors. Nothing in the
+type system enforces the `compileCustomNamespaces`-before-`compileSource`
+dependency; it remains convention + code comments.
 
 `dev-server.ts` additionally runs its own EXML-only resource watcher: it
 watches `project.resourceDir` recursively (only if `config.exml` is set),
@@ -260,9 +263,10 @@ Confirmed file lists (from directory listing, not the README):
 | I want to... | Look at |
 |---|---|
 | Add a new EXML tag / component mapping | `core/exml/registry.ts` (`COMPONENTS`) |
-| Change how skin factories are generated | `core/exml/codegen.ts` |
+| Change how skin factories are generated or bundled | `core/exml/codegen.ts`, `core/exml/skin-module-builder.ts` |
 | Debug why a namespace class is duplicated (`instanceof` breaks) | `core/namespace-external-plugin.ts`, confirm `compileCustomNamespaces` ran before `compileSource` |
 | Add a new build pipeline step | `core/plugins/`, register it in `core/plugins/index.ts`'s `defaultPlugins()` (and `dev-server.ts`'s list if it should also run in dev) |
 | Change the HTML template placeholder contract | `core/plugins/generate-html.ts` (`PLACEHOLDERS`) |
-| Debug why release build throws on an EXML typo but dev didn't | `core/plugins/compile-exml.ts` — `generateSkinModule`'s `strict` param, fed `isRelease` |
+| Change strict promotion or machine diagnostic output | `core/diagnostics/`, `commands/build.ts`, `commands/dev.ts` |
+| Debug EXML failure recovery in dev | `core/exml/skin-module-builder.ts`, `core/dev-server.ts` |
 | Change what `kurot create` scaffolds | `templates/game/` or `templates/empty/`, plus `core/template.ts` for the package.json rewrite logic |

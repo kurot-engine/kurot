@@ -13,6 +13,7 @@ import {
 	copyAssets,
 } from './plugins/index.js';
 import { logger } from '../utils/logger.js';
+import type { DevEvent } from './diagnostics/index.js';
 
 export interface DevServerOptions {
 	/**
@@ -23,6 +24,14 @@ export interface DevServerOptions {
 	 * Whether to generate sourcemaps for the app bundle.
 	 */
 	sourcemap: boolean;
+	/**
+	 * Whether supported warnings stop builds.
+	 */
+	strict: boolean;
+	/**
+	 * Receives machine-readable lifecycle events.
+	 */
+	onEvent?: (event: DevEvent) => void;
 }
 
 /**
@@ -34,18 +43,28 @@ export interface DevServerOptions {
  * The browser is not auto-reloaded — refresh manually to pick up changes.
  */
 export async function startDevServer(project: Project, options: DevServerOptions): Promise<void> {
-	const ctx = createContext(project, { sourcemap: options.sourcemap, watch: true });
-	await runPipeline(ctx, [
-		compileExml(),
-		compileEngine(),
-		compileCustomNamespaces(),
-		compileSource(),
-		generateHtml(),
-		copyAssets(),
-	]);
+	const ctx = createContext(project, { sourcemap: options.sourcemap, watch: true, strict: options.strict });
+	const startedAt = Date.now();
+	options.onEvent?.({ type: 'build-start', reason: 'initial' });
+	try {
+		await runPipeline(ctx, [
+			compileExml(),
+			compileEngine(),
+			compileCustomNamespaces(),
+			compileSource(),
+			generateHtml(),
+			copyAssets(),
+		]);
+		emitDiagnostics(ctx, options);
+		options.onEvent?.({ type: 'build-complete', success: true, durationMs: Date.now() - startedAt });
+	} catch (error) {
+		emitDiagnostics(ctx, options);
+		options.onEvent?.({ type: 'build-complete', success: false, durationMs: Date.now() - startedAt });
+		throw error;
+	}
 
-	watchResources(project, ctx);
-	const server = startHttpServer(project, options.port);
+	watchResources(project, ctx, options);
+	const server = startHttpServer(project, options);
 
 	process.on('SIGINT', async () => {
 		logger.info('Stopping dev server...');
@@ -58,7 +77,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 /**
  * Recompiles EXML and re-copies assets when a `.exml` file changes.
  */
-function watchResources(project: Project, ctx: BuildContext): void {
+function watchResources(project: Project, ctx: BuildContext, options: DevServerOptions): void {
 	if (!project.config.exml) return;
 
 	let debounce: ReturnType<typeof setTimeout> | undefined;
@@ -68,11 +87,17 @@ function watchResources(project: Project, ctx: BuildContext): void {
 			if (!filename || !filename.endsWith('.exml')) return;
 			clearTimeout(debounce);
 			debounce = setTimeout(async () => {
+				const startedAt = Date.now();
+				options.onEvent?.({ type: 'build-start', reason: 'exml-change' });
 				logger.info(`EXML changed: ${path.basename(filename)}, recompiling...`);
 				try {
 					await compileExml().apply(ctx);
 					await copyAssets().apply(ctx);
+					emitDiagnostics(ctx, options);
+					options.onEvent?.({ type: 'build-complete', success: true, durationMs: Date.now() - startedAt });
 				} catch (err) {
+					emitDiagnostics(ctx, options);
+					options.onEvent?.({ type: 'build-complete', success: false, durationMs: Date.now() - startedAt });
 					logger.error(`EXML recompile failed: ${err instanceof Error ? err.message : err}`);
 				}
 			}, 100);
@@ -87,7 +112,7 @@ function watchResources(project: Project, ctx: BuildContext): void {
 /**
  * Serves static files from the project output directory.
  */
-function startHttpServer(project: Project, port: number): http.Server {
+function startHttpServer(project: Project, options: DevServerOptions): http.Server {
 	const server = http.createServer(async (req, res) => {
 		const url = (req.url ?? '/').split('?')[0];
 		const filePath = path.join(project.outputDir, url === '/' ? 'index.html' : url);
@@ -101,11 +126,19 @@ function startHttpServer(project: Project, port: number): http.Server {
 		}
 	});
 
-	server.listen(port, () => {
-		logger.success(`Dev server running at http://localhost:${port}`);
+	server.listen(options.port, () => {
+		const url = `http://localhost:${options.port}`;
+		logger.success(`Dev server running at ${url}`);
 		logger.info('Watching for changes (refresh the browser to reload)...');
+		options.onEvent?.({ type: 'server-ready', url });
 	});
 	return server;
+}
+
+function emitDiagnostics(ctx: BuildContext, options: DevServerOptions): void {
+	for (const diagnostic of ctx.diagnostics.all()) {
+		options.onEvent?.({ type: 'diagnostic', diagnostic });
+	}
 }
 
 const MIME_TYPES: Record<string, string> = {

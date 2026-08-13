@@ -73,12 +73,22 @@ Compile the project into ESM application, engine, namespace, and theme bundles.
 kurot build [options]
 ```
 
-| Option          | Description                                            | Default |
-| --------------- | ------------------------------------------------------ | ------- |
-| `-r, --release` | Minified, content-hashed release build (→ bin-release) | `false` |
-| `--sourcemap`   | Generate sourcemaps                                    | `false` |
-| `--watch`       | Rebuild source on file changes                         | `false` |
-| `--analyze`     | Print bundle size analysis (esbuild metafile)          | `false` |
+| Option                   | Description                                            | Default |
+| ------------------------ | ------------------------------------------------------ | ------- |
+| `-r, --release`          | Minified, content-hashed release build (→ bin-release) | `false` |
+| `--sourcemap`            | Generate sourcemaps                                    | `false` |
+| `--watch`                | Rebuild source on file changes                         | `false` |
+| `--analyze`              | Print bundle size analysis (esbuild metafile)          | `false` |
+| `--strict`               | Promote supported warnings to build errors             | `false` |
+| `--diagnostics <format>` | Diagnostic output: `human` or `json`                   | `human` |
+
+`--diagnostics json` writes exactly one JSON result to stdout. It includes
+`success`, `mode`, `durationMs`, the output directory on success, and all
+structured diagnostics. Release builds use strict diagnostic policy by default.
+
+```bash
+kurot build --strict --diagnostics json
+```
 
 **Output (Egret-aligned shape, ESM under the hood):**
 
@@ -102,10 +112,23 @@ Start a development server with auto-recompilation on file changes (manual brows
 kurot dev [options]
 ```
 
-| Option              | Description         | Default |
-| ------------------- | ------------------- | ------- |
-| `-p, --port <port>` | Port to listen      | `3000`  |
-| `--sourcemap`       | Generate sourcemaps | `false` |
+| Option                   | Description                                | Default |
+| ------------------------ | ------------------------------------------ | ------- |
+| `-p, --port <port>`      | Port to listen                             | `3000`  |
+| `--sourcemap`            | Generate sourcemaps                        | `false` |
+| `--strict`               | Promote supported warnings to build errors | `false` |
+| `--diagnostics <format>` | Diagnostic output: `human` or `jsonl`      | `human` |
+
+Unlike build's single JSON result, `kurot dev --diagnostics jsonl` writes one
+JSON event per line so an agent can follow initial builds, diagnostics,
+rebuilds, and server readiness incrementally.
+
+```bash
+kurot dev --strict --diagnostics jsonl
+```
+
+Machine-readable modes reserve stdout for their JSON protocol and never include
+ANSI color sequences. Failures set a non-zero process exit code.
 
 ### `kurot clean`
 
@@ -197,6 +220,13 @@ The CLI includes a complete EXML skin parsing and code generation pipeline (XML 
 - **Skin Properties** — preserves root properties such as `minWidth`, `minHeight`, and state-specific values
 - **Percent Layout** — auto-detects `width="100%"` and converts to `percentWidth`
 - **Data Binding** — parses `{expression}` binding syntax and generates `Binding.bindProperty` calls
+- **Structured Diagnostics** — stable codes, source locations, suggestions, and strict warning promotion
+
+Unknown tags remain warnings in normal development builds and are omitted from
+the generated visual tree. Under `--strict` (and in release builds), those
+warnings become errors. Syntax errors, invalid theme JSON, and other genuine
+Skin compilation failures always stop the build; the compiler never substitutes
+an empty Skin factory.
 
 The standard declarations `xmlns:eui="http://ns.egret.com/eui"` and
 `xmlns:egret="http://ns.egret.com/egret"` are namespace identifiers. The CLI
