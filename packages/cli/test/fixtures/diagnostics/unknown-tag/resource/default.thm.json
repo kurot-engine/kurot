@@ -1,0 +1,9 @@
+{
+	"skins": {
+		"kurot.ui.Button": "resource/skins/UnknownTagSkin.exml"
+	},
+	"exmls": [
+		"resource/skins/UnknownTagSkin.exml"
+	],
+	"autoGenerateExmlsList": false
+}

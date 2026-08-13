@@ -1,0 +1,9 @@
+{
+	"skins": {
+		"kurot.ui.Button": "resource/skins/MalformedSkin.exml"
+	},
+	"exmls": [
+		"resource/skins/MalformedSkin.exml"
+	],
+	"autoGenerateExmlsList": false
+}

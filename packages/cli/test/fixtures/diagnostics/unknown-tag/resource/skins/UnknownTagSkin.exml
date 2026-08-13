@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.UnknownTagSkin" xmlns:eui="http://ns.egret.com/eui">
+	<eui:Buton id="misspelledButton" label="Dropped"/>
+	<eui:Label id="survivingLabel" text="Still generated"/>
+</eui:Skin>

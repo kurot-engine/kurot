@@ -1,0 +1,9 @@
+{
+	"skins": {
+		"kurot.ui.Button": "resource/skins/ValidSkin.exml"
+	},
+	"exmls": [
+		"resource/skins/ValidSkin.exml"
+	],
+	"autoGenerateExmlsList": false
+}

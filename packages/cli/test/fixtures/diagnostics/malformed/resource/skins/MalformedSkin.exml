@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eui:Skin class="skins.MalformedSkin" xmlns:eui="http://ns.egret.com/eui">
+	<eui:Button id="brokenButton">
+</eui:Skin>
