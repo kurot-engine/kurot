@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { InstructionSet, type Instruction } from '../src/kurot/player/webgl/InstructionSet.js';
+import { InstructionSet, type Instruction } from '../src/kurot/player/InstructionSet.js';
 import type { DisplayObject } from '../src/kurot/display/DisplayObject.js';
 
 function mockObj(id = 1): DisplayObject {

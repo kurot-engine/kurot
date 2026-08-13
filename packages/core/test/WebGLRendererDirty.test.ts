@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
-import { InstructionSet } from '../src/kurot/player/webgl/InstructionSet.js';
+import { InstructionSet } from '../src/kurot/player/InstructionSet.js';
 import { WebGLRenderer } from '../src/kurot/player/webgl/WebGLRenderer.js';
 
 interface TestTransform {

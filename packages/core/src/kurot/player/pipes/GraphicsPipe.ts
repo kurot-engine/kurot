@@ -1,13 +1,13 @@
-import type { Graphics } from '../../../display/Graphics.js';
-import type { DisplayObject } from '../../../display/DisplayObject.js';
-import { Rectangle } from '../../../geom/Rectangle.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { Graphics } from '../../display/Graphics.js';
+import type { DisplayObject } from '../../display/DisplayObject.js';
+import { Rectangle } from '../../geom/Rectangle.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
-import type { CanvasRenderer } from '../../canvas/index.js';
-import { RenderBuffer } from '../../canvas/index.js';
-import type { GL } from '../WebGLUtils.js';
+import type { RenderPipe } from '../RenderPipe.js';
+import type { CanvasRenderer } from '../canvas/index.js';
+import { RenderBuffer } from '../canvas/index.js';
+import type { GL } from '../webgl/WebGLUtils.js';
 
 // Shared scratch rectangle — avoids per-execute allocation.
 const _scratchBounds = new Rectangle();

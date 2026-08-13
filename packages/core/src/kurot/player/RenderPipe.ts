@@ -1,5 +1,5 @@
 import type { DisplayObject } from '../display/DisplayObject.js';
-import type { InstructionSet } from './webgl/InstructionSet.js';
+import type { InstructionSet } from './InstructionSet.js';
 
 /**
  * A RenderPipe handles one category of DisplayObject (Bitmap, Graphics, Mesh…).

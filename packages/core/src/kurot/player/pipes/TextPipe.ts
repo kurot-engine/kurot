@@ -1,12 +1,12 @@
-import type { TextField } from '../../../text/TextField.js';
-import { TextFieldType } from '../../../text/enums/TextFieldType.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { TextField } from '../../text/TextField.js';
+import { TextFieldType } from '../../text/enums/TextFieldType.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
-import type { CanvasRenderer } from '../../canvas/index.js';
-import { RenderBuffer } from '../../canvas/index.js';
-import type { GL } from '../WebGLUtils.js';
+import type { RenderPipe } from '../RenderPipe.js';
+import type { CanvasRenderer } from '../canvas/index.js';
+import { RenderBuffer } from '../canvas/index.js';
+import type { GL } from '../webgl/WebGLUtils.js';
 
 // ── Texture GC registry ───────────────────────────────────────────────────────
 

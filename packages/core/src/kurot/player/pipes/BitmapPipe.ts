@@ -1,8 +1,8 @@
-import type { Bitmap } from '../../../display/Bitmap.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { Bitmap } from '../../display/Bitmap.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
+import type { RenderPipe } from '../RenderPipe.js';
 
 // ── Instruction ───────────────────────────────────────────────────────────────
 
@@ -109,8 +109,8 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 
 	private _drawScale9(
 		bitmap: Bitmap,
-		bd: import('../../../display/texture/BitmapData.js').BitmapData,
-		grid: import('../../../geom/Rectangle.js').Rectangle,
+		bd: import('../../display/texture/BitmapData.js').BitmapData,
+		grid: import('../../geom/Rectangle.js').Rectangle,
 		destW: number,
 		destH: number,
 		buffer: WebGLRenderBuffer,

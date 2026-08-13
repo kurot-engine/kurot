@@ -1,10 +1,10 @@
-import type { DisplayObject } from '../../../display/DisplayObject.js';
-import { Matrix } from '../../../geom/Matrix.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { DisplayObject } from '../../display/DisplayObject.js';
+import { Matrix } from '../../geom/Matrix.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
-import { WebGLRenderBuffer as WGLBuf } from '../WebGLRenderBuffer.js';
+import type { RenderPipe } from '../RenderPipe.js';
+import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
 
 const INSTRUCTION_POOL_LIMIT = 256;
 

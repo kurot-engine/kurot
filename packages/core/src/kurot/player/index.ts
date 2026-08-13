@@ -18,7 +18,7 @@ export {
 } from './SystemTicker.js';
 
 // ── Rendering ─────────────────────────────────────────────────────────────────
-export { InstructionSet, type Instruction } from './webgl/InstructionSet.js';
+export { InstructionSet, type Instruction } from './InstructionSet.js';
 export type { RenderPipe } from './RenderPipe.js';
 export { RenderBuffer, hitTestBuffer, CanvasRenderer, DisplayList } from './canvas/index.js';
 

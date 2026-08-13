@@ -1,4 +1,4 @@
-import type { DisplayObject } from '../../display/DisplayObject.js';
+import type { DisplayObject } from '../display/DisplayObject.js';
 
 /**
  * A single renderable instruction in the instruction set.

@@ -1,11 +1,11 @@
-import type { DisplayObject } from '../../../display/DisplayObject.js';
-import type { Filter } from '../../../filters/Filter.js';
-import { ColorMatrixFilter } from '../../../filters/ColorMatrixFilter.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { DisplayObject } from '../../display/DisplayObject.js';
+import type { Filter } from '../../filters/Filter.js';
+import { ColorMatrixFilter } from '../../filters/ColorMatrixFilter.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
-import { WebGLRenderBuffer as WGLBuf } from '../WebGLRenderBuffer.js';
+import type { RenderPipe } from '../RenderPipe.js';
+import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
 
 // ── Instructions ──────────────────────────────────────────────────────────────
 

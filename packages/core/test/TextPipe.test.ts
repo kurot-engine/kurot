@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { TextPipe } from '../src/kurot/player/webgl/pipes/TextPipe.js';
+import { TextPipe } from '../src/kurot/player/pipes/TextPipe.js';
 import { TextField } from '../src/kurot/text/TextField.js';
 import type { CanvasRenderer } from '../src/kurot/player/canvas/index.js';
 import type { RenderBuffer } from '../src/kurot/player/canvas/index.js';

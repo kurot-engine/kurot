@@ -1,9 +1,9 @@
-import type { Mesh } from '../../../display/Mesh.js';
-import type { DisplayObject } from '../../../display/DisplayObject.js';
-import type { WebGLRenderBuffer } from '../WebGLRenderBuffer.js';
+import type { Mesh } from '../../display/Mesh.js';
+import type { DisplayObject } from '../../display/DisplayObject.js';
+import type { WebGLRenderBuffer } from '../webgl/WebGLRenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
-import type { RenderPipe } from '../../RenderPipe.js';
+import type { RenderPipe } from '../RenderPipe.js';
 
 // ── Instruction ───────────────────────────────────────────────────────────────
 

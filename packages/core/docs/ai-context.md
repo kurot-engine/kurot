@@ -82,7 +82,7 @@ src/kurot/
   end of `WebGLRenderer.render()` looks like dead code but isn't — it resets
   the GL viewport/projection after an in-frame offscreen activation (filter,
   mask, cacheAsBitmap). It's marked "DO NOT delete" in the source for a reason.
-- `RenderPipe.destroyRelable()` (immediate GPU resource release) is **not**
+- `RenderPipe.destroyRenderable()` (immediate GPU resource release) is **not**
   called automatically on removal from stage, because `$onRemoveFromStage`
   also fires for temporary removals (e.g. virtualized lists). `GraphicsPipe`
   and `TextPipe` instead rely on a `FinalizationRegistry` to `gl.deleteTexture()`

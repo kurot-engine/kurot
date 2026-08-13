@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
 import { Filter } from '../src/kurot/filters/Filter.js';
-import { FilterPipe } from '../src/kurot/player/webgl/pipes/FilterPipe.js';
-import { MaskPipe } from '../src/kurot/player/webgl/pipes/MaskPipe.js';
+import { FilterPipe } from '../src/kurot/player/pipes/FilterPipe.js';
+import { MaskPipe } from '../src/kurot/player/pipes/MaskPipe.js';
 
 describe('effect instruction pools', () => {
 	it('clear strong references before pooling filter instructions', () => {

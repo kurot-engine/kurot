@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
 import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
 import { WebGLRenderBuffer as WGLBuf } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
-import { MaskPipe } from '../src/kurot/player/webgl/pipes/MaskPipe.js';
+import { MaskPipe } from '../src/kurot/player/pipes/MaskPipe.js';
 
 afterEach(() => {
 	vi.restoreAllMocks();

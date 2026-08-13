@@ -3,7 +3,7 @@ import { Sprite } from '../src/kurot/display/Sprite.js';
 import { Filter } from '../src/kurot/filters/Filter.js';
 import { Matrix } from '../src/kurot/geom/Matrix.js';
 import { Rectangle } from '../src/kurot/geom/Rectangle.js';
-import { InstructionSet } from '../src/kurot/player/webgl/InstructionSet.js';
+import { InstructionSet } from '../src/kurot/player/InstructionSet.js';
 import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
 import { WebGLRenderer } from '../src/kurot/player/webgl/WebGLRenderer.js';
 

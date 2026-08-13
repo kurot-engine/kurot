@@ -7,8 +7,9 @@ and is **stale in places** — e.g. it says MovieClip registers with the
 ticker internally, but the shipped code has no such registration (matches
 the README's external-scheduler design instead). Treat `plan.md` as
 historical, not descriptive. `docs-internal/game-review.md` is a code
-review; B1 was fixed in 1.0.0, B2/B3 are accepted-as-is design tradeoffs
-still referenced below. Both files are gitignored/local-only — don't
+review; B1 was fixed in 1.0.0, B3 is an accepted-as-is design tradeoff
+still referenced below (B2 is not referenced in this file — see the
+review if present in your checkout). Both files are gitignored/local-only — don't
 assume they exist in every checkout.
 
 Package identity: `@kurot/game@1.0.6`. Peer-depends on `@kurot/core`.
