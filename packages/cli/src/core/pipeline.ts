@@ -1,4 +1,6 @@
 import { logger } from '../utils/logger.js';
+import { DiagnosticCollector } from './diagnostics/index.js';
+import { BuildError } from './errors.js';
 import type { Project } from './project.js';
 
 /**
@@ -13,6 +15,14 @@ export interface BuildContext {
 	readonly sourcemap: boolean;
 	readonly analyze: boolean;
 	readonly watch: boolean;
+	/**
+	 * Whether strict policy promotes selected warnings to errors.
+	 */
+	readonly strict: boolean;
+	/**
+	 * Diagnostics reported by build plugins.
+	 */
+	readonly diagnostics: DiagnosticCollector;
 	/**
 	 * Artifacts produced during the build, populated incrementally by plugins.
 	 */
@@ -65,13 +75,16 @@ export interface BuildPlugin {
  */
 export function createContext(
 	project: Project,
-	options: { sourcemap?: boolean; analyze?: boolean; watch?: boolean } = {},
+	options: { sourcemap?: boolean; analyze?: boolean; watch?: boolean; strict?: boolean } = {},
 ): BuildContext {
+	const strict = options.strict ?? false;
 	return {
 		project,
 		sourcemap: options.sourcemap ?? false,
 		analyze: options.analyze ?? false,
 		watch: options.watch ?? false,
+		strict,
+		diagnostics: new DiagnosticCollector({ strict }),
 		outputs: { engine: {}, namespaceModules: new Map() },
 		disposers: [],
 	};
@@ -80,10 +93,14 @@ export function createContext(
 /**
  * Runs plugins in order, logging each step.
  */
-export async function runPipeline(ctx: BuildContext, plugins: BuildPlugin[]): Promise<void> {
+export async function runPipeline(ctx: BuildContext, plugins: readonly BuildPlugin[]): Promise<void> {
 	for (const plugin of plugins) {
 		logger.step(plugin.name);
 		await plugin.apply(ctx);
+		if (ctx.diagnostics.hasErrors()) {
+			const count = ctx.diagnostics.all().filter(diagnostic => diagnostic.severity === 'error').length;
+			throw new BuildError(`Build stopped after '${plugin.name}' with ${count} error diagnostic(s).`);
+		}
 	}
 }
 
