@@ -34,10 +34,14 @@ pnpm --dir agent-evals test
 
 ## Initial scope
 
-The first milestone establishes ten fixed tasks: project creation, text,
-images, buttons, dragging, Tween, WASD movement, HUD, pause, and enemy follow.
-Every task must eventually have a machine-executable acceptance contract before
-it counts toward the baseline.
+The first milestone is intentionally limited to SLOT and Crash Game clients.
+Its ten tasks cover a static SLOT layout, spin flow, reel stop order, win
+presentation, quick stop, next-spin cleanup, a static Crash layout, round flow,
+cash-out presentation, and snapshot recovery. Backend behavior is represented
+by deterministic fixtures and replay adapters, never by a production service.
+
+Every task must have a machine-executable acceptance contract before it counts
+toward the baseline.
 
 No runner is claimed as implemented yet. The current foundation only defines
 the stable evaluation records and directory ownership needed to build one.
