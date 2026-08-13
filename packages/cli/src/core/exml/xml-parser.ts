@@ -16,11 +16,23 @@
 
 // ── Public types ─────────────────────────────────────────────────────
 
+/**
+ * Half-open offsets covering a parsed XML node or attribute.
+ */
+export interface SourceRange {
+	readonly start: number;
+	readonly end: number;
+}
+
 export interface XNode {
 	/**
 	 * Node type.
 	 */
 	readonly type: 'element' | 'text';
+	/**
+	 * Half-open source range containing the complete node syntax.
+	 */
+	readonly range: SourceRange;
 }
 
 export interface XText extends XNode {
@@ -40,6 +52,10 @@ export interface XAttribute {
 	 * Attribute value (unescaped).
 	 */
 	readonly value: string;
+	/**
+	 * Half-open source range containing the complete attribute assignment.
+	 */
+	readonly range: SourceRange;
 }
 
 export interface XElement extends XNode {
@@ -131,7 +147,7 @@ class _Parser {
 
 				// CDATA
 				if (this.src.startsWith('<![CDATA[', this.pos)) {
-					nodes.push({ type: 'text', text: this.readCDATA() } as XText);
+					nodes.push(this.readCDATA());
 					continue;
 				}
 
@@ -179,7 +195,7 @@ class _Parser {
 			// Self-closing />
 			if (this.src.startsWith('/>', this.pos)) {
 				this.pos += 2;
-				return { type: 'element', name: tagName, attributes: attrs, children: [] };
+				return { type: 'element', name: tagName, attributes: attrs, children: [], range: { start, end: this.pos } };
 			}
 
 			// Open tag end >
@@ -191,8 +207,13 @@ class _Parser {
 			// Attribute
 			const am = this.src.slice(this.pos).match(RX_ATTR);
 			if (am) {
-				attrs.push({ name: am[1], value: am[2] ?? am[3] });
+				const attributeStart = this.pos;
 				this.pos += am[0].length;
+				attrs.push({
+					name: am[1],
+					value: am[2] ?? am[3],
+					range: { start: attributeStart, end: this.pos },
+				});
 			} else {
 				// Unexpected character — skip
 				this.pos++;
@@ -213,32 +234,33 @@ class _Parser {
 			throw new Error(`EXML: missing closing tag </${tagName}>`);
 		}
 
-		return { type: 'element', name: tagName, attributes: attrs, children };
+		return { type: 'element', name: tagName, attributes: attrs, children, range: { start, end: this.pos } };
 	}
 
 	// ── Text ──────────────────────────────────────────────────────────
 
 	private readText(): XText {
+		const start = this.pos;
 		let text = '';
 		while (this.pos < this.src.length && this.src[this.pos] !== '<') {
 			text += this.src[this.pos++];
 		}
-		return { type: 'text', text: unescapeXML(text) };
+		return { type: 'text', text: unescapeXML(text), range: { start, end: this.pos } };
 	}
 
 	// ── CDATA ─────────────────────────────────────────────────────────
 
-	private readCDATA(): string {
+	private readCDATA(): XText {
 		const start = this.pos;
 		this.pos += 9; // skip '<![CDATA['
 		const end = this.src.indexOf(']]>', this.pos);
 		if (end === -1) {
 			this.pos = this.src.length;
-			return this.src.slice(start);
+			return { type: 'text', text: this.src.slice(start), range: { start, end: this.pos } };
 		}
 		const content = this.src.slice(this.pos, end);
 		this.pos = end + 3;
-		return content;
+		return { type: 'text', text: content, range: { start, end: this.pos } };
 	}
 
 	// ── Skip helpers ──────────────────────────────────────────────────

@@ -17,7 +17,9 @@
 
 // ── XML Parser ───────────────────────────────────────────────────────
 export { parseXML, filterElements, getTextContent } from './xml-parser.js';
-export type { XNode, XText, XAttribute, XElement } from './xml-parser.js';
+export type { SourceRange, XNode, XText, XAttribute, XElement } from './xml-parser.js';
+export { SourceLocator, createSourceLocator } from './source-location.js';
+export type { SourcePosition } from './source-location.js';
 
 // ── AST / IR types ───────────────────────────────────────────────────
 export type {

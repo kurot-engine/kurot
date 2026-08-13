@@ -9,6 +9,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseXML, filterElements, getTextContent } from '../src/core/exml/xml-parser.js';
+import { createSourceLocator } from '../src/core/exml/source-location.js';
 import {
 	lookupComponent,
 	resolveModule,
@@ -29,7 +30,7 @@ describe('parseXML', () => {
 	it('parses a simple element', () => {
 		const el = parseXML('<eui:Skin class="TestSkin"/>');
 		expect(el.name).toBe('eui:Skin');
-		expect(el.attributes[0]).toEqual({ name: 'class', value: 'TestSkin' });
+		expect(el.attributes[0]).toMatchObject({ name: 'class', value: 'TestSkin' });
 	});
 
 	it('parses nested elements', () => {
@@ -38,7 +39,7 @@ describe('parseXML', () => {
 		const children = filterElements(el.children);
 		expect(children).toHaveLength(1);
 		expect(children[0].name).toBe('eui:Button');
-		expect(children[0].attributes[0]).toEqual({ name: 'label', value: 'OK' });
+		expect(children[0].attributes[0]).toMatchObject({ name: 'label', value: 'OK' });
 	});
 
 	it('parses text content', () => {
@@ -77,6 +78,65 @@ describe('parseXML', () => {
 
 	it('rejects a missing closing tag', () => {
 		expect(() => parseXML('<eui:Skin><eui:Button/>')).toThrow('missing closing tag </eui:Skin>');
+	});
+
+	it('tracks complete ranges for nested and self-closing elements', () => {
+		const source = '<eui:Skin>\n\t<eui:Button label="OK"/>\n</eui:Skin>';
+		const root = parseXML(source);
+		const button = filterElements(root.children)[0];
+
+		expect(root.range).toEqual({ start: 0, end: source.length });
+		expect(source.slice(button.range.start, button.range.end)).toBe('<eui:Button label="OK"/>');
+	});
+
+	it('tracks complete attribute ranges', () => {
+		const source = '<eui:Button id="btn" label=\'Click\'/>';
+		const button = parseXML(source);
+
+		expect(button.attributes.map(attribute => source.slice(attribute.range.start, attribute.range.end))).toEqual([
+			'id="btn"',
+			"label='Click'",
+		]);
+	});
+
+	it('tracks ranges for text and CDATA nodes', () => {
+		const source = '<root>Hello<![CDATA[<world>]]></root>';
+		const root = parseXML(source);
+		const [text, cdata] = root.children;
+
+		expect(source.slice(text.range.start, text.range.end)).toBe('Hello');
+		expect(source.slice(cdata.range.start, cdata.range.end)).toBe('<![CDATA[<world>]]>');
+	});
+});
+
+describe('SourceLocator', () => {
+	it('maps LF offsets to one-based lines and columns', () => {
+		const source = 'first\nsecond\nthird';
+		const locator = createSourceLocator(source);
+
+		expect(locator.locate(source.indexOf('second'))).toEqual({ line: 2, column: 1, offset: 6 });
+		expect(locator.locate(source.indexOf('third') + 2)).toEqual({ line: 3, column: 3, offset: 15 });
+	});
+
+	it('maps CRLF offsets without shifting the next line', () => {
+		const source = 'first\r\nsecond';
+		const locator = createSourceLocator(source);
+
+		expect(locator.locate(source.indexOf('second'))).toEqual({ line: 2, column: 1, offset: 7 });
+	});
+
+	it('counts columns in UTF-16 code units', () => {
+		const source = '😀x';
+		const locator = createSourceLocator(source);
+
+		expect(locator.locate(source.indexOf('x'))).toEqual({ line: 1, column: 3, offset: 2 });
+	});
+
+	it('rejects offsets outside the source', () => {
+		const locator = createSourceLocator('abc');
+
+		expect(() => locator.locate(-1)).toThrow(RangeError);
+		expect(() => locator.locate(4)).toThrow(RangeError);
 	});
 });
 
