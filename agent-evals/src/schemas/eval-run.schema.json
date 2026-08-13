@@ -1,0 +1,43 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://kurot.dev/schemas/agent-evals/eval-run-v1.schema.json",
+	"title": "Kurot Agent Eval Run",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["schemaVersion", "taskId", "model", "kurotRevision", "startedAt", "metrics"],
+	"properties": {
+		"schemaVersion": { "const": "1" },
+		"taskId": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$" },
+		"model": { "type": "string", "minLength": 1 },
+		"kurotRevision": { "type": "string", "minLength": 1 },
+		"startedAt": { "type": "string", "format": "date-time" },
+		"metrics": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"firstBuildSucceeded",
+				"firstRunSucceeded",
+				"behaviorAccepted",
+				"visualAccepted",
+				"repairRounds",
+				"tokenCount",
+				"durationMs",
+				"inventedApiCount",
+				"internalApiUseCount",
+				"foreignConventionCount"
+			],
+			"properties": {
+				"firstBuildSucceeded": { "type": "boolean" },
+				"firstRunSucceeded": { "type": "boolean" },
+				"behaviorAccepted": { "type": "boolean" },
+				"visualAccepted": { "type": "boolean" },
+				"repairRounds": { "type": "integer", "minimum": 0 },
+				"tokenCount": { "type": "integer", "minimum": 0 },
+				"durationMs": { "type": "integer", "minimum": 0 },
+				"inventedApiCount": { "type": "integer", "minimum": 0 },
+				"internalApiUseCount": { "type": "integer", "minimum": 0 },
+				"foreignConventionCount": { "type": "integer", "minimum": 0 }
+			}
+		}
+	}
+}

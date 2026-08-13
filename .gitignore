@@ -11,6 +11,10 @@ bin-release/
 coverage/
 *.tsbuildinfo
 
+# Generated Agent Eval results (keep the directory documentation)
+agent-evals/reports/*
+!agent-evals/reports/README.md
+
 # Logs
 *.log
 npm-debug.log*

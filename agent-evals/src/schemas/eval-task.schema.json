@@ -1,0 +1,31 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://kurot.dev/schemas/agent-evals/eval-task-v1.schema.json",
+	"title": "Kurot Agent Eval Task",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["schemaVersion", "id", "category", "title", "prompt", "acceptance"],
+	"properties": {
+		"schemaVersion": { "const": "1" },
+		"id": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$" },
+		"category": {
+			"enum": ["basic", "interaction", "ui", "gameplay", "debugging"]
+		},
+		"title": { "type": "string", "minLength": 1 },
+		"prompt": { "type": "string", "minLength": 1 },
+		"acceptance": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "kind", "description"],
+				"properties": {
+					"id": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+					"kind": { "enum": ["command", "file", "diagnostic", "behavior", "visual"] },
+					"description": { "type": "string", "minLength": 1 }
+				}
+			}
+		}
+	}
+}
