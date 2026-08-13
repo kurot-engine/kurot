@@ -4,6 +4,30 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.13] — 2026-08-13
+
+This release prepares the render pipeline for future backend swapping (e.g. WebGPU) **without changing any rendered output**. The execution layer is decoupled from concrete WebGL types behind two backend-neutral interfaces, so the leaf render pipes no longer import anything under `webgl/`. Behavior is identical to 1.0.12; the changes are purely structural.
+
+### Changed
+
+- **Flattened render-pipe layout** — moved `InstructionSet` and all render pipes (`Bitmap`/`Filter`/`Graphics`/`Mask`/`Mesh`/`Particle`/`Text`) out of `player/webgl/` into `player/` and `player/pipes/`, so GPU-neutral code no longer lives under the WebGL-specific tree. Import paths updated across the renderer, pipes, and tests.
+- **`RenderContext` interface** — extracted the contract between pipes and a GPU backend into `player/RenderContext.ts`. `WebGLRenderContext` now `implements RenderContext`; its method bodies are untouched. Texture/offscreen handles are exposed as opaque aliases `TextureHandle` and `OffscreenBufferHandle` (both `= unknown`) rather than leaking `WebGLTexture`/`WebGLRenderBuffer`.
+- **Backend-managed texture GC** — `GraphicsPipe`/`TextPipe` no longer hold a raw GL reference to delete textures later. Texture lifecycle is delegated to the context via `registerTextureForGC`/`unregisterTextureGC`/`deleteTexture`, so pipes never need to know which backend created a texture.
+- **`RenderBuffer` interface** — extracted `player/RenderBuffer.ts` as the second coupling point (the buffer state leaf pipes read/write). `WebGLRenderBuffer implements RenderBuffer`; leaf-pipe `execute()` signatures now take `RenderBuffer` instead of `WebGLRenderBuffer`. The interface narrows only what pipes actually use (`context`/`globalAlpha`/`globalMatrix`/`offsetX`/`offsetY`/`saveTransform`/`restoreTransform`); WebGL-specific members stay on the concrete class.
+
+### Removed (breaking)
+
+- **`RenderBuffer` class renamed to `CanvasBuffer`** — the public Canvas 2D offscreen-buffer class (`player/canvas/RenderBuffer.ts`) was renamed `CanvasBuffer` to free the `RenderBuffer` name for the new backend-neutral interface. Re-exported from `@kurot/core`; downstream `@kurot/*` packages had no references, but external `import { RenderBuffer } from '@kurot/core'` will need updating.
+- **`DisplayList.renderBuffer` → `DisplayList.canvasBuffer`** — the public field (type `CanvasBuffer`) was renamed to match its type. Likewise `renderBuffer` fields on `GraphicsPipe`/`TextPipe` cache entries.
+
+### Docs
+
+- Consolidated per-package Egret comparisons into a single `docs/egret-migration.md`.
+- Refreshed `ai-context.md` (core/ui/game): removed stale staleness notes, fixed the `destroyRenderable` typo, corrected directory/line/test counts.
+- Refined `pixi-alignment.md` roadmap: clarified dynamic texture-slot sizing, Shader Bits composition, KTX2 status, and WebGPU timing guidance.
+
+---
+
 ## [1.0.12] — 2026-08-12
 
 This release simplifies renderer initialization before the engine enters feature development. `Player` now attempts WebGL directly on the application canvas instead of creating a second temporary WebGL context solely for capability detection.

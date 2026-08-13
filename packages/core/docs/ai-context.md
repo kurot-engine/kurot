@@ -28,13 +28,15 @@ src/kurot/
 │                   texture/ (BitmapData, Texture, RenderTexture, SpriteSheet).
 │                   Defines the retained tree the renderer reads from; does not render itself.
 ├── player/         Game loop + both render backends. Player, createPlayer(), SystemTicker/
-│                   ticker singleton, ScreenAdapter, TouchHandler, RenderPipe interface.
+│                   ticker singleton, ScreenAdapter, TouchHandler. Backend-neutral abstractions
+│                   live here: RenderPipe / RenderContext / RenderBuffer interfaces (internal,
+│                   not re-exported), InstructionSet, and pipes/ (Bitmap/Graphics/Mesh/Text/
+│                   Filter/Mask/Particle) — all GPU-agnostic, consumed by both backends.
 │   ├── webgl/      WebGLRenderer, WebGLRenderContext, WebGLRenderBuffer/Target,
 │   │               WebGLVertexArrayObject, WebGLDrawCmdManager, MultiTextureBatcher,
-│   │               InstructionSet, pipes/ (Bitmap/Graphics/Mesh/Text/Filter/Mask/Particle),
-│   │               shaders/ (ShaderLib GLSL 1.00, ShaderLib2 GLSL 3.00).
+│   │               shaders/ (ShaderLib GLSL 1.00, ShaderLib2 GLSL 3.00). The WebGL-only execute path.
 │   └── canvas/     CanvasRenderer (fallback AND a dependency of the WebGL path — see §2),
-│                   DisplayList (offscreen cache backing cacheAsBitmap), RenderBuffer.
+│                   DisplayList (offscreen cache backing cacheAsBitmap), CanvasBuffer.
 ├── events/         Event, EventDispatcher (capture/bubble, once()), EventPhase,
 │                   8 concrete subclasses (TouchEvent, TimerEvent, ProgressEvent, etc.).
 ├── geom/           Matrix, Point, Rectangle + shared*/create()/release() object pools.
@@ -133,7 +135,8 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **Net**: `HttpMethod`, `HttpResponseType`, `HttpRequest`/`HttpRequestEvents`, `ImageLoader`/`ImageLoaderEvents`.
 - **Filters**: `Filter`, `BlurFilter`, `ColorMatrixFilter`, `GlowFilter`, `DropShadowFilter`, `CustomFilter`.
 - **Media**: `Sound`/`SoundType`/`SoundEvents`, `SoundChannel`, `Video`.
-- **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`; rendering: `InstructionSet`/`Instruction`, `RenderPipe`, `RenderBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
+- **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`; rendering: `InstructionSet`/`Instruction`, `RenderPipe`, `CanvasBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
+  - _(Internal, not re-exported)_ `RenderContext` / `RenderBuffer` interfaces (`player/RenderContext.ts`, `player/RenderBuffer.ts`): the backend-neutral contracts leaf pipes depend on; `WebGLRenderContext`/`WebGLRenderBuffer` implement them. See `docs-internal/renderer-backend-decoupling.md`.
 - **Text**: `HorizontalAlign`, `VerticalAlign`, `TextFieldType`, `TextFieldInputType`, `HtmlTextParser`, `BitmapFont`, `BitmapText`, `measureText`/`getFontString`, `TextField`, `StageText`, `InputController`, `tokenize`/`splitGraphemes`.
 - **System**: `Capabilities`.
 - **localStorage**: namespace object — `import { localStorage } from '@kurot/core'`, then `localStorage.getItem(...)`.

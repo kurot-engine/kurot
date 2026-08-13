@@ -51,7 +51,7 @@ packages/core/src/kurot/
 │   ├── canvas/                       # Canvas 2D 渲染后端（降级方案）
 │   │   ├── CanvasRenderer.ts         # 直接遍历渲染器（支持全部 DisplayObject 类型 + 滤镜降级）
 │   │   ├── DisplayList.ts            # cacheAsBitmap 离屏缓存
-│   │   └── RenderBuffer.ts           # Canvas 2D 缓冲区（含 hitTestBuffer 像素级命中测试）
+│   │   └── CanvasBuffer.ts          # Canvas 2D 缓冲区（含 hitTestBuffer 像素级命中测试）
 │   └── webgl/                        # WebGL 渲染后端（主渲染器）
 │       ├── WebGLRenderer.ts          # 两阶段渲染器（build + execute，含 RenderGroup/DisplayListCache 支持）
 │       ├── WebGLRenderContext.ts      # WebGL 状态管理 + draw 调度（WebGL1/2 自动选择，含 blurFboPool 对象池）
