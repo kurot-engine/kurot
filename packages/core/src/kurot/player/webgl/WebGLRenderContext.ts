@@ -14,6 +14,7 @@ import { SYM_GL_CONTEXT, SYM_PREMULTIPLIED, SYM_DEFAULT_EMPTY, SYM_SMOOTHING } f
 import type { GL } from './WebGLUtils.js';
 import type { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
+import type { RenderContext } from '../RenderContext.js';
 
 interface BlurFramebufferEntry {
 	texture: WebGLTexture;
@@ -24,7 +25,17 @@ interface BlurFramebufferEntry {
 const BLUR_FRAMEBUFFER_POOL_LIMIT = 16;
 const BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT = 64 * 1024 * 1024;
 
-export class WebGLRenderContext {
+/**
+ * Backing store for `registerTextureForGC`/`unregisterTextureGC`. Shared at
+ * module scope (mirroring the pattern each pipe used to keep its own
+ * registry) since the cleanup callback only needs the `gl`/`texture` pair
+ * captured at registration time, not any WebGLRenderContext instance state.
+ */
+const _gcRegistry = new FinalizationRegistry<{ gl: GL; texture: WebGLTexture }>(({ gl, texture }) => {
+	gl.deleteTexture(texture);
+});
+
+export class WebGLRenderContext implements RenderContext {
 	// ── Public readonly fields ────────────────────────────────────────────────
 
 	public readonly gl: GL;
@@ -290,6 +301,26 @@ export class WebGLRenderContext {
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+	}
+
+	/**
+	 * Registers `texture` for reclamation once `owner` is garbage-collected,
+	 * against `token` (an opaque object the caller keeps around so a later
+	 * `unregisterTextureGC(token)` call can cancel this specific registration
+	 * before it fires — e.g. when `owner`'s cached texture is replaced).
+	 * Backend-agnostic replacement for a pipe holding onto a raw `gl` handle
+	 * itself just to call `gl.deleteTexture()` later.
+	 */
+	public registerTextureForGC(owner: object, texture: WebGLTexture, token: object): void {
+		_gcRegistry.register(owner, { gl: this.gl, texture }, token);
+	}
+
+	public unregisterTextureGC(token: object): void {
+		_gcRegistry.unregister(token);
+	}
+
+	public deleteTexture(texture: WebGLTexture): void {
+		this.gl.deleteTexture(texture);
 	}
 
 	public getWebGLTexture(bitmapData: BitmapData): WebGLTexture | undefined {
@@ -682,9 +713,7 @@ export class WebGLRenderContext {
 			this._blurFboPoolSize >= BLUR_FRAMEBUFFER_POOL_LIMIT ||
 			this._blurFboPoolBytes + entry.byteSize > BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT
 		) {
-			const oldest = this._blurFboPool.entries().next().value as
-				| [string, BlurFramebufferEntry[]]
-				| undefined;
+			const oldest = this._blurFboPool.entries().next().value as [string, BlurFramebufferEntry[]] | undefined;
 			if (!oldest) break;
 
 			const [oldestKey, entries] = oldest;

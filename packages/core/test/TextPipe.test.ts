@@ -9,8 +9,8 @@ function mockTexture(): WebGLTexture {
 	return {} as WebGLTexture;
 }
 
-function mockGl(): { deleteTexture: ReturnType<typeof vi.fn> } {
-	return { deleteTexture: vi.fn() };
+function mockContext(): { deleteTexture: ReturnType<typeof vi.fn>; unregisterTextureGC: ReturnType<typeof vi.fn> } {
+	return { deleteTexture: vi.fn(), unregisterTextureGC: vi.fn() };
 }
 
 // Reach into TextPipe's private cache/token maps directly. There is no public
@@ -20,9 +20,10 @@ function mockGl(): { deleteTexture: ReturnType<typeof vi.fn> } {
 interface TextPipeInternals {
 	_cache: WeakMap<TextField, { texture: WebGLTexture | undefined; renderBuffer: RenderBuffer }>;
 	_registryTokens: WeakMap<TextField, object>;
-	// Untyped on purpose: real code assigns a `GL` instance, tests assign a
-	// vi.fn()-based mock. Both only need to support `.deleteTexture(texture)`.
-	_gl: unknown;
+	// Untyped on purpose: real code assigns a `RenderContext` instance, tests
+	// assign a vi.fn()-based mock. Both only need to support
+	// `.deleteTexture(texture)` / `.unregisterTextureGC(token)`.
+	_context: unknown;
 }
 
 function internals(pipe: TextPipe): TextPipeInternals {
@@ -41,16 +42,17 @@ describe('TextPipe', () => {
 		const pipe = new TextPipe({} as CanvasRenderer);
 		const tf = new TextField();
 		const texture = mockTexture();
-		const gl = mockGl();
+		const context = mockContext();
 
-		internals(pipe)._gl = gl;
+		internals(pipe)._context = context;
 		seedCache(pipe, tf, texture);
 		const token = {};
 		internals(pipe)._registryTokens.set(tf, token);
 
 		pipe.destroyRenderable(tf);
 
-		expect(gl.deleteTexture).toHaveBeenCalledWith(texture);
+		expect(context.deleteTexture).toHaveBeenCalledWith(texture);
+		expect(context.unregisterTextureGC).toHaveBeenCalledWith(token);
 		expect(internals(pipe)._registryTokens.get(tf)).toBeUndefined();
 	});
 
@@ -58,7 +60,7 @@ describe('TextPipe', () => {
 		const pipe = new TextPipe({} as CanvasRenderer);
 		const tf = new TextField();
 		seedCache(pipe, tf, mockTexture());
-		internals(pipe)._gl = mockGl();
+		internals(pipe)._context = mockContext();
 
 		pipe.destroyRenderable(tf);
 
@@ -69,28 +71,28 @@ describe('TextPipe', () => {
 	it('destroyRenderable on a TextField with no cache entry is a no-op', () => {
 		const pipe = new TextPipe({} as CanvasRenderer);
 		const tf = new TextField();
-		const gl = mockGl();
-		internals(pipe)._gl = gl;
+		const context = mockContext();
+		internals(pipe)._context = context;
 
 		expect(() => pipe.destroyRenderable(tf)).not.toThrow();
-		expect(gl.deleteTexture).not.toHaveBeenCalled();
+		expect(context.deleteTexture).not.toHaveBeenCalled();
 	});
 
 	it('destroyRenderable on a cache entry with no texture yet does not call deleteTexture', () => {
 		const pipe = new TextPipe({} as CanvasRenderer);
 		const tf = new TextField();
-		const gl = mockGl();
-		internals(pipe)._gl = gl;
+		const context = mockContext();
+		internals(pipe)._context = context;
 		seedCache(pipe, tf, undefined);
 
 		pipe.destroyRenderable(tf);
 
-		expect(gl.deleteTexture).not.toHaveBeenCalled();
+		expect(context.deleteTexture).not.toHaveBeenCalled();
 	});
 
-	it('destroyRenderable without a cached GL context does not throw', () => {
-		// execute() hasn't run yet, so _gl is still undefined — destroyRenderable
-		// must not crash trying to call deleteTexture on it.
+	it('destroyRenderable without a cached render context does not throw', () => {
+		// execute() hasn't run yet, so _context is still undefined —
+		// destroyRenderable must not crash trying to call deleteTexture on it.
 		const pipe = new TextPipe({} as CanvasRenderer);
 		const tf = new TextField();
 		seedCache(pipe, tf, mockTexture());
