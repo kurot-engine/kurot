@@ -5,7 +5,17 @@
  * converts SkinIR → JS source code.
  */
 
+import type { SourceRange } from './xml-parser.js';
+
 // ── Value types ──────────────────────────────────────────────────────
+
+/**
+ * Component tag that could not be resolved while parsing a skin.
+ */
+export interface UnresolvedTag {
+	readonly name: string;
+	readonly range: SourceRange;
+}
 
 /**
  * A literal value (string, number, boolean, null).
@@ -267,5 +277,5 @@ export interface SkinIR {
 	 * namespace (see `NamespaceModule`). These are silently dropped from the
 	 * generated skin, so callers should surface them as build warnings.
 	 */
-	readonly unresolvedTags: string[];
+	readonly unresolvedTags: UnresolvedTag[];
 }

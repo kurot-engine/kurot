@@ -3,7 +3,8 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createContext } from '../src/core/pipeline.js';
+import { createContext, runPipeline } from '../src/core/pipeline.js';
+import { DIAGNOSTIC_CODES } from '../src/core/diagnostics/index.js';
 import { compileExml } from '../src/core/plugins/compile-exml.js';
 import type { BuildMode, Project } from '../src/core/project.js';
 import { logger } from '../src/utils/logger.js';
@@ -48,14 +49,38 @@ describe('compile EXML behavior baseline', () => {
 		await compileExml().apply(ctx);
 
 		expect(warning).toHaveBeenCalledWith(
-			'skins/UnknownTagSkin.exml: unresolved tag(s) dropped from skin: eui:Buton',
+			'skins/UnknownTagSkin.exml: Unknown EXML tag "eui:Buton" was dropped from the generated skin.',
 		);
+		expect(ctx.diagnostics.all()).toEqual([
+			{
+				code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+				severity: 'warning',
+				message: 'Unknown EXML tag "eui:Buton" was dropped from the generated skin.',
+				location: {
+					file: 'skins/UnknownTagSkin.exml',
+					line: 3,
+					column: 2,
+					offset: 116,
+				},
+				suggestions: ['Did you mean "eui:Button"?'],
+			},
+		]);
 		const scriptPath = path.join(outputDir, ctx.outputs.skinsScript ?? 'missing');
 		const script = await fs.readFile(scriptPath, 'utf-8');
 		expect(script).not.toContain('Buton');
 		expect(script).not.toContain('misspelledButton');
 		expect(script).toContain('new Label()');
 		expect(script).toContain('survivingLabel.text = "Still generated"');
+	});
+
+	it('stops the pipeline when strict mode promotes an unknown tag diagnostic', async () => {
+		vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+		const { ctx } = await createFixtureContext('unknown-tag', 'development', true);
+
+		await expect(runPipeline(ctx, [compileExml()])).rejects.toThrow(
+			"Build stopped after 'compile EXML' with 1 error diagnostic(s).",
+		);
+		expect(ctx.diagnostics.all()[0]?.severity).toBe('error');
 	});
 
 	it('emits an empty skin factory after a development parse failure', async () => {
@@ -98,6 +123,7 @@ describe('compile EXML behavior baseline', () => {
 async function createFixtureContext(
 	fixtureName: string,
 	mode: BuildMode,
+	strict = false,
 ): Promise<{ ctx: ReturnType<typeof createContext>; outputDir: string }> {
 	const root = path.join(fixturesDir, fixtureName);
 	const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), `kurot-cli-${fixtureName}-`));
@@ -129,5 +155,5 @@ async function createFixtureContext(
 		customNamespaces: [],
 	};
 
-	return { ctx: createContext(project), outputDir };
+	return { ctx: createContext(project, { strict }), outputDir };
 }

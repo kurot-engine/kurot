@@ -4,7 +4,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { ensureDir, writeFile } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
-import { parseToIR, generateCode } from '../exml/index.js';
+import { generateCode, parseToIR } from '../exml/index.js';
+import { createUnresolvedTagDiagnostics } from '../exml/exml-diagnostics.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
 
@@ -112,7 +113,7 @@ async function buildSkinsModule(ctx: BuildContext, skins: CompiledSkin[]): Promi
 		const indexLines: string[] = [];
 		await Promise.all(
 			skins.map(async (skin, i) => {
-				const code = generateSkinModule(skin, customNamespaces, isRelease);
+				const code = generateSkinModule(ctx, skin, customNamespaces, isRelease);
 				await fs.writeFile(path.join(stubDir, `skin${i}.ts`), code);
 				const funcName = factoryName(skin.className);
 				indexLines.push(
@@ -150,15 +151,17 @@ async function buildSkinsModule(ctx: BuildContext, skins: CompiledSkin[]): Promi
  * Generates an ESM skin factory, returning a stub on parse failure.
  */
 function generateSkinModule(
+	ctx: BuildContext,
 	skin: CompiledSkin,
 	customNamespaces: readonly { prefix: string; specifier: string }[],
 	strict: boolean,
 ): string {
 	try {
 		const ir = parseToIR(skin.file.contents, skin.className, customNamespaces);
-		if (ir.unresolvedTags.length > 0) {
-			const tags = [...new Set(ir.unresolvedTags)].join(', ');
-			logger.warn(`${skin.file.relPath}: unresolved tag(s) dropped from skin: ${tags}`);
+		const diagnostics = createUnresolvedTagDiagnostics(skin.file.relPath, skin.file.contents, ir.unresolvedTags);
+		for (const diagnostic of diagnostics) {
+			ctx.diagnostics.report(diagnostic);
+			logger.warn(`${diagnostic.location?.file}: ${diagnostic.message}`);
 		}
 		return generateCode(ir, { format: 'esm' });
 	} catch (err) {

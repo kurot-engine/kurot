@@ -19,6 +19,7 @@ import type {
 	StateOverride,
 	StateAddItems,
 	StateSetProperty,
+	UnresolvedTag,
 } from './ast.js';
 
 // ── Public API ───────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ class ParseContext {
 	/**
 	 * Tag names that could not be resolved to a component or namespace.
 	 */
-	unresolvedTags: string[] = [];
+	unresolvedTags: UnresolvedTag[] = [];
 	/**
 	 * Counter for generating unique variable names.
 	 */
@@ -281,7 +282,7 @@ class ParseContext {
 		if (!info) {
 			// Unknown component — dropped from the generated skin; the caller
 			// (see `unresolvedTags`) is responsible for surfacing this as a warning.
-			this.unresolvedTags.push(el.name);
+			this.unresolvedTags.push({ name: el.name, range: el.range });
 			return null;
 		}
 

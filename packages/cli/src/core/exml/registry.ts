@@ -203,6 +203,28 @@ export function localName(tagName: string): string {
 }
 
 /**
+ * Suggests the closest registered component tag for a misspelled built-in tag.
+ *
+ * @param tagName - Full tag name that could not be resolved
+ * @returns A close registered tag, or `undefined` when no candidate is reliable
+ */
+export function suggestComponentTag(tagName: string): string | undefined {
+	const separator = tagName.indexOf(':');
+	const prefix = separator >= 0 ? tagName.slice(0, separator) : '';
+	const expectedModule = prefix ? NAMESPACE_MODULES[prefix] : undefined;
+	if (prefix && !expectedModule) return undefined;
+
+	const requestedName = localName(tagName);
+	const candidates = Object.entries(COMPONENTS)
+		.filter(([, info]) => !expectedModule || info.module === expectedModule)
+		.map(([name]) => ({ name, distance: editDistance(requestedName, name) }))
+		.sort((a, b) => a.distance - b.distance || a.name.localeCompare(b.name));
+	const candidate = candidates[0];
+	if (!candidate || candidate.distance > suggestionThreshold(requestedName.length)) return undefined;
+	return prefix ? `${prefix}:${candidate.name}` : candidate.name;
+}
+
+/**
  * Checks if a tag name is a known property node (contains a dot).
  *
  * e.g. "eui:Button.label" → property "label" on `Button`.
@@ -227,4 +249,23 @@ export function parsePropertyNode(tagName: string): { owner: string; property: s
 	const ownerPart = parts[0];
 	const property = parts.slice(1).join('.');
 	return { owner: localName(ownerPart), property };
+}
+
+function suggestionThreshold(length: number): number {
+	if (length <= 3) return 1;
+	if (length <= 7) return 2;
+	return 3;
+}
+
+function editDistance(a: string, b: string): number {
+	const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+	for (let i = 1; i <= a.length; i++) {
+		const current = [i];
+		for (let j = 1; j <= b.length; j++) {
+			const substitution = previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1);
+			current.push(Math.min(current[j - 1] + 1, previous[j] + 1, substitution));
+		}
+		previous.splice(0, previous.length, ...current);
+	}
+	return previous[b.length];
 }

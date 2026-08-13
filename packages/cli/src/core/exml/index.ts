@@ -38,6 +38,7 @@ export type {
 	StateSetProperty,
 	StateSetStateProperty,
 	BindingDef,
+	UnresolvedTag,
 } from './ast.js';
 
 // ── Component Registry ───────────────────────────────────────────────
@@ -48,6 +49,7 @@ export {
 	localName,
 	isPropertyNode,
 	parsePropertyNode,
+	suggestComponentTag,
 } from './registry.js';
 export type { ComponentInfo, NamespaceModule } from './registry.js';
 

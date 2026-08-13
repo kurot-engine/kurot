@@ -17,6 +17,7 @@ import {
 	isPropertyNode,
 	parsePropertyNode,
 	getDefaultProperty,
+	suggestComponentTag,
 } from '../src/core/exml/registry.js';
 import { parseEXML } from '../src/core/exml/exml-parser.js';
 import { generateCode } from '../src/core/exml/codegen.js';
@@ -187,6 +188,16 @@ describe('Component Registry', () => {
 	it('parses property node names', () => {
 		const parsed = parsePropertyNode('eui:Button.label');
 		expect(parsed).toEqual({ owner: 'Button', property: 'label' });
+	});
+
+	it('suggests close built-in component names within the same namespace', () => {
+		expect(suggestComponentTag('eui:Buton')).toBe('eui:Button');
+		expect(suggestComponentTag('egret:Sprte')).toBe('egret:Sprite');
+	});
+
+	it('does not suggest a component for an unknown namespace or distant name', () => {
+		expect(suggestComponentTag('game:Buton')).toBeUndefined();
+		expect(suggestComponentTag('eui:CompletelyDifferent')).toBeUndefined();
 	});
 });
 
@@ -385,7 +396,12 @@ describe('Custom namespaces', () => {
 		// Only <eui:Label> resolves; <game:HeroNarrowIR> is unknown without config.
 		expect(group.children).toHaveLength(1);
 		expect(group.children[0].className).toBe('Label');
-		expect(ir.unresolvedTags).toContain('game:HeroNarrowIR');
+		expect(ir.unresolvedTags.map(tag => tag.name)).toContain('game:HeroNarrowIR');
+		const unresolved = ir.unresolvedTags[0];
+		if (!unresolved) throw new Error('Expected an unresolved custom namespace tag');
+		expect(CUSTOM_NS_EXML.slice(unresolved.range.start, unresolved.range.end)).toBe(
+			'<game:HeroNarrowIR id="heroIR" skinName="game.widget.HeroNarrowIRSkin"/>',
+		);
 	});
 
 	it('resolves and imports a custom-namespace tag when the namespace is configured', () => {
