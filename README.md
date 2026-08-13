@@ -9,7 +9,7 @@ Core features include:
 - A WebGL primary rendering backend with a Canvas 2D fallback backend.
 - EUI-compatible components, layout, states, data binding, and theming system.
 - Build-time EXML → ESM compilation, with no XML parsing at runtime.
-- Tween, MovieClip, ScrollView, URLLoader, and Spine 4.3 support.
+- Tween, MovieClip, ScrollView, and URLLoader game extensions.
 
 > **Naming note:** the npm packages have migrated to `@kurot/*`. Legacy `blakron` identifiers in the CLI, config files, and source paths will be unified in later migration steps.
 
@@ -22,16 +22,14 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/core`](packages/core/README.md)           | `packages/core`      | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
 | [`@kurot/ui`](packages/ui/README.md)               | `packages/ui`        | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)           | `packages/game`      | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/spine-4.3`](packages/spine-4.3/README.md) | `packages/spine-4.3` | Skeletal animation runtime adapted from Spine 4.3                                                              | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)             | `packages/cli`       | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
 
-Dependencies flow in one direction: `core` is the foundation package; `ui`, `game`, and `spine-4.3` depend only on `core` and not on each other; `cli` is a build-time-only tool and is never pulled into the browser runtime.
+Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other; `cli` is a build-time-only tool and is never pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
 ```text
 @kurot/core
  ├─ @kurot/ui
- ├─ @kurot/game
- └─ @kurot/spine-4.3
+ └─ @kurot/game
 
 @kurot/cli  (build-time only)
 ```
@@ -54,7 +52,7 @@ pnpm --dir packages/core build
 pnpm --dir packages/core test
 ```
 
-Replace `core` with `cli`, `ui`, `game`, or `spine` to install and build the corresponding package:
+Replace `core` with `cli`, `ui`, or `game` to install and build the corresponding package:
 
 ```sh
 pnpm --dir packages/<package> install
@@ -67,7 +65,7 @@ pnpm --dir packages/<package> build
 pnpm --dir packages/<package> test
 ```
 
-`spine` currently has no test script. Every package supports a TypeScript compile-watch command:
+Every package supports a TypeScript compile-watch command:
 
 ```sh
 pnpm --dir packages/<package> dev

@@ -9,19 +9,17 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package            | Version | One-line role                                                                                                                                                                   | Read this first                                                                  |
 | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `@kurot/core`      | 1.0.12  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
+| `@kurot/core`      | 1.0.13  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
 | `@kurot/ui`        | 1.1.7   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
 | `@kurot/cli`       | 1.0.2   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
-| `@kurot/spine-4.3` | 0.2.3   | Spine 4.3 skeletal animation adapter. Depends only on `core` (plus `@esotericsoftware/spine-core`).                                                                             | [`packages/spine-4.3/docs/ai-context.md`](packages/spine-4.3/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
 ```
 @kurot/core
  ├─ @kurot/ui
- ├─ @kurot/game
- └─ @kurot/spine-4.3
+ └─ @kurot/game
 
 @kurot/cli  (build-time only, no runtime dependency on the above)
 ```
@@ -81,7 +79,7 @@ Kurot/
 ├── README.md          Human-facing overview (English)
 ├── docs/              Contribution rules (docs/code-rules.md) — committed
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
-├── packages/          The 5 packages above, each with its own docs/ + docs-internal/
+├── packages/          The 4 packages above, each with its own docs/ + docs-internal/
 ├── examples/          demo (Vite + hand-written EXML) and my-game (CLI-scaffolded)
 └── reference/         Local read-only reference sources — not distributed via git
 ```
