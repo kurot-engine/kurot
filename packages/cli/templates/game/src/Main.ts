@@ -1,9 +1,9 @@
 /**
- * Kurot 标准游戏模板
+ * Kurot game project template.
  *
- * 使用 @kurot/ui 构建响应式界面，并通过 @kurot/game 播放补间动画。
+ * Builds a responsive interface with @kurot/ui and plays tween animations with @kurot/game.
  *
- * 生命周期：constructor → ADDED_TO_STAGE → $onAddToStage → runGame → loadResource → createGameScene → startAnimation
+ * Lifecycle: constructor → ADDED_TO_STAGE → $onAddToStage → runGame → load → createGameScene → startAnimation
  */
 import { createPlayer, Event, resource } from '@kurot/core';
 import { Button, Label, Rect, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
@@ -64,7 +64,7 @@ class Main extends UILayer {
 	}
 
 	private async loadTheme(): Promise<void> {
-		// 加载主题（UI 组件默认皮肤映射）
+		// Load the theme and its default UI skin mappings.
 		const theme = new Theme('resource/default.thm.json');
 		await new Promise<void>(resolve => theme.addEventListener(Event.COMPLETE, () => resolve()));
 	}
@@ -78,12 +78,12 @@ class Main extends UILayer {
 	private textfield!: Label;
 
 	/**
-	 * 创建游戏场景
+	 * Create the game scene.
 	 *
-	 * 使用 EUI 组件和约束布局搭建响应式画面。
+	 * Build a responsive view with EUI components and constraint-based layout.
 	 */
 	private createGameScene(): void {
-		// 响应式背景
+		// Responsive background
 		const sky = new Rect();
 		sky.left = 0;
 		sky.right = 0;
@@ -92,7 +92,7 @@ class Main extends UILayer {
 		sky.fillColor = 0x2d3436;
 		this.addChild(sky);
 
-		// 半透明顶栏
+		// Translucent header
 		const topMask = new Rect();
 		topMask.left = 0;
 		topMask.right = 0;
@@ -102,7 +102,7 @@ class Main extends UILayer {
 		topMask.fillAlpha = 0.5;
 		this.addChild(topMask);
 
-		// 标题文本
+		// Title
 		const colorLabel = new Label();
 		colorLabel.textColor = 0xffffff;
 		colorLabel.left = 0;
@@ -115,7 +115,7 @@ class Main extends UILayer {
 		colorLabel.size = 36;
 		this.addChild(colorLabel);
 
-		// 描述文本（用于动画）
+		// Animated description
 		const textfield = new Label();
 		this.addChild(textfield);
 		textfield.alpha = 0;
@@ -129,7 +129,7 @@ class Main extends UILayer {
 		textfield.textColor = 0xffffff;
 		this.textfield = textfield;
 
-		// UI 按钮示例（需要默认主题）
+		// UI button using the default theme
 		const button = new Button();
 		button.label = 'Click Me';
 		button.horizontalCenter = 0;
@@ -139,7 +139,7 @@ class Main extends UILayer {
 	}
 
 	/**
-	 * 播放文本淡入淡出动画
+	 * Play a looping text fade animation.
 	 */
 	private startAnimation(): void {
 		const texts = ['Open-source, Free, Multi-platform', 'Push Game Forward', 'HTML5 Game Engine'];
@@ -160,7 +160,7 @@ class Main extends UILayer {
 	}
 }
 
-// ── 启动 ──────────────────────────────────────────────────────────────────
+// ── Bootstrap ─────────────────────────────────────────────────────────────
 const app = createPlayer({
 	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
 	contentWidth: 640,

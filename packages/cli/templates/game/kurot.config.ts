@@ -12,5 +12,8 @@ export default {
 	},
 	exml: {
 		themeFile: 'resource/default.thm.json',
+		namespaces: {
+			game: 'src/game-components.ts',
+		},
 	},
 };

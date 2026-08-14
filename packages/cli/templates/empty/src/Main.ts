@@ -1,10 +1,10 @@
 /**
- * Kurot 空白项目模板
+ * Kurot empty project template.
  *
- * 最小化入口，只依赖 @kurot/core，不含 UI 组件。
- * 适用于纯 Canvas 渲染、自定义绘制、动画实验等场景。
+ * A minimal entry point that depends only on @kurot/core and contains no UI components.
+ * Suitable for Canvas rendering, custom drawing, and animation experiments.
  *
- * 生命周期：constructor → ADDED_TO_STAGE → $onAddToStage
+ * Lifecycle: constructor → ADDED_TO_STAGE → $onAddToStage
  */
 import { createPlayer, Sprite, Event } from '@kurot/core';
 
@@ -15,12 +15,12 @@ class Main extends Sprite {
 	}
 
 	private onAddedToStage(_event: Event): void {
-		// 在这里编写你的游戏逻辑
+		// Add your game logic here.
 		console.log('Kurot game started');
 	}
 }
 
-// ── 启动 ──────────────────────────────────────────────────────────────────
+// ── Bootstrap ─────────────────────────────────────────────────────────────
 const app = createPlayer({
 	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
 	contentWidth: 640,
