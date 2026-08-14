@@ -1,7 +1,7 @@
 import type { IUIComponent } from './IUIComponent.js';
 
 /**
- * Interface for scrollable container components.
+ * Scrollable UI component with measurable content bounds.
  */
 export interface IViewport extends IUIComponent {
 	readonly contentWidth: number;

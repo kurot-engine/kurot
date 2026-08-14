@@ -10,10 +10,11 @@ import { Rectangle } from '@kurot/core';
 const tmpBounds = new Rectangle();
 
 /**
- * TileLayout arranges layout elements in columns and rows of equally-sized cells.
+ * Arranges children in equal-sized rows and columns.
  *
- * Supports orientation (rows vs columns), requested column/row counts,
- * column/row alignment justification, percent size within cells, and virtual layout.
+ * Requested row or column counts constrain the grid; otherwise the available
+ * size and orientation determine the counts. Cell dimensions are inferred from
+ * the largest measured element unless explicitly assigned.
  */
 export class TileLayout extends LayoutBase {
 	// ── Instance fields ───────────────────────────────────────────────────

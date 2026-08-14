@@ -1,6 +1,9 @@
 import { Event, type IEventDispatcher } from '@kurot/core';
 import type { ItemRenderer } from '../components/ItemRenderer.js';
 
+/**
+ * Reports activation of an item in an item-rendering component.
+ */
 export class ItemTapEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
 
@@ -8,8 +11,17 @@ export class ItemTapEvent extends Event {
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Data item that was activated.
+	 */
 	public item: unknown;
+	/**
+	 * Index of the activated item in the data provider.
+	 */
 	public itemIndex = -1;
+	/**
+	 * Renderer that received the interaction, when one is available.
+	 */
 	public itemRenderer?: ItemRenderer;
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -20,6 +32,10 @@ export class ItemTapEvent extends Event {
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Dispatches an item-tap event when the target has a listener.
+	 * Returns `true` without allocating an event when no listener is registered.
+	 */
 	public static dispatchItemTapEvent(
 		target: IEventDispatcher,
 		item: unknown,

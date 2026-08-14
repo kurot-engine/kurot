@@ -1,5 +1,8 @@
 import { Event, type IEventDispatcher } from '@kurot/core';
 
+/**
+ * Reports a named property change to bindings and other observers.
+ */
 export class PropertyEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
 
@@ -7,6 +10,9 @@ export class PropertyEvent extends Event {
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Name of the property that changed.
+	 */
 	public property = '';
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -17,6 +23,10 @@ export class PropertyEvent extends Event {
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Dispatches a property-change event when the target has a listener.
+	 * Returns `true` without allocating an event when no listener is registered.
+	 */
 	public static dispatchPropertyEvent(target: IEventDispatcher, property: string): boolean {
 		if (!target.hasEventListener(PropertyEvent.PROPERTY_CHANGE)) return true;
 		const e = new PropertyEvent(PropertyEvent.PROPERTY_CHANGE);

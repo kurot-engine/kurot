@@ -3,9 +3,9 @@ import { LayoutBase } from './LayoutBase.js';
 import { isUIComponent } from '../core/UIComponent.js';
 
 /**
- * Absolute (constraint-based) layout.
- * Positions $children using left/right/top/bottom/horizontalCenter/verticalCenter
- * and percentWidth/percentHeight constraints.
+ * Positions children with edge, center, and percentage-size constraints.
+ * Edge constraints take precedence over percentage sizing on the same axis.
+ * Virtual layout is not supported.
  */
 export class BasicLayout extends LayoutBase {
 	// ── Getters / Setters ─────────────────────────────────────────────────
@@ -15,7 +15,6 @@ export class BasicLayout extends LayoutBase {
 	}
 
 	public override set useVirtualLayout(_v: boolean) {
-		/* no-op */
 	}
 
 	// ── Override methods ──────────────────────────────────────────────────

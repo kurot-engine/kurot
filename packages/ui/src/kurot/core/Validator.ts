@@ -5,16 +5,10 @@ type QueueClient = IUIComponent & DisplayObject;
 type ValidatorClient = QueueClient;
 
 /**
- * Manages the deferred invalidation/validation cycle for UI components.
+ * Schedules deferred validation for UI components.
  *
- * When a component marks itself as invalid (properties / size / display list),
- * the Validator queues it and processes all queued components on the next
- * ENTER_FRAME tick, in depth order.
- *
- * Processing order:
- *   1. validateProperties  — shallowest first
- *   2. validateSize        — deepest first ($children before parents)
- *   3. validateDisplayList — shallowest first
+	 * Validation runs properties from shallowest to deepest, size from deepest
+	 * to shallowest, then display lists from shallowest to deepest.
  */
 export class Validator extends EventDispatcher {
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -59,7 +53,7 @@ export class Validator extends EventDispatcher {
 	}
 
 	/**
-	 * Force immediate validation of all components at or below `target`'s depth.
+	 * Immediately validates the target and its descendants until no phase is invalid.
 	 */
 	public validateClient(target: ValidatorClient): void {
 		const oldLevel = this._targetLevel;
@@ -209,9 +203,6 @@ class DepthQueue {
 		bin.insert(client);
 	}
 
-	/**
-	 * Pop deepest (for size validation — $children before parents).
-	 */
 	public pop(): QueueClient | undefined {
 		let max = this._max;
 		const min = this._min;
@@ -231,9 +222,6 @@ class DepthQueue {
 		return undefined;
 	}
 
-	/**
-	 * Shift shallowest (for properties / display list — parents before $children).
-	 */
 	public shift(): QueueClient | undefined {
 		let min = this._min;
 		const max = this._max;
@@ -358,9 +346,6 @@ class DepthBin {
 		}
 	}
 
-	/**
-	 * Find a direct or indirect child of `ancestor` in this bin.
-	 */
 	public findDescendant(ancestor: QueueClient): QueueClient | undefined {
 		if (!(ancestor instanceof DisplayObjectContainer)) return undefined;
 		for (const item of this.items) {

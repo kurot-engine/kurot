@@ -1,9 +1,6 @@
 import { LayoutBase } from './LayoutBase.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
 
-/**
- * Internal info for percent-based layout calculation.
- */
 interface ChildInfo {
 	layoutElement: IUIComponent;
 	size: number;
@@ -13,9 +10,7 @@ interface ChildInfo {
 }
 
 /**
- * Base class for HorizontalLayout and VerticalLayout.
- * Provides common properties: gap, padding, horizontalAlign, verticalAlign,
- * virtual layout caching, and percent-size distribution.
+ * Shared spacing, alignment, and virtualization behavior for linear layouts.
  */
 export abstract class LinearLayoutBase extends LayoutBase {
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -166,19 +161,15 @@ export abstract class LinearLayoutBase extends LayoutBase {
 	// ── Protected methods ─────────────────────────────────────────────────
 
 	protected measureReal(): void {
-		// override in subclass
 	}
 
 	protected measureVirtual(): void {
-		// override in subclass
 	}
 
 	protected updateDisplayListReal(_width: number, _height: number): void {
-		// override in subclass
 	}
 
 	protected updateDisplayListVirtual(_width: number, _height: number): void {
-		// override in subclass
 	}
 
 	protected getStartPosition(_index: number): number {
@@ -193,9 +184,6 @@ export abstract class LinearLayoutBase extends LayoutBase {
 		return 0;
 	}
 
-	/**
-	 * Binary search to find the element index at a given position.
-	 */
 	protected findIndexAt(x: number, i0: number, i1: number): number {
 		const index = ((i0 + i1) * 0.5) | 0;
 		const elementX = this.getStartPosition(index);
@@ -210,10 +198,6 @@ export abstract class LinearLayoutBase extends LayoutBase {
 		return false;
 	}
 
-	/**
-	 * Distribute available space among percent-sized $children,
-	 * respecting min/max constraints.
-	 */
 	protected flexChildrenProportionally(
 		spaceForChildren: number,
 		spaceToDistribute: number,

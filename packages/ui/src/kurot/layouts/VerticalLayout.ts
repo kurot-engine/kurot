@@ -6,7 +6,6 @@ import { Rectangle } from '@kurot/core';
 
 const tmpBounds = new Rectangle();
 
-/** Internal child info for percent distribution. */
 interface ChildInfo {
 	layoutElement: IUIComponent;
 	size: number;
@@ -16,14 +15,10 @@ interface ChildInfo {
 }
 
 /**
- * VerticalLayout arranges layout elements in a vertical sequence, top to bottom,
- * with optional gaps between elements and optional padding around the edges.
+ * Arranges children from top to bottom with configurable gaps and padding.
  *
- * Supports:
- * - `horizontalAlign`: left / center / right / justify / contentJustify
- * - `verticalAlign`: top / middle / bottom / justify
- * - `percentWidth` / `percentHeight` on $children
- * - Virtual layout (only visible elements are measured/laid out)
+ * Virtual layout measures and creates only the visible element range, using
+ * the typical element size to estimate elements that have not been created.
  */
 export class VerticalLayout extends LinearLayoutBase {
 	// ── Override methods ──────────────────────────────────────────────────
@@ -108,7 +103,6 @@ export class VerticalLayout extends LinearLayoutBase {
 		let heightToDistribute = targetHeight;
 		let maxElementWidth = this.maxElementSize;
 
-		// First pass: gather info
 		for (let i = 0; i < count; i++) {
 			const el = asLayoutElement(target, i);
 			if (!el || !el.includeInLayout) {
@@ -139,7 +133,6 @@ export class VerticalLayout extends LinearLayoutBase {
 		heightToDistribute = Math.max(0, heightToDistribute);
 		const excessSpace = targetHeight - totalPreferredHeight - gap * (numElements - 1);
 
-		// Justify mode: calculate average for shrinking
 		let averageHeight: number | undefined;
 		let largeChildrenCount = numElements;
 		const heightDic = new Map<IUIComponent, number>();
@@ -172,7 +165,6 @@ export class VerticalLayout extends LinearLayoutBase {
 			}
 		}
 
-		// Vertical alignment offset
 		if (this._verticalAlign === 'middle') {
 			y = paddingT + heightToDistribute * 0.5;
 		} else if (this._verticalAlign === 'bottom') {
@@ -186,7 +178,6 @@ export class VerticalLayout extends LinearLayoutBase {
 
 		let roundOff = 0;
 
-		// Second pass: position and size
 		for (let i = 0; i < count; i++) {
 			const el = asLayoutElement(target, i);
 			if (!el || !el.includeInLayout) continue;
@@ -424,10 +415,6 @@ function asLayoutElement(target: ILayoutTarget, index: number): IUIComponent | u
 	return undefined;
 }
 
-/**
- * Get a virtual element (creates/reuses renderer on demand) as IUIComponent.
- * Used by updateDisplayListVirtual to only instantiate visible renderers.
- */
 function asVirtualLayoutElement(target: ILayoutTarget, index: number): IUIComponent | undefined {
 	const child = target.getVirtualElementAt(index);
 	if (!child) return undefined;

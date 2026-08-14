@@ -1,7 +1,7 @@
 import { Event, type IEventDispatcher } from '@kurot/core';
 
 /**
- * UI event types and dispatcher for UI component lifecycle and interaction events.
+ * UI component lifecycle and interaction event.
  */
 export class UIEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
@@ -39,6 +39,10 @@ export class UIEvent extends Event {
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Dispatches a UI event when the target has a listener.
+	 * Returns `true` without allocating an event when no listener is registered.
+	 */
 	public static dispatchUIEvent(
 		target: IEventDispatcher,
 		eventType: string,

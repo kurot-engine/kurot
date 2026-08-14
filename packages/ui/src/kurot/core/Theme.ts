@@ -10,16 +10,13 @@ interface ThemeConfig {
 }
 
 /**
- * Skin theme. Maps component class names to default skin class names.
+ * Maps component class names to default skins.
  *
- * Usage:
+ * @example
  * ```ts
  * const theme = new Theme('resource/default.thm.js');
- * theme.addEventListener(Event.COMPLETE, () => { ... });
+	 * theme.addEventListener(Event.COMPLETE, handleComplete);
  * ```
- *
- * @event Event.COMPLETE  Dispatched when the theme config is loaded and all skins are registered.
- * @event IOErrorEvent.IO_ERROR  Dispatched when the theme config or compiled skins fail to load.
  */
 export class Theme extends EventDispatcher {
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -45,9 +42,7 @@ export class Theme extends EventDispatcher {
 	// ── Public methods ────────────────────────────────────────────────────
 
 	/**
-	 * Map a default skin class name for a host component class name.
-	 * @param hostComponentKey  e.g. "eui.Button" or "app.MyButton"
-	 * @param skinName          e.g. "skins.ButtonSkin"
+	 * Maps a component key to its default skin class name.
 	 */
 	public mapSkin(hostComponentKey: string, skinName: string): void {
 		if (!hostComponentKey || !skinName) return;
@@ -55,8 +50,8 @@ export class Theme extends EventDispatcher {
 	}
 
 	/**
-	 * Look up the default skin name for a component instance.
-	 * Search order: hostComponentKey → class name → parent class names up to Component.
+	 * Resolves a component's skin by host key, class name, then ancestor class.
+	 * Returns an empty string while the theme is loading or when no skin is mapped.
 	 */
 	public getSkinName(client: Component): string {
 		if (!this._initialized) {
@@ -106,8 +101,7 @@ export class Theme extends EventDispatcher {
 
 		if (data.styles) this._styles = data.styles;
 
-		// Skins are loaded from a compiled ESM module that self-registers its
-		// factories on globalThis.
+		// Compiled skin modules register their factories on globalThis when imported.
 		if (data.skinsJs) {
 			this._loadSkinsModule(data.skinsJs).then(
 				() => this._onLoaded(),
@@ -121,7 +115,6 @@ export class Theme extends EventDispatcher {
 		}
 	}
 
-	/** Dynamically imports the compiled skins module (resolves relative to the theme URL). */
 	private async _loadSkinsModule(skinsJs: string): Promise<void> {
 		const base = new URL(this._configURL, globalThis.location?.href ?? 'http://localhost/');
 		const moduleUrl = new URL(skinsJs, base).href;
@@ -183,14 +176,15 @@ const _defaultThemeAdapter: IThemeAdapter = {
 let _currentTheme: Theme | undefined;
 
 /**
- * Register the active theme. Called automatically by Theme constructor when a stage is provided.
+ * Sets the active theme used by UI components.
+ * A Theme instance registers itself during construction.
  */
 export function setTheme(theme: Theme): void {
 	_currentTheme = theme;
 }
 
 /**
- * Get the currently active theme, if any.
+ * Returns the active theme, if one has been created or registered.
  */
 export function getTheme(): Theme | undefined {
 	return _currentTheme;

@@ -1,5 +1,8 @@
 import { Event, type IEventDispatcher } from '@kurot/core';
 
+/**
+ * Change operations reported by {@link CollectionEvent}.
+ */
 export const CollectionEventKind = {
 	ADD: 'add',
 	REMOVE: 'remove',
@@ -12,6 +15,9 @@ export const CollectionEventKind = {
 
 export type CollectionEventKind = (typeof CollectionEventKind)[keyof typeof CollectionEventKind];
 
+/**
+ * Describes a change to an observable collection.
+ */
 export class CollectionEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
 
@@ -19,10 +25,25 @@ export class CollectionEvent extends Event {
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Operation that changed the collection.
+	 */
 	public kind: CollectionEventKind = CollectionEventKind.ADD;
+	/**
+	 * Items added, updated, or moved by the operation.
+	 */
 	public items: unknown[] = [];
+	/**
+	 * Items removed or replaced by the operation.
+	 */
 	public oldItems: unknown[] = [];
+	/**
+	 * Resulting collection index, or `-1` when the operation has no index.
+	 */
 	public location = -1;
+	/**
+	 * Previous collection index, or `-1` when the operation has no previous index.
+	 */
 	public oldLocation = -1;
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -33,6 +54,10 @@ export class CollectionEvent extends Event {
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Dispatches a collection-change event when the target has a listener.
+	 * Returns `true` without allocating an event when no listener is registered.
+	 */
 	public static dispatchCollectionEvent(
 		target: IEventDispatcher,
 		kind: CollectionEventKind,

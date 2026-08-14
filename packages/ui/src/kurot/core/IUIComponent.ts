@@ -1,19 +1,17 @@
 import type { IEventDispatcher, Rectangle } from '@kurot/core';
 
 /**
- * Interface implemented by all UI components.
- * Defines the layout contract: constraint properties, invalidation cycle,
- * and bounds query methods used by layout classes.
+ * Layout, measurement, and validation contract implemented by UI components.
  */
 export interface IUIComponent extends IEventDispatcher {
 	/**
-	 * Whether this component participates in parent layout. Default true.
+	 * Whether this component participates in its parent's layout.
 	 */
 	includeInLayout: boolean;
 
 	// ── Anchor constraints ────────────────────────────────────────────────
 	/**
-	 * Distance from the left edge of the parent container
+	 * Distance from the left edge of the parent container.
 	 */
 	left: number | string;
 	/**

@@ -1,12 +1,10 @@
 import { Event } from '@kurot/core';
 
 /**
- * Dispatched by Scroller during throw (inertial scrolling).
+ * Reports the start of inertial scrolling.
  *
- * Listeners can call `preventDefault()` to cancel the throw animation,
- * or modify `toPos` to redirect the throw target.
- *
- * Egret-compatible: eui.ScrollerThrowEvent
+ * Call `preventDefault()` to cancel the animation or assign `toPos` to
+ * redirect its destination.
  */
 export class ScrollerThrowEvent extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
@@ -16,7 +14,13 @@ export class ScrollerThrowEvent extends Event {
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Scroll position at the start of the throw.
+	 */
 	public currentPos = 0;
+	/**
+	 * Proposed destination, which listeners may replace.
+	 */
 	public toPos = 0;
 
 	// ── Constructor ───────────────────────────────────────────────────────

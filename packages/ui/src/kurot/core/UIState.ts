@@ -43,8 +43,7 @@ function isDeltaIdentity(m: Matrix): boolean {
 }
 
 /**
- * The interface that UIState requires from its host DisplayObject.
- * Keeps UIState decoupled from any specific DisplayObject subclass.
+ * Display-object lifecycle hooks required by {@link UIState}.
  */
 export interface IUIOwner extends DisplayObject {
 	createChildren(): void;
@@ -55,11 +54,7 @@ export interface IUIOwner extends DisplayObject {
 }
 
 /**
- * Encapsulates all UI layout state and logic for a component.
- *
- * Instead of using a mixin, Group and Component each hold a UIState instance
- * and delegate all IUIComponent method calls to it. This keeps the class
- * hierarchy clean and avoids prototype manipulation.
+ * Manages layout, measurement, and validation state for one UI component.
  */
 export class UIState {
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -274,11 +269,7 @@ export class UIState {
 			this._owner.childrenCreated();
 			UIEvent.dispatchUIEvent(this._owner, UIEvent.CREATION_COMPLETE);
 		} else {
-			// Re-entering the display list after removal — force a redraw so
-			// graphics commands are rebuilt in the WebGL instruction set.
-			// Use validateNow() to execute synchronously before the next render
-			// phase, avoiding the timing issue where structureDirty fires before
-			// the Validator has filled the graphics commands.
+			// Re-entry must rebuild display commands before the next render phase.
 			this.invalidateDisplayList();
 			if (this._owner.stage) validator.validateClient(this._owner as IUIOwner & IUIComponent);
 		}
@@ -521,9 +512,7 @@ export class UIState {
 		}
 		if (changed) {
 			this.invalidateDisplayList();
-			// A layout size change affects this component's rendered bounds.
-			// Propagate dirtiness to ancestors so a cacheAsBitmap parent is
-			// rasterized again after deferred UI measurement completes.
+			// Deferred size changes must invalidate cached ancestor bitmaps.
 			this._owner.$markDirty();
 			this._owner.dispatchEventWith(Event.RESIZE);
 		}
@@ -607,6 +596,9 @@ export class UIState {
 
 // ── Type guard ────────────────────────────────────────────────────────────────
 
+/**
+ * Identifies UI components by the presence of their delegated `ui` state.
+ */
 export function isUIComponent(obj: unknown): obj is IUIComponent {
 	return obj != null && typeof obj === 'object' && 'ui' in obj;
 }

@@ -2,8 +2,7 @@ import type { DisplayObject } from '@kurot/core';
 import type { IUIComponent } from '../core/IUIComponent.js';
 
 /**
- * Interface that layout algorithms require from their target container.
- * Both Group and Component implement this.
+ * Container operations required by layout algorithms.
  */
 export interface ILayoutTarget extends IUIComponent {
 	readonly numChildren: number;

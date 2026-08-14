@@ -1,7 +1,7 @@
 import type { IUIComponent } from './IUIComponent.js';
 
 /**
- * Interface for list item renderers.
+ * UI component that renders one item from a data provider.
  */
 export interface IItemRenderer extends IUIComponent {
 	/**

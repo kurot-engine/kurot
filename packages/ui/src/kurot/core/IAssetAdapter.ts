@@ -1,15 +1,12 @@
 import type { Texture } from '@kurot/core';
 
 /**
- * Adapter interface for resolving asset sources (e.g. image URLs) to Texture instances.
- * Implement this interface and pass it to `setAssetAdapter()` to customize asset loading.
+ * Resolves asset identifiers to textures.
  */
 export interface IAssetAdapter {
 	/**
-	 * Resolve an asset source string to a content value (typically a Texture).
-	 * @param source  The asset identifier (URL, resource key, etc.)
-	 * @param callback  Called with the resolved content and original source when done.
-	 *                  `content` is `undefined` when the asset could not be loaded.
+	 * Resolves an asset and reports `undefined` when it cannot be loaded.
+	 * The callback receives the original source so callers can correlate requests.
 	 */
 	getAsset(source: string, callback: (content: Texture | undefined, source: string) => void): void;
 }

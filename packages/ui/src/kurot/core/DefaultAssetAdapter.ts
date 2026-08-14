@@ -2,8 +2,7 @@ import { Texture, ImageLoader, Event } from '@kurot/core';
 import type { IAssetAdapter } from './IAssetAdapter.js';
 
 /**
- * Default asset adapter that loads images via ImageLoader and
- * resolves them to Texture instances.
+ * Loads image assets as textures with {@link ImageLoader}.
  */
 export class DefaultAssetAdapter implements IAssetAdapter {
 	// ── Public methods ────────────────────────────────────────────────────

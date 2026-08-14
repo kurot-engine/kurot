@@ -2,11 +2,8 @@ import { Watcher } from './Watcher.js';
 import type { IEventDispatcher } from '@kurot/core';
 
 /**
- * Binding — static utility class for data binding.
- *
- * - `bindProperty(host, chain, target, prop)` — binds `host.chain` → `target.prop`
- * - `bindHandler(host, chain, handler, thisObject)` — calls `handler(value)` on change
- * - `bindProperties(host, templates, chainIndex, target, prop)` — template-string binding
+ * Creates reactive property-chain bindings.
+ * Binding hosts must dispatch property-change events for observed properties.
  */
 export class Binding {
 	/**
@@ -14,11 +11,10 @@ export class Binding {
 	 *
 	 * ```ts
 	 * Binding.bindProperty(user, ['name'], label, 'text');
-	 * // label.text === user.name; auto-updates when user dispatches PropertyChange
 	 * ```
 	 */
 	public static bindProperty(host: unknown, chain: string[], target: unknown, prop: string): Watcher | undefined {
-		const watcher = Watcher.watch(host as IEventDispatcher | undefined, chain, undefined, undefined);
+		const watcher = Watcher.watch(host as IEventDispatcher | undefined, chain);
 		if (watcher) {
 			const assign = (value: unknown): void => {
 				(target as Record<string, unknown>)[prop] = value;
@@ -33,7 +29,7 @@ export class Binding {
 	 * Binds a property chain on `host` to a handler function.
 	 *
 	 * ```ts
-	 * Binding.bindHandler(user, ['name'], (v) => console.log(v), null);
+	 * Binding.bindHandler(user, ['name'], value => console.log(value), undefined);
 	 * ```
 	 */
 	public static bindHandler(
@@ -50,13 +46,9 @@ export class Binding {
 	}
 
 	/**
-	 * Template-string binding used by EXML compiler.
+	 * Binds a mixture of literal values and property chains to a string property.
 	 *
-	 * `templates` is a mixed array of literal strings and `Watcher` instances.
-	 * `chainIndex` marks which entries are dynamic (property chains).
-	 *
-	 * The result is the string concatenation of all template values, written
-	 * to `target[prop]`.
+	 * `chainIndex` identifies entries in `templates` that contain property chains.
 	 */
 	public static bindProperties(
 		host: unknown,
@@ -79,7 +71,7 @@ export class Binding {
 			let watcher: Watcher | undefined;
 
 			if (typeof element === 'string') {
-				watcher = Watcher.watch(host as IEventDispatcher | undefined, element.split('.'), undefined, undefined);
+				watcher = Watcher.watch(host as IEventDispatcher | undefined, element.split('.'));
 			} else if (element instanceof Watcher) {
 				watcher = element;
 				watcher.reset(host as IEventDispatcher | undefined);

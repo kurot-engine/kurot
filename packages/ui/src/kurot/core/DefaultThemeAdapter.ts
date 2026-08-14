@@ -1,7 +1,7 @@
 import type { IThemeAdapter } from './IThemeAdapter.js';
 
 /**
- * Default theme adapter that loads theme configuration files via fetch().
+ * Loads theme configuration files with `fetch`.
  */
 export class DefaultThemeAdapter implements IThemeAdapter {
 	// ── Public methods ────────────────────────────────────────────────────

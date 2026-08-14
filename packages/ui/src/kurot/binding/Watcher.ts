@@ -2,42 +2,50 @@ import type { Event, IEventDispatcher } from '@kurot/core';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**
- * An object that can both dispatch {@link PropertyEvent.PROPERTY_CHANGE} and be
- * read by arbitrary property name (i.e. it is a record of named bindable values).
- *
- * This is the minimal contract a binding host must satisfy. In practice every
- * host is an {@link EventDispatcher} subclass (Skin, Component, Group, …) whose
- * own properties are mutated and then announced via
- * {@link PropertyEvent.dispatchPropertyEvent}. The index signature models that
- * dynamic access without forcing every host through `as unknown as Record<…>`.
+ * Event dispatcher whose properties can be observed by name.
  */
 export type Bindable = IEventDispatcher & Record<string, unknown>;
 
 /**
- * Watcher monitors a property (or property chain) on a host object.
- * When the property changes (via {@link PropertyEvent}), the registered
- * handler is invoked with the new value.
+ * Observes a property chain and reports changes to its leaf value.
  *
- * Create instances via the static {@link Watcher.watch} method — do not use the
- * constructor directly.
+ * Each object in the chain must dispatch
+ * {@link PropertyEvent.PROPERTY_CHANGE} when an observed property changes.
  */
 export class Watcher {
 	// ── Instance fields ───────────────────────────────────────────────────
 
-	private _host?: Bindable;
 	private readonly _property: string;
+    private readonly _next?: Watcher;
+
+	private _host?: Bindable;
 	private _handler?: (value: unknown) => void;
 	private _thisObject: unknown;
-	private readonly _next?: Watcher;
-	private _isExecuting = false;
+    private _isExecuting = false;
+
+	private _onPropertyChange = (event: Event): void => {
+		if (!(event instanceof PropertyEvent)) return;
+		if (event.property !== this._property || this._isExecuting) return;
+		try {
+			this._isExecuting = true;
+			if (this._next) {
+				this._next.reset(this._getHostPropertyValue() as IEventDispatcher | undefined);
+			}
+			if (this._handler) {
+				this._handler.call(this._thisObject, this.getValue());
+			}
+		} finally {
+			this._isExecuting = false;
+		}
+	};
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
 	public constructor(
 		property: string,
-		handler: ((value: unknown) => void) | undefined,
-		thisObject: unknown,
-		next: Watcher | undefined,
+		handler?: (value: unknown) => void,
+		thisObject?: unknown,
+		next?: Watcher,
 	) {
 		this._property = property;
 		this._handler = handler;
@@ -49,25 +57,17 @@ export class Watcher {
 
 	/**
 	 * Creates and starts a Watcher for a property chain.
+	 * Returns `undefined` when the chain is empty.
 	 *
 	 * ```ts
-	 * // watches host.a.b.c
-	 * Watcher.watch(host, ['a', 'b', 'c'], (value) => { ... }, this);
+	 * Watcher.watch(host, ['profile', 'name'], value => updateName(value));
 	 * ```
-	 *
-	 * @param host   Root object hosting the chain.  Must dispatch
-	 *               `PropertyEvent.PROPERTY_CHANGE` when its bindable
-	 *               properties change (i.e. implement `IEventDispatcher`).
-	 * @param chain  Property names forming the chain, e.g. `['a','b','c']`.
-	 * @param handler Called with the new leaf value whenever the chain changes.
-	 * @param thisObject  `this` context for the handler.
-	 * @returns The head Watcher, or `undefined` if `chain` is empty.
 	 */
 	public static watch(
 		host: IEventDispatcher | undefined,
 		chain: string[],
-		handler: ((value: unknown) => void) | undefined,
-		thisObject: unknown,
+		handler?: (value: unknown) => void,
+		thisObject?: unknown,
 	): Watcher | undefined {
 		if (chain.length === 0) return undefined;
 		const property = chain[0];
@@ -98,12 +98,6 @@ export class Watcher {
 			this._host.removeEventListener(PropertyEvent.PROPERTY_CHANGE, this._onPropertyChange);
 		}
 
-		// The cast is unavoidable: `IEventDispatcher` (core) is not generic over
-		// a property map, so TS cannot know the host also exposes bindable own
-		// properties by name. `Bindable` only adds an index signature on top of
-		// `IEventDispatcher` — it models what every real host (Skin, Component,
-		// Group) already does at runtime. This is the single place the engine
-		// bridges the event-dispatcher contract and dynamic property access.
 		this._host = newHost as Bindable | undefined;
 
 		if (this._host) {
@@ -126,25 +120,4 @@ export class Watcher {
 	private _getHostPropertyValue(): unknown {
 		return this._host ? this._host[this._property] : undefined;
 	}
-
-	private _onPropertyChange = (e: Event): void => {
-		// `e` arrives as `Event` because the listener is registered through the
-		// `IEventDispatcher` interface, whose signature is not generic over an
-		// EventMap (core 1.0 limitation). The dispatcher always uses
-		// `PropertyEvent.dispatchPropertyEvent`, which constructs a
-		// `PropertyEvent`, so the runtime type is guaranteed.
-		if (!(e instanceof PropertyEvent)) return;
-		if (e.property !== this._property || this._isExecuting) return;
-		try {
-			this._isExecuting = true;
-			if (this._next) {
-				this._next.reset(this._getHostPropertyValue() as IEventDispatcher | undefined);
-			}
-			if (this._handler) {
-				this._handler.call(this._thisObject, this.getValue());
-			}
-		} finally {
-			this._isExecuting = false;
-		}
-	};
 }

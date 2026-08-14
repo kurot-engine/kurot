@@ -2,20 +2,32 @@ import { EventDispatcher } from '@kurot/core';
 import type { ILayoutTarget } from './ILayoutTarget.js';
 
 /**
- * Base class for all layout algorithms.
- * Subclasses must implement `measure()` and `updateDisplayList()`.
+ * Base class for container measurement and child placement algorithms.
  */
 export abstract class LayoutBase extends EventDispatcher {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Container managed by this layout.
+	 */
 	public target?: ILayoutTarget;
+	/**
+	 * Estimated element width used before virtual elements are measured.
+	 */
 	public typicalWidth = 71;
+	/**
+	 * Estimated element height used before virtual elements are measured.
+	 */
 	public typicalHeight = 22;
 
 	protected _useVirtualLayout = false;
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Whether the layout may create and measure only visible elements.
+	 * Virtual layout is disabled by default.
+	 */
 	public get useVirtualLayout(): boolean {
 		return this._useVirtualLayout;
 	}

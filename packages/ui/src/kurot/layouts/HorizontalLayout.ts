@@ -6,7 +6,6 @@ import { Rectangle } from '@kurot/core';
 
 const tmpBounds = new Rectangle();
 
-/** Internal child info for percent distribution. */
 interface ChildInfo {
 	layoutElement: IUIComponent;
 	size: number;
@@ -16,14 +15,10 @@ interface ChildInfo {
 }
 
 /**
- * HorizontalLayout arranges layout elements in a horizontal sequence, left to right,
- * with optional gaps between elements and optional padding around the edges.
+ * Arranges children from left to right with configurable gaps and padding.
  *
- * Supports:
- * - `verticalAlign`: top / middle / bottom / justify / contentJustify
- * - `horizontalAlign`: left / center / right / justify
- * - `percentWidth` / `percentHeight` on $children
- * - Virtual layout
+ * Virtual layout measures and creates only the visible element range, using
+ * the typical element size to estimate elements that have not been created.
  */
 export class HorizontalLayout extends LinearLayoutBase {
 	// ── Override methods ──────────────────────────────────────────────────
@@ -108,7 +103,6 @@ export class HorizontalLayout extends LinearLayoutBase {
 		let widthToDistribute = targetWidth;
 		let maxElementHeight = this.maxElementSize;
 
-		// First pass: gather info
 		for (let i = 0; i < count; i++) {
 			const el = asLayoutElement(target, i);
 			if (!el || !el.includeInLayout) {
@@ -171,7 +165,6 @@ export class HorizontalLayout extends LinearLayoutBase {
 			}
 		}
 
-		// Horizontal alignment offset
 		if (this._horizontalAlign === 'center') {
 			x = paddingL + widthToDistribute * 0.5;
 		} else if (this._horizontalAlign === 'right') {
@@ -185,7 +178,6 @@ export class HorizontalLayout extends LinearLayoutBase {
 
 		let roundOff = 0;
 
-		// Second pass: position and size
 		for (let i = 0; i < count; i++) {
 			const el = asLayoutElement(target, i);
 			if (!el || !el.includeInLayout) continue;
@@ -423,10 +415,6 @@ function asLayoutElement(target: ILayoutTarget, index: number): IUIComponent | u
 	return undefined;
 }
 
-/**
- * Get a virtual element (creates/reuses renderer on demand) as IUIComponent.
- * Used by updateDisplayListVirtual to only instantiate visible renderers.
- */
 function asVirtualLayoutElement(target: ILayoutTarget, index: number): IUIComponent | undefined {
 	const child = target.getVirtualElementAt(index);
 	if (!child) return undefined;
