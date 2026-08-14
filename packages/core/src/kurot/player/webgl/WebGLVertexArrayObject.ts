@@ -2,12 +2,10 @@ import { premultiplyTint } from './WebGLUtils.js';
 import type { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 
 // ── Single-texture vertex layout ──────────────────────────────────────────────
-// x(f32) y(f32) u(f32) v(f32) color(u32) = 5 floats = 20 bytes
 const VERT_SIZE = 5;
 const VERT_BYTE_SIZE = VERT_SIZE * 4;
 
 // ── Multi-texture vertex layout ───────────────────────────────────────────────
-// x(f32) y(f32) u(f32) v(f32) color(u32) textureId(f32) = 6 floats = 24 bytes
 export const MULTI_VERT_SIZE = 6;
 export const MULTI_VERT_BYTE_SIZE: number = MULTI_VERT_SIZE * 4;
 
@@ -18,20 +16,22 @@ const MAX_INDICES = MAX_QUADS * 6;
 export class WebGLVertexArrayObject {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
-	/** Maximum byte size of the vertex buffer (single-texture layout). */
+	/**
+	 * Maximum byte size of the vertex buffer (single-texture layout).
+	 */
 	public static readonly MAX_VERTEX_BYTES: number = MAX_VERTS * VERT_BYTE_SIZE;
 
-	/** Maximum byte size of the multi-texture vertex buffer. */
+	/**
+	 * Maximum byte size of the multi-texture vertex buffer.
+	 */
 	public static readonly MAX_MULTI_VERTEX_BYTES: number = MAX_VERTS * MULTI_VERT_BYTE_SIZE;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	// Single-texture buffer
 	private readonly _buffer: ArrayBuffer;
 	private readonly _float32: Float32Array;
 	private readonly _uint32: Uint32Array;
 
-	// Multi-texture buffer (larger stride)
 	private readonly _multiBuffer: ArrayBuffer;
 	private readonly _multiFloat32: Float32Array;
 	private readonly _multiUint32: Uint32Array;
@@ -43,7 +43,6 @@ export class WebGLVertexArrayObject {
 	private _indexIndex = 0;
 	private _hasMesh = false;
 
-	// Whether the current batch uses the multi-texture layout.
 	private _isMulti = false;
 
 	public constructor() {
@@ -58,7 +57,6 @@ export class WebGLVertexArrayObject {
 		this._indices = new Uint16Array(MAX_INDICES);
 		this._indicesForMesh = new Uint16Array(MAX_INDICES);
 
-		// Pre-fill quad indices: 0,1,2 / 0,2,3
 		for (let i = 0, j = 0; i < MAX_INDICES; i += 6, j += 4) {
 			this._indices[i] = j;
 			this._indices[i + 1] = j + 1;
@@ -116,7 +114,6 @@ export class WebGLVertexArrayObject {
 		return this._isMulti;
 	}
 
-	// Switch this batch to multi-texture mode. Must be called before any cacheArrays.
 	public setMultiTexture(enabled: boolean): void {
 		this._isMulti = enabled;
 	}
@@ -142,8 +139,6 @@ export class WebGLVertexArrayObject {
 	): void {
 		const alpha = Math.min(buffer.globalAlpha, 1.0);
 		const tint = buffer.globalTintColor;
-		// All Kurot textures are uploaded with UNPACK_PREMULTIPLY_ALPHA_WEBGL=1,
-		// so always premultiply the vertex color.
 		const packed = premultiplyTint(tint, alpha);
 
 		const m = buffer.globalMatrix;

@@ -2,17 +2,7 @@ import type { DisplayObject } from '../display/DisplayObject.js';
 import type { InstructionSet } from './InstructionSet.js';
 
 /**
- * A RenderPipe handles one category of DisplayObject (Bitmap, Graphics, Mesh…).
- *
- * Inspired by Pixi.js 8's RenderPipe interface.
- *
- * Lifecycle per frame:
- *   1. If InstructionSet.structureDirty:
- *        pipe.addToInstructionSet(obj, set)   — build instruction from scratch
- *   2. Else if obj.$renderDirty:
- *        pipe.updateRenderable(obj)            — patch GPU data only
- *   3. Always:
- *        pipe.execute(instruction, ...)        — issue the actual draw call
+ * Builds and updates instructions for one display-object category.
  */
 export interface RenderPipe<T extends DisplayObject = DisplayObject> {
 	/**
@@ -28,8 +18,8 @@ export interface RenderPipe<T extends DisplayObject = DisplayObject> {
 	updateRenderable(renderable: T): void;
 
 	/**
-	 * Optional cleanup when a renderable is removed from the scene.
-	 * Use this to release GPU textures / cached buffers.
+	 * Releases resources when cleanup is requested explicitly.
+	 * Stage removal does not invoke this hook automatically.
 	 */
 	destroyRenderable?(renderable: T): void;
 }

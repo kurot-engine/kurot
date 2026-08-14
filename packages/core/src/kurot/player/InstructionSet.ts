@@ -1,14 +1,9 @@
 import type { DisplayObject } from '../display/DisplayObject.js';
 
 /**
- * A single renderable instruction in the instruction set.
- * Each instruction captures everything needed to execute one draw operation
- * without re-reading the scene graph.
- *
- * Inspired by Pixi.js 8's Instruction / InstructionSet pattern.
+ * A render operation captured without requiring scene-graph access at execution.
  */
 export interface Instruction {
-	// Identifies which pipe should execute this instruction.
 	readonly renderPipeId: string;
 	/**
 	 * The display object this instruction was built from.
@@ -20,40 +15,20 @@ export interface Instruction {
 export type RenderableInstructionIndices = number | number[];
 
 /**
- * An ordered list of render instructions for one frame.
- *
- * Key design points (from Pixi.js 8):
- * - `instructions` is reused while a set is stable and cleared on rebuild so
- *   removed display objects are not retained by stale instruction slots.
- * - `structureDirty` signals that the scene graph changed and the set must
- *   be fully rebuilt before the next render.
- * - `dirtyRenderables` holds objects whose GPU data changed but whose
- *   position in the instruction list is still valid — only those need
- *   updateRenderable(), not a full rebuild.
+ * Stores ordered render instructions and incremental update state.
  */
 export class InstructionSet {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	// Instructions in execution order for the current structure.
 	public readonly instructions: Instruction[] = [];
-
-	// Number of active entries in instructions.
-	public instructionSize = 0;
-
-	// Whether the scene structure requires this set to be rebuilt.
-	public structureDirty = true;
-
-	// Deduplicated renderables awaiting an incremental data update.
 	public readonly dirtyRenderables: DisplayObject[] = [];
-
-	// Number of active entries in dirtyRenderables.
-	public dirtyRenderableCount = 0;
-
-	// Transform-bearing instruction indices associated with each renderable.
 	public readonly renderableIndex: Map<DisplayObject, RenderableInstructionIndices> = new Map();
 
-	// Membership set used to deduplicate dirty renderables within a frame.
-	private readonly _dirtyRenderableSet = new Set<DisplayObject>();
+    public instructionSize = 0;
+	public structureDirty = true;
+	public dirtyRenderableCount = 0;
+
+    private readonly _dirtyRenderableSet = new Set<DisplayObject>();
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
@@ -67,7 +42,6 @@ export class InstructionSet {
 		this.renderableIndex.clear();
 	}
 
-	// Append an instruction.
 	public add(instruction: Instruction): void {
 		this.instructions[this.instructionSize++] = instruction;
 	}

@@ -16,15 +16,6 @@ export class Player implements Renderable {
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 	public readonly stage: Stage;
-	private _isPlaying = false;
-	private _root?: DisplayObject;
-	private _canvas2dBuffer?: CanvasBuffer;
-	private _canvas2dRenderer?: CanvasRenderer;
-	private _webglBuffer?: WebGLRenderBuffer;
-	private _webglRenderer?: WebGLRenderer;
-	private _webglContext?: WebGLRenderContext;
-	private _unregisterCallbacks: Array<() => void> = [];
-
 	public readonly perf = {
 		frameCount: 0,
 		lastFrameTime: 0,
@@ -40,6 +31,14 @@ export class Player implements Renderable {
 		totalRenderTimeMs: 0,
 	};
 
+	private _isPlaying = false;
+	private _root?: DisplayObject;
+	private _canvas2dBuffer?: CanvasBuffer;
+	private _canvas2dRenderer?: CanvasRenderer;
+	private _webglBuffer?: WebGLRenderBuffer;
+	private _webglRenderer?: WebGLRenderer;
+	private _webglContext?: WebGLRenderContext;
+	private _unregisterCallbacks: Array<() => void> = [];
 	private _fpsFrames = 0;
 	private _fpsLastTime = performance.now();
 
@@ -49,33 +48,19 @@ export class Player implements Renderable {
 
 		try {
 			this._webglContext = new WebGLRenderContext(canvas);
-			this._webglBuffer = new WebGLRenderBuffer(
-				this._webglContext,
-				canvas.width || 1,
-				canvas.height || 1,
-				true,
-			);
+			this._webglBuffer = new WebGLRenderBuffer(this._webglContext, canvas.width || 1, canvas.height || 1, true);
 			this._webglRenderer = new WebGLRenderer();
 
-			// Wire up renderer hooks. The engine is single-Player by design:
-			// Player assigns these static hooks directly and clears them in
-			// `destroy()`. There is no multi-Player listener registry.
 			const renderer = this._webglRenderer;
 			DisplayObject.$onStructureChange = () => renderer.markStructureDirty();
 			DisplayObjectContainer.$onContainerStructureChange = owner => renderer.markStructureDirty(owner);
 			DisplayObject.$onRenderableDirty = obj => renderer.markRenderableDirty(obj);
 			this._unregisterCallbacks.push(
-				// After context loss + restore, all WebGL textures are invalid and
-				// the instruction set contains stale texture references. Force a
-				// full rebuild so the next render re-uploads everything.
 				this._webglContext.addContextRestoredListener(() => renderer.markStructureDirty()),
 			);
 
 			return;
 		} catch {
-			// WebGL init failed — fall through to Canvas 2D. Drop references so the
-			// half-constructed context can be GC'd; the GL resources themselves are
-			// reclaimed by the browser when the canvas is dropped.
 			this._webglContext = undefined;
 			this._webglBuffer = undefined;
 		}
@@ -113,13 +98,13 @@ export class Player implements Renderable {
 		ticker.removePlayer(this);
 	}
 
-	/** Destroy the player and release all resources. */
+	/**
+	 * Destroy the player and release all resources.
+	 */
 	public destroy(): void {
 		this.pause();
 		for (const fn of this._unregisterCallbacks) fn();
 		this._unregisterCallbacks = [];
-		// Single-Player engine: clear the static renderer hooks so they stop
-		// notifying a renderer whose owner is gone.
 		DisplayObject.$onStructureChange = undefined;
 		DisplayObject.$onRenderableDirty = undefined;
 		DisplayObjectContainer.$onContainerStructureChange = undefined;

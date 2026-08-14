@@ -9,79 +9,52 @@ import type { RenderBuffer } from '../RenderBuffer.js';
 import type { CanvasRenderer } from '../canvas/index.js';
 import { CanvasBuffer } from '../canvas/index.js';
 
-// Shared scratch rectangle — avoids per-execute allocation.
 const _scratchBounds = new Rectangle();
-
-// ── Instruction ───────────────────────────────────────────────────────────────
 
 export interface GraphicsInstruction extends Instruction {
 	readonly renderPipeId: 'graphics';
-	renderable: DisplayObject; // Shape or Sprite
-	/** The Graphics object attached to the renderable. */
+	renderable: DisplayObject;
 	graphics: Graphics;
 	offsetX: number;
 	offsetY: number;
 }
 
-// ── Cache entry ───────────────────────────────────────────────────────────────
-
 interface GraphicsCache {
 	canvasBuffer: CanvasBuffer;
-	// Opaque backend texture handle — its concrete type (WebGLTexture, GPUTexture, ...)
-	// is backend-specific; this pipe only passes it back to RenderContext methods.
 	texture: TextureHandle;
 	textureWidth: number;
 	textureHeight: number;
-	/** Bounds origin in local space — needed to position the texture. */
 	boundsX: number;
 	boundsY: number;
 }
 
-// ── Pipe ──────────────────────────────────────────────────────────────────────
-
 /**
- * Handles WebGL rendering of Shape / Sprite graphics.
- *
- * Rasterizes the Graphics commands to an offscreen Canvas, uploads as a
- * WebGL texture, and caches it. The cache is invalidated when
- * `graphics.canvasCacheDirty` is true (set by Graphics.dirty()).
+ * Rasterizes graphics into cached textures for render-buffer drawing.
  */
 export class GraphicsPipe implements RenderPipe<DisplayObject> {
+
 	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'graphics';
-	private static readonly _pool: GraphicsInstruction[] = [];
+
+    private static readonly _pool: GraphicsInstruction[] = [];
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 	private readonly _canvasRenderer: CanvasRenderer;
 	private readonly _cache = new WeakMap<Graphics, GraphicsCache>();
 	private readonly _registryTokens = new WeakMap<Graphics, object>();
-	private _context?: RenderContext;
+
+    private _context?: RenderContext;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 	public constructor(canvasRenderer: CanvasRenderer) {
 		this._canvasRenderer = canvasRenderer;
 	}
 
-	private static _alloc(renderable: DisplayObject, graphics: Graphics, ox: number, oy: number): GraphicsInstruction {
-		const inst = GraphicsPipe._pool.pop() ?? {
-			renderPipeId: 'graphics',
-			renderable,
-			graphics,
-			offsetX: ox,
-			offsetY: oy,
-		};
-		inst.renderable = renderable;
-		inst.graphics = graphics;
-		inst.offsetX = ox;
-		inst.offsetY = oy;
-		return inst;
-	}
+	// ── Public methods ────────────────────────────────────────────────────────
 
 	public static release(inst: GraphicsInstruction): void {
 		GraphicsPipe._pool.push(inst);
 	}
-
-	// ── RenderPipe impl ───────────────────────────────────────────────────────
 
 	public addToInstructionSet(renderable: DisplayObject, set: InstructionSet): void {
 		const graphics = renderable.graphics;
@@ -91,17 +64,13 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		set.add(GraphicsPipe._alloc(renderable, graphics, 0, 0));
 	}
 
-	public updateRenderable(_renderable: DisplayObject): void {
-		// Cache invalidation is driven by graphics.canvasCacheDirty,
-		// which is checked at execute time — nothing to pre-upload here.
-	}
+	public updateRenderable(_renderable: DisplayObject): void {}
 
 	public destroyRenderable(renderable: DisplayObject): void {
 		const graphics = renderable.graphics;
 		if (!graphics) return;
 		const cache = this._cache.get(graphics);
 		if (cache?.texture) {
-			// Unregister from GC registry and delete texture immediately.
 			const token = this._registryTokens.get(graphics);
 			if (token) {
 				this._context?.unregisterTextureGC(token);
@@ -112,15 +81,12 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		this._cache.delete(graphics);
 	}
 
-	// ── Execute ───────────────────────────────────────────────────────────────
-
 	public execute(inst: GraphicsInstruction, buffer: RenderBuffer): void {
 		const { graphics } = inst;
 		if (graphics.commands.length === 0) {
 			return;
 		}
 
-		// Cache the render context for use in destroyRenderable.
 		if (!this._context) this._context = buffer.context;
 
 		const bounds = _scratchBounds;
@@ -137,7 +103,6 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
 
-		// ── Cache lookup / rebuild ────────────────────────────────────────────
 		let cache = this._cache.get(graphics);
 		if (!cache) {
 			cache = {
@@ -158,8 +123,6 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 				cache.canvasBuffer.resize(w, h);
 			}
 			cache.canvasBuffer.clear();
-			// skipCache=true: we are the cache owner, bypass CanvasRenderer's own
-			// offscreen canvas layer to avoid a redundant intermediate rasterization.
 			this._canvasRenderer.renderGraphicsToContext(
 				graphics,
 				cache.canvasBuffer.context,
@@ -171,12 +134,10 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			const surface = cache.canvasBuffer.surface;
 			if (!cache.texture) {
 				cache.texture = buffer.context.createTexture(surface);
-				// Register for GC-based cleanup.
 				const token = {};
 				buffer.context.registerTextureForGC(graphics, cache.texture, token);
 				this._registryTokens.set(graphics, token);
 			} else {
-				// Unregister old texture, create new registration for updated texture.
 				const oldToken = this._registryTokens.get(graphics);
 				if (oldToken) buffer.context.unregisterTextureGC(oldToken);
 				buffer.context.updateTexture(cache.texture, surface);
@@ -188,7 +149,6 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			cache.textureHeight = h;
 			cache.boundsX = bounds.x;
 			cache.boundsY = bounds.y;
-			// Consume the dirty flag — Phase 1 set it, we've now rebuilt.
 			graphics.canvasCacheDirty = false;
 		}
 
@@ -196,9 +156,6 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			return;
 		}
 
-		// ── Draw cached texture ───────────────────────────────────────────────
-		// ox/oy are already baked into globalMatrix via _applyTransform.
-		// Only add bounds origin (content may start at non-zero local coords).
 		buffer.saveTransform();
 		if (cache.boundsX !== 0 || cache.boundsY !== 0) {
 			buffer.globalMatrix.append(1, 0, 0, 1, cache.boundsX, cache.boundsY);
@@ -207,5 +164,22 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		buffer.context.drawTexture(cache.texture, 0, 0, w, h, 0, 0, w, h, w, h);
 
 		buffer.restoreTransform();
+	}
+
+	// ── Private methods ───────────────────────────────────────────────────────
+
+	private static _alloc(renderable: DisplayObject, graphics: Graphics, ox: number, oy: number): GraphicsInstruction {
+		const inst = GraphicsPipe._pool.pop() ?? {
+			renderPipeId: 'graphics',
+			renderable,
+			graphics,
+			offsetX: ox,
+			offsetY: oy,
+		};
+		inst.renderable = renderable;
+		inst.graphics = graphics;
+		inst.offsetX = ox;
+		inst.offsetY = oy;
+		return inst;
 	}
 }

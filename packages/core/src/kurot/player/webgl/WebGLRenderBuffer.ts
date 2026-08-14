@@ -57,21 +57,16 @@ export class WebGLRenderBuffer implements RenderBuffer {
 
 	public offscreenOriginX = 0;
 	public offscreenOriginY = 0;
-	// Whether instructions must be converted from world space into this offscreen buffer's local space.
 	public hasOffscreenTransform = false;
-	// Inverse world transform of the object that owns this offscreen buffer.
 	public readonly offscreenInverseTransform: Matrix = new Matrix();
-	// Local translation that places content bounds after any filter padding.
 	public offscreenLocalX = 0;
 	public offscreenLocalY = 0;
 	public filterPadX = 0;
 	public filterPadY = 0;
 
-	// Stencil
 	public stencilList: { x: number; y: number; width: number; height: number }[] = [];
 	public stencilHandleCount = 0;
 
-	// Scissor
 	public scissorState = false;
 	public hasScissor = false;
 
@@ -149,7 +144,6 @@ export class WebGLRenderBuffer implements RenderBuffer {
 		this.rootRenderTarget.useFrameBuffer = useFrameBuffer;
 		this.rootRenderTarget.activate();
 
-		// Flip vertically and un-premultiply alpha.
 		const result = new Uint8Array(4 * width * height);
 		for (let i = 0; i < height; i++) {
 			for (let j = 0; j < width; j++) {

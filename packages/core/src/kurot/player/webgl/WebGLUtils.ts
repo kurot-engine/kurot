@@ -1,13 +1,13 @@
-/** Symbol keys stored on WebGLTexture objects. */
+/**
+ * Symbol keys stored on WebGLTexture objects.
+ */
 export const SYM_GL_CONTEXT = '__kurotGlContext';
 export const SYM_PREMULTIPLIED = '__kurotPremultiplied';
 export const SYM_DEFAULT_EMPTY = '__kurotDefaultEmpty';
 export const SYM_SMOOTHING = '__kurotSmoothing';
 
 /**
- * Unified GL context type.
- * WebGL2RenderingContext is a strict superset of WebGL1 — all existing API
- * calls are identical, so no rendering code needs to change.
+ * WebGL context accepted by shared rendering utilities.
  */
 export type GL = WebGL2RenderingContext | WebGLRenderingContext;
 
@@ -40,7 +40,6 @@ export function deleteWebGLTexture(gl: GL | undefined, texture: WebGLTexture | u
 	if (gl) gl.deleteTexture(texture);
 }
 
-// Premultiply tint color with alpha, packing into a uint32.
 export function premultiplyTint(tint: number, alpha: number): number {
 	if (alpha === 1.0) return (0xff000000 | tint) >>> 0;
 	if (alpha === 0.0) return 0;

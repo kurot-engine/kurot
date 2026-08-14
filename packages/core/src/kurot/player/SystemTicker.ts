@@ -3,13 +3,11 @@ import { DisplayObject } from '../display/DisplayObject.js';
 
 export const START_TIME: number = Date.now();
 
-/** @internal Flag: should broadcast Event.RENDER next frame. */
 export let invalidateRenderFlag = false;
 export function setInvalidateRenderFlag(value: boolean): void {
 	invalidateRenderFlag = value;
 }
 
-/** @internal Flag: should re-render immediately after current event processing. */
 export let requestRenderingFlag = false;
 export function setRequestRenderingFlag(value: boolean): void {
 	requestRenderingFlag = value;
@@ -22,15 +20,15 @@ interface TickEntry {
 	thisObject: unknown;
 }
 
-/** Render callback — called by SystemTicker each frame to render a player. */
+/**
+ * Render callback — called by SystemTicker each frame to render a player.
+ */
 export interface Renderable {
 	render(triggerByFrame: boolean, costTicker: number): void;
 }
 
 /**
- * The core frame loop, equivalent to Egret's `sys.SystemTicker`.
- * Drives `requestAnimationFrame`, manages frame rate, broadcasts ENTER_FRAME / RENDER,
- * and invokes registered tick callbacks and player renderers.
+ * Runs frame throttling, tick callbacks, player rendering and deferred calls.
  */
 export class SystemTicker {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -47,7 +45,6 @@ export class SystemTicker {
 	private _rafId = 0;
 	private _running = false;
 
-	// Deferred calls (equivalent to egret.callLater)
 	private _callLaterList: Array<{ fn: (...args: unknown[]) => void; args: unknown[] }> = [];
 
 	// ── Constructor ───────────────────────────────────────────────────────────
@@ -119,7 +116,9 @@ export class SystemTicker {
 		this._isPaused = false;
 	}
 
-	/** Force a single update (useful for testing). */
+	/**
+	 * Force a single update (useful for testing).
+	 */
 	public update(forceUpdate = false): void {
 		this.tick(forceUpdate);
 	}
@@ -141,7 +140,6 @@ export class SystemTicker {
 			return;
 		}
 
-		// Execute tick callbacks
 		let needRender = requestRenderingFlag;
 		const ticks = [...this._ticks];
 		for (const entry of ticks) {
@@ -152,7 +150,6 @@ export class SystemTicker {
 		const deltaTime = timeStamp - this._lastTimeStamp;
 		this._lastTimeStamp = timeStamp;
 
-		// Frame rate throttling
 		if (deltaTime >= this._frameDeltaTime || forceUpdate) {
 			this._lastCount = this._frameInterval;
 		} else {
@@ -174,10 +171,8 @@ export class SystemTicker {
 	private render(triggerByFrame: boolean, costTicker: number): void {
 		if (this._players.length === 0) return;
 
-		// Execute deferred calls
 		this.flushCallLaters();
 
-		// Broadcast RENDER event if requested
 		if (invalidateRenderFlag) {
 			this.broadcastRender();
 			invalidateRenderFlag = false;
@@ -221,10 +216,14 @@ export class SystemTicker {
 	}
 }
 
-/** Singleton ticker instance. */
+/**
+ * Singleton ticker instance.
+ */
 export const ticker: SystemTicker = new SystemTicker();
 
-/** Returns milliseconds since engine start. */
+/**
+ * Returns milliseconds since engine start.
+ */
 export function getTimer(): number {
 	return Date.now() - START_TIME;
 }

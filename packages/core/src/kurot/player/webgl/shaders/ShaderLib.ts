@@ -1,6 +1,5 @@
 /**
- * GLSL ES 1.00 shaders — used with WebGL1 context.
- * For WebGL2 (GLSL ES 3.00) shaders see ../webgl2/ShaderLib2.ts
+ * GLSL ES 1.00 shader sources for WebGL 1.
  */
 export const ShaderLib = {
 	default_vert: /* glsl */ `
@@ -17,10 +16,6 @@ void main(void) {
    vColor = aColor;
    }`,
 
-	// Standalone vertex shader for fullscreen quad blits (filters, blur passes).
-	// Identical to default_vert but kept separate so filter passes can be
-	// paired with their own fragment shaders without colliding with the
-	// batched-texture program cache key.
 	fullscreen_vert: /* glsl */ `
    attribute vec2 aVertexPosition;
    attribute vec2 aTextureCoord;

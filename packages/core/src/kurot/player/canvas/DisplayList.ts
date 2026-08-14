@@ -4,13 +4,10 @@ import { deleteWebGLTexture, SYM_GL_CONTEXT, type GL } from '../webgl/WebGLUtils
 import { CanvasBuffer } from './CanvasBuffer.js';
 
 /**
- * DisplayList provides per-object offscreen caching for DisplayObjects with
- * cacheAsBitmap = true. When the object is not dirty, the cached canvas is
- * reused directly, avoiding re-traversal of the subtree.
- *
- * Equivalent to Egret's sys.DisplayList (non-stage variant).
+ * Caches a display-object subtree in an offscreen bitmap.
  */
 export class DisplayList {
+
 	// ── Static fields ─────────────────────────────────────────────────────────
 	private static _pool: DisplayList[] = [];
 

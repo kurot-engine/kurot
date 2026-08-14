@@ -1,5 +1,3 @@
-import type { Filter } from '../../filters/Filter.js';
-
 // ── MultiTextureDrawCmd ───────────────────────────────────────────────────────
 
 /**
@@ -10,7 +8,6 @@ export interface MultiTextureDrawCmd {
 	count: number;
 	readonly textures: WebGLTexture[];
 	textureCount: number;
-	filter: Filter | undefined;
 }
 
 export function makeMultiCmd(
@@ -23,23 +20,13 @@ export function makeMultiCmd(
 		count,
 		textures: slots.slice(0, slotCount) as WebGLTexture[],
 		textureCount: slotCount,
-		filter: undefined,
 	};
 }
 
 // ── MultiTextureBatcher ───────────────────────────────────────────────────────
 
 /**
- * Manages texture slot allocation for multi-texture batching.
- *
- * Inspired by Pixi.js 8's Batcher: instead of breaking a batch every time
- * the texture changes, we assign each unique texture a slot (0–7) and pack
- * all quads into a single draw call. When all slots are occupied we flush.
- *
- * Limitations:
- * - Only plain (no-filter) texture draws can be batched.
- * - Filters, masks, blend-mode changes, and mesh draws always break the batch.
- * - Maximum 8 textures per batch (WebGL1 minimum guaranteed texture units).
+ * Allocates up to eight texture slots for one batched draw command.
  */
 export class MultiTextureBatcher {
 	// ── Static fields ─────────────────────────────────────────────────────────
@@ -47,7 +34,9 @@ export class MultiTextureBatcher {
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 	public readonly slots: (WebGLTexture | undefined)[] = new Array(MultiTextureBatcher.MAX_TEXTURES).fill(undefined);
+
 	private _slotCount = 0;
+
 	private readonly _slotMap = new Map<WebGLTexture, number>();
 
 	// ── Getters ───────────────────────────────────────────────────────────────

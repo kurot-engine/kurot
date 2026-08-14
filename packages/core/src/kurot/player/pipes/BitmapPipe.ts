@@ -4,71 +4,39 @@ import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 
-// ── Instruction ───────────────────────────────────────────────────────────────
-
 export interface BitmapInstruction extends Instruction {
 	readonly renderPipeId: 'bitmap';
 	renderable: Bitmap;
-	/** Snapshot of the buffer state at build time — updated each frame. */
 	offsetX: number;
 	offsetY: number;
 }
 
-// ── Pipe ──────────────────────────────────────────────────────────────────────
-
 /**
- * Handles WebGL rendering of Bitmap display objects.
- *
- * addToInstructionSet  — called once when the scene structure changes.
- * updateRenderable     — called every frame when only data changed.
- * execute              — issues the actual WebGL draw call.
+ * Renders bitmap instructions through a render buffer.
  */
 export class BitmapPipe implements RenderPipe<Bitmap> {
+
+	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'bitmap';
 
-	// Pool of reusable instruction objects to avoid per-frame allocation.
 	private static readonly _pool: BitmapInstruction[] = [];
 
-	private static _alloc(bitmap: Bitmap, offsetX: number, offsetY: number): BitmapInstruction {
-		const inst = BitmapPipe._pool.pop() ?? {
-			renderPipeId: 'bitmap',
-			renderable: bitmap,
-			offsetX,
-			offsetY,
-		};
-		inst.renderable = bitmap;
-		inst.offsetX = offsetX;
-		inst.offsetY = offsetY;
-		return inst;
-	}
+	// ── Public methods ────────────────────────────────────────────────────────
 
 	public static release(inst: BitmapInstruction): void {
 		BitmapPipe._pool.push(inst);
 	}
 
-	// ── RenderPipe impl ───────────────────────────────────────────────────────
-
 	public addToInstructionSet(bitmap: Bitmap, set: InstructionSet): void {
-		// offsetX/Y are patched at execute time from the buffer state;
-		// store 0 as placeholder — the renderer sets them before calling execute.
 		set.add(BitmapPipe._alloc(bitmap, 0, 0));
 	}
 
-	public updateRenderable(_bitmap: Bitmap): void {
-		// Bitmap data is read directly from the DisplayObject at execute time,
-		// so no pre-upload step is needed here.
-	}
+	public updateRenderable(_bitmap: Bitmap): void {}
 
-	public destroyRenderable(_bitmap: Bitmap): void {
-		// BitmapData GPU textures are managed by WebGLRenderContext.getWebGLTexture()
-		// and released when BitmapData itself is destroyed — nothing to do here.
-	}
-
-	// ── Execute ───────────────────────────────────────────────────────────────
+	public destroyRenderable(_bitmap: Bitmap): void {}
 
 	/**
-	 * Issue the draw call for a BitmapInstruction.
-	 * Called by WebGLRenderer._executeInstructions().
+	 * Draws a bitmap instruction into the active render buffer.
 	 */
 	public execute(inst: BitmapInstruction, buffer: RenderBuffer): void {
 		const bitmap = inst.renderable;
@@ -105,6 +73,21 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
+	}
+
+	// ── Private methods ───────────────────────────────────────────────────────
+
+	private static _alloc(bitmap: Bitmap, offsetX: number, offsetY: number): BitmapInstruction {
+		const inst = BitmapPipe._pool.pop() ?? {
+			renderPipeId: 'bitmap',
+			renderable: bitmap,
+			offsetX,
+			offsetY,
+		};
+		inst.renderable = bitmap;
+		inst.offsetX = offsetX;
+		inst.offsetY = offsetY;
+		return inst;
 	}
 
 	private _drawScale9(

@@ -2,15 +2,8 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from
-scratch each session. `docs-internal/plan.md` is the original design plan
-and is **stale in places** — e.g. it says MovieClip registers with the
-ticker internally, but the shipped code has no such registration (matches
-the README's external-scheduler design instead). Treat `plan.md` as
-historical, not descriptive. `docs-internal/game-review.md` is a code
-review; B1 was fixed in 1.0.0, B3 is an accepted-as-is design tradeoff
-still referenced below (B2 is not referenced in this file — see the
-review if present in your checkout). Both files are gitignored/local-only — don't
-assume they exist in every checkout.
+scratch each session. It describes the current source and public exports;
+internal plans and reviews are not required context.
 
 Package identity: `@kurot/game@1.0.6`. Peer-depends on `@kurot/core`.
 
@@ -23,13 +16,13 @@ tween / display / particle / net — see §4.
 src/kurot/
 ├── tween/      Tween, TweenGroup, Ease. Chainable property animation with a
 │               step queue, repeat/yoyo, pause/resume, and Promise completion.
-├── display/    MovieClip, MovieClipData, MovieClipDataFactory (Egret JSON
+├── display/    MovieClip, MovieClipData, MovieClipDataFactory (sprite-sheet JSON
 │               importer), MovieClipTextureParser, ScrollView. Sequence-frame
 │               animation (externally driven) and inertial scroll container.
 ├── particle/   Particle, GravityParticle, ParticleSystem, GravityParticleSystem.
 │               Pooled particle emission, template-method physics extension.
 └── net/        URLLoader, URLRequest, URLVariables, URLRequestHeader/Method,
-                URLLoaderDataFormat. Egret-compatible wrapper over core's
+                URLLoaderDataFormat. Convenience wrapper over core's
                 HttpRequest/ImageLoader/Sound.
 ```
 
@@ -40,9 +33,8 @@ src/kurot/
 - **All tweens share ONE ticker registration**, not one per instance.
   `Tween.get()` registers with core's `ticker.startTick()` only when the
   first active tween appears (`_activeTweens.size === 0 → 1`), and
-  unregisters when the last one is removed. Contrast with `ParticleSystem`
-  below, which registers per-instance — don't assume the two subsystems work
-  the same way.
+  unregisters when the last one is removed. `ParticleSystem` independently
+  registers each system instance.
 - The first tick after registration is a no-op that only captures
   `_lastTimeStamp` — a newly created tween effectively starts advancing on
   the _second_ ticker callback, not the first.
@@ -139,16 +131,14 @@ src/kurot/
   rather than being cached/invalidated on a dirty flag — resizing content
   externally without going through ScrollView's own methods can leave bounds
   stale until the next getter/touch call.
-- `game-review.md` B3: a `dt = now - this._touchLastTime || 1` line is
-  logically correct but easy to misread — it's `(now - lastTime) || 1` (a
-  zero-elapsed-ms fallback), not `now - (lastTime || 1)`.
+- The `dt = now - this._touchLastTime || 1` expression uses `1` when the
+  elapsed time is zero; operator precedence makes it equivalent to
+  `(now - this._touchLastTime) || 1`.
 
 ### Particle / GravityParticle system
 
 - **`ParticleSystem` registers with the ticker per-instance**
-  (`ticker.startTick(this._update, this)`), unlike Tween's single shared
-  registration — an important asymmetry, don't assume the two subsystems
-  behave the same way.
+  (`ticker.startTick(this._update, this)`). Tween uses one shared registration.
 - `stop(false)` (the default) stops new emission but does **not**
   unregister the ticker or clear existing particles — the ticker keeps
   running until existing particles naturally expire and count hits 0. Only
@@ -195,9 +185,8 @@ lifespan / maxParticles` in its constructor, after `parseConfig()` sets
 - JSON parse failures dispatch `IOErrorEvent.IO_ERROR` rather than throwing
   — the async error contract is always event-based, never an unhandled
   exception.
-- `URLVariables.decode()` uses a custom regex parser (not `URLSearchParams`)
-  and collapses repeated query keys into an array value — behavior that
-  differs subtly from `URLSearchParams` semantics.
+- `URLVariables.decode()` uses a custom regex parser and collapses repeated
+  query keys into an array value.
 - `close()` fully cleans up all three loader paths (xhr/imageLoader/sound):
   removes listeners, aborts, and dereferences. Still don't rely on
   inspecting internal fields as an "is it done" check; use the
@@ -222,7 +211,7 @@ ticker-registration behavior from one subsystem to the other.
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add a new easing function                | `tween/Ease.ts`                                                                                                                                                |
 | Debug why a tween isn't animating        | Check `Tween.ts` `_globalTick`/`_registerTicker` — confirm the tween is in `_activeTweens`                                                                     |
-| Import a new Egret MovieClip export      | `display/MovieClipDataFactory.ts`, remember the duration-expansion + 1-based label indexing                                                                    |
+| Import a MovieClip sprite-sheet export   | `display/MovieClipDataFactory.ts`, remember the duration-expansion + 1-based label indexing                                                                    |
 | Change scroll physics                    | `display/ScrollView.ts` — check both `_applyResistance` (drag) and the spring correction in `_handleEnterFrame` (release)                                      |
 | Add a new particle physics model         | `particle/ParticleSystem.ts` (template base), model on `particle/GravityParticleSystem.ts`'s `initParticle`/`advanceParticle` override pattern                 |
 | Debug a stuck/never-completing URLLoader | Check which core loader `dataFormat` routes to (`URLLoader.ts`), verify listeners are on `Event.COMPLETE`/`IOErrorEvent.IO_ERROR`, not polling internal fields |

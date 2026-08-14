@@ -2,15 +2,13 @@
 
 Read this before exploring `src/`. It is a compressed map of the package so an
 agent unfamiliar with Kurot does not need to re-derive the architecture from
-scratch on every session. It complements, and does not replace,
-[architecture.md](./architecture.md), [pixi-alignment.md](./pixi-alignment.md),
-and [resource.md](./resource.md) — those go deeper on rendering internals and
-the resource system.
+scratch on every session. Treat the package source and its `src/index.ts`
+barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@1.0.12`, TypeScript rewrite of the Egret engine
-runtime. Keeps Egret's public `DisplayObject`/event API surface, replaces the
-rendering internals with a Pixi.js‑8‑style flat "InstructionSet + RenderPipe"
-pipeline. ES2022 / evergreen browsers only, `strict: true`, no `any`. Two
+Package identity: `@kurot/core@1.0.14`. It provides Kurot's scene graph,
+events, rendering, text, resource, network and media runtime. Rendering uses a
+flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
+with `strict: true`. Two
 rendering backends: WebGL (primary, two-phase build/execute, InstructionSet-
 driven) and Canvas 2D (fallback, direct scene-graph traversal every frame — no
 InstructionSet, no dirty-flag optimization).
@@ -29,9 +27,9 @@ src/kurot/
 │                   Defines the retained tree the renderer reads from; does not render itself.
 ├── player/         Game loop + both render backends. Player, createPlayer(), SystemTicker/
 │                   ticker singleton, ScreenAdapter, TouchHandler. Backend-neutral abstractions
-│                   live here: RenderPipe / RenderContext / RenderBuffer interfaces (internal,
-│                   not re-exported), InstructionSet, and pipes/ (Bitmap/Graphics/Mesh/Text/
-│                   Filter/Mask/Particle) — all GPU-agnostic, consumed by both backends.
+│                   live here: RenderPipe / RenderContext / RenderBuffer interfaces (the latter
+│                   two are internal), InstructionSet, and pipes/ (Bitmap/Graphics/Mesh/Text/
+│                   Filter/Mask/Particle). The WebGL instruction renderer consumes the pipes.
 │   ├── webgl/      WebGLRenderer, WebGLRenderContext, WebGLRenderBuffer/Target,
 │   │               WebGLVertexArrayObject, WebGLDrawCmdManager, MultiTextureBatcher,
 │   │               shaders/ (ShaderLib GLSL 1.00, ShaderLib2 GLSL 3.00). The WebGL-only execute path.
@@ -41,7 +39,7 @@ src/kurot/
 │                   8 concrete subclasses (TouchEvent, TimerEvent, ProgressEvent, etc.).
 ├── geom/           Matrix, Point, Rectangle + shared*/create()/release() object pools.
 ├── filters/        Filter base + BlurFilter, GlowFilter, DropShadowFilter, ColorMatrixFilter,
-│                   CustomFilter. Pure data/padding — GPU execution lives in player/webgl/pipes/.
+│                   CustomFilter. Pure data/padding — execution lives in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
 │                   HtmlTextParser, InputController, TextMeasurer, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
@@ -50,20 +48,20 @@ src/kurot/
 ├── media/          Sound (+SoundChannel), Video. Web Audio + HTMLAudioElement fallback.
 ├── system/         Capabilities (static). Must be _init()'d — createPlayer() does this for you.
 ├── utils/          ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils.
-│                   (HashObject is GONE — do not reference it, see §5.)
+│                   No engine-wide numeric object identity API is provided.
 ├── localStorage/   Plain functions (getItem/setItem/removeItem/clear), exported as a namespace.
 ├── external/       ExternalInterface — bridge to window.* host callbacks.
 └── benchmark/       Dev/QA stress-test harness. NOT exported from index.ts — internal only.
 ```
 
-## 2. Non-obvious behavior (things an AI trained on Egret/Pixi/cocos will get wrong)
+## 2. Non-obvious current behavior
 
 - `DisplayObject.matrix` getter returns a **clone**, not a live reference.
   Mutating the returned matrix does nothing — assign it back or use `$setMatrix`.
 - `getChildAt`/`removeChildAt` return `undefined` on out-of-bounds instead of
   throwing. `removeChildren()` returns `void`, not the removed array.
-- `blendMode` string values are Canvas-2D composite-operation names, not
-  Egret's: `"normal"` is now `"source-over"`.
+- `blendMode` string values are Canvas 2D composite-operation names;
+  the normal value is `"source-over"`.
 - `cacheAsBitmap` is a pure alias for `cacheAsTexture(true)` — there is no
   separate legacy path. It **always** rasterizes to an offscreen Canvas 2D
   surface first (`DisplayList`), then optionally re-uploads as a GL texture.
@@ -103,8 +101,13 @@ src/kurot/
   bypasses it and leaves capability queries stale.
 - `StageText` (a real DOM `<input>` overlaid on the canvas) is only used for
   `TextFieldType.INPUT` — the rest of `TextField` is fully canvas/GPU-drawn.
-- Only 4 built-in filters exist (not 20+ like Pixi.js). Extension is via
-  `CustomFilter` with raw GLSL, not a larger built-in library.
+- Four built-in effect filters are provided: `BlurFilter`, `GlowFilter`,
+  `DropShadowFilter`, and `ColorMatrixFilter`. Custom effects use
+  `CustomFilter` with raw GLSL.
+- `Video` extends `Bitmap` and is directly renderable. It swaps between poster
+  and video textures, invalidates `BitmapData` on each available video frame,
+  and uses `requestAnimationFrame` only when `requestVideoFrameCallback` is
+  unavailable.
 - hitTest / lookup APIs return `undefined`, never `null`, throughout — check
   `=== undefined`.
 
@@ -112,15 +115,15 @@ src/kurot/
 
 | Term                                     | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Where defined                                                                                                                                                                        |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `InstructionSet`                         | Flat, reusable array of `Instruction` objects representing one frame's draw ops for a subtree, replacing scene-graph traversal at execute time. Tracks `structureDirty`, `dirtyRenderables`, and a `renderableIndex: Map<DisplayObject, number\|number[]>` for O(1) lookup during incremental patches.                                                                                                                                                                                 | `player/webgl/InstructionSet.ts`                                                                                                                                                     |
-| `RenderPipe`                             | Interface implemented once per display-object category (`BitmapPipe`, `GraphicsPipe`, `MeshPipe`, `TextPipe`, `FilterPipe`, `MaskPipe`, `ParticlePipe`). Three lifecycle methods: `addToInstructionSet()` (build), `updateRenderable()` (patch), optional `destroyRenderable()` (rarely invoked, see §2). Dispatched via `renderPipeId` string per instruction.                                                                                                                        | `player/RenderPipe.ts`, impls in `player/webgl/pipes/`                                                                                                                               |
+| `InstructionSet`                         | Flat, reusable array of `Instruction` objects representing one frame's draw ops for a subtree, replacing scene-graph traversal at execute time. Tracks `structureDirty`, `dirtyRenderables`, and a `renderableIndex: Map<DisplayObject, number\|number[]>` for O(1) lookup during incremental patches.                                                                                                                                                                                 | `player/InstructionSet.ts`                                                                                                                                                           |
+| `RenderPipe`                             | Interface implemented once per display-object category (`BitmapPipe`, `GraphicsPipe`, `MeshPipe`, `TextPipe`, `FilterPipe`, `MaskPipe`, `ParticlePipe`). It defines `addToInstructionSet()` (build), `updateRenderable()` (patch), and optional `destroyRenderable()` cleanup. The current renderer does not invoke cleanup merely because an object leaves the stage. Instructions are dispatched by `renderPipeId`.                                                               | `player/RenderPipe.ts`, implementations in `player/pipes/`                                                                                                                           |
 | `structureDirty` vs `renderDirty`        | `structureDirty` (on `InstructionSet`): topology changed (child added/removed/reordered, filter/mask changed) → full rebuild. `renderDirty` (on `DisplayObject`, propagated via `$renderDirtyUp()`): only visual data changed (position/alpha/tint/texture) on an object whose instruction-list slot is still valid → patch only, no rebuild.                                                                                                                                          | Propagated in `display/DisplayObject.ts` (`$markDirty()`, `$cacheDirtyUp()`, `$renderDirtyUp()`); consumed in `player/webgl/WebGLRenderer.ts` `render()`                             |
 | `RenderGroup`                            | A `DisplayObjectContainer` with `isRenderGroup = true`. Gets its own independent `InstructionSet` (tracked via `WeakMap`/`WeakRef` in `WebGLRenderer`). Structural changes inside the group never force the parent to rebuild — the parent set holds a single `renderGroup` instruction pointing at the child set.                                                                                                                                                                     | `isRenderGroup` field: `display/DisplayObjectContainer.ts`; group handling: `player/webgl/WebGLRenderer.ts` (`_buildRenderGroup()`, `markStructureDirty()`, `markRenderableDirty()`) |
-| `cacheAsTexture` vs `cacheAsBitmap`      | `cacheAsBitmap` is a pure alias for `cacheAsTexture(true/false)`. `cacheAsTexture(options)` accepts `{resolution?, scaleMode?}` and creates a `DisplayList` (offscreen Canvas 2D buffer), reused across frames until dirty. On WebGL it's drawn as a single `displayListCache` instruction; rasterization still goes through `CanvasRenderer`, then the result is uploaded as a GL texture.                                                                                            | `display/DisplayObject.ts` (getter/setter ~L317–344); `player/canvas/DisplayList.ts`; `player/webgl/WebGLRenderer.ts` `_executeDisplayListCache()`                                   |
+| `cacheAsTexture` vs `cacheAsBitmap`      | `cacheAsBitmap` is a pure alias for `cacheAsTexture(true/false)`. `cacheAsTexture(options)` accepts `{resolution?, scaleMode?}` and creates a `DisplayList` (offscreen Canvas 2D buffer), reused across frames until dirty. On WebGL it's drawn as a single `displayListCache` instruction; rasterization still goes through `CanvasRenderer`, then the result is uploaded as a GL texture.                                                                                            | `display/DisplayObject.ts`; `player/canvas/DisplayList.ts`; `player/webgl/WebGLRenderer.ts` (`_executeDisplayListCache()`)                                                           |
 | `DrawCmdManager` (`WebGLDrawCmdManager`) | Queue of `DrawCmd` records (12 types: TEXTURE, RECT, PUSH*MASK, POP_MASK, BLEND, RESIZE_TARGET, CLEAR_COLOR, ACT_BUFFER, ENABLE_SCISSOR, DISABLE_SCISSOR, SMOOTHING, MULTI_TEXTURE) sitting between `RenderPipe`s and actual GL calls. Auto-merges consecutive compatible commands. `WebGLRenderContext._flush()` walks it once per frame. This is the real batching layer — distinct from `MultiTextureBatcher`, which only assigns texture \_slots* for the `MULTI_TEXTURE` command. | `player/webgl/WebGLDrawCmdManager.ts`                                                                                                                                                |
 | `WebGLRenderContext` lifecycle           | Constructed directly by `Player` (no factory/singleton). Auto-selects `webgl2` (ShaderLib2, GLSL ES 3.00) falling back to `webgl` (ShaderLib, GLSL ES 1.00). Listens for `webglcontextlost`/`webglcontextrestored`; on restore, re-creates GPU buffers, clears the shader cache, invalidates tracked `BitmapData.webGLTexture` refs, and tells `WebGLRenderer` to force a full instruction rebuild.                                                                                    | `player/webgl/WebGLRenderContext.ts`                                                                                                                                                 |
 | `Player` vs `Stage`                      | `Stage` is a `DisplayObjectContainer` subclass: root of the scene graph, holds `stageWidth`/`stageHeight`/`scaleMode`/`orientation`/`frameRate` (proxies to the global `ticker`). No rendering logic itself. `Player` owns the `<canvas>`, constructs the WebGL-or-Canvas2D renderer, registers with `ticker` on `start()`, and calls `renderer.render(stage, buffer, matrix)` every tick. One `Player` per app — see §2.                                                              | `display/Stage.ts`, `player/Player.ts`                                                                                                                                               |
-| GPU texture GC                           | `GraphicsPipe`/`TextPipe` each keep a module-level `FinalizationRegistry` that deletes the GL texture when the owning JS object is actually garbage-collected, because there is no reliable "permanently removed from stage" signal to hook `destroyRenderable()` to.                                                                                                                                                                                                                  | `player/webgl/pipes/GraphicsPipe.ts`, `TextPipe.ts`                                                                                                                                  |
+| GPU texture GC                           | `GraphicsPipe`/`TextPipe` register cached textures through `RenderContext.registerTextureForGC()`. The WebGL context owns the module-level `FinalizationRegistry`; explicit destruction unregisters the token and deletes the texture immediately.                                                                                                                                                                                                                                    | `player/RenderContext.ts`, `player/pipes/GraphicsPipe.ts`, `player/pipes/TextPipe.ts`, `player/webgl/WebGLRenderContext.ts`                                                          |
 
 ## 4. Public API surface (`src/index.ts`)
 
@@ -131,66 +134,48 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **Events**: `Event`, `EventMap` (type), `EventPhase`, `IEventDispatcher`, `EventDispatcher`, `FocusEvent`, `HTTPStatusEvent`, `IOErrorEvent`, `ProgressEvent`, `StageOrientationEvent`, `TextEvent`, `TimerEvent`, `TouchEvent`.
 - **Geom**: `Point`/`sharedPoint`, `Rectangle`/`sharedRectangle`, `Matrix`/`sharedMatrix`.
 - **Utils**: `NumberUtils`, `Base64Util`, `toColorString`, `Logger`/`LogLevel`, `Timer`/`TimerEvents`, `ByteArray`/`Endian`, `registerFontMapping`/`cacheFontResource`, `DebugLog`.
-- **Display**: enums (`BitmapFillMode`, `BlendMode`+helpers, `CapsStyle`, `GradientType`, `JointStyle`, `OrientationMode`, `StageScaleMode`); `DisplayObject`/`RenderMode`/`RenderObjectType`; `DisplayObjectContainer`, `Stage`, `Graphics`, `Shape`, `Sprite`, `Bitmap`, `Mesh`; textures: `BitmapData`, `Texture`, `RenderTexture`, `SpriteSheet`; `PathCommandType`/`GraphicsCommand` (type).
-- **Net**: `HttpMethod`, `HttpResponseType`, `HttpRequest`/`HttpRequestEvents`, `ImageLoader`/`ImageLoaderEvents`.
+- **Display**: enums (`BitmapFillMode`, `BlendMode`/`blendModeToNumber`/`numberToBlendMode`, `CapsStyle`, `GradientType`, `JointStyle`, `OrientationMode`, `StageScaleMode`); `DisplayObject`/`RenderMode`/`RenderObjectType`/`DisplayObjectEvents`/`CacheAsTextureOptions`; `DisplayObjectContainer`, `Stage`, `Graphics`/`setGraphicsHitTest`, `Shape`, `Sprite`, `Bitmap`/`setBitmapPixelHitTest`, `Mesh`; textures: `BitmapData`/`CompressedTextureData`, `Texture`/`textureScaleFactor`, `RenderTexture`, `SpriteSheet`; `PathCommandType`/`GraphicsCommand` (type).
+- **Net**: `HttpMethod`/`HttpMethodType`, `HttpResponseType`/`HttpResponseTypeType`, `HttpRequest`/`HttpRequestEvents`, `ImageLoader`/`ImageLoaderEvents`.
 - **Filters**: `Filter`, `BlurFilter`, `ColorMatrixFilter`, `GlowFilter`, `DropShadowFilter`, `CustomFilter`.
 - **Media**: `Sound`/`SoundType`/`SoundEvents`, `SoundChannel`, `Video`.
-- **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`; rendering: `InstructionSet`/`Instruction`, `RenderPipe`, `CanvasBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
-  - _(Internal, not re-exported)_ `RenderContext` / `RenderBuffer` interfaces (`player/RenderContext.ts`, `player/RenderBuffer.ts`): the backend-neutral contracts leaf pipes depend on; `WebGLRenderContext`/`WebGLRenderBuffer` implement them. See `docs-internal/renderer-backend-decoupling.md`.
-- **Text**: `HorizontalAlign`, `VerticalAlign`, `TextFieldType`, `TextFieldInputType`, `HtmlTextParser`, `BitmapFont`, `BitmapText`, `measureText`/`getFontString`, `TextField`, `StageText`, `InputController`, `tokenize`/`splitGraphemes`.
+- **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`, `START_TIME`, `invalidateRenderFlag`/`setInvalidateRenderFlag`, `requestRenderingFlag`/`setRequestRenderingFlag`, `Renderable`; rendering: `InstructionSet`/`Instruction`, `RenderPipe` (type), `CanvasBuffer`, `hitTestBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`/`StageDisplaySize`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
+  - `RenderContext` / `RenderBuffer` (`player/RenderContext.ts`, `player/RenderBuffer.ts`) are internal backend-neutral contracts and are not re-exported.
+- **Text**: `HorizontalAlign`, `VerticalAlign`, `TextFieldType`, `TextFieldInputType`; types `ITextStyle`, `ITextElement`, `IWTextElement`, `ILineElement`, `IHitTextElement`; `HtmlTextParser`, `BitmapFont`, `BitmapText`, `measureText`/`getFontString`, `TextField`, `StageText`, `InputController`, `tokenize`/`splitGraphemes`.
 - **System**: `Capabilities`.
 - **localStorage**: namespace object — `import { localStorage } from '@kurot/core'`, then `localStorage.getItem(...)`.
 - **External**: `ExternalInterface` (named, not namespaced).
-- **Resource**: `Resource`/`resource` (shared instance), `ResourceItem`, `ResourceType`, `ResourceConfig`, `ResourceLoader`, `ResourceEventType`/`ResourceEvent`, `AnalyzerBase`, `ImageAnalyzer`, `JsonAnalyzer`, `TextAnalyzer`, `SoundAnalyzer`, `SheetAnalyzer`.
+- **Resource**: `Resource`/`resource` (shared instance), `ProgressCallback`, `ResourceEventListener`, `ResourceItem`, `ResourceType`, `ResourceConfig`/`ResourceConfigData`/`ResourceConfigEntry`, `ResourceLoader`, `ResourceEventType`/`ResourceEvent`, `AnalyzerBase`, `ImageAnalyzer`, `JsonAnalyzer`, `TextAnalyzer`, `SoundAnalyzer`, `SheetAnalyzer`.
 
 `benchmark/` is dev-only tooling and is **not** exported from `index.ts`.
 
-## 5. Migration gotchas (1.0.0 breaking changes vs. Egret)
+## 5. Current API constraints
 
-1. `.hashCode` / `HashObject` / `IHashObject` removed entirely. Use `===` or
-   `WeakMap`-keyed lookups for identity, not integer hash codes.
-2. `Resource.instance` singleton getter removed — import the shared instance:
-   `import { resource } from '@kurot/core'`.
-3. Multi-Player listener registration (`addStructureChangeListener` etc.) on
-   `DisplayObject`/`DisplayObjectContainer` removed. The engine is single-
-   Player by design (static hooks set directly by `Player`'s constructor).
-   `architecture.md` §3.5 now documents this correctly (corrected 2026-08-12).
-4. `WebGLRenderContext.getInstance()` / `resetInstance()` removed — `Player`
-   constructs the context directly per canvas.
-5. Internal fields are `$`-prefixed (`$x`, `$y`, `$renderDirty`, ...) to mark
-   them as not part of the public API, even though TS can't enforce privacy
-   across the package boundary.
-6. Vendor-prefix fallbacks removed (`experimental-webgl`, `webkitAudioContext`,
-   `webkit/moz` fullscreen) along with the hand-rolled base64 implementation —
-   `Base64Util.encode()` now takes `ArrayBuffer`, not `string`.
-7. `Texture.getPixel32`/`getPixels`/`toDataURL` deprecated — use
-   `RenderTexture.getPixel32` instead.
-8. hitTest return values changed `null` → `undefined` throughout.
-9. Egret's `RenderNode` intermediate representation and the "interface + Web
-   impl + Native impl" triple-file pattern are gone. No native-wrapper target
-   exists — Kurot is web/canvas-only.
+- Object identity uses object references; there is no `hashCode` API.
+- Import the resource singleton as `resource`; `Resource` can also be
+  instantiated directly.
+- One `Player` owns the runtime hooks for a page. Constructing another player
+  replaces those static hooks.
+- `Player` constructs its own `WebGLRenderContext`; there is no context
+  singleton.
+- `$`-prefixed members are engine internals even when TypeScript visibility
+  permits package-level access.
+- `Base64Util.encode()` accepts `ArrayBuffer`.
+- Pixel reads are provided by `RenderTexture.getPixel32()`; the corresponding
+  base `Texture` read/export methods throw unsupported-operation errors.
+- Hit-test and lookup misses return `undefined`.
+- The supported runtime target is the browser; there is no native-wrapper
+  backend.
+- Event sources can specialize `EventDispatcher<EventMap>` for typed listener
+  callbacks; untyped callers use the base `Event` overload.
+- `MultiTextureBatcher.MAX_TEXTURES` is currently fixed at 8.
 
-## 6. Not-yet-implemented (roadmap docs — don't treat as current behavior)
-
-- `docs-internal/event-api-modernization.md` / `docs-internal/eventmap-decision.md`
-  (gitignored, local-only): proposals for a generic `EventMap`-typed
-  `addEventListener`. **Not implemented** — listeners are still typed
-  `(e: Event) => void`, requiring `as XxxEvent` casts at call sites.
-- `docs/pixi-alignment.md`: forward-looking roadmap (dynamic texture slots
-  beyond 8, Shader Bits composition, third-party pipe registry, KTX2 textures,
-  WebGPU backend). `MultiTextureBatcher.MAX_TEXTURES` is still hardcoded to 8.
-- `docs-internal/core-review.md` (gitignored, local-only): catalog of ~12
-  known minor issues (B1–B12); a few are fixed (HashObject removal), most
-  are still open — see that file for the current list before assuming
-  something is or isn't a bug, if it's present in your checkout.
-
-## 7. Task → file map
+## 6. Task → file map
 
 | I want to...                               | Look at                                                                                                          |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | Add a new DisplayObject subclass           | `display/DisplayObject.ts`, model it on `display/Shape.ts`                                                       |
-| Add a new filter                           | `filters/`, follow `BlurFilter.ts`'s ping-pong dual-pass pattern; GPU side in `player/webgl/pipes/FilterPipe.ts` |
-| Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/webgl/InstructionSet.ts`                                                |
+| Add a new filter                           | `filters/`, follow `BlurFilter.ts`'s ping-pong dual-pass pattern; execution side in `player/pipes/FilterPipe.ts` |
+| Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                      |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                 |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                     |
 | Change text layout/wrapping                | `text/WordWrap.ts`, `text/TextMeasurer.ts`                                                                       |

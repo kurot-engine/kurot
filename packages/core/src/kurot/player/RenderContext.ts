@@ -2,39 +2,17 @@ import type { BitmapData } from '../display/texture/BitmapData.js';
 import type { Filter } from '../filters/Filter.js';
 
 /**
- * Opaque backend texture handle.
- *
- * Its concrete type is backend-specific (`WebGLTexture` today, `GPUTexture` in
- * a future WebGPU backend). Pipes only ever receive this from `RenderContext`
- * methods and pass it back to other `RenderContext` methods — they never
- * inspect its internals. Aliased to `unknown` (not a branded type) because the
- * WebGL backend returns the native `WebGLTexture` directly, which couldn't
- * satisfy a branded interface without a wrapping class. The alias exists for
- * readability and documentation, not type-level enforcement.
+ * Opaque texture handle passed between render pipes and their context.
  */
 export type TextureHandle = unknown;
 
 /**
- * Opaque offscreen buffer handle (`WebGLRenderBuffer` today). Same rationale
- * as {@link TextureHandle} — pass-through only, aliased to `unknown`.
+ * Opaque offscreen buffer handle passed through a render context.
  */
 export type OffscreenBufferHandle = unknown;
 
 /**
- * Backend-agnostic drawing surface used by leaf/effect pipes.
- *
- * This is the one coupling point between a pipe's `execute()` body and a
- * concrete GPU API. `WebGLRenderContext` implements this interface today;
- * a future WebGPU backend would provide its own implementation without any
- * change to the pipes that consume it.
- *
- * Only methods actually called from `player/pipes/*.ts` are declared here —
- * see docs-internal/renderer-backend-decoupling.md for the grep that
- * produced this list. `texture`/`buffer` parameters are typed
- * {@link TextureHandle}/{@link OffscreenBufferHandle} because their concrete
- * shape (`WebGLTexture`, `WebGLRenderBuffer`, ...) is backend-specific; pipes
- * only ever pass through values they received from this same interface, never
- * inspect their internals directly.
+ * Drawing surface contract consumed by render pipes.
  */
 export interface RenderContext {
 	// ── Draw ────────────────────────────────────────────────────────────────
@@ -116,7 +94,9 @@ export interface RenderContext {
 	 */
 	registerTextureForGC(owner: object, texture: TextureHandle, token: object): void;
 
-	/** Cancels a pending registration made via `registerTextureForGC`. */
+	/**
+	 * Cancels a pending registration made via `registerTextureForGC`.
+	 */
 	unregisterTextureGC(token: object): void;
 
 	/**
@@ -152,6 +132,8 @@ export interface RenderContext {
 
 	// ── Limits ──────────────────────────────────────────────────────────────
 
-	/** Maximum texture dimension the backend can handle (e.g. `MAX_TEXTURE_SIZE` in WebGL). */
+	/**
+	 * Maximum texture dimension the backend can handle (e.g. `MAX_TEXTURE_SIZE` in WebGL).
+	 */
 	maxTextureSize: number;
 }

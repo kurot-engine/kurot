@@ -21,7 +21,6 @@ import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 
 const CAPS_MAP: Record<string, CanvasLineCap> = { none: 'butt', square: 'square', round: 'round' };
 
-/** Convert a 0xRRGGBB color number to a CSS rgb() string. */
 function colorToString(color: number): string {
 	const r = (color >> 16) & 0xff;
 	const g = (color >> 8) & 0xff;
@@ -30,22 +29,11 @@ function colorToString(color: number): string {
 }
 
 /**
- * Canvas 2D renderer. Traverses the DisplayObject tree and draws each node
- * using the Canvas 2D API. Equivalent to Egret's `CanvasRenderer`.
- *
- * Performance notes:
- * - Currently does full-tree traversal and full-canvas redraw every frame.
- *   Egret used a DisplayList with dirty-region tracking to only redraw changed areas.
- *   This should be added when performance becomes a concern.
- * - Egret used a RenderNode intermediate layer (BitmapNode, GraphicsNode, etc.)
- *   to cache rendering instructions. Kurot reads DisplayObject data directly,
- *   which is simpler but skips the caching benefit. If profiling shows the JS-side
- *   traversal is a bottleneck, consider adding a lightweight render command cache.
- * - For high-performance scenarios, a WebGL renderer with batch rendering should
- *   be implemented as an alternative backend.
+ * Traverses a display-object tree and renders it with Canvas 2D.
  */
 export class CanvasRenderer {
-	// ── Instance fields ───────────────────────────────────────────────────────
+
+    // ── Instance fields ───────────────────────────────────────────────────────
 	private _hasFill = false;
 	private _hasStroke = false;
 
@@ -65,7 +53,6 @@ export class CanvasRenderer {
 		return drawCalls;
 	}
 
-	/** @internal Used by WebGLRenderer for offscreen DisplayList rendering. */
 	public renderToContext(
 		displayObject: DisplayObject,
 		ctx: CanvasRenderingContext2D,
@@ -75,7 +62,6 @@ export class CanvasRenderer {
 		this.drawDisplayObject(displayObject, ctx, offsetX, offsetY, true);
 	}
 
-	/** @internal Used by WebGLRenderer to rasterize a Graphics object into a Canvas 2D context. */
 	public renderGraphicsToContext(
 		graphics: Graphics,
 		ctx: CanvasRenderingContext2D,
@@ -87,7 +73,6 @@ export class CanvasRenderer {
 		this.renderGraphics(graphics, ctx, offsetX, offsetY, forHitTest, skipCache);
 	}
 
-	/** @internal Used by WebGL TextPipe to rasterize a TextField into a Canvas 2D context. */
 	public renderTextFieldToContext(
 		tf: TextField,
 		ctx: CanvasRenderingContext2D,
@@ -97,7 +82,6 @@ export class CanvasRenderer {
 		this.renderTextField(tf, ctx, offsetX, offsetY);
 	}
 
-	/** @internal Used by Bitmap pixel hit test. */
 	public renderBitmapToContext(
 		bitmap: Bitmap,
 		ctx: CanvasRenderingContext2D,
@@ -117,7 +101,6 @@ export class CanvasRenderer {
 	): number {
 		let drawCalls = 0;
 
-		// DisplayList cache (cacheAsBitmap)
 		const $displayList = displayObject.$displayList;
 		if ($displayList && !_isStage) {
 			if (displayObject.$cacheDirty || displayObject.$renderDirty) {
@@ -137,7 +120,6 @@ export class CanvasRenderer {
 				displayObject.$cacheDirty = false;
 				displayObject.$renderDirty = false;
 			}
-			// Draw cached result and skip $children
 			if ($displayList.bitmapData?.source) {
 				const resolution = $displayList.actualResolution;
 				const previousSmoothing = ctx.imageSmoothingEnabled;
@@ -155,10 +137,8 @@ export class CanvasRenderer {
 			return drawCalls;
 		}
 
-		// Draw self
 		drawCalls += this.renderSelf(displayObject, ctx, offsetX, offsetY);
 
-		// Draw $children
 		const $children = displayObject.$children;
 		if (!$children) return drawCalls;
 
@@ -241,15 +221,11 @@ export class CanvasRenderer {
 		const bounds = displayObject.$getOriginalBounds();
 		if (bounds.width <= 0 || bounds.height <= 0) return 0;
 
-		// Build CSS filter string for GPU-accelerated filters.
-		// ColorMatrixFilter cannot be expressed as a CSS filter string (arbitrary matrix),
-		// so it falls back to the CPU pixel path below.
 		const cssFilters: string[] = [];
 		let hasCpuFilter = false;
 
 		for (const filter of filters) {
 			if (filter instanceof BlurFilter) {
-				// Average blurX/blurY — CSS blur is isotropic.
 				const radius = (filter.blurX + filter.blurY) / 2;
 				if (radius > 0) cssFilters.push(`blur(${radius}px)`);
 			} else if (filter instanceof DropShadowFilter) {
@@ -263,7 +239,6 @@ export class CanvasRenderer {
 				const a = Math.round(filter.alpha * 255);
 				cssFilters.push(`drop-shadow(${dx}px ${dy}px ${blur}px rgba(${r},${g},${b},${a / 255}))`);
 			} else if (filter instanceof GlowFilter) {
-				// Approximate glow as a zero-offset drop-shadow.
 				const blur = (filter.blurX + filter.blurY) / 2;
 				const r = (filter.color >> 16) & 0xff;
 				const g = (filter.color >> 8) & 0xff;
@@ -302,7 +277,6 @@ export class CanvasRenderer {
 		const offscreen = new CanvasBuffer(bufferW, bufferH);
 		const offCtx = offscreen.context;
 
-		// Apply CSS-capable filters on the offscreen context before drawing.
 		if (cssFilters.length > 0) offCtx.filter = cssFilters.join(' ');
 
 		let drawCalls = 0;
@@ -321,7 +295,6 @@ export class CanvasRenderer {
 
 		offCtx.filter = 'none';
 
-		// Apply CPU-only filters (ColorMatrixFilter).
 		const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
 		const data = imageData.data;
 		for (const filter of filters) {
@@ -360,8 +333,6 @@ export class CanvasRenderer {
 			ctx.clip();
 		}
 
-		// DisplayObject mask: render content and mask to offscreen buffers,
-		// composite with 'destination-in' to produce the masked result.
 		if (mask) {
 			const bounds = displayObject.$getOriginalBounds();
 			if (bounds.width <= 0 || bounds.height <= 0) {
@@ -374,16 +345,13 @@ export class CanvasRenderer {
 			const bx = bounds.x;
 			const by = bounds.y;
 
-			// Render content to offscreen buffer
 			const contentBuffer = new CanvasBuffer(bw, bh);
 			const contentCtx = contentBuffer.context;
 			const drawCalls = this.drawDisplayObject(displayObject, contentCtx, -bx, -by);
 
-			// Render mask shape to the same buffer using destination-in
 			contentCtx.globalCompositeOperation = 'destination-in';
 			const maskMatrix = mask.$getConcatenatedMatrix();
 			const parentMatrix = displayObject.$getConcatenatedMatrix();
-			// Transform mask relative to the content's local space
 			contentCtx.save();
 			const invA = parentMatrix.a,
 				invB = parentMatrix.b,
@@ -399,7 +367,6 @@ export class CanvasRenderer {
 					id = invA / det;
 				const itx = (invC * invTy - invD * invTx) / det;
 				const ity = (invB * invTx - invA * invTy) / det;
-				// Combine: inverse(parent) * mask
 				const ra = ia * maskMatrix.a + ic * maskMatrix.b;
 				const rb = ib * maskMatrix.a + id * maskMatrix.b;
 				const rc = ia * maskMatrix.c + ic * maskMatrix.d;
@@ -414,7 +381,6 @@ export class CanvasRenderer {
 			contentCtx.restore();
 			contentCtx.globalCompositeOperation = 'source-over';
 
-			// Draw the masked result onto the main context
 			ctx.drawImage(contentBuffer.surface, offsetX + bx, offsetY + by);
 			contentBuffer.destroy();
 
@@ -461,8 +427,6 @@ export class CanvasRenderer {
 		const bd = mesh.bitmapData;
 		if (!bd?.source || mesh.vertices.length === 0) return 0;
 
-		// Canvas 2D doesn't natively support mesh rendering.
-		// Fall back to drawing the full texture as a simple bitmap.
 		const destW = !isNaN(mesh.width) ? mesh.width : mesh.textureWidth;
 		const destH = !isNaN(mesh.height) ? mesh.height : mesh.textureHeight;
 		ctx.drawImage(
@@ -515,13 +479,11 @@ export class CanvasRenderer {
 		// ── Offscreen cache (skip for hit-test or when caller manages its own cache) ──
 		if (!forHitTest && !skipCache) {
 			if (graphics.canvasCacheDirty || !graphics.offscreenCanvas) {
-				// Measure bounds to size the offscreen canvas
 				const bounds = new Rectangle();
 				graphics.$measureContentBounds(bounds);
 				const cw = Math.ceil(bounds.width) || 1;
 				const ch = Math.ceil(bounds.height) || 1;
 
-				// Create or resize offscreen canvas
 				if (!graphics.offscreenCanvas) {
 					graphics.offscreenCanvas = document.createElement('canvas');
 					graphics.offscreenCtx = graphics.offscreenCanvas.getContext('2d', { willReadFrequently: true })!;
@@ -541,7 +503,6 @@ export class CanvasRenderer {
 				for (const cmd of graphics.commands) {
 					this.executeGraphicsCommand(cmd, oc2d, false);
 				}
-				// Flush any open path that wasn't closed by endFill
 				this.flushOpenPath(oc2d);
 				oc2d.restore();
 
@@ -550,7 +511,6 @@ export class CanvasRenderer {
 				graphics.canvasCacheDirty = false;
 			}
 
-			// Draw cached offscreen canvas
 			ctx.drawImage(
 				graphics.offscreenCanvas!,
 				offsetX + graphics.offscreenBoundsX!,
@@ -567,18 +527,14 @@ export class CanvasRenderer {
 		for (const cmd of graphics.commands) {
 			this.executeGraphicsCommand(cmd, ctx, forHitTest);
 		}
-		// Flush any open path that wasn't closed by endFill
 		this.flushOpenPath(ctx);
 		ctx.restore();
 		return 1;
 	}
 
 	private renderTextField(tf: TextField, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): number {
-		tf.getLinesArr(); // ensure lines are computed
+		tf.getLinesArr();
 
-		// INPUT mode while focused: HTML input element owns the display.
-		// Only render background/border so the field is visible, but skip
-		// text content to avoid the double-text artefact.
 		const inputFocused = tf.type === TextFieldType.INPUT && tf.isTyping;
 
 		const width = !isNaN(tf.$explicitWidth) ? tf.$explicitWidth : tf.textWidth;
@@ -601,7 +557,6 @@ export class CanvasRenderer {
 			ctx.strokeRect(0, 0, width, height);
 		}
 
-		// While the native input is active, skip text/cursor rendering.
 		if (inputFocused) {
 			ctx.restore();
 			return 0;
@@ -631,11 +586,7 @@ export class CanvasRenderer {
 		// ── ScrollV offset ────────────────────────────────────────────────────
 		const scrollOffset = tf.getScrollYOffset();
 
-		// ── Draw lines (Egret-style: textBaseline='middle', y at line-height center) ──
-		// Following Egret's TextField.drawText():
-		//   drawY advances by h/2 before drawing, then h/2 + lineSpacing after.
-		//   Each element's y = drawY + (lineHeight - elementSize) / 2.
-		//   With textBaseline='middle', the browser handles vertical centering automatically.
+		// ── Text lines ───────────────────────────────────────────────────────────
 		let drawY = verticalOffset - scrollOffset;
 		let drawCalls = 0;
 
@@ -649,7 +600,6 @@ export class CanvasRenderer {
 				continue;
 			}
 
-			// Horizontal alignment offset
 			let lineX = 0;
 			if (tf.textAlign === HorizontalAlign.RIGHT) {
 				lineX = width - line.width;
@@ -657,7 +607,6 @@ export class CanvasRenderer {
 				lineX = (width - line.width) / 2;
 			}
 
-			// Draw each element in the line
 			for (const el of line.elements) {
 				const style = el.style;
 				const fontSize = style?.size ?? tf.size;
@@ -675,7 +624,6 @@ export class CanvasRenderer {
 
 				const textY = drawY + (h - fontSize) / 2;
 
-				// Stroke
 				if (stroke > 0) {
 					ctx.strokeStyle = colorToString(strokeColor);
 					ctx.lineWidth = stroke * 2;
@@ -684,7 +632,6 @@ export class CanvasRenderer {
 					drawCalls++;
 				}
 
-				// Fill
 				ctx.fillStyle = colorToString(textColor);
 				ctx.fillText(el.text, lineX, textY);
 				drawCalls++;
@@ -697,13 +644,11 @@ export class CanvasRenderer {
 
 		// ── INPUT cursor ──────────────────────────────────────────────────────
 		if (tf.type === TextFieldType.INPUT && tf.isTyping) {
-			// Draw blinking cursor at caretIndex position
 			const caretIndex = tf.caretIndex;
 			const fontStr = getFontString(tf.size, tf.fontFamily, tf.bold, tf.italic);
 			ctx.font = fontStr;
 			ctx.textBaseline = 'middle';
 
-			// Calculate cursor x by measuring text up to caretIndex
 			let cursorX = 0;
 			let charCount = 0;
 			for (const line of lines) {
@@ -719,7 +664,7 @@ export class CanvasRenderer {
 					charCount += elLen;
 				}
 				if (charCount >= caretIndex) break;
-				cursorX = 0; // reset x for next line
+				cursorX = 0;
 			}
 
 			const cursorY = verticalOffset - scrollOffset;
@@ -807,8 +752,6 @@ export class CanvasRenderer {
 					this._hasFill = true;
 					break;
 				}
-				// createGradientBox uses the Flash/Egret convention where the matrix
-				// maps gradient space ±819.2 (1638.4/2) to the desired box edges.
 				const GH = 819.2;
 				let gradient: CanvasGradient;
 				if (cmd.matrix) {
@@ -951,9 +894,6 @@ function applyColorMatrix(data: Uint8ClampedArray, matrix: number[]): void {
 }
 
 // ── Graphics pixel-perfect hit test ──────────────────────────────────────────
-// Registered here to avoid circular dependency between display/ and player/.
-// Uses the shared 3×3 hitTestBuffer: translate so the test point lands at (1,1),
-// render with forHitTest=true (all shapes drawn as opaque black), then read alpha.
 
 const _hitRenderer = new CanvasRenderer();
 
@@ -961,7 +901,6 @@ setGraphicsHitTest((graphics: Graphics, localX: number, localY: number): boolean
 	const buf = hitTestBuffer();
 	buf.clear();
 	const ctx = buf.context;
-	// Translate so localX/Y maps to pixel (1,1) in the 3×3 buffer
 	ctx.setTransform(1, 0, 0, 1, 1 - localX, 1 - localY);
 	_hitRenderer.renderGraphicsToContext(graphics, ctx, 0, 0, true);
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -973,7 +912,6 @@ setGraphicsHitTest((graphics: Graphics, localX: number, localY: number): boolean
 });
 
 // ── Bitmap pixel-perfect hit test ────────────────────────────────────────────
-// Renders the Bitmap into the shared 3×3 buffer at the test point and reads alpha.
 
 setBitmapPixelHitTest((bitmap: Bitmap, localX: number, localY: number): boolean => {
 	const buf = hitTestBuffer();

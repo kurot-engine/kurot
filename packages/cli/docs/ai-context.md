@@ -2,9 +2,8 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the pipeline from scratch
-each session. `docs/architecture.md` covers the same plugin pipeline in
-prose/tables and is a good cross-reference. Egret↔Kurot differences/migration live in the root
-[`docs/egret-migration.md`](../../../docs/egret-migration.md), not here.
+each session. [`architecture.md`](./architecture.md) covers the same plugin
+pipeline in greater detail.
 
 Package identity: `@kurot/cli@1.1.0`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
@@ -37,7 +36,7 @@ src/
 │   │   ├── registry.ts             Namespace prefix map + component tag registry
 │   │   ├── exml-parser.ts          XElement tree -> SkinIR
 │   │   └── codegen.ts              SkinIR -> ESM source text (string building, not AST)
-│   └── plugins/                    Pipeline steps, run in array order (see §4)
+│   └── plugins/                    Pipeline steps, run in array order (see §5)
 │       ├── clean-output.ts, compile-exml.ts, compile-engine.ts,
 │       │   compile-custom-namespaces.ts, compile-source.ts,
 │       │   generate-html.ts, manifest.ts, copy-assets.ts
@@ -46,7 +45,7 @@ src/
 ```
 
 Templates actually scaffolded by `create` live in `templates/game/` and
-`templates/empty/` (sibling to `src/`, not under it) — see §5.
+`templates/empty/` (sibling to `src/`, not under it) — see §6.
 
 ## 2. Non-obvious behavior
 
@@ -110,8 +109,7 @@ Templates actually scaffolded by `create` live in `templates/game/` and
 - `kurot create` makes **live npm registry HTTP calls** (3s timeout per
   package) to pin each scaffolded `@kurot/*` dependency to a concrete
   version, falling back to the literal string `'latest'` on failure/timeout.
-  This is a real network dependency during scaffolding, not mentioned in the
-  README.
+  This is a real network dependency during scaffolding.
 - `writeManifest` is a **no-op outside release mode** — `manifest.json` is
   only ever written for release builds.
 - Release output path is timestamped (`bin-release/web/<YYMMDDHHmmss>/`) —
@@ -225,9 +223,9 @@ watching itself happens separately, inside `compileSource`'s own
 ## 6. `create` — what actually gets scaffolded
 
 `scaffoldProject(name, template)`:
-1. Copies `templates/<template>/` verbatim (no content templating/
-   placeholder substitution — unlike the HTML page template mechanism in
-   §2/generate-html.ts, scaffolded file contents are copied as-is).
+1. Copies `templates/<template>/` verbatim. Scaffolded file contents do not
+   undergo placeholder substitution; HTML build templates are handled
+   separately by `generate-html.ts`.
 2. Rewrites `<name>/package.json`: sets `.name`; pins `@kurot/cli` to
    `^<version of the CLI binary currently running>`; re-resolves every other
    `@kurot/*` dependency against the npm registry `latest` tag (3s timeout,
@@ -245,18 +243,25 @@ Confirmed file lists (from directory listing, not the README):
   `exml` key in its `kurot.config.ts`.
 - Both templates' `pnpm-workspace.yaml` set `allowBuilds: {esbuild: true}`
   and `minimumReleaseAge: 0` — a pnpm supply-chain-safety config baked into
-  every new project, not mentioned in the README.
-- `game/src/Main.ts`'s actual lifecycle is `createChildren → runGame →
+  every new project.
+- `game/src/Main.ts`'s lifecycle is `createChildren → runGame →
   loadResource → installResourceAssetAdapter → loadTheme → createGameScene →
-  startAnimation` — the README's lifecycle table omits
-  `installResourceAssetAdapter`, a private step between `loadResource` and
+  startAnimation`. `installResourceAssetAdapter` is a private step between `loadResource` and
   `loadTheme` that swaps in a custom `AssetAdapter` so EXML `source=
   "button_up_png"`-style references resolve against the preloaded resource
   group before falling back to `DefaultAssetAdapter`.
 - Generated project comments (`LoadingUI.ts`, `Main.ts`) are in Simplified
   Chinese, consistent with this package's own docs.
 
-## 7. Task → file map
+## 7. Published package surface
+
+The `kurot` executable is the command entry. The package's JavaScript/TypeScript
+entry is `dist/define.js` / `dist/define.d.ts`, generated from `src/define.ts`.
+It exports configuration types only: `ProjectConfig`, `BuildTarget`,
+`StageConfig`, `ExmlConfig`, and `OutputConfig`. CLI pipeline, EXML and
+diagnostic internals are not package subpath exports.
+
+## 8. Task → file map
 
 | I want to... | Look at |
 |---|---|

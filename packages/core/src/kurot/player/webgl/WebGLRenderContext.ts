@@ -25,12 +25,6 @@ interface BlurFramebufferEntry {
 const BLUR_FRAMEBUFFER_POOL_LIMIT = 16;
 const BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT = 64 * 1024 * 1024;
 
-/**
- * Backing store for `registerTextureForGC`/`unregisterTextureGC`. Shared at
- * module scope (mirroring the pattern each pipe used to keep its own
- * registry) since the cleanup callback only needs the `gl`/`texture` pair
- * captured at registration time, not any WebGLRenderContext instance state.
- */
 const _gcRegistry = new FinalizationRegistry<{ gl: GL; texture: WebGLTexture }>(({ gl, texture }) => {
 	gl.deleteTexture(texture);
 });
@@ -67,8 +61,6 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _vertexBuffer: WebGLBuffer;
 	private readonly _indexBuffer: WebGLBuffer;
 	private _bindIndices = false;
-	// Track which GPU buffer size is currently allocated so we only re-allocate
-	// when switching between single-texture and multi-texture layouts.
 	private _gpuVertexBufferSize = 0;
 	private _defaultEmptyTexture?: WebGLTexture;
 	private _maxTextureUnits = MultiTextureBatcher.MAX_TEXTURES;
@@ -77,20 +69,13 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
 
 	// ── Blur FBO pool ─────────────────────────────────────────────────────────
-	// Key: "${width}x${height}", Value: stack of reusable { texture, fbo } pairs.
 	private readonly _blurFboPool: Map<string, BlurFramebufferEntry[]> = new Map();
-	// Total number of framebuffer pairs currently retained across all sizes.
 	private _blurFboPoolSize: number = 0;
-	// Approximate RGBA texture memory retained by the blur pool.
 	private _blurFboPoolBytes: number = 0;
 
-	// Public so Player can construct it. The engine is single-Player by
-	// design; there is intentionally no getInstance() singleton.
 	public constructor(canvas: HTMLCanvasElement) {
 		this.surface = canvas;
 
-		// Prefer WebGL2 with GLSL ES 3.00 shaders.
-		// Fall back to WebGL1 for older devices.
 		const gl2 = canvas.getContext('webgl2') as WebGL2RenderingContext | null;
 		if (gl2) {
 			this.gl = gl2;
@@ -132,9 +117,6 @@ export class WebGLRenderContext implements RenderContext {
 		this.drawCmdManager = new WebGLDrawCmdManager();
 		this._vao = new WebGLVertexArrayObject();
 
-		// Pre-allocate the GPU vertex buffer at maximum single-texture capacity.
-		// bufferSubData will update only the used portion each frame without
-		// triggering a GPU memory reallocation.
 		gl.bufferData(gl.ARRAY_BUFFER, WebGLVertexArrayObject.MAX_VERTEX_BYTES, gl.DYNAMIC_DRAW);
 		this._gpuVertexBufferSize = WebGLVertexArrayObject.MAX_VERTEX_BYTES;
 
@@ -150,19 +132,7 @@ export class WebGLRenderContext implements RenderContext {
 		});
 	}
 
-	// ── Getter ────────────────────────────────────────────────────────────────
-
-	/**
-	 * Register a callback invoked after the WebGL context is restored.
-	 * Returns an unregister function.
-	 */
-	public addContextRestoredListener(fn: () => void): () => void {
-		this._contextRestoredCallbacks.push(fn);
-		return () => {
-			const i = this._contextRestoredCallbacks.indexOf(fn);
-			if (i >= 0) this._contextRestoredCallbacks.splice(i, 1);
-		};
-	}
+	// ── Getters ───────────────────────────────────────────────────────────────
 
 	public get activatedBuffer(): WebGLRenderBuffer | undefined {
 		return this._currentBuffer;
@@ -181,7 +151,18 @@ export class WebGLRenderContext implements RenderContext {
 		return this._defaultEmptyTexture;
 	}
 
-	// ── Buffer stack ──────────────────────────────────────────────────────────
+	// ── Public methods ────────────────────────────────────────────────────────
+
+	/**
+	 * Registers a context-restored callback and returns its unregister function.
+	 */
+	public addContextRestoredListener(fn: () => void): () => void {
+		this._contextRestoredCallbacks.push(fn);
+		return () => {
+			const i = this._contextRestoredCallbacks.indexOf(fn);
+			if (i >= 0) this._contextRestoredCallbacks.splice(i, 1);
+		};
+	}
 
 	public pushBuffer(buffer: WebGLRenderBuffer): void {
 		this._bufferStack.push(buffer);
@@ -558,20 +539,9 @@ export class WebGLRenderContext implements RenderContext {
 	}
 
 	/**
-	 * Composite the offscreen filter result back onto the current (parent) buffer.
-	 *
-	 * Strategy (following Egret's WebGLRenderer._drawWithFilter pattern):
-	 *
-	 * 1. Flush all pending batched commands so the offscreen FBO content is
-	 *    fully rasterised and the GL state is clean.
-	 * 2. Apply multi-pass effects (blur ping-pong) directly on the offscreen
-	 *    texture via temporary FBOs.
-	 * 3. Activate the parent buffer's FBO.
-	 * 4. Draw the offscreen texture onto the parent buffer using the batched
-	 *    drawTexture() path so that the parent buffer's globalMatrix is
-	 *    correctly applied to position the result.
-	 * 5. Flush immediately so the draw executes while the GL FBO state is
-	 *    known-good, preventing feedback loops.
+	 * Composites an offscreen filter result into the active parent buffer.
+	 * Pending work is flushed before sampling and after compositing to prevent
+	 * framebuffer feedback and state leakage.
 	 */
 	public compositeFilterResult(filters: Filter[], offscreen: WebGLRenderBuffer): void {
 		const target = offscreen.rootRenderTarget;
@@ -581,52 +551,28 @@ export class WebGLRenderContext implements RenderContext {
 		const w = target.width;
 		const h = target.height;
 
-		// Step 1 — flush pending commands (leaf draws into the offscreen FBO).
 		this.flush();
 
-		// Step 2 — multi-pass blur (operates entirely via direct GL calls on
-		// temporary FBOs; does NOT touch the batched command queue).
 		for (const filter of filters) {
 			if (filter instanceof BlurFilter && (filter.blurX > 0 || filter.blurY > 0)) {
 				this._drawBlurPingPong(target.texture, w, h, filter, offscreen);
 			}
 		}
 
-		// Step 3 — ensure the parent buffer's FBO is the active GL framebuffer.
 		if (this._currentBuffer) {
 			this._currentBuffer.rootRenderTarget.activate();
 			this.onResize(this._currentBuffer.width, this._currentBuffer.height);
 		}
 
-		// Step 4 — queue a batched drawTexture so the parent buffer's
-		// globalMatrix positions the quad correctly.
 		const nonBlurFilter = filters.find(f => !(f instanceof BlurFilter));
 
 		this.activeFilter = nonBlurFilter;
 		this.drawTexture(target.texture, 0, 0, w, h, 0, 0, w, h, w, h);
 		this.activeFilter = undefined;
 
-		// Step 5 — flush immediately.
 		this.flush();
 	}
 
-	/**
-	 * Two-pass separable Gaussian blur.
-	 * Horizontal pass renders into a temporary FBO; vertical pass writes the
-	 * blurred result back into the offscreen buffer's FBO so that the caller
-	 * (compositeFilterResult) can composite it onto the parent buffer.
-	 *
-	 * Optimisations vs. the naive approach:
-	 * - FBO pool: temporary textures/framebuffers are reused across frames
-	 *   (keyed by size) to avoid the expensive create/delete cycle on mobile.
-	 * - Dynamic shader tier: the loop bound in the GLSL is a compile-time
-	 *   constant chosen from {4, 8, 16, 32} so the GPU can unroll/optimise it,
-	 *   while still supporting blur radii up to 32 px.
-	 *
-	 * NOTE: This method does NOT restore the parent buffer's FBO — the caller
-	 * is responsible for activating the correct destination FBO before the
-	 * final composite draw.
-	 */
 	private _drawBlurPingPong(
 		texture: WebGLTexture,
 		w: number,
@@ -655,7 +601,6 @@ export class WebGLRenderContext implements RenderContext {
 			tmpEntry = { texture: tmpTex, fbo: tmpFbo, byteSize: w * h * 4 };
 		}
 
-		// Clear the temporary FBO before use.
 		gl.bindFramebuffer(gl.FRAMEBUFFER, tmpEntry.fbo);
 		gl.viewport(0, 0, w, h);
 		gl.clearColor(0, 0, 0, 0);
@@ -744,11 +689,6 @@ export class WebGLRenderContext implements RenderContext {
 		this._blurFboPoolBytes += entry.byteSize;
 	}
 
-	/**
-	 * Draws a single full-screen quad using the given program and texture.
-	 * `setUniforms` is called after `useProgram` to let the caller set
-	 * filter-specific uniforms.
-	 */
 	private _drawFullscreenQuad(
 		prog: WebGLProgram,
 		texture: WebGLTexture,
@@ -785,29 +725,24 @@ export class WebGLRenderContext implements RenderContext {
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		setUniforms(prog);
 
-		// Build a single quad covering [0,w] × [0,h] directly in a local buffer.
 		const f32 = new Float32Array(20);
 		const u32 = new Uint32Array(f32.buffer);
-		const packed = 0xffffffff; // white, full alpha (premultiplied)
-		// v0 (0,0)
+		const packed = 0xffffffff;
 		f32[0] = 0;
 		f32[1] = 0;
 		f32[2] = 0;
 		f32[3] = 0;
 		u32[4] = packed;
-		// v1 (w,0)
 		f32[5] = w;
 		f32[6] = 0;
 		f32[7] = 1;
 		f32[8] = 0;
 		u32[9] = packed;
-		// v2 (w,h)
 		f32[10] = w;
 		f32[11] = h;
 		f32[12] = 1;
 		f32[13] = 1;
 		u32[14] = packed;
-		// v3 (0,h)
 		f32[15] = 0;
 		f32[16] = h;
 		f32[17] = 0;
@@ -818,11 +753,6 @@ export class WebGLRenderContext implements RenderContext {
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
 		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 
-		// Restore the GPU vertex buffer to its pre-allocated size so that the
-		// next _flush() call can safely use bufferSubData without overflowing.
-		// _drawFullscreenQuad replaces the buffer with a tiny 80-byte quad;
-		// without this restore, bufferSubData would write past the end of the
-		// GPU allocation and trigger INVALID_VALUE / buffer overflow errors.
 		gl.bufferData(gl.ARRAY_BUFFER, this._gpuVertexBufferSize, gl.DYNAMIC_DRAW);
 		this._bindIndices = false;
 	}
@@ -846,55 +776,41 @@ export class WebGLRenderContext implements RenderContext {
 	private _onContextRestored(): void {
 		const gl = this.gl;
 
-		// Re-apply baseline GL state.
 		gl.disable(gl.DEPTH_TEST);
 		gl.disable(gl.CULL_FACE);
 		gl.enable(gl.BLEND);
 		gl.colorMask(true, true, true, true);
 		gl.activeTexture(gl.TEXTURE0);
 
-		// Re-bind the vertex and index buffers (they are lost on context loss).
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
 
-		// Re-allocate the GPU vertex buffer after context loss.
 		gl.bufferData(gl.ARRAY_BUFFER, this._gpuVertexBufferSize, gl.DYNAMIC_DRAW);
 
-		// Clear the shader program cache — all programs are invalid after context loss.
 		WebGLProgram.clearCache();
 
-		// Reset internal state.
 		this._bindIndices = false;
 		this._batcher.reset();
 		this.drawCmdManager.clear();
 		this._vao.clear();
 
-		// The default empty texture is also lost.
 		this._defaultEmptyTexture = undefined;
 
-		// All blur FBO pool entries are invalid after context loss — discard them.
 		this._blurFboPool.clear();
 		this._blurFboPoolSize = 0;
 		this._blurFboPoolBytes = 0;
 
-		// Invalidate all cached WebGL textures on BitmapData instances.
-		// After context loss every WebGLTexture handle is invalid; clearing the
-		// reference lets getWebGLTexture() lazily re-upload from the source.
 		for (const ref of this._trackedBitmapDatas) {
 			const bd = ref.deref();
 			if (bd) {
 				bd.webGLTexture = undefined;
 			} else {
-				// BitmapData was garbage collected — remove the dead WeakRef.
 				this._trackedBitmapDatas.delete(ref);
 			}
 		}
 
-		// Restore projection.
 		this.onResize();
 
-		// Notify listeners (e.g. WebGLRenderer) so they can rebuild instructions
-		// and invalidate texture references.
 		for (const fn of this._contextRestoredCallbacks) fn();
 	}
 
@@ -905,18 +821,13 @@ export class WebGLRenderContext implements RenderContext {
 
 		if (vao.getVerticesByteLength() === 0 && cmds.drawDataLen === 0) return;
 
-		// Upload only the vertices written this frame.
-		// If the batch switched to multi-texture layout the GPU buffer may need
-		// to grow (multi stride is 24B vs 20B for single); re-allocate once.
 		const neededBytes = vao.getVerticesByteLength();
 		if (neededBytes > 0) {
 			if (neededBytes > this._gpuVertexBufferSize) {
-				// Grow: re-allocate at the new maximum capacity.
 				const newSize = WebGLVertexArrayObject.MAX_MULTI_VERTEX_BYTES;
 				gl.bufferData(gl.ARRAY_BUFFER, newSize, gl.DYNAMIC_DRAW);
 				this._gpuVertexBufferSize = newSize;
 			}
-			// Upload only the used portion — no GPU memory reallocation.
 			gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Uint8Array(vao.getVerticesBuffer(), 0, neededBytes));
 		}
 		if (!this._bindIndices) {
@@ -925,8 +836,6 @@ export class WebGLRenderContext implements RenderContext {
 				vao.isMesh() ? vao.getMeshIndices() : vao.getIndices(),
 				gl.STATIC_DRAW,
 			);
-			// Quad indices are static — cache after first upload.
-			// Mesh indices vary per frame — never cache.
 			if (!vao.isMesh()) {
 				this._bindIndices = true;
 			}
@@ -1058,7 +967,7 @@ export class WebGLRenderContext implements RenderContext {
 		const prog = WebGLProgram.get(gl, this.shaders.multi_vert, this.shaders.multi_frag, 'multi');
 		gl.useProgram(prog.id);
 
-		const stride = 6 * 4; // MULTI_VERT_BYTE_SIZE
+		const stride = 6 * 4;
 		const aPos = prog.attributes['aVertexPosition'];
 		const aUV = prog.attributes['aTextureCoord'];
 		const aColor = prog.attributes['aColor'];
@@ -1083,7 +992,6 @@ export class WebGLRenderContext implements RenderContext {
 		const uProj = prog.uniforms['projectionVector'];
 		if (uProj) gl.uniform2f(uProj, this.projectionX, this.projectionY);
 
-		// Bind each texture to its unit and set the sampler uniform array.
 		const uSamplers = prog.uniforms['uSamplers[0]'];
 		const samplerIndices = new Int32Array(cmd.textureCount);
 		for (let i = 0; i < cmd.textureCount; i++) {
@@ -1092,7 +1000,6 @@ export class WebGLRenderContext implements RenderContext {
 			samplerIndices[i] = i;
 		}
 		if (uSamplers) gl.uniform1iv(uSamplers, samplerIndices);
-		// Restore active texture unit to 0 for subsequent single-texture draws.
 		gl.activeTexture(gl.TEXTURE0);
 
 		gl.drawElements(gl.TRIANGLES, count * 3, gl.UNSIGNED_SHORT, indexOffset * 6);
@@ -1125,7 +1032,6 @@ export class WebGLRenderContext implements RenderContext {
 		const prog = this._getTextureProgram(filter);
 		gl.useProgram(prog.id);
 
-		// Vertex attributes: x,y (2f), uv (2f), color (4ub)
 		const stride = 5 * 4;
 		const aPos = prog.attributes['aVertexPosition'];
 		const aUV = prog.attributes['aTextureCoord'];
@@ -1151,7 +1057,6 @@ export class WebGLRenderContext implements RenderContext {
 
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 
-		// Apply filter uniforms
 		if (filter instanceof ColorMatrixFilter) {
 			const uMatrix = prog.uniforms['matrix'];
 			const uAdd = prog.uniforms['colorAdd'];
@@ -1188,8 +1093,6 @@ export class WebGLRenderContext implements RenderContext {
 				const uHide = prog.uniforms['hideObject'];
 				if (uHide) gl.uniform1f(uHide, filter.hideObject ? 1 : 0);
 			} else {
-				// GlowFilter: zero out DropShadow-specific uniforms so stale
-				// values from a previous DropShadowFilter draw don't leak in.
 				const uDist = prog.uniforms['dist'];
 				if (uDist) gl.uniform1f(uDist, 0);
 				const uAngle = prog.uniforms['angle'];

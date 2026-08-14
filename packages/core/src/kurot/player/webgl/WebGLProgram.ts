@@ -4,7 +4,6 @@ import type { GL } from './WebGLUtils.js';
 export type UniformMap = Record<string, WebGLUniformLocation | null>;
 export type AttributeMap = Record<string, number>;
 
-// Alias to avoid name collision with the class itself.
 type NativeWebGLProgram = NonNullable<ReturnType<GL['createProgram']>>;
 
 export class WebGLProgram {

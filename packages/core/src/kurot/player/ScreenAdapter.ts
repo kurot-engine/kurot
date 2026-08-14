@@ -11,11 +11,7 @@ export interface StageDisplaySize {
 }
 
 /**
- * Manages the relationship between the browser viewport, the canvas element,
- * and the Stage logical size. Handles resize events and applies the configured
- * StageScaleMode.
- *
- * Equivalent to Egret's `sys.Screen` + `DefaultScreenAdapter`.
+ * Keeps the browser viewport, canvas and logical stage size synchronized.
  */
 export class ScreenAdapter {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -54,6 +50,11 @@ export class ScreenAdapter {
 		this.updateScreenSize();
 	}
 
+	/**
+	 * Resizes the canvas and updates stage and input scaling.
+	 * Input scaling reads the canvas backing size after the player resize because
+	 * updating the root render buffer can change that size.
+	 */
 	public updateScreenSize(): void {
 		const stage = this._player.stage;
 		const container = this._canvas.parentElement;
@@ -75,18 +76,9 @@ export class ScreenAdapter {
 
 		this._player.updateStageSize(size.stageWidth, size.stageHeight);
 
-		// Sync canvas bounding size into Capabilities for game code to read.
 		Capabilities.boundingClientWidth = size.displayWidth;
 		Capabilities.boundingClientHeight = size.displayHeight;
 
-		// The WebGL renderer maps stage coordinates 1:1 to canvas buffer pixels
-		// (projectionVector = canvasWidth/2, -canvasHeight/2).  To convert a
-		// CSS-pixel offset within the canvas to a stage coordinate we need:
-		//   stageCoord = cssPixel * (canvasBufferWidth / clientWidth)
-		//
-		// IMPORTANT: After the call to updateStageSize() above, the WebGL buffer
-		// resize may have changed canvas.width from displayWidth to stageWidth.
-		// So we must read canvas.width *now*, not reuse size.displayWidth.
 		const innerW = this._canvas.clientWidth || size.displayWidth;
 		const innerH = this._canvas.clientHeight || size.displayHeight;
 		const scaleX = this._canvas.width / innerW;
@@ -150,7 +142,6 @@ export class ScreenAdapter {
 				break;
 		}
 
-		// Ensure even dimensions to avoid sub-pixel rendering issues
 		if (stageWidth % 2 !== 0) stageWidth++;
 		if (stageHeight % 2 !== 0) stageHeight++;
 		if (displayWidth % 2 !== 0) displayWidth++;

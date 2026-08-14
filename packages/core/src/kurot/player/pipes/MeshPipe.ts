@@ -5,8 +5,6 @@ import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 
-// ── Instruction ───────────────────────────────────────────────────────────────
-
 export interface MeshInstruction extends Instruction {
 	readonly renderPipeId: 'mesh';
 	renderable: Mesh;
@@ -14,31 +12,21 @@ export interface MeshInstruction extends Instruction {
 	offsetY: number;
 }
 
-// ── Pipe ──────────────────────────────────────────────────────────────────────
-
+/**
+ * Draws textured mesh instructions through a render buffer.
+ */
 export class MeshPipe implements RenderPipe<Mesh> {
+
+    // ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'mesh';
 
 	private static readonly _pool: MeshInstruction[] = [];
 
-	private static _alloc(mesh: Mesh, ox: number, oy: number): MeshInstruction {
-		const inst = MeshPipe._pool.pop() ?? {
-			renderPipeId: 'mesh',
-			renderable: mesh,
-			offsetX: ox,
-			offsetY: oy,
-		};
-		inst.renderable = mesh;
-		inst.offsetX = ox;
-		inst.offsetY = oy;
-		return inst;
-	}
+	// ── Public methods ────────────────────────────────────────────────────────
 
 	public static release(inst: MeshInstruction): void {
 		MeshPipe._pool.push(inst);
 	}
-
-	// ── RenderPipe impl ───────────────────────────────────────────────────────
 
 	public addToInstructionSet(mesh: Mesh, set: InstructionSet): void {
 		if (!mesh.bitmapData?.source || mesh.vertices.length === 0 || mesh.indices.length === 0) {
@@ -47,15 +35,9 @@ export class MeshPipe implements RenderPipe<Mesh> {
 		set.add(MeshPipe._alloc(mesh, 0, 0));
 	}
 
-	public updateRenderable(_mesh: Mesh): void {
-		// Mesh data is read directly at execute time.
-	}
+	public updateRenderable(_mesh: Mesh): void {}
 
-	public destroyRenderable(_mesh: Mesh): void {
-		// GPU textures managed by BitmapData lifecycle.
-	}
-
-	// ── Execute ───────────────────────────────────────────────────────────────
+	public destroyRenderable(_mesh: Mesh): void {}
 
 	public execute(inst: MeshInstruction, buffer: RenderBuffer): void {
 		const mesh = inst.renderable;
@@ -67,7 +49,6 @@ export class MeshPipe implements RenderPipe<Mesh> {
 		const destW = !isNaN(mesh.width) ? mesh.width : mesh.textureWidth;
 		const destH = !isNaN(mesh.height) ? mesh.height : mesh.textureHeight;
 
-		// offsetX/Y are already baked into globalMatrix via _applyTransform.
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
 
@@ -92,5 +73,20 @@ export class MeshPipe implements RenderPipe<Mesh> {
 
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
+	}
+
+	// ── Private methods ───────────────────────────────────────────────────────
+
+	private static _alloc(mesh: Mesh, ox: number, oy: number): MeshInstruction {
+		const inst = MeshPipe._pool.pop() ?? {
+			renderPipeId: 'mesh',
+			renderable: mesh,
+			offsetX: ox,
+			offsetY: oy,
+		};
+		inst.renderable = mesh;
+		inst.offsetX = ox;
+		inst.offsetY = oy;
+		return inst;
 	}
 }

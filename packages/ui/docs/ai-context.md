@@ -2,10 +2,9 @@
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from scratch
-each session. It complements `docs/architecture.md` — that file covers the
-_why_ (design rationale, validation cycle internals, layout algorithm
-internals, Egret comparison); this file covers the _what to watch out for_
-(gotchas, terminology, task→file lookup).
+each session. Treat the package source and its `src/index.ts` barrel as the
+authority for current behavior and exports; this file provides the compressed
+map, runtime contracts and task→file lookup.
 
 Package identity: `@kurot/ui@1.1.7`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
@@ -24,7 +23,7 @@ src/kurot/
 │                   UIState (the actual layout state machine — see §3),
 │                   Validator/validator (global RAF-batched validation scheduler),
 │                   Theme/getTheme()/setTheme(), IViewport, IAssetAdapter/IThemeAdapter.
-├── components/     Group, Component (delegation core — see §2), Skin, and ~28
+├── components/     Group, Component (delegation core — see §2), Skin, and
 │                   concrete widgets: Button, Label, CheckBox, RadioButton,
 │                   ToggleButton/ToggleSwitch, ProgressBar, HSlider/VSlider,
 │                   Rect, Image, EditableText, TextInput, Panel, ViewStack,
@@ -44,11 +43,11 @@ src/kurot/
                     ScrollerThrowEvent.
 ```
 
-## 2. Non-obvious behavior (things an AI trained on EUI/Flex conventions will get wrong)
+## 2. Non-obvious current behavior
 
-- **`Skin` is NOT a `Group`/DisplayObject subclass.** `components/Skin.ts:25`
-  is `class Skin extends EventDispatcher<SkinEvents>` — a plain data holder,
-  not a visual container (see `docs/architecture.md` §3.1). A skin's
+- **`Skin` is NOT a `Group`/DisplayObject subclass.** `components/Skin.ts`
+  defines `class Skin extends EventDispatcher<SkinEvents>` — a plain data
+  holder, not a visual container. A skin's
   `elementsContent: DisplayObject[]` are physically parented onto the _host_
   `Component` by `Component._setSkin()`, not onto the skin itself. The skin
   object itself never appears in the display tree — its only job is to
@@ -80,19 +79,17 @@ Skin` constructors (detected via regex on `Function.prototype.toString()`,
   `invalidateDisplayList()` + parent invalidation as side effects.
 - **Reading `.width`/`.height` can force a synchronous layout pass.**
   `getWidth()/getHeight()` call `_validateSizeNow()` before returning — this
-  mirrors Flex/EUI semantics but differs from most retained-mode engines
-  where a getter just returns the last computed value.
+  therefore a getter may perform layout work before returning.
 - Anchor/percent constraints (`left`/`right`/`percentWidth`, etc.) have zero
   effect until the component is added to a `Group` that has a `layout`
   assigned. Setting them on a standalone/unparented component is a no-op.
 - `isUIComponent()` is duck-typed (`'ui' in obj`) — any object with a `.ui`
   property passes, not necessarily a real `Group`/`Component`.
-- **Virtual layout defaults to OFF**, unlike Egret EUI which defaults it on.
+- **Virtual layout defaults to OFF.**
   Must opt in explicitly: `list.useVirtualLayout = true`.
 - `ArrayCollection.filterFunction()` **mutates `_source` in place** — filtered-
   out items are permanently removed from the backing array, not just hidden
-  from the view (unlike EUI's view-cursor-based filtering, which preserves the
-  original list). To "unfilter," reassign `source`.
+  from the view. To "unfilter," reassign `source`.
   Also: `source =` setter dispatches `RESET` (resets scroll position
   downstream in `DataGroup`); `replaceAll()` deliberately avoids that to
   preserve scroll position — called out in its own doc comment.
@@ -126,7 +123,7 @@ Skin` constructors (detected via regex on `Function.prototype.toString()`,
 | `skinParts`                                        | `Skin.skinParts: string[]` — property names the component looks up via `skin.getPart(name)` (plain `this[name]` lookup on the skin instance) and binds via `Component.setSkinPart()`. Purely convention-based, no decorators/metadata.                                                                                                                                                                            | `components/Skin.ts`, `components/Component.ts`                                         |
 | Skin/State/SetProperty pattern                     | Declare `skinParts` + `states: State[]` in a `Skin` subclass. `Component.currentState` flows into `Skin.currentState`, which diffs old vs new `State.overrides` and calls `apply()`/`remove()` on each `IOverride`.                                                                                                                                                                                               | `states/State.ts`, `states/IOverride.ts`, `states/SetProperty.ts`, `components/Skin.ts` |
 | `IViewport`                                        | Extends `IUIComponent` with `contentWidth`/`contentHeight` (readonly) and `scrollH`/`scrollV`/`scrollEnabled`. Implemented by `Group` (and thus `DataGroup`/`List`), consumed by `Scroller`.                                                                                                                                                                                                                      | `core/IViewport.ts`                                                                     |
-| Virtual layout                                     | Layout mode where only currently-visible-index item renderers are instantiated; off-screen renderers recycle into `DataGroup._freeRenderers` (a `Map<class, ItemRenderer[]>` free-list pool keyed by renderer class). Toggled via `layout.useVirtualLayout`. Off by default (unlike Egret EUI).                                                                                                                   | `layouts/LayoutBase.ts`, `components/DataGroup.ts`                                      |
+| Virtual layout                                     | Layout mode where only currently-visible-index item renderers are instantiated; off-screen renderers recycle into `DataGroup._freeRenderers` (a `Map<class, ItemRenderer[]>` free-list pool keyed by renderer class). Toggled via `layout.useVirtualLayout`. Off by default.                                                                                                                                     | `layouts/LayoutBase.ts`, `components/DataGroup.ts`                                      |
 | `childrenCreated()` vs `UIEvent.CREATION_COMPLETE` | `childrenCreated()` is the imperative override hook, called synchronously once right after `createChildren()`. `CREATION_COMPLETE` is the event fired immediately after, for external listeners. Both fire at the same instant, exactly once per instance.                                                                                                                                                        | `core/UIState.ts` (`$onAddToStage`), `events/UIEvent.ts`                                |
 
 ## 4. Public API surface (`src/index.ts`)
@@ -134,9 +131,9 @@ Skin` constructors (detected via regex on `Function.prototype.toString()`,
 Flat re-export of 7 barrels, in this order: `core`, `layouts`, `components`,
 `events`, `states`, `collections`, `binding`.
 
-- **core**: `IUIComponent`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
+- **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
 - **layouts**: `ILayoutTarget`, `LayoutBase`, `BasicLayout`, `LinearLayoutBase`, `VerticalLayout`, `HorizontalLayout`, `TileLayout`, `ColumnAlign`, `RowAlign`, `JustifyAlign`, `TileOrientation`.
-- **components**: `Group`, `Component`, `Skin`, `Button`, `Label`, `CheckBox`, `RadioButton`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
+- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
 - **events**: `UIEvent`, `ItemTapEvent`, `CollectionEvent`/`CollectionEventKind`, `PropertyEvent`, `ScrollerThrowEvent`.
 - **states**: `State`, `IOverride`, `SetProperty`, `SetStateProperty`, `AddItems`.
 - **collections**: `ICollection`, `ArrayCollection`.

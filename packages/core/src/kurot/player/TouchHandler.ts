@@ -3,10 +3,9 @@ import { DisplayObject } from '../display/DisplayObject.js';
 import { TouchEvent } from '../events/TouchEvent.js';
 
 /**
- * Manages touch/mouse input on a canvas element and dispatches TouchEvent
- * to the appropriate DisplayObject in the display list.
- *
- * Equivalent to Egret's `sys.TouchHandler` + `WebTouchHandler`.
+ * Dispatches canvas pointer input to display objects as touch events.
+ * Mouse defaults are suppressed so focusing a native text input is not
+ * immediately undone by the canvas.
  */
 export class TouchHandler {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -115,9 +114,6 @@ export class TouchHandler {
 
 	private getStageCoords(clientX: number, clientY: number): { x: number; y: number } {
 		const rect = this._canvas.getBoundingClientRect();
-		// Use clientLeft/clientTop to offset for CSS borders on the canvas.
-		// getBoundingClientRect() includes borders, but the stage content
-		// area starts at (clientLeft, clientTop) inside the rect.
 		return {
 			x: (clientX - rect.left - this._canvas.clientLeft) * this._scaleX,
 			y: (clientY - rect.top - this._canvas.clientTop) * this._scaleY,
@@ -130,7 +126,6 @@ export class TouchHandler {
 		this._canvas.addEventListener('touchend', this.onTouchEndEvent);
 		this._canvas.addEventListener('touchcancel', this.onTouchEndEvent);
 		this._canvas.addEventListener('mousedown', this.onMouseDown);
-		// Keep tracking an active drag after the pointer leaves the canvas.
 		window.addEventListener('mousemove', this.onMouseMove);
 		window.addEventListener('mouseup', this.onMouseUp);
 	}
@@ -162,10 +157,6 @@ export class TouchHandler {
 	};
 
 	private onMouseDown = (e: MouseEvent): void => {
-		// Prevent the canvas from stealing focus away from any native input
-		// element that is about to be focused by the touch handler (e.g. a
-		// TextField in INPUT mode). Without this, the browser would move focus
-		// to the canvas on mousedown, immediately blurring the input.
 		e.preventDefault();
 		const { x, y } = this.getStageCoords(e.clientX, e.clientY);
 		this.onTouchBegin(x, y, 0);

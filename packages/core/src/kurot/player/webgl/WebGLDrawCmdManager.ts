@@ -24,10 +24,10 @@ export const enum DrawCmdType {
 export interface DrawCmd {
 	type: DrawCmdType;
 	count: number;
-	texture: WebGLTexture | undefined;
-	filter: Filter | undefined;
+	texture?: WebGLTexture;
+	filter?: Filter;
 	value: string;
-	buffer: WebGLRenderBuffer | undefined;
+	buffer?: WebGLRenderBuffer;
 	width: number;
 	height: number;
 	textureWidth: number;
@@ -35,18 +35,14 @@ export interface DrawCmd {
 	smoothing: boolean;
 	x: number;
 	y: number;
-	// Populated only for MULTI_TEXTURE commands.
-	multiCmd: MultiTextureDrawCmd | undefined;
+	multiCmd?: MultiTextureDrawCmd;
 }
 
 function makeCmd(): DrawCmd {
 	return {
 		type: DrawCmdType.TEXTURE,
 		count: 0,
-		texture: undefined,
-		filter: undefined,
 		value: '',
-		buffer: undefined,
 		width: 0,
 		height: 0,
 		textureWidth: 0,
@@ -54,7 +50,6 @@ function makeCmd(): DrawCmd {
 		smoothing: false,
 		x: 0,
 		y: 0,
-		multiCmd: undefined,
 	};
 }
 
@@ -64,6 +59,7 @@ export class WebGLDrawCmdManager {
 	// ── Public fields ─────────────────────────────────────────────────────────
 
 	public readonly drawData: DrawCmd[] = [];
+
 	public drawDataLen = 0;
 
 	// ── Public methods — push ─────────────────────────────────────────────────
@@ -118,7 +114,6 @@ export class WebGLDrawCmdManager {
 	 */
 	public pushDrawMultiTexture(multiCmd: MultiTextureDrawCmd): void {
 		const last = this.drawData[this.drawDataLen - 1];
-		// Merge consecutive commands that share the same slot layout.
 		if (
 			this.drawDataLen > 0 &&
 			last.type === DrawCmdType.MULTI_TEXTURE &&

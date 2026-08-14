@@ -1,6 +1,5 @@
 /**
- * GLSL ES 3.00 shaders — used with WebGL2 context.
- * For WebGL1 (GLSL ES 1.00) shaders see ../webgl/ShaderLib.ts
+ * GLSL ES 3.00 shader sources for WebGL 2.
  */
 export const ShaderLib2 = {
 	default_vert: /* glsl */ `#version 300 es
@@ -17,10 +16,6 @@ void main(void) {
    vColor = aColor;
 }`,
 
-	// Standalone vertex shader for fullscreen quad blits (filters, blur passes).
-	// Identical to default_vert but kept separate so filter passes can be
-	// paired with their own fragment shaders without colliding with the
-	// batched-texture program cache key.
 	fullscreen_vert: /* glsl */ `#version 300 es
 in vec2 aVertexPosition;
 in vec2 aTextureCoord;
@@ -35,7 +30,6 @@ void main(void) {
    vColor = aColor;
 }`,
 
-	// Multi-texture vertex shader: carries textureId as a float attribute.
 	multi_vert: /* glsl */ `#version 300 es
 in vec2 aVertexPosition;
 in vec2 aTextureCoord;
@@ -53,10 +47,6 @@ void main(void) {
    vTextureId = aTextureId;
 }`,
 
-	// Multi-texture fragment shader.
-	// Each branch uses a constant integer to index the sampler array, which
-	// satisfies GLSL ES 3.00's requirement that sampler indices be constant or
-	// dynamically uniform. (Direct variable indexing is NOT allowed.)
 	multi_frag: /* glsl */ `#version 300 es
 precision lowp float;
 in vec2 vTextureCoord;
@@ -120,7 +110,6 @@ void main() {
     fragColor = color;
 }`,
 
-	// Horizontal blur pass for ping-pong two-pass Gaussian blur.
 	blur_h_frag: /* glsl */ `#version 300 es
 precision mediump float;
 uniform float blurX;
@@ -141,7 +130,6 @@ void main() {
     fragColor = color / total;
 }`,
 
-	// Vertical blur pass for ping-pong two-pass Gaussian blur.
 	blur_v_frag: /* glsl */ `#version 300 es
 precision mediump float;
 uniform float blurY;

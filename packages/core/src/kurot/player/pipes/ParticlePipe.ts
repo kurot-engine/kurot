@@ -6,8 +6,6 @@ import type { RenderPipe } from '../RenderPipe.js';
 import type { Texture as TextureClass } from '../../display/texture/Texture.js';
 import { Matrix } from '../../geom/Matrix.js';
 
-// ── Instruction ───────────────────────────────────────────────────────────────
-
 export interface ParticleInstruction extends Instruction {
 	readonly renderPipeId: 'particle';
 	renderable: DisplayObject;
@@ -15,30 +13,21 @@ export interface ParticleInstruction extends Instruction {
 	offsetY: number;
 }
 
-// ── Pipe ──────────────────────────────────────────────────────────────────────
-
 /**
- * Handles WebGL rendering of ParticleSystem display objects.
- * The ParticleSystem lives in @kurot/game; core accesses it via duck-typing.
+ * Draws particle systems supplied through the game package's structural contract.
  */
 export class ParticlePipe implements RenderPipe<DisplayObject> {
+
+    // ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'particle';
 
-	// ── RenderPipe impl ───────────────────────────────────────────────────────
+	// ── Public methods ────────────────────────────────────────────────────────
 
-	public addToInstructionSet(_ps: DisplayObject, _set: InstructionSet): void {
-		/* no-op */
-	}
+	public addToInstructionSet(_ps: DisplayObject, _set: InstructionSet): void {}
 
-	public updateRenderable(_ps: DisplayObject): void {
-		/* no-op */
-	}
+	public updateRenderable(_ps: DisplayObject): void {}
 
-	public destroyRenderable(_ps: DisplayObject): void {
-		/* no-op */
-	}
-
-	// ── Execute ───────────────────────────────────────────────────────────────
+	public destroyRenderable(_ps: DisplayObject): void {}
 
 	public execute(inst: ParticleInstruction, buffer: RenderBuffer): void {
 		const ps = inst.renderable as unknown as {

@@ -42,10 +42,8 @@ export interface KurotApp {
  * ```
  */
 export function createPlayer(options: KurotOptions): KurotApp {
-	// Detect runtime environment once per session.
 	Capabilities._init();
 
-	// Wire up RenderTexture renderer once on first call
 	if (!RenderTexture.renderer) {
 		const _renderer = new CanvasRenderer();
 		RenderTexture.renderer = (displayObject, width, height, offsetX, offsetY) => {
