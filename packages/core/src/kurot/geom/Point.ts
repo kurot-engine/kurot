@@ -92,5 +92,7 @@ export class Point {
 	}
 }
 
-/** @internal Reusable temp instance for framework internals — do not hold references. */
+/**
+ * Shared temporary point. Do not retain references to it.
+ */
 export const sharedPoint: Point = new Point();

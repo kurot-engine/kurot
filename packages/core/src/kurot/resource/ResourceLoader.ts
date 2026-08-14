@@ -10,23 +10,31 @@ import type { AnalyzerBase } from './analyzers/AnalyzerBase.js';
  * - Progress is reported via the `onProgress` callback.
  */
 export class ResourceLoader {
-	// ── Configuration ──────────────────────────────────────────────────────
+	// ── Instance fields ──────────────────────────────────────────────────────
 
-	/** Maximum concurrent loads */
+	/**
+	 * Maximum concurrent loads
+	 */
 	public threadCount = 2;
-	/** Maximum retries for failed items */
+	/**
+	 * Maximum retries for failed items
+	 */
 	public retryCount = 3;
 
-	// ── Callbacks ──────────────────────────────────────────────────────────
 
-	/** Called for each successfully loaded item */
+	/**
+	 * Called for each successfully loaded item
+	 */
 	public onComplete?: (item: ResourceItem) => void;
-	/** Called for each failed item (after retries exhausted) */
+	/**
+	 * Called for each failed item (after retries exhausted)
+	 */
 	public onError?: (item: ResourceItem) => void;
-	/** Called with (loaded, total) progress */
+	/**
+	 * Called with (loaded, total) progress
+	 */
 	public onProgress?: (loaded: number, total: number) => void;
 
-	// ── Internal state ─────────────────────────────────────────────────────
 
 	private pendingList: ResourceItem[] = [];
 	private loadingList: ResourceItem[] = [];
@@ -36,7 +44,7 @@ export class ResourceLoader {
 	private totalCount = 0;
 	private completedCount = 0;
 
-	// ── Public API ─────────────────────────────────────────────────────────
+	// ── Public methods ─────────────────────────────────────────────────────────
 
 	/**
 	 * Register an analyzer for a resource type.
@@ -84,7 +92,6 @@ export class ResourceLoader {
 	private _resolve?: () => void;
 
 	private next(): void {
-		// All done?
 		if (this.pendingList.length === 0 && this.activeCount === 0) {
 			if (this._resolve) {
 				this._resolve();
@@ -93,7 +100,6 @@ export class ResourceLoader {
 			return;
 		}
 
-		// Fill up to threadCount
 		while (this.activeCount < this.threadCount && this.pendingList.length > 0) {
 			const item = this.pendingList.shift()!;
 			this.loadingList.push(item);
@@ -102,20 +108,6 @@ export class ResourceLoader {
 		}
 	}
 
-	/**
-	 * Load a single item via its registered analyzer and route the outcome
-	 * through `finishItem()`, regardless of how it finished (no analyzer,
-	 * synchronous throw, rejection, or a resolved result).
-	 *
-	 * `analyzer.loadFile(item)` is a plain (possibly user-supplied) method —
-	 * it isn't guaranteed to always return a Promise before throwing. If it
-	 * throws synchronously instead of rejecting, that exception happens on
-	 * the call expression itself, before any Promise exists to attach
-	 * `.catch()` to; without the try/catch below, the exception would
-	 * propagate out of `loadItem()` (past `next()`'s while-loop, skipping
-	 * every subsequent item this tick) and this item's `activeCount` slot
-	 * would never be retired, permanently wedging `start()`.
-	 */
 	private loadItem(item: ResourceItem): void {
 		const analyzer = this.analyzerMap.get(item.type);
 		if (!analyzer) {
@@ -133,9 +125,6 @@ export class ResourceLoader {
 			return;
 		}
 
-		// Use the rejection callback of then(), rather than a chained catch().
-		// Exceptions from completion callbacks must not be mistaken for an
-		// analyzer failure and retire the same item twice.
 		result.then(
 			r => {
 				this.finishItem(r);
@@ -147,11 +136,6 @@ export class ResourceLoader {
 		);
 	}
 
-	/**
-	 * Single completion point for an in-flight item, whether it loaded, failed,
-	 * threw, or had no analyzer. Decrements `activeCount` exactly once per item
-	 * so retry / no-analyzer paths can't double-decrement or leak a slot.
-	 */
 	private finishItem(item: ResourceItem): void {
 		this.loadingList = this.loadingList.filter(i => i !== item);
 		this.activeCount--;
@@ -181,7 +165,6 @@ export class ResourceLoader {
 			return;
 		}
 
-		// Retries exhausted
 		this.completedCount++;
 		this.safeNotify(() => this.onError?.(item));
 		this.reportProgress();
@@ -196,7 +179,6 @@ export class ResourceLoader {
 		try {
 			callback();
 		} catch {
-			// Consumer callbacks must not corrupt loader bookkeeping or stall the queue.
 		}
 	}
 }

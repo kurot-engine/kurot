@@ -12,7 +12,6 @@ export class SoundChannel extends EventDispatcher {
 	private _loopCount = 0;
 	private _volume = 1;
 
-	// Web Audio API
 	private _context?: AudioContext;
 	private _gainNode?: GainNode;
 	private _bufferSource?: AudioBufferSourceNode;
@@ -20,14 +19,12 @@ export class SoundChannel extends EventDispatcher {
 	private _webAudioStartTime = 0;
 	private _startOffset = 0;
 
-	// HTMLAudioElement fallback
 	private _audio?: HTMLAudioElement;
 
 	private _stopped = false;
 
 	// ── Constructor (Web Audio) ───────────────────────────────────────────────
 
-	/** @internal Use Sound.play() to create instances. */
 	constructor(
 		context: AudioContext | undefined,
 		audioBuffer: AudioBuffer | undefined,

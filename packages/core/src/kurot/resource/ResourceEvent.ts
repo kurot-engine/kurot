@@ -18,14 +18,24 @@ export type ResourceEventType = (typeof ResourceEventType)[keyof typeof Resource
  * Event data passed to resource event listeners.
  */
 export interface ResourceEvent {
-	/** Event type */
+	/**
+	 * Event type
+	 */
 	type: ResourceEventType;
-	/** Group name (for group events) */
+	/**
+	 * Group name (for group events)
+	 */
 	groupName: string;
-	/** The resource item involved (may be undefined for group-level events) */
+	/**
+	 * The resource item involved (may be undefined for group-level events)
+	 */
 	item?: ResourceItem;
-	/** Number of items loaded so far in the group */
+	/**
+	 * Number of items loaded so far in the group
+	 */
 	itemsLoaded: number;
-	/** Total number of items in the group */
+	/**
+	 * Total number of items in the group
+	 */
 	itemsTotal: number;
 }

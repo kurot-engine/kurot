@@ -72,8 +72,6 @@ export class DropShadowFilter extends GlowFilter {
 		if (this._distance !== 0) {
 			const dx = this._distance * NumberUtils.cos(this._angle);
 			const dy = this._distance * NumberUtils.sin(this._angle);
-			// Shadow offset goes right/down → expand right/bottom padding.
-			// Shadow offset goes left/up → expand left/top padding.
 			if (dx > 0) {
 				this.paddingRight += Math.ceil(dx);
 			} else {

@@ -15,9 +15,6 @@ import { tokenize, splitGraphemes } from './WordWrap.js';
 /**
  * TextField displays text content. Supports single-line, multi-line, word wrap,
  * rich text (textFlow), input mode, and basic styling.
- *
- * Simplified from Egret's TextField — uses normal properties instead of the
- * internal $TextField array-based storage.
  */
 export class TextField extends DisplayObject {
 	// ── Static fields ─────────────────────────────────────────────────────────
@@ -73,9 +70,6 @@ export class TextField extends DisplayObject {
 		this.invalidateFontString();
 	}
 
-	// Width/Height affect line-breaking, so invalidate text when they change.
-	// NOTE: override both getter AND setter — overriding only the setter in JS
-	// shadows the parent's getter, causing `tf.height` to return `undefined`.
 	public override get width(): number {
 		return isNaN(this.$explicitWidth) ? this.$getOriginalBounds().width : this.$explicitWidth;
 	}
@@ -231,15 +225,11 @@ export class TextField extends DisplayObject {
 				this._inputController = new InputController(this);
 			}
 			this.touchEnabled = true;
-			// Set default size if not explicitly set, matching old Egret behaviour
 			if (isNaN(this.$explicitWidth)) this.width = 100;
 			if (isNaN(this.$explicitHeight)) this.height = 30;
 			if (this.stage) {
 				this._inputController.addStageText();
 			}
-			// Sync the raw text to StageText so the native input shows the
-			// current value (the text setter may have run before the
-			// InputController was created).
 			this._inputController.setText(this._text);
 		} else {
 			if (this._inputController) {
@@ -265,9 +255,6 @@ export class TextField extends DisplayObject {
 		return this._text;
 	}
 	public set text(value: string) {
-		// Keep the runtime API compatible with Egret/DOM text setters. JavaScript
-		// callers and EXML bindings can provide numbers, objects, or null despite
-		// the TypeScript declaration; line layout must always receive a string.
 		const normalized = value == null ? '' : String(value);
 		if (this._text === normalized) return;
 		this._text = normalized;
@@ -325,7 +312,6 @@ export class TextField extends DisplayObject {
 			this._restrictAnd = undefined;
 			this._restrictNot = undefined;
 		} else {
-			// Find the first unescaped '^'
 			let index = -1;
 			let i = 0;
 			while (i < value.length) {
@@ -350,12 +336,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
-	/** @internal Parsed whitelist portion of restrict. */
 	get restrictAnd(): string | undefined {
 		return this._restrictAnd;
 	}
 
-	/** @internal Parsed blacklist portion of restrict. */
 	get restrictNot(): string | undefined {
 		return this._restrictNot;
 	}
@@ -417,14 +401,12 @@ export class TextField extends DisplayObject {
 	}
 	public get textHeight(): number {
 		this.ensureLines();
-		// INPUT single-line: height is always fontSize, matching Egret behaviour
 		if (this._type === TextFieldType.INPUT && !this._multiline) {
 			return this._fontSize;
 		}
 		return this._textHeight + (this._numLines - 1) * this._lineSpacing;
 	}
 
-	/** @internal Font string for Canvas 2D rendering. */
 	get fontString(): string {
 		return this._fontString;
 	}
@@ -439,18 +421,15 @@ export class TextField extends DisplayObject {
 		return this._selectionActive;
 	}
 
-	/** @internal Whether the user is currently typing (INPUT mode). Used by renderer. */
 	get isTyping(): boolean {
 		return this._isTyping;
 	}
 
-	/** @internal Computed line layout data. */
 	getLinesArr(): ILineElement[] {
 		this.ensureLines();
 		return this._linesArr ?? [];
 	}
 
-	/** @internal Y offset in pixels for the current scrollV position. */
 	getScrollYOffset(): number {
 		if (this._scrollV <= 1) return 0;
 		this.ensureLines();
@@ -471,7 +450,6 @@ export class TextField extends DisplayObject {
 
 	public appendElement(element: ITextElement): void {
 		if (this._displayAsPassword) {
-			// In password mode, only update the raw text, don't expose textFlow
 			this.text = this._text + element.text;
 			return;
 		}
@@ -498,7 +476,6 @@ export class TextField extends DisplayObject {
 		this._selectionActive = endIndex;
 	}
 
-	/** @internal Called by InputController when typing state changes. */
 	setIsTyping(value: boolean): void {
 		this._isTyping = value;
 		this.$renderDirty = true;
@@ -562,11 +539,9 @@ export class TextField extends DisplayObject {
 			totalHeight += line.height;
 		}
 		this._textWidth = maxWidth;
-		// Store raw sum of line heights (without lineSpacing); textHeight getter adds spacing.
 		this._textHeight = totalHeight;
 	}
 
-	/** Number of fully-visible lines in the current explicit height (mirrors Egret's $getScrollNum). */
 	private getScrollNum(): number {
 		if (!this._multiline) return 1;
 		if (isNaN(this.$explicitHeight)) return this._numLines;
@@ -584,14 +559,12 @@ export class TextField extends DisplayObject {
 		const isInput = this._type === TextFieldType.INPUT;
 		const lines: ILineElement[] = [];
 
-		// Width == 0: return empty placeholder (matches old behaviour)
 		if (!isNaN(maxWidth) && maxWidth === 0) {
 			return [{ width: 0, height: 0, charNum: 0, hasNextLine: false, elements: [] }];
 		}
 
 		let currentLine: IWTextElement[] = [];
 		let lineWidth = 0;
-		// INPUT mode: line height is always fontSize, not per-style max
 		let lineHeight = this._fontSize;
 		let lineCharNum = 0;
 
@@ -617,7 +590,6 @@ export class TextField extends DisplayObject {
 			const bold = style.bold ?? this._bold;
 			const italic = style.italic ?? this._italic;
 
-			// Split by line breaks first (\r\n, \r, \n)
 			const segments = element.text.split(/\r\n|\r|\n/);
 
 			for (let si = 0; si < segments.length; si++) {
@@ -626,14 +598,12 @@ export class TextField extends DisplayObject {
 
 				if (seg === '') {
 					if (!isLastSeg) {
-						// explicit newline
 						flushLine(true);
 					}
 					continue;
 				}
 
 				if (isNaN(maxWidth)) {
-					// No width constraint — whole segment goes on current line
 					const w = measureText(seg, fontFamily, fontSize, bold, italic);
 					currentLine.push({ text: seg, width: w, style: element.style });
 					lineWidth += w;
@@ -641,18 +611,15 @@ export class TextField extends DisplayObject {
 					lineCharNum += seg.length;
 					if (!isLastSeg) flushLine(true);
 				} else {
-					// Width constrained — need to break the segment
 					const totalSegWidth = measureText(seg, fontFamily, fontSize, bold, italic);
 
 					if (lineWidth + totalSegWidth <= maxWidth || !this._multiline) {
-						// Fits on current line
 						currentLine.push({ text: seg, width: totalSegWidth, style: element.style });
 						lineWidth += totalSegWidth;
 						if (!isInput) lineHeight = Math.max(lineHeight, fontSize);
 						lineCharNum += seg.length;
 						if (!isLastSeg) flushLine(true);
 					} else {
-						// Need to break — tokenize into words/spaces, then wrap by width
 						const tokenTexts = this._wordWrap ? tokenize(seg) : (seg.match(/[\s\S]/gu) ?? seg.split(''));
 
 						let ww = 0;
@@ -662,12 +629,10 @@ export class TextField extends DisplayObject {
 							const w = measureText(token, fontFamily, fontSize, bold, italic);
 
 							if (lineWidth !== 0 && lineWidth + w > maxWidth) {
-								// Flush current line and start new one
 								flushLine(false);
 							}
 
 							if (w > maxWidth) {
-								// Single token wider than field — break char by char
 								const chars = splitGraphemes(token);
 								for (const ch of chars) {
 									const cw = measureText(ch, fontFamily, fontSize, bold, italic);
@@ -731,21 +696,18 @@ export class TextField extends DisplayObject {
 		}
 	};
 
-	/** @internal Hit-test to find the ITextElement at a given local coordinate. */
 	private getTextElementAt(x: number, y: number): ITextElement | undefined {
 		this.ensureLines();
 		const lines = this._linesArr ?? [];
 		const width = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
 		const height = !isNaN(this.$explicitHeight) ? this.$explicitHeight : this.textHeight;
 
-		// Compute total text height for vertical alignment offset
 		let totalTextHeight = 0;
 		for (let i = 0; i < lines.length; i++) {
 			totalTextHeight += lines[i].height;
 			if (i > 0) totalTextHeight += this._lineSpacing;
 		}
 
-		// Vertical alignment offset (mirrors renderTextField)
 		let verticalOffset = 0;
 		if (this._verticalAlign === VerticalAlign.MIDDLE) {
 			verticalOffset = Math.max(0, (height - totalTextHeight) / 2);
@@ -753,17 +715,14 @@ export class TextField extends DisplayObject {
 			verticalOffset = Math.max(0, height - totalTextHeight);
 		}
 
-		// ScrollV offset
 		const scrollOffset = this.getScrollYOffset();
 
-		// Adjust y into text-local space (line-top coordinates)
 		const localY = y - verticalOffset + scrollOffset;
 
 		let lineY = 0;
 		for (const line of lines) {
 			if (localY < lineY) break;
 			if (localY <= lineY + line.height) {
-				// Horizontal alignment offset
 				let lineX = 0;
 				if (this._textAlign === HorizontalAlign.RIGHT) {
 					lineX = width - line.width;

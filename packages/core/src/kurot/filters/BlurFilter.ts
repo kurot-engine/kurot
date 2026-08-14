@@ -9,10 +9,6 @@ export class BlurFilter extends Filter {
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
-	// Note: 旧版 Egret 的 BlurFilter 内部创建了 BlurXFilter 和 BlurYFilter 两个子滤镜，
-	// 用于 WebGL 渲染器的两 pass 高斯模糊。Kurot 将这个实现细节移到渲染层，
-	// Filter 只负责存储参数（blurX/blurY），渲染器读取 uniforms 自行决定 pass 策略。
-
 	public constructor(blurX = 4, blurY = 4, quality = 1) {
 		super();
 		this.type = 'blur';

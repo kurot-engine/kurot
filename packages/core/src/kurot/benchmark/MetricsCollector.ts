@@ -17,7 +17,8 @@ export class MetricsCollector {
 	// ── Instance fields ──────────────────────────────────────────────────────────
 
 	private readonly _windowSize: number;
-	private readonly _buffer: FrameData[];
+    private readonly _buffer: FrameData[];
+
 	private _writeIndex = 0;
 	private _frameCount = 0;
 

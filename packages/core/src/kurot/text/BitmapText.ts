@@ -17,7 +17,6 @@ export class BitmapText extends DisplayObject {
 	private _textAlign: HorizontalAlign = HorizontalAlign.LEFT;
 	private _verticalAlign: VerticalAlign = VerticalAlign.TOP;
 
-	// Width/Height affect line-breaking, so invalidate text when they change.
 	public override set width(value: number) {
 		const v = isNaN(value) ? NaN : value;
 		if (this.$explicitWidth === v) return;
@@ -124,26 +123,21 @@ export class BitmapText extends DisplayObject {
 		}
 	}
 
-	/** @internal Returns computed text lines for rendering. */
 	getTextLines(): string[] {
 		return this._ensureLines();
 	}
-	/** @internal Per-line widths for rendering. */
 	getTextLinesWidth(): number[] {
 		this._ensureLines();
 		return this._textLinesWidth;
 	}
-	/** @internal Per-line heights for rendering. */
 	getLineHeights(): number[] {
 		this._ensureLines();
 		return this._lineHeights;
 	}
-	/** @internal Text start X offset after alignment. */
 	getTextStartX(): number {
 		this._ensureLines();
 		return this._textStartX;
 	}
-	/** @internal Text start Y offset after alignment. */
 	getTextStartY(): number {
 		this._ensureLines();
 		return this._textStartY;

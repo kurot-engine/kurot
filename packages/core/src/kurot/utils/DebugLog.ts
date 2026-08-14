@@ -23,5 +23,4 @@ export class DebugLog {
 	}
 }
 
-// Expose to window for test page
 (globalThis as Record<string, unknown>).DebugLog = DebugLog;

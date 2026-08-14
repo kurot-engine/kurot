@@ -41,7 +41,6 @@ export class BitmapFont extends SpriteSheet {
 		return (this._charList[name]?.[key] as number) ?? 0;
 	}
 
-	/** @internal Returns the height of the first character, used for space width calculation. */
 	getFirstCharHeight(): number {
 		if (this._firstCharHeight === 0) {
 			for (const str in this._charList) {
@@ -58,7 +57,6 @@ export class BitmapFont extends SpriteSheet {
 
 	private _parseConfig(fntText: string): Record<string, CharConfig> {
 		const lines = fntText.replace(/\r\n/g, '\n').split('\n');
-		// Find the "chars count=N" line dynamically instead of assuming line index
 		let charsCount = 0;
 		let charsStartLine = -1;
 		for (let i = 0; i < lines.length; i++) {

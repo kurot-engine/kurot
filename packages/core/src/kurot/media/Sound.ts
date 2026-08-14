@@ -15,7 +15,6 @@ export const SoundType = {
 
 export type SoundType = (typeof SoundType)[keyof typeof SoundType];
 
-// Shared AudioContext — created lazily on first use
 let sharedContext: AudioContext | undefined;
 
 function getAudioContext(): AudioContext | undefined {
@@ -28,7 +27,6 @@ function getAudioContext(): AudioContext | undefined {
 	}
 }
 
-// Serial decode queue — avoids concurrent decodeAudioData calls crashing on mobile
 interface DecodeTask {
 	buffer: ArrayBuffer;
 	onSuccess: (buf: AudioBuffer) => void;
@@ -47,7 +45,6 @@ function processDecodeQueue(): void {
 	if (isDecoding || decodeQueue.length === 0) return;
 	const ctx = getAudioContext();
 	if (!ctx) {
-		// No Web Audio — drain queue with errors
 		while (decodeQueue.length) decodeQueue.shift()!.onError();
 		return;
 	}
@@ -82,9 +79,6 @@ export class Sound extends EventDispatcher<SoundEvents> {
 	private _audio?: HTMLAudioElement;
 	private _url = '';
 	private _loaded = false;
-	// Bumped on every load()/close() call. Async callbacks (xhr.onload, decodeAudioData,
-	// canplaythrough) capture the generation at start time and no-op if it's stale by the
-	// time they fire, so a cancelled load can't resurrect state after close().
 	private _generation = 0;
 
 	// ── Getters ───────────────────────────────────────────────────────────────
@@ -112,7 +106,6 @@ export class Sound extends EventDispatcher<SoundEvents> {
 
 	public play(startTime = 0, loops = 0): SoundChannel {
 		if (!this._loaded) {
-			// Return a no-op channel and dispatch an error, matching old Egret behaviour
 			IOErrorEvent.dispatchIOErrorEvent(this);
 			return new SoundChannel(undefined, undefined, undefined, 0, 0);
 		}
@@ -125,7 +118,7 @@ export class Sound extends EventDispatcher<SoundEvents> {
 	}
 
 	public close(): void {
-		this._generation++; // invalidate any in-flight load's async callbacks
+		this._generation++;
 		this._audioBuffer = undefined;
 		if (this._audio) {
 			this._audio.src = '';
@@ -157,7 +150,6 @@ export class Sound extends EventDispatcher<SoundEvents> {
 				},
 				onError: () => {
 					if (generation !== this._generation) return;
-					// Decode failed — fall back to HTMLAudioElement
 					this.loadHtmlAudio(url, generation);
 				},
 			});

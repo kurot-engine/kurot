@@ -142,7 +142,9 @@ export class HtmlTextParser {
 		return this._result;
 	}
 
-	/** @deprecated Use parse() instead. */
+	/**
+	 * @deprecated Use parse() instead.
+	 */
 	public parser(htmltext: string): ITextElement[] {
 		return this.parse(htmltext);
 	}

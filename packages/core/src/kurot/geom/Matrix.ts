@@ -213,7 +213,6 @@ export class Matrix {
 
 	// ── Internal methods ──────────────────────────────────────────────────────
 
-	/** @internal */
 	invertInto(target: Matrix): void {
 		const { a, b, c, d, tx, ty } = this;
 		if (b === 0 && c === 0) {
@@ -242,7 +241,6 @@ export class Matrix {
 		target.ty = -(nb * tx + nd * ty);
 	}
 
-	/** @internal */
 	transformBounds(bounds: Rectangle): void {
 		const { a, b, c, d, tx, ty } = this;
 		const x = bounds.x,
@@ -284,31 +282,26 @@ export class Matrix {
 		bounds.height = Math.ceil((y1 > y3 ? y1 : y3) - bounds.y);
 	}
 
-	/** @internal */
 	getScaleX(): number {
 		if (this.b === 0) return this.a;
 		const result = Math.sqrt(this.a * this.a + this.b * this.b);
 		return this.getDeterminant() < 0 ? -result : result;
 	}
 
-	/** @internal */
 	getScaleY(): number {
 		if (this.c === 0) return this.d;
 		const result = Math.sqrt(this.c * this.c + this.d * this.d);
 		return this.getDeterminant() < 0 ? -result : result;
 	}
 
-	/** @internal */
 	getSkewX(): number {
 		return this.d < 0 ? Math.atan2(this.d, this.c) + Math.PI / 2 : Math.atan2(this.d, this.c) - Math.PI / 2;
 	}
 
-	/** @internal */
 	getSkewY(): number {
 		return this.a < 0 ? Math.atan2(this.b, this.a) - Math.PI : Math.atan2(this.b, this.a);
 	}
 
-	/** @internal */
 	updateScaleAndRotation(scaleX: number, scaleY: number, skewX: number, skewY: number): void {
 		if ((skewX === 0 || skewX === TWO_PI) && (skewY === 0 || skewY === TWO_PI)) {
 			this.a = scaleX;
@@ -326,7 +319,6 @@ export class Matrix {
 		this.d = u * scaleY;
 	}
 
-	/** @internal target = other * this */
 	preMultiplyInto(other: Matrix, target: Matrix): void {
 		let a = other.a * this.a,
 			b = 0,
@@ -357,5 +349,7 @@ export class Matrix {
 	}
 }
 
-/** @internal Reusable temp instance for framework internals — do not hold references. */
+/**
+ * Shared temporary matrix. Do not retain references to it.
+ */
 export const sharedMatrix: Matrix = new Matrix();

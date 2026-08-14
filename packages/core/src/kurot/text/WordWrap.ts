@@ -53,7 +53,6 @@ const NEWLINES = new Set([0x000a, 0x000d]);
  * Newlines are NOT included (the caller should split by newlines first).
  *
  * - Latin: "hello world" → ["hello", " ", "world"]
- * - CJK:   "你好世界"     → ["你", "好", "世", "界"]
  * - Thai:  "สวัสดีครับ"    → ["สวัสดี", "ครับ"]
  */
 export function tokenize(text: string): string[] {
@@ -64,7 +63,6 @@ export function tokenize(text: string): string[] {
 		for (const seg of getSegmenter().segment(text)) {
 			const s = seg.segment;
 			if (!s) continue;
-			// Skip newlines — caller handles them
 			const code = s.charCodeAt(0);
 			if (NEWLINES.has(code)) continue;
 			result.push(s);
@@ -72,7 +70,6 @@ export function tokenize(text: string): string[] {
 		return result;
 	}
 
-	// Fallback: split into individual characters
 	const result: string[] = [];
 	let buf = '';
 	for (let i = 0; i < text.length; i++) {

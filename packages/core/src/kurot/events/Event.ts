@@ -1,7 +1,9 @@
 import { EventPhase } from './EventPhase.js';
 import type { IEventDispatcher } from './IEventDispatcher.js';
 
-/** Event type string → Event subclass mapping. Each event source declares its own. */
+/**
+ * Maps event type strings to their event payload types.
+ */
 export type EventMap = Record<string, Event>;
 
 type EventConstructor<T extends Event> = new (type: string, bubbles?: boolean, cancelable?: boolean) => T;
@@ -149,8 +151,6 @@ export class Event {
 	// ── Internal methods (used by EventDispatcher) ────────────────────────────
 
 	setDispatchContext(target: IEventDispatcher, phase: number): void {
-		// _target is the original dispatch target and must not change during bubbling/capturing.
-		// Only set it at AT_TARGET phase (or when it hasn't been set yet).
 		if (phase === EventPhase.AT_TARGET || this._target === undefined) {
 			this._target = target;
 		}
@@ -163,7 +163,7 @@ export class Event {
 	}
 
 	resetForPool(type: string, bubbles?: boolean, cancelable?: boolean): void {
-	    this.data = undefined;
+		this.data = undefined;
 		this._type = type;
 		this._bubbles = !!bubbles;
 		this._cancelable = !!cancelable;

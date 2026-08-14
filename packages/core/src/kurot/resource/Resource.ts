@@ -24,7 +24,7 @@ export type ProgressCallback = (loaded: number, total: number) => void;
 export type ResourceEventListener = (event: ResourceEvent) => void;
 
 /**
- * Modern resource manager — async/await API, type-safe, module-based.
+ * Loads, groups, caches, and destroys configured resources.
  *
  * @example
  * ```ts
@@ -121,7 +121,6 @@ export class Resource {
 	 * Load a single resource by name. Returns the cached data.
 	 */
 	public async load<T = unknown>(name: string): Promise<T> {
-		// Check cache
 		const cached = this.get<T>(name);
 		if (cached !== undefined) return cached;
 
@@ -140,10 +139,6 @@ export class Resource {
 			throw new Error(`Failed to load resource "${name}" from "${item.url}".`);
 		}
 
-		// A subkey resolves to its owning resource item (for example a texture
-		// name resolves to the parent sheet). Track that canonical item name so
-		// destroyAll() later destroys the complete resource instead of only the
-		// requested sub-resource.
 		this.loadedNames.add(item.name);
 		return this.get<T>(name)!;
 	}
@@ -154,7 +149,6 @@ export class Resource {
 	 * Get a cached resource synchronously. Returns undefined if not loaded.
 	 */
 	public get<T = unknown>(name: string): T | undefined {
-		// Try each analyzer
 		for (const analyzer of this.analyzerMap.values()) {
 			const data = analyzer.getRes<T>(name);
 			if (data !== undefined) return data;
@@ -281,7 +275,6 @@ export class Resource {
 		this.analyzerMap.set(ResourceType.Sound, soundAnalyzer);
 		this.analyzerMap.set(ResourceType.Sheet, sheetAnalyzer);
 
-		// Also register with loader
 		this.loader.registerAnalyzer(ResourceType.Image, imageAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Json, jsonAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Text, textAnalyzer);
@@ -378,9 +371,6 @@ export class Resource {
 				});
 			};
 
-			// No-op: item-level progress is already reported above via
-			// `this.loader.onComplete`. This just satisfies the loader's
-			// optional callback slot.
 			this.loader.onProgress = (_loaded: number, _total: number): void => {};
 
 			this.loader.start().then(() => {
@@ -424,7 +414,6 @@ export class Resource {
 				try {
 					listener(event);
 				} catch {
-					// swallow listener errors
 				}
 			}
 		}

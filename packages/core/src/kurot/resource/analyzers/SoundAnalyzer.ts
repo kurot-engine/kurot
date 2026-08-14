@@ -43,7 +43,6 @@ export class SoundAnalyzer extends AnalyzerBase {
 	}
 
 	protected override onResourceDestroy(_resource: unknown): void {
-		// Audio elements don't need explicit disposal, but we can release references
 		if (_resource instanceof HTMLAudioElement) {
 			_resource.pause();
 			_resource.src = '';

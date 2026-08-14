@@ -1,4 +1,6 @@
-/** Cache for font file ArrayBuffers, keyed by URL. */
+/**
+ * Cache for font file ArrayBuffers, keyed by URL.
+ */
 const fontResourceCache: Record<string, ArrayBuffer> = {};
 
 /**

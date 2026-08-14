@@ -32,7 +32,6 @@ export class TimerEvent extends Event {
 
 	/**
 	 * Requests an immediate re-render after this event is processed.
-	 * Full implementation requires the player/runtime layer.
 	 */
 	public updateAfterEvent(): void {
 		setRequestRenderingFlag(true);

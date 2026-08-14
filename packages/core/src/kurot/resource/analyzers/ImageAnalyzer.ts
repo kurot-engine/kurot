@@ -13,7 +13,6 @@ export class ImageAnalyzer extends AnalyzerBase {
 	 * Load an image resource.
 	 */
 	public loadFile(item: ResourceItem): Promise<ResourceItem> {
-		// Already cached
 		if (this.fileDic.has(item.name)) {
 			item.loaded = true;
 			return Promise.resolve(item);

@@ -33,9 +33,13 @@ interface SheetConfig {
  * Produces a SpriteSheet object with sub-textures.
  */
 export class SheetAnalyzer extends AnalyzerBase {
-	/** Texture map for individual sub-textures accessible by subkey */
+	/**
+	 * Texture map for individual sub-textures accessible by subkey
+	 */
 	private textureMap: Map<string, Texture> = new Map<string, Texture>();
-	/** Reverse mapping: sheet name → sub-key names */
+	/**
+	 * Reverse mapping: sheet name → sub-key names
+	 */
 	private sheetSubkeys: Map<string, string[]> = new Map<string, string[]>();
 
 	/**
@@ -50,13 +54,11 @@ export class SheetAnalyzer extends AnalyzerBase {
 			return Promise.resolve(item);
 		}
 
-		// Step 1: Load the JSON config
 		return this.loadSheetConfig(item).then(({ config, imageUrl }) => {
 			if (!config || !imageUrl) {
 				item.loaded = false;
 				return item;
 			}
-			// Step 2: Load the image
 			return this.loadSheetImage(item, imageUrl, config);
 		});
 	}
@@ -65,15 +67,12 @@ export class SheetAnalyzer extends AnalyzerBase {
 	 * Get a cached resource by name. Supports subkey lookup (e.g., "sheet.textureName").
 	 */
 	public override getRes<T = unknown>(name: string): T | undefined {
-		// Direct lookup
 		const direct = this.fileDic.get(name);
 		if (direct) return direct as T | undefined;
 
-		// Subkey lookup in texture map
 		const tex = this.textureMap.get(name);
 		if (tex) return tex as T | undefined;
 
-		// Dot notation: "sheetName.subKey"
 		const dotIndex = name.indexOf('.');
 		if (dotIndex !== -1) {
 			const prefix = name.substring(0, dotIndex);
@@ -90,7 +89,6 @@ export class SheetAnalyzer extends AnalyzerBase {
 	public override destroyRes(name: string): boolean {
 		const sheet = this.fileDic.get(name);
 		if (sheet instanceof SpriteSheet) {
-			// Clean up sub-key textures from the texture map
 			const subkeys = this.sheetSubkeys.get(name);
 			if (subkeys) {
 				for (const texName of subkeys) {
@@ -102,7 +100,6 @@ export class SheetAnalyzer extends AnalyzerBase {
 			sheet.dispose();
 			return true;
 		}
-		// Also support destroying individual sub-textures by name
 		if (this.textureMap.has(name)) {
 			this.textureMap.delete(name);
 			return true;
@@ -217,9 +214,6 @@ export class SheetAnalyzer extends AnalyzerBase {
 		this.fileDic.set(name, spriteSheet);
 	}
 
-	/**
-	 * Resolve a relative image path from the sheet URL.
-	 */
 	private getRelativePath(url: string, file: string): string {
 		const normalized = url.split('\\').join('/');
 		const index = normalized.lastIndexOf('/');

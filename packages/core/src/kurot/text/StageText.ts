@@ -2,16 +2,7 @@ import { EventDispatcher } from '../events/EventDispatcher.js';
 import type { TextField } from './TextField.js';
 
 /**
- * Manages a native HTML <input> or <textarea> element overlaid on the canvas
- * for text input.
- *
- * Positioning strategy
- * ────────────────────
- * The wrapper div uses `position:fixed` so that its `left`/`top` are relative
- * to the **viewport**.  We then compute the viewport coordinates of the
- * TextField by combining `canvas.getBoundingClientRect()` with the complete
- * concatenated display-list matrix. This preserves translation, scale,
- * rotation, and the page's canvas scaling.
+ * Manages the native HTML input element used by input text fields.
  */
 export class StageText extends EventDispatcher {
 	private _textField?: TextField;
@@ -44,7 +35,6 @@ export class StageText extends EventDispatcher {
 	show(_active = false): void {
 		if (!this._textField) return;
 		if (this._isShowing) {
-			// Already visible — just reposition
 			this.initElementPosition();
 			this.resetStageText();
 			return;
@@ -73,7 +63,6 @@ export class StageText extends EventDispatcher {
 	}
 
 	onBlur(): void {
-		// clearInputElement is already called from the native blur event listener.
 	}
 
 	resetStageText(): void {
@@ -96,9 +85,6 @@ export class StageText extends EventDispatcher {
 			}
 		}
 
-		// Keep the DOM control in TextField-local pixels. initElementPosition()
-		// applies the complete display-list matrix to the wrapper, exactly as the
-		// renderer does for the canvas text.
 		el.style.width = tf.width + 'px';
 		el.style.left = '0px';
 		el.style.transform = '';
@@ -114,9 +100,7 @@ export class StageText extends EventDispatcher {
 			el.style.padding = '0px';
 		}
 
-		// Clip the div to the TextField bounds (matches Egret's approach)
 		this._inputDiv.style.overflow = 'hidden';
-		// this._inputDiv.style.clip = `rect(0px ${inputCSSWidth}px ${tf.height * this._gscaleY}px 0px)`;
 		this._inputDiv.style.width = tf.width + 'px';
 		this._inputDiv.style.height = tf.height + 'px';
 	}
@@ -126,7 +110,6 @@ export class StageText extends EventDispatcher {
 	private ensureElements(): void {
 		if (this._inputDiv && this._inputElement) return;
 		if (!this._textField) return;
-		// Create wrapper div
 		if (!this._inputDiv) {
 			const div = document.createElement('div');
 			div.style.position = 'fixed';
@@ -145,7 +128,6 @@ export class StageText extends EventDispatcher {
 			document.body.appendChild(div);
 			this._inputDiv = div;
 		}
-		// Create input element
 		if (!this._inputElement) {
 			const tf = this._textField;
 			const el = tf.multiline ? document.createElement('textarea') : document.createElement('input');
@@ -190,16 +172,6 @@ export class StageText extends EventDispatcher {
 		}
 	}
 
-	/**
-	 * Positions the wrapper div so that its (0,0) aligns with the TextField's
-	 * top-left corner on screen.
-	 *
-	 * Uses `position:fixed` + viewport coordinates so the calculation works
-	 * regardless of the page layout (flex centering, CSS transforms, etc.).
-	 *
-	 * IMPORTANT: Uses `clientWidth`/`clientHeight` and `clientLeft`/`clientTop`
-	 * to correctly handle CSS borders on the canvas element.
-	 */
 	private initElementPosition(): void {
 		if (!this._textField || !this._inputDiv) return;
 		const tf = this._textField;
@@ -212,15 +184,10 @@ export class StageText extends EventDispatcher {
 		let scaleY = 1;
 
 		if (canvas) {
-			// getBoundingClientRect includes CSS border
 			const rect = canvas.getBoundingClientRect();
-			// clientLeft/Top = border width on left/top side
 			const borderLeft = canvas.clientLeft;
 			const borderTop = canvas.clientTop;
 
-			// Stage coords map 1:1 to canvas buffer pixels (WebGL projection).
-			// Canvas buffer pixels map to CSS pixels via:  cssPx = bufPx * (clientW / canvas.width)
-			// Combined:  cssPx = stagePx * (clientW / canvas.width)
 			scaleX = (canvas.clientWidth || 1) / (canvas.width || 1);
 			scaleY = (canvas.clientHeight || 1) / (canvas.height || 1);
 			left = rect.left + borderLeft;
@@ -230,7 +197,6 @@ export class StageText extends EventDispatcher {
 		this._inputDiv.style.left = left + 'px';
 		this._inputDiv.style.top = top + 'px';
 
-		// For multiline fields with lineSpacing, nudge the textarea up slightly
 		if (tf.multiline && tf.height > tf.size && this._inputElement) {
 			this._inputElement.style.top = `${-tf.lineSpacing / 2}px`;
 		} else if (this._inputElement) {
@@ -247,11 +213,8 @@ export class StageText extends EventDispatcher {
 		if (el.value !== this._text) {
 			el.value = this._text;
 		}
-		// Reveal the input element
 		el.style.opacity = '1';
 		this._isShowing = true;
-		// Defer focus to avoid the browser stealing it back during the
-		// current mousedown event processing.
 		setTimeout(() => {
 			if (!this._isShowing || !this._inputElement) return;
 			el.selectionStart = el.value.length;
@@ -276,9 +239,6 @@ export class StageText extends EventDispatcher {
 			el.style.padding = '0';
 			el.style.lineHeight = '';
 			el.style.verticalAlign = '';
-			// DO NOT clear el.value here — the text is preserved in _text.
-			// Clearing it causes the displayed text to disappear while the
-			// InputController still holds a valid text string.
 			el.blur();
 		}
 		if (div) {
@@ -287,7 +247,6 @@ export class StageText extends EventDispatcher {
 			div.style.height = '0px';
 			div.style.width = '0px';
 			div.style.transform = '';
-			// div.style.clip = '';
 		}
 		this._clearing = false;
 	}
@@ -297,12 +256,10 @@ export class StageText extends EventDispatcher {
 	private setAreaHeight(tf: TextField, el: HTMLElement): void {
 		const cssLineH = tf.size + tf.lineSpacing;
 		if (tf.height <= tf.size) {
-			// Field shorter than font size — clamp to font height
 			el.style.height = tf.size + 'px';
 			el.style.padding = '0px';
 			el.style.lineHeight = cssLineH + 'px';
 		} else {
-			// Padding distributes the remaining field height around the line box.
 			el.style.height = tf.height + 'px';
 			const rap = tf.height - tf.size - tf.lineSpacing;
 			const valign = getValign(tf);
@@ -325,12 +282,11 @@ export class StageText extends EventDispatcher {
 	}
 }
 
-/** Convert TextField.verticalAlign string to a 0‒1 ratio (Egret style). */
 function getValign(tf: TextField): number {
 	const v = (tf as any).verticalAlign;
 	if (v === 'middle' || v === 'Middle') return 0.5;
 	if (v === 'bottom' || v === 'Bottom') return 1;
-	return 0; // top
+	return 0;
 }
 
 function colorString(color: number): string {

@@ -5,7 +5,9 @@ import { ResourceItem } from '../ResourceItem.js';
  * Each analyzer handles loading and caching one type of resource.
  */
 export abstract class AnalyzerBase {
-	/** Cached resource data: name → data */
+	/**
+	 * Cached resource data: name → data
+	 */
 	protected fileDic: Map<string, unknown> = new Map<string, unknown>();
 
 	/**
@@ -40,10 +42,6 @@ export abstract class AnalyzerBase {
 		return false;
 	}
 
-	/**
-	 * Called when a resource is destroyed. Subclasses override for cleanup.
-	 */
 	protected onResourceDestroy(_resource: unknown): void {
-		// override in subclasses
 	}
 }

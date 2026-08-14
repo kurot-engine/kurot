@@ -204,16 +204,16 @@ export class Rectangle {
 		return this.setTo(0, 0, 0, 0);
 	}
 
-	/** @internal */
 	getBaseWidth(angle: number): number {
 		return Math.abs(Math.cos(angle)) * this.width + Math.abs(Math.sin(angle)) * this.height;
 	}
 
-	/** @internal */
 	getBaseHeight(angle: number): number {
 		return Math.abs(Math.sin(angle)) * this.width + Math.abs(Math.cos(angle)) * this.height;
 	}
 }
 
-/** @internal Reusable temp instance for framework internals — do not hold references. */
+/**
+ * Shared temporary rectangle. Do not retain references to it.
+ */
 export const sharedRectangle: Rectangle = new Rectangle();
