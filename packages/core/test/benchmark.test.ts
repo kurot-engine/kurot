@@ -379,11 +379,11 @@ function makeEmptyStats(): Stats {
 }
 
 describe('PerfPanel', () => {
-	it('warmup 阶段 status 显示"预热中…"', () => {
+	it('shows the warmup status', () => {
 		const els = makeMockEls();
 		const panel = new PerfPanel(els);
 		panel.update(makeEmptyStats(), 'warmup');
-		expect(els.status.textContent).toBe('预热中…');
+		expect(els.status.textContent).toBe('Warming up…');
 	});
 
 	it('warmup 阶段所有数值元素显示"--"', () => {
@@ -407,11 +407,11 @@ describe('PerfPanel', () => {
 		expect(els.drawCalls.className).toBe('dimmed');
 	});
 
-	it('measuring 阶段 status 显示"测量中"', () => {
+	it('shows the measuring status', () => {
 		const els = makeMockEls();
 		const panel = new PerfPanel(els);
 		panel.update(makeEmptyStats(), 'measuring');
-		expect(els.status.textContent).toBe('测量中');
+		expect(els.status.textContent).toBe('Measuring');
 	});
 
 	it('measuring 阶段 fps 元素显示正确数值', () => {
@@ -434,11 +434,11 @@ describe('PerfPanel', () => {
 		expect(els.renderP95.textContent).toBe('1.45 ms');
 	});
 
-	it('paused 阶段 status 显示"已暂停"', () => {
+	it('shows the paused status', () => {
 		const els = makeMockEls();
 		const panel = new PerfPanel(els);
 		panel.update(makeEmptyStats(), 'paused');
-		expect(els.status.textContent).toBe('已暂停');
+		expect(els.status.textContent).toBe('Paused');
 	});
 });
 
@@ -517,7 +517,7 @@ describe('ReportExporter', () => {
 		const report = exporter.buildReport('sprite-batch', 500, makeStats());
 		const md = exporter.formatMarkdown(report);
 
-		const hasHeader = md.includes('场景') || md.toLowerCase().includes('scene');
+		const hasHeader = md.includes('Scene');
 		expect(hasHeader).toBe(true);
 	});
 

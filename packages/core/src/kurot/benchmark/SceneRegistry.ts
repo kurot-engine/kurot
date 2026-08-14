@@ -1,7 +1,7 @@
 import type { SceneDescriptor } from './BenchmarkRunner.js';
 
 /**
- * 场景工厂接口，用于在测试中注入 mock，在 HTML 中注入真实 Kurot 对象。
+ * Creates the display objects used by benchmark scenes.
  */
 export interface SceneFactory {
 	createBitmap(texIndex?: number): unknown;
@@ -217,9 +217,7 @@ export const scenes: SceneDescriptor[] = [
 			buildTree(container, 0);
 
 			return () => {
-				// Remove only direct $children of the root container; nested cleanup cascades
 				if (factory) {
-					// Remove the top-level sprites added to container
 					for (let i = 0; i < branchFactor; i++) {
 						if (allChildren[i] !== undefined) {
 							factory.removeChild(container, allChildren[i]);

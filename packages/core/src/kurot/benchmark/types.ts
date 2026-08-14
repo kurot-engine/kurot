@@ -1,4 +1,6 @@
-/** 单帧采集数据 */
+/**
+ * Metrics collected for one rendered frame.
+ */
 export interface FrameData {
 	fps: number;
 	drawCalls: number;
@@ -6,7 +8,9 @@ export interface FrameData {
 	objectCount: number;
 }
 
-/** 单项指标的统计摘要 */
+/**
+ * Statistical summary for one metric.
+ */
 export interface StatSummary {
 	current: number;
 	avg: number;
@@ -15,7 +19,9 @@ export interface StatSummary {
 	max: number;
 }
 
-/** 完整统计结果 */
+/**
+ * Aggregated benchmark statistics.
+ */
 export interface Stats {
 	frameCount: number;
 	fps: StatSummary;
@@ -25,7 +31,9 @@ export interface Stats {
 	isLowFps: boolean;
 }
 
-/** 导出报告格式 */
+/**
+ * Serializable benchmark report.
+ */
 export interface ReportData {
 	timestamp: string;
 	userAgent: string;

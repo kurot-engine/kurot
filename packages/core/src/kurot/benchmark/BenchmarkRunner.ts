@@ -12,125 +12,108 @@ export interface SceneDescriptor {
 }
 
 /**
- * 纯状态机，管理 warmup/measuring/paused 状态。
- * 不依赖 Kurot 引擎，通过外部注入的回调与引擎交互。
+ * Coordinates benchmark scene transitions and measurement phases.
  */
 export class BenchmarkRunner {
+	// ── Instance fields ──────────────────────────────────────────────────────────
 
-    private readonly warmupTarget = 60;
+	private readonly _warmupTarget = 60;
+	private _phase: Phase = 'idle';
+	private _warmupFrames = 0;
+	private _currentSceneId?: string;
+	private _currentCount = 0;
+	private _cleanup?: () => void;
 
-    private phase: Phase = 'idle';
-	private warmupFrames = 0;
-	private currentSceneId?: string;
-	private currentCount = 0;
-	private cleanup?: () => void;
+	// ── Constructor ─────────────────────────────────────────────────────────────
 
-	constructor(
-		private readonly collector: MetricsCollector,
-		private readonly onPhaseChange: (phase: Phase) => void,
-		private readonly getSceneDescriptor: (id: string) => SceneDescriptor | undefined,
-		private readonly container: unknown,
+	public constructor(
+		private readonly _collector: MetricsCollector,
+		private readonly _onPhaseChange: (phase: Phase) => void,
+		private readonly _getSceneDescriptor: (id: string) => SceneDescriptor | undefined,
+		private readonly _container: unknown,
 	) {}
 
+	// ── Public methods ────────────────────────────────────────────────────────────
+
 	/**
-	 * 切换场景：销毁旧场景，重建新场景，重置 warmup
+	 * Switches the active scene and starts a new warmup phase.
 	 */
-	switchScene(sceneId: string, count: number): void {
-		// 1. 销毁旧场景
-		if (this.cleanup) {
-			this.cleanup();
-			this.cleanup = undefined;
+	public switchScene(sceneId: string, count: number): void {
+		if (this._cleanup) {
+			this._cleanup();
+			this._cleanup = undefined;
 		}
 
-		// 2. 找到场景描述符，构建新场景
-		const descriptor = this.getSceneDescriptor(sceneId);
+		const descriptor = this._getSceneDescriptor(sceneId);
 		if (descriptor) {
-			this.cleanup = descriptor.build(this.container, count);
+			this._cleanup = descriptor.build(this._container, count);
 		}
 
-		this.currentSceneId = sceneId;
-		this.currentCount = count;
+		this._currentSceneId = sceneId;
+		this._currentCount = count;
 
-		// 3. 重置 warmup 状态
-		this.warmupFrames = 0;
-		this.phase = 'warmup';
-		this.onPhaseChange(this.phase);
+		this._warmupFrames = 0;
+		this._phase = 'warmup';
+		this._onPhaseChange(this._phase);
 
-		// 4. 清空统计
-		this.collector.reset();
+		this._collector.reset();
 	}
 
-	/**
-	 * 重建当前场景（对象数量变更）
-	 */
-	rebuildScene(count: number): void {
-		if (this.currentSceneId !== undefined) {
-			this.switchScene(this.currentSceneId, count);
+	public rebuildScene(count: number): void {
+		if (this._currentSceneId !== undefined) {
+			this.switchScene(this._currentSceneId, count);
 		}
 	}
 
-	/**
-	 * 暂停（仅在 measuring 状态有效）
-	 */
-	pause(): void {
-		if (this.phase === 'measuring') {
-			this.phase = 'paused';
-			this.onPhaseChange(this.phase);
+	public pause(): void {
+		if (this._phase === 'measuring') {
+			this._phase = 'paused';
+			this._onPhaseChange(this._phase);
 		}
 	}
 
-	/**
-	 * 继续（仅在 paused 状态有效）
-	 */
-	resume(): void {
-		if (this.phase === 'paused') {
-			this.phase = 'measuring';
-			this.onPhaseChange(this.phase);
+	public resume(): void {
+		if (this._phase === 'paused') {
+			this._phase = 'measuring';
+			this._onPhaseChange(this._phase);
 		}
 	}
 
-	/**
-	 * 重置测量：清空统计，重新进入 warmup
-	 */
-	resetMeasurement(): void {
-		this.collector.reset();
-		this.warmupFrames = 0;
-		this.phase = 'warmup';
-		this.onPhaseChange(this.phase);
+	public resetMeasurement(): void {
+		this._collector.reset();
+		this._warmupFrames = 0;
+		this._phase = 'warmup';
+		this._onPhaseChange(this._phase);
 	}
 
 	/**
-	 * 每帧回调（由外部 ENTER_FRAME 事件调用）
+	 * Records one frame while measurement is active.
 	 */
-	onFrame(perf: { fps: number; drawCalls: number; renderTimeMs: number }): void {
-		if (this.phase === 'idle' || this.phase === 'paused') {
+	public onFrame(perf: { fps: number; drawCalls: number; renderTimeMs: number }): void {
+		if (this._phase === 'idle' || this._phase === 'paused') {
 			return;
 		}
 
-		if (this.phase === 'warmup') {
-			this.warmupFrames++;
-			if (this.warmupFrames >= this.warmupTarget) {
-				this.phase = 'measuring';
-				this.onPhaseChange(this.phase);
+		if (this._phase === 'warmup') {
+			this._warmupFrames++;
+			if (this._warmupFrames >= this._warmupTarget) {
+				this._phase = 'measuring';
+				this._onPhaseChange(this._phase);
 			}
 			return;
 		}
 
-		// measuring 状态
-		if (this.phase === 'measuring') {
-			this.collector.record({
+		if (this._phase === 'measuring') {
+			this._collector.record({
 				fps: perf.fps,
 				drawCalls: perf.drawCalls,
 				renderTimeMs: perf.renderTimeMs,
-				objectCount: this.currentCount,
+				objectCount: this._currentCount,
 			});
 		}
 	}
 
-	/**
-	 * 获取当前阶段
-	 */
-	getPhase(): Phase {
-		return this.phase;
+	public getPhase(): Phase {
+		return this._phase;
 	}
 }

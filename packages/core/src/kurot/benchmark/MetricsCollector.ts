@@ -1,9 +1,7 @@
 import type { FrameData, Stats } from './types.js';
 
 /**
- * 计算排序数组的百分位数
- * @param sortedArr 已排序的数组
- * @param p 百分位（0-1）
+ * Returns a percentile from an ascending numeric array.
  */
 export function percentile(sortedArr: number[], p: number): number {
 	if (sortedArr.length === 0) return 0;
@@ -13,52 +11,50 @@ export function percentile(sortedArr: number[], p: number): number {
 }
 
 /**
- * 使用 ring buffer 维护 300 帧滑动窗口的指标采集器
+ * Collects frame metrics in a fixed-size rolling window.
  */
 export class MetricsCollector {
-	private readonly windowSize: number;
-	private readonly buffer: FrameData[];
-	private writeIdx: number = 0;
-	private frameCount: number = 0;
+	// ── Instance fields ──────────────────────────────────────────────────────────
 
-	constructor(windowSize: number = 300) {
-		this.windowSize = windowSize;
-		this.buffer = new Array<FrameData>(windowSize);
+	private readonly _windowSize: number;
+	private readonly _buffer: FrameData[];
+	private _writeIndex = 0;
+	private _frameCount = 0;
+
+	// ── Constructor ────────────────────────────────────────────────────────────
+
+	public constructor(windowSize = 300) {
+		this._windowSize = windowSize;
+		this._buffer = new Array<FrameData>(windowSize);
 	}
 
-	/**
-	 * 写入一帧数据到 ring buffer
-	 */
-	record(frame: FrameData): void {
-		this.buffer[this.writeIdx] = frame;
-		this.writeIdx = (this.writeIdx + 1) % this.windowSize;
-		if (this.frameCount < this.windowSize) {
-			this.frameCount++;
+	// ── Public methods ──────────────────────────────────────────────────────────
+
+	public record(frame: FrameData): void {
+		this._buffer[this._writeIndex] = frame;
+		this._writeIndex = (this._writeIndex + 1) % this._windowSize;
+		if (this._frameCount < this._windowSize) {
+			this._frameCount++;
+		}
+	}
+
+	public reset(): void {
+		this._writeIndex = 0;
+		this._frameCount = 0;
+		for (let i = 0; i < this._windowSize; i++) {
+			this._buffer[i] = undefined as unknown as FrameData;
 		}
 	}
 
 	/**
-	 * 清空所有历史数据，重置写指针和帧计数
+	 * Reports sustained frame times above 33.3 ms over the latest ten frames.
 	 */
-	reset(): void {
-		this.writeIdx = 0;
-		this.frameCount = 0;
-		// 清空 buffer 引用
-		for (let i = 0; i < this.windowSize; i++) {
-			this.buffer[i] = undefined as unknown as FrameData;
-		}
-	}
+	public isLowFps(): boolean {
+		if (this._frameCount < 10) return false;
 
-	/**
-	 * 连续 10 帧 renderTimeMs > 33.3ms 时返回 true
-	 */
-	isLowFps(): boolean {
-		if (this.frameCount < 10) return false;
-
-		// 从最近写入的帧往回检查 10 帧
 		for (let i = 0; i < 10; i++) {
-			const idx = (this.writeIdx - 1 - i + this.windowSize) % this.windowSize;
-			const frame = this.buffer[idx];
+			const idx = (this._writeIndex - 1 - i + this._windowSize) % this._windowSize;
+			const frame = this._buffer[idx];
 			if (!frame || frame.renderTimeMs <= 33.3) {
 				return false;
 			}
@@ -66,11 +62,8 @@ export class MetricsCollector {
 		return true;
 	}
 
-	/**
-	 * 计算并返回统计结果
-	 */
-	getStats(): Stats {
-		if (this.frameCount === 0) {
+	public getStats(): Stats {
+		if (this._frameCount === 0) {
 			return {
 				frameCount: 0,
 				fps: { current: 0, avg: 0, p50: 0, p95: 0, max: 0 },
@@ -81,14 +74,13 @@ export class MetricsCollector {
 			};
 		}
 
-		// 收集有效帧数据
 		const fpsValues: number[] = [];
 		const renderValues: number[] = [];
 		const drawCallValues: number[] = [];
 
-		for (let i = 0; i < this.frameCount; i++) {
-			const idx = (this.writeIdx - this.frameCount + i + this.windowSize * 2) % this.windowSize;
-			const frame = this.buffer[idx];
+		for (let i = 0; i < this._frameCount; i++) {
+			const idx = (this._writeIndex - this._frameCount + i + this._windowSize * 2) % this._windowSize;
+			const frame = this._buffer[idx];
 			if (frame) {
 				fpsValues.push(frame.fps);
 				renderValues.push(frame.renderTimeMs);
@@ -96,9 +88,8 @@ export class MetricsCollector {
 			}
 		}
 
-		// 最新帧（writeIdx - 1）
-		const latestIdx = (this.writeIdx - 1 + this.windowSize) % this.windowSize;
-		const latestFrame = this.buffer[latestIdx];
+		const latestIdx = (this._writeIndex - 1 + this._windowSize) % this._windowSize;
+		const latestFrame = this._buffer[latestIdx];
 
 		const sortedFps = [...fpsValues].sort((a, b) => a - b);
 		const sortedRender = [...renderValues].sort((a, b) => a - b);
@@ -111,7 +102,7 @@ export class MetricsCollector {
 			latestFrame && latestFrame.drawCalls > 0 ? latestFrame.objectCount / latestFrame.drawCalls : 0;
 
 		return {
-			frameCount: this.frameCount,
+			frameCount: this._frameCount,
 			fps: {
 				current: latestFrame?.fps ?? 0,
 				avg: avgFps,
