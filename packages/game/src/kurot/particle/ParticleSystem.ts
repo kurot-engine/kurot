@@ -110,30 +110,32 @@ export class ParticleSystem extends DisplayObject {
 	 * Custom $renderObjectType for particle systems.
 	 * Value 6 — extends the core RenderObjectType enum without modifying core.
 	 */
-	public static readonly RENDER_TYPE_PARTICLE = 6 as const;
+	public static readonly RENDER_TYPE_PARTICLE = 6;
 
-	// ── Private fields ────────────────────────────────────────────────────────
+	// ── Instance fields ─────────────────────────────────────────────────────────
 
-	private readonly _pool: Particle[] = [];
-	private _frameTime = 0;
-	private readonly _particles: Particle[] = [];
-	private _emitterBounds?: Rectangle;
-	private _relativeContentBounds?: Rectangle;
-	private _timeStamp = 0;
-
-	// ── Protected fields ──────────────────────────────────────────────────────
+	/**
+	 * Remaining emission time in milliseconds. A value of -1 emits indefinitely.
+	 */
+	public emissionTime = -1;
+	public texture: Texture;
+	public maxParticles = 200;
+	public numParticles = 0;
+	/**
+	 * Particle constructor used when the pool is empty. Defaults to Particle.
+	 */
+	public particleClass?: new () => Particle;
 
 	protected _emitterX = 0;
 	protected _emitterY = 0;
 
-	// ── Public fields ─────────────────────────────────────────────────────────
-
-	public emissionTime = -1;
+	private readonly _pool: Particle[] = [];
+	private readonly _particles: Particle[] = [];
 	private _emissionRate: number;
-	public texture: Texture;
-	public maxParticles = 200;
-	public numParticles = 0;
-	public particleClass: (new () => Particle) | null = null;
+	private _frameTime = 0;
+	private _emitterBounds?: Rectangle;
+	private _relativeContentBounds?: Rectangle;
+	private _timeStamp = 0;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 

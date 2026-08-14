@@ -11,7 +11,9 @@ export const Ease = {
 	linear: (t: number): number => t,
 
 	// ── Configurable factories ────────────────────────────────────────────────
-	/** Produces an adjustable quadratic curve; amount is clamped to [-1, 1]. */
+	/**
+	 * Produces an adjustable quadratic curve with an amount clamped to [-1, 1].
+	 */
 	get: (amount: number): EaseFunction => {
 		const a = Math.max(-1, Math.min(1, amount));
 		return (t: number): number => {
@@ -172,10 +174,6 @@ export const Ease = {
 
 	/**
 	 * Creates a custom cubic-bezier easing function.
-	 *
-	 * The supplied progress is an x-coordinate. The corresponding curve
-	 * parameter is found with Newton iteration, falling back to bounded binary
-	 * search near flat derivatives, then used to sample the y-coordinate.
 	 */
 	cubicBezier(x1: number, y1: number, x2: number, y2: number): EaseFunction {
 		const sampleX = (t: number): number => 3 * x1 * t * (1 - t) * (1 - t) + 3 * x2 * t * t * (1 - t) + t * t * t;

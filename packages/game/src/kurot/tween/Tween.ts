@@ -74,10 +74,6 @@ function _unregisterTicker(): void {
 	ticker.stopTick(_globalTick, null);
 }
 
-/**
- * Advances a snapshot so callbacks may add or remove tweens without affecting
- * the current traversal. Newly created tweens begin on the following frame.
- */
 function _globalTick(timeStamp: number): boolean {
 	if (_lastTimeStamp === undefined) {
 		_lastTimeStamp = timeStamp;
@@ -108,11 +104,6 @@ function _removeActive(tween: Tween): void {
 	_unregisterTicker();
 }
 
-/**
- * Ends one tween lifecycle. Completion is resolved before release listeners so
- * observers always see a settled, inactive tween. This is the only path used
- * by natural completion and explicit removal.
- */
 function _releaseTween(tween: Tween): void {
 	const target = tween._target;
 	if (!target) {
@@ -257,8 +248,8 @@ export class Tween {
 	 * same terminal state.
 	 */
 	public then<TResult1 = void, TResult2 = never>(
-		onfulfilled?: ((value: void) => TResult1 | PromiseLike<TResult1>) | undefined | null,
-		onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+		onfulfilled?: ((value: void) => TResult1 | PromiseLike<TResult1>) | null,
+		onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
 	): PromiseLike<TResult1 | TResult2> {
 		return new Promise<void>(resolve => {
 			if (this._isCompleted) {
@@ -493,10 +484,6 @@ export class Tween {
 		this._onLoopCompleteObj = options?.onLoopCompleteObj;
 	}
 
-	/**
-	 * Runs consecutive zero-duration steps. Property steps are reversible;
-	 * callbacks and setters run only forward because they have no generic undo.
-	 */
 	private _advanceInstantSteps(): void {
 		while (this._stepIndex < this._steps.length) {
 			const step = this._steps[this._canonicalStepIndex(this._stepIndex)];
@@ -513,9 +500,6 @@ export class Tween {
 		}
 	}
 
-	/**
-	 * Starts the next repeat cycle and flips traversal direction for yoyo.
-	 */
 	private _startNextCycle(): void {
 		if (this._repeatsLeft > 0) {
 			this._repeatsLeft--;
@@ -528,11 +512,6 @@ export class Tween {
 		}
 	}
 
-	/**
-	 * Captures endpoints lazily. A captured endpoint is never overwritten so a
-	 * repeat or yoyo pass retraces the same animation instead of sampling a
-	 * mutated target value.
-	 */
 	private _initializeStep(step: TweenStep): void {
 		if (step.type === 'to' && step.startValues) {
 			return;
@@ -556,12 +535,10 @@ export class Tween {
 		}
 	}
 
-	/** Maps the current traversal index to the original step order for yoyo. */
 	private _canonicalStepIndex(index: number): number {
 		return this._reversed ? this._steps.length - 1 - index : index;
 	}
 
-	/** Applies one interpolated `to` or `from` step at an uneased normalized progress value. */
 	private _applyStep(step: TweenStep, progress: number): void {
 		const target = this._target as Record<string, unknown>;
 		if (step.type === 'to') {
@@ -579,7 +556,6 @@ export class Tween {
 		}
 	}
 
-	/** Executes a non-interpolated forward step; only callbacks and property sets reach this method. */
 	private _executeInstantStep(step: TweenStep): void {
 		if (step.type === 'call') {
 			step.fn.apply(step.thisObj ?? this._target, step.params);
@@ -588,7 +564,6 @@ export class Tween {
 		}
 	}
 
-	/** Copies a `set` step's values to the target without invoking user code. */
 	private _applySetStep(step: SetStep): void {
 		const target = this._target as Record<string, unknown>;
 		for (const key of Object.keys(step.props)) {
@@ -596,11 +571,6 @@ export class Tween {
 		}
 	}
 
-	/**
-	 * Rebuilds target state from the start of the forward sequence. Calls are
-	 * skipped, while `set` is applied because later interpolation may depend on
-	 * its resulting target state.
-	 */
 	private _seekTo(position: number): void {
 		this._stepIndex = 0;
 		this._stepElapsed = 0;
@@ -634,7 +604,6 @@ export class Tween {
 		}
 	}
 
-	/** Invokes the per-update observer with its configured receiver or the tween target. */
 	private _notifyChange(): void {
 		if (this._onChange) {
 			this._onChange.call(this._onChangeObj ?? this._target, this);

@@ -5,39 +5,31 @@ import type { Tween } from './Tween.js';
  */
 export type EaseFunction = (t: number) => number;
 
-/** @internal Discriminant used by the runtime step queue. */
 export type StepType = 'to' | 'from' | 'wait' | 'call' | 'set';
 
-/** @internal Fields shared by every queued tween step. */
 export interface BaseStep {
 	type: StepType;
 	duration: number;
 }
 
-/** @internal Interpolates from captured target values to `props`. */
 export interface ToStep extends BaseStep {
 	type: 'to';
 	props: Record<string, number>;
 	ease: EaseFunction;
-	/** Captured once to preserve repeat and yoyo endpoints. */
 	startValues?: Record<string, number>;
 }
 
-/** @internal Interpolates from `props` to captured target values. */
 export interface FromStep extends BaseStep {
 	type: 'from';
 	props: Record<string, number>;
 	ease: EaseFunction;
-	/** Captured once before the source values are applied. */
 	endValues?: Record<string, number>;
 }
 
-/** @internal Advances time without mutating target properties. */
 export interface WaitStep extends BaseStep {
 	type: 'wait';
 }
 
-/** @internal Runs a user callback during forward playback only. */
 export interface CallStep extends BaseStep {
 	type: 'call';
 	fn: (...args: unknown[]) => void;
@@ -45,13 +37,11 @@ export interface CallStep extends BaseStep {
 	params: unknown[];
 }
 
-/** @internal Assigns properties immediately during forward playback only. */
 export interface SetStep extends BaseStep {
 	type: 'set';
 	props: Record<string, unknown>;
 }
 
-/** @internal Complete union of runtime step variants. */
 export type TweenStep = ToStep | FromStep | WaitStep | CallStep | SetStep;
 
 /**
