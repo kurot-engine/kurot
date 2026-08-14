@@ -142,7 +142,6 @@ export class DisplayObjectContainer extends DisplayObject {
 		}
 		if (sortRequired && $children.length > 1) {
 			$children.sort(this.sortChildrenFunc);
-			// Child order changed — instruction set must be rebuilt.
 			DisplayObjectContainer.$onContainerStructureChange?.(this);
 		}
 	}
@@ -345,24 +344,10 @@ export class DisplayObjectContainer extends DisplayObject {
 
 	private markDirtyInternal(): void {
 		this.$markDirty();
-		// Notify the renderer that the scene structure changed.
-		// Pass `this` as the owner so the renderer can route the dirty signal
-		// to the correct InstructionSet (RenderGroup or root).
 		DisplayObjectContainer.$onContainerStructureChange?.(this);
 	}
 
-	/**
-	 * @internal
-	 * Injected by Player at startup. Called whenever a child is added, removed,
-	 * or reordered so the WebGLRenderer can mark its InstructionSet as dirty.
-	 * The `owner` argument is the container that changed — used to route the
-	 * dirty signal to a RenderGroup's set when applicable.
-	 *
-	 * Single-Player engine: Player assigns this directly in its constructor and
-	 * clears it in `destroy()`. There is intentionally no registration API.
-	 */
 	static $onContainerStructureChange?: (owner: DisplayObjectContainer) => void;
-
 
 	private sortChildrenFunc(a: DisplayObject, b: DisplayObject): number {
 		if (a.zIndex === b.zIndex) {

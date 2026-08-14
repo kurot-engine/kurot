@@ -1,10 +1,8 @@
 export const BlendMode = {
-	// ── 所有浏览器支持 ────────────────────────────────────────────────────────
 	NORMAL: 'source-over',
 	ADD: 'lighter',
 	ERASE: 'destination-out',
 
-	// ── 主流浏览器支持（iOS/Android 部分支持）────────────────────────────────
 	MULTIPLY: 'multiply',
 	SCREEN: 'screen',
 	LIGHTEN: 'lighten',

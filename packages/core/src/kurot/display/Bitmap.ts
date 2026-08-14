@@ -5,7 +5,6 @@ import { Texture } from './texture/Texture.js';
 import { BitmapFillMode } from './enums/BitmapFillMode.js';
 import type { Stage } from './Stage.js';
 
-/** @internal Injected by CanvasRenderer to avoid circular dependency. */
 export let bitmapPixelHitTest: ((bitmap: Bitmap, localX: number, localY: number) => boolean) | undefined;
 
 export function setBitmapPixelHitTest(fn: (bitmap: Bitmap, localX: number, localY: number) => boolean): void {
@@ -27,7 +26,6 @@ export class Bitmap extends DisplayObject {
 	private _explicitBitmapWidth = NaN;
 	private _explicitBitmapHeight = NaN;
 
-	// Cached texture region data (updated when texture changes)
 	bitmapData?: BitmapData;
 	bitmapX = 0;
 	bitmapY = 0;
@@ -166,7 +164,6 @@ export class Bitmap extends DisplayObject {
 
 		if (value) {
 			this.refreshImageData();
-			// When already on stage, update BitmapData reference counting.
 			if (this.$stage) {
 				if (old?.bitmapData && old.bitmapData !== value.bitmapData) {
 					BitmapData.removeDisplayObject(this, old.bitmapData);

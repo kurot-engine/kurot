@@ -16,12 +16,14 @@ export interface SceneDescriptor {
  * 不依赖 Kurot 引擎，通过外部注入的回调与引擎交互。
  */
 export class BenchmarkRunner {
-	private phase: Phase = 'idle';
+
+    private readonly warmupTarget = 60;
+
+    private phase: Phase = 'idle';
 	private warmupFrames = 0;
-	private readonly warmupTarget = 60;
-	private currentSceneId: string | undefined;
+	private currentSceneId?: string;
 	private currentCount = 0;
-	private cleanup: (() => void) | undefined;
+	private cleanup?: () => void;
 
 	constructor(
 		private readonly collector: MetricsCollector,

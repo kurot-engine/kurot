@@ -6,13 +6,19 @@ import type { Texture } from './texture/Texture.js';
 export class Mesh extends Bitmap {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	/** Vertex positions: [x0, y0, x1, y1, ...] */
+	/**
+	 * Vertex positions stored as x/y pairs.
+	 */
 	public vertices: number[] = [];
 
-	/** Triangle indices into the vertices array. */
+	/**
+	 * Triangle indices into the vertices array.
+	 */
 	public indices: number[] = [];
 
-	/** UV coordinates: [u0, v0, u1, v1, ...] */
+	/**
+	 * Texture coordinates stored as u/v pairs.
+	 */
 	public uvs: number[] = [];
 
 	private _verticesDirty = true;

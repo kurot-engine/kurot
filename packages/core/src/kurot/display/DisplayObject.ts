@@ -14,18 +14,9 @@ import type { Stage } from './Stage.js';
 import type { Graphics } from './Graphics.js';
 
 /**
- * EventMap for DisplayObject and all its subclasses (Sprite, Stage, TextField, ...).
- *
- * Maps each event type string to the concrete Event subclass that the framework
- * dispatches for that type, so `addEventListener(TouchEvent.TOUCH_TAP, e => ...)`
- * infers `e` as `TouchEvent` instead of the `Event` base class.
- *
- * Subclasses that emit additional event types (e.g. TextField dispatches
- * TextEvent.LINK) may declare their own EventMap extending this one and pass
- * it to EventDispatcher via a generic EventDispatcher subclass.
+ * Event payloads dispatched by display objects.
  */
 export interface DisplayObjectEvents extends EventMap {
-	// Base Event payloads
 	[Event.ADDED]: Event;
 	[Event.REMOVED]: Event;
 	[Event.ADDED_TO_STAGE]: Event;
@@ -36,7 +27,6 @@ export interface DisplayObjectEvents extends EventMap {
 	[Event.CHANGE]: Event;
 	[Event.COMPLETE]: Event;
 
-	// Touch events — payload is always TouchEvent
 	[TouchEvent.TOUCH_BEGIN]: TouchEvent;
 	[TouchEvent.TOUCH_MOVE]: TouchEvent;
 	[TouchEvent.TOUCH_END]: TouchEvent;
@@ -44,16 +34,21 @@ export interface DisplayObjectEvents extends EventMap {
 	[TouchEvent.TOUCH_TAP]: TouchEvent;
 	[TouchEvent.TOUCH_RELEASE_OUTSIDE]: TouchEvent;
 
-	// Focus events — payload is always FocusEvent
 	[FocusEvent.FOCUS_IN]: FocusEvent;
 	[FocusEvent.FOCUS_OUT]: FocusEvent;
 }
 
-/** Options for caching a display subtree as one reusable texture. */
+/**
+ * Options for caching a display subtree as one reusable texture.
+ */
 export interface CacheAsTextureOptions {
-	/** Raster resolution. Higher values improve sharpness at a memory cost. */
+	/**
+	 * Raster resolution. Higher values improve sharpness at a memory cost.
+	 */
 	resolution?: number;
-	/** Sampling mode used when the cached texture is scaled. */
+	/**
+	 * Sampling mode used when the cached texture is scaled.
+	 */
 	scaleMode?: 'linear' | 'nearest';
 }
 
@@ -67,7 +62,6 @@ function clampRotation(value: number): number {
 	return value;
 }
 
-/** @internal Render mode hint for the renderer. */
 export const enum RenderMode {
 	NONE = 1,
 	FILTER = 2,
@@ -75,7 +69,6 @@ export const enum RenderMode {
 	SCROLLRECT = 4,
 }
 
-/** @internal Identifies the concrete renderable type, replacing instanceof checks in hot paths. */
 export const enum RenderObjectType {
 	NONE = 0,
 	BITMAP = 1,
@@ -95,39 +88,18 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	static $eventAddToStageList: DisplayObject[] = [];
 	static $eventRemoveFromStageList: DisplayObject[] = [];
 
-	/**
-	 * @internal
-	 * Injected by Player at startup. Called when $renderMode changes (visible,
-	 * filters, mask, blendMode) so the WebGLRenderer can mark its InstructionSet dirty.
-	 *
-	 * Single-Player engine: Player assigns this directly in its constructor and
-	 * clears it in `destroy()`. There is intentionally no registration API.
-	 */
 	static $onStructureChange?: () => void;
 
-	/**
-	 * @internal
-	 * Injected by Player at startup. Called when a DisplayObject's visual data
-	 * changes (position, texture, alpha, tint) but the scene structure is unchanged.
-	 * The renderer uses this to update the transform snapshot in the InstructionSet
-	 * without doing a full rebuild.
-	 *
-	 * Single-Player engine: Player assigns this directly in its constructor and
-	 * clears it in `destroy()`. There is intentionally no registration API.
-	 */
 	static $onRenderableDirty?: (obj: DisplayObject) => void;
-
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	// 场景图
 	$hasAddToStage = false;
 	$children?: DisplayObject[];
 	$parent?: DisplayObjectContainer;
 	$stage?: Stage;
 	$nestLevel = 0;
 
-	// 变换
 	$x = 0;
 	$y = 0;
 	$anchorOffsetX = 0;
@@ -136,7 +108,6 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	$explicitHeight: number = NaN;
 	$useTranslate = false;
 
-	// 外观
 	$visible = true;
 	$alpha = 1;
 	$blendMode = 0;
@@ -144,33 +115,27 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	$cacheAsBitmap = false;
 	$touchEnabled: boolean = DisplayObject.defaultTouchEnabled;
 
-	// 遮罩
 	$mask?: DisplayObject;
 	$maskRect?: Rectangle;
 	$scrollRect?: Rectangle;
 	$maskedObject?: DisplayObject;
 
-	// 渲染状态
 	$renderMode?: RenderMode;
 	$renderObjectType: RenderObjectType = RenderObjectType.NONE;
 	$renderDirty = false;
 	$cacheDirty = false;
 	$displayList?: DisplayList;
 
-	// 世界缓存（$markDirty 更新，O(1) 读取）
 	$worldAlpha = 1;
 	$worldTint = 0xffffff;
 	$tintRGB = 0;
 
-	// 排序
 	$sortDirty = false;
 	$lastSortedIndex = 0;
 
-	// bounds 缓存
 	private _boundsDirty = true;
 	private readonly _cachedBounds = new Rectangle();
 
-	// 私有
 	private _name = '';
 	private _matrix: Matrix = new Matrix();
 	private _matrixDirty = false;
@@ -321,7 +286,9 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.cacheAsTexture(value);
 	}
 
-	/** PixiJS-style cache API. `cacheAsBitmap` remains an Egret-compatible alias. */
+	/**
+	 * Caches this display subtree as a reusable texture.
+	 */
 	public cacheAsTexture(value: boolean | CacheAsTextureOptions): void {
 		if (value === false) {
 			this.$cacheAsBitmap = false;
@@ -334,7 +301,9 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.updateCacheTexture();
 	}
 
-	/** Marks cached content for regeneration on the next render. */
+	/**
+	 * Marks cached content for regeneration on the next render.
+	 */
 	public updateCacheTexture(): void {
 		if (!this.$displayList) return;
 		this.$cacheDirty = true;
@@ -466,7 +435,6 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		if (!shapeFlag) {
 			return true;
 		}
-		// Pixel-perfect: delegate to $hitTest which Shape/Sprite override
 		return this.$hitTest(x, y) !== undefined;
 	}
 
@@ -496,21 +464,18 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return false;
 	}
 
-	// Overload 1: type-safe path for events declared in DisplayObjectEvents
 	public override addEventListener<K extends keyof DisplayObjectEvents & string>(
 		type: K,
 		listener: (event: DisplayObjectEvents[K]) => void,
 		useCapture?: boolean,
 		priority?: number,
 	): void;
-	// Overload 2: fallback for arbitrary type strings
 	public override addEventListener(
 		type: string,
 		listener: (event: Event) => void,
 		useCapture?: boolean,
 		priority?: number,
 	): void;
-	// Impl: type-erased to satisfy both overloads (see AnyListener in EventDispatcher)
 	public override addEventListener(
 		type: string,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -528,13 +493,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		}
 	}
 
-	// Overload 1: type-safe path
 	public override removeEventListener<K extends keyof DisplayObjectEvents & string>(
 		type: K,
 		listener: (event: DisplayObjectEvents[K]) => void,
 		useCapture?: boolean,
 	): void;
-	// Overload 2: fallback
 	public override removeEventListener(type: string, listener: (event: Event) => void, useCapture?: boolean): void;
 	public override removeEventListener(
 		type: string,
@@ -774,9 +737,6 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 				this.$displayList = undefined;
 			}
 		}
-		// cacheAsBitmap toggle changes the instruction set structure:
-		// the subtree either collapses to a single displayListCache instruction
-		// or expands back to individual leaf instructions.
 		DisplayObject.$onStructureChange?.();
 		this.$markDirty();
 	}
@@ -814,7 +774,6 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		} else {
 			this.$renderMode = undefined;
 		}
-		// RenderMode change means the instruction set structure is stale.
 		DisplayObject.$onStructureChange?.();
 	}
 
@@ -982,19 +941,14 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markTransformDirty();
 	}
 
-	/** Marks world placement/color dirty without invalidating this object's cached pixels. */
 	$markTransformDirty(): void {
 		this._boundsDirty = true;
 
-		// Update cached world alpha and tint so _refreshLeafTransform can read
-		// them in O(1) without walking the parent chain.
 		let alpha = this.$alpha;
 		let tint = this.$tintRGB;
 		let p = this.$parent;
 		while (p) {
 			alpha *= p.$alpha;
-			// Rendering applies the closest non-default tint: an object's own tint
-			// overrides its parent, otherwise it inherits the nearest tinted ancestor.
 			if (tint === 0xffffff && p.$tintRGB !== 0xffffff) {
 				tint = p.$tintRGB;
 			}
@@ -1003,7 +957,6 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$worldAlpha = alpha;
 		this.$worldTint = tint;
 
-		// Notify the renderer that this object's data changed.
 		DisplayObject.$onRenderableDirty?.(this);
 		const parent = this.$parent;
 		if (parent && !parent.$cacheDirty) {

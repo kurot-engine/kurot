@@ -4,7 +4,6 @@ import { Rectangle } from '../geom/Rectangle.js';
 import { PathCommandType, type GraphicsCommand } from './GraphicsPath.js';
 import type { DisplayObject } from './DisplayObject.js';
 
-/** @internal Injected by CanvasRenderer at startup to avoid circular dependency. */
 export let graphicsHitTest: ((graphics: Graphics, localX: number, localY: number) => boolean) | undefined;
 
 export function setGraphicsHitTest(fn: (graphics: Graphics, localX: number, localY: number) => boolean): void {
@@ -297,8 +296,6 @@ export class Graphics {
 	}
 
 	$onRemoveFromStage(): void {
-		// Do not clear commands — the Shape may be re-added to the display list
-		// and needs its graphics to remain intact for re-rendering.
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────

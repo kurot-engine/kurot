@@ -56,17 +56,23 @@ export class Texture {
 		}
 	}
 
-	/** @deprecated Use setBitmapData instead. */
+	/**
+	 * @deprecated Use setBitmapData instead.
+	 */
 	public getPixel32(_x: number, _y: number): number[] {
 		throw new Error('getPixel32 is not supported');
 	}
 
-	/** @deprecated Requires renderer implementation. */
+	/**
+	 * @deprecated This operation is not supported by Texture.
+	 */
 	public getPixels(_x: number, _y: number, _width = 1, _height = 1): number[] {
 		throw new Error('getPixels requires renderer implementation');
 	}
 
-	/** @deprecated Requires renderer implementation. */
+	/**
+	 * @deprecated This operation is not supported by Texture.
+	 */
 	public toDataURL(_type: string, _rect?: Rectangle): string {
 		throw new Error('toDataURL requires renderer implementation');
 	}

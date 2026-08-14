@@ -112,7 +112,6 @@ export class Stage extends DisplayObjectContainer {
 
 	// ── Protected hooks (override in platform adapters) ───────────────────────
 
-	/** @internal Called by ScreenAdapter to register itself. */
 	setScreenAdapter(adapter: ScreenAdapter): void {
 		this._screenAdapter = adapter;
 	}
@@ -122,6 +121,5 @@ export class Stage extends DisplayObjectContainer {
 	}
 
 	protected onMaxTouchesChanged(): void {
-		// Input system hook — handled at player level
 	}
 }
