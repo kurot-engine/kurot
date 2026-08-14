@@ -1,70 +1,66 @@
 /**
  * Kurot 标准游戏模板
  *
- * 使用 @kurot/core 进行 Canvas 绘制 + @kurot/game 补间动画。
- * 通过 Shape、TextField 等基础显示对象构建游戏场景。
+ * 使用 @kurot/ui 构建响应式界面，并通过 @kurot/game 播放补间动画。
  *
  * 生命周期：constructor → ADDED_TO_STAGE → $onAddToStage → runGame → loadResource → createGameScene → startAnimation
  */
-import { createPlayer, TextField, Shape, Event, Stage, Texture, resource } from '@kurot/core';
-import { Button, DefaultAssetAdapter, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
+import { createPlayer, Event, resource } from '@kurot/core';
+import { Button, Label, Rect, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
 import { Tween } from '@kurot/game';
-import { LoadingUI } from './LoadingUI';
+import { AssetAdapter } from '@/AssetAdapter';
+import { LifecycleHandler } from '@/LifecycleHandler';
+import { Preloader } from '@/Preloader';
 
 class Main extends UILayer {
+	private readonly _preloader = new Preloader();
+
 	createChildren(): void {
 		super.createChildren();
 
 		const stage = this.stage;
 		if (!stage) return;
 
-		this.runGame(stage).catch(e => {
-			console.log(e);
+		setAssetAdapter(new AssetAdapter());
+		LifecycleHandler.init(stage);
+
+		void this.runGame().catch(error => {
+			console.error('[Main] Unable to start game:', error);
 		});
 	}
 
-	private async runGame(stage: Stage): Promise<void> {
-		await this.loadResource(stage);
-		this.installResourceAssetAdapter();
-		await this.loadTheme();
-		this.createGameScene(stage);
+	private async runGame(): Promise<void> {
+		await this.createPreloader();
+		await this.load();
+		this._preloader.destroy();
+		this.createGameScene();
 		this.startAnimation();
 	}
 
-	/**
-	 * 让 EXML 中的 source="button_up_png" 优先解析为预加载图集的子纹理，
-	 * 普通 URL 图片仍交给默认适配器加载。
-	 */
-	private installResourceAssetAdapter(): void {
-		const fallback = new DefaultAssetAdapter();
-		setAssetAdapter({
-			getAsset: (source, callback) => {
-				const texture = resource.get<Texture>(source);
-				if (texture) {
-					callback(texture, source);
-					return;
-				}
-				fallback.getAsset(source, callback);
-			},
-		});
+	private async load(): Promise<void> {
+		await this.updatePreloader('Loading resource configuration...', 1, 2);
+		await resource.loadConfig('resource/default.res.json', 'resource/');
+
+		await this.updatePreloader('Loading theme...', 2, 2);
+		await this.loadTheme();
+
+		if (resource.hasGroup('preload')) {
+			this._preloader.updateText('Loading resources...');
+			await resource.loadGroup('preload', 0, (loaded, total) => {
+				this._preloader.onProgress(loaded, total);
+			});
+		}
 	}
 
-	private async loadResource(stage: Stage): Promise<void> {
-		const loadingView = new LoadingUI();
-		stage.addChild(loadingView);
+	private async createPreloader(): Promise<void> {
+		await this._preloader.init();
+		this.addChild(this._preloader);
+	}
 
-		try {
-			await resource.loadConfig('resource/default.res.json', 'resource/');
-			if (resource.hasGroup('preload')) {
-				await resource.loadGroup('preload', 0, (loaded, total) => {
-					loadingView.onProgress(loaded, total);
-				});
-			}
-		} catch {
-			// 资源配置文件不存在时静默跳过（纯代码项目无需资源配置）
-		}
-
-		stage.removeChild(loadingView);
+	private async updatePreloader(message: string, current: number, total: number): Promise<void> {
+		this._preloader.updateText(message);
+		this._preloader.updateProgress(current, total);
+		await this.wait(0.1);
 	}
 
 	private async loadTheme(): Promise<void> {
@@ -73,60 +69,71 @@ class Main extends UILayer {
 		await new Promise<void>(resolve => theme.addEventListener(Event.COMPLETE, () => resolve()));
 	}
 
-	private textfield!: TextField;
+	private wait(timeout: number): Promise<void> {
+		return new Promise<void>(resolve => {
+			setTimeout(resolve, timeout * 1000);
+		});
+	}
+
+	private textfield!: Label;
 
 	/**
 	 * 创建游戏场景
 	 *
-	 * 使用 Shape（矢量绘制）和 TextField（文本）等基础显示对象搭建画面。
+	 * 使用 EUI 组件和约束布局搭建响应式画面。
 	 */
-	private createGameScene(stage: Stage): void {
-		const stageW = stage.stageWidth;
-		const stageH = stage.stageHeight;
-
-		// 背景色块
-		const sky = new Shape();
-		sky.graphics.beginFill(0x2d3436, 1);
-		sky.graphics.drawRect(0, 0, stageW, stageH);
-		sky.graphics.endFill();
+	private createGameScene(): void {
+		// 响应式背景
+		const sky = new Rect();
+		sky.left = 0;
+		sky.right = 0;
+		sky.top = 0;
+		sky.bottom = 0;
+		sky.fillColor = 0x2d3436;
 		this.addChild(sky);
 
 		// 半透明顶栏
-		const topMask = new Shape();
-		topMask.graphics.beginFill(0x000000, 0.5);
-		topMask.graphics.drawRect(0, 0, stageW, 172);
-		topMask.graphics.endFill();
-		topMask.y = 33;
+		const topMask = new Rect();
+		topMask.left = 0;
+		topMask.right = 0;
+		topMask.top = 33;
+		topMask.height = 172;
+		topMask.fillColor = 0x000000;
+		topMask.fillAlpha = 0.5;
 		this.addChild(topMask);
 
 		// 标题文本
-		const colorLabel = new TextField();
+		const colorLabel = new Label();
 		colorLabel.textColor = 0xffffff;
-		colorLabel.width = stageW;
+		colorLabel.left = 0;
+		colorLabel.right = 0;
+		colorLabel.top = 80;
+		colorLabel.height = 48;
 		colorLabel.textAlign = 'center';
+		colorLabel.verticalAlign = 'middle';
 		colorLabel.text = 'Hello Kurot';
 		colorLabel.size = 36;
-		colorLabel.x = 0;
-		colorLabel.y = 80;
 		this.addChild(colorLabel);
 
 		// 描述文本（用于动画）
-		const textfield = new TextField();
+		const textfield = new Label();
 		this.addChild(textfield);
 		textfield.alpha = 0;
-		textfield.width = stageW;
+		textfield.left = 0;
+		textfield.right = 0;
+		textfield.top = 135;
+		textfield.height = 36;
 		textfield.textAlign = 'center';
+		textfield.verticalAlign = 'middle';
 		textfield.size = 24;
 		textfield.textColor = 0xffffff;
-		textfield.x = 0;
-		textfield.y = 135;
 		this.textfield = textfield;
 
 		// UI 按钮示例（需要默认主题）
 		const button = new Button();
 		button.label = 'Click Me';
-		button.x = (stageW - 200) / 2;
-		button.y = 200;
+		button.horizontalCenter = 0;
+		button.top = 200;
 		button.width = 200;
 		this.addChild(button);
 	}
