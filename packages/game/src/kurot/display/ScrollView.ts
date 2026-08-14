@@ -45,29 +45,10 @@ const FRAME_MS = 16.67;
 export class ScrollView extends Sprite {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	/**
-	 * Horizontal scroll policy. Default: `ScrollPolicy.AUTO`.
-	 */
 	public horizontalScrollPolicy: ScrollPolicy = ScrollPolicy.AUTO;
-
-	/**
-	 * Vertical scroll policy. Default: `ScrollPolicy.AUTO`.
-	 */
 	public verticalScrollPolicy: ScrollPolicy = ScrollPolicy.AUTO;
-
-	/**
-	 * Minimum touch movement in pixels before scrolling begins. Default: 10.
-	 */
 	public scrollBeginThreshold = 10;
-
-	/**
-	 * Scroll speed multiplier applied to touch deltas. Default: 1.
-	 */
 	public scrollSpeed = 1;
-
-	/**
-	 * Whether to allow over-scroll bounce at the content boundaries. Default: true.
-	 */
 	public bounces = true;
 
 	private _content?: Sprite;

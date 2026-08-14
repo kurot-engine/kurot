@@ -24,7 +24,7 @@ export class MovieClip extends Bitmap {
 	private _playTimes = 1;
 	private _playedTimes = 0;
 	private _playRangeStart = 0;
-	private _playRangeEnd: number | undefined;
+	private _playRangeEnd?: number;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 

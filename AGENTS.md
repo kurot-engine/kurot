@@ -9,7 +9,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package            | Version | One-line role                                                                                                                                                                   | Read this first                                                                  |
 | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `@kurot/core`      | 1.0.13  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
+| `@kurot/core`      | 1.0.14  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
 | `@kurot/ui`        | 1.1.7   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
 | `@kurot/cli`       | 1.1.0   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
@@ -35,12 +35,12 @@ you need an implementation you haven't already been pointed to.
 
 ## High-signal rules (full detail in `docs/code-rules.md`)
 
-- TypeScript only, ESM, ES2022, `strict: true`, zero `any`, `Node.js >= 20`, `pnpm`.
+- TypeScript only, ESM, ES2022, `strict: true`, no new `any`, `Node.js >= 20` for tooling, `pnpm`.
 - Application-layer code uses `undefined`, never `null` (DOM/WebGL API boundaries are the one exception — `null` is required there by the browser spec).
 - Every exported function declares a return type. Named exports only, no `export default`.
-- Class member order: static fields → instance fields → constructor → getters/setters → public methods → overrides → private methods, with `// ── Section ──` comments between groups.
-- No comments unless code truly can't express intent; JSDoc only on exported API, always multi-line format.
-- No `@ts-ignore`/`@ts-expect-error`/`as any`. No class hierarchies deeper than 2 levels. No file over 300 lines.
+- Class member order: static fields/methods → instance fields → constructor → getters/setters → public methods → overrides → protected/internal methods → private methods, with `// ── Section ──` comments between non-empty groups when useful.
+- Comments document contracts that types and code cannot express; do not narrate implementation. Use multi-line JSDoc for non-obvious exported APIs, including public class and interface properties. Private/internal members are undocumented by default.
+- No `@ts-ignore`/`@ts-expect-error`/new `as any`. New files should stay under 300 lines; do not mechanically split existing large engine files.
 - Full rules, naming conventions, and the "don't write compat code" policy: [`docs/code-rules.md`](docs/code-rules.md).
 
 ## Commands

@@ -128,36 +128,11 @@ export class ParticleSystem extends DisplayObject {
 
 	// ── Public fields ─────────────────────────────────────────────────────────
 
-	/**
-	 * Total emission time in ms. -1 = infinite.
-	 * @default -1
-	 */
 	public emissionTime = -1;
-
-	/**
-	 * Interval between particle emissions in ms.
-	 */
 	private _emissionRate: number;
-
-	/**
-	 * The texture used for each particle.
-	 */
 	public texture: Texture;
-
-	/**
-	 * Maximum number of particles alive at any time.
-	 * @default 200
-	 */
 	public maxParticles = 200;
-
-	/**
-	 * Current number of active particles.
-	 */
 	public numParticles = 0;
-
-	/**
-	 * Particle class to instantiate. Set by subclasses.
-	 */
 	public particleClass: (new () => Particle) | null = null;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
@@ -179,7 +154,9 @@ export class ParticleSystem extends DisplayObject {
 		return this._particles;
 	}
 
-	/** Interval between particle emissions in milliseconds. Zero disables emission. */
+	/**
+	 * Interval between particle emissions in milliseconds. Zero disables emission.
+	 */
 	public get emissionRate(): number {
 		return this._emissionRate;
 	}

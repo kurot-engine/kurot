@@ -35,7 +35,6 @@ function _validateFrameNumber(value: number, frameCount: number, name: string): 
 export class MovieClipDataFactory {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	/** Whether generated MovieClipData instances are cached by clip name. */
 	public enableCache = true;
 
 	private _mcDataSet: EgretMovieClipDataSet | undefined;
@@ -58,7 +57,9 @@ export class MovieClipDataFactory {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
-	/** Egret MovieClip JSON data set containing top-level `mc` and `res` maps. */
+	/**
+	 * Egret MovieClip JSON data set containing top-level `mc` and `res` maps.
+	 */
 	public get mcDataSet(): EgretMovieClipDataSet | undefined {
 		return this._mcDataSet;
 	}
@@ -69,7 +70,9 @@ export class MovieClipDataFactory {
 		this.clearCache();
 	}
 
-	/** Atlas texture used to create a core SpriteSheet for generated frame textures. */
+	/**
+	 * Atlas texture used to create a core SpriteSheet for generated frame textures.
+	 */
 	public get texture(): Texture | undefined {
 		return this._texture;
 	}
@@ -80,12 +83,16 @@ export class MovieClipDataFactory {
 		this.clearCache();
 	}
 
-	/** SpriteSheet created from texture, or undefined when no atlas texture is set. */
+	/**
+	 * SpriteSheet created from texture, or undefined when no atlas texture is set.
+	 */
 	public get spriteSheet(): SpriteSheet | undefined {
 		return this._spriteSheet;
 	}
 
-	/** Strategy used to translate Egret frame offsets and atlas regions. */
+	/**
+	 * Strategy used to translate Egret frame offsets and atlas regions.
+	 */
 	public get textureParser(): MovieClipTextureParser {
 		return this._textureParser;
 	}

@@ -7,16 +7,22 @@ import type { Texture } from '@kurot/core';
  * currentFrame value as a 1-based frame number.
  */
 export interface MovieClipFrame {
-	/** Texture displayed for this logical frame; undefined represents a blank frame. */
+	/**
+	 * Texture displayed for this logical frame; undefined represents a blank frame.
+	 */
 	texture?: Texture;
 	/**
 	 * Timing metadata in milliseconds for an external animation scheduler.
 	 * MovieClip does not consume this value when advanceFrame() is called.
 	 */
 	duration: number;
-	/** Optional label that begins at this 0-based runtime frame. */
+	/**
+	 * Optional label that begins at this 0-based runtime frame.
+	 */
 	label?: string;
-	/** Custom event name dispatched after this frame becomes current. */
+	/**
+	 * Custom event name dispatched after this frame becomes current.
+	 */
 	event?: string;
 }
 
@@ -28,9 +34,13 @@ export interface MovieClipFrame {
  */
 export interface MovieClipLabel {
 	name: string;
-	/** First frame in the inclusive range. */
+	/**
+	 * First frame in the inclusive range.
+	 */
 	startFrame: number;
-	/** Last frame in the inclusive range. */
+	/**
+	 * Last frame in the inclusive range.
+	 */
 	endFrame: number;
 }
 
@@ -51,13 +61,21 @@ export interface EgretMovieClipResourceData {
  * MovieClipDataFactory expands duration into that many logical runtime frames.
  */
 export interface EgretMovieClipFrameData {
-	/** Name of an entry in the top-level `res` map; omit it for a blank frame. */
+	/**
+	 * Name of an entry in the top-level `res` map; omit it for a blank frame.
+	 */
 	res?: string;
-	/** Horizontal display offset applied to the generated frame texture; defaults to 0. */
+	/**
+	 * Horizontal display offset applied to the generated frame texture; defaults to 0.
+	 */
 	x?: number;
-	/** Vertical display offset applied to the generated frame texture; defaults to 0. */
+	/**
+	 * Vertical display offset applied to the generated frame texture; defaults to 0.
+	 */
 	y?: number;
-	/** Positive integer number of logical frames occupied by this key frame; defaults to 1. */
+	/**
+	 * Positive integer number of logical frames occupied by this key frame; defaults to 1.
+	 */
 	duration?: number;
 }
 
@@ -69,9 +87,13 @@ export interface EgretMovieClipFrameData {
  */
 export interface EgretMovieClipLabelData {
 	name: string;
-	/** First 1-based logical frame in the range. */
+	/**
+	 * First 1-based logical frame in the range.
+	 */
 	frame: number;
-	/** Last inclusive 1-based logical frame in the range. */
+	/**
+	 * Last inclusive 1-based logical frame in the range.
+	 */
 	end?: number;
 }
 
@@ -106,15 +128,25 @@ export interface EgretMovieClipDataSet {
 	res?: Record<string, EgretMovieClipResourceData>;
 }
 
-/** Events dispatched by MovieClip during frame changes and playback boundaries. */
+/**
+ * Events dispatched by MovieClip during frame changes and playback boundaries.
+ */
 export const MovieClipEvent = {
-	/** Dispatched after a finite playback session reaches its final frame and stops. */
+	/**
+	 * Dispatched after a finite playback session reaches its final frame and stops.
+	 */
 	COMPLETE: 'complete',
-	/** Dispatched after a completed cycle that will continue with another cycle. */
+	/**
+	 * Dispatched after a completed cycle that will continue with another cycle.
+	 */
 	LOOP_COMPLETE: 'loopComplete',
-	/** Dispatched when MovieClip makes a valid logical frame current. */
+	/**
+	 * Dispatched when MovieClip makes a valid logical frame current.
+	 */
 	FRAME_CHANGE: 'frameChange',
 } as const;
 
-/** Union of the built-in MovieClip event names. Custom frame-event names remain strings. */
+/**
+ * Union of the built-in MovieClip event names. Custom frame-event names remain strings.
+ */
 export type MovieClipEventType = (typeof MovieClipEvent)[keyof typeof MovieClipEvent];

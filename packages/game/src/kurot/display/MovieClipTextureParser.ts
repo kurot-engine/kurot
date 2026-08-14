@@ -1,6 +1,8 @@
 import type { SpriteSheet, Texture } from '@kurot/core';
 
-/** Validated atlas and registration data for one MovieClip frame texture. */
+/**
+ * Validated atlas and registration data for one MovieClip frame texture.
+ */
 export interface MovieClipTextureSource {
 	name: string;
 	bitmapX: number;
@@ -11,7 +13,9 @@ export interface MovieClipTextureSource {
 	offsetY: number;
 }
 
-/** Strategy used by MovieClipDataFactory to convert frame texture metadata. */
+/**
+ * Strategy used by MovieClipDataFactory to convert frame texture metadata.
+ */
 export interface MovieClipTextureParser {
 	createFrameTexture(spriteSheet: SpriteSheet, source: MovieClipTextureSource): Texture;
 }
@@ -24,7 +28,6 @@ export interface MovieClipTextureParser {
  * frame's drawable dimensions even when either offset is negative.
  */
 export class EgretMovieClipTextureParser implements MovieClipTextureParser {
-
 	createFrameTexture(spriteSheet: SpriteSheet, source: MovieClipTextureSource): Texture {
 		return spriteSheet.createTexture(
 			source.name,

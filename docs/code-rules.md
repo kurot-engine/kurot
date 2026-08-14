@@ -8,14 +8,14 @@
 
 - **TypeScript only**，所有 `.ts` 文件，禁止 `.js` 业务代码。
 - 目标 `ES2022`，模块系统 `ESM`（`"type": "module"`）。
-- 使用 `Node.js >= 20` API，不写向下兼容代码。
+- CLI、构建和开发工具使用 `Node.js >= 20` API；引擎运行时以 ES2022 现代浏览器为目标。两者都不写向下兼容代码。
 - 使用 `pnpm` 作为包管理器。
 
 ## 2. 类型系统
 
 ### 2.1 严格模式
 
-`tsconfig.json` 必须 `"strict": true`，不得通过 `as any` / `@ts-ignore` 绕过。
+`tsconfig.json` 必须 `"strict": true`，不得通过 `as any` / `@ts-ignore` 绕过。新代码禁止新增 `any`；现有 `any` 属于待清理技术债，修改相关代码时优先使用 `unknown`、泛型或明确的结构类型消除。
 
 ### 2.2 禁止 null（应用层）
 
@@ -65,23 +65,25 @@ const files: string[] = await fs.readdir(srcDir);
 
 ### 3.1 格式化
 
-遵循 `.prettierrc`，提交前 `pnpm format`。
+遵循仓库现有格式。如果当前包提供 `format` script，提交前运行；没有格式化脚本时，至少运行该包的构建、测试与 `git diff --check`。
 
 ### 3.2 命名
 
 | 场景                                    | 风格                                 | 示例                                        |
 | --------------------------------------- | ------------------------------------ | ------------------------------------------- |
-| 文件名                                  | `kebab-case`                         | `exml-compiler.ts`                          |
+| 导出主 class/interface 的文件名           | `PascalCase`                         | `DisplayObject.ts`                          |
+| CLI、配置、工具和功能模块文件名             | `kebab-case`                         | `exml-compiler.ts`                          |
 | class / interface / type / enum         | `PascalCase`                         | `ProjectConfig`, `BitmapFillMode`           |
 | `const enum`（枚举类型名）              | `PascalCase`                         | `DrawCmdType`                               |
 | 函数 / 方法 / 变量                      | `camelCase`                          | `buildProject`, `getOrAssignSlot`           |
-| 全局常量（`static readonly` / `const`） | `UPPER_SNAKE_CASE`                   | `MAX_TEXTURES`, `DEFAULT_WIDTH`             |
+| 配置阈值、协议常量和真正不变的常量          | `UPPER_SNAKE_CASE`                   | `MAX_TEXTURES`, `DEFAULT_WIDTH`             |
+| 共享实例、单例和可变模块状态                  | `camelCase`                          | `sharedPoint`, `resource`, `ticker`         |
 | 私有实例字段                            | `_camelCase`（下划线前缀）           | `_config`, `_slotCount`                     |
-| 布尔变量/属性                           | `is` / `has` / `should` / `can` 前缀 | `isFull()`, `hasEui`, `contextLost`         |
+| 布尔判断方法/计算状态                     | 优先 `is` / `has` / `should` / `can` | `isFull()`, `hasEui`, `canRender`           |
 | 事件回调                                | `on` / `handle` 前缀                 | `onResize`, `handleClick`                   |
-| 工厂函数（创建并返回对象）              | `make` / `create` 前缀               | `makeMultiCmd`, `makeCmd`                   |
+| 工厂函数（创建并返回对象）              | `make` / `create` / `from` 前缀      | `makeMultiCmd`, `createPlayer`              |
 | 类型参数（泛型）                        | 单大写字母或 `T` 前缀                | `T`, `TValue`, `TResult`                    |
-| 接口（仅用作类型标注）                  | 不加 `I` 前缀                        | `TextCache`, `DrawCmd`（不是 `ITextCache`） |
+| 新接口（仅用作类型标注）                | 不加 `I` 前缀                        | `TextCache`, `DrawCmd`（不是 `ITextCache`） |
 
 ```typescript
 // 正确 — 常量命名
@@ -91,8 +93,10 @@ private static readonly _pool: TextInstruction[] = [];
 // 正确 — 布尔命名
 public isFull(): boolean { ... }
 public get contextLost(): boolean { ... }
+public visible = true;
+public smoothing = true;
 
-// 错误 — 布尔命名
+// 错误 — 判断方法语义不清
 public full(): boolean { ... }
 public get lost(): boolean { ... }
 ```
@@ -153,14 +157,16 @@ class Foo {
 
 #### 函数参数
 
-- 可选参数用 `?`，不写 `| undefined`：
-- 可选参数必须放在参数列表末尾。
+- 调用者可以省略整个参数位置时，使用 `param?: T`。
+- 调用者必须传递该参数位置、但值允许为空时，使用 `param: T | undefined`。
+- `?` 参数通常位于参数列表末尾；不为追求 `?` 而调整具有明确语义的参数顺序。
 
 ```typescript
 // 正确
 function drawTexture(smoothing?: boolean): void { ... }
+function deleteTexture(gl: GL | undefined, texture: WebGLTexture | undefined): void { ... }
 
-// 错误
+// 错误 — 本应允许省略的末位参数
 function drawTexture(smoothing: boolean | undefined): void { ... }
 ```
 
@@ -227,31 +233,44 @@ switch (value) {
 
 ### 3.7 注释
 
-- **不写注释**，除非代码本身无法表达意图。
-- 需要注释时，用 JSDoc 格式，只对**导出 API** 写。
-- JSDoc 注释统一使用**多行格式**，即使只有一行内容：
+- 注释用于表达类型、命名和代码结构无法清楚表达的契约或约束，不复述代码行为。
+- 导出 API 在存在非显然语义时应使用 JSDoc，包括：
+  - 导出的 class、interface、type、function 和 enum；
+  - 导出 class 的 public 属性、getter/setter 和方法；
+  - interface 的属性；
+  - 参数单位、取值范围、`undefined` 的含义、副作用、生命周期和调用顺序。
+- 简单、自解释的公开成员不强制添加 JSDoc。
+- private、protected 和 internal 成员默认不写 JSDoc；仅当存在无法通过代码表达的重要不变量时例外。
+- 不写历史来源、迁移对比、实现步骤或代码行为复述。
+- JSDoc 统一使用**多行格式**，即使只有一行内容。
+- `// ── Section ──` 成员分区、lint/tool 指令以及必要的 fall-through 标记不受 JSDoc 格式限制。
 
 ```typescript
-// 正确 — 多行格式
+// 正确 — 类型无法表达单位、范围和副作用
 /**
- * The name of this state.
+ * Raster resolution multiplier.
+ * Values above 1 improve sharpness but increase memory usage.
  */
-name: string;
+resolution?: number;
 
 /**
- * Force immediate validation of all components at or below target's depth.
+ * Texture displayed by this bitmap.
+ * Assign undefined to remove the current texture.
  */
-validateClient(target: ValidatorClient): void { ... }
+public texture: Texture | undefined;
+
+// 正确 — 简单且自解释，无需 JSDoc
+public visible = true;
+
+// 错误 — 复述代码
+// Increment the index.
+index++;
 
 // 错误 — 单行 /** */ 格式
-/** The name of this state. */
-name: string;
-
-/** Force immediate validation of all components at or below target's depth. */
-validateClient(target: ValidatorClient): void { ... }
+/** Raster resolution multiplier. */
+resolution?: number;
 ```
 
-- 类属性不写注释。
 - 禁止 `// TODO` / `// FIXME` 混在代码中，用 Issue 跟踪。
 
 ### 3.8 类型导入
@@ -276,13 +295,18 @@ states: import('../states/State.js').State[] = [];
 
 ```
 1. Static fields          （静态字段）
-2. Instance fields        （实例字段：public → private）
-3. Constructor            （构造函数）
-4. Getters / Setters      （访问器）
-5. Public methods         （公开方法）
-6. Override methods       （重写方法）
-7. Private methods        （私有方法）
+2. Static methods         （静态方法）
+3. Instance fields        （实例字段：public → protected → private）
+4. Constructor            （构造函数）
+5. Getters / Setters      （访问器）
+6. Public methods         （公开方法）
+7. Override methods       （重写方法）
+8. Protected methods      （供子类扩展的方法）
+9. Internal methods       （包内/框架方法）
+10. Private methods       （私有方法）
 ```
+
+不存在的分区不写空分区注释。只有一个简单成员分区的小类不强制写分区注释。
 
 ```typescript
 export class Bitmap extends DisplayObject {
@@ -322,8 +346,8 @@ export class Bitmap extends DisplayObject {
 ### 4.3 Getter / Setter 规范
 
 - Getter 和 Setter **紧邻放置**，中间不插入其他成员。
-- Getter 中不做复杂计算，复杂逻辑抽到私有方法。
-- Setter 中做**相等性检查**避免无意义的 dirty 标记：
+- Getter 不应产生可观察副作用；昂贵计算应缓存或改为方法。
+- Setter 默认先做**相等性检查**避免无意义的 dirty 标记；当“重新赋值”本身具有失效或刷新语义时可以省略。
 
 ```typescript
 // 正确
@@ -341,11 +365,11 @@ public set smoothing(value: boolean) {
 
 ### 4.4 静态工厂优于构造函数重载
 
-当创建对象有多种方式时，用静态工厂方法而非构造函数重载：
+当创建对象有多种语义时，用命名静态工厂方法而非构造函数重载。新建实例优先使用 `create` / `make` / `from`；对象池取用可使用 `alloc`，单例访问可使用 `getInstance`：
 
 ```typescript
 // 正确
-public static getInstance(canvas: HTMLCanvasElement): WebGLRenderContext { ... }
+public static create(canvas: HTMLCanvasElement): WebGLRenderContext { ... }
 public static alloc(tf: TextField, ox: number, oy: number): TextInstruction { ... }
 
 // 错误
@@ -368,11 +392,16 @@ constructor(canvas: HTMLCanvasElement, shared?: boolean) { ... }
 
 禁止"上帝文件"（一个文件做编译+EXML+拷贝+生成 manifest）。
 
+- 新文件原则上不超过 300 行。
+- 修改既有大文件时不为满足行数进行无意义拆分；新增独立职责时优先提取模块，并通过专项重构逐步降低体积。
+- 不继续加深既有框架基类之上的业务继承链；新的横切能力优先使用组合。
+
 ### 5.2 函数式优先
 
-- 纯函数 > 类方法。
-- 数据不可变：传入的 `config` 对象不得被修改。
-- 副作用隔离：文件 I/O 集中在最外层调用。
+- 无状态转换逻辑优先纯函数。
+- 具有对象身份、生命周期、缓存或资源所有权的领域对象使用 class。
+- CLI/构建层的配置转换默认不修改传入的 `config` 对象。
+- CLI/构建层的文件 I/O 尽量集中在最外层编排。
 
 ```typescript
 // 正确 — 纯函数
@@ -387,14 +416,15 @@ class IndexHtmlGenerator {
 
 ### 5.3 依赖注入
 
-- 核心逻辑不依赖 `fs` / `path` 等具体实现，通过参数传入。
-- 便于测试时可 mock 文件系统。
+- CLI/构建层的纯转换逻辑不直接依赖 `fs` / `path`；文件系统交互放在编排层或通过明确接口传入。
+- 引擎运行时只在存在多实现、测试替身或资源所有权边界时使用依赖注入，不为形式统一增加抽象层。
 
 ### 5.4 错误处理
 
-- 抛出自定义错误类，不抛字符串。
+- 只抛出 `Error` 或其子类，不抛字符串。
+- 当调用方需要稳定分类、附加上下文或区分恢复策略时使用自定义错误类；不强制每个错误都定义新类。
 - CLI 入口层捕获错误并友好输出。
-- 编译错误收集后统一输出，不中途退出。
+- 批处理编译流程在能安全继续时收集错误后统一输出；配置无效或继续执行可能产生错误产物时应立即失败。
 
 ```typescript
 // 正确
@@ -414,28 +444,28 @@ throw 'build failed';
 
 ## 6. 不写兼容性代码
 
-- **不兼容旧版 Egret**：配置文件格式、API、CLI 参数全部重新设计。
+- **只实现文档明确承诺的兼容面**：EXML、EUI API、资源配置等已公开说明的协议可以兼容；不根据 Egret/Pixi 的历史行为推测或添加隐式兼容分支。
+- **未列入公开契约的历史行为不做兼容**：新增兼容面必须先更新公开文档和测试。
 - **不兼容旧浏览器**：目标 `ES2022`，不生成 ES5 polyfill。
-- **不写平台检测兼容**：`process.platform` 直接用，不包 `try/catch`。
-- **不用 deprecated API**：`new Buffer()` → `Buffer.from()`，`fs.exists()` → `fs.stat()` 等。
+- **不写无依据的平台兼容分支**：仅当公开支持矩阵确实存在平台差异时使用 `process.platform` 或能力检测，不用宽泛 `try/catch` 吞掉未知错误。
+- **不新增对已废弃 Node/浏览器 API 的使用**：`new Buffer()` → `Buffer.from()`，`fs.exists()` → `fs.stat()` 等。已发布的引擎 deprecated API 按版本策略保留，不为清除警告直接破坏兼容性。
 
 ## 7. 测试
 
-- 每个核心模块必须有单元测试。
+- 新增核心模块或修改可观察行为时必须添加或更新单元测试。纯文档、注释和无行为差异的格式调整不强制新增测试。
 - 使用 `vitest`。
-- 测试文件命名：`*.test.ts`，放在对应模块同级。
+- 测试文件命名：`*.test.ts`，默认放在包级 `test/` 目录；测试专用资源放在 `test/fixtures/`。
 
 ## 8. 禁止清单
 
 | 禁止                              | 替代            |
 | --------------------------------- | --------------- |
 | `global` / `globalThis` 赋值      | 模块作用域变量  |
-| `any` 类型                        | 具体类型或泛型  |
+| 新增 `any` 类型                  | `unknown`、具体类型或泛型 |
 | `@ts-ignore` / `@ts-expect-error` | 修正类型        |
-| `null`                            | `undefined`     |
+| 应用层 `null`                     | `undefined`     |
 | `export default`                  | 命名导出        |
 | `var`                             | `const` / `let` |
 | `require()`                       | `import`        |
-| 类继承链 > 2 层                   | 组合 / 函数     |
 | 文件内 `console.log`              | 统一 `logger`   |
 | `// @ts-nocheck`                  | 删除并修正类型  |

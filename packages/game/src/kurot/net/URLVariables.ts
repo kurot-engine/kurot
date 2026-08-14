@@ -9,7 +9,6 @@
  * Egret-compatible: egret.URLVariables
  */
 export class URLVariables {
-	/** Key-value pairs stored in this object. */
 	variables: Record<string, string | string[]> = {};
 
 	constructor(source?: string) {
