@@ -245,6 +245,50 @@ class MyButtonSkin extends Skin {
 | `UIEvent.CLOSING`                   | `Panel`                         | Close button tapped (cancelable)                     |
 | `UIEvent.CREATION_COMPLETE`         | Any `Component`                 | First `createChildren` completed                     |
 
+## UI Benchmark
+
+The UI package includes three deterministic browser workloads: a 400-node
+static skin, transform/alpha animation across 240 UI nodes, and a 10,000-record
+virtual list. They measure frame/render time, draw calls, validation-phase
+activity, and ItemRenderer creation/reuse.
+
+Validation counters cover measured frames. Renderer creation/reuse and maximum
+live-renderer counts cover the complete scenario, including warmup, so the
+report can distinguish a stable pool from per-frame renderer churn.
+
+The first complete Chromium run used 60 warmup frames and 300 measured frames:
+
+| Workload | Setup | Frame P95 | Render P95 | Draw calls | UI lifecycle result |
+| -------- | ----: | --------: | ---------: | ---------: | ------------------- |
+| 400-node static image UI | 8.50 ms | 10.20 ms | 0.20 ms | 1 | No repeated validation after stabilization |
+| 240-node transform/alpha animation | 3.90 ms | 10.00 ms | 0.30 ms | 1 | No measure or display-list validation |
+| 10,000-record virtual list | 6.90 ms | 9.90 ms | 0.50 ms | 5 | 19 renderers created and at most 19 live |
+
+The transform workload recorded 72,000 `commitProperties` calls: 240 moving UI
+nodes × 300 measured frames. Multiple property changes on the same component
+were coalesced to one property commit per frame. Under the current UI contract,
+position changes participate in parent layout/content-bound invalidation, so
+this is expected bookkeeping rather than 72,000 measurements, layouts, texture
+uploads, or draw calls. The workload still remained one draw call and triggered
+zero `measure` and zero `updateDisplayList` calls during measurement.
+
+These results show that the core batching path reaches the UI layer, stable UI
+does not continue validating, and virtual layout bounds renderer population by
+the visible window. They are scoped results from one Chromium environment, not
+a cross-device performance guarantee or a comparison with another UI framework.
+
+```sh
+pnpm benchmark
+pnpm benchmark:smoke
+pnpm benchmark:compare
+```
+
+`benchmark` starts the visual page at `/benchmark/`. `benchmark:smoke` verifies
+all scenarios quickly, while `benchmark:compare` runs 60 warmup and 300 measured
+frames per scenario and writes local JSON/Markdown results under
+`examples/benchmark/results/`. This is a Kurot UI self-baseline, not a
+cross-framework ranking.
+
 ## Differences from Egret EUI
 
 |                | Egret EUI                   | @kurot/ui                          |

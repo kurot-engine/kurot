@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Kurot UI Benchmark</title>
+		<link rel="stylesheet" href="./style.css" />
+	</head>
+	<body>
+		<header>
+			<div>
+				<h1>Kurot UI Benchmark</h1>
+				<p>Validation, layout, rendering, and virtual-list reuse</p>
+			</div>
+			<span id="status" data-state="ready">Ready</span>
+		</header>
+		<main>
+			<aside>
+				<section>
+					<h2>Configuration</h2>
+					<label>Scenario <select id="scenario"></select></label>
+					<label>Warmup frames <input id="warmup" type="number" min="0" value="60" /></label>
+					<label>Measured frames <input id="frames" type="number" min="1" value="300" /></label>
+					<button id="run">Run benchmark</button>
+				</section>
+				<section>
+					<h2>Result</h2>
+					<div id="metrics" class="metrics"><span>No completed run</span></div>
+					<button id="download" disabled>Download JSON</button>
+				</section>
+			</aside>
+			<div class="workspace">
+				<canvas id="game" width="800" height="600"></canvas>
+				<pre id="summary">Choose a scenario and run the benchmark.</pre>
+			</div>
+		</main>
+		<script type="module" src="./src/main.ts"></script>
+	</body>
+</html>

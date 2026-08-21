@@ -22,8 +22,12 @@
 		"build": "tsc --build",
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
-		"test": "vitest run",
-		"test:watch": "vitest",
+		"test": "vitest run --config vitest.config.ts",
+		"test:watch": "vitest --config vitest.config.ts",
+		"benchmark": "vite --config vite.config.ts",
+		"benchmark:compare": "playwright test --config examples/benchmark/playwright.config.ts",
+		"benchmark:smoke": "UI_BENCHMARK_PROFILE=smoke playwright test --config examples/benchmark/playwright.config.ts",
+		"build:benchmark": "vite --config vite.config.ts build",
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"peerDependencies": {
@@ -31,9 +35,11 @@
 	},
 	"devDependencies": {
 		"@kurot/core": "^1.0.12",
+		"@playwright/test": "1.62.1",
 		"@types/node": "^22.0.0",
 		"happy-dom": "^20.8.9",
 		"typescript": "^5.6.0",
+		"vite": "^8.0.8",
 		"vitest": "^4.1.4"
 	},
 	"keywords": [

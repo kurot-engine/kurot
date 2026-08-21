@@ -177,3 +177,4 @@ before patching core's transform code.
 | Debug a binding not firing                     | Check the source property's setter actually calls `PropertyEvent.dispatchPropertyEvent` — see `binding/Watcher.ts`                                                        |
 | Add virtual-layout support to a new layout     | `layouts/LayoutBase.ts` (`elementAdded`/`elementRemoved`/`getElementIndicesInView`/`clearVirtualLayoutCache`), reference `layouts/VerticalLayout.ts`'s `elementSizeTable` |
 | Understand the validation/RAF scheduling order | `core/Validator.ts`                                                                                                                                                       |
+| Measure UI validation/rendering performance    | `examples/benchmark/` for the visual runner, scenarios, Playwright automation, and local JSON/Markdown reports                                                           |

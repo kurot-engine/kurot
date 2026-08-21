@@ -149,6 +149,30 @@ whole or that draw-call ratios translate directly into equal FPS gains. The
 benchmark method and commands are documented in the
 [`@kurot/core` README](packages/core/README.md#validated-renderer-comparison).
 
+### Measured UI status
+
+The initial `@kurot/ui` browser benchmark confirms that core rendering
+efficiency reaches the UI layer:
+
+| Workload | Frame P95 | Render P95 | Draw calls | Lifecycle evidence |
+| -------- | --------: | ---------: | ---------: | ------------------ |
+| 400-node static image UI | 10.20 ms | 0.20 ms | 1 | No repeated validation after stabilization |
+| 240-node transform/alpha animation | 10.00 ms | 0.30 ms | 1 | No measure or display-list validation |
+| 10,000-record virtual list | 9.90 ms | 0.50 ms | 5 | At most 19 live ItemRenderers |
+
+The animation workload performs one coalesced `commitProperties` call per
+moving UI component per frame because position participates in the unified
+layout/content-bound invalidation model. It does not cause repeated measure,
+layout, texture upload, or extra draw calls in this workload. The virtual list
+creates renderers for the visible window rather than for all 10,000 records.
+
+These measurements support a scoped conclusion: Kurot UI preserves core
+batching for image-based static and transform/alpha workloads, reaches a clean
+stable state, and bounds virtual-list renderer population. They are a
+self-baseline from one Chromium environment, not a cross-framework or
+cross-device ranking. Commands and measurement details are documented in the
+[`@kurot/ui` README](packages/ui/README.md#ui-benchmark).
+
 ### EXML and EUI
 
 `@kurot/cli` parses `.exml` files into SkinIR at build time and generates ESM modules. At runtime, `@kurot/ui`'s theming system dynamically loads the generated skin factories, so build artifacts don't need to carry or parse EXML source files.

@@ -7,6 +7,7 @@ dist/
 build/
 packages/core/examples/benchmark/dist/
 packages/core/examples/benchmark/results/
+packages/ui/examples/benchmark/results/
 test-results/
 bin-debug/
 bin-release/
