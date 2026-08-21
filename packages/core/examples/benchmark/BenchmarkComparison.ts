@@ -86,6 +86,10 @@ async function runBenchmark(): Promise<void> {
 					frameTimeMs,
 					renderTimeMs: metrics.renderTimeMs,
 					objectCount: count,
+					heapUsedBytes: readHeapUsedBytes(),
+					textureCount: metrics.textureCount,
+					framebufferPoolSize: metrics.framebufferPoolSize,
+					framebufferPoolBytes: metrics.framebufferPoolBytes,
 				});
 				updateMetrics(collector);
 			}
@@ -128,6 +132,12 @@ async function runBenchmark(): Promise<void> {
 	getElement<HTMLButtonElement>('copy').disabled = false;
 	document.dispatchEvent(new CustomEvent('benchmark-complete', { detail: state.result }));
 	runtime.destroy();
+}
+
+function readHeapUsedBytes(): number | undefined {
+	const memory = (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory;
+	const value = memory?.usedJSHeapSize;
+	return value !== undefined && Number.isFinite(value) ? value : undefined;
 }
 
 function initializeControls(): void {

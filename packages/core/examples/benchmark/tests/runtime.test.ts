@@ -410,6 +410,7 @@ function makeStats(): Stats {
 		frame: { current: 16.7, avg: 16.8, p5: 16.1, p50: 16.7, p95: 17.5, p99: 18.1, max: 19.0 },
 		render: { current: 16.7, avg: 16.5, p5: 15.9, p50: 16.6, p95: 17.2, p99: 17.8, max: 18.0 },
 		drawCalls: { current: 10, avg: 9.5 },
+		resources: { textureCount: { current: 32, max: 32 } },
 		batchEfficiency: 52.6,
 		isLowFps: false,
 	};

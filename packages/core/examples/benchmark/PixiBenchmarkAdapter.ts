@@ -100,6 +100,7 @@ export class PixiBenchmarkAdapter implements BenchmarkAdapter {
 		return {
 			drawCalls: this._drawCallCounter.read(),
 			renderTimeMs: performance.now() - start,
+			textureCount: this._textures.length,
 		};
 	}
 

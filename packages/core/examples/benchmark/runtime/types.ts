@@ -7,6 +7,10 @@ export interface FrameData {
 	frameTimeMs: number;
 	renderTimeMs: number;
 	objectCount: number;
+	heapUsedBytes?: number;
+	textureCount: number;
+	framebufferPoolSize?: number;
+	framebufferPoolBytes?: number;
 }
 
 /**
@@ -50,6 +54,12 @@ export interface Stats {
 	frame: StatSummary;
 	render: StatSummary;
 	drawCalls: { current: number; avg: number };
+	resources: {
+		heapUsedBytes?: StatSummary;
+		textureCount: { current: number; max: number };
+		framebufferPoolSize?: { current: number; max: number };
+		framebufferPoolBytes?: { current: number; max: number };
+	};
 	batchEfficiency: number;
 	isLowFps: boolean;
 }
@@ -68,4 +78,10 @@ export interface ReportData {
 	renderTimeMs: { avg: number; p50: number; p95: number; p99: number; max: number };
 	drawCallsAvg: number;
 	batchEfficiencyAvg: number;
+	resources: {
+		heapUsedBytes?: { avg: number; p95: number; max: number };
+		textureCount: { current: number; max: number };
+		framebufferPoolSize?: { current: number; max: number };
+		framebufferPoolBytes?: { current: number; max: number };
+	};
 }

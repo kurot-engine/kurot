@@ -36,6 +36,18 @@ export class ReportExporter {
 			},
 			drawCallsAvg: stats.drawCalls.avg,
 			batchEfficiencyAvg: stats.batchEfficiency,
+			resources: {
+				heapUsedBytes: stats.resources.heapUsedBytes
+					? {
+						avg: stats.resources.heapUsedBytes.avg,
+						p95: stats.resources.heapUsedBytes.p95,
+						max: stats.resources.heapUsedBytes.max,
+					}
+					: undefined,
+				textureCount: stats.resources.textureCount,
+				framebufferPoolSize: stats.resources.framebufferPoolSize,
+				framebufferPoolBytes: stats.resources.framebufferPoolBytes,
+			},
 		};
 		this._assertValidReport(report);
 		return report;
@@ -113,7 +125,12 @@ export class ReportExporter {
 			environment.warmupFrames,
 			environment.measuredFrames,
 			environment.run,
+			report.resources.textureCount.current,
+			report.resources.textureCount.max,
 		];
+		if (report.resources.heapUsedBytes) values.push(...Object.values(report.resources.heapUsedBytes));
+		if (report.resources.framebufferPoolSize) values.push(...Object.values(report.resources.framebufferPoolSize));
+		if (report.resources.framebufferPoolBytes) values.push(...Object.values(report.resources.framebufferPoolBytes));
 		if (values.some(value => !Number.isFinite(value) || value < 0)) {
 			throw new Error('Benchmark report numeric fields must be finite and non-negative.');
 		}

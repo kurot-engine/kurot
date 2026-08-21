@@ -1,4 +1,4 @@
-export const BENCHMARK_PROTOCOL_VERSION = 1;
+export const BENCHMARK_PROTOCOL_VERSION = 2;
 export const DEFAULT_BENCHMARK_SEED = 0x4b55524f;
 
 /**

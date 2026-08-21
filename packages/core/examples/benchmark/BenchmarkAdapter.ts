@@ -1,6 +1,9 @@
 export interface RenderMetrics {
 	drawCalls: number;
 	renderTimeMs: number;
+	textureCount: number;
+	framebufferPoolSize?: number;
+	framebufferPoolBytes?: number;
 }
 
 export type BenchmarkBackend = 'webgl1' | 'webgl2';

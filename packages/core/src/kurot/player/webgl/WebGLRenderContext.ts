@@ -135,6 +135,16 @@ export class WebGLRenderContext implements RenderContext {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/** Number of reusable framebuffers currently retained by the blur pipeline. */
+	public get blurFramebufferPoolSize(): number {
+		return this._blurFboPoolSize;
+	}
+
+	/** Estimated GPU bytes retained by the reusable blur framebuffer pool. */
+	public get blurFramebufferPoolBytes(): number {
+		return this._blurFboPoolBytes;
+	}
+
 	public get activatedBuffer(): WebGLRenderBuffer | undefined {
 		return this._currentBuffer;
 	}

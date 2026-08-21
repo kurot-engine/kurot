@@ -71,6 +71,7 @@ export class MetricsCollector {
 				frame: { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 },
 				render: { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 },
 				drawCalls: { current: 0, avg: 0 },
+				resources: { textureCount: { current: 0, max: 0 } },
 				batchEfficiency: 0,
 				isLowFps: false,
 			};
@@ -80,6 +81,10 @@ export class MetricsCollector {
 		const frameValues: number[] = [];
 		const renderValues: number[] = [];
 		const drawCallValues: number[] = [];
+		const heapValues: number[] = [];
+		const textureValues: number[] = [];
+		const framebufferPoolValues: number[] = [];
+		const framebufferPoolByteValues: number[] = [];
 
 		for (let i = 0; i < this._frameCount; i++) {
 			const idx = (this._writeIndex - this._frameCount + i + this._windowSize * 2) % this._windowSize;
@@ -89,6 +94,10 @@ export class MetricsCollector {
 				frameValues.push(frame.frameTimeMs);
 				renderValues.push(frame.renderTimeMs);
 				drawCallValues.push(frame.drawCalls);
+				if (frame.heapUsedBytes !== undefined) heapValues.push(frame.heapUsedBytes);
+				textureValues.push(frame.textureCount);
+				if (frame.framebufferPoolSize !== undefined) framebufferPoolValues.push(frame.framebufferPoolSize);
+				if (frame.framebufferPoolBytes !== undefined) framebufferPoolByteValues.push(frame.framebufferPoolBytes);
 			}
 		}
 
@@ -140,8 +149,34 @@ export class MetricsCollector {
 				current: latestFrame?.drawCalls ?? 0,
 				avg: avgDrawCalls,
 			},
+			resources: {
+				heapUsedBytes: summarizeOptional(heapValues),
+				textureCount: summarizeCurrentMax(textureValues) ?? { current: 0, max: 0 },
+				framebufferPoolSize: summarizeCurrentMax(framebufferPoolValues),
+				framebufferPoolBytes: summarizeCurrentMax(framebufferPoolByteValues),
+			},
 			batchEfficiency,
 			isLowFps: this.isLowFps(),
 		};
 	}
+}
+
+function summarizeOptional(values: number[]): Stats['resources']['heapUsedBytes'] {
+	if (values.length === 0) return undefined;
+	const sorted = [...values].sort((a, b) => a - b);
+	const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
+	return {
+		current: values[values.length - 1],
+		avg,
+		p5: percentile(sorted, 0.05),
+		p50: percentile(sorted, 0.5),
+		p95: percentile(sorted, 0.95),
+		p99: percentile(sorted, 0.99),
+		max: sorted[sorted.length - 1],
+	};
+}
+
+function summarizeCurrentMax(values: number[]): { current: number; max: number } | undefined {
+	if (values.length === 0) return undefined;
+	return { current: values[values.length - 1], max: Math.max(...values) };
 }

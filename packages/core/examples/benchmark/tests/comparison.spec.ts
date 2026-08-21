@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { arch, cpus, hostname, platform, totalmem } from 'node:os';
 import { resolve } from 'node:path';
 import type { ReportData } from '../runtime/types.js';
+import { evaluateRegressionGate, type BenchmarkBaseline } from './performance-gate.js';
 
 interface BrowserBenchmarkState {
 	status: 'initializing' | 'warmup' | 'measuring' | 'complete' | 'error';
@@ -9,7 +12,7 @@ interface BrowserBenchmarkState {
 	error?: string;
 }
 
-interface SummaryRow {
+export interface SummaryRow {
 	engine: string;
 	version: string;
 	backend: string;
@@ -28,6 +31,26 @@ interface SummaryRow {
 	renderP95Min: number;
 	renderP95Max: number;
 	drawCalls: number;
+	heapP95?: number;
+	textureCount: number;
+	framebufferPoolSize?: number;
+}
+
+interface RunMetadata {
+	schemaVersion: 1;
+	machine: {
+		id: string;
+		named: boolean;
+		platform: string;
+		arch: string;
+		cpu: string;
+		cpuCount: number;
+		totalMemoryBytes: number;
+	};
+	source: { commit: string; dirty: boolean };
+	browser: { name: string; version: string };
+	profile: string;
+	startedAt: string;
 }
 
 const DEFAULT_SCENES = [
@@ -56,7 +79,7 @@ const BENCHMARK_PROFILES: Record<'smoke' | 'standard', BenchmarkProfile> = {
 	},
 	standard: {
 		scenes: DEFAULT_SCENES,
-		repeats: 3,
+		repeats: 5,
 		warmup: 60,
 		frames: 300,
 	},
@@ -75,6 +98,7 @@ test('runs the reproducible engine comparison matrix', async ({ browser, browser
 	const seed = readNonNegativeInteger('BENCHMARK_SEED', 0x4b55524f);
 	const runMode = process.env.BENCHMARK_RUN_MODE === 'headed' ? 'headed' : 'headless';
 	const results: ReportData[] = [];
+	const startedAt = new Date().toISOString();
 	const backendCount = engines.reduce((count, engine) => count + backends.filter(backend => supports(engine, backend)).length, 0);
 	const totalCases = scenes.length * backendCount * repeats;
 	if (totalCases === 0) {
@@ -133,6 +157,8 @@ test('runs the reproducible engine comparison matrix', async ({ browser, browser
 	}
 
 	const outputRoot = resolve(process.cwd(), 'examples/benchmark/results');
+	const metadata = createRunMetadata(browserName, browser.version(), profileName, startedAt);
+	const summary = summarize(results);
 	const rawRoot = resolve(outputRoot, 'raw');
 	await mkdir(rawRoot, { recursive: true });
 	for (const result of results) {
@@ -140,8 +166,14 @@ test('runs the reproducible engine comparison matrix', async ({ browser, browser
 		const filename = `${slug(env.engine)}-${slug(env.backend)}-${slug(result.scene)}-run-${env.run}.json`;
 		await writeFile(resolve(rawRoot, filename), JSON.stringify(result, null, 2) + '\n', 'utf8');
 	}
-	await writeFile(resolve(outputRoot, 'comparison.json'), JSON.stringify(summarize(results), null, 2) + '\n', 'utf8');
+	await writeFile(resolve(outputRoot, 'comparison.json'), JSON.stringify(summary, null, 2) + '\n', 'utf8');
 	await writeFile(resolve(outputRoot, 'comparison.md'), formatMarkdown(results), 'utf8');
+	await writeFile(resolve(outputRoot, 'run-metadata.json'), JSON.stringify(metadata, null, 2) + '\n', 'utf8');
+	const historyRoot = resolve(outputRoot, 'history', slug(metadata.machine.id), metadata.source.commit, startedAt.replace(/[:.]/g, '-'));
+	await mkdir(historyRoot, { recursive: true });
+	await writeFile(resolve(historyRoot, 'run.json'), JSON.stringify({ metadata, summary, results }, null, 2) + '\n', 'utf8');
+	await writeFile(resolve(outputRoot, 'baseline-candidate.json'), JSON.stringify({ metadata, rows: summary }, null, 2) + '\n', 'utf8');
+	await applyRegressionGate(metadata, summary);
 	console.log(`[benchmark] Complete. Reports written to ${outputRoot}`);
 });
 
@@ -177,8 +209,69 @@ function summarize(results: ReportData[]): SummaryRow[] {
 			renderP95Min: Math.min(...renderP95),
 			renderP95Max: Math.max(...renderP95),
 			drawCalls: median(group.map(item => item.drawCallsAvg)),
+			heapP95: medianOptional(group.map(item => item.resources.heapUsedBytes?.p95)),
+			textureCount: Math.max(...group.map(item => item.resources.textureCount.max)),
+			framebufferPoolSize: maxOptional(group.map(item => item.resources.framebufferPoolSize?.max)),
 		};
 	});
+}
+
+async function applyRegressionGate(metadata: RunMetadata, rows: SummaryRow[]): Promise<void> {
+	if (!metadata.machine.named) {
+		console.log('[benchmark] Regression gate skipped: set BENCHMARK_MACHINE to identify a reference machine.');
+		return;
+	}
+	const baselinePath = resolve(process.cwd(), 'examples/benchmark/baselines', `${slug(metadata.machine.id)}.json`);
+	let baseline: BenchmarkBaseline;
+	try {
+		baseline = JSON.parse(await readFile(baselinePath, 'utf8')) as BenchmarkBaseline;
+	} catch {
+		console.log(`[benchmark] Regression gate skipped: no approved baseline at ${baselinePath}.`);
+		return;
+	}
+	const gate = evaluateRegressionGate(baseline, { metadata, rows });
+	await writeFile(resolve(process.cwd(), 'examples/benchmark/results/regression-gate.json'), JSON.stringify(gate, null, 2) + '\n', 'utf8');
+	if (gate.status === 'incompatible') throw new Error(`Benchmark baseline is incompatible: ${gate.reason}`);
+	expect(gate.regressions, gate.regressions.map(item => item.message).join('\n')).toEqual([]);
+	console.log('[benchmark] Regression gate passed.');
+}
+
+function createRunMetadata(browserName: string, browserVersion: string, profile: string, startedAt: string): RunMetadata {
+	const machineName = process.env.BENCHMARK_MACHINE?.trim();
+	return {
+		schemaVersion: 1,
+		machine: {
+			id: machineName || `unnamed-${hostname()}`,
+			named: !!machineName,
+			platform: platform(),
+			arch: arch(),
+			cpu: cpus()[0]?.model ?? 'unknown',
+			cpuCount: cpus().length,
+			totalMemoryBytes: totalmem(),
+		},
+		source: { commit: readGit(['rev-parse', 'HEAD'], 'unknown'), dirty: readGit(['status', '--porcelain'], '') !== '' },
+		browser: { name: browserName, version: browserVersion },
+		profile,
+		startedAt,
+	};
+}
+
+function readGit(args: string[], fallback: string): string {
+	try {
+		return execFileSync('git', args, { encoding: 'utf8' }).trim() || fallback;
+	} catch {
+		return fallback;
+	}
+}
+
+function medianOptional(values: Array<number | undefined>): number | undefined {
+	const defined = values.filter((value): value is number => value !== undefined);
+	return defined.length > 0 ? median(defined) : undefined;
+}
+
+function maxOptional(values: Array<number | undefined>): number | undefined {
+	const defined = values.filter((value): value is number => value !== undefined);
+	return defined.length > 0 ? Math.max(...defined) : undefined;
 }
 
 function formatMarkdown(results: ReportData[]): string {
@@ -190,16 +283,20 @@ function formatMarkdown(results: ReportData[]): string {
 		'',
 		'Ranges show minimum–maximum values across runs.',
 		'',
-		'| Engine | Backend | Scene | Objects | Runs | FPS p5 median [range] | Frame p50 | Frame p95 median [range] | Frame p99 | Render p95 median [range] | Draw calls |',
-		'|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|',
+		'| Engine | Backend | Scene | Objects | Runs | FPS p5 median [range] | Frame p50 | Frame p95 median [range] | Frame p99 | Render p95 median [range] | Draw calls | Heap p95 (MiB) | Textures | Blur FBOs |',
+		'|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
 	];
 	for (const row of rows) {
 		lines.push(
-			`| ${row.engine} ${row.version} | ${row.backend} | ${row.scene} | ${row.objects} | ${row.samples} | ${formatRange(row.fpsP5, row.fpsP5Min, row.fpsP5Max, 1)} | ${row.frameP50.toFixed(2)} | ${formatRange(row.frameP95, row.frameP95Min, row.frameP95Max, 2)} | ${row.frameP99.toFixed(2)} | ${formatRange(row.renderP95, row.renderP95Min, row.renderP95Max, 2)} | ${row.drawCalls.toFixed(1)} |`,
+			`| ${row.engine} ${row.version} | ${row.backend} | ${row.scene} | ${row.objects} | ${row.samples} | ${formatRange(row.fpsP5, row.fpsP5Min, row.fpsP5Max, 1)} | ${row.frameP50.toFixed(2)} | ${formatRange(row.frameP95, row.frameP95Min, row.frameP95Max, 2)} | ${row.frameP99.toFixed(2)} | ${formatRange(row.renderP95, row.renderP95Min, row.renderP95Max, 2)} | ${row.drawCalls.toFixed(1)} | ${formatBytes(row.heapP95)} | ${row.textureCount} | ${row.framebufferPoolSize ?? 'n/a'} |`,
 		);
 	}
 	lines.push('', 'No overall winner is calculated; interpret results per workload.', '');
 	return lines.join('\n');
+}
+
+function formatBytes(value: number | undefined): string {
+	return value === undefined ? 'n/a' : (value / (1024 * 1024)).toFixed(1);
 }
 
 function median(values: number[]): number {

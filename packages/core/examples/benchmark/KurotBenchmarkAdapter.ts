@@ -122,6 +122,9 @@ export class KurotBenchmarkAdapter implements BenchmarkAdapter {
 		return {
 			drawCalls: this._drawCallCounter.read(),
 			renderTimeMs: app.player.perf.renderTimeMs,
+			textureCount: this._textures.length,
+			framebufferPoolSize: app.player.framebufferPoolSize,
+			framebufferPoolBytes: app.player.framebufferPoolBytes,
 		};
 	}
 

@@ -21,8 +21,8 @@ export class Player implements Renderable {
 		lastFrameTime: 0,
 		fps: 0,
 		avgFps: 0,
-		minFps: 0 as number,
-		maxFps: 0 as number,
+		minFps: 0,
+		maxFps: 0,
 		drawCalls: 0,
 		avgDrawCalls: 0,
 		renderTimeMs: 0,
@@ -75,6 +75,16 @@ export class Player implements Renderable {
 
 	public get isWebGL(): boolean {
 		return !!this._webglRenderer;
+	}
+
+	/** Number of reusable framebuffers currently retained by the blur pipeline. */
+	public get framebufferPoolSize(): number {
+		return this._webglContext?.blurFramebufferPoolSize ?? 0;
+	}
+
+	/** Estimated GPU bytes retained by the reusable blur framebuffer pool. */
+	public get framebufferPoolBytes(): number {
+		return this._webglContext?.blurFramebufferPoolBytes ?? 0;
 	}
 
 	public start(root?: DisplayObject): void {

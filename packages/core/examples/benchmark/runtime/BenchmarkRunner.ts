@@ -89,7 +89,16 @@ export class BenchmarkRunner {
 	/**
 	 * Records one frame while measurement is active.
 	 */
-	public onFrame(perf: { fps: number; drawCalls: number; frameTimeMs?: number; renderTimeMs: number }): void {
+	public onFrame(perf: {
+		fps: number;
+		drawCalls: number;
+		frameTimeMs?: number;
+		renderTimeMs: number;
+		textureCount?: number;
+		framebufferPoolSize?: number;
+		framebufferPoolBytes?: number;
+		heapUsedBytes?: number;
+	}): void {
 		if (this._phase === 'idle' || this._phase === 'paused') {
 			return;
 		}
@@ -110,6 +119,10 @@ export class BenchmarkRunner {
 				frameTimeMs: perf.frameTimeMs ?? (perf.fps > 0 ? 1000 / perf.fps : 0),
 				renderTimeMs: perf.renderTimeMs,
 				objectCount: this._currentCount,
+				heapUsedBytes: perf.heapUsedBytes,
+				textureCount: perf.textureCount ?? 0,
+				framebufferPoolSize: perf.framebufferPoolSize,
+				framebufferPoolBytes: perf.framebufferPoolBytes,
 			});
 		}
 	}

@@ -165,7 +165,19 @@ pnpm benchmark:compare
 checks that every supported engine/backend integration works, and
 `benchmark:compare` runs the complete reproducible comparison matrix. Automated
 runs print case-by-case progress and write reports to the ignored local
-`examples/benchmark/results/` directory.
+`examples/benchmark/results/` directory. Each run records its commit, exact
+browser version, machine characteristics, raw samples, and a commit-addressed
+history entry. Chromium also reports JS heap use; all adapters report logical
+benchmark texture count, while Kurot additionally reports its retained blur
+framebuffer pool.
+
+Release regression gates are deliberately machine-scoped. Set a stable
+`BENCHMARK_MACHINE` name on a reference machine and approve the generated
+`results/baseline-candidate.json` as
+`examples/benchmark/baselines/<machine-name>.json`. A later
+`benchmark:compare` automatically applies the baseline only when the machine
+name and exact browser version match. Timing limits use both observed variance
+and a 12% floor; a baseline row needs at least five samples before it can gate.
 
 Deterministic visual regression tests cover Canvas 2D, WebGL 1, WebGL 2, and
 WebGL context restoration:
