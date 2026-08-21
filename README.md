@@ -2,6 +2,13 @@
 
 Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, EUI, and EXML developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
 
+> Kurot continues Egret 5.4.1's display-object and development model while
+> upgrading its rendering core to a WebGL2-first, InstructionSet/RenderPipe,
+> multi-texture batching architecture. In the validated mixed-texture, deep
+> container, display-list churn, and texture-swap workloads, Kurot substantially
+> reduced draw calls. Canvas 2D fallback remains a capability shared by both
+> engines.
+
 Core features include:
 
 - Egret-style `DisplayObject`, event, geometry, graphics, resource, and media APIs.
@@ -12,6 +19,28 @@ Core features include:
 - Tween, MovieClip, ScrollView, and URLLoader game extensions.
 
 > **Naming note:** the npm packages have migrated to `@kurot/*`. Legacy `blakron` identifiers in the CLI, config files, and source paths will be unified in later migration steps.
+
+## From Egret to Kurot
+
+Kurot is a continuation of Egret 5.4.1 for the modern web platform, not a new
+API placed on top of the old renderer. It retains the productive display-object,
+event, EUI, and EXML model while replacing the rendering and build foundations.
+
+| Area | Egret 5.4.1 | Kurot |
+| ---- | ----------- | ----- |
+| GPU backend | WebGL 1 | WebGL 2 preferred, WebGL 1 fallback |
+| Software fallback | Canvas 2D | Canvas 2D |
+| Batching | Primarily consecutive same-texture draws | Up to eight textures in one batch |
+| Render organization | RenderNode tree | Flat `InstructionSet` + `RenderPipe` execution |
+| Update model | RenderNode/display-tree updates | Separate `structureDirty` rebuilds and `renderDirty` patches |
+| Modules | Namespace/global-oriented runtime | Native ESM |
+| Language target | Legacy web/TypeScript environment | ES2022 with `strict: true` |
+| EXML | Egret runtime/toolchain model | Build-time EXML → ESM compilation |
+
+Canvas 2D fallback is a capability shared by both engines; it is not presented
+as a Kurot invention. Kurot's measurable renderer evolution is its modern
+WebGL2-capable pipeline and multi-texture batching, together with a reproducible
+correctness and performance validation system.
 
 ## Packages and dependencies
 
@@ -102,8 +131,22 @@ renderer-call advantage in several cases and a clear lead in the 50-object
 filter workload: WebGL 2 Frame P95 was 17.9 ms for PixiJS and 25.0 ms for Kurot,
 with 150 versus 200 draw calls.
 
+Against Egret 5.4.1 on WebGL 1, the same benchmark measured the following draw
+calls. These values describe the named workloads, not universal speed-up
+factors:
+
+| Workload | Kurot | Egret 5.4.1 |
+| -------- | ----: | ----------: |
+| 500 single-texture sprites | 1 | 1 |
+| 500 sprites across eight textures | 1 | 500 |
+| 300 dynamic transforms | 1 | 1 |
+| 500 objects in a deep container tree | 1 | 500 |
+| 500 objects with display-list churn | 1 | 451 |
+| 500 objects with dynamic texture swaps | 1 | 167.3 |
+
 These are scoped workload results, not a claim that Kurot matches PixiJS as a
-whole. The benchmark method and commands are documented in the
+whole or that draw-call ratios translate directly into equal FPS gains. The
+benchmark method and commands are documented in the
 [`@kurot/core` README](packages/core/README.md#validated-renderer-comparison).
 
 ### EXML and EUI
