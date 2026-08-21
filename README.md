@@ -17,12 +17,12 @@ Core features include:
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
-| Package                                            | Path                 | Responsibility                                                                                                 | Internal dependencies |
-| -------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md)           | `packages/core`      | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
-| [`@kurot/ui`](packages/ui/README.md)               | `packages/ui`        | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
-| [`@kurot/game`](packages/game/README.md)           | `packages/game`      | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)             | `packages/cli`       | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
+| Package                                  | Version | Path            | Responsibility                                                                                                 | Internal dependencies |
+| ---------------------------------------- | ------- | --------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
+| [`@kurot/core`](packages/core/README.md) | 1.0.15  | `packages/core` | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
+| [`@kurot/ui`](packages/ui/README.md)     | 1.1.7   | `packages/ui`   | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
+| [`@kurot/game`](packages/game/README.md) | 1.0.6   | `packages/game` | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
+| [`@kurot/cli`](packages/cli/README.md)   | 1.1.1   | `packages/cli`  | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other; `cli` is a build-time-only tool and is never pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
@@ -91,6 +91,20 @@ The CLI supports project creation, building, a dev server, and cleanup. Generate
 2. **Execute**: dispatches instructions to the corresponding `RenderPipe` by `renderPipeId` to perform the actual drawing.
 
 This design separates scene structure changes from render data updates: `structureDirty` triggers instruction set rebuilds, while `renderDirty` triggers partial data updates. The WebGL backend supports multi-texture batching; when WebGL is unavailable, it falls back to the Canvas 2D backend.
+
+### Measured renderer status
+
+The current shared benchmark compares Kurot 1.0.15, PixiJS 8.20.0, and Egret
+5.4.1 with deterministic workloads. On an Apple M1 Max in headless Chromium
+151, Kurot and PixiJS both reduced six ordinary sprite/container workloads to
+one draw call and remained in the same frame-time band. PixiJS retained a small
+renderer-call advantage in several cases and a clear lead in the 50-object
+filter workload: WebGL 2 Frame P95 was 17.9 ms for PixiJS and 25.0 ms for Kurot,
+with 150 versus 200 draw calls.
+
+These are scoped workload results, not a claim that Kurot matches PixiJS as a
+whole. The benchmark method and commands are documented in the
+[`@kurot/core` README](packages/core/README.md#validated-renderer-comparison).
 
 ### EXML and EUI
 

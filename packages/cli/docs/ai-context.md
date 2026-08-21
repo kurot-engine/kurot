@@ -5,7 +5,7 @@ unfamiliar with Kurot does not need to re-derive the pipeline from scratch
 each session. [`architecture.md`](./architecture.md) covers the same plugin
 pipeline in greater detail.
 
-Package identity: `@kurot/cli@1.1.0`. Node.js build tool, esbuild-powered,
+Package identity: `@kurot/cli@1.1.1`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
 via `npx` (scaffolding) or as a devDependency with npm scripts.
 

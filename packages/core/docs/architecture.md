@@ -1,6 +1,6 @@
 # @kurot/core 架构文档
 
-> 当前版本：1.0.12。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
+> 当前版本：1.0.15。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---

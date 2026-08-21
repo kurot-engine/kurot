@@ -108,8 +108,8 @@ draw call 就得把它们拼进同一张图集，而图集有尺寸上限、也�
   实际只用 1 张纹理也一样——这是无条件付出的固定成本。
 - **shader 更复杂**：fragment 端是 8 路 if/else 采样 + sampler 数组，片段着色成本略高于单纹理。
 - **槽位上限 8**：`MAX_TEXTURES` 硬编码为 8（WebGL1 最小保证值）。纹理数远超 8 时仍会反复 flush，
-  不能指望它消除所有 draw call。WebGL2 设备实际支持 16+ 却被卡在 8——这是
-  [pixi-alignment.md](../packages/core/docs/pixi-alignment.md) 里 P1-1 待优化的点。
+  不能指望它消除所有 draw call。WebGL2 设备可能提供更多纹理单元，但 Kurot
+  当前不会动态扩大批次容量。
 - **槽位分配是贪心的**：`getOrAssignSlot` 按到达顺序占槽，绘制顺序不佳时会比理论值多 flush 几次。
 - **静默回退易误判**：filter / mesh（含 Spine、MovieClip）/ blend 变化都会悄悄打断批，开发者可能
   以为在合批实则没有。判断真实 draw call 数应看 `Player.perf`，不能凭直觉。

@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Stable (1.0.12).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Stable (1.0.15).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
@@ -86,6 +86,37 @@ The rendering pipeline borrows concepts from Pixi.js 8 while keeping the Egret d
 | WebGL state management                | Egret     | DrawCmdManager batching command queue                           |
 | Mask strategies                       | Egret     | scissor / stencil / offscreen compositing                       |
 
+## Validated renderer comparison
+
+Kurot 1.0.15 was compared with PixiJS 8.20.0 and Egret 5.4.1 across seven
+deterministic workloads. The complete run used headless Chromium 151.0.7922.34
+on an Apple M1 Max, an 800×600 surface at DPR/resolution 1, 60 warmup frames,
+300 measured frames, five fresh browser contexts per case, and 175 total cases.
+
+| WebGL 2 workload | Objects | Frame P95 Kurot / PixiJS | Render P95 Kurot / PixiJS | Draw calls Kurot / PixiJS |
+| ---------------- | ------: | ------------------------: | -------------------------: | --------------------------: |
+| Sprite batch | 500 | 16.8 / 17.2 ms | 0.2 / 0.2 ms | 1 / 1 |
+| Mixed textures | 500 | 17.0 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
+| Dynamic transforms | 300 | 17.1 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
+| Deep container | 500 | 17.1 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
+| Rapid churn | 500 | 17.0 / 17.0 ms | 0.3 / 0.3 ms | 1 / 1 |
+| Texture swap | 500 | 16.8 / 16.8 ms | 0.3 / 0.2 ms | 1 / 1 |
+| Filter heavy | 50 | 25.0 / 17.9 ms | 0.7 / 0.4 ms | 200 / 150 |
+
+The result supports a narrow conclusion: Kurot's sprite/container batching is
+competitive in these six ordinary workloads, while PixiJS has a small
+renderer-call advantage in several cases and is clearly ahead in the measured
+filter workload. Kurot's next renderer priority is reducing filter passes and
+offscreen-composition cost.
+
+It does not establish overall PixiJS feature parity, mobile performance, or a
+memory advantage. Most ordinary cases are close to browser refresh cadence, so
+they demonstrate batching and the absence of obvious stalls more strongly than
+they distinguish CPU limits. Canvas2D/WebGL1/WebGL2 golden tests and manual
+checks on macOS Chrome, Windows Chrome/Firefox, recent iOS browsers, and a
+recent Android Chrome device provide correctness evidence, not cross-device
+performance rankings.
+
 ## Quick Start
 
 ```typescript
@@ -119,7 +150,7 @@ root.addChild(rect);
 ```bash
 pnpm install
 pnpm run build        # compile
-pnpm run test         # run tests (634 cases)
+pnpm run test         # run tests (641 cases)
 pnpm run dev          # watch mode
 ```
 
@@ -128,7 +159,6 @@ pnpm run dev          # watch mode
 - [CHANGELOG.md](./CHANGELOG.md) — versioned release notes, including the full list of 1.0.0 breaking changes
 - [Architecture](./docs/architecture.md) — engine structure and rendering pipeline
 - [Resource system](./docs/resource.md) — resource configuration, loading, and lifecycle
-- [PixiJS alignment](./docs/pixi-alignment.md) — rendering concepts adopted from PixiJS and intentional differences
 - [Live demo](https://irwinmc.github.io/kurot-demo/) — interactive rendering examples
 
 ## Test Pages

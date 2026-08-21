@@ -97,7 +97,7 @@ First stable release. From this version forward the public API surface (exports 
   - **MovieClip** (`0.3.2`): refactored to **external frame scheduling** — `MovieClip` no longer owns a ticker or measures elapsed time; the game loop calls `advanceFrame()` for each logical animation frame. This keeps the engine's animation clock centralized and makes frame stepping explicit.
   - **URLLoader** (`0.3.3`+): `URLVariables` support for both GET (appended as query string) and POST (sent as form-encoded body with automatic `Content-Type` header when none is set). `close()` now aborts in-flight `HttpRequest` / `ImageLoader` / `Sound` uniformly.
 - No breaking changes are introduced by 1.0.0 itself beyond the version bump. The 0.3.x API is preserved as-is; 1.0 marks the stability commitment, not a behavioural change.
-- Code review (`docs/game-review.md`, internal) found no A-class issues. Three B-class improvements were noted; only B1 (URLLoader listener cleanup) was applied for this release. The other two (Tween per-frame snapshot allocation, ScrollView operator-precedence readability) are accepted as-is and tracked in the review document.
+- An internal code review found no A-class issues. Three B-class improvements were noted; only B1 (URLLoader listener cleanup) was applied for this release. The other two (Tween per-frame snapshot allocation and ScrollView operator-precedence readability) were accepted as-is.
 
 ---
 
