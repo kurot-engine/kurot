@@ -9,12 +9,12 @@ export default defineConfig({
 		},
 	},
 	build: {
-		outDir: resolve(__dirname, 'benchmark-dist'),
+		outDir: resolve(__dirname, 'examples/benchmark/dist'),
 		emptyOutDir: true,
 		rollupOptions: {
 			input: {
 				index: resolve(__dirname, 'examples/index.html'),
-				benchmark: resolve(__dirname, 'examples/benchmark.html'),
+				benchmark: resolve(__dirname, 'examples/benchmark/index.html'),
 				'visual-test': resolve(__dirname, 'examples/visual-test.html'),
 				'text-test': resolve(__dirname, 'examples/text-test.html'),
 				'bitmap-test': resolve(__dirname, 'examples/bitmap-test.html'),
@@ -22,7 +22,6 @@ export default defineConfig({
 				'sound-test': resolve(__dirname, 'examples/sound-test.html'),
 				'video-test': resolve(__dirname, 'examples/video-test.html'),
 				'net-test': resolve(__dirname, 'examples/net-test.html'),
-				'egret-benchmark': resolve(__dirname, 'examples/egret-benchmark.html'),
 			},
 		},
 	},

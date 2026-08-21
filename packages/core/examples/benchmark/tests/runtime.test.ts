@@ -1,15 +1,19 @@
 import { describe, it, expect, vi } from 'vitest';
-import { MetricsCollector } from '../src/kurot/benchmark/MetricsCollector.js';
-import { BenchmarkRunner } from '../src/kurot/benchmark/BenchmarkRunner.js';
-import { scenes, getScene } from '../src/kurot/benchmark/SceneRegistry.js';
-import { fpsColorClass, PerfPanel } from '../src/kurot/benchmark/PerfPanel.js';
-import type { PerfPanelElements } from '../src/kurot/benchmark/PerfPanel.js';
-import type { FrameData, Stats } from '../src/kurot/benchmark/types.js';
+import { MetricsCollector } from '../runtime/MetricsCollector.js';
+import { BenchmarkRunner } from '../runtime/BenchmarkRunner.js';
+import { fpsColorClass, PerfPanel } from '../runtime/PerfPanel.js';
+import {
+	BENCHMARK_PROTOCOL_VERSION,
+	createSeededRandom,
+} from '../runtime/BenchmarkProtocol.js';
+import type { PerfPanelElements } from '../runtime/PerfPanel.js';
+import type { BenchmarkEnvironment, FrameData, Stats } from '../runtime/types.js';
 
 function makeFrame(overrides: Partial<FrameData> = {}): FrameData {
 	return {
 		fps: 60,
 		drawCalls: 10,
+		frameTimeMs: 16.7,
 		renderTimeMs: 16.7,
 		objectCount: 100,
 		...overrides,
@@ -75,10 +79,10 @@ describe('MetricsCollector', () => {
 		expect(stats.fps.avg).toBeCloseTo(expectedAvg, 5);
 	});
 
-	it('isLowFps() 在连续 10 帧 renderTimeMs > 33.3 时返回 true', () => {
+	it('isLowFps() 在连续 10 帧 frameTimeMs > 33.3 时返回 true', () => {
 		const collector = new MetricsCollector();
 		for (let i = 0; i < 10; i++) {
-			collector.record(makeFrame({ renderTimeMs: 40 }));
+			collector.record(makeFrame({ frameTimeMs: 40 }));
 		}
 		expect(collector.isLowFps()).toBe(true);
 		expect(collector.getStats().isLowFps).toBe(true);
@@ -88,10 +92,10 @@ describe('MetricsCollector', () => {
 		const collector = new MetricsCollector();
 		// 先写 9 帧高延迟
 		for (let i = 0; i < 9; i++) {
-			collector.record(makeFrame({ renderTimeMs: 40 }));
+			collector.record(makeFrame({ frameTimeMs: 40 }));
 		}
 		// 第 10 帧低延迟
-		collector.record(makeFrame({ renderTimeMs: 16 }));
+		collector.record(makeFrame({ frameTimeMs: 16 }));
 		expect(collector.isLowFps()).toBe(false);
 		expect(collector.getStats().isLowFps).toBe(false);
 	});
@@ -105,6 +109,23 @@ describe('MetricsCollector', () => {
 		const stats = collector.getStats();
 		expect(stats.frameCount).toBe(0);
 		expect(stats.fps.current).toBe(0);
+	});
+});
+
+describe('BenchmarkProtocol', () => {
+	it('replays the same sequence for the same seed', () => {
+		const first = createSeededRandom(1234);
+		const second = createSeededRandom(1234);
+		expect(Array.from({ length: 20 }, first)).toEqual(Array.from({ length: 20 }, second));
+	});
+
+	it('produces values in the half-open interval [0, 1)', () => {
+		const random = createSeededRandom();
+		for (let i = 0; i < 1000; i++) {
+			const value = random();
+			expect(value).toBeGreaterThanOrEqual(0);
+			expect(value).toBeLessThan(1);
+		}
 	});
 });
 
@@ -240,72 +261,6 @@ describe('BenchmarkRunner', () => {
 	});
 });
 
-// ─── SceneRegistry ──────────────────────────────────────────────────────────
-
-describe('SceneRegistry', () => {
-	it('scenes 数组有 5 个元素', () => {
-		expect(scenes).toHaveLength(5);
-	});
-
-	it('每个场景有 id、label、defaultCount、minCount、maxCount 字段', () => {
-		for (const scene of scenes) {
-			expect(typeof scene.id).toBe('string');
-			expect(typeof scene.label).toBe('string');
-			expect(typeof scene.defaultCount).toBe('number');
-			expect(typeof scene.minCount).toBe('number');
-			expect(typeof scene.maxCount).toBe('number');
-		}
-	});
-
-	it('sprite-batch 的 minCount=50、maxCount=2000', () => {
-		const scene = getScene('sprite-batch');
-		expect(scene).toBeDefined();
-		expect(scene!.minCount).toBe(50);
-		expect(scene!.maxCount).toBe(2000);
-	});
-
-	it('filter-heavy 的 maxCount=200', () => {
-		const scene = getScene('filter-heavy');
-		expect(scene).toBeDefined();
-		expect(scene!.maxCount).toBe(200);
-	});
-
-	it('getScene("sprite-batch") 返回正确场景', () => {
-		const scene = getScene('sprite-batch');
-		expect(scene).toBeDefined();
-		expect(scene!.id).toBe('sprite-batch');
-		expect(scene!.label).toBe('Sprite Batch');
-	});
-
-	it('getScene("nonexistent") 返回 undefined', () => {
-		expect(getScene('nonexistent')).toBeUndefined();
-	});
-
-	it('sprite-batch build 函数使用 mock factory 正常运行并返回 cleanup', () => {
-		const $children: unknown[] = [];
-		const factory = {
-			createBitmap: () => ({ x: 0, y: 0, rotation: 0, alpha: 1 }),
-			createShape: () => ({ x: 0, y: 0 }),
-			createSprite: () => ({ x: 0, y: 0 }),
-			addChild: (_parent: unknown, child: unknown) => {
-				$children.push(child);
-			},
-			removeChild: (_parent: unknown, child: unknown) => {
-				const idx = $children.indexOf(child);
-				if (idx !== -1) $children.splice(idx, 1);
-			},
-			addEventListener: () => {},
-			removeEventListener: () => {},
-		};
-		const container = {};
-		const scene = getScene('sprite-batch')!;
-		const cleanup = (scene.build as any)(container, 10, factory);
-		expect($children).toHaveLength(10);
-		cleanup();
-		expect($children).toHaveLength(0);
-	});
-});
-
 // ─── fpsColorClass ──────────────────────────────────────────────────────────
 
 describe('fpsColorClass', () => {
@@ -367,10 +322,11 @@ function makeMockEls(): PerfPanelElements {
 }
 
 function makeEmptyStats(): Stats {
-	const summary = { current: 0, avg: 0, p50: 0, p95: 0, max: 0 };
+	const summary = { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 };
 	return {
 		frameCount: 0,
 		fps: { ...summary },
+		frame: { ...summary },
 		render: { ...summary },
 		drawCalls: { current: 0, avg: 0 },
 		batchEfficiency: 0,
@@ -418,7 +374,7 @@ describe('PerfPanel', () => {
 		const els = makeMockEls();
 		const panel = new PerfPanel(els);
 		const stats = makeEmptyStats();
-		stats.fps = { current: 58, avg: 57, p50: 57, p95: 56, max: 60 };
+		stats.fps = { current: 58, avg: 57, p5: 54, p50: 57, p95: 59, p99: 60, max: 60 };
 		panel.update(stats, 'measuring');
 		expect(els.fps.textContent).toBe('58.0');
 	});
@@ -427,7 +383,7 @@ describe('PerfPanel', () => {
 		const els = makeMockEls();
 		const panel = new PerfPanel(els);
 		const stats = makeEmptyStats();
-		stats.render = { current: 1.234, avg: 1.18, p50: 1.2, p95: 1.45, max: 2.0 };
+		stats.render = { current: 1.234, avg: 1.18, p5: 1, p50: 1.2, p95: 1.45, p99: 1.8, max: 2.0 };
 		panel.update(stats, 'measuring');
 		expect(els.renderCurrent.textContent).toBe('1.23 ms');
 		expect(els.renderAvg.textContent).toBe('1.18 ms');
@@ -444,36 +400,61 @@ describe('PerfPanel', () => {
 
 // ─── ReportExporter ──────────────────────────────────────────────────────────
 
-import { ReportExporter } from '../src/kurot/benchmark/ReportExporter.js';
-import type { ReportData } from '../src/kurot/benchmark/types.js';
+import { ReportExporter } from '../runtime/ReportExporter.js';
+import type { ReportData } from '../runtime/types.js';
 
 function makeStats(): Stats {
 	return {
 		frameCount: 100,
-		fps: { current: 60, avg: 59.8, p50: 60, p95: 58.2, max: 61 },
-		render: { current: 16.7, avg: 16.5, p50: 16.6, p95: 17.2, max: 18.0 },
+		fps: { current: 60, avg: 59.8, p5: 57.2, p50: 60, p95: 60.5, p99: 60.9, max: 61 },
+		frame: { current: 16.7, avg: 16.8, p5: 16.1, p50: 16.7, p95: 17.5, p99: 18.1, max: 19.0 },
+		render: { current: 16.7, avg: 16.5, p5: 15.9, p50: 16.6, p95: 17.2, p99: 17.8, max: 18.0 },
 		drawCalls: { current: 10, avg: 9.5 },
 		batchEfficiency: 52.6,
 		isLowFps: false,
 	};
 }
 
+function makeEnvironment(): BenchmarkEnvironment {
+	return {
+		protocolVersion: BENCHMARK_PROTOCOL_VERSION,
+		engine: 'Kurot',
+		engineVersion: '1.0.14',
+		backend: 'webgl2',
+		browser: 'chromium',
+		runMode: 'headless',
+		scenarioVersion: 1,
+		seed: 1234,
+		viewportWidth: 800,
+		viewportHeight: 600,
+		devicePixelRatio: 1,
+		resolution: 1,
+		antialias: false,
+		warmupFrames: 60,
+		measuredFrames: 300,
+		run: 1,
+	};
+}
+
 describe('ReportExporter', () => {
 	it('buildReport 返回包含所有必需字段的对象', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('sprite-batch', 500, makeStats());
+		const report = exporter.buildReport('sprite-batch', 500, makeStats(), makeEnvironment());
 
 		expect(report).toHaveProperty('timestamp');
 		expect(report).toHaveProperty('userAgent');
+		expect(report).toHaveProperty('environment');
 		expect(report).toHaveProperty('scene');
 		expect(report).toHaveProperty('objectCount');
 		expect(report).toHaveProperty('fps');
 		expect(report.fps).toHaveProperty('avg');
-		expect(report.fps).toHaveProperty('p95');
-		expect(report.fps).toHaveProperty('max');
+		expect(report.fps).toHaveProperty('p5');
+		expect(report.fps).toHaveProperty('p50');
 		expect(report).toHaveProperty('renderTimeMs');
+		expect(report).toHaveProperty('frameTimeMs');
 		expect(report.renderTimeMs).toHaveProperty('avg');
 		expect(report.renderTimeMs).toHaveProperty('p95');
+		expect(report.renderTimeMs).toHaveProperty('p99');
 		expect(report.renderTimeMs).toHaveProperty('max');
 		expect(report).toHaveProperty('drawCallsAvg');
 		expect(report).toHaveProperty('batchEfficiencyAvg');
@@ -481,7 +462,7 @@ describe('ReportExporter', () => {
 
 	it('buildReport 的 timestamp 是有效 ISO 8601 字符串', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('sprite-batch', 500, makeStats());
+		const report = exporter.buildReport('sprite-batch', 500, makeStats(), makeEnvironment());
 
 		expect(typeof report.timestamp).toBe('string');
 		// ISO 8601 格式：YYYY-MM-DDTHH:mm:ss.sssZ
@@ -492,16 +473,26 @@ describe('ReportExporter', () => {
 
 	it('buildReport 的 scene 和 objectCount 正确', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('filter-heavy', 200, makeStats());
+		const report = exporter.buildReport('filter-heavy', 200, makeStats(), makeEnvironment());
 
 		expect(report.scene).toBe('filter-heavy');
 		expect(report.objectCount).toBe(200);
 	});
 
+	it('buildReport rejects non-finite metrics', () => {
+		const exporter = new ReportExporter();
+		const stats = makeStats();
+		stats.frame.p95 = Number.NaN;
+
+		expect(() => exporter.buildReport('sprite-batch', 500, stats, makeEnvironment())).toThrow(
+			'Benchmark report numeric fields must be finite and non-negative.',
+		);
+	});
+
 	it('formatMarkdown 输出包含 | 开头结尾的行', () => {
 		const exporter = new ReportExporter();
 		const stats = makeStats();
-		const report = exporter.buildReport('sprite-batch', 500, stats);
+		const report = exporter.buildReport('sprite-batch', 500, stats, makeEnvironment());
 		const md = exporter.formatMarkdown(report);
 
 		const lines = md.split('\n').filter(l => l.trim().length > 0);
@@ -514,7 +505,7 @@ describe('ReportExporter', () => {
 
 	it('formatMarkdown 输出包含表头行（含 场景 或 scene）', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('sprite-batch', 500, makeStats());
+		const report = exporter.buildReport('sprite-batch', 500, makeStats(), makeEnvironment());
 		const md = exporter.formatMarkdown(report);
 
 		const hasHeader = md.includes('Scene');
@@ -523,7 +514,7 @@ describe('ReportExporter', () => {
 
 	it('formatMarkdown 输出包含分隔行（含 ---）', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('sprite-batch', 500, makeStats());
+		const report = exporter.buildReport('sprite-batch', 500, makeStats(), makeEnvironment());
 		const md = exporter.formatMarkdown(report);
 
 		expect(md).toContain('---');
@@ -531,7 +522,7 @@ describe('ReportExporter', () => {
 
 	it('formatMarkdown 输出包含数据行（含场景 ID）', () => {
 		const exporter = new ReportExporter();
-		const report = exporter.buildReport('sprite-batch', 500, makeStats());
+		const report = exporter.buildReport('sprite-batch', 500, makeStats(), makeEnvironment());
 		const md = exporter.formatMarkdown(report);
 
 		expect(md).toContain('sprite-batch');

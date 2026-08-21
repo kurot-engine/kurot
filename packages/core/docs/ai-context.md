@@ -50,9 +50,11 @@ src/kurot/
 ├── utils/          ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils.
 │                   No engine-wide numeric object identity API is provided.
 ├── localStorage/   Plain functions (getItem/setItem/removeItem/clear), exported as a namespace.
-├── external/       ExternalInterface — bridge to window.* host callbacks.
-└── benchmark/       Dev/QA stress-test harness. NOT exported from index.ts — internal only.
+└── external/       ExternalInterface — bridge to window.* host callbacks.
 ```
+
+The dev-only benchmark page, runtime, adapters, vendor baseline, and tests are
+colocated under `examples/benchmark/`; none are exported from `index.ts`.
 
 ## 2. Non-obvious current behavior
 
@@ -146,7 +148,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **External**: `ExternalInterface` (named, not namespaced).
 - **Resource**: `Resource`/`resource` (shared instance), `ProgressCallback`, `ResourceEventListener`, `ResourceItem`, `ResourceType`, `ResourceConfig`/`ResourceConfigData`/`ResourceConfigEntry`, `ResourceLoader`, `ResourceEventType`/`ResourceEvent`, `AnalyzerBase`, `ImageAnalyzer`, `JsonAnalyzer`, `TextAnalyzer`, `SoundAnalyzer`, `SheetAnalyzer`.
 
-`benchmark/` is dev-only tooling and is **not** exported from `index.ts`.
+`examples/benchmark/` is dev-only tooling and is **not** exported from `index.ts`.
 
 ## 5. Current API constraints
 
@@ -180,4 +182,4 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                     |
 | Change text layout/wrapping                | `text/WordWrap.ts`, `text/TextMeasurer.ts`                                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                     |
-| Run perf tests                             | `benchmark/`, `pnpm benchmark` (see package README)                                                              |
+| Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`  |

@@ -6,25 +6,28 @@
 
 ## 0. 可用的基础设施(已存在,直接复用)
 
-不要从零搭测试框架。`@kurot/core` 已内置一套 benchmark 设施(`src/kurot/benchmark/`,不导出,仅内部):
+不要从零搭测试框架。`@kurot/core` 已有共享场景、引擎适配器和浏览器自动化设施:
 
-- **`SceneDescriptor`**(`BenchmarkRunner.ts`):测试场景的统一抽象。
+- **`ScenarioDefinition`**(`examples/benchmark/Scenarios.ts`):Kurot、PixiJS 与 Egret 共用的场景抽象。
   ```ts
-  interface SceneDescriptor {
-  	id: string;
-  	label?: string;
-  	defaultCount?: number;
-  	build(container: unknown, count: number): () => void; // 返回 cleanup
+  interface ScenarioDefinition {
+    id: string;
+    version: number;
+    defaultCount: number;
+    build(adapter: BenchmarkAdapter, count: number, seed: number): ScenarioRuntime;
   }
   ```
-  写测试 = 往 `SceneRegistry` 注册一个 `SceneDescriptor`,在 `build(container, count)` 里搭场景,
-  返回一个销毁函数。`BenchmarkRunner` 负责切场景、销毁、重建。
-- **`BenchmarkRunner`**:状态机 `idle → warmup(60 帧)→ measuring → paused`,每帧由外部 `ENTER_FRAME`
-  调 `onFrame(perf)` 驱动。warmup 60 帧后才采数,避免首屏抖动污染统计。
-- **`Player.perf`**(`player/Player.ts`):每帧可读 `drawCalls`、`renderTimeMs`、`fps` 等。
-- **`MetricsCollector` → `Stats`**:给出 fps/render 的 p50/p95/max、`drawCalls.avg`、
+  新的跨引擎测试应只定义一次场景,通过 `BenchmarkAdapter` 执行创建、变更和销毁。随机输入必须使用
+  协议提供的固定种子,不能直接调用 `Math.random()`。
+- **`BenchmarkComparison.ts`**:按固定 warmup 与测量帧数运行场景,并通过页面状态暴露机器可读结果。
+- **`examples/benchmark/tests/comparison.spec.ts`**:在独立页面中重复运行 Kurot、PixiJS、Egret 和受支持后端矩阵,
+  保存原始 JSON,并以中位数和区间生成对比报告。
+- **`DrawCallCounter`**(`examples/benchmark/DrawCallCounter.ts`):统一拦截三个适配器实际调用的
+  `gl.drawArrays` / `gl.drawElements`,避免使用各引擎含义不同的内部 draw-call 统计。
+- **`Player.perf`**(`player/Player.ts`):每帧可读 `renderTimeMs`、`fps` 等 Kurot 内部指标。
+- **`MetricsCollector` → `Stats`**:分别给出 FPS、整帧时间和渲染调用时间的分位数、`drawCalls.avg`、
   `batchEfficiency`(= `objectCount / drawCalls`,每 draw call 平均渲染对象数,越高批得越好)。
-- **`ReportExporter`**:把 `ReportData` 导出,便于留档对比。
+- **`ReportExporter`**:把带协议、引擎、后端、分辨率、种子和运行模式信息的 `ReportData` 导出。
 
 关键事实:**`renderTimeMs` 是整段 `renderer.render()`(build + execute 合并),没有单独的 build/execute
 计时**。因此"分阶段成本"这一项要么读源码加临时打点,要么用结构变化 vs 数据变化的对照来推断(见测试 2)。
@@ -113,11 +116,11 @@ structureDirty、有/无 filter)。同一个引擎、同一帧、只翻转一个
 
 ## 5. 落地步骤(给实现者)
 
-1. 新建 benchmark 场景文件,按上述 4 个方向各注册一个 `SceneDescriptor` 到 `SceneRegistry`;
-   `build(container, count)` 里用 `Bitmap`/`Texture`/`Container` 搭场景,返回 cleanup。
-2. 在主循环里把 `player.perf` 的 `{ fps, drawCalls, renderTimeMs }` 喂给 `runner.onFrame(...)`。
-3. 每个场景按"对照"要求跑两组(开关 / 行为),各取 warmup 后的稳态统计(`Stats` 的 p95)。
-4. 汇总成一张"场景 × 对照组 × 指标"的表(可用 `ReportExporter` 留档)。判据见各节。
+1. 在 `examples/benchmark/Scenarios.ts` 增加场景定义;若需要新能力,同时在三个 engine adapter
+   增加语义等价操作。仅用于 Kurot 架构验证的场景必须明确标为 Kurot-specific,不能混入等价性排名。
+2. 每个场景按"对照"要求跑两组(开关 / 行为),各取 warmup 后的固定帧窗口统计。
+3. 用 `pnpm --dir packages/core benchmark:compare` 生成原始报告和中位数汇总。
+4. 汇总成一张"场景 × 对照组 × 指标"的表。判据见各节。
 5. **测前先确认没有 vsync 把 fps 钉死在 60**——当 fps 已被 vsync 封顶时,用 `renderTimeMs`(CPU 侧)
    而非 fps 判断优化,否则看不出差别。这是最容易踩的坑。
 

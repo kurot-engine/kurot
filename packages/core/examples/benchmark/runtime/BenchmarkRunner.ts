@@ -89,7 +89,7 @@ export class BenchmarkRunner {
 	/**
 	 * Records one frame while measurement is active.
 	 */
-	public onFrame(perf: { fps: number; drawCalls: number; renderTimeMs: number }): void {
+	public onFrame(perf: { fps: number; drawCalls: number; frameTimeMs?: number; renderTimeMs: number }): void {
 		if (this._phase === 'idle' || this._phase === 'paused') {
 			return;
 		}
@@ -107,6 +107,7 @@ export class BenchmarkRunner {
 			this._collector.record({
 				fps: perf.fps,
 				drawCalls: perf.drawCalls,
+				frameTimeMs: perf.frameTimeMs ?? (perf.fps > 0 ? 1000 / perf.fps : 0),
 				renderTimeMs: perf.renderTimeMs,
 				objectCount: this._currentCount,
 			});

@@ -17,7 +17,7 @@ export class MetricsCollector {
 	// ── Instance fields ──────────────────────────────────────────────────────────
 
 	private readonly _windowSize: number;
-    private readonly _buffer: FrameData[];
+	private readonly _buffer: Array<FrameData | undefined>;
 
 	private _writeIndex = 0;
 	private _frameCount = 0;
@@ -26,7 +26,7 @@ export class MetricsCollector {
 
 	public constructor(windowSize = 300) {
 		this._windowSize = windowSize;
-		this._buffer = new Array<FrameData>(windowSize);
+		this._buffer = new Array<FrameData | undefined>(windowSize);
 	}
 
 	// ── Public methods ──────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ export class MetricsCollector {
 		this._writeIndex = 0;
 		this._frameCount = 0;
 		for (let i = 0; i < this._windowSize; i++) {
-			this._buffer[i] = undefined as unknown as FrameData;
+			this._buffer[i] = undefined;
 		}
 	}
 
@@ -56,7 +56,7 @@ export class MetricsCollector {
 		for (let i = 0; i < 10; i++) {
 			const idx = (this._writeIndex - 1 - i + this._windowSize) % this._windowSize;
 			const frame = this._buffer[idx];
-			if (!frame || frame.renderTimeMs <= 33.3) {
+			if (!frame || frame.frameTimeMs <= 33.3) {
 				return false;
 			}
 		}
@@ -67,8 +67,9 @@ export class MetricsCollector {
 		if (this._frameCount === 0) {
 			return {
 				frameCount: 0,
-				fps: { current: 0, avg: 0, p50: 0, p95: 0, max: 0 },
-				render: { current: 0, avg: 0, p50: 0, p95: 0, max: 0 },
+				fps: { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 },
+				frame: { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 },
+				render: { current: 0, avg: 0, p5: 0, p50: 0, p95: 0, p99: 0, max: 0 },
 				drawCalls: { current: 0, avg: 0 },
 				batchEfficiency: 0,
 				isLowFps: false,
@@ -76,6 +77,7 @@ export class MetricsCollector {
 		}
 
 		const fpsValues: number[] = [];
+		const frameValues: number[] = [];
 		const renderValues: number[] = [];
 		const drawCallValues: number[] = [];
 
@@ -84,6 +86,7 @@ export class MetricsCollector {
 			const frame = this._buffer[idx];
 			if (frame) {
 				fpsValues.push(frame.fps);
+				frameValues.push(frame.frameTimeMs);
 				renderValues.push(frame.renderTimeMs);
 				drawCallValues.push(frame.drawCalls);
 			}
@@ -93,9 +96,11 @@ export class MetricsCollector {
 		const latestFrame = this._buffer[latestIdx];
 
 		const sortedFps = [...fpsValues].sort((a, b) => a - b);
+		const sortedFrame = [...frameValues].sort((a, b) => a - b);
 		const sortedRender = [...renderValues].sort((a, b) => a - b);
 
 		const avgFps = fpsValues.reduce((s, v) => s + v, 0) / fpsValues.length;
+		const avgFrame = frameValues.reduce((s, v) => s + v, 0) / frameValues.length;
 		const avgRender = renderValues.reduce((s, v) => s + v, 0) / renderValues.length;
 		const avgDrawCalls = drawCallValues.reduce((s, v) => s + v, 0) / drawCallValues.length;
 
@@ -107,15 +112,28 @@ export class MetricsCollector {
 			fps: {
 				current: latestFrame?.fps ?? 0,
 				avg: avgFps,
+				p5: percentile(sortedFps, 0.05),
 				p50: percentile(sortedFps, 0.5),
 				p95: percentile(sortedFps, 0.95),
+				p99: percentile(sortedFps, 0.99),
 				max: sortedFps[sortedFps.length - 1] ?? 0,
+			},
+			frame: {
+				current: latestFrame?.frameTimeMs ?? 0,
+				avg: avgFrame,
+				p5: percentile(sortedFrame, 0.05),
+				p50: percentile(sortedFrame, 0.5),
+				p95: percentile(sortedFrame, 0.95),
+				p99: percentile(sortedFrame, 0.99),
+				max: sortedFrame[sortedFrame.length - 1] ?? 0,
 			},
 			render: {
 				current: latestFrame?.renderTimeMs ?? 0,
 				avg: avgRender,
+				p5: percentile(sortedRender, 0.05),
 				p50: percentile(sortedRender, 0.5),
 				p95: percentile(sortedRender, 0.95),
+				p99: percentile(sortedRender, 0.99),
 				max: sortedRender[sortedRender.length - 1] ?? 0,
 			},
 			drawCalls: {

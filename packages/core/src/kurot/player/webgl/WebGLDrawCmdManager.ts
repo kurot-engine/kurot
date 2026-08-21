@@ -114,14 +114,17 @@ export class WebGLDrawCmdManager {
 	 */
 	public pushDrawMultiTexture(multiCmd: MultiTextureDrawCmd): void {
 		const last = this.drawData[this.drawDataLen - 1];
+		const previous = last?.multiCmd;
 		if (
 			this.drawDataLen > 0 &&
 			last.type === DrawCmdType.MULTI_TEXTURE &&
-			last.multiCmd &&
-			last.multiCmd.textureCount === multiCmd.textureCount &&
-			last.multiCmd.textures.every((t, i) => t === multiCmd.textures[i])
+			previous &&
+			previous.textureCount <= multiCmd.textureCount &&
+			previous.textures.every((texture, index) => texture === multiCmd.textures[index])
 		) {
-			last.multiCmd.count += multiCmd.count;
+			previous.textures.push(...multiCmd.textures.slice(previous.textureCount));
+			previous.textureCount = multiCmd.textureCount;
+			previous.count += multiCmd.count;
 			last.count += multiCmd.count;
 			return;
 		}

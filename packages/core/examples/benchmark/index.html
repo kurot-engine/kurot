@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>2D Engine Render Benchmark</title>
+		<link rel="stylesheet" href="../style.css" />
+		<style>
+			:root {
+				--sidebar-w: 300px;
+				--log-h: 132px;
+			}
+			.sidebar {
+				padding: 12px;
+			}
+			.row label {
+				width: 72px;
+			}
+			.action-row {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 6px;
+				margin-top: 10px;
+			}
+			.action-row .primary {
+				grid-column: 1 / -1;
+				background: rgba(59, 111, 212, 0.14);
+				border-color: rgba(59, 111, 212, 0.35);
+				color: var(--accent);
+				font-weight: 600;
+			}
+			button:disabled {
+				opacity: 0.4;
+				cursor: default;
+			}
+			#canvas-wrap {
+				align-items: flex-start;
+				overflow: auto;
+				padding: 24px;
+			}
+			.header-right > span {
+				color: var(--text-dim);
+				font-size: 10px;
+			}
+			#viewport {
+				width: 800px;
+				height: 600px;
+				flex: 0 0 auto;
+			}
+			#gameCanvas {
+				display: block;
+				width: 800px;
+				height: 600px;
+				box-sizing: content-box;
+				background: #0b1020;
+			}
+			#gameCanvas[hidden] {
+				display: none;
+			}
+			#viewport > .egret-player {
+				position: relative !important;
+				width: 800px;
+				height: 600px;
+				overflow: hidden !important;
+			}
+			#viewport > .egret-player canvas {
+				position: absolute !important;
+				top: 0 !important;
+				left: 0 !important;
+				width: 800px !important;
+				height: 600px !important;
+				background: #0b1020;
+			}
+			.progress-track {
+				height: 4px;
+				margin-top: 8px;
+				overflow: hidden;
+				border-radius: 4px;
+				background: rgba(0, 0, 0, 0.08);
+			}
+			#progress-bar {
+				width: 0;
+				height: 100%;
+				background: var(--accent);
+				transition: width 0.1s linear;
+			}
+			.run-details {
+				display: grid;
+				grid-template-columns: minmax(260px, 1fr) minmax(320px, 2fr);
+				gap: 4px 24px;
+				padding: 10px 14px;
+			}
+			.run-details .metric-row {
+				min-width: 0;
+			}
+			.run-details .value {
+				overflow: hidden;
+				text-align: right;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.help-text {
+				color: var(--text-dim);
+				font-size: 10px;
+				line-height: 1.6;
+			}
+			.sidebar .metric-row .value {
+				font-size: 10px;
+				text-align: right;
+			}
+			#error {
+				grid-column: 1 / -1;
+				color: var(--error);
+				font-size: 10px;
+				white-space: pre-wrap;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="index.html" class="back-link">&larr; Back</a>
+			<span class="page-title">Kurot / PixiJS / Egret Render Benchmark</span>
+			<div class="header-right">
+				<span>Protocol v1</span>
+				<div id="status" class="status-badge badge-loading">Initializing</div>
+			</div>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<div class="glass-card">
+					<h3>Configuration</h3>
+					<div class="row">
+						<label for="engine">Engine</label>
+						<select id="engine">
+							<option value="kurot">Kurot</option>
+							<option value="pixi">PixiJS</option>
+							<option value="egret">Egret 5.4.1</option>
+						</select>
+					</div>
+					<div class="row">
+						<label for="backend">Backend</label>
+						<select id="backend">
+							<option value="webgl2">WebGL 2</option>
+							<option value="webgl1">WebGL 1</option>
+						</select>
+					</div>
+					<div class="row">
+						<label for="scene">Scenario</label>
+						<select id="scene"></select>
+					</div>
+					<div class="row">
+						<label for="count">Objects</label>
+						<input id="count" type="number" />
+					</div>
+					<div class="row">
+						<label for="warmup">Warmup</label>
+						<input id="warmup" type="number" min="0" />
+					</div>
+					<div class="row">
+						<label for="frames">Frames</label>
+						<input id="frames" type="number" min="1" />
+					</div>
+					<div class="action-row">
+						<button id="run" class="primary">Run Benchmark</button>
+						<button id="export" disabled>Export JSON</button>
+						<button id="copy" disabled>Copy Markdown</button>
+					</div>
+				</div>
+				<div class="glass-card">
+					<h3>Measurement</h3>
+					<div class="metric-row">
+						<span class="label">Progress</span>
+						<span id="progress" class="value">0</span>
+					</div>
+					<div class="progress-track"><div id="progress-bar"></div></div>
+					<div class="metric-row">
+						<span class="label">FPS</span>
+						<span id="fps" class="value">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Frame ms</span>
+						<span id="frame-time" class="value">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Render ms</span>
+						<span id="render-time" class="value">--</span>
+					</div>
+					<div class="metric-row">
+						<span class="label">Draw calls</span>
+						<span id="draw-calls" class="value">--</span>
+					</div>
+				</div>
+				<div class="glass-card help-text">
+					This page runs one visible case. Use <code>benchmark:smoke</code> for a quick integration check or
+					<code>benchmark:compare</code> for the full matrix and reports.
+				</div>
+			</div>
+			<div class="right-panel">
+				<div id="canvas-wrap">
+					<div id="viewport"><canvas id="gameCanvas" width="800" height="600"></canvas></div>
+				</div>
+				<div class="log-panel">
+					<div class="log-header"><span>Current Run</span></div>
+					<div class="run-details">
+						<div class="metric-row">
+							<span class="label">Engine</span>
+							<span id="engine-value" class="value">--</span>
+						</div>
+						<div class="metric-row">
+							<span class="label">Scenario</span>
+							<span id="scenario-value" class="value">--</span>
+						</div>
+						<div id="error"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="module" src="./BenchmarkComparison.ts"></script>
+	</body>
+</html>

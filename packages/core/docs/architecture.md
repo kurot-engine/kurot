@@ -99,7 +99,6 @@ packages/core/src/kurot/
 │   └── Capabilities.ts               # 运行时 WebGL 扩展/平台能力检测（UA + Client Hints）
 ├── net/              # 网络加载（HttpRequest, ImageLoader, HttpMethod, HttpResponseType）
 ├── media/            # 媒体（Sound, SoundChannel, Video）
-├── benchmark/        # 性能基准（MetricsCollector, BenchmarkRunner, SceneRegistry, PerfPanel, ReportExporter, types）
 ├── utils/            # 工具类（ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils, toColorString）
 │                     # 注：不提供 HashObject，对象身份比较用 === 或 WeakMap 键控查找
 ├── localStorage/     # 本地存储
@@ -363,7 +362,5 @@ app.start(root);
 | player/    | InstructionSet, InstructionPool, RenderGroup, TextPipe, MaskPipe, WebGLRendererDirty, WebGLRendererLeaf, WebGLVertexArrayObject, WebGLRenderBuffer, WebGLBlurFramebufferPool, CreatePlayer, TouchHandler |
 | net/       | HttpRequest, ImageLoader                                                                                                                                                                                 |
 | resource/  | Resource（并发 loadGroup 队列化）, ResourceLoader（并发/重试/无 analyzer 场景）                                                                                                                          |
-| benchmark/ | 性能基准测试                                                                                                                                                                                             |
+| examples/benchmark/tests/ | 性能基准运行时与跨引擎对比测试                                                                                                                                                              |
 | text/      | 通过 display 集成测试覆盖                                                                                                                                                                                |
-
-

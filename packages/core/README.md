@@ -147,7 +147,25 @@ pnpm benchmark
 | **Sound Test**  | Sound / SoundChannel: load, play, volume, loop, error handling       |
 | **Video Test**  | Video: load, play/pause, seek, volume, resize                        |
 | **Net Test**    | HttpRequest / ImageLoader: GET / POST, responseType, timeout, abort  |
-| **Benchmark**   | WebGL perf: 5 stress scenes with FPS / Draw Calls / Batch Efficiency |
+| **Benchmark**   | Shared Kurot/PixiJS/Egret comparison across 7 deterministic workloads |
+
+Kurot and PixiJS run on WebGL 1 and WebGL 2. The bundled Egret 5.4.1 baseline
+supports WebGL 1 only; unsupported combinations are omitted rather than
+reported as zero-cost results.
+
+The benchmark has three task-oriented commands:
+
+```bash
+pnpm benchmark
+pnpm benchmark:smoke
+pnpm benchmark:compare
+```
+
+`benchmark` starts the visible interactive page, `benchmark:smoke` quickly
+checks that every supported engine/backend integration works, and
+`benchmark:compare` runs the complete reproducible comparison matrix. Automated
+runs print case-by-case progress and write reports to the ignored local
+`examples/benchmark/results/` directory.
 
 ## License
 

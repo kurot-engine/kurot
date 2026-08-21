@@ -5,7 +5,9 @@ node_modules/
 # Generated build artifacts
 dist/
 build/
-benchmark-dist/
+packages/core/examples/benchmark/dist/
+packages/core/examples/benchmark/results/
+test-results/
 bin-debug/
 bin-release/
 coverage/
