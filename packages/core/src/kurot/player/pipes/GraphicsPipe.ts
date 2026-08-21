@@ -26,6 +26,7 @@ interface GraphicsCache {
 	textureHeight: number;
 	boundsX: number;
 	boundsY: number;
+	contextVersion: number;
 }
 
 /**
@@ -104,6 +105,14 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		buffer.offsetY = 0;
 
 		let cache = this._cache.get(graphics);
+		if (cache && cache.contextVersion !== buffer.context.contextVersion) {
+			const oldToken = this._registryTokens.get(graphics);
+			if (oldToken) buffer.context.unregisterTextureGC(oldToken);
+			this._registryTokens.delete(graphics);
+			cache.texture = undefined;
+			cache.contextVersion = buffer.context.contextVersion;
+			graphics.canvasCacheDirty = true;
+		}
 		if (!cache) {
 			cache = {
 				canvasBuffer: new CanvasBuffer(w, h),
@@ -112,6 +121,7 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 				textureHeight: 0,
 				boundsX: bounds.x,
 				boundsY: bounds.y,
+				contextVersion: buffer.context.contextVersion,
 			};
 			this._cache.set(graphics, cache);
 		}

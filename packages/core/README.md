@@ -167,6 +167,17 @@ checks that every supported engine/backend integration works, and
 runs print case-by-case progress and write reports to the ignored local
 `examples/benchmark/results/` directory.
 
+Deterministic visual regression tests cover Canvas 2D, WebGL 1, WebGL 2, and
+WebGL context restoration:
+
+```bash
+pnpm test:visual
+```
+
+After an intentional renderer change has been visually reviewed, regenerate the
+golden images with `pnpm test:visual:update`. Failed comparisons retain expected,
+actual, and diff images under the ignored local `test-results/` directory.
+
 ## License
 
 MIT

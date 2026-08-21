@@ -52,6 +52,13 @@ export class WebGLRenderTarget {
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture!, 0);
 	}
 
+	/** Discards GPU handles invalidated by a restored WebGL context. */
+	public handleContextRestored(): void {
+		this.texture = undefined;
+		this._frameBuffer = undefined;
+		this._stencilBuffer = undefined;
+	}
+
 	public enabledStencil(): void {
 		if (!this._frameBuffer || this._stencilBuffer) return;
 		const gl = this._gl;

@@ -61,8 +61,6 @@ type EffectPushInstruction = (FilterPushInstruction | MaskPushInstruction) & {
 interface DisplayListCacheInstruction {
 	renderPipeId: 'displayListCache';
 	renderable: DisplayObject;
-	offsetX: number;
-	offsetY: number;
 	transform: TransformState;
 }
 
@@ -451,8 +449,6 @@ export class WebGLRenderer {
 		return {
 			renderPipeId: 'displayListCache',
 			renderable: obj,
-			offsetX,
-			offsetY,
 			transform,
 		};
 	}
@@ -611,12 +607,7 @@ export class WebGLRenderer {
 				case 'displayListCache': {
 					const cacheInst = inst as DisplayListCacheInstruction;
 					this._applyTransform(activeBuffer, cacheInst.transform);
-					this._executeDisplayListCache(
-						cacheInst.renderable,
-						activeBuffer,
-						cacheInst.offsetX,
-						cacheInst.offsetY,
-					);
+					this._executeDisplayListCache(cacheInst.renderable, activeBuffer);
 					break;
 				}
 
@@ -772,8 +763,6 @@ export class WebGLRenderer {
 	private _executeDisplayListCache(
 		obj: DisplayObject,
 		buffer: WebGLRenderBuffer,
-		offsetX: number,
-		offsetY: number,
 	): void {
 		const $displayList = obj.$displayList;
 		if (!$displayList) return;
@@ -805,9 +794,6 @@ export class WebGLRenderer {
 		const w = $displayList.canvasBuffer.width;
 		const h = $displayList.canvasBuffer.height;
 		const resolution = $displayList.actualResolution;
-		if (offsetX !== 0 || offsetY !== 0) {
-			buffer.globalMatrix.append(1, 0, 0, 1, offsetX, offsetY);
-		}
 		buffer.context.drawImage(
 			bd,
 			0,
@@ -823,9 +809,6 @@ export class WebGLRenderer {
 			false,
 			$displayList.scaleMode === 'linear',
 		);
-		if (offsetX !== 0 || offsetY !== 0) {
-			buffer.globalMatrix.append(1, 0, 0, 1, -offsetX, -offsetY);
-		}
 	}
 
 	private _renderMaskObject(

@@ -12,7 +12,7 @@ import { ShaderLib, getBlurTier, makeBlurHFrag, makeBlurVFrag } from './shaders/
 import { ShaderLib2, getBlurTier2, makeBlurHFrag2, makeBlurVFrag2 } from './shaders/ShaderLib2.js';
 import { SYM_GL_CONTEXT, SYM_PREMULTIPLIED, SYM_DEFAULT_EMPTY, SYM_SMOOTHING } from './WebGLUtils.js';
 import type { GL } from './WebGLUtils.js';
-import type { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
+import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
 import type { RenderContext } from '../RenderContext.js';
 
@@ -51,6 +51,7 @@ export class WebGLRenderContext implements RenderContext {
 	public projectionY = 0;
 	public activeFilter?: Filter;
 	public currentBlendMode = 'source-over';
+	public contextVersion = 0;
 
 	// ── Private fields ────────────────────────────────────────────────────────
 
@@ -58,8 +59,8 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _batcher = new MultiTextureBatcher();
 	private readonly _bufferStack: WebGLRenderBuffer[] = [];
 	private _currentBuffer?: WebGLRenderBuffer;
-	private readonly _vertexBuffer: WebGLBuffer;
-	private readonly _indexBuffer: WebGLBuffer;
+	private _vertexBuffer: WebGLBuffer;
+	private _indexBuffer: WebGLBuffer;
 	private _bindIndices = false;
 	private _gpuVertexBufferSize = 0;
 	private _defaultEmptyTexture?: WebGLTexture;
@@ -446,6 +447,9 @@ export class WebGLRenderContext implements RenderContext {
 		// ── Multi-texture path (plain quads without filter) ───────────────────
 		const useMulti = !this.activeFilter && !meshVertices && this._maxTextureUnits > 1;
 		if (useMulti) {
+			if (!this._vao.isMultiTexture() && this._vao.getVerticesByteLength() > 0) {
+				this.flush();
+			}
 			let slot = this._batcher.getOrAssignSlot(texture);
 			if (slot === -1) {
 				this.flush();
@@ -775,6 +779,7 @@ export class WebGLRenderContext implements RenderContext {
 
 	private _onContextRestored(): void {
 		const gl = this.gl;
+		this.contextVersion++;
 
 		gl.disable(gl.DEPTH_TEST);
 		gl.disable(gl.CULL_FACE);
@@ -782,6 +787,8 @@ export class WebGLRenderContext implements RenderContext {
 		gl.colorMask(true, true, true, true);
 		gl.activeTexture(gl.TEXTURE0);
 
+		this._vertexBuffer = gl.createBuffer()!;
+		this._indexBuffer = gl.createBuffer()!;
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._vertexBuffer);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
 
@@ -799,6 +806,7 @@ export class WebGLRenderContext implements RenderContext {
 		this._blurFboPool.clear();
 		this._blurFboPoolSize = 0;
 		this._blurFboPoolBytes = 0;
+		WebGLRenderBuffer.handleContextRestored(this);
 
 		for (const ref of this._trackedBitmapDatas) {
 			const bd = ref.deref();

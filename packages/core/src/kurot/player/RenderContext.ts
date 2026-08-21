@@ -15,6 +15,9 @@ export type OffscreenBufferHandle = unknown;
  * Drawing surface contract consumed by render pipes.
  */
 export interface RenderContext {
+	/** Increments whenever backend GPU resources must be recreated. */
+	readonly contextVersion: number;
+
 	// ── Draw ────────────────────────────────────────────────────────────────
 
 	drawImage(

@@ -32,4 +32,19 @@ describe('WebGLDrawCmdManager multi-texture batching', () => {
 
 		expect(manager.drawDataLen).toBe(2);
 	});
+
+	it('preserves blend changes around a multi-texture draw', () => {
+		const manager = new WebGLDrawCmdManager();
+		const texture = {} as WebGLTexture;
+
+		manager.pushSetBlend('lighter');
+		manager.pushDrawMultiTexture(makeMultiCmd(2, [texture], 1));
+		manager.pushSetBlend('source-over');
+
+		expect(manager.drawData.slice(0, manager.drawDataLen).map(command => command.type)).toEqual([
+			DrawCmdType.BLEND,
+			DrawCmdType.MULTI_TEXTURE,
+			DrawCmdType.BLEND,
+		]);
+	});
 });

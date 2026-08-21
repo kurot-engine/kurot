@@ -19,11 +19,21 @@ export class WebGLRenderBuffer implements RenderBuffer {
 			}
 		}
 		if (buf) {
+			buf.rootRenderTarget.initFrameBuffer();
 			buf.resize(width, height);
 			buf._resetState();
 			return buf;
 		}
 		return new WebGLRenderBuffer(context, width, height, false);
+	}
+
+	/** Invalidates pooled GPU targets owned by a restored context. */
+	public static handleContextRestored(context: WebGLRenderContext): void {
+		for (const buffer of _pool) {
+			if (buffer.context === context) {
+				buffer.rootRenderTarget.handleContextRestored();
+			}
+		}
 	}
 
 	public static release(buf: WebGLRenderBuffer): void {

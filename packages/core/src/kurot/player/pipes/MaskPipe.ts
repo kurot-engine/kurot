@@ -16,6 +16,7 @@ export interface MaskPushInstruction extends Instruction {
 	offsetX: number;
 	offsetY: number;
 	isScrollRect?: boolean;
+	savedBlendMode?: string;
 }
 
 export interface MaskPopInstruction extends Instruction {
@@ -59,6 +60,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			inst.offsetX = offsetX;
 			inst.offsetY = offsetY;
 			inst.isScrollRect = undefined;
+			inst.savedBlendMode = undefined;
 			return inst;
 		}
 		return { renderPipeId: 'maskPush', renderable, offsetX, offsetY };
@@ -134,6 +136,12 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 		const scrollRect = renderable.$scrollRect ?? renderable.$maskRect;
 
 		if (!renderable.$mask && (!renderable.$children || renderable.$children.length === 0)) {
+			if (renderable.$blendMode !== 0) {
+				inst.savedBlendMode = buffer.context.currentBlendMode;
+				buffer.context.setGlobalCompositeOperation(
+					({ 1: 'lighter', 2: 'destination-out' }[renderable.$blendMode] ?? 'source-over'),
+				);
+			}
 			if (scrollRect) {
 				buffer.context.pushMask(
 					scrollRect.x + inst.offsetX,
@@ -180,6 +188,9 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			if (scrollRect) {
 				buffer.context.popMask();
 			}
+			if (push.savedBlendMode !== undefined) {
+				buffer.context.setGlobalCompositeOperation(push.savedBlendMode);
+			}
 			return;
 		}
 
@@ -210,6 +221,9 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			maskBuffer.context.popBuffer();
 			maskBuffer.context.flush();
 
+			displayBuffer.setTransform(1, 0, 0, 1, 0, 0);
+			displayBuffer.globalAlpha = 1;
+			displayBuffer.globalTintColor = 0xffffff;
 			displayBuffer.context.setGlobalCompositeOperation('destination-in');
 			const mw = maskBuffer.rootRenderTarget.width;
 			const mh = maskBuffer.rootRenderTarget.height;

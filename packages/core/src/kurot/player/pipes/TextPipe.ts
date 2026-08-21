@@ -22,6 +22,7 @@ interface TextCache {
 	textureHeight: number;
 	canvasScaleX: number;
 	canvasScaleY: number;
+	contextVersion: number;
 }
 
 /**
@@ -108,6 +109,14 @@ export class TextPipe implements RenderPipe<TextField> {
 		const pixelH = Math.ceil(logicalH * canvasScaleY);
 
 		let cache = this._cache.get(tf);
+		if (cache && cache.contextVersion !== buffer.context.contextVersion) {
+			const oldToken = this._registryTokens.get(tf);
+			if (oldToken) buffer.context.unregisterTextureGC(oldToken);
+			this._registryTokens.delete(tf);
+			cache.texture = undefined;
+			cache.contextVersion = buffer.context.contextVersion;
+			tf.$renderDirty = true;
+		}
 		let scaleChanged = false;
 
 		if (cache) {
@@ -124,6 +133,7 @@ export class TextPipe implements RenderPipe<TextField> {
 				textureHeight: 0,
 				canvasScaleX,
 				canvasScaleY,
+				contextVersion: buffer.context.contextVersion,
 			};
 			this._cache.set(tf, cache);
 		}

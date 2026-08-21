@@ -1,0 +1,39 @@
+name: Core visual regression
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/core-visual-regression.yml'
+      - 'packages/core/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/core-visual-regression.yml'
+      - 'packages/core/**'
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: packages/core/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:visual
+      - name: Upload visual diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-visual-regression-diffs
+          path: packages/core/test-results/
+          if-no-files-found: ignore

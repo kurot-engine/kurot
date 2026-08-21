@@ -24,6 +24,8 @@
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
 		"test": "vitest run",
+		"test:visual": "playwright test --config examples/visual-regression/playwright.config.ts",
+		"test:visual:update": "playwright test --config examples/visual-regression/playwright.config.ts --update-snapshots",
 		"test:watch": "vitest",
 		"prepublishOnly": "npm run clean && npm run build",
 		"benchmark": "vite --config vite.config.ts",

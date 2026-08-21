@@ -162,7 +162,13 @@ export class WebGLDrawCmdManager {
 		let drawState = false;
 		for (let i = this.drawDataLen - 1; i >= 0; i--) {
 			const d = this.drawData[i];
-			if (d.type === DrawCmdType.TEXTURE || d.type === DrawCmdType.RECT) drawState = true;
+			if (
+				d.type === DrawCmdType.TEXTURE ||
+				d.type === DrawCmdType.RECT ||
+				d.type === DrawCmdType.MULTI_TEXTURE
+			) {
+				drawState = true;
+			}
 			if (!drawState && d.type === DrawCmdType.BLEND) {
 				this.drawData.splice(i, 1);
 				this.drawDataLen--;

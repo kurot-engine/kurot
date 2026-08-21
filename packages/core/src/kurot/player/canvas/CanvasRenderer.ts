@@ -20,6 +20,17 @@ import { getFontString } from '../../text/TextMeasurer.js';
 import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 
 const CAPS_MAP: Record<string, CanvasLineCap> = { none: 'butt', square: 'square', round: 'round' };
+const CANVAS_BLUR_RADIUS_SCALE = 0.25;
+
+interface TintedCanvasCache {
+	buffer: CanvasBuffer;
+	tint: number;
+	contentVersion: number;
+	sourceX: number;
+	sourceY: number;
+	sourceWidth: number;
+	sourceHeight: number;
+}
 
 function colorToString(color: number): string {
 	const r = (color >> 16) & 0xff;
@@ -36,6 +47,9 @@ export class CanvasRenderer {
     // ── Instance fields ───────────────────────────────────────────────────────
 	private _hasFill = false;
 	private _hasStroke = false;
+	private readonly _bitmapTintCache = new WeakMap<Bitmap, TintedCanvasCache>();
+	private readonly _graphicsTintCache = new WeakMap<Graphics, TintedCanvasCache>();
+	private _globalTint = 0xffffff;
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
@@ -44,6 +58,7 @@ export class CanvasRenderer {
 	 */
 	public render(displayObject: DisplayObject, buffer: CanvasBuffer, matrix?: Matrix): number {
 		const ctx = buffer.context;
+		this._globalTint = 0xffffff;
 		if (matrix) {
 			ctx.save();
 			ctx.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
@@ -145,6 +160,10 @@ export class CanvasRenderer {
 		for (let i = 0; i < $children.length; i++) {
 			const child = $children[i];
 			if (child.$renderMode === RenderMode.NONE) continue;
+			const previousTint = this._globalTint;
+			if (child.$tintRGB !== 0xffffff) {
+				this._globalTint = child.tint;
+			}
 
 			let childOffsetX: number;
 			let childOffsetY: number;
@@ -183,6 +202,7 @@ export class CanvasRenderer {
 			} else if (prevAlpha !== undefined) {
 				ctx.globalAlpha = prevAlpha;
 			}
+			this._globalTint = previousTint;
 		}
 
 		return drawCalls;
@@ -226,7 +246,7 @@ export class CanvasRenderer {
 
 		for (const filter of filters) {
 			if (filter instanceof BlurFilter) {
-				const radius = (filter.blurX + filter.blurY) / 2;
+				const radius = ((filter.blurX + filter.blurY) / 2) * CANVAS_BLUR_RADIUS_SCALE;
 				if (radius > 0) cssFilters.push(`blur(${radius}px)`);
 			} else if (filter instanceof DropShadowFilter) {
 				const angleRad = (filter.angle / 180) * Math.PI;
@@ -425,21 +445,48 @@ export class CanvasRenderer {
 
 	private renderMesh(mesh: Mesh, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): number {
 		const bd = mesh.bitmapData;
-		if (!bd?.source || mesh.vertices.length === 0) return 0;
+		if (!bd?.source || mesh.vertices.length === 0 || mesh.uvs.length !== mesh.vertices.length) return 0;
 
-		const destW = !isNaN(mesh.width) ? mesh.width : mesh.textureWidth;
-		const destH = !isNaN(mesh.height) ? mesh.height : mesh.textureHeight;
-		ctx.drawImage(
-			bd.source as CanvasImageSource,
-			mesh.bitmapX,
-			mesh.bitmapY,
-			mesh.bitmapWidth,
-			mesh.bitmapHeight,
-			offsetX + mesh.bitmapOffsetX,
-			offsetY + mesh.bitmapOffsetY,
-			destW,
-			destH,
-		);
+		const tinted = this._globalTint !== 0xffffff;
+		const source = tinted
+			? this.getTintedBitmapSource(mesh, this._globalTint)
+			: (bd.source as CanvasImageSource);
+		const sourceX = tinted ? 0 : mesh.bitmapX;
+		const sourceY = tinted ? 0 : mesh.bitmapY;
+		const sourceWidth = mesh.bitmapWidth;
+		const sourceHeight = mesh.bitmapHeight;
+		ctx.imageSmoothingEnabled = mesh.smoothing;
+
+		for (let i = 0; i + 2 < mesh.indices.length; i += 3) {
+			const i0 = mesh.indices[i];
+			const i1 = mesh.indices[i + 1];
+			const i2 = mesh.indices[i + 2];
+			if (
+				i0 < 0 ||
+				i1 < 0 ||
+				i2 < 0 ||
+				i0 * 2 + 1 >= mesh.vertices.length ||
+				i1 * 2 + 1 >= mesh.vertices.length ||
+				i2 * 2 + 1 >= mesh.vertices.length
+			) {
+				continue;
+			}
+			this.drawTexturedTriangle(
+				ctx,
+				source,
+				sourceX,
+				sourceY,
+				sourceWidth,
+				sourceHeight,
+				mesh.vertices,
+				mesh.uvs,
+				i0,
+				i1,
+				i2,
+				offsetX + mesh.bitmapOffsetX,
+				offsetY + mesh.bitmapOffsetY,
+			);
+		}
 		return 1;
 	}
 
@@ -452,18 +499,200 @@ export class CanvasRenderer {
 		if (destW <= 0 || destH <= 0) return 0;
 
 		ctx.imageSmoothingEnabled = bitmap.smoothing;
-		ctx.drawImage(
-			bd.source as CanvasImageSource,
-			bitmap.bitmapX,
-			bitmap.bitmapY,
-			bitmap.bitmapWidth,
-			bitmap.bitmapHeight,
-			offsetX + bitmap.bitmapOffsetX,
-			offsetY + bitmap.bitmapOffsetY,
-			destW,
-			destH,
-		);
+		if (this._globalTint === 0xffffff) {
+			ctx.drawImage(
+				bd.source as CanvasImageSource,
+				bitmap.bitmapX,
+				bitmap.bitmapY,
+				bitmap.bitmapWidth,
+				bitmap.bitmapHeight,
+				offsetX + bitmap.bitmapOffsetX,
+				offsetY + bitmap.bitmapOffsetY,
+				destW,
+				destH,
+			);
+		} else {
+			ctx.drawImage(
+				this.getTintedBitmapSource(bitmap, this._globalTint),
+				offsetX + bitmap.bitmapOffsetX,
+				offsetY + bitmap.bitmapOffsetY,
+				destW,
+				destH,
+			);
+		}
 		return 1;
+	}
+
+	private getTintedBitmapSource(bitmap: Bitmap, tint: number): HTMLCanvasElement {
+		const bitmapData = bitmap.bitmapData!;
+		let cache = this._bitmapTintCache.get(bitmap);
+		const needsUpdate =
+			!cache ||
+			cache.tint !== tint ||
+			cache.contentVersion !== bitmapData.contentVersion ||
+			cache.sourceX !== bitmap.bitmapX ||
+			cache.sourceY !== bitmap.bitmapY ||
+			cache.sourceWidth !== bitmap.bitmapWidth ||
+			cache.sourceHeight !== bitmap.bitmapHeight;
+		if (!cache) {
+			cache = this.createTintedCanvasCache();
+			this._bitmapTintCache.set(bitmap, cache);
+		}
+		if (needsUpdate) {
+			this.updateTintedCanvas(
+				cache,
+				bitmapData.source as CanvasImageSource,
+				bitmap.bitmapX,
+				bitmap.bitmapY,
+				bitmap.bitmapWidth,
+				bitmap.bitmapHeight,
+				tint,
+				bitmapData.contentVersion,
+			);
+		}
+		return cache.buffer.surface;
+	}
+
+	private getTintedGraphicsSource(graphics: Graphics, tint: number, sourceChanged: boolean): HTMLCanvasElement {
+		const source = graphics.offscreenCanvas!;
+		let cache = this._graphicsTintCache.get(graphics);
+		const needsUpdate =
+			sourceChanged ||
+			!cache ||
+			cache.tint !== tint ||
+			cache.sourceWidth !== source.width ||
+			cache.sourceHeight !== source.height;
+		if (!cache) {
+			cache = this.createTintedCanvasCache();
+			this._graphicsTintCache.set(graphics, cache);
+		}
+		if (needsUpdate) {
+			this.updateTintedCanvas(cache, source, 0, 0, source.width, source.height, tint, cache.contentVersion + 1);
+		}
+		return cache.buffer.surface;
+	}
+
+	private createTintedCanvasCache(): TintedCanvasCache {
+		return {
+			buffer: new CanvasBuffer(),
+			tint: 0xffffff,
+			contentVersion: -1,
+			sourceX: 0,
+			sourceY: 0,
+			sourceWidth: 0,
+			sourceHeight: 0,
+		};
+	}
+
+	private updateTintedCanvas(
+		cache: TintedCanvasCache,
+		source: CanvasImageSource,
+		sourceX: number,
+		sourceY: number,
+		sourceWidth: number,
+		sourceHeight: number,
+		tint: number,
+		contentVersion: number,
+	): void {
+		const width = Math.max(1, Math.ceil(sourceWidth));
+		const height = Math.max(1, Math.ceil(sourceHeight));
+		if (cache.buffer.width !== width || cache.buffer.height !== height) {
+			cache.buffer.resize(width, height);
+		} else {
+			cache.buffer.clear();
+		}
+		const context = cache.buffer.context;
+		context.drawImage(source, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+		context.globalCompositeOperation = 'multiply';
+		context.fillStyle = colorToString(tint);
+		context.fillRect(0, 0, width, height);
+		context.globalCompositeOperation = 'destination-in';
+		context.drawImage(source, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+		context.globalCompositeOperation = 'source-over';
+		cache.tint = tint;
+		cache.contentVersion = contentVersion;
+		cache.sourceX = sourceX;
+		cache.sourceY = sourceY;
+		cache.sourceWidth = sourceWidth;
+		cache.sourceHeight = sourceHeight;
+	}
+
+	private drawTexturedTriangle(
+		ctx: CanvasRenderingContext2D,
+		source: CanvasImageSource,
+		sourceX: number,
+		sourceY: number,
+		sourceWidth: number,
+		sourceHeight: number,
+		vertices: number[],
+		uvs: number[],
+		i0: number,
+		i1: number,
+		i2: number,
+		offsetX: number,
+		offsetY: number,
+	): void {
+		const sx0 = sourceX + uvs[i0 * 2] * sourceWidth;
+		const sy0 = sourceY + uvs[i0 * 2 + 1] * sourceHeight;
+		const sx1 = sourceX + uvs[i1 * 2] * sourceWidth;
+		const sy1 = sourceY + uvs[i1 * 2 + 1] * sourceHeight;
+		const sx2 = sourceX + uvs[i2 * 2] * sourceWidth;
+		const sy2 = sourceY + uvs[i2 * 2 + 1] * sourceHeight;
+		const dx0 = offsetX + vertices[i0 * 2];
+		const dy0 = offsetY + vertices[i0 * 2 + 1];
+		const dx1 = offsetX + vertices[i1 * 2];
+		const dy1 = offsetY + vertices[i1 * 2 + 1];
+		const dx2 = offsetX + vertices[i2 * 2];
+		const dy2 = offsetY + vertices[i2 * 2 + 1];
+		const determinant = sx0 * (sy1 - sy2) + sx1 * (sy2 - sy0) + sx2 * (sy0 - sy1);
+		if (Math.abs(determinant) <= Number.EPSILON) return;
+
+		const a = (dx0 * (sy1 - sy2) + dx1 * (sy2 - sy0) + dx2 * (sy0 - sy1)) / determinant;
+		const b = (dy0 * (sy1 - sy2) + dy1 * (sy2 - sy0) + dy2 * (sy0 - sy1)) / determinant;
+		const c = (dx0 * (sx2 - sx1) + dx1 * (sx0 - sx2) + dx2 * (sx1 - sx0)) / determinant;
+		const d = (dy0 * (sx2 - sx1) + dy1 * (sx0 - sx2) + dy2 * (sx1 - sx0)) / determinant;
+		const e =
+			(dx0 * (sx1 * sy2 - sx2 * sy1) +
+				dx1 * (sx2 * sy0 - sx0 * sy2) +
+				dx2 * (sx0 * sy1 - sx1 * sy0)) /
+			determinant;
+		const f =
+			(dy0 * (sx1 * sy2 - sx2 * sy1) +
+				dy1 * (sx2 * sy0 - sx0 * sy2) +
+				dy2 * (sx0 * sy1 - sx1 * sy0)) /
+			determinant;
+
+		ctx.save();
+		const centerX = (dx0 + dx1 + dx2) / 3;
+		const centerY = (dy0 + dy1 + dy2) / 3;
+		const vx0 = dx0 - centerX;
+		const vy0 = dy0 - centerY;
+		const vx1 = dx1 - centerX;
+		const vy1 = dy1 - centerY;
+		const vx2 = dx2 - centerX;
+		const vy2 = dy2 - centerY;
+		const length0 = Math.hypot(vx0, vy0);
+		const length1 = Math.hypot(vx1, vy1);
+		const length2 = Math.hypot(vx2, vy2);
+		const scale0 = length0 > 0 ? 1 + 0.5 / length0 : 1;
+		const scale1 = length1 > 0 ? 1 + 0.5 / length1 : 1;
+		const scale2 = length2 > 0 ? 1 + 0.5 / length2 : 1;
+		// Slightly overlapping clips prevent transparent antialiasing seams between adjacent triangles.
+		const clipX0 = centerX + vx0 * scale0;
+		const clipY0 = centerY + vy0 * scale0;
+		const clipX1 = centerX + vx1 * scale1;
+		const clipY1 = centerY + vy1 * scale1;
+		const clipX2 = centerX + vx2 * scale2;
+		const clipY2 = centerY + vy2 * scale2;
+		ctx.beginPath();
+		ctx.moveTo(clipX0, clipY0);
+		ctx.lineTo(clipX1, clipY1);
+		ctx.lineTo(clipX2, clipY2);
+		ctx.closePath();
+		ctx.clip();
+		ctx.transform(a, b, c, d, e, f);
+		ctx.drawImage(source, 0, 0);
+		ctx.restore();
 	}
 
 	private renderGraphics(
@@ -478,7 +707,9 @@ export class CanvasRenderer {
 
 		// ── Offscreen cache (skip for hit-test or when caller manages its own cache) ──
 		if (!forHitTest && !skipCache) {
+			let rebuilt = false;
 			if (graphics.canvasCacheDirty || !graphics.offscreenCanvas) {
+				rebuilt = true;
 				const bounds = new Rectangle();
 				graphics.$measureContentBounds(bounds);
 				const cw = Math.ceil(bounds.width) || 1;
@@ -511,11 +742,11 @@ export class CanvasRenderer {
 				graphics.canvasCacheDirty = false;
 			}
 
-			ctx.drawImage(
-				graphics.offscreenCanvas!,
-				offsetX + graphics.offscreenBoundsX!,
-				offsetY + graphics.offscreenBoundsY!,
-			);
+			const source =
+				this._globalTint === 0xffffff
+					? graphics.offscreenCanvas!
+					: this.getTintedGraphicsSource(graphics, this._globalTint, rebuilt);
+			ctx.drawImage(source, offsetX + graphics.offscreenBoundsX!, offsetY + graphics.offscreenBoundsY!);
 			return 1;
 		}
 
