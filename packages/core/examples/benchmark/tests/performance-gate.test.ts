@@ -39,7 +39,7 @@ function makeBaseline(row: SummaryRow): BenchmarkBaseline {
 
 function makeRow(overrides: Partial<SummaryRow> = {}): SummaryRow {
 	return {
-		engine: 'Kurot', version: '1.0.14', backend: 'webgl2', scene: 'sprite-batch', objects: 1000,
+		engine: 'Kurot', version: '1.0.15', backend: 'webgl2', scene: 'sprite-batch', objects: 1000,
 		samples: 5, fpsP5: 60, fpsP5Min: 59, fpsP5Max: 61, frameP50: 9, frameP95: 10,
 		frameP95Min: 9.5, frameP95Max: 10.5, frameP99: 11, renderP95: 5, renderP95Min: 4.8,
 		renderP95Max: 5.2, drawCalls: 1, textureCount: 32, framebufferPoolSize: 0, ...overrides,

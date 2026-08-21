@@ -4,6 +4,83 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.15] — 2026-08-21
+
+This release establishes reproducible renderer validation across Kurot,
+PixiJS, and Egret while fixing the backend differences exposed by that work.
+Canvas 2D, WebGL 1, and WebGL 2 now share deterministic visual coverage, and
+the benchmark suite records correctness, performance, resource lifetime, and
+device evidence without reducing the result to a single overall score.
+
+### Added
+
+- **Cross-engine benchmark harness** — added seven deterministic workloads with
+  Kurot, PixiJS 8, and Egret 5.4.1 adapters. Automated Chromium runs cover
+  supported WebGL 1/2 combinations, repeat each standard case five times, and
+  export raw JSON plus median/range Markdown summaries.
+- **Performance history and conservative gates** — benchmark protocol v2 records
+  commit, dirty-worktree state, exact browser version, named-machine identity,
+  frame/render time, draw calls, JS heap when available, logical texture count,
+  and Kurot's retained blur framebuffer pool. Approved same-machine baselines
+  can reject statistically meaningful regressions without comparing unrelated
+  hardware.
+- **Deterministic visual regression suite** — added reviewed Canvas 2D, WebGL 1,
+  and WebGL 2 golden scenes for transforms, tint/alpha/blend, masks, filters,
+  graphics, text, cached content, mesh deformation, RenderTexture, and WebGL
+  context restoration.
+- **Resource-lifetime soak runner** — added short, 30-minute, two-hour, and
+  overnight profiles for repeated scene construction, texture upload/disposal,
+  blur framebuffer-pool pressure, heap plateau checks, and context recovery.
+- **Release device matrix** — added a responsive diagnostics page and JSON
+  evidence export for browser, display, touch, GPU renderer, WebGL limits,
+  completed manual checks, and known device exceptions.
+- **Renderer diagnostics** — `Player` now exposes read-only blur framebuffer-pool
+  entry and byte counts without adding work to the normal render loop.
+
+### Fixed
+
+- **Canvas 2D backend parity** — implemented multiplicative tint for Bitmap,
+  Graphics, and Mesh content; rendered Mesh geometry through textured triangles
+  instead of a flat rectangle; and calibrated CSS blur strength against the
+  WebGL blur pipeline.
+- **WebGL cached-content positioning** — removed duplicate offset application
+  when compositing cached display lists, fixing double-translated
+  `cacheAsBitmap` output.
+- **WebGL mask composition** — resets the composite buffer transform, alpha, and
+  tint before applying a rendered mask, aligning masked output with Canvas 2D.
+- **Additive blending across multi-texture batches** — multi-texture commands now
+  form blend-state boundaries, and direct masked leaves save and restore their
+  blend mode correctly.
+- **Mixed vertex-layout batching** — flushes pending geometry before switching
+  into the multi-texture vertex layout, preventing incompatible vertex formats
+  from sharing one upload.
+- **WebGL context restoration** — recreates vertex/index buffers, invalidates
+  pooled render targets, and refreshes cached Graphics/Text GPU textures after
+  a restored context.
+- **Mobile visual validation** — the golden scene now uses the engine's
+  `StageScaleMode.SHOW_ALL`, so the complete 640×480 scene remains visible on
+  constrained portrait and landscape viewports without changing its logical
+  content.
+
+### Changed
+
+- **Benchmark code is dev-only** — moved the benchmark runtime out of `src/`
+  and colocated it with adapters, vendor baselines, Playwright configs, and
+  tests under `examples/benchmark/`; it remains outside the published API.
+- **Version identity synchronization** — updated package/agent documentation,
+  benchmark reports, and `Capabilities.engineVersion` to `1.0.15`.
+
+### Tests
+
+- Full Core unit suite: 58 test files, 641 tests passing.
+- Visual regression: 5 passing cases covering Canvas 2D, WebGL 1/2, and WebGL
+  1/2 context restoration.
+- Cross-engine smoke: 5 supported Kurot/PixiJS/Egret backend combinations
+  passing.
+- Resource soak and device-matrix export smoke tests passing.
+
+---
+
 ## [1.0.14] — 2026-08-13
 
 This release turns `Video` into a directly renderable display object and modernizes video-frame texture updates. Applications can now add a `Video` straight to the display list without manually bridging it through `BitmapData`, `Texture`, and `Bitmap`; WebGL uploads occur only when the browser produces a new decoded frame.

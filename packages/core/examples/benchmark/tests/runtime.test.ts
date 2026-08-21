@@ -420,7 +420,7 @@ function makeEnvironment(): BenchmarkEnvironment {
 	return {
 		protocolVersion: BENCHMARK_PROTOCOL_VERSION,
 		engine: 'Kurot',
-		engineVersion: '1.0.14',
+		engineVersion: '1.0.15',
 		backend: 'webgl2',
 		browser: 'chromium',
 		runMode: 'headless',

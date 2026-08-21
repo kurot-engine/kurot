@@ -29,9 +29,9 @@ export class Capabilities {
 	public static $renderMode: string = 'unknown';
 
 	/**
-	 * Kurot engine version, injected at build time via package.json.
+	 * Current Kurot engine version.
 	 */
-	public static readonly engineVersion: string = '0.2.4';
+	public static readonly engineVersion: string = '1.0.15';
 
 	/**
 	 * Width of the canvas bounding client rect in CSS pixels.
