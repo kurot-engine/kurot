@@ -190,6 +190,27 @@ After an intentional renderer change has been visually reviewed, regenerate the
 golden images with `pnpm test:visual:update`. Failed comparisons retain expected,
 actual, and diff images under the ignored local `test-results/` directory.
 
+Resource-lifetime soak tests repeatedly rebuild scenes, upload and dispose
+textures, pressure blur framebuffer pools, force garbage collection, and restore
+a lost WebGL context. The short release smoke is:
+
+```bash
+pnpm test:soak
+```
+
+Long evidence runs use the explicit `test:soak:30m`, `test:soak:2h`, and
+`test:soak:overnight` commands. Reports are written under the ignored
+`examples/benchmark/results/soak/` directory. Virtual-list renderer reuse is
+owned by the UI package and is intentionally outside this core test suite.
+
+The example index also links to a release device-matrix page. It captures
+browser/display details, the reported GPU renderer, WebGL limits, completed
+manual checks, and known exceptions as a portable JSON record. This supports
+manual macOS, Windows, iOS, Android, integrated-GPU, and discrete-GPU release
+coverage without treating one machine's result as evidence for another.
+`pnpm test:device-matrix` smoke-tests the diagnostics and JSON export path; it
+does not replace the manual checks on physical devices.
+
 ## License
 
 MIT

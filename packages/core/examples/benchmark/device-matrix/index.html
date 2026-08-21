@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Kurot Device Matrix</title>
+		<link rel="stylesheet" href="../../style.css" />
+		<style>
+			:root { --sidebar-w: 330px; }
+			.content { flex: 1; overflow: auto; padding: 20px; }
+			.matrix { display: grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap: 12px; }
+			.metric-row { gap: 16px; }
+			.metric-row .value { max-width: 65%; text-align: right; overflow-wrap: anywhere; }
+			.check { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; }
+			.check input { width: auto; margin-top: 2px; }
+			textarea { width: 100%; min-height: 100px; resize: vertical; }
+			.actions { display: grid; gap: 8px; }
+			@media (max-width: 900px) { .matrix { grid-template-columns: 1fr; } }
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<a href="../" class="back-link">&larr; Benchmark</a>
+			<span class="page-title">Release Device Matrix</span>
+			<div class="header-right"><div id="status" class="status-badge badge-ready">Ready</div></div>
+		</div>
+		<div class="main">
+			<div class="sidebar">
+				<div class="glass-card">
+					<h3>Test identity</h3>
+					<div class="row"><label for="release">Release</label><input id="release" placeholder="1.0.15" /></div>
+					<div class="row"><label for="device">Device</label><input id="device" placeholder="MacBook Pro 2021" /></div>
+					<div class="row"><label for="class">GPU class</label><select id="class"><option value="integrated">Integrated</option><option value="discrete">Discrete</option><option value="mobile-mid">Mobile mid-range</option><option value="mobile-low">Mobile low-end</option><option value="mobile-recent">Mobile recent</option><option value="other">Other</option></select></div>
+				</div>
+				<div class="glass-card">
+					<h3>Manual checks</h3>
+					<label class="check"><input id="visual" type="checkbox" /> Visual regression scene matches</label>
+					<label class="check"><input id="interaction" type="checkbox" /> Pointer/touch interaction works</label>
+					<label class="check"><input id="context" type="checkbox" /> Context restoration works</label>
+					<label class="check"><input id="soak" type="checkbox" /> Resource soak smoke passes</label>
+				</div>
+				<div class="glass-card actions">
+					<button id="copy">Copy JSON</button>
+					<button id="download">Download JSON</button>
+				</div>
+			</div>
+			<div class="content">
+				<div class="matrix">
+					<div class="glass-card"><h3>Browser and display</h3><div id="browser"></div></div>
+					<div class="glass-card"><h3>WebGL 2</h3><div id="webgl2"></div></div>
+					<div class="glass-card"><h3>WebGL 1</h3><div id="webgl1"></div></div>
+					<div class="glass-card"><h3>Known exceptions</h3><textarea id="notes" placeholder="Record rendering differences, unsupported features, or device-specific failures."></textarea></div>
+				</div>
+			</div>
+		</div>
+		<script type="module" src="./DeviceMatrix.ts"></script>
+	</body>
+</html>

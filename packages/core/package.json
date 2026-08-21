@@ -31,6 +31,11 @@
 		"benchmark": "vite --config vite.config.ts",
 		"benchmark:compare": "playwright test --config examples/benchmark/playwright.config.ts",
 		"benchmark:smoke": "BENCHMARK_PROFILE=smoke playwright test --config examples/benchmark/playwright.config.ts",
+		"test:soak": "playwright test --config examples/benchmark/soak.playwright.config.ts",
+		"test:soak:30m": "SOAK_DURATION_MINUTES=30 playwright test --config examples/benchmark/soak.playwright.config.ts",
+		"test:soak:2h": "SOAK_DURATION_MINUTES=120 playwright test --config examples/benchmark/soak.playwright.config.ts",
+		"test:soak:overnight": "SOAK_DURATION_MINUTES=480 playwright test --config examples/benchmark/soak.playwright.config.ts",
+		"test:device-matrix": "playwright test --config examples/benchmark/device-matrix.playwright.config.ts",
 		"build:benchmark": "vite --config vite.config.ts build",
 		"preview:benchmark": "vite preview --config vite.config.ts --host 0.0.0.0 --port 4173"
 	},

@@ -41,7 +41,7 @@ async function initialize(): Promise<void> {
 		canvas,
 		contentWidth: WIDTH,
 		contentHeight: HEIGHT,
-		scaleMode: StageScaleMode.NO_SCALE,
+		scaleMode: StageScaleMode.SHOW_ALL,
 		frameRate: 60,
 	});
 	verifyBackend(app, canvas, backend);

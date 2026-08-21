@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kurot resource soak</title>
+		<style>
+			body { margin: 0; color: #d8e2f0; background: #10151d; font: 14px system-ui; }
+			main { width: min(900px, calc(100% - 32px)); margin: 24px auto; }
+			canvas { width: 640px; height: 480px; background: #182331; border: 1px solid #33455c; }
+			pre { padding: 16px; background: #151e29; border-radius: 8px; }
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>Resource lifetime soak</h1>
+			<p>Use the automated runner to exercise repeated scene, texture, filter-buffer, and context lifecycles.</p>
+			<canvas id="soak" width="640" height="480"></canvas>
+			<pre id="status">Initializing…</pre>
+		</main>
+		<script type="module" src="./ResourceSoak.ts"></script>
+	</body>
+</html>
