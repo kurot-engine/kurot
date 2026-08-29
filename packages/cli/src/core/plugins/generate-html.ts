@@ -1,9 +1,9 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
+import { BuildError } from '../errors.js';
 import { writeFile } from '../../utils/fs.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
-import { BuildError } from '../errors.js';
 
 const PLACEHOLDERS = {
 	importMap: '{{KUROT_IMPORT_MAP}}',

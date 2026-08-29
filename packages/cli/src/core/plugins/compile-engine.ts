@@ -10,10 +10,8 @@ import type { Project } from '../project.js';
  * Bundles each `@kurot/*` engine package into its own chunk under `js/`,
  * externalizing the other engine packages so code is never duplicated.
  *
- * The resulting chunks are wired into the page via an import map (see
- * `generate-html`), e.g. `@kurot/core` → `js/kurot.core.js`. This mirrors
- * Egret's split `egret.min.js` / `eui.min.js` layout while staying ESM, so the
- * browser-side dependency graph resolves bare specifiers to cached chunks.
+ * The resulting chunks are wired into the page through an import map (see
+ * `generate-html`), so browser-side bare specifiers resolve to shared chunks.
  *
  * Engine chunks change rarely, so in release mode they carry a content hash for
  * long-term caching.
@@ -70,9 +68,11 @@ async function bundlePackage(
 		platform: 'browser',
 		target: 'es2022',
 		minify,
+		// Theme resolves default skins by constructor.name; release minification
+		// must preserve that runtime contract.
+		keepNames: minify,
 		metafile: true,
 		logLevel: 'warning',
-		// Other engine packages stay external — resolved via the import map.
 		external: project.enginePackages.filter(p => p !== pkg),
 	});
 

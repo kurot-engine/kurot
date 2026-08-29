@@ -58,10 +58,16 @@ export interface RefValue {
 	readonly varName: string;
 }
 
+/**
+ * Value forms supported by EXML property assignments.
+ */
 export type PropertyValue = LiteralValue | PercentValue | BindingValue | RefValue;
 
 // ── Property assignment ──────────────────────────────────────────────
 
+/**
+ * Property value assigned either by default or in a named state.
+ */
 export interface PropertyAssignment {
 	/**
 	 * Property name.
@@ -137,6 +143,9 @@ export interface PropertyChild {
 
 // ── State overrides ──────────────────────────────────────────────────
 
+/**
+ * State override that inserts a display object into a container property.
+ */
 export interface StateAddItems {
 	readonly type: 'AddItems';
 	/**
@@ -157,6 +166,9 @@ export interface StateAddItems {
 	readonly propertyName: string;
 }
 
+/**
+ * State override that assigns a property on a skin part.
+ */
 export interface StateSetProperty {
 	readonly type: 'SetProperty';
 	/**
@@ -173,6 +185,9 @@ export interface StateSetProperty {
 	readonly value: PropertyValue;
 }
 
+/**
+ * Binding-backed property override associated with a state.
+ */
 export interface StateSetStateProperty {
 	readonly type: 'SetStateProperty';
 	/**
@@ -189,10 +204,16 @@ export interface StateSetStateProperty {
 	readonly stateName: string;
 }
 
+/**
+ * Override forms accepted by a skin state.
+ */
 export type StateOverride = StateAddItems | StateSetProperty | StateSetStateProperty;
 
 // ── State definition ─────────────────────────────────────────────────
 
+/**
+ * Named skin state and its generated overrides.
+ */
 export interface StateDef {
 	/**
 	 * State name (e.g. "up", "down", "disabled").
@@ -210,6 +231,9 @@ export interface StateDef {
 
 // ── Binding definition ───────────────────────────────────────────────
 
+/**
+ * Binding assignment retained by the skin intermediate representation.
+ */
 export interface BindingDef {
 	/**
 	 * Target variable name.
@@ -227,6 +251,9 @@ export interface BindingDef {
 
 // ── Skin IR (top-level) ─────────────────────────────────────────────
 
+/**
+ * Complete intermediate representation consumed by the code generator.
+ */
 export interface SkinIR {
 	/**
 	 * Skin class name (e.g. "MySkin").

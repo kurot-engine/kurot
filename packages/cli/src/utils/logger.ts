@@ -14,17 +14,21 @@ function write(method: 'log' | 'warn' | 'error', message: string): void {
 	console[method](message);
 }
 
+/**
+ * Enables or suppresses human-readable logger output.
+ * Machine-readable diagnostic modes disable it to keep stdout parseable.
+ */
 export function setLoggerEnabled(value: boolean): void {
 	enabled = value;
 }
 
+/**
+ * Human-readable CLI logger with a consistent Kurot prefix and severity color.
+ */
 export const logger = {
 	info: (msg: string): void => write('log', `${tag} ${msg}`),
 	success: (msg: string): void => write('log', `${tag} ${green}${msg}${reset}`),
 	warn: (msg: string): void => write('warn', `${tag} ${yellow}${msg}${reset}`),
 	error: (msg: string): void => write('error', `${tag} ${red}${msg}${reset}`),
-	/**
-	 * Logs a single pipeline step, indented under the current command.
-	 */
 	step: (msg: string): void => write('log', `${tag} ${dim}›${reset} ${msg}`),
 };

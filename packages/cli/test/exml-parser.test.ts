@@ -143,7 +143,7 @@ describe('SourceLocator', () => {
 
 describe('game template skins', () => {
 	it('compiles every default EXML skin without unresolved tags', async () => {
-		const skinsDir = path.resolve(testDir, '../templates/game/resource/skins');
+		const skinsDir = path.resolve(testDir, '../templates/game/resource/skins/eui');
 		const files = (await fs.readdir(skinsDir)).filter(file => file.endsWith('.exml'));
 
 		expect(files).toHaveLength(21);
@@ -161,8 +161,14 @@ describe('game template skins', () => {
 describe('Component Registry', () => {
 	it('looks up Button component', () => {
 		const info = lookupComponent('eui:Button');
-		expect(info).not.toBeNull();
+		expect(info).toBeDefined();
 		expect(info!.module).toBe('@kurot/ui');
+	});
+
+	it('returns undefined for unknown registry entries', () => {
+		expect(lookupComponent('eui:Missing')).toBeUndefined();
+		expect(resolveModule('missing:Missing')).toBeUndefined();
+		expect(parsePropertyNode('eui:Button')).toBeUndefined();
 	});
 
 	it('looks up Skin with default property', () => {
@@ -382,7 +388,9 @@ const CUSTOM_NS_EXML = `<?xml version="1.0" encoding="utf-8"?>
 	</eui:Group>
 </eui:Skin>`;
 
-const CUSTOM_NAMESPACES = [{ prefix: 'game', specifier: '#ns/game' }];
+const CUSTOM_NAMESPACES = [
+	{ prefix: 'game', specifier: '#ns/game', componentNames: new Set(['HeroNarrowIR']) },
+];
 
 describe('Custom namespaces', () => {
 	it('resolves a prefixed tag to the configured namespace specifier', () => {
@@ -416,5 +424,13 @@ describe('Custom namespaces', () => {
 		const code = compileEXML(CUSTOM_NS_EXML, 'game.ui.AdventurePosIRSkin', { customNamespaces: CUSTOM_NAMESPACES });
 		expect(code).toContain('from "#ns/game"');
 		expect(code).toContain('new HeroNarrowIR()');
+	});
+
+	it('rejects and suggests a misspelled discovered component', () => {
+		const source = CUSTOM_NS_EXML.replace('game:HeroNarrowIR', 'game:HeroNarrowIr');
+		const ir = parseEXML(source, 'game.ui.AdventurePosIRSkin', CUSTOM_NAMESPACES);
+
+		expect(ir.unresolvedTags.map(tag => tag.name)).toEqual(['game:HeroNarrowIr']);
+		expect(suggestComponentTag('game:HeroNarrowIr', CUSTOM_NAMESPACES)).toBe('game:HeroNarrowIR');
 	});
 });

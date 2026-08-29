@@ -1,24 +1,23 @@
 /**
  * Static component registry for EXML → JS code generation.
  *
- * Maps short tag names (e.g. `Button`, `Skin`) to their module paths
- * and default properties. This replaces the old runtime-reflection-based
- * `EXMLConfig`.
+ * Maps local tag names such as `Button` and `Skin` to their module specifiers
+ * and default properties.
  */
 
 export interface ComponentInfo {
 	/**
 	 * Module path to import from (e.g. "@kurot/ui").
 	 */
-	module: string;
+	readonly module: string;
 	/**
 	 * The default property name — direct children are assigned here.
 	 */
-	defaultProperty?: string;
+	readonly defaultProperty?: string;
 	/**
 	 * Whether `defaultProperty` accepts an array (vs a single value).
 	 */
-	isArray?: boolean;
+	readonly isArray?: boolean;
 }
 
 /**
@@ -34,6 +33,12 @@ export interface NamespaceModule {
 	 * Virtual module specifier resolved via the HTML import map.
 	 */
 	readonly specifier: string;
+	/**
+	 * Exact component names exported by an automatically discovered namespace.
+	 * Omitted for a manually maintained namespace whose exports are only known
+	 * to the module bundler.
+	 */
+	readonly componentNames?: ReadonlySet<string>;
 }
 
 // ── Namespace mappings ───────────────────────────────────────────────
@@ -129,7 +134,7 @@ const COMPONENTS: Record<string, ComponentInfo> = {
 // ── Public API ───────────────────────────────────────────────────────
 
 /**
- * Look up a component by its tag name.
+ * Looks up a component by its tag name.
  *
  * Project-defined namespaces (`customNamespaces`) take priority when the
  * tag's prefix matches one: this mirrors Egret's `xmlns:game="game.*"`
@@ -137,30 +142,34 @@ const COMPONENTS: Record<string, ComponentInfo> = {
  * which module a tag resolves to (the same is true of the built-in `eui`/
  * `egret` prefixes below).
  *
- * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
- * @returns Component info or null if not found
+ * @param tagName - Complete tag name, optionally including a prefix.
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`.
+ * @returns Component metadata, or `undefined` when the tag is unknown.
  */
 export function lookupComponent(
 	tagName: string,
 	customNamespaces: readonly NamespaceModule[] = [],
-): ComponentInfo | null {
+): ComponentInfo | undefined {
 	const prefix = tagName.includes(':') ? tagName.split(':')[0] : '';
 	if (prefix) {
 		const custom = customNamespaces.find(ns => ns.prefix === prefix);
-		if (custom) return { module: custom.specifier };
+		if (custom) {
+			const name = localName(tagName);
+			if (custom.componentNames && !custom.componentNames.has(name)) return undefined;
+			return { module: custom.specifier };
+		}
 	}
 
 	const local = localName(tagName);
-	return COMPONENTS[local] ?? null;
+	return COMPONENTS[local];
 }
 
 /**
- * Get the default property for a component.
+ * Gets the default property for a component.
  *
- * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
- * @returns The default property name, or `undefined` if the component is unknown
+ * @param tagName - Complete tag name, optionally including a prefix.
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`.
+ * @returns The default property name, or `undefined` when none is registered.
  */
 export function getDefaultProperty(
 	tagName: string,
@@ -171,32 +180,33 @@ export function getDefaultProperty(
 }
 
 /**
- * Resolve a tag name to its import module path.
+ * Resolves a tag name to its import module path.
  *
- * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`
- * @returns The module path, or `null` if the tag could not be resolved
+ * @param tagName - Complete tag name, optionally including a prefix.
+ * @param customNamespaces - Project-defined namespaces from `kurot.config.ts`.
+ * @returns The module specifier, or `undefined` when the tag is unknown.
  */
-export function resolveModule(tagName: string, customNamespaces: readonly NamespaceModule[] = []): string | null {
-	// Check for namespace prefix first
+export function resolveModule(tagName: string, customNamespaces: readonly NamespaceModule[] = []): string | undefined {
 	if (tagName.includes(':')) {
 		const [prefix] = tagName.split(':');
 		const custom = customNamespaces.find(ns => ns.prefix === prefix);
-		if (custom) return custom.specifier;
+		if (custom) {
+			const name = localName(tagName);
+			return custom.componentNames && !custom.componentNames.has(name) ? undefined : custom.specifier;
+		}
 		const modulePath = NAMESPACE_MODULES[prefix];
 		if (modulePath) return modulePath;
 	}
 
-	// Fall back to component registry
 	const info = lookupComponent(tagName, customNamespaces);
-	return info?.module ?? null;
+	return info?.module;
 }
 
 /**
- * Get the local (un-prefixed) class name from a tag name.
+ * Gets the local class name from a tag name.
  *
- * @param tagName - Full tag name possibly with prefix (e.g. "eui:Button")
- * @returns The local class name (e.g. "Button")
+ * @param tagName - Complete tag name, optionally including a prefix.
+ * @returns The unprefixed class name.
  */
 export function localName(tagName: string): string {
 	return tagName.includes(':') ? tagName.split(':').pop()! : tagName;
@@ -205,50 +215,64 @@ export function localName(tagName: string): string {
 /**
  * Suggests the closest registered component tag for a misspelled built-in tag.
  *
- * @param tagName - Full tag name that could not be resolved
- * @returns A close registered tag, or `undefined` when no candidate is reliable
+ * @param tagName - Complete tag name that could not be resolved.
+ * @param customNamespaces - Project-defined namespaces available to the skin.
+ * @returns A close registered tag, or `undefined` when no candidate is reliable.
  */
-export function suggestComponentTag(tagName: string): string | undefined {
+export function suggestComponentTag(
+	tagName: string,
+	customNamespaces: readonly NamespaceModule[] = [],
+): string | undefined {
 	const separator = tagName.indexOf(':');
 	const prefix = separator >= 0 ? tagName.slice(0, separator) : '';
+	const custom = customNamespaces.find(namespace => namespace.prefix === prefix);
+	if (custom?.componentNames) {
+		return suggestName(tagName, prefix, [...custom.componentNames]);
+	}
 	const expectedModule = prefix ? NAMESPACE_MODULES[prefix] : undefined;
 	if (prefix && !expectedModule) return undefined;
 
 	const requestedName = localName(tagName);
-	const candidates = Object.entries(COMPONENTS)
+	const names = Object.entries(COMPONENTS)
 		.filter(([, info]) => !expectedModule || info.module === expectedModule)
-		.map(([name]) => ({ name, distance: editDistance(requestedName, name) }))
-		.sort((a, b) => a.distance - b.distance || a.name.localeCompare(b.name));
-	const candidate = candidates[0];
-	if (!candidate || candidate.distance > suggestionThreshold(requestedName.length)) return undefined;
-	return prefix ? `${prefix}:${candidate.name}` : candidate.name;
+		.map(([name]) => name);
+	return suggestName(requestedName, prefix, names);
 }
 
 /**
- * Checks if a tag name is a known property node (contains a dot).
+ * Checks whether a tag name uses EXML property-node syntax.
  *
  * e.g. "eui:Button.label" → property "label" on `Button`.
  *
- * @param tagName - Full tag name to check
- * @returns Whether the tag name contains a dot
+ * @param tagName - Complete tag name to inspect.
+ * @returns Whether the tag contains a property separator.
  */
 export function isPropertyNode(tagName: string): boolean {
 	return tagName.includes('.');
 }
 
 /**
- * Parse a property node tag like "eui:Button.label" into its parts.
+ * Parses a property-node tag such as `eui:Button.label`.
  *
- * @param tagName - Full property node tag name
- * @returns The owner class and property name, or `null` if not a property node
+ * @param tagName - Complete property-node tag name.
+ * @returns The owner and property names, or `undefined` when the tag is not a property node.
  */
-export function parsePropertyNode(tagName: string): { owner: string; property: string } | null {
-	// First strip namespace prefix
+export function parsePropertyNode(tagName: string): { owner: string; property: string } | undefined {
 	const parts = tagName.split('.');
-	if (parts.length < 2) return null;
+	if (parts.length < 2) return undefined;
 	const ownerPart = parts[0];
 	const property = parts.slice(1).join('.');
 	return { owner: localName(ownerPart), property };
+}
+
+function suggestName(tagName: string, prefix: string, names: readonly string[]): string | undefined {
+	const requestedName = localName(tagName);
+	const candidates = names
+		.map(name => ({ name, distance: editDistance(requestedName, name) }))
+		.sort((a, b) => a.distance - b.distance || a.name.localeCompare(b.name));
+	const candidate = candidates[0];
+	if (!candidate || candidate.distance > suggestionThreshold(requestedName.length)) return undefined;
+	return prefix ? `${prefix}:${candidate.name}` : candidate.name;
 }
 
 function suggestionThreshold(length: number): number {

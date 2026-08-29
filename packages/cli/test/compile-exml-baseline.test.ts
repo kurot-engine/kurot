@@ -7,6 +7,7 @@ import { createContext, runPipeline } from '../src/core/pipeline.js';
 import { DIAGNOSTIC_CODES } from '../src/core/diagnostics/index.js';
 import { compileExml } from '../src/core/plugins/compile-exml.js';
 import type { BuildMode, Project } from '../src/core/project.js';
+import type { ProjectComponent } from '../src/core/project.js';
 import { logger } from '../src/utils/logger.js';
 
 const testDir = path.dirname(fileURLToPath(import.meta.url));
@@ -19,6 +20,70 @@ afterEach(async () => {
 });
 
 describe('compile EXML behavior baseline', () => {
+	it('compiles paired component skins omitted from an explicit theme exmls list', async () => {
+		const { ctx, outputDir, root } = await createMutableFixtureContext('valid');
+		const componentSkin = path.join(root, 'resource/skins/components/BetButtonSkin.exml');
+		await fs.mkdir(path.dirname(componentSkin), { recursive: true });
+		await fs.writeFile(
+			componentSkin,
+			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"><eui:Label/></eui:Skin>',
+		);
+		await fs.writeFile(
+			path.join(root, 'resource/default.thm.json'),
+			JSON.stringify({
+				skins: {},
+				autoGenerateExmlsList: false,
+				exmls: ['resource/skins/ValidSkin.exml'],
+			}),
+		);
+		ctx.project.components.push({
+			name: 'BetButton',
+			tag: 'game:BetButton',
+			namespace: 'game',
+			specifier: '#ns/game',
+			source: path.join(root, 'src/components/BetButton.ts'),
+			sourceRelative: 'src/components/BetButton.ts',
+			skin: componentSkin,
+			skinRelative: 'resource/skins/components/BetButtonSkin.exml',
+			skinClass: 'components.BetButtonSkin',
+		});
+
+		await compileExml().apply(ctx);
+
+		const script = await fs.readFile(path.join(outputDir, ctx.outputs.skinsScript ?? 'missing'), 'utf-8');
+		expect(script).toContain('globalThis["components.BetButtonSkin"]');
+	});
+
+	it('injects discovered component skin mappings without changing source theme data', async () => {
+		const { ctx, outputDir } = await createFixtureContext('valid', 'development');
+		const component: ProjectComponent = {
+			name: 'BetButton',
+			tag: 'game:BetButton',
+			namespace: 'game',
+			specifier: '#ns/game',
+			source: path.join(ctx.project.root, 'src/components/BetButton.ts'),
+			sourceRelative: 'src/components/BetButton.ts',
+			skin: path.join(ctx.project.resourceDir, 'skins/ValidSkin.exml'),
+			skinRelative: 'resource/skins/ValidSkin.exml',
+			skinClass: 'skins.ValidSkin',
+		};
+		ctx.project.components.push(component);
+
+		await compileExml().apply(ctx);
+
+		const outputTheme = JSON.parse(
+			await fs.readFile(path.join(outputDir, 'resource/default.thm.json'), 'utf-8'),
+		) as { skins: Record<string, string> };
+		expect(outputTheme.skins).toEqual({
+			BetButton: 'skins.ValidSkin',
+			'kurot.ui.Button': 'skins.ValidSkin',
+		});
+		const sourceTheme = JSON.parse(
+			await fs.readFile(path.join(ctx.project.resourceDir, 'default.thm.json'), 'utf-8'),
+		) as { skins: Record<string, string> };
+		expect(sourceTheme.skins).not.toHaveProperty('BetButton');
+	});
+
 	it('compiles a valid development skin and rewrites its theme', async () => {
 		const { ctx, outputDir } = await createFixtureContext('valid', 'development');
 
@@ -293,6 +358,7 @@ function createProjectContext(
 		themeFile,
 		enginePackages: [],
 		customNamespaces: [],
+		components: [],
 	};
 
 	return createContext(project, { strict });

@@ -59,5 +59,6 @@ function createProject(htmlTemplate: string): Project {
 		htmlTemplate,
 		enginePackages: ['@kurot/core'],
 		customNamespaces: [],
+		components: [],
 	};
 }

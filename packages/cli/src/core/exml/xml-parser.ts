@@ -1,299 +1,285 @@
 /**
- * Lightweight XML parser for EXML files.
+ * Lightweight XML parser for the subset used by EXML skins.
  *
- * Designed to handle the subset of XML used by EXML skin definitions:
- * - Element nodes with namespace-prefixed tags
- * - Text nodes (including whitespace)
- * - Attribute values (quoted)
- * - Self-closing elements
- * - CDATA sections
- * - XML comments and processing instructions (skipped)
- *
- * Does NOT support:
- * - DTD / ENTITY declarations
- * - Namespaced attribute prefixes (we only care about the local name)
+ * Supports prefixed elements, quoted attributes, text, CDATA, comments,
+ * processing instructions, and self-closing elements. DTD and entity
+ * declarations are outside the supported input contract.
  */
 
-// ── Public types ─────────────────────────────────────────────────────
-
 /**
- * Half-open offsets covering a parsed XML node or attribute.
+ * Half-open UTF-16 offsets covering parsed source syntax.
  */
 export interface SourceRange {
 	readonly start: number;
 	readonly end: number;
 }
 
+/**
+ * Base node in the parsed XML tree.
+ */
 export interface XNode {
-	/**
-	 * Node type.
-	 */
 	readonly type: 'element' | 'text';
 	/**
-	 * Half-open source range containing the complete node syntax.
+	 * Range containing the complete node syntax.
 	 */
 	readonly range: SourceRange;
 }
 
+/**
+ * Text node whose content has XML entities decoded.
+ */
 export interface XText extends XNode {
 	readonly type: 'text';
 	/**
-	 * Raw text content (may be whitespace).
+	 * Text content, including insignificant whitespace.
 	 */
 	readonly text: string;
 }
 
+/**
+ * Parsed XML attribute.
+ */
 export interface XAttribute {
 	/**
-	 * Full attribute name including prefix (e.g. "eui:label").
+	 * Complete attribute name, including any namespace prefix.
 	 */
 	readonly name: string;
 	/**
-	 * Attribute value (unescaped).
+	 * Decoded attribute value.
 	 */
 	readonly value: string;
 	/**
-	 * Half-open source range containing the complete attribute assignment.
+	 * Range containing the complete attribute assignment.
 	 */
 	readonly range: SourceRange;
 }
 
+/**
+ * Element node in the parsed XML tree.
+ */
 export interface XElement extends XNode {
 	readonly type: 'element';
 	/**
-	 * Full tag name including prefix (e.g. "eui:Button").
+	 * Complete tag name, including any namespace prefix.
 	 */
 	readonly name: string;
 	/**
-	 * Attributes in order.
+	 * Attributes in source order.
 	 */
 	readonly attributes: XAttribute[];
 	/**
-	 * Child nodes (elements and text).
+	 * Element and text children in source order.
 	 */
 	readonly children: XNode[];
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────
+const RX_OPEN = /^<([a-zA-Z_][\w:.-]*)/;
+const RX_CLOSE = /^<\/([a-zA-Z_][\w:.-]*)\s*>/;
+const RX_ATTR = /^([a-zA-Z_][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/;
+const CDATA_OPEN_LENGTH = '<![CDATA['.length;
+
+/**
+ * Returns the element children from a mixed XML child list.
+ */
+export function filterElements(children: readonly XNode[]): XElement[] {
+	return children.filter((node): node is XElement => node.type === 'element');
+}
+
+/**
+ * Concatenates the text children from a mixed XML child list.
+ */
+export function getTextContent(children: readonly XNode[]): string {
+	return children
+		.filter(isText)
+		.map(node => node.text)
+		.join('');
+}
+
+/**
+ * Parses EXML source and returns its first root element.
+ *
+ * Leading text, comments, and processing instructions are ignored.
+ *
+ * @throws {Error} If no root element exists or element closing tags are invalid.
+ */
+export function parseXML(source: string): XElement {
+	const parser = new XmlParser(source);
+	for (const node of parser.parse()) {
+		if (isElement(node)) return node;
+	}
+	throw new Error('EXML: no root element found');
+}
+
+class XmlParser {
+	// ── Instance fields ───────────────────────────────────────────────
+
+	private readonly _source: string;
+	private _position = 0;
+
+	// ── Constructor ───────────────────────────────────────────────────
+
+	public constructor(source: string) {
+		this._source = source;
+	}
+
+	// ── Public methods ────────────────────────────────────────────────
+
+	public parse(): XNode[] {
+		this._skipWhitespace();
+		return this._parseNodes();
+	}
+
+	// ── Private methods ───────────────────────────────────────────────
+
+	private _parseNodes(): XNode[] {
+		const nodes: XNode[] = [];
+		while (this._position < this._source.length) {
+			if (this._source[this._position] === '<') {
+				if (this._source.slice(this._position).match(RX_CLOSE)) {
+					break;
+				}
+				if (this._source.startsWith('<!--', this._position)) {
+					this._skipComment();
+					continue;
+				}
+				if (this._source.startsWith('<![CDATA[', this._position)) {
+					nodes.push(this._readCDATA());
+					continue;
+				}
+				if (this._source.startsWith('<?', this._position)) {
+					this._skipProcessingInstruction();
+					continue;
+				}
+				const element = this._parseElement();
+				if (element) {
+					nodes.push(element);
+				}
+				continue;
+			}
+			nodes.push(this._readText());
+		}
+		return nodes;
+	}
+
+	private _parseElement(): XElement | undefined {
+		const start = this._position;
+		if (this._source[this._position] !== '<') return undefined;
+
+		const tagMatch = this._source.slice(this._position).match(RX_OPEN);
+		if (!tagMatch) {
+			this._position++;
+			return undefined;
+		}
+
+		const tagName = tagMatch[1];
+		this._position += tagMatch[0].length;
+		const attributes: XAttribute[] = [];
+		for (;;) {
+			this._skipWhitespace();
+			if (this._position >= this._source.length) {
+				break;
+			}
+			if (this._source.startsWith('/>', this._position)) {
+				this._position += 2;
+				return {
+					type: 'element',
+					name: tagName,
+					attributes,
+					children: [],
+					range: { start, end: this._position },
+				};
+			}
+			if (this._source[this._position] === '>') {
+				this._position++;
+				break;
+			}
+
+			const attributeMatch = this._source.slice(this._position).match(RX_ATTR);
+			if (!attributeMatch) {
+				this._position++;
+				continue;
+			}
+			const attributeStart = this._position;
+			this._position += attributeMatch[0].length;
+			attributes.push({
+				name: attributeMatch[1],
+				value: attributeMatch[2] ?? attributeMatch[3],
+				range: { start: attributeStart, end: this._position },
+			});
+		}
+
+		const children = this._parseNodes();
+		const closeMatch = this._source.slice(this._position).match(RX_CLOSE);
+		if (!closeMatch) {
+			throw new Error(`EXML: missing closing tag </${tagName}>`);
+		}
+		if (closeMatch[1] !== tagName) {
+			throw new Error(`EXML: expected closing tag </${tagName}>, got </${closeMatch[1]}>`);
+		}
+		this._position += closeMatch[0].length;
+		return {
+			type: 'element',
+			name: tagName,
+			attributes,
+			children,
+			range: { start, end: this._position },
+		};
+	}
+
+	private _readText(): XText {
+		const start = this._position;
+		let text = '';
+		while (this._position < this._source.length && this._source[this._position] !== '<') {
+			text += this._source[this._position++];
+		}
+		return { type: 'text', text: unescapeXML(text), range: { start, end: this._position } };
+	}
+
+	private _readCDATA(): XText {
+		const start = this._position;
+		this._position += CDATA_OPEN_LENGTH;
+		const end = this._source.indexOf(']]>', this._position);
+		if (end === -1) {
+			this._position = this._source.length;
+			return { type: 'text', text: this._source.slice(start), range: { start, end: this._position } };
+		}
+		const text = this._source.slice(this._position, end);
+		this._position = end + 3;
+		return { type: 'text', text, range: { start, end: this._position } };
+	}
+
+	private _skipComment(): void {
+		const end = this._source.indexOf('-->', this._position + 4);
+		this._position = end === -1 ? this._source.length : end + 3;
+	}
+
+	private _skipProcessingInstruction(): void {
+		const end = this._source.indexOf('?>', this._position + 2);
+		this._position = end === -1 ? this._source.length : end + 2;
+	}
+
+	private _skipWhitespace(): void {
+		while (this._position < this._source.length && /\s/.test(this._source[this._position])) {
+			this._position++;
+		}
+	}
+}
 
 function isText(node: XNode): node is XText {
 	return node.type === 'text';
 }
 
-export function filterElements(children: readonly XNode[]): XElement[] {
-	return children.filter((n): n is XElement => n.type === 'element');
+function isElement(node: XNode): node is XElement {
+	return node.type === 'element';
 }
 
-export function getTextContent(children: readonly XNode[]): string {
-	return children
-		.filter(isText)
-		.map(t => t.text)
-		.join('');
-}
-
-// ── Parser implementation ────────────────────────────────────────────
-
-/**
- * Parse an EXML string into an XML element tree.
- * Returns the root element (the `<eui:Skin>` or equivalent).
- */
-export function parseXML(source: string): XElement {
-	const parser = new _Parser(source);
-	const nodes = parser.parse();
-	// Find the first element node (skip whitespace text, comments, PI)
-	for (const n of nodes) {
-		if (n.type === 'element') return n as XElement;
-	}
-	throw new Error('EXML: no root element found');
-}
-
-// ── Internal parser ──────────────────────────────────────────────────
-
-const RX_OPEN = /^<([a-zA-Z_][\w:.-]*)/;
-const RX_CLOSE = /^<\/([a-zA-Z_][\w:.-]*)\s*>/;
-const RX_ATTR = /^([a-zA-Z_][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/;
-
-class _Parser {
-	private src: string;
-	private pos = 0;
-
-	constructor(source: string) {
-		this.src = source;
-	}
-
-	// ── Main entry ────────────────────────────────────────────────────
-
-	parse(): XNode[] {
-		this.skipWhitespace();
-		return this.parseNodes();
-	}
-
-	// ── Node list ─────────────────────────────────────────────────────
-
-	private parseNodes(): XNode[] {
-		const nodes: XNode[] = [];
-		while (this.pos < this.src.length) {
-			// End of parent element?
-			if (this.src[this.pos] === '<') {
-				// Closing tag?
-				const m = this.src.slice(this.pos).match(RX_CLOSE);
-				if (m) break; // let parent handle it
-
-				// Comment
-				if (this.src.startsWith('<!--', this.pos)) {
-					this.skipComment();
-					continue;
-				}
-
-				// CDATA
-				if (this.src.startsWith('<![CDATA[', this.pos)) {
-					nodes.push(this.readCDATA());
-					continue;
-				}
-
-				// Processing instruction <?...?>
-				if (this.src.startsWith('<?', this.pos)) {
-					this.skipPI();
-					continue;
-				}
-
-				// Element
-				const el = this.parseElement();
-				if (el) nodes.push(el);
-				continue;
-			}
-
-			// Text content
-			nodes.push(this.readText());
-		}
-		return nodes;
-	}
-
-	// ── Element ───────────────────────────────────────────────────────
-
-	private parseElement(): XElement | null {
-		const start = this.pos;
-		if (this.src[this.pos] !== '<') return null;
-
-		const rest = this.src.slice(this.pos);
-		const tagMatch = rest.match(RX_OPEN);
-		if (!tagMatch) {
-			// Malformed — skip the '<' and continue
-			this.pos++;
-			return null;
-		}
-
-		const tagName = tagMatch[1];
-		this.pos += tagMatch[0].length;
-
-		// Parse attributes
-		const attrs: XAttribute[] = [];
-		for (;;) {
-			this.skipWS();
-			if (this.pos >= this.src.length) break;
-
-			// Self-closing />
-			if (this.src.startsWith('/>', this.pos)) {
-				this.pos += 2;
-				return { type: 'element', name: tagName, attributes: attrs, children: [], range: { start, end: this.pos } };
-			}
-
-			// Open tag end >
-			if (this.src[this.pos] === '>') {
-				this.pos++;
-				break;
-			}
-
-			// Attribute
-			const am = this.src.slice(this.pos).match(RX_ATTR);
-			if (am) {
-				const attributeStart = this.pos;
-				this.pos += am[0].length;
-				attrs.push({
-					name: am[1],
-					value: am[2] ?? am[3],
-					range: { start: attributeStart, end: this.pos },
-				});
-			} else {
-				// Unexpected character — skip
-				this.pos++;
-			}
-		}
-
-		// Children
-		const children = this.parseNodes();
-
-		// Consume closing tag
-		const closeMatch = this.src.slice(this.pos).match(RX_CLOSE);
-		if (closeMatch) {
-			if (closeMatch[1] !== tagName) {
-				throw new Error(`EXML: expected closing tag </${tagName}>, got </${closeMatch[1]}>`);
-			}
-			this.pos += closeMatch[0].length;
-		} else {
-			throw new Error(`EXML: missing closing tag </${tagName}>`);
-		}
-
-		return { type: 'element', name: tagName, attributes: attrs, children, range: { start, end: this.pos } };
-	}
-
-	// ── Text ──────────────────────────────────────────────────────────
-
-	private readText(): XText {
-		const start = this.pos;
-		let text = '';
-		while (this.pos < this.src.length && this.src[this.pos] !== '<') {
-			text += this.src[this.pos++];
-		}
-		return { type: 'text', text: unescapeXML(text), range: { start, end: this.pos } };
-	}
-
-	// ── CDATA ─────────────────────────────────────────────────────────
-
-	private readCDATA(): XText {
-		const start = this.pos;
-		this.pos += 9; // skip '<![CDATA['
-		const end = this.src.indexOf(']]>', this.pos);
-		if (end === -1) {
-			this.pos = this.src.length;
-			return { type: 'text', text: this.src.slice(start), range: { start, end: this.pos } };
-		}
-		const content = this.src.slice(this.pos, end);
-		this.pos = end + 3;
-		return { type: 'text', text: content, range: { start, end: this.pos } };
-	}
-
-	// ── Skip helpers ──────────────────────────────────────────────────
-
-	private skipComment(): void {
-		const end = this.src.indexOf('-->', this.pos + 4);
-		this.pos = end === -1 ? this.src.length : end + 3;
-	}
-
-	private skipPI(): void {
-		const end = this.src.indexOf('?>', this.pos + 2);
-		this.pos = end === -1 ? this.src.length : end + 2;
-	}
-
-	private skipWS(): void {
-		while (this.pos < this.src.length && /\s/.test(this.src[this.pos])) this.pos++;
-	}
-
-	private skipWhitespace(): void {
-		this.skipWS();
-	}
-}
-
-// ── Unescape XML entities ────────────────────────────────────────────
-
-function unescapeXML(s: string): string {
-	// Use hex char codes to avoid auto-formatter converting XML entities
-	const ENTITIES: Record<string, string> = {
+function unescapeXML(value: string): string {
+	const entities: Record<string, string> = {
 		amp: '\x26',
 		lt: '\x3C',
 		gt: '\x3E',
 		quot: '\x22',
 		apos: '\x27',
 	};
-	return s.replace(/&(amp|lt|gt|quot|apos);/g, (m, name: string) => ENTITIES[name] ?? m);
+	return value.replace(/&(amp|lt|gt|quot|apos);/g, (match, name: string) => entities[name] ?? match);
 }

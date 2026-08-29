@@ -4,11 +4,20 @@ import * as path from 'node:path';
 import { ensureDir } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
 import { namespaceModuleExternalPlugin, normalizeModuleKey } from '../namespace-external-plugin.js';
+import type { Dirent } from 'node:fs';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
 
+const COMMON: esbuild.BuildOptions = {
+	bundle: true,
+	format: 'esm',
+	platform: 'browser',
+	target: 'es2022',
+	logLevel: 'warning',
+};
+
 /**
- * Compiles the project source with esbuild, matching Egret's output shape:
+ * Compiles the project source with esbuild using mode-specific output shapes:
  *
  * - **development**: each `src/**\/*.ts` is emitted to a mirrored `.js` path
  *   (`Main.js`, `com/akakata/LoadingUI.js`), preserving directory structure.
@@ -29,14 +38,6 @@ export function compileSource(): BuildPlugin {
 		},
 	};
 }
-
-const COMMON: esbuild.BuildOptions = {
-	bundle: true,
-	format: 'esm',
-	platform: 'browser',
-	target: 'es2022',
-	logLevel: 'warning',
-};
 
 /**
  * Per-file output preserving the source tree (development).
@@ -86,6 +87,8 @@ async function buildRelease(ctx: BuildContext): Promise<void> {
 		outdir: path.join(project.outputDir, 'js'),
 		entryNames: 'main.min_[hash]',
 		minify: true,
+		// Component.hostComponentKey defaults to constructor.name.
+		keepNames: true,
 		sourcemap: ctx.sourcemap,
 		metafile: true,
 		external: [...project.enginePackages, ...project.customNamespaces.map(ns => ns.specifier)],
@@ -125,7 +128,7 @@ async function collectSources(srcDir: string): Promise<string[]> {
 	const results: string[] = [];
 
 	async function walk(dir: string): Promise<void> {
-		let entries: import('node:fs').Dirent[];
+		let entries: Dirent[];
 		try {
 			entries = await fs.readdir(dir, { withFileTypes: true });
 		} catch {

@@ -3,6 +3,7 @@ import { cleanOutput } from './clean-output.js';
 import { compileExml } from './compile-exml.js';
 import { compileEngine } from './compile-engine.js';
 import { compileCustomNamespaces } from './compile-custom-namespaces.js';
+import { writeComponentCatalog } from './component-catalog.js';
 import { compileSource } from './compile-source.js';
 import { generateHtml } from './generate-html.js';
 import { writeManifest } from './manifest.js';
@@ -12,6 +13,7 @@ export { cleanOutput } from './clean-output.js';
 export { compileExml } from './compile-exml.js';
 export { compileEngine } from './compile-engine.js';
 export { compileCustomNamespaces } from './compile-custom-namespaces.js';
+export { writeComponentCatalog } from './component-catalog.js';
 export { compileSource } from './compile-source.js';
 export { generateHtml } from './generate-html.js';
 export { writeManifest } from './manifest.js';
@@ -33,6 +35,7 @@ export function defaultPlugins(): BuildPlugin[] {
 		compileExml(),
 		compileEngine(),
 		compileCustomNamespaces(),
+		writeComponentCatalog(),
 		compileSource(),
 		generateHtml(),
 		writeManifest(),

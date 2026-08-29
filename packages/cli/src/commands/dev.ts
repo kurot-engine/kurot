@@ -12,6 +12,9 @@ interface DevOptions {
 	readonly diagnostics: string;
 }
 
+/**
+ * Commander definition for the development server and file watchers.
+ */
 export const devCommand = new Command('dev')
 	.description('Start a development server with rebuild on change')
 	.option('-p, --port <port>', 'Port to listen on', '3000')
@@ -40,6 +43,8 @@ export const devCommand = new Command('dev')
 		} catch (err) {
 			logger.error(`Dev server failed: ${err instanceof Error ? err.message : String(err)}`);
 			process.exitCode = 1;
-			if (machine) setLoggerEnabled(true);
+			if (machine) {
+				setLoggerEnabled(true);
+			}
 		}
 	});

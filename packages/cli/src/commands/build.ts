@@ -7,7 +7,6 @@ import {
 	DIAGNOSTIC_CODES,
 	parseBuildDiagnosticsFormat,
 	writeMachineOutput,
-	type BuildDiagnosticsFormat,
 } from '../core/diagnostics/index.js';
 import { logger, setLoggerEnabled } from '../utils/logger.js';
 import type { BuildContext } from '../core/pipeline.js';
@@ -17,23 +16,32 @@ interface BuildOptions {
 	/**
 	 * Produce a minified, content-hashed release build under `bin-release`.
 	 */
-	release: boolean;
+	readonly release: boolean;
 	/**
 	 * Generate sourcemaps for the app bundle.
 	 */
-	sourcemap: boolean;
+	readonly sourcemap: boolean;
 	/**
 	 * Rebuild source on file changes (always uses development mode).
 	 */
-	watch: boolean;
+	readonly watch: boolean;
 	/**
 	 * Print esbuild bundle size analysis after the build.
 	 */
-	analyze: boolean;
-	strict: boolean;
-	diagnostics: string;
+	readonly analyze: boolean;
+	/**
+	 * Promote supported warnings to build errors.
+	 */
+	readonly strict: boolean;
+	/**
+	 * Human-readable or machine-readable diagnostic output format.
+	 */
+	readonly diagnostics: string;
 }
 
+/**
+ * Commander definition for one-shot and watched project builds.
+ */
 export const buildCommand = new Command('build')
 	.description('Build the project')
 	.option('-r, --release', 'Minified, content-hashed release build (→ bin-release)', false)

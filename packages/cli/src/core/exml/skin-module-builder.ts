@@ -15,8 +15,17 @@ import type { BuildContext } from '../pipeline.js';
  * EXML source file resolved for skin compilation.
  */
 export interface ExmlFile {
+	/**
+	 * Absolute source path.
+	 */
 	readonly path: string;
+	/**
+	 * POSIX path relative to the project's resource directory.
+	 */
 	readonly relPath: string;
+	/**
+	 * UTF-8 EXML source text.
+	 */
 	readonly contents: string;
 }
 
@@ -25,11 +34,16 @@ export interface ExmlFile {
  */
 export interface CompiledSkin {
 	readonly file: ExmlFile;
+	/**
+	 * Complete class name used for global factory registration.
+	 */
 	readonly className: string;
 }
 
 /**
  * Builds and atomically installs the ESM bundle for a set of EXML skins.
+ *
+ * @returns The installed bundle's filename relative to the output `js` directory.
  */
 export async function buildSkinsModule(ctx: BuildContext, skins: readonly CompiledSkin[]): Promise<string> {
 	const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
@@ -56,9 +70,18 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 
 async function generateSkinModule(ctx: BuildContext, skin: CompiledSkin): Promise<string | undefined> {
 	try {
-		const namespaces = ctx.project.customNamespaces.map(ns => ({ prefix: ns.prefix, specifier: ns.specifier }));
+		const namespaces = ctx.project.customNamespaces.map(ns => ({
+			prefix: ns.prefix,
+			specifier: ns.specifier,
+			...(ns.components ? { componentNames: new Set(ns.components.map(component => component.name)) } : {}),
+		}));
 		const ir = parseToIR(skin.file.contents, skin.className, namespaces);
-		const diagnostics = createUnresolvedTagDiagnostics(skin.file.relPath, skin.file.contents, ir.unresolvedTags);
+		const diagnostics = createUnresolvedTagDiagnostics(
+			skin.file.relPath,
+			skin.file.contents,
+			ir.unresolvedTags,
+			namespaces,
+		);
 		for (const diagnostic of diagnostics) {
 			ctx.diagnostics.report(diagnostic);
 			logger.warn(`${diagnostic.location?.file}: ${diagnostic.message}`);

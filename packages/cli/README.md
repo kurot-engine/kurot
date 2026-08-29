@@ -160,9 +160,11 @@ export default {
 	// Optional: enable EXML skin compilation
 	exml: {
 		themeFile: 'resource/default.thm.json',
-		// Optional: map a custom EXML prefix to a source barrel file
-		namespaces: {
-			game: 'src/ui/index.ts',
+		// Optional: discover reusable component source/Skin pairs
+		components: {
+			namespace: 'game',
+			sourceDir: 'src/components',
+			skinDir: 'resource/skins/components',
 		},
 	},
 };
@@ -182,6 +184,7 @@ export default {
 | `stage.orientation` | `string` | Orientation: `auto` / `portrait` / `landscape`                                                                           |
 | `stage.frameRate`   | `number` | Frame rate — must be a positive integer                                                                                  |
 | `exml.themeFile`    | `string` | Theme JSON file path                                                                                                     |
+| `exml.components`   | `ComponentsConfig` | Optional reusable-component convention: namespace, TypeScript source directory, and Skin directory        |
 | `exml.namespaces`   | `Record<string, string>` | Optional EXML prefix → source barrel-file mapping                                                          |
 
 ## HTML Template
@@ -217,7 +220,8 @@ The CLI includes a complete EXML skin parsing and code generation pipeline (XML 
 - **AST / IR Generation** — converts to an intermediate representation (SkinIR)
 - **Code Generation** — outputs ESM factory functions
 - **Component Registry** — built-in `eui:*` / `egret:*` namespace mapping to `@kurot/ui` / `@kurot/core`
-- **Custom Namespaces** — maps project prefixes such as `game:*` to source barrel files through `exml.namespaces`
+- **Reusable Components** — pairs `src/components/<Name>.ts` with `resource/skins/components/<Name>Skin.exml`, then exposes `<game:Name>` without a hand-written barrel
+- **Custom Namespaces** — retains `exml.namespaces` for advanced manually maintained source barrels
 - **View States** — supports `<eui:states>`, shorthand `states="up,down"`, state properties, `includeIn`, and `excludeFrom`
 - **Skin Properties** — preserves root properties such as `minWidth`, `minHeight`, and state-specific values
 - **Percent Layout** — auto-detects `width="100%"` and converts to `percentWidth`
@@ -234,6 +238,28 @@ The standard declarations `xmlns:eui="http://ns.egret.com/eui"` and
 `xmlns:egret="http://ns.egret.com/egret"` are namespace identifiers. The CLI
 resolves their prefixes internally and does not access those URLs over the
 network, so the original Egret namespace pages do not need to be hosted.
+
+### Reusable components
+
+The game template keeps reusable component logic and white-Egret-compatible
+skins in parallel directories:
+
+```text
+src/components/<path>/<Name>.ts
+resource/skins/components/<path>/<Name>Skin.exml
+```
+
+The TypeScript file must export a class named `<Name>`, and the paired EXML
+must use a standard `eui:Skin` root with a `class` attribute. The CLI validates
+the pair, generates the shared `#ns/game` entry, adds the default Theme mapping,
+and accepts `<game:Name />` in other skins. Components are globally unique by
+class name within the configured namespace.
+
+Development builds also emit `.kurot/component-catalog.json` for editor and
+agent tooling. The catalog is intentionally omitted from release output.
+
+`exml.namespaces` remains available for advanced manual namespace barrels, but
+its prefix must not conflict with `exml.components.namespace`.
 
 ### Custom component lifecycle
 
@@ -278,7 +304,7 @@ or `js/default.thm.min_<hash>.js` (release) — that registers each skin factory
 pointer to that module, which the runtime `Theme` imports. No `.exml` is shipped.
 
 ```
-resource/skins/*.exml
+resource/skins/**/*.exml
         ↓ parseXML()
     XML Element Tree
         ↓ parseEXML()
@@ -304,11 +330,14 @@ my-game/
 ├── resource/
 │   ├── default.res.json       # Resource config
 │   ├── default.thm.json       # Theme file: component → skin mapping
-│   └── skins/                 # EXML skin directory (21 default skins)
-│       ├── ButtonSkin.exml
-│       ├── ...
-│       └── ViewStackSkin.exml
+│   └── skins/                 # EXML skin directory
+│       ├── components/        # Reusable component skins (standard eui:Skin)
+│       └── eui/               # 21 built-in EUI component skins
+│           ├── ButtonSkin.exml
+│           ├── ...
+│           └── ViewStackSkin.exml
 └── src/
+    ├── components/            # Reusable component TypeScript classes
     ├── Main.ts                # Entry: class Main extends Sprite
     └── LoadingUI.ts           # Loading progress display
 ```

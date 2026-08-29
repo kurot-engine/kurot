@@ -3,9 +3,9 @@
  * top level to print a friendly error instead of a raw stack trace.
  */
 export class BuildError extends Error {
-	constructor(
+	public constructor(
 		message: string,
-		readonly cause?: Error,
+		public readonly cause?: Error,
 	) {
 		super(message);
 		this.name = 'BuildError';
@@ -17,7 +17,7 @@ export class BuildError extends Error {
  * invalid `stage.scaleMode`).
  */
 export class ConfigError extends Error {
-	constructor(message: string) {
+	public constructor(message: string) {
 		super(message);
 		this.name = 'ConfigError';
 	}

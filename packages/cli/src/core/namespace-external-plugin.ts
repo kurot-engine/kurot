@@ -14,8 +14,8 @@ import * as path from 'node:path';
  * `import { HeroNarrowIR } from './ui/index.js'`) match its `HeroNarrowIR.ts`
  * source file (the metafile key).
  *
- * @param absolutePath - Absolute file path to normalize
- * @returns The path with its extension stripped, if any
+ * @param absolutePath - Absolute file path to normalize.
+ * @returns The path with its extension stripped, if any.
  */
 export function normalizeModuleKey(absolutePath: string): string {
 	const ext = path.extname(absolutePath);
@@ -43,9 +43,9 @@ export function normalizeModuleKey(absolutePath: string): string {
  * `.js`-suffixed import convention (see `normalizeModuleKey`) makes that
  * unnecessary — a plain path + extension-strip is enough to match.
  *
- * @param namespaceModules - Extensionless absolute path → virtual specifier,
- * populated from esbuild's `metafile.outputs[x].inputs` (see `compile-custom-namespaces.ts`)
- * @returns An esbuild plugin implementing the rewrite
+ * @param namespaceModules - Extensionless absolute path to virtual specifier,
+ * populated from esbuild's `metafile.outputs[x].inputs`.
+ * @returns An esbuild plugin implementing the rewrite.
  */
 export function namespaceModuleExternalPlugin(namespaceModules: ReadonlyMap<string, string>): esbuild.Plugin {
 	return {

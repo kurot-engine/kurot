@@ -1,7 +1,9 @@
 import * as fs from 'node:fs/promises';
 import type { BuildPlugin } from '../pipeline.js';
 
-// Removes artifacts from previous builds before writing the new output.
+/**
+ * Removes artifacts from the selected output directory before a build.
+ */
 export function cleanOutput(): BuildPlugin {
 	return {
 		name: 'clean output',

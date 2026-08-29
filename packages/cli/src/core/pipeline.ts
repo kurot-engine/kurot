@@ -4,16 +4,72 @@ import { BuildError } from './errors.js';
 import type { Project } from './project.js';
 
 /**
+ * Artifacts and namespace state populated incrementally by build plugins.
+ */
+export interface BuildOutputs {
+	/**
+	 * Entry script path relative to the output directory.
+	 */
+	entryScript?: string;
+	/**
+	 * Compiled skins module path relative to the output directory.
+	 */
+	skinsScript?: string;
+	/**
+	 * Component catalog path relative to the development output directory.
+	 */
+	componentCatalog?: string;
+	/**
+	 * Import-map entries from module specifiers to output-relative chunk paths.
+	 */
+	engine: Record<string, string>;
+	/**
+	 * Source modules already owned by namespace bundles.
+	 *
+	 * Keys are normalized, extensionless absolute paths. Values are virtual
+	 * namespace specifiers. Source compilation uses the map to preserve a single
+	 * class identity when relative imports bypass a namespace entry.
+	 */
+	namespaceModules: Map<string, string>;
+	/**
+	 * Generated entry sources for convention-based component namespaces.
+	 */
+	namespaceEntries: Map<string, string>;
+	/**
+	 * Namespace rebuild callbacks used when component membership changes.
+	 */
+	namespaceRebuilders: Map<string, () => Promise<void>>;
+}
+
+/**
+ * Options used to create a build context.
+ */
+export interface BuildContextOptions {
+	readonly sourcemap?: boolean;
+	readonly analyze?: boolean;
+	readonly watch?: boolean;
+	readonly strict?: boolean;
+}
+
+/**
  * Shared state threaded through every build plugin.
  *
- * Plugins read the immutable `project` and `options`, and communicate results
- * to later plugins through `outputs` (e.g. the source compiler reports the
- * generated entry script name so the HTML generator can reference it).
+ * Plugins treat `project` and build flags as immutable and communicate with
+ * later steps through `outputs`.
  */
 export interface BuildContext {
 	readonly project: Project;
+	/**
+	 * Whether application bundles include source maps.
+	 */
 	readonly sourcemap: boolean;
+	/**
+	 * Whether release compilation prints bundle analysis.
+	 */
 	readonly analyze: boolean;
+	/**
+	 * Whether long-lived compiler contexts watch for source changes.
+	 */
 	readonly watch: boolean;
 	/**
 	 * Whether strict policy promotes selected warnings to errors.
@@ -26,36 +82,7 @@ export interface BuildContext {
 	/**
 	 * Artifacts produced during the build, populated incrementally by plugins.
 	 */
-	readonly outputs: {
-		/**
-		 * Entry script path, relative to the output dir (e.g. `Main.js`, `js/main.min_ab12.js`).
-		 */
-		entryScript?: string;
-		/**
-		 * Compiled skins module path, relative to the output dir (e.g. `js/default.thm.js`).
-		 */
-		skinsScript?: string;
-		/**
-		 * Engine import-map: package specifier → chunk path relative to output dir.
-		 */
-		engine: Record<string, string>;
-		/**
-		 * Every source file bundled into a custom-namespace chunk (see
-		 * `compile-custom-namespaces.ts`), keyed by its extensionless absolute
-		 * path (see `normalizeModuleKey` in `namespace-external-plugin.ts`) and
-		 * mapped to that namespace's virtual specifier (e.g. `#ns/game`).
-		 *
-		 * Populated from esbuild's `metafile.outputs[x].inputs` — the exact set
-		 * of files a chunk inlined, not a guess. Two consumers rely on this:
-		 * `compile-source.ts` excludes these files from its per-file dev output
-		 * (re-emitting them as separate entry points would bundle a second,
-		 * distinct copy of the same classes), and `namespaceModuleExternalPlugin`
-		 * rewrites any import resolving to one of these paths — even a relative
-		 * import that bypasses the namespace's barrel file — to the matching
-		 * specifier instead of inlining it.
-		 */
-		namespaceModules: Map<string, string>;
-	};
+	readonly outputs: BuildOutputs;
 	/**
 	 * Cleanup callbacks registered by long-lived plugins (watchers, contexts).
 	 */
@@ -75,7 +102,7 @@ export interface BuildPlugin {
  */
 export function createContext(
 	project: Project,
-	options: { sourcemap?: boolean; analyze?: boolean; watch?: boolean; strict?: boolean } = {},
+	options: BuildContextOptions = {},
 ): BuildContext {
 	const strict = options.strict ?? project.mode === 'release';
 	return {
@@ -85,7 +112,12 @@ export function createContext(
 		watch: options.watch ?? false,
 		strict,
 		diagnostics: new DiagnosticCollector({ strict }),
-		outputs: { engine: {}, namespaceModules: new Map() },
+		outputs: {
+			engine: {},
+			namespaceModules: new Map(),
+			namespaceEntries: new Map(),
+			namespaceRebuilders: new Map(),
+		},
 		disposers: [],
 	};
 }

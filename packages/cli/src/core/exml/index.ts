@@ -15,6 +15,12 @@
  * ```
  */
 
+import { generateCode } from './codegen.js';
+import { parseEXML } from './exml-parser.js';
+import type { SkinIR } from './ast.js';
+import type { CodeGenOptions } from './codegen.js';
+import type { NamespaceModule } from './registry.js';
+
 // ── XML Parser ───────────────────────────────────────────────────────
 export { parseXML, filterElements, getTextContent } from './xml-parser.js';
 export type { SourceRange, XNode, XText, XAttribute, XElement } from './xml-parser.js';
@@ -62,12 +68,6 @@ export type { CodeGenOptions } from './codegen.js';
 
 // ── Convenience: parse + generate in one step ────────────────────────
 
-import { parseEXML } from './exml-parser.js';
-import { generateCode } from './codegen.js';
-import type { CodeGenOptions } from './codegen.js';
-import type { NamespaceModule } from './registry.js';
-import type { SkinIR } from './ast.js';
-
 export interface CompileExmlOptions extends CodeGenOptions {
 	/**
 	 * Project-defined EXML namespaces (see `ProjectConfig.exml.namespaces`).
@@ -76,12 +76,12 @@ export interface CompileExmlOptions extends CodeGenOptions {
 }
 
 /**
- * Compile an EXML source string directly to JavaScript.
+ * Compiles an EXML source string directly to JavaScript.
  *
- * @param source - EXML source text
- * @param className - Optional class name (used for factory function name)
- * @param options - Code generation options, plus project-defined namespaces
- * @returns Generated JS source string
+ * @param source - EXML source text.
+ * @param className - Optional class name used for the factory function name.
+ * @param options - Code generation options and project-defined namespaces.
+ * @returns Generated JavaScript source.
  */
 export function compileEXML(source: string, className?: string, options?: CompileExmlOptions): string {
 	const ir = parseEXML(source, className, options?.customNamespaces ?? []);
@@ -89,12 +89,12 @@ export function compileEXML(source: string, className?: string, options?: Compil
 }
 
 /**
- * Compile an EXML source string to a SkinIR (parse only, no codegen).
+ * Parses an EXML source string into its intermediate representation.
  *
- * @param source - EXML source text
- * @param className - Optional class name
- * @param customNamespaces - Project-defined EXML namespaces
- * @returns SkinIR intermediate representation
+ * @param source - EXML source text.
+ * @param className - Optional skin class name.
+ * @param customNamespaces - Project-defined EXML namespaces.
+ * @returns The parsed skin intermediate representation.
  */
 export function parseToIR(
 	source: string,

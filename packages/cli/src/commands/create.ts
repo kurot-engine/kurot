@@ -1,7 +1,11 @@
 import { Command } from 'commander';
-import { scaffoldProject, TEMPLATES, type TemplateName } from '../core/template.js';
+import { scaffoldProject, TEMPLATES } from '../core/template.js';
 import { logger } from '../utils/logger.js';
+import type { TemplateName } from '../core/template.js';
 
+/**
+ * Commander definition for scaffolding a project template.
+ */
 export const createCommand = new Command('create')
 	.description('Create a new Kurot project')
 	.argument('<name>', 'Project name')

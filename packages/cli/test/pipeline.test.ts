@@ -135,5 +135,6 @@ function createProject(): Project {
 		resourceDir: '/project/resource',
 		enginePackages: [],
 		customNamespaces: [],
+		components: [],
 	};
 }

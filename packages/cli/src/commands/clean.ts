@@ -5,6 +5,9 @@ import { loadConfig } from '../core/config.js';
 import { OUTPUT_DIRS } from '../core/project.js';
 import { logger } from '../utils/logger.js';
 
+/**
+ * Commander definition for removing development and release outputs.
+ */
 export const cleanCommand = new Command('clean').description('Remove build output directories').action(async () => {
 	const config = await loadConfig();
 	const names = [...new Set([config.output.dir, OUTPUT_DIRS.release])];

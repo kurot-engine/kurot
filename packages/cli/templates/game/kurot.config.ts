@@ -12,8 +12,10 @@ export default {
 	},
 	exml: {
 		themeFile: 'resource/default.thm.json',
-		namespaces: {
-			game: 'src/game-components.ts',
+		components: {
+			namespace: 'game',
+			sourceDir: 'src/components',
+			skinDir: 'resource/skins/components',
 		},
 	},
 };

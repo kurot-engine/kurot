@@ -5,6 +5,7 @@ import { logger } from '../../utils/logger.js';
 import { DIAGNOSTIC_CODES } from '../diagnostics/index.js';
 import { buildSkinsModule } from '../exml/skin-module-builder.js';
 import { BuildError } from '../errors.js';
+import type { Dirent } from 'node:fs';
 import type { Diagnostic } from '../diagnostics/index.js';
 import type { CompiledSkin, ExmlFile } from '../exml/skin-module-builder.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
@@ -17,10 +18,19 @@ import type { Project } from '../project.js';
  * - `exmls` entries may be project-root-relative paths (Egret) or objects.
  */
 interface ThemeData {
+	/**
+	 * Host component names mapped to EXML paths or compiled skin class names.
+	 */
 	skins?: Record<string, string>;
-	exmls?: Array<string | { path: string; [k: string]: unknown }>;
+	/**
+	 * Explicit EXML inputs used when automatic discovery is disabled.
+	 */
+	exmls?: Array<string | { path: string; [key: string]: unknown }>;
+	/**
+	 * Whether compilation discovers every EXML file below `resource`.
+	 */
 	autoGenerateExmlsList?: boolean;
-	[k: string]: unknown;
+	[key: string]: unknown;
 }
 
 /**
@@ -70,7 +80,10 @@ export function compileExml(): BuildPlugin {
 			const outTheme: ThemeData = { ...theme };
 			delete outTheme.exmls;
 			delete outTheme.autoGenerateExmlsList;
-			outTheme.skins = remapSkins(project, theme.skins ?? {}, skins);
+			outTheme.skins = {
+				...componentSkinMappings(project),
+				...remapSkins(project, theme.skins ?? {}, skins),
+			};
 			outTheme.skinsJs = toPosix(path.relative(path.dirname(relThemePath), `js/${skinsFile}`));
 
 			await writeFile(path.join(project.outputDir, relThemePath), JSON.stringify(outTheme, null, '\t'));
@@ -106,6 +119,12 @@ async function resolveExmlFiles(
 				});
 			}
 		}
+		const included = new Set(files.map(file => path.resolve(file.path)));
+		for (const component of project.components) {
+			if (included.has(path.resolve(component.skin))) continue;
+			files.push(await readExmlAt(project.resourceDir, component.skin));
+		}
+		files.sort((a, b) => a.relPath.localeCompare(b.relPath));
 		return { files, missingDeclaredPaths };
 	}
 	return { files: await collectExmlFiles(project.resourceDir), missingDeclaredPaths: new Set() };
@@ -118,7 +137,7 @@ async function collectExmlFiles(resourceDir: string): Promise<ExmlFile[]> {
 	const results: ExmlFile[] = [];
 
 	async function walk(dir: string): Promise<void> {
-		let entries: import('node:fs').Dirent[];
+		let entries: Dirent[];
 		try {
 			entries = await fs.readdir(dir, { withFileTypes: true });
 		} catch {
@@ -126,8 +145,11 @@ async function collectExmlFiles(resourceDir: string): Promise<ExmlFile[]> {
 		}
 		for (const entry of entries) {
 			const full = path.join(dir, entry.name);
-			if (entry.isDirectory()) await walk(full);
-			else if (entry.name.endsWith('.exml')) results.push(await readExmlAt(resourceDir, full));
+			if (entry.isDirectory()) {
+				await walk(full);
+			} else if (entry.name.endsWith('.exml')) {
+				results.push(await readExmlAt(resourceDir, full));
+			}
 		}
 	}
 
@@ -249,6 +271,10 @@ function remapSkins(project: Project, skins: Record<string, string>, compiled: C
 		}
 	}
 	return result;
+}
+
+function componentSkinMappings(project: Project): Record<string, string> {
+	return Object.fromEntries(project.components.map(component => [component.name, component.skinClass]));
 }
 
 function isSkinPath(value: string): boolean {

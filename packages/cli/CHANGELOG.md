@@ -5,6 +5,40 @@ All notable changes to `@kurot/cli` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## 1.1.2 — 2026-08-30
+
+### Added
+
+- Convention-based reusable components through `exml.components`, pairing
+  `src/components/<Name>.ts` with
+  `resource/skins/components/<Name>Skin.exml` while keeping standard EUI Skin
+  files editable in existing visual tooling.
+- Automatic `#ns/<prefix>` namespace entries, Theme mappings, exact EXML tag
+  validation with spelling suggestions, and a development-only
+  `.kurot/component-catalog.json` for future editor and agent tooling.
+- Component-aware development watching for TypeScript/Skin additions,
+  removals, renames, and edits.
+
+### Changed
+
+- New game projects no longer scaffold or require `src/game-components.ts`.
+  Manual `exml.namespaces` barrels remain supported for advanced use.
+- Default EUI skins in new game projects are grouped under
+  `resource/skins/eui`, keeping them separate from reusable component skins.
+
+### Fixed
+
+- Release bundles now preserve component constructor names required by the
+  Theme default-Skin lookup contract.
+
+### Tests
+
+- Added coverage for component discovery, pairing validation, generated
+  namespaces, Theme mappings, development catalogs, release name preservation,
+  watched component additions, and the updated game template layout.
+
 ## 1.1.0 — 2026-08-13
 
 ### Added

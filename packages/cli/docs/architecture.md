@@ -32,6 +32,7 @@ packages/cli/
 │   │   ├── namespace-external-plugin.ts  # 共享 esbuild 插件，防 namespace 类重复打包
 │   │   ├── errors.ts                  # BuildError / ConfigError
 │   │   ├── diagnostics/               # 诊断模型、策略、稳定 code 和机器输出协议
+│   │   ├── components/                # 可复用组件 TS/Skin 配对与刷新
 │   │   ├── exml/                      # EXML → SkinIR → ESM 编译器
 │   │   │   ├── xml-parser.ts          # 手写递归下降 XML 解析器（XElement/XText）
 │   │   │   ├── registry.ts            # namespace 前缀表 + 组件标签注册表
@@ -45,6 +46,7 @@ packages/cli/
 │   │       ├── compile-exml.ts
 │   │       ├── compile-engine.ts
 │   │       ├── compile-custom-namespaces.ts
+│   │       ├── component-catalog.ts
 │   │       ├── compile-source.ts
 │   │       ├── generate-html.ts
 │   │       ├── manifest.ts
@@ -69,6 +71,8 @@ compile engine
   ↓
 compile custom namespaces
   ↓
+write component catalog（仅 development 且配置 components）
+  ↓
 compile source
   ↓
 generate index.html
@@ -83,11 +87,12 @@ copy assets
 1. `cleanOutput`：清空输出目录，因此每次构建都不是增量的（增量发生在 esbuild 的 watch 层）。
 2. `compileExml`：读取主题配置，编译 EXML，并生成主题 ESM bundle。
 3. `compileEngine`：把 `package.json` 中的 `@kurot/*` 运行时依赖分别打成 chunk。
-4. `compileCustomNamespaces`：把 `exml.namespaces` 指定的 barrel file 分别打成 `ns.<prefix>` chunk。
-5. `compileSource`：开发模式按源文件输出；发布模式生成压缩且带 hash 的应用 bundle。
-6. `generateHtml`：生成 canvas、import map 和 ESM 入口脚本。
-7. `writeManifest`：发布模式生成 Egret 形状的 `manifest.json`。
-8. `copyAssets`：复制 `resource/`，并在启用 EXML 时跳过源主题文件和 `.exml` 文件。
+4. `compileCustomNamespaces`：把手工 barrel 或 CLI 自动生成的组件入口分别打成 `ns.<prefix>` chunk。
+5. `writeComponentCatalog`：开发模式输出 `.kurot/component-catalog.json`，release 不携带。
+6. `compileSource`：开发模式按源文件输出；发布模式生成压缩且带 hash 的应用 bundle。
+7. `generateHtml`：生成 canvas、import map 和 ESM 入口脚本。
+8. `writeManifest`：发布模式生成 Egret 形状的 `manifest.json`。
+9. `copyAssets`：复制 `resource/`，并在启用 EXML 时跳过源主题文件和 `.exml` 文件。
 
 顺序不能随意交换。自定义 namespace 必须先于应用源码编译，以便应用和皮肤都通过 `#ns/<prefix>` 指向同一个模块实例，避免重复打包导致类身份不一致。
 
@@ -98,7 +103,7 @@ CLI 不会生成单一的自包含文件。引擎、项目 namespace、主题和
 ```text
 @kurot/core ───────────────→ js/kurot.core[.min_<hash>].js
 @kurot/ui ─────────────────→ js/kurot.ui[.min_<hash>].js
-src/ui/index.ts ─────────────→ js/ns.game[.min_<hash>].js
+src/components/**/*.ts ──────→ js/ns.game[.min_<hash>].js
 resource/**/*.exml ──────────→ js/default.thm[.min_<hash>].js
 src/Main.ts ─────────────────→ Main.js 或 js/main.min_<hash>.js
 ```
@@ -115,6 +120,8 @@ HTML import map 将 `@kurot/*` 和 `#ns/*` 裸 specifier 映射到对应 chunk�
 bin-debug/
 ├── index.html
 ├── Main.js
+├── .kurot/
+│   └── component-catalog.json    # 仅配置 components 时存在
 ├── LoadingUI.js
 ├── js/
 │   ├── kurot.core.js
@@ -174,7 +181,7 @@ kurot build [-r|--release] [--sourcemap] [--watch] [--analyze] [--strict] [--dia
 kurot dev [-p|--port <port>] [--sourcemap] [--strict] [--diagnostics human|jsonl]
 ```
 
-执行开发构建并启动静态服务器。esbuild 监听应用源码和自定义 namespace；`resource/` 监听器在 `.exml` 变化时重新编译主题并复制资源。引擎依赖或其他静态资源变化后应重新启动 dev server。当前没有浏览器自动刷新，需要手动刷新页面。
+执行开发构建并启动静态服务器。esbuild 监听应用源码和自定义 namespace；`resource/` 监听器在普通 `.exml` 变化时重新编译主题。组件监听器负责 `sourceDir` 与 `skinDir` 中组件的新增、删除、重命名和修改，并刷新 namespace、主题与 catalog。引擎依赖或其他静态资源变化后应重新启动 dev server。当前没有浏览器自动刷新，需要手动刷新页面。
 
 `--diagnostics jsonl` 将每个 `build-start`、`diagnostic`、
 `build-complete` 和 `server-ready` 事件作为独立 JSON 行写入 stdout。它与
@@ -203,14 +210,16 @@ export default {
 	},
 	exml: {
 		themeFile: 'resource/default.thm.json',
-		namespaces: {
-			game: 'src/ui/index.ts',
+		components: {
+			namespace: 'game',
+			sourceDir: 'src/components',
+			skinDir: 'resource/skins/components',
 		},
 	},
 };
 ```
 
-配置文件可以是 `kurot.config.ts` 或 `kurot.config.js`。未提供配置文件时使用默认值；用户配置会与默认 `stage` 配置合并。当前只支持 `html5` target。
+配置文件可以是 `kurot.config.ts` 或 `kurot.config.js`。未提供配置文件时使用默认值；用户配置会与默认 `stage` 配置合并。当前只支持 `html5` target。`exml.namespaces` 仍可用于高级手工 barrel，但不能与 `exml.components.namespace` 使用相同前缀。
 
 ## 八、EXML 编译
 

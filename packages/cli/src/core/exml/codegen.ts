@@ -8,80 +8,87 @@
 import type {
 	SkinIR,
 	SkinNode,
-	PropertyAssignment,
 	PropertyValue,
-	PropertyChild,
 	StateDef,
 	StateOverride,
-	StateAddItems,
-	StateSetProperty,
 	LiteralValue,
-	PercentValue,
-	BindingValue,
 } from './ast.js';
-import { getDefaultProperty, lookupComponent } from './registry.js';
+import { lookupComponent } from './registry.js';
 
 // ── Public API ───────────────────────────────────────────────────────
 
 export interface CodeGenOptions {
 	/**
-	 * Output format. Only `'esm'` is supported (import/export statements for
-	 * use as ES modules). Retained as an option for forward compatibility.
+	 * Output format. Only ESM factory modules are supported.
 	 */
-	format?: 'esm';
+	readonly format?: 'esm';
+}
+
+interface StatePropertyOverride {
+	readonly stateName: string;
+	readonly targetId: string;
+	readonly propName: string;
+	readonly value: PropertyValue;
+}
+
+interface TemplatePart {
+	readonly type: 'literal' | 'binding';
+	readonly value: string;
 }
 
 /**
- * Generate JavaScript source code from a SkinIR.
+ * Generates JavaScript source code from a skin intermediate representation.
  *
- * @param ir - The skin intermediate representation
- * @param options - Code generation options
- * @returns Generated JS source string
+ * @param ir - Skin intermediate representation.
+ * @param options - Code generation options.
+ * @returns Generated JavaScript source.
  */
 export function generateCode(ir: SkinIR, _options?: CodeGenOptions): string {
-	return new CodeGen(ir).generate();
+	return new CodeGenerator(ir).generate();
 }
 
 // ── Code generator ───────────────────────────────────────────────────
 
-class CodeGen {
-	private readonly ir: SkinIR;
-	private readonly lines: string[] = [];
-	private indent = 0;
+class CodeGenerator {
+	// ── Instance fields ───────────────────────────────────────────────
 
-	constructor(ir: SkinIR) {
-		this.ir = ir;
+	private readonly _ir: SkinIR;
+	private readonly _lines: string[] = [];
+	private _indent = 0;
+
+	// ── Constructor ───────────────────────────────────────────────────
+
+	public constructor(ir: SkinIR) {
+		this._ir = ir;
 	}
 
-	generate(): string {
+	// ── Public methods ────────────────────────────────────────────────
+
+	public generate(): string {
 		this.emitHeader();
 		this.emitImports();
 		this.emitFunction();
-		return this.lines.join('\n') + '\n';
+		return this._lines.join('\n') + '\n';
 	}
 
-	// ── Header comment ────────────────────────────────────────────────
+	// ── Private methods ───────────────────────────────────────────────
 
 	private emitHeader(): void {
-		this.line(`// Generated from ${this.ir.className || 'Skin'}.exml`);
+		this.line(`// Generated from ${this._ir.className || 'Skin'}.exml`);
 		this.line('// @generated — do not edit manually');
 		this.line('');
 	}
 
-	// ── Imports ───────────────────────────────────────────────────────
-
 	private emitImports(): void {
-		// Group imports by module
 		const moduleImports = new Map<string, Set<string>>();
-		for (const [className, modulePath] of this.ir.imports) {
+		for (const [className, modulePath] of this._ir.imports) {
 			if (!moduleImports.has(modulePath)) {
 				moduleImports.set(modulePath, new Set());
 			}
 			moduleImports.get(modulePath)!.add(className);
 		}
 
-		// Also ensure we import Binding if there are any bindings
-		let hasBindings = this.hasBindingsInTree(this.ir.children);
+		const hasBindings = this.hasBindingsInTree(this._ir.children);
 		if (hasBindings) {
 			if (!moduleImports.has('@kurot/ui')) {
 				moduleImports.set('@kurot/ui', new Set());
@@ -98,15 +105,14 @@ class CodeGen {
 			moduleImports.get('@kurot/core')!.add('Rectangle');
 		}
 
-		// Ensure State, AddItems, SetProperty are imported if we have states
-		if (this.ir.states.length > 0) {
+		if (this._ir.states.length > 0) {
 			if (!moduleImports.has('@kurot/ui')) {
 				moduleImports.set('@kurot/ui', new Set());
 			}
 			const uiImports = moduleImports.get('@kurot/ui')!;
 			uiImports.add('State');
-			uiImports.add('SetProperty'); // always needed for node state-specific props
-			for (const state of this.ir.states) {
+			uiImports.add('SetProperty');
+			for (const state of this._ir.states) {
 				for (const override of state.overrides) {
 					uiImports.add(override.type);
 				}
@@ -120,68 +126,57 @@ class CodeGen {
 		this.line('');
 	}
 
-	// ── Factory function ──────────────────────────────────────────────
-
 	private emitFunction(): void {
-		const funcName = this.factoryName(this.ir.className);
+		const funcName = this.factoryName(this._ir.className);
 		this.line(`export function ${funcName}() {`);
-		this.indent++;
+		this._indent++;
 
-		// Create skin instance
 		this.line('const skin = new Skin();');
 
-		// Set skin parts
-		if (this.ir.skinParts.length > 0) {
-			this.line(`skin.skinParts = ${JSON.stringify(this.ir.skinParts)};`);
+		if (this._ir.skinParts.length > 0) {
+			this.line(`skin.skinParts = ${JSON.stringify(this._ir.skinParts)};`);
 		}
 
-		// Set skin dimensions
-		if (this.ir.width != null) {
-			this.line(`skin.width = ${this.ir.width};`);
+		if (this._ir.width !== undefined) {
+			this.line(`skin.width = ${this._ir.width};`);
 		}
-		if (this.ir.height != null) {
-			this.line(`skin.height = ${this.ir.height};`);
+		if (this._ir.height !== undefined) {
+			this.line(`skin.height = ${this._ir.height};`);
 		}
-		for (const prop of this.ir.properties) {
-			if (!prop.state) this.emitPropertyAssignment('skin', prop.name, prop.value);
+		for (const prop of this._ir.properties) {
+			if (!prop.state) {
+				this.emitPropertyAssignment('skin', prop.name, prop.value);
+			}
 		}
 
-		// Create and configure all nodes
-		this.emitNodeDeclarations(this.ir.children, 'skin');
+		this.emitNodeDeclarations(this._ir.children);
 
-		// Set elementsContent on skin
-		const defaultChildren = this.ir.children.filter(n => n.includeIn.length === 0 && n.excludeFrom.length === 0);
+		const defaultChildren = this._ir.children.filter(n => n.includeIn.length === 0 && n.excludeFrom.length === 0);
 		if (defaultChildren.length > 0) {
 			const childVars = defaultChildren.map(n => n.varName).join(', ');
 			this.line(`skin.elementsContent = [${childVars}];`);
 		}
 
-		// Emit declarations (non-visual)
-		for (const decl of this.ir.declarations) {
+		for (const decl of this._ir.declarations) {
 			this.emitNodeCreation(decl);
 			this.emitNodeProperties(decl);
 		}
 
-		// Emit states
 		this.emitStates();
 
 		this.line('return skin;');
-		this.indent--;
+		this._indent--;
 		this.line('}');
 	}
 
-	// ── Node declarations ─────────────────────────────────────────────
-
-	private emitNodeDeclarations(nodes: readonly SkinNode[], parentVar: string): void {
+	private emitNodeDeclarations(nodes: readonly SkinNode[]): void {
 		for (const node of nodes) {
 			this.emitNodeCreation(node);
 			this.emitNodeProperties(node);
 			this.emitNodePropertyChildren(node);
 
-			// Recurse into children
-			this.emitNodeDeclarations(node.children, node.varName);
+			this.emitNodeDeclarations(node.children);
 
-			// Assign children to default property
 			const defaultPropChildren = node.children.filter(c => c.includeIn.length === 0 && c.excludeFrom.length === 0);
 			if (defaultPropChildren.length > 0) {
 				const info = lookupComponent(node.className);
@@ -191,7 +186,6 @@ class CodeGen {
 				if (isArray) {
 					this.line(`${node.varName}.${defaultProp} = [${childVars}];`);
 				} else {
-					// Single-value property: assign first child directly
 					this.line(`${node.varName}.${defaultProp} = ${defaultPropChildren[0].varName};`);
 				}
 			}
@@ -200,12 +194,10 @@ class CodeGen {
 
 	private emitNodeCreation(node: SkinNode): void {
 		this.line(`const ${node.varName} = new ${node.className}();`);
-		// If node has an id, set it on the skin (skin part)
 		if (node.id) {
 			this.line(`skin.${node.id} = ${node.varName};`);
 		} else {
-			// If node has state-specific properties, register it on skin by varName
-			// so SetProperty can resolve it via skin.getPart(varName)
+			// Anonymous state targets still need a stable key for `skin.getPart()`.
 			const hasStateProps = node.properties.some(p => p.state);
 			if (hasStateProps) {
 				this.line(`skin.${node.varName} = ${node.varName};`);
@@ -213,12 +205,9 @@ class CodeGen {
 		}
 	}
 
-	// ── Properties ────────────────────────────────────────────────────
-
 	private emitNodeProperties(node: SkinNode): void {
 		for (const prop of node.properties) {
 			if (prop.state) {
-				// State-specific property → handled via SetProperty override
 				continue;
 			}
 			this.emitPropertyAssignment(node.varName, prop.name, prop.value);
@@ -238,7 +227,6 @@ class CodeGen {
 			}
 		}
 
-		// Handle bindings
 		if (value.type === 'binding') {
 			this.emitBinding(target, prop, value.expression);
 			return;
@@ -248,10 +236,8 @@ class CodeGen {
 	}
 
 	private emitBinding(target: string, prop: string, expression: string): void {
-		// The expression is already stripped of outer braces by parseValue().
-		// Check whether it contains inner braces (template binding like "Hello {name}!").
+		// Inner braces distinguish template bindings from simple property chains.
 		if (expression.includes('{')) {
-			// Template binding: Binding.bindProperties
 			const parts = parseBindingTemplate(expression);
 			if (parts.some(p => p.type === 'binding')) {
 				const templates: string[] = [];
@@ -269,14 +255,11 @@ class CodeGen {
 				);
 			}
 		} else {
-			// Simple binding: Binding.bindProperty(host, ['chain'], target, 'prop')
 			this.line(
 				`Binding.bindProperty(this, ["${expression.split('.').join('", "')}"], ${target}, "${prop}");`,
 			);
 		}
 	}
-
-	// ── Property children ─────────────────────────────────────────────
 
 	private emitNodePropertyChildren(node: SkinNode): void {
 		for (const pc of node.propertyChildren) {
@@ -292,13 +275,11 @@ class CodeGen {
 		}
 	}
 
-	// ── States ────────────────────────────────────────────────────────
-
 	private emitStates(): void {
-		if (this.ir.states.length === 0) return;
+		if (this._ir.states.length === 0) return;
 
 		const stateLines: string[] = [];
-		for (const state of this.ir.states) {
+		for (const state of this._ir.states) {
 			stateLines.push(this.generateStateExpr(state));
 		}
 
@@ -306,12 +287,11 @@ class CodeGen {
 	}
 
 	private generateStateExpr(state: StateDef): string {
-		// Collect overrides: explicit overrides from State element + state-specific props from nodes
+		// Explicit state entries and dotted property attributes share one override list.
 		const allOverrides = [...state.overrides];
 
-		// Add SetProperty overrides from node properties with this state name or matching stateGroup
-		const nodeOverrides = this.collectStatePropertyOverrides(this.ir.children);
-		for (const prop of this.ir.properties) {
+		const nodeOverrides = this.collectStatePropertyOverrides(this._ir.children);
+		for (const prop of this._ir.properties) {
 			if (prop.state) {
 				nodeOverrides.push({
 					stateName: prop.state,
@@ -322,7 +302,6 @@ class CodeGen {
 			}
 		}
 		for (const { stateName, targetId, propName, value } of nodeOverrides) {
-			// Match by state name or by stateGroup membership
 			const matches = stateName === state.name || state.stateGroups.includes(stateName);
 			if (matches) {
 				allOverrides.push({ type: 'SetProperty', targetId, name: propName, value });
@@ -339,14 +318,10 @@ class CodeGen {
 
 	private generateOverrideExpr(override: StateOverride): string {
 		switch (override.type) {
-			case 'AddItems': {
-				const o = override as StateAddItems;
-				return `new AddItems("${o.targetId}", "${o.destinationId}", ${o.position}, "${o.propertyName}")`;
-			}
-			case 'SetProperty': {
-				const o = override as StateSetProperty;
-				return `new SetProperty("${o.targetId}", "${o.name}", ${this.propertyValueToJS(o.name, o.value)})`;
-			}
+			case 'AddItems':
+				return `new AddItems("${override.targetId}", "${override.destinationId}", ${override.position}, "${override.propertyName}")`;
+			case 'SetProperty':
+				return `new SetProperty("${override.targetId}", "${override.name}", ${this.propertyValueToJS(override.name, override.value)})`;
 			default:
 				return '/* unknown override */';
 		}
@@ -354,8 +329,8 @@ class CodeGen {
 
 	private collectStatePropertyOverrides(
 		nodes: readonly SkinNode[],
-	): { stateName: string; targetId: string; propName: string; value: PropertyValue }[] {
-		const result: { stateName: string; targetId: string; propName: string; value: PropertyValue }[] = [];
+	): StatePropertyOverride[] {
+		const result: StatePropertyOverride[] = [];
 		for (const node of nodes) {
 			for (const prop of node.properties) {
 				if (prop.state) {
@@ -372,18 +347,16 @@ class CodeGen {
 		return result;
 	}
 
-	// ── Value helpers ─────────────────────────────────────────────────
-
 	private valueToJS(value: PropertyValue): string {
 		switch (value.type) {
 			case 'literal':
-				return literalToJS(value as LiteralValue);
+				return literalToJS(value);
 			case 'percent':
-				return String((value as PercentValue).value);
+				return String(value.value);
 			case 'binding':
-				return `/* binding: ${(value as BindingValue).expression} */`;
+				return `/* binding: ${value.expression} */`;
 			case 'ref':
-				return (value as { varName: string }).varName;
+				return value.varName;
 			default:
 				return 'undefined';
 		}
@@ -399,19 +372,16 @@ class CodeGen {
 		return this.valueToJS(value);
 	}
 
-	// ── Utilities ─────────────────────────────────────────────────────
-
 	private line(text: string): void {
 		if (text === '') {
-			this.lines.push('');
+			this._lines.push('');
 		} else {
-			this.lines.push('\t'.repeat(this.indent) + text);
+			this._lines.push('\t'.repeat(this._indent) + text);
 		}
 	}
 
 	private factoryName(className: string): string {
 		if (!className) return 'createSkin';
-		// Convert "skins.MySkin" → "createMySkin"
 		const parts = className.split('.');
 		const base = parts[parts.length - 1];
 		return `create${base}`;
@@ -428,7 +398,7 @@ class CodeGen {
 	}
 
 	private hasPropertyInTree(propertyName: string): boolean {
-		if (this.ir.properties.some(prop => prop.name === propertyName)) return true;
+		if (this._ir.properties.some(prop => prop.name === propertyName)) return true;
 		const visit = (nodes: readonly SkinNode[]): boolean => {
 			for (const node of nodes) {
 				if (node.properties.some(prop => prop.name === propertyName)) return true;
@@ -436,7 +406,7 @@ class CodeGen {
 			}
 			return false;
 		};
-		return visit(this.ir.children) || visit(this.ir.declarations);
+		return visit(this._ir.children) || visit(this._ir.declarations);
 	}
 }
 
@@ -451,11 +421,6 @@ function literalToJS(value: LiteralValue): string {
 
 function escapeJS(s: string): string {
 	return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-}
-
-interface TemplatePart {
-	type: 'literal' | 'binding';
-	value: string;
 }
 
 /**
@@ -474,12 +439,15 @@ function parseBindingTemplate(expr: string): TemplatePart[] {
 				parts.push({ type: 'literal', value: current });
 				current = '';
 			}
-			// Find matching }
 			let depth = 1;
 			let j = i + 1;
 			while (j < expr.length && depth > 0) {
-				if (expr[j] === '{') depth++;
-				if (expr[j] === '}') depth--;
+				if (expr[j] === '{') {
+					depth++;
+				}
+				if (expr[j] === '}') {
+					depth--;
+				}
 				j++;
 			}
 			parts.push({ type: 'binding', value: expr.slice(i + 1, j - 1) });

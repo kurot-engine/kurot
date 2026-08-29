@@ -2,30 +2,33 @@ import * as path from 'node:path';
 import { exists } from '../utils/fs.js';
 import { ConfigError } from './errors.js';
 
+/**
+ * Runtime platform targeted by project builds.
+ */
 export type BuildTarget = 'html5';
 
 export interface StageConfig {
 	/**
 	 * Stage width in points.
 	 */
-	width: number;
+	readonly width: number;
 	/**
 	 * Stage height in points.
 	 */
-	height: number;
+	readonly height: number;
 	/**
 	 * Egret-style scale mode: `showAll` | `noScale` | `exactFit` | `noBorder` |
 	 * `fixedHeight` | `fixedWidth` | `fixedNarrow` | `fixedWide`.
 	 */
-	scaleMode: string;
+	readonly scaleMode: string;
 	/**
 	 * Preferred device orientation (e.g. `auto`, `portrait`, `landscape`).
 	 */
-	orientation: string;
+	readonly orientation: string;
 	/**
 	 * Target frame rate, in frames per second.
 	 */
-	frameRate: number;
+	readonly frameRate: number;
 }
 
 export interface ExmlConfig {
@@ -33,7 +36,7 @@ export interface ExmlConfig {
 	 * Path to the Egret-style theme file (e.g. `resource/default.thm.json`),
 	 * relative to the project root.
 	 */
-	themeFile: string;
+	readonly themeFile: string;
 	/**
 	 * Custom EXML namespaces for project-defined components, matching Egret's
 	 * `xmlns:game="game.*"` convention. Maps the namespace prefix used in EXML
@@ -44,7 +47,33 @@ export interface ExmlConfig {
 	 * skins bundles via an import map, so a class referenced from EXML and from
 	 * game code resolves to the same module instance (no duplicate class identity).
 	 */
-	namespaces?: Record<string, string>;
+	readonly namespaces?: Readonly<Record<string, string>>;
+	/**
+	 * Convention-based reusable UI components.
+	 *
+	 * A component source `<Name>.ts` under `sourceDir` is paired with
+	 * `<Name>Skin.exml` at the same relative path under `skinDir`. The CLI
+	 * exposes paired components through `namespace` without requiring a
+	 * hand-written namespace barrel.
+	 */
+	readonly components?: ComponentsConfig;
+}
+
+export interface ComponentsConfig {
+	/**
+	 * EXML namespace prefix used to instantiate discovered components.
+	 */
+	readonly namespace: string;
+	/**
+	 * Directory containing reusable component TypeScript sources, relative to
+	 * the project root.
+	 */
+	readonly sourceDir: string;
+	/**
+	 * Directory containing the corresponding component skins, relative to the
+	 * project root.
+	 */
+	readonly skinDir: string;
 }
 
 export interface OutputConfig {
@@ -53,7 +82,7 @@ export interface OutputConfig {
 	 * (default: `bin-debug`). Release builds always go to
 	 * `bin-release/web/<timestamp>` regardless of this setting.
 	 */
-	dir: string;
+	readonly dir: string;
 }
 
 export interface HtmlConfig {
@@ -61,35 +90,35 @@ export interface HtmlConfig {
 	 * Path to the project-owned HTML template, relative to the project root.
 	 * Omit to use the CLI's built-in default template.
 	 */
-	template: string;
+	readonly template: string;
 }
 
 export interface ProjectConfig {
 	/**
 	 * Build target platform. Only `html5` is currently supported.
 	 */
-	target: BuildTarget;
+	readonly target: BuildTarget;
 	/**
 	 * Path to the entry source file, relative to the project root
 	 * (default: `src/Main.ts`).
 	 */
-	entry: string;
+	readonly entry: string;
 	/**
 	 * Development build output settings.
 	 */
-	output: OutputConfig;
+	readonly output: OutputConfig;
 	/**
 	 * HTML page template settings. Omit to use the built-in default page.
 	 */
-	html?: HtmlConfig;
+	readonly html?: HtmlConfig;
 	/**
 	 * Stage / canvas configuration.
 	 */
-	stage: StageConfig;
+	readonly stage: StageConfig;
 	/**
 	 * EXML compilation settings. Omit to disable EXML support entirely.
 	 */
-	exml?: ExmlConfig;
+	readonly exml?: ExmlConfig;
 }
 
 const DEFAULTS: ProjectConfig = {
@@ -121,8 +150,8 @@ const VALID_SCALE_MODES = [
  * directory, merging it over `DEFAULTS`. Falls back to `DEFAULTS` entirely
  * when no config file is present.
  *
- * @returns The validated project configuration
- * @throws {ConfigError} If `stage.frameRate`, `stage.scaleMode`, or `entry` is invalid
+ * @returns The validated project configuration.
+ * @throws {ConfigError} If the project configuration is invalid.
  */
 export async function loadConfig(): Promise<ProjectConfig> {
 	const configPath = path.resolve('kurot.config.ts');
@@ -140,27 +169,23 @@ export async function loadConfig(): Promise<ProjectConfig> {
 		config = DEFAULTS;
 	}
 
-	// Validate stage.frameRate
 	if (!Number.isInteger(config.stage.frameRate) || config.stage.frameRate <= 0) {
 		throw new ConfigError(
 			`Invalid config: stage.frameRate must be a positive integer, got ${config.stage.frameRate}`,
 		);
 	}
 
-	// Validate stage.scaleMode
 	if (!VALID_SCALE_MODES.includes(config.stage.scaleMode as (typeof VALID_SCALE_MODES)[number])) {
 		throw new ConfigError(
 			`Invalid config: stage.scaleMode must be one of ${VALID_SCALE_MODES.map(m => `'${m}'`).join(', ')}, got '${config.stage.scaleMode}'`,
 		);
 	}
 
-	// Validate entry file exists
 	const entryPath = path.resolve(config.entry);
 	if (!(await exists(entryPath))) {
 		throw new ConfigError(`Invalid config: entry file '${config.entry}' does not exist`);
 	}
 
-	// Validate HTML template exists
 	if (config.html) {
 		const templatePath = path.resolve(config.html.template);
 		if (!(await exists(templatePath))) {
@@ -168,5 +193,22 @@ export async function loadConfig(): Promise<ProjectConfig> {
 		}
 	}
 
+	validateComponentsConfig(config.exml?.components);
+
 	return config;
+}
+
+function validateComponentsConfig(components: ComponentsConfig | undefined): void {
+	if (!components) return;
+	if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(components.namespace)) {
+		throw new ConfigError(
+			`Invalid config: exml.components.namespace must be a valid XML namespace prefix, got '${components.namespace}'`,
+		);
+	}
+	if (!components.sourceDir.trim()) {
+		throw new ConfigError('Invalid config: exml.components.sourceDir must not be empty');
+	}
+	if (!components.skinDir.trim()) {
+		throw new ConfigError('Invalid config: exml.components.skinDir must not be empty');
+	}
 }

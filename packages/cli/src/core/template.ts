@@ -1,13 +1,27 @@
-import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { copyDir, writeFile, exists } from '../utils/fs.js';
+import { copyDir, ensureDir, exists, writeFile } from '../utils/fs.js';
+
+interface PackageJson {
+	name?: string;
+	dependencies?: Record<string, string>;
+	devDependencies?: Record<string, string>;
+	[key: string]: unknown;
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, '../../templates');
 const CLI_PKG = path.resolve(__dirname, '../../package.json');
 
+/**
+ * Project templates bundled with the CLI.
+ */
 export const TEMPLATES = ['game', 'empty'] as const;
+
+/**
+ * Name of a bundled project template.
+ */
 export type TemplateName = (typeof TEMPLATES)[number];
 
 /**
@@ -17,7 +31,8 @@ export type TemplateName = (typeof TEMPLATES)[number];
  * - `name` is set to the project name.
  * - `@kurot/cli` is pinned to the version of the CLI doing the scaffolding,
  *   so a project always uses the CLI that created it (never a stale template pin).
- * - `@kurot/*` engine packages are set to `latest`.
+ * - `@kurot/*` engine packages are pinned to the registry's latest concrete
+ *   version, with the `latest` tag retained only as an offline fallback.
  */
 export async function scaffoldProject(name: string, template: TemplateName): Promise<void> {
 	const templateDir = path.join(TEMPLATES_DIR, template);
@@ -31,6 +46,12 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 	}
 
 	await copyDir(templateDir, destDir);
+	if (template === 'game') {
+		await Promise.all([
+			ensureDir(path.join(destDir, 'src/components')),
+			ensureDir(path.join(destDir, 'resource/skins/components')),
+		]);
+	}
 
 	const pkgPath = path.join(destDir, 'package.json');
 	if (await exists(pkgPath)) {
@@ -43,13 +64,6 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 	}
 }
 
-interface PackageJson {
-	name?: string;
-	dependencies?: Record<string, string>;
-	devDependencies?: Record<string, string>;
-	[k: string]: unknown;
-}
-
 /**
  * Rewrites `@kurot/*` ranges: the CLI to its own version, and each engine
  * package to the concrete latest version (`^x.y.z`) resolved from the registry.
@@ -58,8 +72,11 @@ async function pinKurotDeps(deps: Record<string, string> | undefined, cliVersion
 	if (!deps) return;
 	await Promise.all(
 		Object.keys(deps).map(async dep => {
-			if (dep === '@kurot/cli') deps[dep] = `^${cliVersion}`;
-			else if (dep.startsWith('@kurot/')) deps[dep] = await resolveLatest(dep);
+			if (dep === '@kurot/cli') {
+				deps[dep] = `^${cliVersion}`;
+			} else if (dep.startsWith('@kurot/')) {
+				deps[dep] = await resolveLatest(dep);
+			}
 		}),
 	);
 }
@@ -77,9 +94,7 @@ async function resolveLatest(pkg: string): Promise<string> {
 			const data = (await res.json()) as { version?: string };
 			if (data.version) return `^${data.version}`;
 		}
-	} catch {
-		// Offline / unpublished — fall back below.
-	}
+	} catch {}
 	return 'latest';
 }
 

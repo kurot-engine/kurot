@@ -7,9 +7,21 @@ export type DiagnosticSeverity = 'warning' | 'error';
  * Source position associated with a diagnostic.
  */
 export interface SourceLocation {
+	/**
+	 * Project-relative source path when available.
+	 */
 	readonly file: string;
+	/**
+	 * One-based source line.
+	 */
 	readonly line?: number;
+	/**
+	 * One-based UTF-16 source column.
+	 */
 	readonly column?: number;
+	/**
+	 * Zero-based UTF-16 source offset.
+	 */
 	readonly offset?: number;
 }
 
@@ -28,5 +40,8 @@ export interface Diagnostic {
  * Policy controlling how diagnostics are classified.
  */
 export interface DiagnosticPolicy {
+	/**
+	 * Whether supported warning codes are promoted to errors.
+	 */
 	readonly strict: boolean;
 }

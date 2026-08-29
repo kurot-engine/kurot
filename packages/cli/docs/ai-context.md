@@ -31,6 +31,7 @@ src/
 │   ├── template.ts                 scaffoldProject(), TEMPLATES list
 │   ├── errors.ts                   BuildError, ConfigError
 │   ├── diagnostics/                Serializable diagnostics, strict policy, JSON/JSONL protocol
+│   ├── components/                 Reusable TS/Skin discovery and refresh
 │   ├── exml/                       The EXML → SkinIR → ESM compiler (see §3)
 │   │   ├── xml-parser.ts           Hand-rolled recursive-descent XML parser
 │   │   ├── registry.ts             Namespace prefix map + component tag registry
@@ -38,7 +39,7 @@ src/
 │   │   └── codegen.ts              SkinIR -> ESM source text (string building, not AST)
 │   └── plugins/                    Pipeline steps, run in array order (see §5)
 │       ├── clean-output.ts, compile-exml.ts, compile-engine.ts,
-│       │   compile-custom-namespaces.ts, compile-source.ts,
+│       │   compile-custom-namespaces.ts, component-catalog.ts, compile-source.ts,
 │       │   generate-html.ts, manifest.ts, copy-assets.ts
 │       └── index.ts                defaultPlugins() — the build-command order
 └── utils/                          Misc helpers
@@ -75,6 +76,19 @@ Templates actually scaffolded by `create` live in `templates/game/` and
 - `ctx.outputs.engine` is a **single shared map** holding both `@kurot/*`
   engine chunks AND `#ns/*` custom-namespace chunks — the import-map
   generator (`generate-html.ts`) doesn't distinguish between them.
+- Release engine, namespace, and application bundles enable esbuild
+  `keepNames`: `Component.hostComponentKey` and Theme inheritance fallback use
+  `constructor.name`, so ordinary identifier minification would break default
+  Skin lookup even though the ESM export name remained stable.
+- `exml.components` is convention-based: `<Name>.ts` under `sourceDir` must
+  pair with `<Name>Skin.exml` at the same relative path under `skinDir`.
+  Component names are globally unique inside that namespace. The CLI generates
+  the namespace entry, validates exact EXML tags, injects default Theme
+  mappings, and writes `.kurot/component-catalog.json` in development only.
+  The Skin remains a standard `eui:Skin`, so existing visual editors can edit it.
+- A manual `exml.namespaces` barrel remains supported, but its exports are
+  intentionally unknown until esbuild runs. Its prefix may not conflict with
+  `exml.components.namespace`.
 - `namespaceModuleExternalPlugin` (in `namespace-external-plugin.ts`) exists
   because a plain esbuild `external: [specifier]` list only catches literal
   `#ns/game`-style imports (what EXML-generated code emits) — it does NOT
@@ -137,11 +151,10 @@ AST-to-AST transform).
   isArray?}`). `defaultProperty` is where direct child nodes get assigned —
   e.g. `Skin`/`Group`/`Panel` → `elementsContent` (array), `DataGroup`/
   `List`/`ComboBox` → `dataProvider` (single value). `lookupComponent()`
-  checks custom namespaces (`exml.namespaces` config) **first** — a matching
-  custom-namespace tag returns just `{module: ns.specifier}` with no default-
-  property info, since the CLI never introspects the barrel file's actual
-  exports; it just imports by the tag's local name assuming it's a named
-  export.
+  checks custom namespaces first. Convention-discovered namespaces carry an
+  exact component-name set, so misspelled `<game:...>` tags are rejected with
+  suggestions. Manual `exml.namespaces` barrels remain open-ended because the
+  parser does not introspect their exports.
 - Root element must be locally named `Skin` (any prefix) or the parser
   throws. `states="a,b,c"` shorthand on the root expands into empty-override
   `StateDef`s. State collection is **two-pass**: pass 1 scans the whole tree
@@ -258,7 +271,7 @@ Confirmed file lists (from directory listing, not the README):
 The `kurot` executable is the command entry. The package's JavaScript/TypeScript
 entry is `dist/define.js` / `dist/define.d.ts`, generated from `src/define.ts`.
 It exports configuration types only: `ProjectConfig`, `BuildTarget`,
-`StageConfig`, `ExmlConfig`, and `OutputConfig`. CLI pipeline, EXML and
+`StageConfig`, `ExmlConfig`, `ComponentsConfig`, and `OutputConfig`. CLI pipeline, EXML and
 diagnostic internals are not package subpath exports.
 
 ## 8. Task → file map
@@ -266,6 +279,7 @@ diagnostic internals are not package subpath exports.
 | I want to... | Look at |
 |---|---|
 | Add a new EXML tag / component mapping | `core/exml/registry.ts` (`COMPONENTS`) |
+| Change reusable-component pairing/catalog behavior | `core/components/discover-components.ts`, `core/plugins/component-catalog.ts` |
 | Change how skin factories are generated or bundled | `core/exml/codegen.ts`, `core/exml/skin-module-builder.ts` |
 | Debug why a namespace class is duplicated (`instanceof` breaks) | `core/namespace-external-plugin.ts`, confirm `compileCustomNamespaces` ran before `compileSource` |
 | Add a new build pipeline step | `core/plugins/`, register it in `core/plugins/index.ts`'s `defaultPlugins()` (and `dev-server.ts`'s list if it should also run in dev) |
