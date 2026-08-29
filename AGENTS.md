@@ -13,6 +13,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/ui`        | 1.1.7   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
 | `@kurot/cli`       | 1.1.3   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
+| `@kurot/ui-document` | 0.1.0 | Headless semantic UI document foundation for future editors, CLI workflows, and Agent tooling. No runtime dependencies.                                                       | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
@@ -22,6 +23,8 @@ Dependency direction is strictly one-way:
  └─ @kurot/game
 
 @kurot/cli  (build-time only, no runtime dependency on the above)
+
+@kurot/ui-document  (headless editing-time model, no runtime dependency)
 ```
 
 Each `ai-context.md` covers, for its own package: a directory map with
@@ -51,7 +54,7 @@ There is no root-level install/build/test command — the repo root has no
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
-pnpm --dir packages/<package> test   # core, cli, ui, game only — spine has none
+pnpm --dir packages/<package> test   # core, cli, ui, game, ui-document
 pnpm --dir packages/<package> dev    # TS compile watch
 ```
 
@@ -79,7 +82,7 @@ Kurot/
 ├── README.md          Human-facing overview (English)
 ├── docs/              Contribution rules (docs/code-rules.md) — committed
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
-├── packages/          The 4 packages above, each with its own docs/ + docs-internal/
+├── packages/          The 5 packages above, each with its own docs/ + docs-internal/
 ├── examples/          demo (Vite + hand-written EXML) and my-game (CLI-scaffolded)
 └── reference/         Local read-only reference sources — not distributed via git
 ```

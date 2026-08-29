@@ -46,14 +46,15 @@ correctness and performance validation system.
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
-| Package                                  | Version | Path            | Responsibility                                                                                                 | Internal dependencies |
-| ---------------------------------------- | ------- | --------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md) | 1.0.15  | `packages/core` | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
-| [`@kurot/ui`](packages/ui/README.md)     | 1.1.7   | `packages/ui`   | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
-| [`@kurot/game`](packages/game/README.md) | 1.0.6   | `packages/game` | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)   | 1.1.3   | `packages/cli`  | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
+| Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
+| ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
+| [`@kurot/core`](packages/core/README.md)               | 1.0.15  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
+| [`@kurot/ui`](packages/ui/README.md)                   | 1.1.7   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
+| [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
+| [`@kurot/cli`](packages/cli/README.md)                 | 1.1.3   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.1.0   | `packages/ui-document` | Headless semantic UI document foundation shared by future editors, CLI workflows, and Agent tooling            | None                  |
 
-Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other; `cli` is a build-time-only tool and is never pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
+Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `cli` is a build-time-only tool, while `ui-document` is a headless editing-time model; neither is pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
 ```text
 @kurot/core
@@ -61,6 +62,8 @@ Dependencies flow in one direction: `core` is the foundation package; `ui` and `
  └─ @kurot/game
 
 @kurot/cli  (build-time only)
+
+@kurot/ui-document  (headless editing-time document model)
 ```
 
 ## Getting started
@@ -81,14 +84,14 @@ pnpm --dir packages/core build
 pnpm --dir packages/core test
 ```
 
-Replace `core` with `cli`, `ui`, or `game` to install and build the corresponding package:
+Replace `core` with `cli`, `ui`, `game`, or `ui-document` to install and build the corresponding package:
 
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
 ```
 
-`core`, `cli`, `ui`, and `game` provide a one-shot test command:
+All five packages provide a one-shot test command:
 
 ```sh
 pnpm --dir packages/<package> test

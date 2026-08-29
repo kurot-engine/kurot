@@ -1,0 +1,50 @@
+{
+	"name": "@kurot/ui-document",
+	"version": "0.1.0",
+	"description": "Headless semantic document model for Kurot UI tooling, editors, CLI workflows, and AI agents",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist/**/*",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc --build",
+		"dev": "tsc --watch",
+		"clean": "rm -rf dist",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"devDependencies": {
+		"@types/node": "^22.0.0",
+		"typescript": "^5.6.0",
+		"vitest": "^4.1.4"
+	},
+	"keywords": [
+		"kurot",
+		"ui",
+		"document-model",
+		"game-editor",
+		"typescript"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/ui-document"
+	},
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
+	}
+}
