@@ -10,5 +10,9 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 - Initial independent package scaffold with strict TypeScript, ESM, build,
   test, publishing metadata, and public documentation.
-- `UI_DOCUMENT_FORMAT_VERSION` as the package's initial versioned format
-  boundary.
+- Initial `UIDocument`, `UINode`, and recursive `UIPropertyValue` semantic
+  model with explicit constructors.
+- Deterministic tree traversal, node lookup, strict validation, structured
+  diagnostics, and validated JSON parsing/serialization.
+- `UI_DOCUMENT_KIND` and `UI_DOCUMENT_FORMAT_VERSION` as explicit format
+  boundaries.
