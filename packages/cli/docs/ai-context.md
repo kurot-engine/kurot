@@ -5,7 +5,7 @@ unfamiliar with Kurot does not need to re-derive the pipeline from scratch
 each session. [`architecture.md`](./architecture.md) covers the same plugin
 pipeline in greater detail.
 
-Package identity: `@kurot/cli@1.1.1`. Node.js build tool, esbuild-powered,
+Package identity: `@kurot/cli@1.1.3`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
 via `npx` (scaffolding) or as a devDependency with npm scripts.
 
@@ -107,7 +107,9 @@ Templates actually scaffolded by `create` live in `templates/game/` and
   literal → numeric literal → fallback string. This means literal strings
   `"true"`, `"false"`, `"null"`, or any numeric-looking string (`"100"`)
   **always** become non-string JS values in generated code — there is no
-  escape hatch to force them through as literal text.
+  escape hatch to force them through as literal text. Fallback strings decode
+  Egret-style `\n` sequences into hard line breaks; this is independent of a
+  Label's `multiline`/automatic-wrapping behavior.
 - `copy-assets.ts` unconditionally skips copying the theme file and all
   `.exml` files whenever `exml` config is present, **regardless of whether
   `compile-exml.ts` actually found/compiled anything**. A misconfigured

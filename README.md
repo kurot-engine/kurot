@@ -51,7 +51,7 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/core`](packages/core/README.md) | 1.0.15  | `packages/core` | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
 | [`@kurot/ui`](packages/ui/README.md)     | 1.1.7   | `packages/ui`   | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md) | 1.0.6   | `packages/game` | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)   | 1.1.1   | `packages/cli`  | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
+| [`@kurot/cli`](packages/cli/README.md)   | 1.1.3   | `packages/cli`  | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other; `cli` is a build-time-only tool and is never pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 

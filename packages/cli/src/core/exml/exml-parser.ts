@@ -389,7 +389,9 @@ class ParseContext {
 			return { type: 'literal', value: num };
 		}
 
-		return { type: 'literal', value: raw };
+		// Egret EXML treats the two-character `\n` sequence in string
+		// attributes as a hard line break before generating runtime code.
+		return { type: 'literal', value: raw.replace(/\\n/g, '\n') };
 	}
 
 	/**

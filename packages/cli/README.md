@@ -2,7 +2,7 @@
 
 CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
-> **Stable (1.1.1).** Requires Node.js 20 or later and emits ES2022 ESM projects.
+> **Stable (1.1.3).** Requires Node.js 20 or later and emits ES2022 ESM projects.
 
 > Migrating from Egret? See [egret-migration.md](../../docs/egret-migration.md)
 >

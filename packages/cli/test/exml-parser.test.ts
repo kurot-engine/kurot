@@ -245,6 +245,17 @@ describe('Code Generator', () => {
 		expect(code).toContain('skin.btn = btn');
 	});
 
+	it('decodes Egret-style newline escapes in string attributes', () => {
+		const source = `<eui:Skin class="skins.MultilineSkin" xmlns:eui="http://ns.egret.com/eui">
+	<eui:Label id="label" text="First\\nSecond"/>
+</eui:Skin>`;
+		const ir = parseEXML(source, 'skins.MultilineSkin');
+		const label = ir.children[0];
+		const text = label.properties.find(property => property.name === 'text');
+
+		expect(text?.value).toEqual({ type: 'literal', value: 'First\nSecond' });
+	});
+
 	it('generates elementsContent assignment', () => {
 		const code = compileEXML(SIMPLE_EXML, 'skins.SimpleSkin');
 		expect(code).toContain('skin.elementsContent = [btn, title]');

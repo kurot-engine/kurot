@@ -7,6 +7,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 1.1.3 — 2026-08-30
+
+### Fixed
+
+- EXML string attributes now decode Egret-style `\n` sequences as hard line
+  breaks instead of rendering the backslash and `n` literally.
+
 ## 1.1.2 — 2026-08-30
 
 ### Added
