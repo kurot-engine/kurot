@@ -15,6 +15,8 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 - Appearance assets materialized as native Kurot `Skin` and `State` objects.
 - Collision-free slash-qualified lookup keys for reusable component internals.
 - A format-v2 browser preview with two instances of one reusable component.
+- Per-instance reusable-component state controllers with atomic activation,
+  exact pre-state restoration, and structured unknown-state errors.
 
 ### Changed
 

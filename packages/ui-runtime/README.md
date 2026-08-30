@@ -18,8 +18,8 @@ with parameter bindings, variants, part overrides, and projected Slot content.
 Appearance assets become native Kurot skins and states.
 
 Version 0.2 performs full-tree creation. It does not yet provide incremental
-reconciliation, dynamic reusable-component state activation, appearance-variant
-selection, bindings, actions, or transitions.
+reconciliation, appearance-variant selection, bindings, actions, or
+transitions.
 
 The result also provides a stable node lookup for editor selection and event
 wiring:
@@ -27,7 +27,15 @@ wiring:
 ```ts
 const startButton = result.instances.get('startButton');
 const internalLabel = result.instances.get('startButton/label');
+
+const state = result.stateControllers.get('startButton');
+state?.setState('disabled');
+state?.clearState();
 ```
+
+Reusable-component state controllers apply Contract state overrides at runtime
+and restore the exact pre-state values when cleared. Controllers are isolated
+per component instance; an unknown state throws `KurotUIRuntimeError`.
 
 Design tokens resolve from the supplied `UIAssetRegistry`. Resource references
 use their registered key by default; applications can provide

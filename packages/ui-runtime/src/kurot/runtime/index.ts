@@ -6,4 +6,5 @@ export type {
 	KurotUIResourceResolver,
 	KurotUICreationResult,
 	KurotUIRuntimeErrorCode,
+	KurotUIStateController,
 } from './types.js';

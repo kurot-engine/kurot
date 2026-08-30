@@ -16,6 +16,7 @@ export type KurotUIRuntimeErrorCode =
 	| 'invalid-layout'
 	| 'invalid-property'
 	| 'invalid-rectangle'
+	| 'unknown-state'
 	| 'unsupported-appearance'
 	| 'unsupported-children'
 	| 'unsupported-component';
@@ -59,6 +60,31 @@ export type KurotUIResourceResolver = (
 ) => UIPropertyValue;
 
 /**
+ * Dynamic state boundary for one expanded reusable component instance.
+ */
+export interface KurotUIStateController {
+	/**
+	 * State currently applied to the reusable component.
+	 */
+	readonly currentState?: string;
+
+	/**
+	 * Contract state names accepted by this controller in stable order.
+	 */
+	readonly states: readonly string[];
+
+	/**
+	 * Restores the active state and applies the requested contract state.
+	 */
+	setState(name: string): void;
+
+	/**
+	 * Removes the active state and restores the pre-state runtime values.
+	 */
+	clearState(): void;
+}
+
+/**
  * Runtime customization supplied for one materialization operation.
  */
 export interface CreateKurotUIOptions {
@@ -97,6 +123,11 @@ export interface KurotUICreationResult {
 	 * use slash-qualified keys such as `action/label`.
 	 */
 	readonly instances: ReadonlyMap<string, DisplayObject>;
+
+	/**
+	 * Dynamic reusable-component state controllers keyed by instance node ID.
+	 */
+	readonly stateControllers: ReadonlyMap<string, KurotUIStateController>;
 }
 
 /**
@@ -122,6 +153,11 @@ export interface KurotUICreationContext {
 	 * Application resource resolver selected for this materialization.
 	 */
 	readonly resolveResource: KurotUIResourceResolver;
+
+	/**
+	 * Dynamic state controllers registered while reusable instances expand.
+	 */
+	readonly stateControllers: Map<string, KurotUIStateController>;
 
 	/**
 	 * Canonical component types keyed by runtime-qualified node identity.

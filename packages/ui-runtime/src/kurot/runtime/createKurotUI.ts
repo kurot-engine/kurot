@@ -47,10 +47,15 @@ export function createKurotUI(
 		assets,
 		instances: new Map(),
 		resolveResource: options.resolveResource ?? (reference => reference.key),
+		stateControllers: new Map(),
 		types: new Map(),
 	};
 	const root = materializeNode(document.root, '$.root', '', context);
-	return Object.freeze({ root, instances: context.instances });
+	return Object.freeze({
+		root,
+		instances: context.instances,
+		stateControllers: context.stateControllers,
+	});
 }
 
 function createRuntimeAssetRegistry(

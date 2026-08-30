@@ -16,6 +16,7 @@ const summary = requireElement('#summary', HTMLPreElement);
 try {
 	const { assets, document } = createPreviewProject();
 	const result = createKurotUI(document, { assets });
+	result.stateControllers.get('settings-action')?.setState('disabled');
 	const app = createPlayer({
 		canvas,
 		contentWidth: 800,
@@ -134,6 +135,17 @@ function createPreviewCard(): UIDocument {
 			},
 			parts: { label: { nodeId: 'label' } },
 			slots: { content: { nodeId: 'content-slot', capacity: 'multiple' } },
+			states: {
+				disabled: {
+					overrides: [
+						{
+							targetId: 'root',
+							property: 'alpha',
+							value: 0.55,
+						},
+					],
+				},
+			},
 			variants: {
 				primary: {
 					overrides: [

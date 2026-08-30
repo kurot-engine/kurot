@@ -146,6 +146,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
   public-part overrides, and projected Slot content;
 - design-token resolution and an application resource-resolution hook;
 - appearance assets installed as native Kurot skins and states;
+- per-instance reusable-component state controllers with atomic restoration;
 - structured runtime errors;
 - a real browser preview proving that a semantic document becomes a rendered
   Kurot display tree.
@@ -159,7 +160,7 @@ The existing CLI still compiles EXML for current projects.
 The following are still design or implementation work:
 
 - data binding and event/action semantics;
-- dynamic reusable-component state activation and appearance-variant selection;
+- appearance-variant selection;
 - incremental runtime reconciliation after an edit;
 - a visual editor shell;
 - Agent tools and context assembly;
@@ -185,7 +186,7 @@ replace EXML in existing projects today.
 | Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
 | Foundation component schema | Partial | Five components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
-| Editable asset kinds and reuse | Implemented for static creation | Screens, components, compact instances, parameter bindings, parts, Slots, component variants, cross-document validation, runtime expansion, and golden fixtures. Dynamic component states remain pending. |
+| Editable asset kinds and reuse | Implemented for creation and states | Screens, components, compact instances, parameter bindings, parts, Slots, component variants/states, cross-document validation, runtime expansion, and golden fixtures. |
 | Appearance, states, bindings, resources | Partial | Native appearance skins/states and design tokens execute at runtime; typed resources have an application resolver hook. Bindings, actions, appearance variants, transitions, and concrete resource adapters remain pending. |
 | Editing operations and history | Implemented | Typed semantic operations, atomic transactions, expected revisions, inverse operations, deterministic diffs, and monotonic undo/redo history. |
 | Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
@@ -735,8 +736,7 @@ and monotonic undo/redo.
 ### Phase 3 — Complete visual semantics
 
 - complete the component catalog needed for a first production UI slice;
-- add dynamic reusable-component state activation, appearance-variant
-  selection, and transition semantics;
+- add appearance-variant selection and transition semantics;
 - define bounded binding and semantic-action contracts;
 - implement concrete resource adapters for fonts, images, Spine, and animation;
 - complete matching runtime adapters for the first production component slice.

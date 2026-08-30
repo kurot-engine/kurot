@@ -12,7 +12,8 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 ## Public API
 
 - `createKurotUI(document, options)` validates and materializes one complete
-  document. It returns `{ root, instances }` rather than owning a Stage.
+  document. It returns `{ root, instances, stateControllers }` rather than
+  owning a Stage.
 - `CreateKurotUIOptions.registry` replaces the foundation semantic registry;
   extend a foundation registry when custom and built-in types coexist.
 - `CreateKurotUIOptions.assets` supplies the complete project asset, resource,
@@ -43,11 +44,11 @@ their owning document scope. Appearance internals use an `@appearance:` scope
 and are installed as a native `Skin`; declared states become `State` and
 `SetProperty` objects.
 
-Do not infer dynamic component-state support from the presence of component
-contract states in `@kurot/ui-document`: version 0.2 does not expose a state
-controller for expanded reusable components. Appearance-variant selection,
-incremental reconciliation, bindings, actions, and transitions are also not
-implemented.
+Reusable component Contracts with states receive one `KurotUIStateController`
+per expanded instance. `setState(name)` applies overrides atomically and
+`clearState()` restores the pre-state values. Appearance states continue to use
+native Kurot `Skin` state handling. Appearance-variant selection, incremental
+reconciliation, bindings, actions, and transitions are not implemented.
 
 `Image.source` and `Component.skinName` are forwarded to the existing
 `@kurot/ui` mechanisms. The package does not invent resource or Theme lookup.
@@ -61,6 +62,7 @@ automatic visual appearance.
 - Recursive tree construction: `src/kurot/runtime/materializeNode.ts`
 - Component reuse: `src/kurot/runtime/materializeComponentInstance.ts`
 - Appearances and states: `src/kurot/runtime/materializeAppearance.ts`
+- Reusable component states: `src/kurot/runtime/states/`
 - Token and resource resolution: `src/kurot/runtime/resolvePropertyValue.ts`
 - Common/runtime properties: `src/kurot/runtime/builtins/applyDisplayProperties.ts`
 - Component property routing: `src/kurot/runtime/builtins/applyComponentProperties.ts`

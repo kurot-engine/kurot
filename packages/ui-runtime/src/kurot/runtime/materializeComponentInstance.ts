@@ -14,6 +14,7 @@ import {
 	qualifyNodeId,
 } from './materializeNode.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { createReusableComponentStateController } from './states/createReusableComponentStateController.js';
 import type { KurotUICreationContext } from './types.js';
 
 /**
@@ -46,6 +47,17 @@ export function materializeComponentInstance(
 	);
 	applyNodeProperties(root, node, path, context);
 	if (node.appearance) applyAppearance(root, node, identity, path, context);
+	if (Object.keys(source.contract.states).length > 0) {
+		context.stateControllers.set(
+			identity,
+			createReusableComponentStateController(
+				source.contract,
+				identity,
+				`$.assets[${JSON.stringify(source.id)}].contract`,
+				context,
+			),
+		);
+	}
 	return root;
 }
 

@@ -217,6 +217,23 @@ describe('createKurotUI', () => {
 		if (!skin) throw new Error('Expected materialized Skin.');
 		skin.states[0]?.overrides[0]?.apply(button, skin);
 		expect(appearanceBackground.alpha).toBe(0.8);
+
+		const playState = result.stateControllers.get('play-action');
+		const settingsState = result.stateControllers.get('settings-action');
+		expect(playState?.states).toEqual(['disabled']);
+		expect(settingsState?.states).toEqual(['disabled']);
+		playState?.setState('disabled');
+		expect(playState?.currentState).toBe('disabled');
+		expect(play.alpha).toBe(0.5);
+		expect(settings.alpha).toBe(1);
+		expect(() => playState?.setState('missing')).toThrowError(
+			expect.objectContaining({ code: 'unknown-state' }),
+		);
+		expect(playState?.currentState).toBe('disabled');
+		expect(play.alpha).toBe(0.5);
+		playState?.clearState();
+		expect(playState?.currentState).toBeUndefined();
+		expect(play.alpha).toBe(1);
 	});
 
 	it('resolves registered resources through the application hook', () => {

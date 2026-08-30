@@ -62,8 +62,8 @@ Dependencies flow in one direction: `core` is the foundation package; `ui` and `
 `@kurot/ui-document` 0.3 provides the reusable format-v2 model and headless
 editing kernel. `@kurot/ui-runtime` 0.2 validates and renders that model,
 including component instances, Slots, appearances, states, variants, resources,
-and design tokens. Version 0.2 specifically executes component variants and
-native appearance states; dynamic component-state activation remains Phase 3.
+and design tokens. Version 0.2 executes component variants, dynamic
+per-instance component states, and native appearance states.
 
 ```text
 @kurot/core
