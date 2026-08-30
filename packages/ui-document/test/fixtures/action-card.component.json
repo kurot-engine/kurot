@@ -1,0 +1,83 @@
+{
+  "kind": "kurot-ui-document",
+  "formatVersion": 2,
+  "id": "action-card",
+  "assetKind": "component",
+  "contract": {
+    "componentType": "game.ActionCard",
+    "parameters": {
+      "label": {
+        "valueType": "string",
+        "required": true,
+        "description": "Visible action label."
+      }
+    },
+    "parts": {
+      "background": {
+        "nodeId": "background"
+      },
+      "label": {
+        "nodeId": "label"
+      }
+    },
+    "slots": {
+      "content": {
+        "nodeId": "content-slot",
+        "capacity": "multiple"
+      }
+    },
+    "states": {
+      "disabled": {
+        "overrides": [
+          {
+            "targetId": "root",
+            "property": "alpha",
+            "value": 0.5
+          }
+        ]
+      }
+    },
+    "variants": {
+      "primary": {
+        "overrides": [
+          {
+            "targetId": "background",
+            "property": "fillColor",
+            "value": {
+              "key": "color.action.primary",
+              "kind": "token",
+              "tokenType": "color"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "root": {
+    "id": "root",
+    "type": "kui.Group",
+    "properties": {},
+    "children": [
+      {
+        "id": "background",
+        "type": "kui.Rect",
+        "properties": {},
+        "children": []
+      },
+      {
+        "id": "label",
+        "type": "kui.Label",
+        "properties": {
+          "text": "Action"
+        },
+        "children": []
+      },
+      {
+        "id": "content-slot",
+        "type": "kui.Group",
+        "properties": {},
+        "children": []
+      }
+    ]
+  }
+}

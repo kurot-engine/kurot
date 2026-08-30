@@ -164,6 +164,12 @@ function normalizeProperties(
 				...(property.enumValues
 					? { enumValues: Object.freeze([...property.enumValues]) }
 					: {}),
+				...(property.resourceTypes
+					? { resourceTypes: Object.freeze([...property.resourceTypes]) }
+					: {}),
+				...(property.tokenTypes
+					? { tokenTypes: Object.freeze([...property.tokenTypes]) }
+					: {}),
 			}),
 		],
 	);

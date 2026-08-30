@@ -1,4 +1,8 @@
 import type {
+	UIDesignTokenType,
+	UIResourceType,
+} from '../model/UIReference.js';
+import type {
 	UIChildrenPolicy,
 	UIComponentDefinition,
 	UIPropertyDefinition,
@@ -9,10 +13,13 @@ import type {
 const CHILDREN_POLICIES = new Set<UIChildrenPolicy>(['multiple', 'none', 'single']);
 const PROPERTY_VALUE_TYPES = new Set<UIPropertyValueType>([
 	'array',
+	'asset-reference',
 	'boolean',
 	'number',
 	'object',
+	'resource-reference',
 	'string',
+	'token-reference',
 	'value',
 ]);
 const PROPERTY_FORMATS = new Set<UIPropertyFormat>([
@@ -20,7 +27,21 @@ const PROPERTY_FORMATS = new Set<UIPropertyFormat>([
 	'layout',
 	'rectangle',
 	'resource',
-	'skin',
+	'token',
+]);
+const RESOURCE_TYPES = new Set<UIResourceType>([
+	'animation',
+	'font',
+	'image',
+	'spine',
+	'sprite-frame',
+]);
+const TOKEN_TYPES = new Set<UIDesignTokenType>([
+	'color',
+	'number',
+	'spacing',
+	'string',
+	'typography',
 ]);
 
 /**
@@ -78,6 +99,22 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 	if (definition.format !== undefined && !PROPERTY_FORMATS.has(definition.format)) {
 		throw new Error(`Unsupported format "${String(definition.format)}" for property "${name}".`);
 	}
+	validateReferenceTypes(
+		name,
+		'resourceTypes',
+		definition.resourceTypes,
+		RESOURCE_TYPES,
+		uniqueValueTypes,
+		'resource-reference',
+	);
+	validateReferenceTypes(
+		name,
+		'tokenTypes',
+		definition.tokenTypes,
+		TOKEN_TYPES,
+		uniqueValueTypes,
+		'token-reference',
+	);
 	if (definition.required !== undefined && typeof definition.required !== 'boolean') {
 		throw new Error(`Property "${name}" required flag must be a boolean.`);
 	}
@@ -109,6 +146,35 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 		!matchesPropertyConstraints(definition.defaultValue, definition, uniqueValueTypes)
 	) {
 		throw new Error(`Property "${name}" default value does not satisfy its schema.`);
+	}
+}
+
+function validateReferenceTypes<TType extends string>(
+	name: string,
+	label: 'resourceTypes' | 'tokenTypes',
+	values: readonly TType[] | undefined,
+	knownValues: ReadonlySet<TType>,
+	valueTypes: ReadonlySet<UIPropertyValueType>,
+	requiredValueType: UIPropertyValueType,
+): void {
+	if (values === undefined) return;
+	if (!Array.isArray(values) || values.length === 0) {
+		throw new Error(`Property "${name}" ${label} must be a non-empty array.`);
+	}
+	if (!valueTypes.has(requiredValueType)) {
+		throw new Error(
+			`Property "${name}" ${label} requires value type "${requiredValueType}".`,
+		);
+	}
+	const uniqueValues = new Set<TType>();
+	for (const value of values) {
+		if (!knownValues.has(value)) {
+			throw new Error(`Property "${name}" contains unsupported ${label} value "${value}".`);
+		}
+		if (uniqueValues.has(value)) {
+			throw new Error(`Property "${name}" contains duplicate ${label} value "${value}".`);
+		}
+		uniqueValues.add(value);
 	}
 }
 

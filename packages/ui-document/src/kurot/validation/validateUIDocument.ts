@@ -1,18 +1,43 @@
 import { UI_DOCUMENT_KIND } from '../model/UIDocument.js';
+import type { UIAssetKind } from '../model/UIAssetKind.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import { UI_DOCUMENT_FORMAT_VERSION } from '../version.js';
-import type { UIDiagnostic, UIDiagnosticCode } from './UIDiagnostic.js';
+import type { UIDiagnostic } from './UIDiagnostic.js';
+import { validateUIAssetContract } from './validateUIAssetContract.js';
+import { validateUIComponentInstance } from './validateUIComponentInstance.js';
+import {
+	addUIDiagnostic,
+	isPlainRecord,
+	validateAssetReference,
+	validateKnownKeys,
+	validateNonEmptyString,
+	validatePropertyValue,
+} from './validationHelpers.js';
 
-const DOCUMENT_KEYS = new Set(['kind', 'formatVersion', 'id', 'root']);
-const NODE_KEYS = new Set(['id', 'type', 'properties', 'children']);
+const DOCUMENT_KEYS = new Set([
+	'assetKind',
+	'contract',
+	'formatVersion',
+	'id',
+	'kind',
+	'root',
+]);
+const NODE_KEYS = new Set([
+	'appearance',
+	'children',
+	'id',
+	'instance',
+	'properties',
+	'type',
+]);
 
 /**
  * Validates unknown input against the current semantic document format.
  */
 export function validateUIDocument(value: unknown): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
-	if (!isRecord(value)) {
-		addDiagnostic(diagnostics, 'invalid-document', '$', 'Document must be an object.');
+	if (!isPlainRecord(value)) {
+		addUIDiagnostic(diagnostics, 'invalid-document', '$', 'Document must be an object.');
 		return diagnostics;
 	}
 
@@ -20,10 +45,18 @@ export function validateUIDocument(value: unknown): UIDiagnostic[] {
 	validateExactValue(value.kind, UI_DOCUMENT_KIND, '$.kind', diagnostics);
 	validateFormatVersion(value.formatVersion, diagnostics);
 	validateNonEmptyString(value.id, '$.id', 'Document id', diagnostics);
+	const assetKind = validateAssetKind(value.assetKind, diagnostics);
 
 	const nodeIds = new Map<string, string>();
 	const nodeStack = new WeakSet<object>();
 	validateNode(value.root, '$.root', diagnostics, nodeIds, nodeStack);
+	validateUIAssetContract(
+		value.contract,
+		assetKind,
+		'$.contract',
+		diagnostics,
+		new Set(nodeIds.keys()),
+	);
 	return diagnostics;
 }
 
@@ -41,12 +74,12 @@ function validateNode(
 	nodeIds: Map<string, string>,
 	nodeStack: WeakSet<object>,
 ): void {
-	if (!isRecord(value)) {
-		addDiagnostic(diagnostics, 'invalid-value', path, 'Node must be an object.');
+	if (!isPlainRecord(value)) {
+		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node must be an object.');
 		return;
 	}
 	if (nodeStack.has(value)) {
-		addDiagnostic(diagnostics, 'invalid-value', path, 'Node tree must not contain cycles.');
+		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node tree must not contain cycles.');
 		return;
 	}
 
@@ -55,26 +88,36 @@ function validateNode(
 	validateNodeId(value.id, `${path}.id`, diagnostics, nodeIds);
 	validateNonEmptyString(value.type, `${path}.type`, 'Node type', diagnostics);
 	validateProperties(value.properties, `${path}.properties`, diagnostics);
-
-	if (!Array.isArray(value.children)) {
-		addDiagnostic(
-			diagnostics,
-			'invalid-value',
-			`${path}.children`,
-			'Node children must be an array.',
-		);
-	} else {
-		for (let index = 0; index < value.children.length; index++) {
-			validateNode(
-				value.children[index],
-				`${path}.children[${index}]`,
-				diagnostics,
-				nodeIds,
-				nodeStack,
-			);
-		}
+	if (value.appearance !== undefined) {
+		validateAssetReference(value.appearance, `${path}.appearance`, diagnostics);
 	}
+	if (value.instance !== undefined) {
+		validateUIComponentInstance(
+			value.instance,
+			`${path}.instance`,
+			diagnostics,
+			(child, childPath) =>
+				validateNode(child, childPath, diagnostics, nodeIds, nodeStack),
+		);
+	}
+	validateChildren(value.children, `${path}.children`, diagnostics, nodeIds, nodeStack);
 	nodeStack.delete(value);
+}
+
+function validateChildren(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+	nodeIds: Map<string, string>,
+	nodeStack: WeakSet<object>,
+): void {
+	if (!Array.isArray(value)) {
+		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node children must be an array.');
+		return;
+	}
+	for (let index = 0; index < value.length; index++) {
+		validateNode(value[index], `${path}[${index}]`, diagnostics, nodeIds, nodeStack);
+	}
 }
 
 function validateNodeId(
@@ -87,7 +130,7 @@ function validateNodeId(
 
 	const firstPath = nodeIds.get(value);
 	if (firstPath) {
-		addDiagnostic(
+		addUIDiagnostic(
 			diagnostics,
 			'duplicate-node-id',
 			path,
@@ -103,77 +146,35 @@ function validateProperties(
 	path: string,
 	diagnostics: UIDiagnostic[],
 ): void {
-	if (!isRecord(value)) {
-		addDiagnostic(diagnostics, 'invalid-value', path, 'Node properties must be an object.');
+	if (!isPlainRecord(value)) {
+		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node properties must be an object.');
 		return;
 	}
-
 	const valueStack = new WeakSet<object>();
 	for (const [key, propertyValue] of Object.entries(value)) {
 		validatePropertyValue(propertyValue, `${path}.${key}`, diagnostics, valueStack);
 	}
 }
 
-function validatePropertyValue(
+function validateAssetKind(
 	value: unknown,
-	path: string,
 	diagnostics: UIDiagnostic[],
-	valueStack: WeakSet<object>,
-): void {
-	if (typeof value === 'string' || typeof value === 'boolean') return;
-	if (typeof value === 'number') {
-		if (!Number.isFinite(value)) {
-			addDiagnostic(
-				diagnostics,
-				'invalid-property-value',
-				path,
-				'Numeric property values must be finite.',
-			);
-		}
-		return;
+): UIAssetKind | undefined {
+	if (value === 'appearance' || value === 'component' || value === 'screen') {
+		return value;
 	}
-	if (!value || typeof value !== 'object') {
-		addDiagnostic(
-			diagnostics,
-			'invalid-property-value',
-			path,
-			'Property value must be serializable and must not be null or undefined.',
-		);
-		return;
-	}
-	if (valueStack.has(value)) {
-		addDiagnostic(
-			diagnostics,
-			'invalid-property-value',
-			path,
-			'Property value must not contain cyclic references.',
-		);
-		return;
-	}
-
-	valueStack.add(value);
-	if (Array.isArray(value)) {
-		for (let index = 0; index < value.length; index++) {
-			validatePropertyValue(value[index], `${path}[${index}]`, diagnostics, valueStack);
-		}
-	} else if (isRecord(value)) {
-		for (const [key, nestedValue] of Object.entries(value)) {
-			validatePropertyValue(nestedValue, `${path}.${key}`, diagnostics, valueStack);
-		}
-	} else {
-		addDiagnostic(
-			diagnostics,
-			'invalid-property-value',
-			path,
-			'Property object must be a plain string-keyed object.',
-		);
-	}
-	valueStack.delete(value);
+	addUIDiagnostic(
+		diagnostics,
+		'invalid-asset-kind',
+		'$.assetKind',
+		'Asset kind must be "screen", "component", or "appearance".',
+	);
+	return undefined;
 }
 
 function validateFormatVersion(value: unknown, diagnostics: UIDiagnostic[]): void {
 	if (!Number.isInteger(value)) {
-		addDiagnostic(
+		addUIDiagnostic(
 			diagnostics,
 			'invalid-value',
 			'$.formatVersion',
@@ -182,7 +183,7 @@ function validateFormatVersion(value: unknown, diagnostics: UIDiagnostic[]): voi
 		return;
 	}
 	if (value !== UI_DOCUMENT_FORMAT_VERSION) {
-		addDiagnostic(
+		addUIDiagnostic(
 			diagnostics,
 			'unsupported-version',
 			'$.formatVersion',
@@ -198,56 +199,11 @@ function validateExactValue(
 	diagnostics: UIDiagnostic[],
 ): void {
 	if (value !== expected) {
-		addDiagnostic(
+		addUIDiagnostic(
 			diagnostics,
 			'invalid-value',
 			path,
 			`Value must be "${expected}".`,
 		);
 	}
-}
-
-function validateNonEmptyString(
-	value: unknown,
-	path: string,
-	label: string,
-	diagnostics: UIDiagnostic[],
-): value is string {
-	if (typeof value !== 'string' || value.trim().length === 0) {
-		addDiagnostic(diagnostics, 'invalid-value', path, `${label} must be a non-empty string.`);
-		return false;
-	}
-	return true;
-}
-
-function validateKnownKeys(
-	value: Record<string, unknown>,
-	knownKeys: ReadonlySet<string>,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
-	for (const key of Object.keys(value)) {
-		if (knownKeys.has(key)) continue;
-		addDiagnostic(
-			diagnostics,
-			'unexpected-property',
-			`${path}.${key}`,
-			`Property "${key}" is not part of the current document format.`,
-		);
-	}
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-	const prototype = Object.getPrototypeOf(value) as object | null;
-	return prototype === Object.prototype || prototype === null;
-}
-
-function addDiagnostic(
-	diagnostics: UIDiagnostic[],
-	code: UIDiagnosticCode,
-	path: string,
-	message: string,
-): void {
-	diagnostics.push({ code, severity: 'error', path, message });
 }

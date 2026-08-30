@@ -1,0 +1,47 @@
+{
+  "kind": "kurot-ui-document",
+  "formatVersion": 2,
+  "id": "primary-button-appearance",
+  "assetKind": "appearance",
+  "contract": {
+    "targetType": "kui.Button",
+    "parameters": {},
+    "parts": {
+      "background": {
+        "nodeId": "background"
+      }
+    },
+    "slots": {},
+    "states": {
+      "pressed": {
+        "overrides": [
+          {
+            "targetId": "background",
+            "property": "alpha",
+            "value": 0.8
+          }
+        ]
+      }
+    },
+    "variants": {}
+  },
+  "root": {
+    "id": "root",
+    "type": "kui.Group",
+    "properties": {},
+    "children": [
+      {
+        "id": "background",
+        "type": "kui.Rect",
+        "properties": {
+          "fillColor": {
+            "key": "color.action.primary",
+            "kind": "token",
+            "tokenType": "color"
+          }
+        },
+        "children": []
+      }
+    ]
+  }
+}

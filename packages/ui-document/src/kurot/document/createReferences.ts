@@ -1,0 +1,45 @@
+import type {
+	UIAssetReference,
+	UIDesignTokenReference,
+	UIDesignTokenType,
+	UIResourceReference,
+	UIResourceType,
+} from '../model/UIReference.js';
+
+/**
+ * Creates a stable reference to another editable UI asset.
+ */
+export function createUIAssetReference(assetId: string): UIAssetReference {
+	assertNonEmpty(assetId, 'Asset id');
+	return { kind: 'asset', assetId };
+}
+
+/**
+ * Creates a typed reference to one project resource.
+ */
+export function createUIResourceReference(
+	resourceType: UIResourceType,
+	key: string,
+): UIResourceReference {
+	assertNonEmpty(resourceType, 'Resource type');
+	assertNonEmpty(key, 'Resource key');
+	return { kind: 'resource', resourceType, key };
+}
+
+/**
+ * Creates a typed reference to one project design token.
+ */
+export function createUIDesignTokenReference(
+	tokenType: UIDesignTokenType,
+	key: string,
+): UIDesignTokenReference {
+	assertNonEmpty(tokenType, 'Token type');
+	assertNonEmpty(key, 'Token key');
+	return { kind: 'token', tokenType, key };
+}
+
+function assertNonEmpty(value: string, label: string): void {
+	if (value.trim().length === 0) {
+		throw new Error(`${label} must not be empty.`);
+	}
+}

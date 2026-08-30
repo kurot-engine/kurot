@@ -1,3 +1,5 @@
+import type { UIAssetContract } from './UIAssetContract.js';
+import type { UIAssetKind } from './UIAssetKind.js';
 import type { UINode } from './UINode.js';
 
 /**
@@ -23,6 +25,16 @@ export interface UIDocument {
 	 * Stable document identifier assigned by the owning project.
 	 */
 	readonly id: string;
+
+	/**
+	 * Authoring purpose that determines cross-document behavior.
+	 */
+	readonly assetKind: UIAssetKind;
+
+	/**
+	 * Public parameters, parts, slots, states, and variants exposed by the asset.
+	 */
+	readonly contract: UIAssetContract;
 
 	/**
 	 * Root component instance of the document.

@@ -3,13 +3,10 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.1.0`. This is a headless, runtime-
-independent semantic document package for Kurot UI editing workflows. It has
-no runtime dependencies.
-
-Source root: `src/kurot/`. Public API: `src/index.ts` re-exports the `model`,
-`document`, `validation`, `serialization`, `schema`, and `catalog` barrels plus
-the current format version.
+Package identity: `@kurot/ui-document@0.2.0`. This is a headless,
+runtime-independent semantic asset package for Kurot UI authoring. It has no
+runtime dependencies. Format version 2 is intentionally incompatible with the
+0.1 proof model.
 
 ## 1. Directory map
 
@@ -17,107 +14,117 @@ the current format version.
 src/
 ├── index.ts                   Public export barrel only.
 └── kurot/
-    ├── version.ts             Current semantic format version.
-    ├── model/                 UIDocument, UINode, recursive property values.
+    ├── version.ts             Current semantic format version (2).
+    ├── model/                 Assets, nodes, contracts, instances, references.
     ├── document/              Constructors, deterministic traversal, lookup.
-    ├── validation/            Strict unknown-input validation + diagnostics.
+    ├── validation/            Strict single-document validation + diagnostics.
     ├── serialization/         Validated parse + canonical JSON serialization.
     ├── schema/                Component definitions, registry, semantic checks.
-    └── catalog/               Audited built-in semantic component subsets.
+    ├── catalog/               Audited built-in semantic component subsets.
+    └── assets/                Project catalogs and cross-document validation.
 ```
 
 ## 2. Current contracts
 
-- A document has exactly `kind`, `formatVersion`, `id`, and `root`.
-- A node has exactly `id`, `type`, `properties`, and `children`.
-- Node IDs are non-empty and unique across the whole document.
-- `type` is an external component-registry key. This package never resolves it
-  to an `@kurot/ui` runtime class.
+- A document has exactly `kind`, `formatVersion`, `id`, `assetKind`, `contract`,
+  and `root`.
+- `assetKind` is `screen`, `component`, or `appearance`.
+- A component asset must publish `contract.componentType`; an appearance must
+  publish `contract.targetType`. Other asset kinds may not use those fields.
+- Contracts contain parameter schemas, public parts, named Slots, runtime
+  states, and authoring variants. Parts, state overrides, and variant overrides
+  target stable node IDs in the defining asset.
+- A node has `id`, `type`, `properties`, optional `instance`, optional
+  `appearance`, and ordered `children`.
+- A reusable instance stores a stable component-asset reference, parameter
+  values, an optional variant, public-part overrides, and projected Slot trees.
+  It never embeds the referenced component's internal tree.
+- Ordinary `children` are invalid on a reusable instance during project
+  validation; projected content must use a Slot declared by the source asset.
+- Node IDs are non-empty and unique across the complete document, including
+  trees projected into Slots.
 - Properties accept strings, booleans, finite numbers, arrays, and plain
   string-keyed objects. Undefined, null, functions, platform objects, cyclic
   values, and non-finite numbers are invalid.
-- Children remain in source order. Object property keys are sorted only when
-  serialized, producing stable JSON without changing array order.
-- Parsing accepts only `UI_DOCUMENT_FORMAT_VERSION`. Migration support does
-  not exist yet; never silently reinterpret another version.
-- Unknown document or node keys are errors. This is deliberate so malformed
-  Agent output is diagnosed instead of silently discarded.
-- Component definitions are runtime-independent metadata. Never import actual
-  `@kurot/ui` classes into this package.
-- `allowUnknownProperties: true` marks an intentionally incomplete component
-  definition. Omitted `children` likewise means its child policy is not yet
-  known. These are incremental catalog controls, not runtime behavior.
-- Property definitions support union value categories, primitive enums,
-  numeric ranges, integer constraints, serializable defaults, and semantic
-  editor formats (`color`, `layout`, `rectangle`, `resource`, `skin`).
-- Component schema inheritance is single-parent through `extends`. Definitions
-  can be registered in any order; `resolve()` performs deterministic
-  base-to-derived merging and detects missing bases and cycles.
-- Only properties, `children`, and `allowUnknownProperties` are inherited.
-  `abstract`, `displayName`, and `description` belong to the exact definition.
-- Abstract definitions may be resolved and listed but cannot be used as a
-  document node type.
-- The foundation catalog contains three abstract bases and the concrete
-  `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` nodes.
-  Their serializable authoring properties are audited and unknown properties
-  are rejected.
-- `kui.Component` is an abstract semantic base. The current CLI also does not
-  expose the legacy `eui:Component` tag as a usable built-in.
-- `kui.*` is the canonical Kurot UI namespace. EUI identifiers must appear
-  only at a legacy EXML adapter boundary, which maps them to `kui.*` identities.
-- The catalog is not a reflection of every runtime getter. Readonly state and
-  runtime objects such as `Texture`, `Bitmap`, and `Skin` are excluded. Image
-  resources and skins use strings; layout and rectangle descriptors are
-  objects whose nested schemas are not implemented yet.
-- State declarations and bindings are intentionally absent from ordinary
-  component properties; later semantic layers must define them explicitly.
+- Tagged references use explicit records: `{ kind: 'asset', assetId }`,
+  `{ kind: 'resource', resourceType, key }`, or
+  `{ kind: 'token', tokenType, key }`.
+- `UIAssetRegistry` owns explicit per-project assets, resource identities, and
+  design tokens. It is not global state.
+- `validateUIAssetRegistry` checks component/appearance compatibility,
+  parameters, variants, parts, Slots, typed project references, duplicate
+  component identities, and asset dependency cycles.
+- Parsing accepts only `UI_DOCUMENT_FORMAT_VERSION`. There is no v1 migration;
+  never silently reinterpret older data.
+- Unknown document, node, contract, instance, or reference keys are errors.
+- Serialization validates first, preserves array order, and normalizes all
+  schema-controlled records and recursive property-object keys.
 
-## 3. Public API
+## 3. Component schema and catalog
 
-- Model: `UIDocument`, `UINode`, `UIPropertyPrimitive`, `UIPropertyObject`,
-  `UIPropertyValue`, `UI_DOCUMENT_KIND`, `UI_DOCUMENT_FORMAT_VERSION`.
-- Creation/query: `createUIDocument`, `createUINode`, `findUINode`,
-  `visitUINodes`, `CreateUIDocumentOptions`, `CreateUINodeOptions`.
-- Validation: `validateUIDocument`, `isUIDocument`, `UIDiagnostic`,
-  `UIDiagnosticCode`, `UIDiagnosticSeverity`.
-- Serialization: `parseUIDocument`, `serializeUIDocument`,
-  `UIDocumentParseError`, `UIDocumentValidationError`.
-- Schema: `UIComponentDefinition`, `UIPropertyDefinition`,
-  `UIResolvedComponentDefinition`, `UIPropertyValueType`, `UIPropertyFormat`,
-  `UIChildrenPolicy`, `UIComponentRegistry`, `UIComponentResolutionError`,
-  `UIComponentResolutionErrorCode`, `validateUIDocumentComponents`.
+- Component definitions remain runtime-independent metadata. Never import
+  actual `@kurot/ui` classes into this package.
+- Property value categories include primitive/structured values plus explicit
+  `asset-reference`, `resource-reference`, and `token-reference` categories.
+- `resourceTypes` and `tokenTypes` further constrain which reference categories
+  a property accepts.
+- Schema inheritance is single-parent through `extends`; resolution is
+  deterministic and detects missing bases and cycles.
+- The foundation catalog contains abstract `kurot.DisplayObject`,
+  `kui.UIComponent`, and `kui.Component`, plus concrete `kui.Group`,
+  `kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button`.
+- `kui.*` is canonical. EUI identifiers belong only at a legacy EXML adapter
+  boundary.
+- `Image.source` and `Button.icon` use typed image/sprite-frame references.
+  Audited colors and layout measurements accept appropriate design tokens.
+- Runtime and compatibility fields are not automatically authoring APIs.
+  `currentState`, `skinName`, and `hostComponentKey` are deliberately absent;
+  states and appearances are modeled directly.
+
+## 4. Public API groups
+
+- Model: `UIDocument`, `UIAssetKind`, `UIAssetContract`, `UINode`,
+  `UIComponentInstance`, reference types, property-value types,
+  `UI_DOCUMENT_KIND`, `UI_DOCUMENT_FORMAT_VERSION`.
+- Creation/query: `createUIDocument`, `createUINode`,
+  `createUIAssetContract`, `createUIComponentInstance`, reference constructors,
+  `findUINode`, `visitUINodes`.
+- Single-document validation: `validateUIDocument`, `isUIDocument`, and
+  diagnostic types.
+- Serialization: `parseUIDocument`, `serializeUIDocument`, parse and validation
+  error classes.
+- Schema: component/property definitions, `UIComponentRegistry`, resolution
+  errors, `matchesUIPropertyDefinition`, and component-aware validation.
 - Catalog: `createKurotUIFoundationRegistry`,
   `registerKurotUIFoundation`.
+- Project assets: `UIAssetRegistry`, project resource/token definitions, and
+  `validateUIAssetRegistry`.
 
-## 4. Package boundary
+## 5. Important limitations
 
-- Owns pure, serializable UI semantics and deterministic transformations.
-- Must remain independent of `@kurot/core` and `@kurot/ui` runtime classes.
-- Must not perform filesystem, network, DOM, canvas, or WebGL operations.
-- Must not contain visual editor panels or model-provider integration.
-- Format adapters translate at the boundary; external formats do not define
-  the internal document model.
+- Parameter declarations and instance values are modeled, but declarative
+  parameter-to-internal-property binding is not implemented yet.
+- Actions, data binding, transactions, revisions, undo/redo, migrations, and a
+  final human-facing `.kui` syntax are not implemented.
+- `@kurot/ui-runtime@0.1.x` consumes format version 1. It does not yet
+  materialize version 2 instances, Slots, appearances, states, or variants.
+- The foundation component catalog is intentionally incomplete; do not invent
+  unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 
-The remaining component catalog, nested structured-value constraints,
-commands/history, states, bindings, resource references, migrations, and EXML
-adapters are planned but are not implemented APIs. Do not infer their shape
-from Egret, Unity, FairyGUI, or other formats.
-
-## 5. Task → file map
+## 6. Task → file map
 
 | Task | Start with |
 | --- | --- |
-| Change the semantic model | `model/UIDocument.ts`, `model/UINode.ts`, `model/UIPropertyValue.ts` |
-| Add construction or tree queries | `document/create.ts`, `document/query.ts` |
-| Add an invariant or diagnostic | `validation/validateUIDocument.ts`, `validation/UIDiagnostic.ts` |
-| Change JSON parsing or canonical output | `serialization/json.ts` |
-| Define component metadata or registry behavior | `schema/UIComponentDefinition.ts`, `schema/UIComponentRegistry.ts` |
-| Change component-definition validation | `schema/validateComponentDefinition.ts` |
-| Change component-aware validation | `schema/validateUIDocumentComponents.ts` |
-| Change the audited Kurot UI foundation | `catalog/kurot-ui-foundation.ts`, `catalog/properties/` |
-| Change public exports | the nearest folder `index.ts`, then `src/index.ts` |
+| Change asset/node/reference shapes | `model/` |
+| Add constructors or tree queries | `document/` |
+| Add a structural invariant | `validation/validateUIDocument.ts` and related validators |
+| Change canonical JSON | `serialization/json.ts` and golden fixtures |
+| Change property semantics | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
+| Change built-in component fields | `catalog/properties/` |
+| Change project catalogs or cross-document rules | `assets/` |
+| Change public exports | nearest folder `index.ts`, then `src/index.ts` |
 
-## 6. Commands
+## 7. Commands
 
 ```sh
 pnpm --dir packages/ui-document install

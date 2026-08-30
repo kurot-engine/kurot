@@ -4,6 +4,48 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.2.0] — 2026-08-30
+
+### Added
+
+- Format version 2 with explicit `screen`, `component`, and `appearance`
+  asset kinds and runtime-neutral public asset contracts.
+- Reusable component instances with stable asset references, typed parameters,
+  variants, public-part overrides, and named Slot projection without copying
+  component internals into parent documents.
+- Public parts, Slot definitions, states, variants, and deterministic property
+  overrides addressed through stable node identifiers.
+- Typed project resource and design-token references, including accepted
+  resource and token categories in component property schemas.
+- `UIAssetRegistry` for deterministic project asset, resource, and design-token
+  lookup.
+- Cross-document validation for component and appearance compatibility,
+  parameters, variants, parts, Slots, missing project references, type
+  mismatches, override property schemas, duplicate component identities, and
+  dependency cycles.
+- Golden conformance fixtures covering a reusable component, an appearance,
+  and a screen containing two compact component instances.
+
+### Changed
+
+- Canonical serialization now normalizes asset contracts, instances, reference
+  records, and property definitions in addition to recursive property values.
+- Tree queries and component-aware validation include children projected into
+  instance Slots.
+- The foundation catalog uses typed resource references for image sources and
+  icons, and accepts typed design tokens for audited color and layout values.
+- Compatibility-shaped `currentState`, `skinName`, and `hostComponentKey`
+  fields were removed from the canonical Kurot authoring catalog. States and
+  appearances are represented directly by the semantic model.
+
+### Breaking
+
+- `UIDocument` now requires `assetKind` and `contract`; nodes may additionally
+  contain `instance` and `appearance`.
+- `UI_DOCUMENT_FORMAT_VERSION` is now `2`. Version 1 input is rejected rather
+  than silently reinterpreted; no migration is provided because 0.1 was an
+  unpublished authoring foundation rather than a production file format.
+
 ## [0.1.0] — 2026-08-30
 
 ### Added

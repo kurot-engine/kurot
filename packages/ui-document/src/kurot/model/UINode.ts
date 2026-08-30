@@ -1,3 +1,5 @@
+import type { UIComponentInstance } from './UIComponentInstance.js';
+import type { UIAssetReference } from './UIReference.js';
 import type { UIPropertyValue } from './UIPropertyValue.js';
 
 /**
@@ -18,6 +20,16 @@ export interface UINode {
 	 * Explicit component properties keyed by public property name.
 	 */
 	readonly properties: Readonly<Record<string, UIPropertyValue>>;
+
+	/**
+	 * Optional reusable component source and instance-local differences.
+	 */
+	readonly instance?: UIComponentInstance;
+
+	/**
+	 * Optional appearance asset applied to this runtime component.
+	 */
+	readonly appearance?: UIAssetReference;
 
 	/**
 	 * Ordered visual children of this component instance.

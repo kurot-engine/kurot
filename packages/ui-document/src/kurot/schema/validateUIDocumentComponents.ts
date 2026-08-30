@@ -1,17 +1,17 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
-import type { UIPropertyValue } from '../model/UIPropertyValue.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import type {
 	UIChildrenPolicy,
-	UIPropertyValueType,
 	UIResolvedComponentDefinition,
 } from './UIComponentDefinition.js';
 import type { UIComponentRegistry } from './UIComponentRegistry.js';
 import { UIComponentResolutionError } from './UIComponentResolutionError.js';
+import { matchesUIPropertyDefinition } from './matchesUIPropertyDefinition.js';
 
 /**
  * Validates component types, known properties, and child policies against a registry.
+ * Reusable instance types are resolved by project asset validation instead.
  * The document must first pass validateUIDocument.
  */
 export function validateUIDocumentComponents(
@@ -42,7 +42,7 @@ function validateNode(
 		});
 	}
 	if (!definition) {
-		if (!registry.has(node.type)) {
+		if (!registry.has(node.type) && !node.instance) {
 			diagnostics.push({
 				code: 'unknown-component-type',
 				severity: 'error',
@@ -85,7 +85,7 @@ function validateNode(
 				}
 				continue;
 			}
-			if (!matchesProperty(value, property)) {
+			if (!matchesUIPropertyDefinition(value, property)) {
 				diagnostics.push({
 					code: 'invalid-component-property',
 					severity: 'error',
@@ -100,6 +100,18 @@ function validateNode(
 
 	for (let index = 0; index < node.children.length; index++) {
 		validateNode(node.children[index]!, `${path}.children[${index}]`, registry, diagnostics);
+	}
+	if (!node.instance) return;
+	for (const slotName of Object.keys(node.instance.slots).sort()) {
+		const children = node.instance.slots[slotName]!;
+		for (let index = 0; index < children.length; index++) {
+			validateNode(
+				children[index]!,
+				`${path}.instance.slots.${slotName}[${index}]`,
+				registry,
+				diagnostics,
+			);
+		}
 	}
 }
 
@@ -123,42 +135,4 @@ function validateChildren(
 				? `Component ${node.type} does not accept children.`
 				: `Component ${node.type} accepts at most one child.`,
 	});
-}
-
-function matchesProperty(
-	value: UIPropertyValue,
-	property: UIResolvedComponentDefinition['properties'][string],
-): boolean {
-	const valueTypes = Array.isArray(property.valueType)
-		? property.valueType
-		: [property.valueType];
-	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;
-	if (property.enumValues && !property.enumValues.some(item => Object.is(item, value))) {
-		return false;
-	}
-	if (typeof value === 'number') {
-		if (property.minimum !== undefined && value < property.minimum) return false;
-		if (property.maximum !== undefined && value > property.maximum) return false;
-		if (property.integer && !Number.isInteger(value)) return false;
-	}
-	return true;
-}
-
-function matchesValueType(value: UIPropertyValue, valueType: UIPropertyValueType): boolean {
-	switch (valueType) {
-		case 'array':
-			return Array.isArray(value);
-		case 'boolean':
-			return typeof value === 'boolean';
-		case 'number':
-			return typeof value === 'number';
-		case 'object':
-			return typeof value === 'object' && !Array.isArray(value);
-		case 'string':
-			return typeof value === 'string';
-		case 'value':
-			return true;
-		default:
-			return false;
-	}
 }

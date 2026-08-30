@@ -1,6 +1,17 @@
+import type {
+	UIAssetContract,
+	UIPropertyOverride,
+	UIStateDefinition,
+	UIVariantDefinition,
+} from '../model/UIAssetContract.js';
+import type {
+	UIComponentInstance,
+	UIInstanceOverride,
+} from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyObject, UIPropertyValue } from '../model/UIPropertyValue.js';
+import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { isUIDocument, validateUIDocument } from '../validation/validateUIDocument.js';
 import { UIDocumentParseError } from './UIDocumentParseError.js';
@@ -51,6 +62,8 @@ function normalizeDocument(document: UIDocument): UIDocument {
 		kind: document.kind,
 		formatVersion: document.formatVersion,
 		id: document.id,
+		assetKind: document.assetKind,
+		contract: normalizeContract(document.contract),
 		root: normalizeNode(document.root),
 	};
 }
@@ -68,7 +81,122 @@ function normalizeNode(node: UINode): UINode {
 		id: node.id,
 		type: node.type,
 		properties,
+		...(node.instance === undefined
+			? {}
+			: { instance: normalizeInstance(node.instance) }),
+		...(node.appearance === undefined
+			? {}
+			: {
+					appearance: {
+						kind: node.appearance.kind,
+						assetId: node.appearance.assetId,
+					},
+				}),
 		children: node.children.map(normalizeNode),
+	};
+}
+
+function normalizeContract(contract: UIAssetContract): UIAssetContract {
+	return {
+		...(contract.componentType === undefined
+			? {}
+			: { componentType: contract.componentType }),
+		...(contract.targetType === undefined ? {} : { targetType: contract.targetType }),
+		parameters: mapSortedRecord(contract.parameters, normalizePropertyDefinition),
+		parts: mapSortedRecord(contract.parts, value => ({
+			nodeId: value.nodeId,
+			...(value.required === undefined ? {} : { required: value.required }),
+			...(value.description === undefined
+				? {}
+				: { description: value.description }),
+		})),
+		slots: mapSortedRecord(contract.slots, value => ({
+			nodeId: value.nodeId,
+			capacity: value.capacity,
+			...(value.required === undefined ? {} : { required: value.required }),
+			...(value.description === undefined
+				? {}
+				: { description: value.description }),
+		})),
+		states: mapSortedRecord(contract.states, normalizeState),
+		variants: mapSortedRecord(contract.variants, normalizeVariant),
+	};
+}
+
+function normalizePropertyDefinition(
+	definition: UIPropertyDefinition,
+): UIPropertyDefinition {
+	return {
+		valueType: Array.isArray(definition.valueType)
+			? [...definition.valueType]
+			: definition.valueType,
+		...(definition.format === undefined ? {} : { format: definition.format }),
+		...(definition.resourceTypes === undefined
+			? {}
+			: { resourceTypes: [...definition.resourceTypes] }),
+		...(definition.tokenTypes === undefined
+			? {}
+			: { tokenTypes: [...definition.tokenTypes] }),
+		...(definition.enumValues === undefined
+			? {}
+			: { enumValues: [...definition.enumValues] }),
+		...(definition.minimum === undefined ? {} : { minimum: definition.minimum }),
+		...(definition.maximum === undefined ? {} : { maximum: definition.maximum }),
+		...(definition.integer === undefined ? {} : { integer: definition.integer }),
+		...(definition.defaultValue === undefined
+			? {}
+			: { defaultValue: definition.defaultValue }),
+		...(definition.required === undefined ? {} : { required: definition.required }),
+		...(definition.description === undefined
+			? {}
+			: { description: definition.description }),
+	};
+}
+
+function normalizeState(definition: UIStateDefinition): UIStateDefinition {
+	return {
+		...(definition.description === undefined
+			? {}
+			: { description: definition.description }),
+		overrides: definition.overrides.map(normalizePropertyOverride),
+	};
+}
+
+function normalizeVariant(definition: UIVariantDefinition): UIVariantDefinition {
+	return {
+		...(definition.description === undefined
+			? {}
+			: { description: definition.description }),
+		overrides: definition.overrides.map(normalizePropertyOverride),
+	};
+}
+
+function normalizePropertyOverride(override: UIPropertyOverride): UIPropertyOverride {
+	return {
+		targetId: override.targetId,
+		property: override.property,
+		value: normalizePropertyValue(override.value),
+	};
+}
+
+function normalizeInstance(instance: UIComponentInstance): UIComponentInstance {
+	return {
+		source: {
+			kind: instance.source.kind,
+			assetId: instance.source.assetId,
+		},
+		parameters: mapSortedRecord(instance.parameters, normalizePropertyValue),
+		...(instance.variant === undefined ? {} : { variant: instance.variant }),
+		overrides: instance.overrides.map(normalizeInstanceOverride),
+		slots: mapSortedRecord(instance.slots, nodes => nodes.map(normalizeNode)),
+	};
+}
+
+function normalizeInstanceOverride(override: UIInstanceOverride): UIInstanceOverride {
+	return {
+		part: override.part,
+		property: override.property,
+		value: normalizePropertyValue(override.value),
 	};
 }
 
@@ -87,4 +215,15 @@ function normalizePropertyValue(value: UIPropertyValue): UIPropertyValue {
 		return Object.fromEntries(entries);
 	}
 	return value;
+}
+
+function mapSortedRecord<TValue, TResult>(
+	value: Readonly<Record<string, TValue>>,
+	map: (value: TValue) => TResult,
+): Record<string, TResult> {
+	return Object.fromEntries(
+		Object.keys(value)
+			.sort()
+			.map((key) => [key, map(value[key]!)]),
+	);
 }

@@ -92,7 +92,8 @@ export const DISPLAY_OBJECT_PROPERTIES: Readonly<Record<string, UIPropertyDefini
 		description: 'Whether descendants are ordered by zIndex before rendering.',
 	},
 	tint: {
-		valueType: 'number',
+		valueType: ['number', 'token-reference'],
+		tokenTypes: ['color'],
 		format: 'color',
 		minimum: 0,
 		maximum: 0xffffff,
@@ -174,30 +175,17 @@ export const UI_COMPONENT_PROPERTIES: Readonly<Record<string, UIPropertyDefiniti
  * Authoring properties inherited by skinnable Kurot controls.
  */
 export const COMPONENT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
-	currentState: {
-		valueType: 'string',
-		defaultValue: '',
-		description: 'Explicit skin view state; an empty string uses the computed state.',
-	},
 	enabled: {
 		valueType: 'boolean',
 		defaultValue: true,
 		description: 'Whether the control accepts interaction and uses enabled states.',
 	},
-	hostComponentKey: {
-		valueType: 'string',
-		description: 'Theme lookup key; omit it to use the runtime class name.',
-	},
-	skinName: {
-		valueType: 'string',
-		format: 'skin',
-		description: 'Serializable skin identifier resolved by the runtime or adapter.',
-	},
 };
 
 function anchorConstraint(description: string): UIPropertyDefinition {
 	return {
-		valueType: ['number', 'string'],
+		valueType: ['number', 'string', 'token-reference'],
+		tokenTypes: ['number', 'spacing'],
 		description: `${description} Strings may use percentage syntax such as "50%".`,
 	};
 }
@@ -213,7 +201,8 @@ function percentageConstraint(description: string): UIPropertyDefinition {
 
 function sizeConstraint(description: string, defaultValue: number): UIPropertyDefinition {
 	return {
-		valueType: 'number',
+		valueType: ['number', 'token-reference'],
+		tokenTypes: ['number', 'spacing'],
 		minimum: 0,
 		defaultValue,
 		description,

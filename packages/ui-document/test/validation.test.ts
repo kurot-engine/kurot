@@ -45,8 +45,16 @@ describe('UI document validation', () => {
 	it('rejects unknown schema fields and unsafe property values', () => {
 		const input = {
 			kind: 'kurot-ui-document',
-			formatVersion: 1,
+			formatVersion: 2,
 			id: 'main-screen',
+			assetKind: 'screen',
+			contract: {
+				parameters: {},
+				parts: {},
+				slots: {},
+				states: {},
+				variants: {},
+			},
 			extra: true,
 			root: {
 				id: 'root',

@@ -103,12 +103,12 @@ pressed, selected, and disabled visuals are an appearance or skin.
 
 ## 3. Current position
 
-Kurot has completed the lower semantic-to-runtime bridge, not the full
-authoring system.
+Kurot has completed the lower semantic-to-runtime proof and the version 2
+reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.1.0` currently provides:
+`@kurot/ui-document@0.2.0` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -117,7 +117,16 @@ authoring system.
 - component definitions, property definitions, inheritance, and deterministic
   registry resolution;
 - an audited foundation catalog for `kui.Group`, `kui.Label`, `kui.Image`,
-  `kui.Rect`, and `kui.Button`.
+  `kui.Rect`, and `kui.Button`;
+- screen, reusable-component, and appearance asset kinds;
+- public contracts containing typed parameters, parts, Slots, states, and
+  variants;
+- compact component instances that retain references and local differences
+  without expanding the source hierarchy;
+- typed project resources and design tokens;
+- project-wide reference, contract, identity, and dependency-cycle validation;
+- golden conformance fixtures for a component, an appearance, and a screen
+  containing two instances.
 
 `@kurot/ui-runtime@0.1.0` currently provides:
 
@@ -142,11 +151,9 @@ The existing CLI still compiles EXML for current projects.
 
 The following are still design or implementation work:
 
-- document kinds for screens, reusable components, and appearances;
-- reusable component references, slots, parameters, and instance overrides;
-- a runtime-neutral skin, parts, state, and variant model;
-- resource catalogs and typed resource references;
-- design tokens and theme-level values;
+- declarative parameter-to-internal-property wiring;
+- runtime materialization of version 2 instances, Slots, appearances, states,
+  variants, resources, and tokens;
 - data binding and event/action semantics;
 - semantic edit operations and atomic transactions;
 - revisions, diffs, undo, redo, and conflict detection;
@@ -158,23 +165,26 @@ The following are still design or implementation work:
 
 ### 3.3 Honest interpretation
 
-The current preview constructs a document in TypeScript only because no editor
-or authoring-file parser exists yet. It is a smoke harness for this completed
+The current `@kurot/ui-runtime` preview constructs a format-v1 foundation
+document in TypeScript. It remains a smoke harness for this earlier completed
 boundary:
 
 ```text
 UIDocument → validated real component tree
 ```
 
-It is not the intended authoring experience and does not replace EXML today.
+Format-v2 authoring assets currently stop at a validated project graph; their
+instances, appearances, resources, states, and variants are not materialized by
+the runtime yet. Neither path is the intended authoring experience, and neither
+replaces EXML today.
 
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
 | Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
 | Foundation component schema | Partial | Five components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the foundation | Real components, properties, layouts, child trees, adapters, errors, tests, and browser preview. |
-| Editable asset kinds and reuse | Not started | Screens, component definitions, instances, slots, and overrides are not modeled. |
-| Appearance, states, bindings, resources | Not started in the new model | Current `@kurot/ui` behavior exists, but runtime-neutral authoring semantics do not. |
+| Editable asset kinds and reuse | Implemented in the headless model | Screens, components, compact instances, parameters, parts, Slots, variants, cross-document validation, and golden fixtures. Runtime materialization is pending. |
+| Appearance, states, bindings, resources | Partial | Appearances, states, typed resources, and design tokens are modeled and validated. Data binding, actions, parameter wiring, and runtime execution are pending. |
 | Editing operations and history | Not started | No transaction, revision, diff, undo, or redo API exists. |
 | Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
 | Agent collaboration | Not started | Schemas exist, but there is no editing tool protocol or context coordinator. |
@@ -684,7 +694,7 @@ second accidental model inside editor code.
 
 This proves the lower boundary but is not yet an authoring workflow.
 
-### Phase 1 — Authoring model v0.2
+### Phase 1 — Authoring model v0.2: completed
 
 - define screen, reusable component, and appearance asset kinds;
 - define component references and dependency identity;
@@ -697,6 +707,11 @@ This proves the lower boundary but is not yet an authoring workflow.
 
 Exit condition: a small reusable control and a screen containing two instances
 can round-trip without expanding instance internals into the parent document.
+
+Completion evidence: the `@kurot/ui-document` golden fixtures contain an
+`ActionCard` component, a button appearance, and a lobby screen with two
+`ActionCard` instances. Canonical round-trip and project validation pass while
+the screen contains only asset references and local instance differences.
 
 ### Phase 2 — Headless editing kernel
 
@@ -713,9 +728,10 @@ operations, with every transaction undoable and redoable.
 ### Phase 3 — Complete visual semantics
 
 - complete the component catalog needed for a first production UI slice;
-- implement appearance parts, states, variants, and transitions;
+- implement runtime execution of appearance parts, states, variants, and
+  transitions;
 - define bounded binding and semantic-action contracts;
-- integrate project resources, fonts, images, Spine, and design tokens;
+- resolve project resources, fonts, images, Spine, and design tokens at runtime;
 - implement matching runtime adapters.
 
 The first slice should stay deliberately finite, such as the controls required

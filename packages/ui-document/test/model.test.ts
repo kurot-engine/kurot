@@ -22,6 +22,14 @@ describe('UI document model', () => {
 
 		expect(document.kind).toBe(UI_DOCUMENT_KIND);
 		expect(document.formatVersion).toBe(UI_DOCUMENT_FORMAT_VERSION);
+		expect(document.assetKind).toBe('screen');
+		expect(document.contract).toEqual({
+			parameters: {},
+			parts: {},
+			slots: {},
+			states: {},
+			variants: {},
+		});
 		expect(document.root.properties).not.toBe(properties);
 		expect(document.root.children).not.toBe(children);
 	});

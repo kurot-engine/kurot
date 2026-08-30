@@ -1,0 +1,88 @@
+{
+  "kind": "kurot-ui-document",
+  "formatVersion": 2,
+  "id": "lobby-screen",
+  "assetKind": "screen",
+  "contract": {
+    "parameters": {},
+    "parts": {},
+    "slots": {},
+    "states": {},
+    "variants": {}
+  },
+  "root": {
+    "id": "root",
+    "type": "kui.Group",
+    "properties": {},
+    "children": [
+      {
+        "id": "play-action",
+        "type": "game.ActionCard",
+        "properties": {
+          "left": 24
+        },
+        "instance": {
+          "source": {
+            "kind": "asset",
+            "assetId": "action-card"
+          },
+          "parameters": {
+            "label": "Play"
+          },
+          "variant": "primary",
+          "overrides": [
+            {
+              "part": "label",
+              "property": "textColor",
+              "value": 16777215
+            }
+          ],
+          "slots": {
+            "content": [
+              {
+                "id": "play-hint",
+                "type": "kui.Label",
+                "properties": {
+                  "text": "Start game"
+                },
+                "children": []
+              }
+            ]
+          }
+        },
+        "children": []
+      },
+      {
+        "id": "settings-action",
+        "type": "game.ActionCard",
+        "properties": {
+          "right": 24
+        },
+        "instance": {
+          "source": {
+            "kind": "asset",
+            "assetId": "action-card"
+          },
+          "parameters": {
+            "label": "Settings"
+          },
+          "overrides": [],
+          "slots": {}
+        },
+        "children": []
+      },
+      {
+        "id": "native-button",
+        "type": "kui.Button",
+        "properties": {
+          "label": "Help"
+        },
+        "appearance": {
+          "kind": "asset",
+          "assetId": "primary-button-appearance"
+        },
+        "children": []
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	createKurotUIFoundationRegistry,
+	createUIResourceReference,
 	createUIDocument,
 	createUINode,
 	registerKurotUIFoundation,
@@ -46,7 +47,11 @@ describe('Kurot UI foundation catalog', () => {
 			valueType: 'string',
 			defaultValue: '',
 		});
-		expect(label?.properties.left?.valueType).toEqual(['number', 'string']);
+		expect(label?.properties.left?.valueType).toEqual([
+			'number',
+			'string',
+			'token-reference',
+		]);
 	});
 
 	it('validates a document using the audited basic properties', () => {
@@ -70,7 +75,9 @@ describe('Kurot UI foundation catalog', () => {
 					createUINode({
 						id: 'background',
 						type: 'kui.Image',
-						properties: { source: 'background_png' },
+						properties: {
+							source: createUIResourceReference('image', 'background_png'),
+						},
 					}),
 					createUINode({
 						id: 'overlay',
@@ -93,7 +100,6 @@ describe('Kurot UI foundation catalog', () => {
 		const registry = createKurotUIFoundationRegistry();
 
 		expect(Object.keys(registry.get('kui.Group')?.properties ?? {}).sort()).toEqual([
-			'currentState',
 			'layout',
 			'scrollEnabled',
 			'scrollH',

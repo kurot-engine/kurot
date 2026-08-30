@@ -1,133 +1,128 @@
 # UI Document Architecture
 
-`@kurot/ui-document` is the shared semantic layer between UI producers and
-consumers. It describes what a UI contains without depending on how it is
-edited, stored externally, compiled, or rendered.
+`@kurot/ui-document` is the shared, headless semantic layer between UI
+producers and consumers. It describes editable UI assets without depending on
+how they are visually edited, persisted, compiled, or rendered.
 
 ```text
 Visual UI Builder ─┐
-CLI / EXML Adapter ├─> UIDocument ─> validation / commands / serialization
-Agent Adapter ─────┘                         │
-                                            └─> runtime compiler or preview
+CLI / Adapter ─────┼─> UI assets ─> validation / edits / serialization
+Agent Tools ───────┘       │
+                           ├─> runtime preview
+                           └─> static factory compiler
 ```
 
-## Model
+## Asset model
 
-A `UIDocument` contains one root `UINode`. Each node provides a stable ID, an
-external component type key, explicit properties, and ordered children.
+Format version 2 defines three asset kinds:
 
-The initial format deliberately excludes runtime class instances, functions,
-DOM objects, textures, and other process-owned resources. Future bindings and
-resource references must be represented as explicit semantic records rather
-than embedded runtime values.
+- a `screen` composes built-in controls and reusable project components;
+- a `component` owns an internal tree and publishes a stable contract;
+- an `appearance` owns visual composition for one target component type.
 
-## Identity
+All kinds share a root `UINode` and a `UIAssetContract`. A contract may publish
+typed parameters, stable parts, named Slots, runtime states, and authoring
+variants. State and variant behavior is represented as ordered property
+overrides addressed through stable node IDs.
 
-Document and node IDs are supplied by the caller; the package does not generate
-random identifiers. This keeps Agent output, tests, diffs, and repeated builds
-deterministic. Validation enforces document-wide node-ID uniqueness.
+The model does not store runtime class instances, functions, DOM objects,
+textures, or unrestricted executable expressions.
 
-## Validation boundary
+## Reusable component identity
 
-External JSON is `unknown` until it passes `validateUIDocument` or
-`parseUIDocument`. Unknown node/document fields are rejected so misspellings
-and unsupported Agent output remain visible as structured diagnostics.
+A reusable component instance stores only:
 
-Constructors make the normal programmatic path concise but do not replace
-whole-document validation: only the validator can detect cross-tree invariants
-such as duplicate IDs.
+- the stable ID of its component asset;
+- typed parameter values;
+- an optional variant;
+- explicit overrides against published parts;
+- child trees projected into published Slots.
 
-## Serialization
+The parent never receives a copy of the component's private hierarchy. This is
+the core invariant that lets definition changes propagate and keeps diffs small
+and reviewable.
 
-`serializeUIDocument` validates before writing, preserves child and array
-order, and sorts property-object keys recursively. It therefore refuses to
-silently convert non-finite numbers to JSON null or discard unsupported values.
+Node IDs remain unique across the parent document, including content projected
+into Slots. Tree traversal uses normal children first, then Slot names in stable
+sorted order while preserving child order within each Slot.
 
-Format adapters must translate to and from this model at their boundary. EXML
-syntax, editor implementation details, and runtime object layout must not leak
-into the core schema without an explicit semantic requirement.
+## Project references
 
-## Component registry
+Documents use explicit tagged references instead of plausible strings:
 
-`UIComponentRegistry` stores semantic component descriptions without importing
-their runtime classes. A definition can describe known property value
-categories and child policies, while `UINode.type` remains the stable link to
-the external runtime or preview registry.
-
-Registries are explicit instances rather than global state. A CLI build, editor
-workspace, test, or Agent session can therefore assemble the exact catalog it
-needs without leaking project-specific custom components into another session.
-
-Definitions reject duplicate component keys and are copied and frozen when
-registered. Listing is sorted by type so prompts and generated metadata remain
-deterministic.
-
-Concrete catalogs can be introduced gradually. Omitting `children` leaves the
-child policy unvalidated; `allowUnknownProperties: true` preserves properties
-that have not yet been described. Completed definitions use a false unknown-
-property policy so misspellings become diagnostics.
-
-Property definitions can express a single value category or a union, primitive
-enums, inclusive numeric bounds, integer-only values, serializable defaults,
-and semantic formats used by editor controls. Formats such as `color`,
-`resource`, and `skin` do not introduce runtime dependencies.
-
-### Inheritance and resolution
-
-Definitions may declare one `extends` type. Abstract definitions provide common
-semantic properties and policies but component-aware validation rejects them
-as `UINode.type` values.
-
-`resolve(type)` walks the complete ancestor chain and returns a frozen
-`UIResolvedComponentDefinition`:
-
-- properties merge from the root base to the requested type;
-- a derived property replaces the complete property definition with the same
-  name;
-- `children` and `allowUnknownProperties` use the nearest explicit value;
-- `abstract`, `displayName`, and `description` describe only the requested type
-  and are not inherited;
-- `baseTypes` records ancestors from the root base to the direct base;
-- resolved property keys use deterministic locale-independent string ordering.
-
-Definitions can be registered in any order. Resolution caches only successful
-results, and every later registration clears that cache. Missing bases and
-inheritance cycles raise `UIComponentResolutionError`; component-aware document
-validation converts those failures into structured diagnostics.
-
-## Kurot UI foundation catalog
-
-The built-in foundation catalog is deliberately smaller than the full
-`@kurot/ui` export surface. It establishes only the component identities and
-relationships already verified against the runtime and EXML compiler:
-
-```text
-kurot.DisplayObject (abstract, strict authoring properties)
-└── kui.UIComponent (abstract)
-    ├── kui.Group (ordered children)
-    └── kui.Component (abstract)
-        ├── kui.Label (leaf)
-        ├── kui.Image (leaf)
-        ├── kui.Rect (leaf)
-        └── kui.Button (leaf)
+```ts
+{ kind: 'asset', assetId: 'balance-bar' }
+{ kind: 'resource', resourceType: 'image', key: 'ui.balance.icon' }
+{ kind: 'token', tokenType: 'color', key: 'color.action.primary' }
 ```
 
-`kui.Component` is a semantic base rather than a directly creatable editor
-node. This also matches the current EXML compiler, which does not register the
-legacy `eui:Component` tag as a usable built-in. The four basic controls are
-leaves because they do not expose an `elementsContent` child contract; `Group`
-does.
+`UIAssetRegistry` is an isolated project catalog for UI assets, resources, and
+design tokens. `validateUIAssetRegistry` checks identities and meaning that
+cannot be verified inside a single file:
 
-Catalog keys use Kurot-owned semantic names such as `kui.Label`. EUI is not a
-document namespace. A legacy EXML adapter is responsible for translating
-between `eui:Label` and `kui.Label`; future editor documents remain independent
-of that compatibility format.
+- source assets exist and publish the expected component type;
+- appearances target the receiving node type;
+- parameters, variants, parts, and Slots belong to the source contract;
+- required values and Slot content are present;
+- single-capacity Slots do not receive multiple children;
+- referenced resources and tokens exist with matching categories;
+- component type identities are unique;
+- asset dependencies are acyclic.
 
-The foundation catalog strictly declares serializable authoring properties from
-the matching Kurot runtime classes. It does not mirror readonly runtime state or
-process-owned objects: `Texture`, `Bitmap`, `Skin`, `LayoutBase`, filters, and
-display masks cannot be embedded in a document. Asset and skin properties use
-stable string identifiers. Layout and rectangle values are semantic objects;
-their nested schemas remain a later catalog layer. State declarations and
-bindings are separate document concerns and are not accepted as untyped
-component properties.
+## Structural validation
+
+External data is `unknown` until it passes `validateUIDocument` or
+`parseUIDocument`. Unknown fields are rejected so misspellings and unsupported
+Agent output remain visible as structured diagnostics.
+
+Constructors make valid shapes concise but do not replace validation. Local
+validation owns exact shapes, serializable values, stable IDs, and references;
+project validation owns cross-asset resolution.
+
+Format version 1 is rejected. There is no compatibility layer because the 0.1
+model was an initial proof rather than a production authoring format.
+
+## Deterministic serialization
+
+`serializeUIDocument` validates before writing. It preserves semantic array
+order and normalizes document, contract, node, instance, reference, property
+definition, and recursive property-object keys. Golden fixtures pin the output
+for a component definition, an appearance, and a screen containing two compact
+instances.
+
+JSON is currently the canonical transport and conformance syntax. This does
+not decide the eventual human-facing `.kui` syntax; future XML-like or editor
+formats must translate losslessly to this model.
+
+## Component schema
+
+`UIComponentRegistry` describes runtime component capabilities without
+importing `@kurot/ui`. Definitions support inheritance, child policies,
+primitive and structured property categories, numeric and enum constraints,
+and explicit asset/resource/token-reference categories.
+
+Resource and token properties can further declare accepted categories. For
+example, `kui.Image.source` accepts typed image or sprite-frame references, and
+audited color fields accept color tokens.
+
+The foundation catalog remains curated rather than reflective. It includes
+only `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` plus
+their abstract bases. Runtime-owned and compatibility-shaped fields are not
+automatically authoring APIs. `currentState`, `skinName`, and
+`hostComponentKey` are absent because states and appearances are first-class
+semantics.
+
+## Runtime boundary
+
+This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
+resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
+provider calls stay outside it.
+
+`@kurot/ui-runtime@0.1.x` still consumes format version 1 and therefore cannot
+materialize version 2 reusable instances, Slots, appearances, states, or
+variants. Updating that adapter is separate work; the authoring model does not
+claim preview support before the runtime passes the same conformance fixtures.
+
+Parameter contracts and instance values are present, but declarative wiring
+from a parameter to internal node properties is also still pending. That
+binding must become explicit data rather than an expression string.

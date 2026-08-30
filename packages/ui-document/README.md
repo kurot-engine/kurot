@@ -4,8 +4,9 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.1.0).** The first document model, validation, query,
-> and deterministic JSON APIs are implemented. The schema is not stable yet.
+> **Early development (0.2.0).** The reusable authoring-asset model is now
+> implemented, but the schema remains pre-1.0 and is not yet a production file
+> format.
 
 ## Installation
 
@@ -28,6 +29,7 @@ import {
 
 const document = createUIDocument({
   id: 'main-screen',
+  assetKind: 'screen',
   root: createUINode({
     id: 'root',
     type: 'kui.Group',
@@ -52,6 +54,14 @@ the corresponding `@kurot/ui` class.
 
 ## Current capabilities
 
+- explicit screen, reusable-component, and appearance assets;
+- public component contracts containing typed parameters, parts, Slots,
+  runtime-neutral states, and authoring variants;
+- compact reusable instances containing an asset reference and only their
+  parameter values, variant, part overrides, and projected Slot content;
+- typed project resource and design-token references;
+- `UIAssetRegistry` and project-wide validation of asset identities,
+  references, type compatibility, public contracts, and dependency cycles;
 - explicit `UIDocument`, `UINode`, and recursive `UIPropertyValue` types;
 - constructors that assign the current format discriminator and version;
 - deterministic pre-order traversal and node lookup;
@@ -64,9 +74,55 @@ the corresponding `@kurot/ui` class.
 - abstract base definitions, single-parent inheritance, deterministic schema
   resolution, and derived property overrides;
 - optional validation of registered component types, known property categories,
-  required properties, child policies, and abstract types.
+  required properties, child policies, and abstract types;
 - union-valued properties, enum values, numeric ranges, integer constraints,
-  serializable defaults, and editor-facing semantic formats.
+  serializable defaults, editor-facing semantic formats, and accepted resource
+  or token categories.
+
+## Reusable assets
+
+A parent stores a reference to a reusable component, not a copy of its internal
+tree:
+
+```ts
+import {
+  createUIAssetReference,
+  createUIComponentInstance,
+  createUIDocument,
+  createUINode,
+  UIAssetRegistry,
+  validateUIAssetRegistry,
+} from '@kurot/ui-document';
+
+const screen = createUIDocument({
+  id: 'lobby-screen',
+  assetKind: 'screen',
+  root: createUINode({
+    id: 'root',
+    type: 'kui.Group',
+    children: [
+      createUINode({
+        id: 'play-action',
+        type: 'game.ActionCard',
+        instance: createUIComponentInstance({
+          source: createUIAssetReference('action-card'),
+          parameters: { label: 'Play' },
+        }),
+      }),
+    ],
+  }),
+});
+
+const registry = new UIAssetRegistry();
+// actionCardDefinition is a component UIDocument created separately.
+registry.registerAsset(actionCardDefinition);
+registry.registerAsset(screen);
+const diagnostics = validateUIAssetRegistry(registry);
+```
+
+The component definition owns its internal hierarchy and publishes only its
+stable contract. Definition changes can therefore propagate without expanding
+or rewriting every parent asset.
 
 Component definitions can remain intentionally incomplete while their runtime
 properties are reviewed:
@@ -117,23 +173,24 @@ from Kurot display objects and UI layout elements, then adds the audited direct
 properties of all five concrete components. Unknown properties are rejected.
 
 Runtime-owned values are deliberately excluded. For example, `Image.source`
-stores an asset key or URL rather than a `Texture`, and readonly objects such as
-`Image.bitmap` are not document properties. `Group.layout` and
+stores a typed project resource reference rather than a `Texture`, and readonly
+objects such as `Image.bitmap` are not document properties. `Group.layout` and
 `Image.scale9Grid` currently accept semantic objects; their nested shapes will
 be tightened when the layout and structured-value catalogs are introduced.
-State declarations and bindings are also reserved for their own semantic
-layers rather than being accepted as untyped component properties.
+States and variants live in asset contracts rather than untyped component
+properties. Compatibility-shaped `currentState`, `skinName`, and
+`hostComponentKey` are not canonical authoring fields.
 
 See [Architecture](./docs/architecture.md) for the current contracts and
 package boundaries.
 
 ## Intended boundary
 
-The package owns the serializable UI document model and its deterministic
+The package owns the serializable UI asset model and its deterministic
 operations. Planned layers include:
 
-- the remaining component catalog, nested structured-value constraints, states,
-  bindings, and resource-reference schemas;
+- the remaining component catalog and nested structured-value constraints;
+- declarative data binding, actions, and parameter-to-internal-property wiring;
 - commands, transactions, undo, and redo;
 - document migrations;
 - adapters for formats such as EXML.
@@ -142,6 +199,11 @@ It will not own rendering, runtime UI components, editor panels, filesystem
 or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
+
+`@kurot/ui-runtime@0.1.x` targets format version 1 and does not yet materialize
+the version 2 instance, Slot, appearance, state, or variant semantics. Runtime
+preview support is a separate next step; this package does not claim that the
+new authoring assets are renderable today.
 
 ## Development
 

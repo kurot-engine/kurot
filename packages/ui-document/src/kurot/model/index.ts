@@ -1,3 +1,23 @@
+export type { UIAssetKind } from './UIAssetKind.js';
+export type {
+	UIAssetContract,
+	UIPartDefinition,
+	UIPropertyOverride,
+	UISlotDefinition,
+	UIStateDefinition,
+	UIVariantDefinition,
+} from './UIAssetContract.js';
+export type {
+	UIComponentInstance,
+	UIInstanceOverride,
+} from './UIComponentInstance.js';
+export type {
+	UIAssetReference,
+	UIDesignTokenReference,
+	UIDesignTokenType,
+	UIResourceReference,
+	UIResourceType,
+} from './UIReference.js';
 export { UI_DOCUMENT_KIND } from './UIDocument.js';
 export type { UIDocument } from './UIDocument.js';
 export type { UINode } from './UINode.js';

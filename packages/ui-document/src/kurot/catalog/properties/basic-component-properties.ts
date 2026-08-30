@@ -4,11 +4,6 @@ import type { UIPropertyDefinition } from '../../schema/UIComponentDefinition.js
  * Authoring properties declared directly by Group.
  */
 export const GROUP_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
-	currentState: {
-		valueType: 'string',
-		defaultValue: '',
-		description: 'Explicit group state used when applying state overrides.',
-	},
 	layout: {
 		valueType: 'object',
 		format: 'layout',
@@ -112,9 +107,10 @@ export const IMAGE_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 	},
 	smoothing: booleanProperty(true, 'Whether scaled bitmap sampling uses interpolation.'),
 	source: {
-		valueType: 'string',
+		valueType: 'resource-reference',
 		format: 'resource',
-		description: 'Serializable asset key or URL resolved by the UI asset adapter.',
+		resourceTypes: ['image', 'sprite-frame'],
+		description: 'Typed image or sprite-frame resource resolved by the project.',
 	},
 };
 
@@ -136,9 +132,10 @@ export const RECT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
  */
 export const BUTTON_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	icon: {
-		valueType: 'string',
+		valueType: 'resource-reference',
 		format: 'resource',
-		description: 'Serializable icon asset key or URL passed to the skin icon part.',
+		resourceTypes: ['image', 'sprite-frame'],
+		description: 'Typed image or sprite-frame resource passed to the icon part.',
 	},
 	label: {
 		valueType: 'string',
@@ -165,7 +162,8 @@ function booleanProperty(defaultValue: boolean, description: string): UIProperty
 
 function colorProperty(defaultValue: number, description: string): UIPropertyDefinition {
 	return {
-		valueType: 'number',
+		valueType: ['number', 'token-reference'],
+		tokenTypes: ['color'],
 		format: 'color',
 		minimum: 0,
 		maximum: 0xffffff,

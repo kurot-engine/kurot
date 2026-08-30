@@ -3,10 +3,13 @@
  */
 export type UIPropertyValueType =
 	| 'array'
+	| 'asset-reference'
 	| 'boolean'
 	| 'number'
 	| 'object'
+	| 'resource-reference'
 	| 'string'
+	| 'token-reference'
 	| 'value';
 
 /**
@@ -17,7 +20,7 @@ export type UIPropertyFormat =
 	| 'layout'
 	| 'rectangle'
 	| 'resource'
-	| 'skin';
+	| 'token';
 
 /**
  * Structural child policy for a component type.
@@ -37,6 +40,16 @@ export interface UIPropertyDefinition {
 	 * Optional semantic presentation used by editors and Agent tools.
 	 */
 	readonly format?: UIPropertyFormat;
+
+	/**
+	 * Resource categories accepted when valueType includes resource-reference.
+	 */
+	readonly resourceTypes?: readonly UIResourceType[];
+
+	/**
+	 * Token categories accepted when valueType includes token-reference.
+	 */
+	readonly tokenTypes?: readonly UIDesignTokenType[];
 
 	/**
 	 * Exact primitive values accepted by this property.
@@ -165,3 +178,7 @@ export interface UIResolvedComponentDefinition {
 	readonly allowUnknownProperties: boolean;
 }
 import type { UIPropertyPrimitive } from '../model/UIPropertyValue.js';
+import type {
+	UIDesignTokenType,
+	UIResourceType,
+} from '../model/UIReference.js';

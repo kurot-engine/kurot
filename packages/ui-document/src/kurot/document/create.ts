@@ -1,8 +1,14 @@
 import { UI_DOCUMENT_FORMAT_VERSION } from '../version.js';
 import { UI_DOCUMENT_KIND } from '../model/UIDocument.js';
+import type { UIAssetContract } from '../model/UIAssetContract.js';
+import type { UIAssetKind } from '../model/UIAssetKind.js';
+import type { UIComponentInstance } from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import type { UIAssetReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
+import { createUIAssetContract } from './createAssetContract.js';
+import { createUIComponentInstance } from './createComponentInstance.js';
 
 /**
  * Input accepted by createUINode.
@@ -24,6 +30,16 @@ export interface CreateUINodeOptions {
 	readonly properties?: Readonly<Record<string, UIPropertyValue>>;
 
 	/**
+	 * Optional reusable component source and instance-local differences.
+	 */
+	readonly instance?: UIComponentInstance;
+
+	/**
+	 * Optional appearance asset applied to this runtime component.
+	 */
+	readonly appearance?: UIAssetReference;
+
+	/**
 	 * Initial ordered children. The array is copied.
 	 */
 	readonly children?: readonly UINode[];
@@ -37,6 +53,16 @@ export interface CreateUIDocumentOptions {
 	 * Stable document identifier assigned by the owning project.
 	 */
 	readonly id: string;
+
+	/**
+	 * Authoring purpose. Defaults to screen for simple documents.
+	 */
+	readonly assetKind?: UIAssetKind;
+
+	/**
+	 * Public contract exposed by the asset.
+	 */
+	readonly contract?: UIAssetContract;
 
 	/**
 	 * Root component instance.
@@ -55,6 +81,12 @@ export function createUINode(options: CreateUINodeOptions): UINode {
 		id: options.id,
 		type: options.type,
 		properties: { ...options.properties },
+		...(options.instance === undefined
+			? {}
+			: { instance: createUIComponentInstance(options.instance) }),
+		...(options.appearance === undefined
+			? {}
+			: { appearance: { ...options.appearance } }),
 		children: [...(options.children ?? [])],
 	};
 }
@@ -69,6 +101,8 @@ export function createUIDocument(options: CreateUIDocumentOptions): UIDocument {
 		kind: UI_DOCUMENT_KIND,
 		formatVersion: UI_DOCUMENT_FORMAT_VERSION,
 		id: options.id,
+		assetKind: options.assetKind ?? 'screen',
+		contract: createUIAssetContract(options.contract),
 		root: options.root,
 	};
 }
