@@ -8,8 +8,8 @@ independent semantic document package for Kurot UI editing workflows. It has
 no runtime dependencies.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` re-exports the `model`,
-`document`, `validation`, and `serialization` barrels plus the current format
-version.
+`document`, `validation`, `serialization`, and `schema` barrels plus the current
+format version.
 
 ## 1. Directory map
 
@@ -21,7 +21,8 @@ src/
     ├── model/                 UIDocument, UINode, recursive property values.
     ├── document/              Constructors, deterministic traversal, lookup.
     ├── validation/            Strict unknown-input validation + diagnostics.
-    └── serialization/         Validated parse + canonical JSON serialization.
+    ├── serialization/         Validated parse + canonical JSON serialization.
+    └── schema/                Component definitions, registry, semantic checks.
 ```
 
 ## 2. Current contracts
@@ -40,6 +41,18 @@ src/
   not exist yet; never silently reinterpret another version.
 - Unknown document or node keys are errors. This is deliberate so malformed
   Agent output is diagnosed instead of silently discarded.
+- Component definitions are runtime-independent metadata. Never import actual
+  `@kurot/ui` classes into this package.
+- `allowUnknownProperties: true` marks an intentionally incomplete component
+  definition. Omitted `children` likewise means its child policy is not yet
+  known. These are incremental catalog controls, not runtime behavior.
+- Component schema inheritance is single-parent through `extends`. Definitions
+  can be registered in any order; `resolve()` performs deterministic
+  base-to-derived merging and detects missing bases and cycles.
+- Only properties, `children`, and `allowUnknownProperties` are inherited.
+  `abstract`, `displayName`, and `description` belong to the exact definition.
+- Abstract definitions may be resolved and listed but cannot be used as a
+  document node type.
 
 ## 3. Public API
 
@@ -51,6 +64,10 @@ src/
   `UIDiagnosticCode`, `UIDiagnosticSeverity`.
 - Serialization: `parseUIDocument`, `serializeUIDocument`,
   `UIDocumentParseError`, `UIDocumentValidationError`.
+- Schema: `UIComponentDefinition`, `UIPropertyDefinition`,
+  `UIResolvedComponentDefinition`, `UIPropertyValueType`, `UIChildrenPolicy`,
+  `UIComponentRegistry`, `UIComponentResolutionError`,
+  `UIComponentResolutionErrorCode`, `validateUIDocumentComponents`.
 
 ## 4. Package boundary
 
@@ -61,9 +78,10 @@ src/
 - Format adapters translate at the boundary; external formats do not define
   the internal document model.
 
-Commands/history, states, bindings, resource references, migrations, and EXML
-adapters are planned but are not implemented APIs. Do not infer their shape
-from Egret, Unity, FairyGUI, or other formats.
+Concrete component catalogs, detailed property constraints, commands/history,
+states, bindings, resource references, migrations, and EXML adapters are
+planned but are not implemented APIs. Do not infer their shape from Egret,
+Unity, FairyGUI, or other formats.
 
 ## 5. Task → file map
 
@@ -73,6 +91,8 @@ from Egret, Unity, FairyGUI, or other formats.
 | Add construction or tree queries | `document/create.ts`, `document/query.ts` |
 | Add an invariant or diagnostic | `validation/validateUIDocument.ts`, `validation/UIDiagnostic.ts` |
 | Change JSON parsing or canonical output | `serialization/json.ts` |
+| Define component metadata or registry behavior | `schema/UIComponentDefinition.ts`, `schema/UIComponentRegistry.ts` |
+| Change component-aware validation | `schema/validateUIDocumentComponents.ts` |
 | Change public exports | the nearest folder `index.ts`, then `src/index.ts` |
 
 ## 6. Commands

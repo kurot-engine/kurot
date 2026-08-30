@@ -2,12 +2,20 @@
  * Stable diagnostic categories emitted by document validation.
  */
 export type UIDiagnosticCode =
+	| 'abstract-component-type'
+	| 'circular-component-inheritance'
 	| 'duplicate-node-id'
+	| 'invalid-component-children'
+	| 'invalid-component-property'
 	| 'invalid-document'
 	| 'invalid-json'
 	| 'invalid-property-value'
 	| 'invalid-value'
+	| 'missing-component-property'
+	| 'missing-component-base'
 	| 'unexpected-property'
+	| 'unknown-component-property'
+	| 'unknown-component-type'
 	| 'unsupported-version';
 
 /**

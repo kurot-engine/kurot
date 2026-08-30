@@ -59,7 +59,37 @@ the corresponding `@kurot/ui` class.
   plain property values, finite numbers, and acyclic trees;
 - structured diagnostics with stable codes and JSON-style paths;
 - validated JSON parsing and deterministic serialization with sorted property
-  keys.
+  keys;
+- runtime-independent component definitions and an isolated component registry;
+- abstract base definitions, single-parent inheritance, deterministic schema
+  resolution, and derived property overrides;
+- optional validation of registered component types, known property categories,
+  required properties, child policies, and abstract types.
+
+Component definitions can remain intentionally incomplete while their runtime
+properties are reviewed:
+
+```ts
+import { UIComponentRegistry } from '@kurot/ui-document';
+
+const registry = new UIComponentRegistry();
+registry.register({
+  type: 'schema.UIComponent',
+  abstract: true,
+  allowUnknownProperties: true,
+});
+
+registry.register({
+  type: 'game.ProfileCard',
+  extends: 'schema.UIComponent',
+});
+
+const resolved = registry.resolve('game.ProfileCard');
+```
+
+Base definitions can be registered after their derived definitions. Resolution
+does not depend on registration order and reports missing bases or inheritance
+cycles explicitly. No concrete `@kurot/ui` component catalog is included yet.
 
 See [Architecture](./docs/architecture.md) for the current contracts and
 package boundaries.
@@ -69,8 +99,8 @@ package boundaries.
 The package owns the serializable UI document model and its deterministic
 operations. Planned layers include:
 
-- component, state, binding, and resource-reference schemas beyond the current
-  document, node, and property model;
+- concrete component catalogs, detailed property constraints, states, bindings,
+  and resource-reference schemas;
 - commands, transactions, undo, and redo;
 - document migrations;
 - adapters for formats such as EXML.
