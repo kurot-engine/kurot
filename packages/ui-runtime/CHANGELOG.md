@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.2.1] — 2026-08-30
+
+### Added
+
+- Selected appearance variants are applied as deterministic base-skin
+  overrides before native state overrides.
+- The browser preview and integration suite cover appearance-variant selection
+  and invalid variant references.
+
+### Changed
+
+- Upgraded the `@kurot/ui-document` contract to `^0.3.2`.
+
 ## [0.2.0] — 2026-08-30
 
 ### Added
@@ -13,15 +26,13 @@ All notable changes to `@kurot/ui-runtime` are documented here.
   public-part overrides, and projected Slot content.
 - Design-token resolution and an explicit resource-resolution hook.
 - Appearance assets materialized as native Kurot `Skin` and `State` objects.
-- Selected appearance variants applied as deterministic base-skin overrides.
 - Collision-free slash-qualified lookup keys for reusable component internals.
-- A browser preview covering reusable components and appearance variants.
+- A browser preview covering reusable components.
 - Per-instance reusable-component state controllers with atomic activation,
   exact pre-state restoration, and structured unknown-state errors.
 
 ### Changed
 
-- Upgraded the `@kurot/ui-document` contract to `^0.3.2`.
 - Project-wide asset and component validation now runs before materialization.
 - The test suite now has an explicit Node/Vitest TypeScript project and performs
   test type-checking before execution.

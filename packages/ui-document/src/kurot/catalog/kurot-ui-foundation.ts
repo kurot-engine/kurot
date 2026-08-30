@@ -10,7 +10,9 @@ import {
 	GROUP_PROPERTIES,
 	IMAGE_PROPERTIES,
 	LABEL_PROPERTIES,
+	PROGRESS_BAR_PROPERTIES,
 	RECT_PROPERTIES,
+	TOGGLE_BUTTON_PROPERTIES,
 } from './properties/basic-component-properties.js';
 
 const DEFINITIONS: readonly UIComponentDefinition[] = [
@@ -77,6 +79,22 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		description: 'Interactive skinnable button with label, icon, and view states.',
 		children: 'none',
 		properties: BUTTON_PROPERTIES,
+	},
+	{
+		type: 'kui.ToggleButton',
+		extends: 'kui.Button',
+		displayName: 'Toggle Button',
+		description: 'Button whose activation toggles a persistent selected state.',
+		children: 'none',
+		properties: TOGGLE_BUTTON_PROPERTIES,
+	},
+	{
+		type: 'kui.ProgressBar',
+		extends: 'kui.Component',
+		displayName: 'Progress Bar',
+		description: 'Skinnable visual indicator for a bounded numeric value.',
+		children: 'none',
+		properties: PROGRESS_BAR_PROPERTIES,
 	},
 ];
 

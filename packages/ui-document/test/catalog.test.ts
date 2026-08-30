@@ -19,7 +19,9 @@ describe('Kurot UI foundation catalog', () => {
 			'kui.Group',
 			'kui.Image',
 			'kui.Label',
+			'kui.ProgressBar',
 			'kui.Rect',
+			'kui.ToggleButton',
 			'kui.UIComponent',
 			'kurot.DisplayObject',
 		]);
@@ -31,6 +33,8 @@ describe('Kurot UI foundation catalog', () => {
 		const label = registry.resolve('kui.Label');
 		const group = registry.resolve('kui.Group');
 		const button = registry.resolve('kui.Button');
+		const toggleButton = registry.resolve('kui.ToggleButton');
+		const progressBar = registry.resolve('kui.ProgressBar');
 
 		expect(label).toMatchObject({
 			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component'],
@@ -43,6 +47,20 @@ describe('Kurot UI foundation catalog', () => {
 			children: 'multiple',
 		});
 		expect(button?.children).toBe('none');
+		expect(toggleButton).toMatchObject({
+			baseTypes: [
+				'kurot.DisplayObject',
+				'kui.UIComponent',
+				'kui.Component',
+				'kui.Button',
+			],
+			children: 'none',
+		});
+		expect(toggleButton?.properties.toggle?.defaultValue).toBe(true);
+		expect(progressBar).toMatchObject({
+			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component'],
+			children: 'none',
+		});
 		expect(label?.properties.text).toMatchObject({
 			valueType: 'string',
 			defaultValue: '',
@@ -88,6 +106,22 @@ describe('Kurot UI foundation catalog', () => {
 						id: 'start',
 						type: 'kui.Button',
 						properties: { label: 'Start' },
+					}),
+					createUINode({
+						id: 'sound-toggle',
+						type: 'kui.ToggleButton',
+						properties: { label: 'Sound', selected: true },
+					}),
+					createUINode({
+						id: 'loading-progress',
+						type: 'kui.ProgressBar',
+						properties: {
+							direction: 'rtl',
+							maximum: 200,
+							minimum: 100,
+							slideDuration: 0,
+							value: 150,
+						},
 					}),
 				],
 			}),
@@ -144,6 +178,12 @@ describe('Kurot UI foundation catalog', () => {
 			'selected',
 			'toggle',
 		]);
+		expect(
+			Object.keys(registry.get('kui.ToggleButton')?.properties ?? {}).sort(),
+		).toEqual(['toggle']);
+		expect(
+			Object.keys(registry.get('kui.ProgressBar')?.properties ?? {}).sort(),
+		).toEqual(['direction', 'maximum', 'minimum', 'slideDuration', 'value']);
 	});
 
 	it('rejects invalid basic component values and unknown properties', () => {
@@ -174,6 +214,16 @@ describe('Kurot UI foundation catalog', () => {
 						type: 'kui.Button',
 						properties: { icon: { textureId: 'start' } },
 					}),
+					createUINode({
+						id: 'toggle',
+						type: 'kui.ToggleButton',
+						properties: { selected: 'yes' },
+					}),
+					createUINode({
+						id: 'progress',
+						type: 'kui.ProgressBar',
+						properties: { direction: 'clockwise', slideDuration: -1 },
+					}),
 				],
 			}),
 		});
@@ -187,6 +237,9 @@ describe('Kurot UI foundation catalog', () => {
 			'$.root.children[1].properties.scale9Grid',
 			'$.root.children[2].properties.fillColor',
 			'$.root.children[3].properties.icon',
+			'$.root.children[4].properties.selected',
+			'$.root.children[5].properties.direction',
+			'$.root.children[5].properties.slideDuration',
 		]);
 	});
 

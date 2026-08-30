@@ -201,15 +201,16 @@ const registry = createKurotUIFoundationRegistry();
 
 It defines the abstract semantic bases `kurot.DisplayObject`,
 `kui.UIComponent`, and `kui.Component`, plus the concrete `kui.Group`,
-`kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` nodes. `Group` accepts
-ordered children; the other four concrete nodes are leaves.
+`kui.Label`, `kui.Image`, `kui.Rect`, `kui.Button`, `kui.ToggleButton`, and
+`kui.ProgressBar` nodes. `Group` accepts ordered children; the other concrete
+nodes are leaves.
 
 `kui.*` is the canonical Kurot UI namespace. EUI names belong only to legacy
 EXML adapters and are not stored in the semantic document.
 
 The foundation catalog declares the serializable authoring properties inherited
 from Kurot display objects and UI layout elements, then adds the audited direct
-properties of all five concrete components. Unknown properties are rejected.
+properties of all seven concrete components. Unknown properties are rejected.
 
 Runtime-owned values are deliberately excluded. For example, `Image.source`
 stores a typed project resource reference rather than a `Texture`, and readonly

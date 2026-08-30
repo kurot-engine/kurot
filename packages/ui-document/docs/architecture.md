@@ -116,11 +116,11 @@ example, `kui.Image.source` accepts typed image or sprite-frame references, and
 audited color fields accept color tokens.
 
 The foundation catalog remains curated rather than reflective. It includes
-only `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` plus
-their abstract bases. Runtime-owned and compatibility-shaped fields are not
-automatically authoring APIs. `currentState`, `skinName`, and
-`hostComponentKey` are absent because states and appearances are first-class
-semantics.
+`kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, `kui.Button`,
+`kui.ToggleButton`, and `kui.ProgressBar` plus their abstract bases.
+Runtime-owned and compatibility-shaped fields are not automatically authoring
+APIs. `currentState`, `skinName`, and `hostComponentKey` are absent because
+states and appearances are first-class semantics.
 
 ## Runtime boundary
 

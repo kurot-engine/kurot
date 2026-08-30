@@ -146,6 +146,50 @@ export const BUTTON_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> =
 	toggle: booleanProperty(false, 'Whether activation automatically toggles selected.'),
 };
 
+/**
+ * Authoring properties declared directly by ToggleButton.
+ */
+export const TOGGLE_BUTTON_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	toggle: booleanProperty(true, 'Whether activation automatically toggles selected.'),
+};
+
+const RANGE_VALUE_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	maximum: {
+		valueType: 'number',
+		defaultValue: 100,
+		description: 'Upper endpoint used to calculate the displayed progress ratio.',
+	},
+	minimum: {
+		valueType: 'number',
+		defaultValue: 0,
+		description: 'Lower endpoint used to calculate the displayed progress ratio.',
+	},
+	value: {
+		valueType: 'number',
+		defaultValue: 0,
+		description: 'Current progress value, clamped to the authored range at runtime.',
+	},
+};
+
+/**
+ * Authoring properties declared directly by ProgressBar.
+ */
+export const PROGRESS_BAR_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	...RANGE_VALUE_PROPERTIES,
+	direction: {
+		valueType: 'string',
+		enumValues: ['ltr', 'rtl', 'ttb', 'btt'],
+		defaultValue: 'ltr',
+		description: 'Direction in which the progress fill grows.',
+	},
+	slideDuration: {
+		valueType: 'number',
+		minimum: 0,
+		defaultValue: 500,
+		description: 'Duration in milliseconds used to animate value changes; zero is immediate.',
+	},
+};
+
 function alphaProperty(defaultValue: number, description: string): UIPropertyDefinition {
 	return {
 		valueType: 'number',

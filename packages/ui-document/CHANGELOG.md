@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.3.3] — 2026-08-31
+
+### Added
+
+- Audited `kui.ToggleButton` Schema inheriting the complete `kui.Button`
+  contract while overriding the `toggle` default to match runtime behavior.
+- Audited `kui.ProgressBar` Schema for its numeric range, fill direction, and
+  slide-duration properties.
+- Catalog validation coverage for both newly supported controls.
+
 ## [0.3.2] — 2026-08-30
 
 ### Added
