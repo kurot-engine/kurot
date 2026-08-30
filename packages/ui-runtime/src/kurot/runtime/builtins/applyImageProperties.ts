@@ -1,7 +1,7 @@
 import { Texture } from '@kurot/core';
 import { Image } from '@kurot/ui';
 import { createRectangle } from '../descriptors/createRectangle.js';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean, invalidRuntimeValue } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by Image.
@@ -30,27 +30,14 @@ export function applyImageProperty(
 	}
 }
 
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw invalidValue('boolean', path);
-}
-
 function requireImageSource(value: unknown, path: string): string | Texture {
 	if (typeof value === 'string' || value instanceof Texture) {
 		return value;
 	}
-	throw invalidValue('a string or Texture', path);
+	throw invalidRuntimeValue('a string or Texture', path);
 }
 
 function requireFillMode(value: unknown, path: string): 'clip' | 'repeat' | 'scale' {
 	if (value === 'clip' || value === 'repeat' || value === 'scale') return value;
-	throw invalidValue('clip, repeat, or scale', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	throw invalidRuntimeValue('clip, repeat, or scale', path);
 }

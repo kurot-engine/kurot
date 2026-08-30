@@ -1,14 +1,10 @@
-import type { DisplayObject } from '@kurot/core';
 import type { UIAssetContract, UIPropertyValue } from '@kurot/ui-document';
 import { matchesUIPropertyDefinition } from '@kurot/ui-document';
-import { applyRuntimeProperty } from '../applyRuntimeProperty.js';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 import { qualifyNodeId } from '../materializeNode.js';
-import type {
-	KurotUIComponentAdapter,
-	KurotUICreationContext,
-	KurotUIDataController,
-} from '../types.js';
+import { applyPropertyUpdates } from '../propertyTransaction.js';
+import type { RuntimePropertyUpdate } from '../propertyTransaction.js';
+import type { KurotUICreationContext, KurotUIDataController } from '../types.js';
 
 /**
  * Creates one validated controller for an asset's bounded external data.
@@ -64,7 +60,7 @@ function applyBindings(
 	context: KurotUICreationContext,
 ): void {
 	const bindings = contract.dataBindings ?? {};
-	const targets: BindingTarget[] = [];
+	const updates: RuntimePropertyUpdate[] = [];
 	for (const name of Object.keys(bindings).sort()) {
 		const binding = bindings[name]!;
 		if (binding.source !== source) {
@@ -76,79 +72,15 @@ function applyBindings(
 		if (target === undefined || type === undefined) {
 			continue;
 		}
-		targets.push({
+		updates.push({
 			path: `$.contract.dataBindings.${name}`,
 			property: binding.property,
 			target,
 			type,
-			adapter: context.adapters[type],
-			previousValue: captureBindingValue(
-				context.adapters[type],
-				target,
-				binding.property,
-				`$.contract.dataBindings.${name}`,
-			),
+			value,
 		});
 	}
-
-	const applied: BindingTarget[] = [];
-	try {
-		for (const target of targets) {
-			applied.push(target);
-			applyRuntimeProperty(
-				target.target,
-				target.type,
-				target.property,
-				value,
-				target.path,
-				context,
-			);
-		}
-	} catch (error) {
-		rollbackBindings(applied);
-		throw error;
-	}
-}
-
-interface BindingTarget {
-	readonly adapter: KurotUIComponentAdapter | undefined;
-	readonly path: string;
-	readonly property: string;
-	readonly target: DisplayObject;
-	readonly type: string;
-	readonly previousValue: unknown;
-}
-
-function rollbackBindings(targets: readonly BindingTarget[]): void {
-	for (let index = targets.length - 1; index >= 0; index--) {
-		const target = targets[index]!;
-		try {
-			if (target.adapter?.restoreProperty !== undefined) {
-				target.adapter.restoreProperty(
-					target.target,
-					target.property,
-					target.previousValue,
-					target.path,
-				);
-			} else {
-				Reflect.set(target.target, target.property, target.previousValue);
-			}
-		} catch {
-			// Preserve the original binding failure; adapters should expose restorable properties.
-		}
-	}
-}
-
-function captureBindingValue(
-	adapter: KurotUIComponentAdapter | undefined,
-	target: DisplayObject,
-	property: string,
-	path: string,
-): unknown {
-	if (adapter?.captureProperty !== undefined) {
-		return adapter.captureProperty(target, property, path);
-	}
-	return Reflect.get(target, property) as unknown;
+	applyPropertyUpdates(updates, context);
 }
 
 function assertValidInitialValues(

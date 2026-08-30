@@ -78,7 +78,7 @@ function exposeAppearanceNodes(
 ): void {
 	const target = context.instances.get(qualifyNodeId(scope, node.id));
 	if (target) {
-		setSkinValue(skin, node.id, target);
+		skin.setPart(node.id, target);
 	}
 	for (const child of node.children) {
 		exposeAppearanceNodes(skin, child, scope, context);
@@ -96,7 +96,7 @@ function exposeParts(
 		const part = appearance.contract.parts[name];
 		const target = context.instances.get(qualifyNodeId(scope, part.nodeId));
 		if (target) {
-			setSkinValue(skin, name, target);
+			skin.setPart(name, target);
 		}
 	}
 	skin.skinParts = names;
@@ -149,8 +149,4 @@ function requireAppearance(
 		);
 	}
 	return appearance;
-}
-
-function setSkinValue(skin: Skin, name: string, value: DisplayObject): void {
-	(skin as unknown as Record<string, unknown>)[name] = value;
 }

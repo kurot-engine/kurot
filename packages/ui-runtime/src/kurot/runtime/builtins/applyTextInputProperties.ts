@@ -1,5 +1,5 @@
 import { TextInput } from '@kurot/ui';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean, requireNumber, requireString, invalidRuntimeValue } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by TextInput.
@@ -37,30 +37,7 @@ export function applyTextInputProperty(
 	}
 }
 
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw invalidValue('boolean', path);
-}
-
 function requireInputType(value: unknown, path: string): 'text' {
 	if (value === 'text') return value;
-	throw invalidValue('text', path);
-}
-
-function requireNumber(value: unknown, path: string): number {
-	if (typeof value === 'number' && Number.isFinite(value)) return value;
-	throw invalidValue('number', path);
-}
-
-function requireString(value: unknown, path: string): string {
-	if (typeof value === 'string') return value;
-	throw invalidValue('string', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	throw invalidRuntimeValue('text', path);
 }

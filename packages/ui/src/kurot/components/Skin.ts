@@ -108,6 +108,15 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	}
 
 	/**
+	 * Set a skin part by name. Write-side counterpart to {@link getPart},
+	 * used by programmatic materializers to install parts whose names come
+	 * from authored data and therefore cannot be declared as class fields.
+	 */
+	public setPart(name: string, value: DisplayObject): void {
+		(this as Record<string, unknown>)[name] = value;
+	}
+
+	/**
 	 * Unwatch every binding created from this skin.
 	 * Called by the host component when the skin is detached or replaced
 	 * so stale watchers don't leak or fire on the wrong host.

@@ -1,5 +1,5 @@
 import { ProgressBar } from '@kurot/ui';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireNumber, invalidRuntimeValue } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by ProgressBar.
@@ -38,18 +38,5 @@ function requireDirection(
 	if (value === 'btt' || value === 'ltr' || value === 'rtl' || value === 'ttb') {
 		return value;
 	}
-	throw invalidValue('btt, ltr, rtl, or ttb', path);
-}
-
-function requireNumber(value: unknown, path: string): number {
-	if (typeof value === 'number' && Number.isFinite(value)) return value;
-	throw invalidValue('number', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	throw invalidRuntimeValue('btt, ltr, rtl, or ttb', path);
 }

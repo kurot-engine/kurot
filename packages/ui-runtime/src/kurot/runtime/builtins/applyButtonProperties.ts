@@ -1,6 +1,6 @@
 import { Texture } from '@kurot/core';
 import { Button } from '@kurot/ui';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean, requireString, invalidRuntimeValue } from './valueGuards.js';
 
 /**
  * Applies one property declared by Button and inherited by its subclasses.
@@ -29,27 +29,9 @@ export function applyButtonProperty(
 	}
 }
 
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw invalidValue('boolean', path);
-}
-
-function requireString(value: unknown, path: string): string {
-	if (typeof value === 'string') return value;
-	throw invalidValue('string', path);
-}
-
 function requireImageSource(value: unknown, path: string): string | Texture {
 	if (typeof value === 'string' || value instanceof Texture) {
 		return value;
 	}
-	throw invalidValue('a string or Texture', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	throw invalidRuntimeValue('a string or Texture', path);
 }

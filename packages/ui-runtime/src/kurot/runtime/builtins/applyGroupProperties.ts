@@ -1,6 +1,6 @@
 import { Group } from '@kurot/ui';
 import { createLayout } from '../descriptors/createLayout.js';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean, requireNumber } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by Group.
@@ -30,22 +30,4 @@ export function applyGroupProperty(
 		default:
 			return false;
 	}
-}
-
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw invalidValue('boolean', path);
-}
-
-function requireNumber(value: unknown, path: string): number {
-	if (typeof value === 'number' && Number.isFinite(value)) return value;
-	throw invalidValue('number', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
 }

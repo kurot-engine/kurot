@@ -1,5 +1,5 @@
 import { Component } from '@kurot/ui';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by Component.
@@ -17,13 +17,4 @@ export function applyComponentProperty(
 		default:
 			return false;
 	}
-}
-
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw new KurotUIRuntimeError(
-		'invalid-property',
-		'Runtime property must be boolean.',
-		path,
-	);
 }

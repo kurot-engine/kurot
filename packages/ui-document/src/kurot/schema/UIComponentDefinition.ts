@@ -1,3 +1,9 @@
+import type { UIPropertyPrimitive } from '../model/UIPropertyValue.js';
+import type {
+	UIDesignTokenType,
+	UIResourceType,
+} from '../model/UIReference.js';
+
 /**
  * Broad serializable value category accepted by a component property.
  */
@@ -232,8 +238,3 @@ export interface UIResolvedComponentDefinition {
 	 */
 	readonly allowUnknownProperties: boolean;
 }
-import type { UIPropertyPrimitive } from '../model/UIPropertyValue.js';
-import type {
-	UIDesignTokenType,
-	UIResourceType,
-} from '../model/UIReference.js';

@@ -7,6 +7,7 @@ import {
 	createUIAssetContract,
 	createUIDocument,
 	createUINode,
+	UIAssetRegistry,
 } from '@kurot/ui-document';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createKurotUI } from '../src/index.js';
@@ -142,6 +143,85 @@ describe('runtime data and semantic actions', () => {
 		);
 		expect(result.data.getValue('status')).toBe('ready');
 		expect(label.text).toBe('ready');
+		expect(adapterState.get(probe)).toBe('ready');
+	});
+
+	it('restores adapter-owned properties through the adapter when a reusable state is cleared', () => {
+		const registry = createKurotUIFoundationRegistry();
+		registry.register({
+			type: 'test.Probe',
+			extends: 'kui.Group',
+			children: 'none',
+			properties: { status: { valueType: 'string' } },
+		});
+		const component = createUIDocument({
+			id: 'probe-card',
+			assetKind: 'component',
+			contract: createUIAssetContract({
+				componentType: 'test.Probe',
+				states: {
+					busy: {
+						overrides: [
+							{ targetId: 'probe', property: 'status', value: 'busy' },
+						],
+					},
+				},
+			}),
+			root: createUINode({
+				id: 'card-root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'probe',
+						type: 'test.Probe',
+						properties: { status: 'ready' },
+					}),
+				],
+			}),
+		});
+		const screen = createUIDocument({
+			id: 'probe-screen',
+			root: createUINode({
+				id: 'card',
+				type: 'test.Probe',
+				instance: {
+					source: { kind: 'asset', assetId: 'probe-card' },
+					parameters: {},
+					overrides: [],
+					slots: {},
+				},
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(component);
+		const adapterState = new WeakMap<object, unknown>();
+		const result = createKurotUI(screen, {
+			registry,
+			assets,
+			adapters: {
+				'test.Probe': {
+					create: () => new Group(),
+					applyProperty: (instance, _name, value) => {
+						adapterState.set(instance, value);
+						return true;
+					},
+					captureProperty: instance => adapterState.get(instance),
+					restoreProperty: (instance, _name, value) => {
+						adapterState.set(instance, value);
+					},
+				},
+			},
+		});
+		const probe = requireInstance(result.instances.get('card/probe'), Group);
+		expect(adapterState.get(probe)).toBe('ready');
+
+		const controller = result.stateControllers.get('card');
+		controller?.setState('busy');
+		expect(controller?.currentState).toBe('busy');
+		expect(adapterState.get(probe)).toBe('busy');
+
+		controller?.clearState();
+		expect(controller?.currentState).toBeUndefined();
 		expect(adapterState.get(probe)).toBe('ready');
 	});
 });

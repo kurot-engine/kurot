@@ -1,6 +1,7 @@
 import { DisplayObject, DisplayObjectContainer } from '@kurot/core';
 import type { IUIComponent } from '@kurot/ui';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireBoolean, requireNumber, invalidRuntimeValue } from './valueGuards.js';
 
 type RuntimeUIComponent = DisplayObject & IUIComponent;
 
@@ -73,25 +74,7 @@ function requireContainer(target: DisplayObject, path: string): DisplayObjectCon
 	);
 }
 
-function requireBoolean(value: unknown, path: string): boolean {
-	if (typeof value === 'boolean') return value;
-	throw invalidValue('boolean', path);
-}
-
 function requireConstraint(value: unknown, path: string): number | string {
 	if (typeof value === 'number' || typeof value === 'string') return value;
-	throw invalidValue('number or string', path);
-}
-
-function requireNumber(value: unknown, path: string): number {
-	if (typeof value === 'number' && Number.isFinite(value)) return value;
-	throw invalidValue('number', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	throw invalidRuntimeValue('number or string', path);
 }

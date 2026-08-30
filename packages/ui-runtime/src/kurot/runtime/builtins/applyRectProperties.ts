@@ -1,5 +1,5 @@
 import { Rect } from '@kurot/ui';
-import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { requireNumber } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by Rect.
@@ -35,17 +35,4 @@ export function applyRectProperty(
 		default:
 			return false;
 	}
-}
-
-function requireNumber(value: unknown, path: string): number {
-	if (typeof value === 'number' && Number.isFinite(value)) return value;
-	throw invalidValue('number', path);
-}
-
-function invalidValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
 }

@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [1.1.8] — 2026-08-31
+
+### Added
+
+- **Skin: `setPart(name, value)`** — write-side counterpart to `getPart(name)`. Installs a named skin part (a `DisplayObject`) under an authored/external name that cannot be declared as a class field. Intended for programmatic materializers such as `@kurot/ui-runtime`; the dynamic-property access is now confined inside `Skin`, symmetric with `getPart`.
+
+---
+
 ## [1.1.7] — 2026-08-10
 
 ### Added

@@ -12,6 +12,7 @@ import type {
 	UIComponentInstance,
 	UIInstanceOverride,
 } from '../model/UIComponentInstance.js';
+import type { UIDocument } from '../model/UIDocument.js';
 import type { UIAppearanceReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
@@ -147,7 +148,7 @@ export interface UIOperationResult {
 	/**
 	 * Updated document snapshot.
 	 */
-	readonly document: import('../model/UIDocument.js').UIDocument;
+	readonly document: UIDocument;
 
 	/**
 	 * Operation that restores the input snapshot when applied immediately.

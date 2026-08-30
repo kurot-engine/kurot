@@ -30,12 +30,12 @@
 	},
 	"peerDependencies": {
 		"@kurot/core": "^1.0.15",
-		"@kurot/ui": "^1.1.7",
+		"@kurot/ui": "^1.1.8",
 		"@kurot/ui-document": "^0.5.0"
 	},
 	"devDependencies": {
 		"@kurot/core": "^1.0.15",
-		"@kurot/ui": "^1.1.7",
+		"@kurot/ui": "^1.1.8",
 		"@kurot/ui-document": "^0.5.0",
 		"@types/node": "^22.0.0",
 		"happy-dom": "^20.8.9",
