@@ -11,7 +11,10 @@ import {
 import { validateUIAssetModes } from './validateUIAssetModes.js';
 
 const CONTRACT_KEYS = new Set([
+	'actions',
 	'componentType',
+	'dataBindings',
+	'dataFields',
 	'parameters',
 	'parts',
 	'slots',
@@ -36,6 +39,8 @@ const PARAMETER_KEYS = new Set([
 const PART_KEYS = new Set(['description', 'nodeId', 'required']);
 const PARAMETER_BINDING_KEYS = new Set(['property', 'targetId']);
 const SLOT_KEYS = new Set(['capacity', 'description', 'nodeId', 'required']);
+const ACTION_KEYS = new Set(['description', 'sourceId', 'trigger']);
+const DATA_BINDING_KEYS = new Set(['property', 'source', 'targetId']);
 
 /**
  * Validates the public authoring contract of one UI asset.
@@ -59,11 +64,174 @@ export function validateUIAssetContract(
 
 	validateKnownKeys(value, CONTRACT_KEYS, path, diagnostics);
 	validateContractTypes(value, assetKind, path, diagnostics);
+	validateDataFields(value.dataFields, `${path}.dataFields`, diagnostics);
+	validateDataBindings(
+		value.dataBindings,
+		`${path}.dataBindings`,
+		diagnostics,
+		nodeIds,
+		value.dataFields,
+	);
+	validateActions(value.actions, `${path}.actions`, diagnostics, nodeIds);
 	validateParameters(value.parameters, `${path}.parameters`, diagnostics, nodeIds);
 	validateParts(value.parts, `${path}.parts`, diagnostics, nodeIds);
 	validateSlots(value.slots, `${path}.slots`, diagnostics, nodeIds);
-	validateUIAssetModes(value.states, `${path}.states`, diagnostics, nodeIds);
-	validateUIAssetModes(value.variants, `${path}.variants`, diagnostics, nodeIds);
+	validateUIAssetModes(value.states, `${path}.states`, diagnostics, nodeIds, true);
+	validateUIAssetModes(value.variants, `${path}.variants`, diagnostics, nodeIds, false);
+}
+
+function validateDataFields(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+): void {
+	if (value === undefined) return;
+	if (!validateNamedRecord(value, path, 'data fields', diagnostics)) return;
+	for (const [name, definition] of Object.entries(value)) {
+		if (!isPlainRecord(definition)) {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				`${path}.${name}`,
+				'Data field definition must be an object.',
+			);
+			continue;
+		}
+		try {
+			validateComponentDefinition({
+				type: 'kurot.ContractData',
+				properties: { [name]: definition as unknown as UIPropertyDefinition },
+			});
+		} catch (error) {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				`${path}.${name}`,
+				error instanceof Error ? error.message : 'Invalid data field definition.',
+			);
+		}
+	}
+}
+
+function validateDataBindings(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+	nodeIds: ReadonlySet<string>,
+	dataFields: unknown,
+): void {
+	if (value === undefined) return;
+	if (!validateNamedRecord(value, path, 'data bindings', diagnostics)) return;
+	const fields = isPlainRecord(dataFields) ? dataFields : {};
+	for (const [name, binding] of Object.entries(value)) {
+		const bindingPath = `${path}.${name}`;
+		if (!isPlainRecord(binding)) {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				bindingPath,
+				'Data binding must be an object.',
+			);
+			continue;
+		}
+		validateKnownKeys(binding, DATA_BINDING_KEYS, bindingPath, diagnostics);
+		if (
+			validateNonEmptyString(
+				binding.source,
+				`${bindingPath}.source`,
+				'Data source',
+				diagnostics,
+			)
+		) {
+			if (!(binding.source in fields)) {
+				addUIDiagnostic(
+					diagnostics,
+					'invalid-asset-contract',
+					`${bindingPath}.source`,
+					`Data field "${binding.source}" is not declared.`,
+				);
+			}
+		}
+		if (
+			validateNonEmptyString(
+				binding.targetId,
+				`${bindingPath}.targetId`,
+				'Target node id',
+				diagnostics,
+			)
+		) {
+			if (!nodeIds.has(binding.targetId)) {
+				addUIDiagnostic(
+					diagnostics,
+					'unknown-node-reference',
+					`${bindingPath}.targetId`,
+					`Node "${binding.targetId}" does not exist in this asset.`,
+				);
+			}
+		}
+		validateNonEmptyString(
+			binding.property,
+			`${bindingPath}.property`,
+			'Property name',
+			diagnostics,
+		);
+	}
+}
+
+function validateActions(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+	nodeIds: ReadonlySet<string>,
+): void {
+	if (value === undefined) return;
+	if (!validateNamedRecord(value, path, 'actions', diagnostics)) return;
+	for (const [name, definition] of Object.entries(value)) {
+		const definitionPath = `${path}.${name}`;
+		if (!isPlainRecord(definition)) {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				definitionPath,
+				'Action definition must be an object.',
+			);
+			continue;
+		}
+		validateKnownKeys(definition, ACTION_KEYS, definitionPath, diagnostics);
+		if (
+			validateNonEmptyString(
+				definition.sourceId,
+				`${definitionPath}.sourceId`,
+				'Action source node id',
+				diagnostics,
+			)
+		) {
+			if (!nodeIds.has(definition.sourceId)) {
+				addUIDiagnostic(
+					diagnostics,
+					'unknown-node-reference',
+					`${definitionPath}.sourceId`,
+					`Node "${definition.sourceId}" does not exist in this asset.`,
+				);
+			}
+		}
+		if (definition.trigger !== 'change' && definition.trigger !== 'tap') {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				`${definitionPath}.trigger`,
+				'Action trigger must be "change" or "tap".',
+			);
+		}
+		if (definition.description !== undefined) {
+			validateNonEmptyString(
+				definition.description,
+				`${definitionPath}.description`,
+				'Description',
+				diagnostics,
+			);
+		}
+	}
 }
 
 function validateContractTypes(

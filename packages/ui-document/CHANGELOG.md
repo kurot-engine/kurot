@@ -4,6 +4,20 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.4.0] — 2026-08-31
+
+### Added
+
+- Typed external data fields and named one-way bindings to stable node
+  properties, including component-schema compatibility validation.
+- Named semantic actions with bounded `tap` and `change` triggers.
+- Numeric state-property transition contracts with duration, delay, and
+  deterministic easing curves.
+- Semantic operations and exact inverse generation for data fields, bindings,
+  and actions.
+- Phase 3 conformance tests covering serialization, validation, editing, and
+  invalid binding or transition targets.
+
 ## [0.3.5] — 2026-08-31
 
 ### Added

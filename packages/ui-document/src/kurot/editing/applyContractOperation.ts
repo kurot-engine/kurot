@@ -1,12 +1,15 @@
 import type {
 	UIAssetContract,
+	UIDataBindingDefinition,
 	UIParameterDefinition,
 	UIPartDefinition,
+	UISemanticActionDefinition,
 	UISlotDefinition,
 	UIStateDefinition,
 	UIVariantDefinition,
 } from '../model/UIAssetContract.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type { UIOperation, UIOperationResult } from './UIOperation.js';
 import { missingValue, requireName } from './editHelpers.js';
 
@@ -23,6 +26,47 @@ export function applyContractOperation(
 	operation: UIContractOperation,
 ): UIOperationResult {
 	switch (operation.kind) {
+		case 'set-contract-data-field':
+			return setEntry(document, operation.name, 'dataFields', operation.definition,
+				previous => previous
+					? { kind: 'set-contract-data-field', name: operation.name, definition: previous }
+					: { kind: 'remove-contract-data-field', name: operation.name });
+		case 'remove-contract-data-field':
+			return removeEntry<UIPropertyDefinition>(document, operation.name, 'dataFields', previous => ({
+				kind: 'set-contract-data-field', name: operation.name, definition: previous,
+			}));
+		case 'set-contract-data-binding':
+			return setEntry(document, operation.name, 'dataBindings', operation.definition,
+				previous => previous
+					? { kind: 'set-contract-data-binding', name: operation.name, definition: previous }
+					: { kind: 'remove-contract-data-binding', name: operation.name });
+		case 'remove-contract-data-binding':
+			return removeEntry<UIDataBindingDefinition>(
+				document,
+				operation.name,
+				'dataBindings',
+				previous => ({
+					kind: 'set-contract-data-binding',
+					name: operation.name,
+					definition: previous,
+				}),
+			);
+		case 'set-contract-action':
+			return setEntry(document, operation.name, 'actions', operation.definition,
+				previous => previous
+					? { kind: 'set-contract-action', name: operation.name, definition: previous }
+					: { kind: 'remove-contract-action', name: operation.name });
+		case 'remove-contract-action':
+			return removeEntry<UISemanticActionDefinition>(
+				document,
+				operation.name,
+				'actions',
+				previous => ({
+					kind: 'set-contract-action',
+					name: operation.name,
+					definition: previous,
+				}),
+			);
 		case 'set-contract-parameter':
 			return setEntry(document, operation.name, 'parameters', operation.definition,
 				previous => previous
@@ -79,7 +123,7 @@ function setEntry<TValue>(
 	createInverse: (previous: TValue | undefined) => UIOperation,
 ): UIOperationResult {
 	const name = requireName(nameInput, 'Contract entry name');
-	const entries = document.contract[key] as Readonly<Record<string, TValue>>;
+	const entries = (document.contract[key] ?? {}) as Readonly<Record<string, TValue>>;
 	const contract = {
 		...document.contract,
 		[key]: { ...entries, [name]: definition },
@@ -96,7 +140,7 @@ function removeEntry<TValue>(
 	key: ContractCollection,
 	createInverse: (previous: TValue) => UIOperation,
 ): UIOperationResult {
-	const entries = document.contract[key] as Readonly<Record<string, TValue>>;
+	const entries = (document.contract[key] ?? {}) as Readonly<Record<string, TValue>>;
 	const previous = entries[name];
 	if (!previous) throw missingValue('Contract entry', '$.name');
 	const nextEntries: Record<string, TValue> = { ...entries };
@@ -112,5 +156,12 @@ function removeEntry<TValue>(
 
 type ContractCollection = keyof Pick<
 	UIAssetContract,
-	'parameters' | 'parts' | 'slots' | 'states' | 'variants'
+	| 'actions'
+	| 'dataBindings'
+	| 'dataFields'
+	| 'parameters'
+	| 'parts'
+	| 'slots'
+	| 'states'
+	| 'variants'
 >;

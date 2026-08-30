@@ -29,6 +29,9 @@ describe('UI document model', () => {
 		expect(document.formatVersion).toBe(UI_DOCUMENT_FORMAT_VERSION);
 		expect(document.assetKind).toBe('screen');
 		expect(document.contract).toEqual({
+			actions: {},
+			dataBindings: {},
+			dataFields: {},
 			parameters: {},
 			parts: {},
 			slots: {},

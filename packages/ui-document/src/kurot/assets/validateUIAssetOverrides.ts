@@ -1,7 +1,14 @@
 import { findUINode } from '../document/query.js';
-import type { UIPropertyOverride } from '../model/UIAssetContract.js';
+import type {
+	UIDataBindingDefinition,
+	UIPropertyOverride,
+} from '../model/UIAssetContract.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
+import type {
+	UIPropertyDefinition,
+	UIPropertyValueType,
+} from '../schema/UIComponentDefinition.js';
 import { matchesUIPropertyDefinition } from '../schema/matchesUIPropertyDefinition.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { addUIDiagnostic } from '../validation/validationHelpers.js';
@@ -15,9 +22,67 @@ export function validateUIAssetOverrides(
 ): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
 	validateParameterBindings(document, components, diagnostics);
+	validateDataBindings(document, components, diagnostics);
 	validateModes(document, 'states', components, diagnostics);
 	validateModes(document, 'variants', components, diagnostics);
 	return diagnostics;
+}
+
+function validateDataBindings(
+	document: UIDocument,
+	components: UIComponentRegistry,
+	diagnostics: UIDiagnostic[],
+): void {
+	const bindings = document.contract.dataBindings ?? {};
+	for (const [name, binding] of Object.entries(bindings)) {
+		validateDataBinding(document, binding, name, components, diagnostics);
+	}
+}
+
+function validateDataBinding(
+	document: UIDocument,
+	binding: UIDataBindingDefinition,
+	name: string,
+	components: UIComponentRegistry,
+	diagnostics: UIDiagnostic[],
+): void {
+	const target = findUINode(document.root, binding.targetId);
+	if (!target) return;
+	const component = components.resolve(target.type);
+	if (!component) return;
+	const targetProperty = component.properties[binding.property];
+	const path = `$.contract.dataBindings.${name}`;
+	if (!targetProperty) {
+		addUIDiagnostic(
+			diagnostics,
+			'unknown-component-property',
+			`${path}.property`,
+			`Property "${binding.property}" is not defined for ${target.type}.`,
+		);
+		return;
+	}
+	const sourceProperty = document.contract.dataFields?.[binding.source];
+	if (!sourceProperty || propertyTypesOverlap(sourceProperty, targetProperty)) return;
+	addUIDiagnostic(
+		diagnostics,
+		'invalid-component-property',
+		`${path}.source`,
+		`Data field "${binding.source}" is not compatible with ${target.type}.${binding.property}.`,
+	);
+}
+
+function propertyTypesOverlap(
+	source: UIPropertyDefinition,
+	target: UIPropertyDefinition,
+): boolean {
+	const sourceTypes = new Set(toValueTypes(source.valueType));
+	return toValueTypes(target.valueType).some(type => sourceTypes.has(type));
+}
+
+function toValueTypes(
+	value: UIPropertyDefinition['valueType'],
+): readonly UIPropertyValueType[] {
+	return Array.isArray(value) ? value : [value as UIPropertyValueType];
 }
 
 function validateParameterBindings(
@@ -67,6 +132,14 @@ function validateUIPropertyOverride(
 		);
 		return;
 	}
+	if (override.transition && !supportsNumericTransition(property)) {
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-component-property',
+			`${path}.transition`,
+			`Transition target "${override.property}" must accept numeric values.`,
+		);
+	}
 	if (matchesUIPropertyDefinition(override.value, property)) return;
 	addUIDiagnostic(
 		diagnostics,
@@ -74,6 +147,10 @@ function validateUIPropertyOverride(
 		`${path}.value`,
 		`Override for "${override.property}" does not satisfy the schema of ${target.type}.`,
 	);
+}
+
+function supportsNumericTransition(property: UIPropertyDefinition): boolean {
+	return toValueTypes(property.valueType).includes('number');
 }
 
 function validateModes(

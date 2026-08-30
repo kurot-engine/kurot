@@ -1,10 +1,13 @@
 import type {
+	UIDataBindingDefinition,
 	UIPartDefinition,
 	UIParameterDefinition,
+	UISemanticActionDefinition,
 	UISlotDefinition,
 	UIStateDefinition,
 	UIVariantDefinition,
 } from '../model/UIAssetContract.js';
+import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type {
 	UIComponentInstance,
 	UIInstanceOverride,
@@ -88,6 +91,24 @@ export type UIOperation =
 			readonly appearance: UIAppearanceReference;
 	  }
 	| { readonly kind: 'remove-node-appearance'; readonly nodeId: string }
+	| {
+			readonly kind: 'set-contract-data-field';
+			readonly name: string;
+			readonly definition: UIPropertyDefinition;
+	  }
+	| { readonly kind: 'remove-contract-data-field'; readonly name: string }
+	| {
+			readonly kind: 'set-contract-data-binding';
+			readonly name: string;
+			readonly definition: UIDataBindingDefinition;
+	  }
+	| { readonly kind: 'remove-contract-data-binding'; readonly name: string }
+	| {
+			readonly kind: 'set-contract-action';
+			readonly name: string;
+			readonly definition: UISemanticActionDefinition;
+	  }
+	| { readonly kind: 'remove-contract-action'; readonly name: string }
 	| {
 			readonly kind: 'set-contract-parameter';
 			readonly name: string;

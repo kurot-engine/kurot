@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.3.5`. This is a headless,
+Package identity: `@kurot/ui-document@0.4.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -35,6 +35,10 @@ src/
 - Contracts contain parameter schemas, public parts, named Slots, runtime
   states, and authoring variants. Parts, state overrides, and variant overrides
   target stable node IDs in the defining asset.
+- Contracts may declare typed external data fields, named one-way bindings to
+  node properties, and semantic actions triggered by `tap` or `change`.
+- State overrides may define bounded numeric transitions with duration, delay,
+  and a deterministic easing curve. Variants cannot contain transitions.
 - Component parameters may bind explicitly to internal node properties; binding
   records contain stable target IDs and property names, never expressions.
 - A node has `id`, `type`, `properties`, optional `instance`, optional
@@ -123,11 +127,11 @@ src/
 
 ## 5. Important limitations
 
-- Actions, data binding, migrations, and a final human-facing `.kui` syntax are
-  not implemented.
+- Migrations and a final human-facing `.kui` syntax are not implemented.
 - `@kurot/ui-runtime@0.2.x` consumes format version 2 and materializes the
   implemented static reuse and appearance slice, including selected appearance
-  variants. Bindings, actions, and reconciliation remain pending.
+  variants. Runtime execution of 0.4 data, action, and transition contracts
+  requires the matching Phase 3 runtime release; reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 

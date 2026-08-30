@@ -8,7 +8,10 @@
     "parts": {},
     "slots": {},
     "states": {},
-    "variants": {}
+    "variants": {},
+    "dataFields": {},
+    "dataBindings": {},
+    "actions": {}
   },
   "root": {
     "id": "root",

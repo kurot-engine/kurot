@@ -57,7 +57,10 @@
           }
         ]
       }
-    }
+    },
+    "dataFields": {},
+    "dataBindings": {},
+    "actions": {}
   },
   "root": {
     "id": "root",

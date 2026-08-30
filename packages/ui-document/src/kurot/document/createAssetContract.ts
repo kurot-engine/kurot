@@ -1,7 +1,9 @@
 import type {
 	UIAssetContract,
+	UIDataBindingDefinition,
 	UIParameterDefinition,
 	UIPartDefinition,
+	UISemanticActionDefinition,
 	UISlotDefinition,
 	UIStateDefinition,
 	UIVariantDefinition,
@@ -11,6 +13,15 @@ import type {
  * Input accepted by createUIAssetContract.
  */
 export interface CreateUIAssetContractOptions {
+	/** Typed external data accepted by this asset. */
+	readonly dataFields?: UIAssetContract['dataFields'];
+
+	/** One-way data assignments into the asset tree. */
+	readonly dataBindings?: Readonly<Record<string, UIDataBindingDefinition>>;
+
+	/** Named semantic actions emitted by this asset. */
+	readonly actions?: Readonly<Record<string, UISemanticActionDefinition>>;
+
 	/**
 	 * Canonical component key published by a component asset.
 	 */
@@ -63,5 +74,8 @@ export function createUIAssetContract(
 		slots: { ...options.slots },
 		states: { ...options.states },
 		variants: { ...options.variants },
+		dataFields: { ...options.dataFields },
+		dataBindings: { ...options.dataBindings },
+		actions: { ...options.actions },
 	};
 }

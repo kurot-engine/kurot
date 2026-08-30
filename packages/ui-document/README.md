@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.3.x).** The reusable authoring model and headless
+> **Early development (0.4.x).** The reusable authoring model and headless
 > editing kernel are implemented, but the schema remains pre-1.0 and is not yet
 > a production file format.
 
@@ -58,6 +58,9 @@ the corresponding `@kurot/ui` class.
 - appearance references with optional validated variant selection;
 - public component contracts containing typed parameters, parts, Slots,
   runtime-neutral states, and authoring variants;
+- typed external data fields, named one-way property bindings, and bounded
+  semantic actions;
+- optional numeric transitions on state property overrides;
 - compact reusable instances containing an asset reference and only their
   parameter values, variant, part overrides, and projected Slot content;
 - typed project resource and design-token references;
@@ -236,7 +239,6 @@ The package owns the serializable UI asset model and its deterministic
 operations. Planned layers include:
 
 - the remaining component catalog and nested structured-value constraints;
-- declarative data binding and actions;
 - document migrations;
 - adapters for formats such as EXML.
 
@@ -248,8 +250,9 @@ respectively.
 `@kurot/ui-runtime@0.2.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
-skins/states. Incremental reconciliation and the remaining dynamic semantics
-are separate runtime work; they do not belong in this headless package.
+skins/states. Runtime execution of the new data, action, and transition
+contracts begins with the matching Phase 3 runtime release. Incremental
+reconciliation remains separate runtime work.
 
 ## Development
 

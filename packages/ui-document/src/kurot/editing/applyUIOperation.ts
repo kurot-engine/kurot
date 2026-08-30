@@ -34,6 +34,12 @@ export function applyUIOperationUnchecked(
 	operation: UIOperation,
 ): UIOperationResult {
 	switch (operation.kind) {
+		case 'set-contract-data-field':
+		case 'remove-contract-data-field':
+		case 'set-contract-data-binding':
+		case 'remove-contract-data-binding':
+		case 'set-contract-action':
+		case 'remove-contract-action':
 		case 'set-contract-parameter':
 		case 'remove-contract-parameter':
 		case 'set-contract-part':

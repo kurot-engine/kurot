@@ -44,6 +44,63 @@ export interface UIPropertyOverride {
 	 * Serializable replacement value.
 	 */
 	readonly value: UIPropertyValue;
+
+	/**
+	 * Optional bounded interpolation used when an appearance enters this state.
+	 */
+	readonly transition?: UIPropertyTransition;
+}
+
+/**
+ * Supported easing curves for authored appearance transitions.
+ */
+export type UITransitionEasing = 'ease-in' | 'ease-in-out' | 'ease-out' | 'linear';
+
+/**
+ * Numeric property interpolation attached to one state override.
+ */
+export interface UIPropertyTransition {
+	/** Duration in milliseconds. */
+	readonly duration: number;
+
+	/** Optional delay in milliseconds. */
+	readonly delay?: number;
+
+	/** Deterministic easing curve. */
+	readonly easing?: UITransitionEasing;
+}
+
+/**
+ * One-way binding from declared screen data to a node property.
+ */
+export interface UIDataBindingDefinition {
+	/** Declared data-field name supplying the value. */
+	readonly source: string;
+
+	/** Stable target node identifier. */
+	readonly targetId: string;
+
+	/** Public property receiving the data value. */
+	readonly property: string;
+}
+
+/**
+ * Runtime-neutral trigger that emits one semantic action.
+ */
+export type UISemanticActionTrigger = 'change' | 'tap';
+
+/**
+ * Public semantic action emitted from one node interaction.
+ */
+export interface UISemanticActionDefinition {
+	/** Stable source node identifier. */
+	readonly sourceId: string;
+
+	/** Bounded interaction trigger observed by the runtime. */
+	readonly trigger: UISemanticActionTrigger;
+
+	/** Authoring guidance for tools and Agents. */
+	readonly description?: string;
 }
 
 /**
@@ -159,4 +216,19 @@ export interface UIAssetContract {
 	 * Author-selected visual or structural variants.
 	 */
 	readonly variants: Readonly<Record<string, UIVariantDefinition>>;
+
+	/**
+	 * Typed external data accepted by this asset.
+	 */
+	readonly dataFields?: Readonly<Record<string, UIPropertyDefinition>>;
+
+	/**
+	 * One-way assignments from declared data fields to internal properties.
+	 */
+	readonly dataBindings?: Readonly<Record<string, UIDataBindingDefinition>>;
+
+	/**
+	 * Named semantic actions emitted by bounded node interactions.
+	 */
+	readonly actions?: Readonly<Record<string, UISemanticActionDefinition>>;
 }

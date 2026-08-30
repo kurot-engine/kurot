@@ -1,12 +1,17 @@
 export type { UIAssetKind } from './UIAssetKind.js';
 export type {
 	UIAssetContract,
+	UIDataBindingDefinition,
 	UIParameterBinding,
 	UIParameterDefinition,
 	UIPartDefinition,
 	UIPropertyOverride,
+	UIPropertyTransition,
+	UISemanticActionDefinition,
+	UISemanticActionTrigger,
 	UISlotDefinition,
 	UIStateDefinition,
+	UITransitionEasing,
 	UIVariantDefinition,
 } from './UIAssetContract.js';
 export type {

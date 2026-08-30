@@ -1,8 +1,10 @@
 import type {
 	UIAssetContract,
+	UIDataBindingDefinition,
 	UIParameterDefinition,
 	UIPropertyOverride,
 	UIStateDefinition,
+	UISemanticActionDefinition,
 	UIVariantDefinition,
 } from '../model/UIAssetContract.js';
 import type {
@@ -55,7 +57,7 @@ export function parseUIDocument(source: string): UIDocument {
 	if (!isUIDocument(value)) {
 		throw new UIDocumentParseError(validateUIDocument(value));
 	}
-	return value;
+	return normalizeDocument(value);
 }
 
 function normalizeDocument(document: UIDocument): UIDocument {
@@ -124,6 +126,29 @@ function normalizeContract(contract: UIAssetContract): UIAssetContract {
 		})),
 		states: mapSortedRecord(contract.states, normalizeState),
 		variants: mapSortedRecord(contract.variants, normalizeVariant),
+		dataFields: mapSortedRecord(contract.dataFields ?? {}, normalizePropertyDefinition),
+		dataBindings: mapSortedRecord(contract.dataBindings ?? {}, normalizeDataBinding),
+		actions: mapSortedRecord(contract.actions ?? {}, normalizeAction),
+	};
+}
+
+function normalizeDataBinding(binding: UIDataBindingDefinition): UIDataBindingDefinition {
+	return {
+		source: binding.source,
+		targetId: binding.targetId,
+		property: binding.property,
+	};
+}
+
+function normalizeAction(
+	definition: UISemanticActionDefinition,
+): UISemanticActionDefinition {
+	return {
+		sourceId: definition.sourceId,
+		trigger: definition.trigger,
+		...(definition.description === undefined
+			? {}
+			: { description: definition.description }),
 	};
 }
 
@@ -196,6 +221,19 @@ function normalizePropertyOverride(override: UIPropertyOverride): UIPropertyOver
 		targetId: override.targetId,
 		property: override.property,
 		value: normalizePropertyValue(override.value),
+		...(override.transition === undefined
+			? {}
+			: {
+					transition: {
+						duration: override.transition.duration,
+						...(override.transition.delay === undefined
+							? {}
+							: { delay: override.transition.delay }),
+						...(override.transition.easing === undefined
+							? {}
+							: { easing: override.transition.easing }),
+					},
+				}),
 	};
 }
 
