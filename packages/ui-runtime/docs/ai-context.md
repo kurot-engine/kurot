@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.2.2`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.2.3`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -27,9 +27,10 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 
 ## Built-in boundary
 
-The audited built-in types are `kui.Group`, `kui.Label`, `kui.Image`,
-`kui.Rect`, `kui.Button`, `kui.ToggleButton`, and `kui.ProgressBar`. Layout
-descriptors accept `kui.BasicLayout`, `kui.HorizontalLayout`,
+The audited built-in types are `kui.Group`, `kui.Label`, `kui.EditableText`,
+`kui.Image`, `kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`,
+and `kui.TextInput`. Layout descriptors accept `kui.BasicLayout`,
+`kui.HorizontalLayout`,
 `kui.VerticalLayout`, and `kui.TileLayout`. Rectangle descriptors are converted
 to `@kurot/core` `Rectangle` instances.
 
@@ -42,6 +43,12 @@ their runtime defaults.
 `kui.ProgressBar` accepts `minimum`, `maximum`, `value`, `direction`, and
 `slideDuration`; its `thumb` and `labelDisplay` appearance parts remain owned by
 the native component behavior.
+
+`kui.TextInput` remains the application-facing control. Its appearance may use
+`kui.EditableText` as the native `textDisplay` part and `kui.Label` as
+`promptDisplay`. Authored TextInput values are applied before its appearance,
+then forwarded by the real control when those parts bind. Input type is
+currently restricted to plain `text` by the shared Schema and runtime.
 
 Reusable component internals are materialized under slash-qualified identities,
 for example `play-action/label`. Parameters apply through declared bindings,
@@ -57,10 +64,11 @@ per expanded instance. `setState(name)` applies overrides atomically and
 native Kurot `Skin` state handling. Incremental reconciliation, bindings,
 actions, and transitions are not implemented.
 
-`Image.source` and `Component.skinName` are forwarded to the existing
-`@kurot/ui` mechanisms. The package does not invent resource or Theme lookup.
-An unskinned `Button` therefore exists and behaves as a component but has no
-automatic visual appearance.
+`Image.source` is forwarded to the existing `@kurot/ui` resource mechanism.
+Appearance assets are materialized as native `Skin` instances and assigned by
+the runtime; `skinName` is not an authored component property. The package does
+not invent resource or Theme lookup. An unskinned `Button` therefore exists and
+behaves as a component but has no automatic visual appearance.
 
 ## Task lookup
 
@@ -71,11 +79,19 @@ automatic visual appearance.
 - Appearances and states: `src/kurot/runtime/materializeAppearance.ts`
 - Reusable component states: `src/kurot/runtime/states/`
 - Token and resource resolution: `src/kurot/runtime/resolvePropertyValue.ts`
-- Common/runtime properties: `src/kurot/runtime/builtins/applyDisplayProperties.ts`
-- Component property routing: `src/kurot/runtime/builtins/applyComponentProperties.ts`
-- Container properties: `src/kurot/runtime/builtins/applyContainerProperties.ts`
-- Text properties: `src/kurot/runtime/builtins/applyTextProperties.ts`
-- Interactive control properties: `src/kurot/runtime/builtins/applyControlProperties.ts`
+- Runtime property orchestration: `src/kurot/runtime/applyRuntimeProperty.ts`
+- Built-in property routing: `src/kurot/runtime/builtins/applyBuiltInProperties.ts`
+- DisplayObject properties: `src/kurot/runtime/builtins/applyDisplayObjectProperties.ts`
+- UIComponent properties: `src/kurot/runtime/builtins/applyUIComponentProperties.ts`
+- Component properties: `src/kurot/runtime/builtins/applyComponentProperties.ts`
+- Group properties: `src/kurot/runtime/builtins/applyGroupProperties.ts`
+- Label properties: `src/kurot/runtime/builtins/applyLabelProperties.ts`
+- EditableText properties: `src/kurot/runtime/builtins/applyEditableTextProperties.ts`
+- TextInput properties: `src/kurot/runtime/builtins/applyTextInputProperties.ts`
+- Image properties: `src/kurot/runtime/builtins/applyImageProperties.ts`
+- Rect properties: `src/kurot/runtime/builtins/applyRectProperties.ts`
+- Button properties: `src/kurot/runtime/builtins/applyButtonProperties.ts`
+- ProgressBar properties: `src/kurot/runtime/builtins/applyProgressBarProperties.ts`
 - Layout descriptors: `src/kurot/runtime/descriptors/createLayout.ts`
 - Rectangle descriptors: `src/kurot/runtime/descriptors/createRectangle.ts`
 - Custom adapter contracts: `src/kurot/runtime/types.ts`

@@ -4,6 +4,26 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.2.3] — 2026-08-31
+
+### Added
+
+- Built-in materialization for `kui.TextInput` and its low-level
+  `kui.EditableText` appearance part.
+- Strict runtime routing for text, prompt, color, password display, character
+  limits, restrictions, and the current plain-text input type.
+- Integration coverage for cached TextInput property forwarding, native skin
+  part binding, prompt state transitions, and touch-to-focus behavior.
+- An interactive browser preview that verifies placeholder rendering, native
+  text entry, input event updates, and coexistence with existing controls.
+
+### Changed
+
+- Upgraded the `@kurot/ui-document` contract to `^0.3.5`.
+- Aligned runtime property handlers with the semantic Schema hierarchy and
+  removed unreachable legacy `currentState`, `skinName`, and
+  `hostComponentKey` property routes.
+
 ## [0.2.2] — 2026-08-31
 
 ### Added

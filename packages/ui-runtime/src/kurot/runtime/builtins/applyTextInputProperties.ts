@@ -1,37 +1,37 @@
-import type { DisplayObject } from '@kurot/core';
-import { Group } from '@kurot/ui';
+import { TextInput } from '@kurot/ui';
 import type { UIPropertyValue } from '@kurot/ui-document';
-import { createLayout } from '../descriptors/createLayout.js';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
- * Applies one property owned by a built-in container component.
+ * Applies one property declared directly by TextInput.
  */
-export function applyContainerProperty(
-	target: DisplayObject,
+export function applyTextInputProperty(
+	target: TextInput,
 	name: string,
 	value: UIPropertyValue,
 	path: string,
 ): boolean {
-	if (!(target instanceof Group)) return false;
 	switch (name) {
-		case 'currentState':
-			target.currentState = requireString(value, path);
+		case 'displayAsPassword':
+			target.displayAsPassword = requireBoolean(value, path);
 			return true;
-		case 'layout':
-			target.layout = createLayout(value, path);
+		case 'inputType':
+			target.inputType = requireInputType(value, path);
 			return true;
-		case 'scrollEnabled':
-			target.scrollEnabled = requireBoolean(value, path);
+		case 'maxChars':
+			target.maxChars = requireNumber(value, path);
 			return true;
-		case 'scrollH':
-			target.scrollH = requireNumber(value, path);
+		case 'prompt':
+			target.prompt = requireString(value, path);
 			return true;
-		case 'scrollV':
-			target.scrollV = requireNumber(value, path);
+		case 'restrict':
+			target.restrict = requireString(value, path);
 			return true;
-		case 'touchThrough':
-			target.touchThrough = requireBoolean(value, path);
+		case 'text':
+			target.text = requireString(value, path);
+			return true;
+		case 'textColor':
+			target.textColor = requireNumber(value, path);
 			return true;
 		default:
 			return false;
@@ -41,6 +41,11 @@ export function applyContainerProperty(
 function requireBoolean(value: UIPropertyValue, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw invalidValue('boolean', path);
+}
+
+function requireInputType(value: UIPropertyValue, path: string): 'text' {
+	if (value === 'text') return value;
+	throw invalidValue('text', path);
 }
 
 function requireNumber(value: UIPropertyValue, path: string): number {

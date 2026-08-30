@@ -14,7 +14,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
 | `@kurot/cli`       | 1.1.3   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
 | `@kurot/ui-document` | 0.3.5 | Headless UI authoring kernel: semantic assets, reuse, appearance variants, validation, operations, transactions, revisions, diffs, and undo/redo. No runtime dependencies.   | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime` | 0.2.2 | Browser materializer for reuse, Slots, tokens, component variants/states, appearance variants/skins/states, and runtime adapters.                                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
+| `@kurot/ui-runtime` | 0.2.3 | Browser materializer for reuse, Slots, tokens, component variants/states, appearance variants/skins/states, and runtime adapters.                                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 

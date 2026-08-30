@@ -1,5 +1,5 @@
 import { createPlayer, Event } from '@kurot/core';
-import { ToggleButton } from '@kurot/ui';
+import { TextInput, ToggleButton } from '@kurot/ui';
 import type { UIDocument } from '@kurot/ui-document';
 import {
 	createUIAppearanceReference,
@@ -10,6 +10,10 @@ import {
 	UIAssetRegistry,
 } from '@kurot/ui-document';
 import { createKurotUI } from '@kurot/ui-runtime';
+import {
+	createPreviewTextInputAppearance,
+	createPreviewTextInputNode,
+} from './textInputPreview.js';
 
 const canvas = requireElement('#game', HTMLCanvasElement);
 const status = requireElement('#status', HTMLElement);
@@ -23,25 +27,37 @@ try {
 	if (!(soundToggle instanceof ToggleButton)) {
 		throw new Error('Preview ToggleButton was not materialized.');
 	}
+	const playerName = result.instances.get('player-name');
+	if (!(playerName instanceof TextInput) || !playerName.textDisplay) {
+		throw new Error('Preview TextInput was not materialized with its textDisplay.');
+	}
 	let toggleChangeCount = 0;
-	const updateToggleStatus = (): void => {
+	let inputChangeCount = 0;
+	const updateStatus = (): void => {
 		const state = soundToggle.selected ? 'ON' : 'OFF';
 		soundToggle.label = `SOUND ${state}`;
-		status.textContent = `Rendered · ToggleButton ${state} · ${toggleChangeCount} changes`;
+		const inputState = playerName.text || 'empty';
+		status.textContent =
+			`Rendered · Toggle ${state} (${toggleChangeCount}) · ` +
+			`Input ${inputState} (${inputChangeCount})`;
 	};
 	soundToggle.addEventListener(Event.CHANGE, () => {
 		toggleChangeCount++;
-		updateToggleStatus();
+		updateStatus();
+	});
+	playerName.textDisplay.addEventListener(Event.CHANGE, () => {
+		inputChangeCount++;
+		updateStatus();
 	});
 	const app = createPlayer({
 		canvas,
 		contentWidth: 800,
-		contentHeight: 450,
+		contentHeight: 540,
 		frameRate: 60,
 		scaleMode: 'showAll',
 	});
 	app.start(result.root);
-	updateToggleStatus();
+	updateStatus();
 	summary.textContent = [
 		`document: ${document.id}`,
 		`root: ${result.root.constructor.name}`,
@@ -62,20 +78,21 @@ function createPreviewProject(): {
 	const card = createPreviewCard();
 	const buttonAppearance = createPreviewButtonAppearance();
 	const progressAppearance = createPreviewProgressAppearance();
+	const textInputAppearance = createPreviewTextInputAppearance();
 	const toggleAppearance = createPreviewToggleAppearance();
 	const document = createUIDocument({
 		id: 'ui-runtime-preview',
 		root: createUINode({
 			id: 'screen',
 			type: 'kui.Group',
-			properties: { height: 450, width: 800 },
+			properties: { height: 540, width: 800 },
 			children: [
 				createUINode({
 					id: 'background',
 					type: 'kui.Rect',
 					properties: {
 						fillColor: 0x0f172a,
-						height: 450,
+						height: 540,
 						width: 800,
 					},
 				}),
@@ -197,6 +214,18 @@ function createPreviewProject(): {
 					},
 					appearance: createUIAppearanceReference(progressAppearance.id),
 				}),
+				createUINode({
+					id: 'text-input-caption',
+					type: 'kui.Label',
+					properties: {
+						size: 13,
+						text: 'TextInput · click and type',
+						textColor: 0x94a3b8,
+						x: 220,
+						y: 438,
+					},
+				}),
+				createPreviewTextInputNode(textInputAppearance.id),
 			],
 		}),
 	});
@@ -204,6 +233,7 @@ function createPreviewProject(): {
 	assets.registerAsset(card);
 	assets.registerAsset(buttonAppearance);
 	assets.registerAsset(progressAppearance);
+	assets.registerAsset(textInputAppearance);
 	assets.registerAsset(toggleAppearance);
 	assets.registerAsset(document);
 	assets.registerToken({

@@ -66,21 +66,24 @@ function applyLayoutProperty(
 		}
 		layout.useVirtualLayout = enabled;
 		return;
+    }
+
+	if (layout instanceof LinearLayoutBase) {
+		if (applyLinearLayoutProperty(layout, name, value, path)) return;
 	}
-	if (layout instanceof LinearLayoutBase && applyLinearProperty(layout, name, value, path)) {
-		return;
+
+    if (layout instanceof TileLayout) {
+		if (applyTileLayoutProperty(layout, name, value, path)) return;
 	}
-	if (layout instanceof TileLayout && applyTileProperty(layout, name, value, path)) {
-		return;
-	}
-	throw new KurotUIRuntimeError(
+
+    throw new KurotUIRuntimeError(
 		'invalid-layout',
 		`Layout property "${name}" is not supported by ${layout.constructor.name}.`,
 		path,
 	);
 }
 
-function applyLinearProperty(
+function applyLinearLayoutProperty(
 	layout: LinearLayoutBase,
 	name: string,
 	value: UIPropertyValue,
@@ -121,7 +124,7 @@ function applyLinearProperty(
 	}
 }
 
-function applyTileProperty(
+function applyTileLayoutProperty(
 	layout: TileLayout,
 	name: string,
 	value: UIPropertyValue,

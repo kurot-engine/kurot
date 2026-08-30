@@ -132,10 +132,12 @@ reusable authoring-asset model, not the full editor or production pipeline.
   diffs, and undo/redo history;
 - explicit parameter-to-internal-property bindings.
 
-`@kurot/ui-runtime@0.2.2` currently provides:
+`@kurot/ui-runtime@0.2.3` currently provides:
 
 - validation before materialization;
-- deterministic construction of the seven audited foundation components;
+- deterministic construction of the nine audited foundation components,
+  including the application-facing `TextInput` and its low-level
+  `EditableText` appearance part;
 - application of audited display, layout, text, image, rectangle, and button
   properties;
 - Basic, horizontal, vertical, and tile layout descriptors;
@@ -147,6 +149,8 @@ reusable authoring-asset model, not the full editor or production pipeline.
   public-part overrides, and projected Slot content;
 - design-token resolution and an application resource-resolution hook;
 - appearance assets installed as native Kurot skins and states;
+- native TextInput appearance-part binding, prompt states, focus, and browser
+  text entry;
 - selected appearance variants applied before native state overrides;
 - per-instance reusable-component state controllers with atomic restoration;
 - structured runtime errors;

@@ -1,10 +1,12 @@
 import type { DisplayObject } from '@kurot/core';
 import type { UIPropertyValue } from '@kurot/ui-document';
-import { applyComponentProperty } from './builtins/applyComponentProperties.js';
-import { applyDisplayProperty } from './builtins/applyDisplayProperties.js';
+import { applyBuiltInProperty } from './builtins/applyBuiltInProperties.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
-import type { KurotUICreationContext } from './types.js';
+import type {
+	KurotUIComponentAdapter,
+	KurotUICreationContext,
+} from './types.js';
 
 /**
  * Applies one resolved semantic property to an existing runtime object.
@@ -18,16 +20,37 @@ export function applyRuntimeProperty(
 	context: KurotUICreationContext,
 ): void {
 	const resolved = resolvePropertyValue(value, path, context);
+
+	if (applyBuiltInProperty(target, name, resolved, path)) {
+		return;
+    }
+
 	const adapter = context.adapters[type];
-	const handled =
-		applyDisplayProperty(target, name, resolved, path) ||
-		applyComponentProperty(target, name, resolved, path) ||
-		adapter?.applyProperty?.(target, name, resolved, path) === true;
-	if (!handled) {
-		throw new KurotUIRuntimeError(
-			'invalid-property',
-			`Runtime property "${name}" is not supported by ${type}.`,
-			path,
-		);
+	if (applyAdapterProperty(adapter, target, name, resolved, path)) {
+		return;
 	}
+
+	throw new KurotUIRuntimeError(
+		'invalid-property',
+		`Runtime property "${name}" is not supported by ${type}.`,
+		path,
+	);
+}
+
+function applyAdapterProperty(
+	adapter: KurotUIComponentAdapter | undefined,
+	target: DisplayObject,
+	name: string,
+	value: UIPropertyValue,
+	path: string,
+): boolean {
+	if (adapter === undefined) {
+		return false;
+    }
+
+	if (adapter.applyProperty === undefined) {
+		return false;
+	}
+
+    return adapter.applyProperty(target, name, value, path);
 }

@@ -68,7 +68,7 @@ h1 {
 canvas {
 	display: block;
 	width: 100%;
-	aspect-ratio: 16 / 9;
+	aspect-ratio: 40 / 27;
 }
 
 pre {

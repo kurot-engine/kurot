@@ -4,6 +4,7 @@ import { Stage, TouchEvent } from '@kurot/core';
 import {
 	BasicLayout,
 	Button,
+	EditableText,
 	Group,
 	HorizontalLayout,
 	Image,
@@ -11,6 +12,7 @@ import {
 	ProgressBar,
 	Rect,
 	TileLayout,
+	TextInput,
 	ToggleButton,
 	VerticalLayout,
 } from '@kurot/ui';
@@ -52,6 +54,7 @@ describe('createKurotUI', () => {
 				properties: {
 					alpha: 0.9,
 					height: 360,
+					left: 24,
 					layout: {
 						type: 'kui.VerticalLayout',
 						properties: { gap: 12, paddingLeft: 16, paddingTop: 20 },
@@ -91,7 +94,12 @@ describe('createKurotUI', () => {
 					createUINode({
 						id: 'action',
 						type: 'kui.Button',
-						properties: { label: 'Continue', selected: true, toggle: true },
+						properties: {
+							enabled: false,
+							label: 'Continue',
+							selected: true,
+							toggle: true,
+						},
 					}),
 					createUINode({
 						id: 'sound-toggle',
@@ -129,6 +137,7 @@ describe('createKurotUI', () => {
 		);
 
 		expect(root.alpha).toBe(0.9);
+		expect(root.left).toBe(24);
 		expect(root.width).toBe(640);
 		expect(root.height).toBe(360);
 		expect(root.numChildren).toBe(6);
@@ -144,6 +153,7 @@ describe('createKurotUI', () => {
 		expect(panel.fillColor).toBe(0x172554);
 		expect(panel.strokeWeight).toBe(2);
 		expect(action.label).toBe('Continue');
+		expect(action.enabled).toBe(false);
 		expect(action.selected).toBe(true);
 		expect(action.toggle).toBe(true);
 		expect(soundToggle.label).toBe('Sound');
@@ -296,6 +306,137 @@ describe('createKurotUI', () => {
 		expect(toggle.selected).toBe(false);
 		dispatchTap(toggle);
 		expect(toggle.selected).toBe(true);
+	});
+
+	it('materializes EditableText as an authored appearance part', () => {
+		const document = createUIDocument({
+			id: 'editable-text-preview',
+			root: createUINode({
+				id: 'text-display',
+				type: 'kui.EditableText',
+				properties: {
+					inputType: 'text',
+					maxChars: 24,
+					promptColor: 0x64748b,
+					restrict: 'A-Za-z0-9_',
+					size: 18,
+					textColor: 0xe2e8f0,
+				},
+			}),
+		});
+
+		const editableText = requireInstance(
+			createKurotUI(document).root,
+			EditableText,
+		);
+
+		expect(editableText.inputType).toBe('text');
+		expect(editableText.maxChars).toBe(24);
+		expect(editableText.prompt).toBe('');
+		expect(editableText.promptColor).toBe(0x64748b);
+		expect(editableText.restrict).toBe('A-Za-z0-9_');
+		expect(editableText.size).toBe(18);
+		expect(editableText.textColor).toBe(0xe2e8f0);
+	});
+
+	it('binds a TextInput appearance and forwards cached input properties', () => {
+		const appearance = createUIDocument({
+			id: 'text-input-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.TextInput',
+				parts: {
+					promptDisplay: { nodeId: 'promptDisplay' },
+					textDisplay: { nodeId: 'textDisplay' },
+				},
+				states: {
+					normal: { overrides: [] },
+					normalWithPrompt: {
+						overrides: [
+							{
+								targetId: 'promptDisplay',
+								property: 'visible',
+								value: true,
+							},
+						],
+					},
+				},
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({ id: 'textDisplay', type: 'kui.EditableText' }),
+					createUINode({
+						id: 'promptDisplay',
+						type: 'kui.Label',
+						properties: { visible: false },
+					}),
+				],
+			}),
+		});
+		const document = createUIDocument({
+			id: 'text-input-preview',
+			root: createUINode({
+				id: 'player-name',
+				type: 'kui.TextInput',
+				properties: {
+					displayAsPassword: true,
+					inputType: 'text',
+					maxChars: 20,
+					prompt: 'Player name',
+					restrict: 'A-Za-z0-9_',
+					text: 'Kurot',
+					textColor: 0x38bdf8,
+				},
+				appearance: createUIAppearanceReference(appearance.id),
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(appearance);
+
+		const result = createKurotUI(document, { assets });
+		const input = requireInstance(result.root, TextInput);
+		const textDisplay = requireInstance(
+			result.instances.get(
+				'player-name@appearance:text-input-appearance/textDisplay',
+			),
+			EditableText,
+		);
+		const promptDisplay = requireInstance(
+			result.instances.get(
+				'player-name@appearance:text-input-appearance/promptDisplay',
+			),
+			Label,
+		);
+
+		expect(input.textDisplay).toBe(textDisplay);
+		expect(input.promptDisplay).toBe(promptDisplay);
+		expect(textDisplay.text).toBe('Kurot');
+		expect(textDisplay.textColor).toBe(0x38bdf8);
+		expect(textDisplay.displayAsPassword).toBe(true);
+		expect(textDisplay.maxChars).toBe(20);
+		expect(textDisplay.restrict).toBe('A-Za-z0-9_');
+		expect(textDisplay.inputType).toBe('text');
+		expect(promptDisplay.text).toBe('Player name');
+		expect(promptDisplay.touchEnabled).toBe(false);
+		const stage = new Stage();
+		stage.addChild(input);
+		input.validateNow();
+		expect(input.currentState).toBe('normal');
+		expect(promptDisplay.visible).toBe(false);
+
+		input.text = '';
+		input.validateNow();
+		expect(input.currentState).toBe('normalWithPrompt');
+		expect(promptDisplay.visible).toBe(true);
+
+		let focused = false;
+		textDisplay.setFocus = (): void => {
+			focused = true;
+		};
+		dispatchTouchBegin(input);
+		expect(focused).toBe(true);
 	});
 
 	it('materializes reusable assets and all instance-local semantics', () => {
@@ -555,6 +696,19 @@ function dispatchTap(target: ToggleButton): void {
 		10,
 		1,
 		false,
+	);
+}
+
+function dispatchTouchBegin(target: TextInput): void {
+	TouchEvent.dispatchTouchEvent(
+		target,
+		TouchEvent.TOUCH_BEGIN,
+		true,
+		false,
+		10,
+		10,
+		1,
+		true,
 	);
 }
 

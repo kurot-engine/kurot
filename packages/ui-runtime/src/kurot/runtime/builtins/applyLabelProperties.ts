@@ -1,18 +1,16 @@
-import type { DisplayObject } from '@kurot/core';
 import { Label } from '@kurot/ui';
 import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
- * Applies one property owned by a built-in text component.
+ * Applies one property owned by Label and inherited by its subclasses.
  */
-export function applyTextProperty(
-	target: DisplayObject,
+export function applyLabelProperty(
+	target: Label,
 	name: string,
 	value: UIPropertyValue,
 	path: string,
 ): boolean {
-	if (!(target instanceof Label)) return false;
 	switch (name) {
 		case 'bold':
 			target.bold = requireBoolean(value, path);
