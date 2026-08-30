@@ -160,8 +160,11 @@ function setInstanceOverride(
 				item.property === operation.override.property,
 		);
 		const overrides = [...instance.overrides];
-		if (index >= 0) overrides[index] = operation.override;
-		else overrides.push(operation.override);
+		if (index >= 0) {
+			overrides[index] = operation.override;
+		} else {
+			overrides.push(operation.override);
+		}
 		return {
 			instance: { ...instance, overrides },
 			inverse:

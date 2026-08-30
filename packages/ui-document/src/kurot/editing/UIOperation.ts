@@ -9,7 +9,7 @@ import type {
 	UIComponentInstance,
 	UIInstanceOverride,
 } from '../model/UIComponentInstance.js';
-import type { UIAssetReference } from '../model/UIReference.js';
+import type { UIAppearanceReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
 
@@ -85,7 +85,7 @@ export type UIOperation =
 	| {
 			readonly kind: 'set-node-appearance';
 			readonly nodeId: string;
-			readonly appearance: UIAssetReference;
+			readonly appearance: UIAppearanceReference;
 	  }
 	| { readonly kind: 'remove-node-appearance'; readonly nodeId: string }
 	| {

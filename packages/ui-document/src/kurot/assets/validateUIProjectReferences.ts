@@ -1,12 +1,14 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
+import {
+	isUIAssetReference,
+	isUIDesignTokenReference,
+	isUIResourceReference,
+} from '../model/UIReference.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { addUIDiagnostic } from '../validation/validationHelpers.js';
 import type { UIAssetRegistry } from './UIAssetRegistry.js';
-import {
-	isReference,
-	visitUIDocumentPropertyValues,
-} from './assetTraversal.js';
+import { visitUIDocumentPropertyValues } from './assetTraversal.js';
 
 /**
  * Validates typed resource, token, and generic asset references in one document.
@@ -30,8 +32,7 @@ function validateResourceReference(
 	registry: UIAssetRegistry,
 	diagnostics: UIDiagnostic[],
 ): void {
-	if (!isReference(value, 'resource') || !('key' in value)) return;
-	if (typeof value.key !== 'string') return;
+	if (!isUIResourceReference(value)) return;
 	const definition = registry.getResource(value.key);
 	if (!definition) {
 		addUIDiagnostic(
@@ -42,7 +43,7 @@ function validateResourceReference(
 		);
 		return;
 	}
-	if (!('resourceType' in value) || definition.resourceType === value.resourceType) return;
+	if (definition.resourceType === value.resourceType) return;
 	addUIDiagnostic(
 		diagnostics,
 		'resource-type-mismatch',
@@ -57,8 +58,7 @@ function validateTokenReference(
 	registry: UIAssetRegistry,
 	diagnostics: UIDiagnostic[],
 ): void {
-	if (!isReference(value, 'token') || !('key' in value)) return;
-	if (typeof value.key !== 'string') return;
+	if (!isUIDesignTokenReference(value)) return;
 	const definition = registry.getToken(value.key);
 	if (!definition) {
 		addUIDiagnostic(
@@ -69,7 +69,7 @@ function validateTokenReference(
 		);
 		return;
 	}
-	if (!('tokenType' in value) || definition.tokenType === value.tokenType) return;
+	if (definition.tokenType === value.tokenType) return;
 	addUIDiagnostic(
 		diagnostics,
 		'token-type-mismatch',
@@ -84,8 +84,7 @@ function validateAssetReference(
 	registry: UIAssetRegistry,
 	diagnostics: UIDiagnostic[],
 ): void {
-	if (!isReference(value, 'asset') || !('assetId' in value)) return;
-	if (typeof value.assetId !== 'string' || registry.getAsset(value.assetId)) return;
+	if (!isUIAssetReference(value) || registry.getAsset(value.assetId)) return;
 	addUIDiagnostic(
 		diagnostics,
 		'unknown-ui-asset',

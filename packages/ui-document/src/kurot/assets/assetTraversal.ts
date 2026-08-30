@@ -1,9 +1,7 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
-import type {
-	UIPropertyObject,
-	UIPropertyValue,
-} from '../model/UIPropertyValue.js';
+import type { UIPropertyValue } from '../model/UIPropertyValue.js';
+import { isUIAssetReference } from '../model/UIReference.js';
 
 export interface UIAssetDependency {
 	/**
@@ -91,26 +89,10 @@ export function collectUIAssetDependencies(
 		}
 	});
 	visitUIDocumentPropertyValues(document, (value, path) => {
-		if (!isReference(value, 'asset') || !('assetId' in value)) return;
-		if (typeof value.assetId !== 'string') return;
+		if (!isUIAssetReference(value)) return;
 		dependencies.push({ assetId: value.assetId, path });
 	});
 	return dependencies;
-}
-
-/**
- * Narrows a property object by its semantic reference discriminator.
- */
-export function isReference(
-	value: UIPropertyValue,
-	kind: 'asset' | 'resource' | 'token',
-): value is UIPropertyObject {
-	return (
-		typeof value === 'object' &&
-		!Array.isArray(value) &&
-		'kind' in value &&
-		value.kind === kind
-	);
 }
 
 function visitUIPropertyValue(

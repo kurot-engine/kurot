@@ -88,6 +88,8 @@ describe('UIComponentRegistry', () => {
 			allowUnknownProperties: false,
 		});
 		expect(resolved?.displayName).toBeUndefined();
+		expect(Object.hasOwn(resolved ?? {}, 'displayName')).toBe(false);
+		expect(Object.hasOwn(resolved ?? {}, 'description')).toBe(false);
 		expect(resolved?.properties.alpha).toEqual({
 			valueType: 'string',
 			description: 'Derived override.',

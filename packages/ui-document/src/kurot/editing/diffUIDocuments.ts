@@ -164,7 +164,11 @@ function visit(
 	index: number,
 	nodes: Map<string, IndexedNode>,
 ): void {
-	nodes.set(node.id, { node, target, index });
+	nodes.set(node.id, {
+		node,
+		...(target === undefined ? {} : { target }),
+		index,
+	});
 	for (let childIndex = 0; childIndex < node.children.length; childIndex++) {
 		visit(
 			node.children[childIndex]!,

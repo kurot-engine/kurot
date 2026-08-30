@@ -1,12 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import {
+	createUIAppearanceReference,
+	createUIAssetReference,
+	createUIDesignTokenReference,
 	createUIDocument,
+	createUIResourceReference,
 	createUINode,
 	findUINode,
 	UI_DOCUMENT_FORMAT_VERSION,
 	UI_DOCUMENT_KIND,
 	visitUINodes,
 } from '../src/index.js';
+import type { UIAppearanceReference, UIAssetReference } from '../src/index.js';
 
 describe('UI document model', () => {
 	it('creates an explicit current-format document', () => {
@@ -44,6 +49,48 @@ describe('UI document model', () => {
 				root: createUINode({ id: 'root', type: 'kui.Group' }),
 			}),
 		).toThrow('Document id must not be empty.');
+	});
+
+	it('creates appearance references with an optional variant', () => {
+		expectTypeOf<UIAppearanceReference>().not.toMatchTypeOf<UIAssetReference>();
+		expect(createUIAppearanceReference('button-skin')).toEqual({
+			kind: 'asset',
+			assetId: 'button-skin',
+		});
+		expect(createUIAppearanceReference('button-skin', 'compact')).toEqual({
+			kind: 'asset',
+			assetId: 'button-skin',
+			variant: 'compact',
+		});
+		expect(() => createUIAppearanceReference('button-skin', ' ')).toThrow(
+			'Appearance variant must not be empty.',
+		);
+	});
+
+	it('creates exact generic property references', () => {
+		expect(createUIAssetReference('action-card')).toEqual({
+			kind: 'asset',
+			assetId: 'action-card',
+		});
+		expect(createUIResourceReference('image', 'button-icon')).toEqual({
+			kind: 'resource',
+			resourceType: 'image',
+			key: 'button-icon',
+		});
+		expect(createUIDesignTokenReference('spacing', 'space.medium')).toEqual({
+			kind: 'token',
+			tokenType: 'spacing',
+			key: 'space.medium',
+		});
+		expect(() => createUIAssetReference(' ')).toThrow(
+			'Asset id must not be empty.',
+		);
+		expect(() => createUIResourceReference('image', '')).toThrow(
+			'Resource key must not be empty.',
+		);
+		expect(() => createUIDesignTokenReference('color', '')).toThrow(
+			'Token key must not be empty.',
+		);
 	});
 
 	it('queries nodes in deterministic pre-order', () => {

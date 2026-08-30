@@ -60,12 +60,18 @@ Documents use explicit tagged references instead of plausible strings:
 { kind: 'token', tokenType: 'color', key: 'color.action.primary' }
 ```
 
+Appearance selections and generic property-level asset references intentionally
+share their stable asset identity without sharing a type. This prevents a
+contextual `variant` selection from being accepted by an unrelated asset-valued
+component property.
+
 `UIAssetRegistry` is an isolated project catalog for UI assets, resources, and
 design tokens. `validateUIAssetRegistry` checks identities and meaning that
 cannot be verified inside a single file:
 
 - source assets exist and publish the expected component type;
 - appearances target the receiving node type;
+- appearance references may select only variants published by that appearance;
 - parameters, variants, parts, and Slots belong to the source contract;
 - required values and Slot content are present;
 - single-capacity Slots do not receive multiple children;
@@ -125,8 +131,9 @@ provider calls stay outside it.
 `@kurot/ui-runtime@0.2.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, resolves their static local semantics, and installs native
-appearance skins/states. Dynamic component states, appearance variants,
-bindings, actions, and incremental reconciliation remain runtime work.
+appearance skins/states. Appearance variants are now authorable and validated;
+their execution, bindings, actions, and incremental reconciliation remain
+runtime work.
 
 ## Editing kernel
 

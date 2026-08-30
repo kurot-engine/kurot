@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+	createUIAssetReference,
+	createUIResourceReference,
 	createUIDocument,
 	createUINode,
+	matchesUIPropertyDefinition,
 	UIComponentRegistry,
 	validateUIDocumentComponents,
 } from '../src/index.js';
@@ -64,6 +67,38 @@ describe('component property schema', () => {
 			'$.root.properties.count',
 			'$.root.properties.offset',
 		]);
+	});
+
+	it('keeps structured objects and exact semantic references distinct', () => {
+		const resource = createUIResourceReference('image', 'button-icon');
+
+		expect(
+			matchesUIPropertyDefinition(resource, {
+				valueType: 'resource-reference',
+				resourceTypes: ['image'],
+			}),
+		).toBe(true);
+		expect(matchesUIPropertyDefinition(resource, { valueType: 'object' })).toBe(
+			false,
+		);
+		expect(
+			matchesUIPropertyDefinition(
+				{ kind: 'resource' },
+				{ valueType: 'resource-reference' },
+			),
+		).toBe(false);
+		expect(
+			matchesUIPropertyDefinition(
+				{ ...createUIAssetReference('button'), variant: 'compact' },
+				{ valueType: 'asset-reference' },
+			),
+		).toBe(false);
+		expect(matchesUIPropertyDefinition(Number.NaN, { valueType: 'number' })).toBe(
+			false,
+		);
+		expect(matchesUIPropertyDefinition(Infinity, { valueType: 'value' })).toBe(
+			false,
+		);
 	});
 
 	it('rejects contradictory property metadata during registration', () => {

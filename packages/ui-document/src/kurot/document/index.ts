@@ -6,6 +6,7 @@ export { createUIComponentInstance } from './createComponentInstance.js';
 export type { CreateUIComponentInstanceOptions } from './createComponentInstance.js';
 export {
 	createUIAssetReference,
+	createUIAppearanceReference,
 	createUIDesignTokenReference,
 	createUIResourceReference,
 } from './createReferences.js';

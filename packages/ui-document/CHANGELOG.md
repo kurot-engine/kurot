@@ -4,6 +4,35 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.3.2] — 2026-08-30
+
+### Added
+
+- `UIAppearanceReference` and `createUIAppearanceReference()` for selecting an
+  appearance asset with an optional published variant.
+- Structural, serialization, and project validation for appearance variant
+  selections, including exact `unknown-variant` diagnostics.
+- Golden fixtures covering a valid compact appearance variant.
+
+### Changed
+
+- Separated contextual appearance selections from generic property asset
+  references while sharing their stable asset-identity fields.
+- Tightened semantic reference matching so malformed or context-specific
+  references cannot satisfy ordinary object and generic reference schemas.
+- Enabled stricter source and test compilation for exact optional properties,
+  unchecked indexed access, unused declarations, implicit returns, overrides,
+  and switch fallthrough.
+
+## [0.3.1] — 2026-08-30
+
+### Changed
+
+- Added an explicit Node/Vitest TypeScript project for the test suite and made
+  `pnpm test` type-check test sources before executing them.
+- Kept fixture loading on standard `node:fs` and `node:url` APIs with an
+  explicit Node type boundary.
+
 ## [0.3.0] — 2026-08-30
 
 ### Added
@@ -33,8 +62,6 @@ All notable changes to `@kurot/ui-document` are documented here.
   invalid intermediate state.
 - Project validation checks parameter binding destinations and their target
   component properties.
-- The test suite now has an explicit Node/Vitest TypeScript project and performs
-  test type-checking before execution.
 
 ## [0.2.0] — 2026-08-30
 

@@ -8,7 +8,7 @@ import { validateUIComponentInstance } from './validateUIComponentInstance.js';
 import {
 	addUIDiagnostic,
 	isPlainRecord,
-	validateAssetReference,
+	validateAppearanceReference,
 	validateKnownKeys,
 	validateNonEmptyString,
 	validatePropertyValue,
@@ -89,7 +89,7 @@ function validateNode(
 	validateNonEmptyString(value.type, `${path}.type`, 'Node type', diagnostics);
 	validateProperties(value.properties, `${path}.properties`, diagnostics);
 	if (value.appearance !== undefined) {
-		validateAssetReference(value.appearance, `${path}.appearance`, diagnostics);
+		validateAppearanceReference(value.appearance, `${path}.appearance`, diagnostics);
 	}
 	if (value.instance !== undefined) {
 		validateUIComponentInstance(

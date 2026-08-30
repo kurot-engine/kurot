@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	applyUIOperation,
 	applyUITransaction,
+	createUIAppearanceReference,
 	createUINode,
 	diffUIDocuments,
 	findUINode,
@@ -80,6 +81,23 @@ describe('semantic UI operations', () => {
 		).toBe('Options');
 		expect(state.document.contract.states.focused).toEqual({ overrides: [] });
 		expect(applyUIOperation(state.document, state.inverse).document).toEqual(component);
+	});
+
+	it('preserves appearance variants through edits and inverse operations', () => {
+		const document = parseUIDocument(LOBBY_SCREEN);
+		const result = applyUIOperation(document, {
+			kind: 'set-node-appearance',
+			nodeId: 'native-button',
+			appearance: createUIAppearanceReference(
+				'primary-button-appearance',
+				'prominent',
+			),
+		});
+
+		expect(findUINode(result.document.root, 'native-button')?.appearance?.variant).toBe(
+			'prominent',
+		);
+		expect(applyUIOperation(result.document, result.inverse).document).toEqual(document);
 	});
 });
 

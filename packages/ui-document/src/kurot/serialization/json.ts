@@ -91,6 +91,9 @@ function normalizeNode(node: UINode): UINode {
 					appearance: {
 						kind: node.appearance.kind,
 						assetId: node.appearance.assetId,
+						...(node.appearance.variant === undefined
+							? {}
+							: { variant: node.appearance.variant }),
 					},
 				}),
 		children: node.children.map(normalizeNode),

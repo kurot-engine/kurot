@@ -123,6 +123,44 @@ describe('UI asset registry', () => {
 		);
 	});
 
+	it('validates appearance variant selection against the referenced asset', () => {
+		const registry = createFixtureRegistry();
+		const screen = registry.getAsset('lobby-screen')!;
+		const nativeButton = screen.root.children[2]!;
+		const invalid = {
+			...screen,
+			root: {
+				...screen.root,
+				children: [
+					...screen.root.children.slice(0, 2),
+					{
+						...nativeButton,
+						appearance: {
+							...nativeButton.appearance!,
+							variant: 'missing',
+						},
+					},
+				],
+			},
+		};
+		const invalidRegistry = new UIAssetRegistry();
+		invalidRegistry.registerAsset(registry.getAsset('action-card')!);
+		invalidRegistry.registerAsset(
+			registry.getAsset('primary-button-appearance')!,
+		);
+		invalidRegistry.registerAsset(invalid);
+		for (const token of registry.listTokens()) {
+			invalidRegistry.registerToken(token);
+		}
+		expect(validateUIAssetRegistry(invalidRegistry)).toContainEqual({
+			code: 'unknown-variant',
+			severity: 'error',
+			path: '$.assets["lobby-screen"].root.children[2].appearance.variant',
+			message:
+				'Variant "missing" is not published by appearance asset "primary-button-appearance".',
+		});
+	});
+
 	it('checks registered resource and token categories', () => {
 		const screen = parseUIDocument(LOBBY_SCREEN);
 		const nativeButton = screen.root.children[2]!;

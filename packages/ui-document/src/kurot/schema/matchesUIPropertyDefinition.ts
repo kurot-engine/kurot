@@ -2,6 +2,11 @@ import type {
 	UIPropertyObject,
 	UIPropertyValue,
 } from '../model/UIPropertyValue.js';
+import {
+	isUIAssetReference,
+	isUIDesignTokenReference,
+	isUIResourceReference,
+} from '../model/UIReference.js';
 import type {
 	UIPropertyDefinition,
 	UIPropertyValueType,
@@ -18,12 +23,10 @@ export function matchesUIPropertyDefinition(
 		? property.valueType
 		: [property.valueType];
 	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;
-	if (isTaggedReference(value, 'resource') && property.resourceTypes) {
-		if (!('resourceType' in value)) return false;
+	if (isUIResourceReference(value) && property.resourceTypes) {
 		if (!property.resourceTypes.some(type => type === value.resourceType)) return false;
 	}
-	if (isTaggedReference(value, 'token') && property.tokenTypes) {
-		if (!('tokenType' in value)) return false;
+	if (isUIDesignTokenReference(value) && property.tokenTypes) {
 		if (!property.tokenTypes.some(type => type === value.tokenType)) return false;
 	}
 	if (property.enumValues && !property.enumValues.some(item => Object.is(item, value))) {
@@ -45,34 +48,31 @@ function matchesValueType(
 		case 'array':
 			return Array.isArray(value);
 		case 'asset-reference':
-			return isTaggedReference(value, 'asset');
+			return isUIAssetReference(value);
 		case 'boolean':
 			return typeof value === 'boolean';
 		case 'number':
-			return typeof value === 'number';
+			return typeof value === 'number' && Number.isFinite(value);
 		case 'object':
-			return typeof value === 'object' && !Array.isArray(value);
+			return isStructuredObject(value);
 		case 'resource-reference':
-			return isTaggedReference(value, 'resource');
+			return isUIResourceReference(value);
 		case 'string':
 			return typeof value === 'string';
 		case 'token-reference':
-			return isTaggedReference(value, 'token');
+			return isUIDesignTokenReference(value);
 		case 'value':
-			return true;
+			return typeof value !== 'number' || Number.isFinite(value);
 		default:
 			return false;
 	}
 }
 
-function isTaggedReference(
-	value: UIPropertyValue,
-	kind: 'asset' | 'resource' | 'token',
-): value is UIPropertyObject {
-	return (
-		typeof value === 'object' &&
-		!Array.isArray(value) &&
-		'kind' in value &&
-		value.kind === kind
-	);
+function isStructuredObject(value: UIPropertyValue): value is UIPropertyObject {
+	if (!isPropertyObject(value)) return false;
+	return value.kind !== 'asset' && value.kind !== 'resource' && value.kind !== 'token';
+}
+
+function isPropertyObject(value: UIPropertyValue): value is UIPropertyObject {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

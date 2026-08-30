@@ -4,7 +4,7 @@ import type { UIAssetContract } from '../model/UIAssetContract.js';
 import type { UIAssetKind } from '../model/UIAssetKind.js';
 import type { UIComponentInstance } from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
-import type { UIAssetReference } from '../model/UIReference.js';
+import type { UIAppearanceReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
 import { createUIAssetContract } from './createAssetContract.js';
@@ -37,7 +37,7 @@ export interface CreateUINodeOptions {
 	/**
 	 * Optional appearance asset applied to this runtime component.
 	 */
-	readonly appearance?: UIAssetReference;
+	readonly appearance?: UIAppearanceReference;
 
 	/**
 	 * Initial ordered children. The array is copied.

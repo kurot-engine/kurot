@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.3.0` currently provides:
+`@kurot/ui-document@0.3.2` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;

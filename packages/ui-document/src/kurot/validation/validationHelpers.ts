@@ -1,19 +1,15 @@
+import {
+	UI_DESIGN_TOKEN_TYPES,
+	UI_RESOURCE_TYPES,
+} from '../model/UIReference.js';
 import type { UIDiagnostic, UIDiagnosticCode } from './UIDiagnostic.js';
 
-const RESOURCE_TYPES = new Set([
-	'animation',
-	'font',
-	'image',
-	'spine',
-	'sprite-frame',
-]);
-const TOKEN_TYPES = new Set([
-	'color',
-	'number',
-	'spacing',
-	'string',
-	'typography',
-]);
+const RESOURCE_TYPES = new Set<string>(UI_RESOURCE_TYPES);
+const TOKEN_TYPES = new Set<string>(UI_DESIGN_TOKEN_TYPES);
+const ASSET_REFERENCE_KEYS = new Set(['assetId', 'kind']);
+const APPEARANCE_REFERENCE_KEYS = new Set(['assetId', 'kind', 'variant']);
+const RESOURCE_REFERENCE_KEYS = new Set(['key', 'kind', 'resourceType']);
+const TOKEN_REFERENCE_KEYS = new Set(['key', 'kind', 'tokenType']);
 
 /**
  * Adds one stable error diagnostic to a mutable validation result.
@@ -141,20 +137,71 @@ export function validateAssetReference(
 	path: string,
 	diagnostics: UIDiagnostic[],
 ): void {
-	if (!isPlainRecord(value)) {
-		addUIDiagnostic(diagnostics, 'invalid-asset-reference', path, 'Asset reference must be an object.');
+	validateAssetReferenceShape(
+		value,
+		path,
+		diagnostics,
+		ASSET_REFERENCE_KEYS,
+		'Asset reference',
+	);
+}
+
+/**
+ * Validates an appearance asset reference and its optional variant selection.
+ */
+export function validateAppearanceReference(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+): void {
+	if (
+		!validateAssetReferenceShape(
+			value,
+			path,
+			diagnostics,
+			APPEARANCE_REFERENCE_KEYS,
+			'Appearance reference',
+		)
+	) {
 		return;
 	}
-	validateKnownKeys(value, new Set(['assetId', 'kind']), path, diagnostics);
+	if (value.variant !== undefined) {
+		validateNonEmptyString(
+			value.variant,
+			`${path}.variant`,
+			'Appearance variant',
+			diagnostics,
+		);
+	}
+}
+
+function validateAssetReferenceShape(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+	knownKeys: ReadonlySet<string>,
+	label: string,
+): value is Record<string, unknown> {
+	if (!isPlainRecord(value)) {
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-asset-reference',
+			path,
+			`${label} must be an object.`,
+		);
+		return false;
+	}
+	validateKnownKeys(value, knownKeys, path, diagnostics);
 	if (value.kind !== 'asset') {
 		addUIDiagnostic(
 			diagnostics,
 			'invalid-asset-reference',
 			`${path}.kind`,
-			'Asset reference kind must be "asset".',
+			`${label} kind must be "asset".`,
 		);
 	}
 	validateNonEmptyString(value.assetId, `${path}.assetId`, 'Asset id', diagnostics);
+	return true;
 }
 
 function validateTaggedReference(
@@ -163,7 +210,7 @@ function validateTaggedReference(
 	diagnostics: UIDiagnostic[],
 ): void {
 	if (value.kind === 'resource') {
-		validateKnownKeys(value, new Set(['key', 'kind', 'resourceType']), path, diagnostics);
+		validateKnownKeys(value, RESOURCE_REFERENCE_KEYS, path, diagnostics);
 		validateNonEmptyString(value.key, `${path}.key`, 'Resource key', diagnostics);
 		if (!RESOURCE_TYPES.has(String(value.resourceType))) {
 			addUIDiagnostic(
@@ -174,7 +221,7 @@ function validateTaggedReference(
 			);
 		}
 	} else if (value.kind === 'token') {
-		validateKnownKeys(value, new Set(['key', 'kind', 'tokenType']), path, diagnostics);
+		validateKnownKeys(value, TOKEN_REFERENCE_KEYS, path, diagnostics);
 		validateNonEmptyString(value.key, `${path}.key`, 'Token key', diagnostics);
 		if (!TOKEN_TYPES.has(String(value.tokenType))) {
 			addUIDiagnostic(

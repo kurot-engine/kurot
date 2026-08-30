@@ -72,4 +72,64 @@ describe('UI document validation', () => {
 		]);
 		expect(isUIDocument(input)).toBe(false);
 	});
+
+	it('validates the complete appearance reference shape', () => {
+		const document = createUIDocument({
+			id: 'main-screen',
+			root: createUINode({ id: 'root', type: 'kui.Button' }),
+		});
+		const input = {
+			...document,
+			root: {
+				...document.root,
+				appearance: {
+					kind: 'asset',
+					assetId: 'primary-button-appearance',
+					variant: ' ',
+					extra: true,
+				},
+			},
+		};
+		const diagnostics = validateUIDocument(input);
+
+		expect(diagnostics).toContainEqual({
+			code: 'unexpected-property',
+			severity: 'error',
+			path: '$.root.appearance.extra',
+			message: 'Property "extra" is not part of the current document format.',
+		});
+		expect(diagnostics).toContainEqual({
+			code: 'invalid-value',
+			severity: 'error',
+			path: '$.root.appearance.variant',
+			message: 'Appearance variant must be a non-empty string.',
+		});
+	});
+
+	it('does not accept an appearance selection as a generic property reference', () => {
+		const document = createUIDocument({
+			id: 'main-screen',
+			root: createUINode({ id: 'root', type: 'kui.Button' }),
+		});
+		const input = {
+			...document,
+			root: {
+				...document.root,
+				properties: {
+					appearance: {
+						kind: 'asset',
+						assetId: 'primary-button-appearance',
+						variant: 'compact',
+					},
+				},
+			},
+		};
+
+		expect(validateUIDocument(input)).toContainEqual({
+			code: 'unexpected-property',
+			severity: 'error',
+			path: '$.root.properties.appearance.variant',
+			message: 'Property "variant" is not part of the current document format.',
+		});
+	});
 });

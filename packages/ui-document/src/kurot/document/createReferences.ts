@@ -1,5 +1,6 @@
 import type {
 	UIAssetReference,
+	UIAppearanceReference,
 	UIDesignTokenReference,
 	UIDesignTokenType,
 	UIResourceReference,
@@ -12,6 +13,24 @@ import type {
 export function createUIAssetReference(assetId: string): UIAssetReference {
 	assertNonEmpty(assetId, 'Asset id');
 	return { kind: 'asset', assetId };
+}
+
+/**
+ * Creates an appearance reference with an optional published variant.
+ */
+export function createUIAppearanceReference(
+	assetId: string,
+	variant?: string,
+): UIAppearanceReference {
+	assertNonEmpty(assetId, 'Asset id');
+	if (variant !== undefined) {
+		assertNonEmpty(variant, 'Appearance variant');
+	}
+	return {
+		kind: 'asset',
+		assetId,
+		...(variant === undefined ? {} : { variant }),
+	};
 }
 
 /**

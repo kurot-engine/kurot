@@ -15,6 +15,7 @@ export type {
 } from './UIComponentInstance.js';
 export type {
 	UIAssetReference,
+	UIAppearanceReference,
 	UIDesignTokenReference,
 	UIDesignTokenType,
 	UIResourceReference,

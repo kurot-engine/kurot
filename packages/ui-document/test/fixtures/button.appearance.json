@@ -23,7 +23,17 @@
         ]
       }
     },
-    "variants": {}
+    "variants": {
+      "compact": {
+        "overrides": [
+          {
+            "targetId": "background",
+            "property": "strokeWeight",
+            "value": 2
+          }
+        ]
+      }
+    }
   },
   "root": {
     "id": "root",

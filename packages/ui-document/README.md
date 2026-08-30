@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.3.0).** The reusable authoring model and headless
+> **Early development (0.3.x).** The reusable authoring model and headless
 > editing kernel are implemented, but the schema remains pre-1.0 and is not yet
 > a production file format.
 
@@ -55,6 +55,7 @@ the corresponding `@kurot/ui` class.
 ## Current capabilities
 
 - explicit screen, reusable-component, and appearance assets;
+- appearance references with optional validated variant selection;
 - public component contracts containing typed parameters, parts, Slots,
   runtime-neutral states, and authoring variants;
 - compact reusable instances containing an asset reference and only their

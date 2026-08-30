@@ -48,6 +48,16 @@ function validateAppearance(
 			`${path}.appearance`,
 			`Appearance asset "${source.id}" does not target ${node.type}.`,
 		);
+		return;
+	}
+	const variant = node.appearance.variant;
+	if (variant !== undefined && !Object.hasOwn(source.contract.variants, variant)) {
+		addUIDiagnostic(
+			diagnostics,
+			'unknown-variant',
+			`${path}.appearance.variant`,
+			`Variant "${variant}" is not published by appearance asset "${source.id}".`,
+		);
 	}
 }
 

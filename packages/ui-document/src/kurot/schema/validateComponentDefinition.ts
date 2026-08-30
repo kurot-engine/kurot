@@ -2,6 +2,10 @@ import type {
 	UIDesignTokenType,
 	UIResourceType,
 } from '../model/UIReference.js';
+import {
+	UI_DESIGN_TOKEN_TYPES,
+	UI_RESOURCE_TYPES,
+} from '../model/UIReference.js';
 import type {
 	UIChildrenPolicy,
 	UIComponentDefinition,
@@ -29,20 +33,8 @@ const PROPERTY_FORMATS = new Set<UIPropertyFormat>([
 	'resource',
 	'token',
 ]);
-const RESOURCE_TYPES = new Set<UIResourceType>([
-	'animation',
-	'font',
-	'image',
-	'spine',
-	'sprite-frame',
-]);
-const TOKEN_TYPES = new Set<UIDesignTokenType>([
-	'color',
-	'number',
-	'spacing',
-	'string',
-	'typography',
-]);
+const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
+const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
 
 /**
  * Rejects malformed component metadata before it enters a registry.

@@ -1,5 +1,5 @@
 import type { UIComponentInstance } from './UIComponentInstance.js';
-import type { UIAssetReference } from './UIReference.js';
+import type { UIAppearanceReference } from './UIReference.js';
 import type { UIPropertyValue } from './UIPropertyValue.js';
 
 /**
@@ -29,7 +29,7 @@ export interface UINode {
 	/**
 	 * Optional appearance asset applied to this runtime component.
 	 */
-	readonly appearance?: UIAssetReference;
+	readonly appearance?: UIAppearanceReference;
 
 	/**
 	 * Ordered visual children of this component instance.

@@ -79,7 +79,8 @@
         },
         "appearance": {
           "kind": "asset",
-          "assetId": "primary-button-appearance"
+          "assetId": "primary-button-appearance",
+          "variant": "compact"
         },
         "children": []
       }

@@ -20,7 +20,7 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ### Changed
 
-- Upgraded the `@kurot/ui-document` contract to `^0.3.0`.
+- Upgraded the `@kurot/ui-document` contract to `^0.3.1`.
 - Project-wide asset and component validation now runs before materialization.
 - The test suite now has an explicit Node/Vitest TypeScript project and performs
   test type-checking before execution.

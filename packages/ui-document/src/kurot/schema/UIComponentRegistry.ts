@@ -67,7 +67,9 @@ export class UIComponentRegistry {
 		const resolved: UIResolvedComponentDefinition[] = [];
 		for (const definition of this.list()) {
 			const result = this.resolve(definition.type);
-			if (result) resolved.push(result);
+			if (result) {
+				resolved.push(result);
+			}
 		}
 		return Object.freeze(resolved);
 	}
@@ -108,13 +110,18 @@ function resolveDefinition(
 		}
 	}
 
+	const children = definition.children ?? base?.children;
 	const resolved: UIResolvedComponentDefinition = Object.freeze({
 		type: definition.type,
 		baseTypes: Object.freeze(base ? [...base.baseTypes, base.type] : []),
 		abstract: definition.abstract ?? false,
-		displayName: definition.displayName,
-		description: definition.description,
-		children: definition.children ?? base?.children,
+		...(definition.displayName === undefined
+			? {}
+			: { displayName: definition.displayName }),
+		...(definition.description === undefined
+			? {}
+			: { description: definition.description }),
+		...(children === undefined ? {} : { children }),
 		properties: mergeProperties(base?.properties, definition.properties),
 		allowUnknownProperties:
 			definition.allowUnknownProperties ?? base?.allowUnknownProperties ?? false,

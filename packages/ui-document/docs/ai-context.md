@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.3.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.3.2`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -38,7 +38,8 @@ src/
 - Component parameters may bind explicitly to internal node properties; binding
   records contain stable target IDs and property names, never expressions.
 - A node has `id`, `type`, `properties`, optional `instance`, optional
-  `appearance`, and ordered `children`.
+  `appearance`, and ordered `children`. An appearance reference may select one
+  variant published by the referenced appearance Contract.
 - A reusable instance stores a stable component-asset reference, parameter
   values, an optional variant, public-part overrides, and projected Slot trees.
   It never embeds the referenced component's internal tree.
@@ -52,6 +53,9 @@ src/
 - Tagged references use explicit records: `{ kind: 'asset', assetId }`,
   `{ kind: 'resource', resourceType, key }`, or
   `{ kind: 'token', tokenType, key }`.
+- Tagged references are distinct from ordinary structured objects. Reference
+  schemas require the complete exact record, and an appearance selection with
+  `variant` is not a generic property-level asset reference.
 - `UIAssetRegistry` owns explicit per-project assets, resource identities, and
   design tokens. It is not global state.
 - `validateUIAssetRegistry` checks component/appearance compatibility,
@@ -111,8 +115,9 @@ src/
 - Actions, data binding, migrations, and a final human-facing `.kui` syntax are
   not implemented.
 - `@kurot/ui-runtime@0.2.x` consumes format version 2 and materializes the
-  implemented static reuse and appearance slice. Dynamic component states,
-  appearance variants, bindings, actions, and reconciliation remain pending.
+  implemented static reuse and appearance slice. Appearance variant selection
+  is modeled here but requires `@kurot/ui-runtime@0.2` support. Bindings,
+  actions, and reconciliation remain pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 

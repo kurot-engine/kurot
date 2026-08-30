@@ -4,6 +4,10 @@ import type {
 	UIDesignTokenType,
 	UIResourceType,
 } from '../model/UIReference.js';
+import {
+	UI_DESIGN_TOKEN_TYPES,
+	UI_RESOURCE_TYPES,
+} from '../model/UIReference.js';
 import { UIDocumentValidationError } from '../serialization/UIDocumentValidationError.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { validateUIDocument } from '../validation/validateUIDocument.js';
@@ -13,20 +17,8 @@ import type {
 	UIResourceDefinition,
 } from './UIProjectDefinition.js';
 
-const RESOURCE_TYPES = new Set<UIResourceType>([
-	'animation',
-	'font',
-	'image',
-	'spine',
-	'sprite-frame',
-]);
-const TOKEN_TYPES = new Set<UIDesignTokenType>([
-	'color',
-	'number',
-	'spacing',
-	'string',
-	'typography',
-]);
+const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
+const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
 
 /**
  * In-memory project catalog used for deterministic cross-document resolution.
