@@ -1,5 +1,4 @@
 import type { DisplayObject } from '@kurot/core';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import {
 	Button,
 	Component,
@@ -30,7 +29,7 @@ import { applyUIComponentProperty } from './applyUIComponentProperties.js';
 export function applyBuiltInProperty(
 	target: DisplayObject,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	if (applyDisplayObjectProperty(target, name, value, path)) return true;

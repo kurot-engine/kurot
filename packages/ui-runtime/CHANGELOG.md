@@ -4,6 +4,27 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.3.0] — 2026-08-31
+
+### Added
+
+- Runtime execution for typed Contract data fields and deterministic one-way
+  property bindings, including initial values and later controller updates.
+- Disposable semantic `tap` and `change` actions with document asset, scope,
+  and source-node identity.
+- Numeric appearance-state transitions with bounded duration, delay, and
+  easing semantics.
+- Category-specific resource adapters for image, sprite-frame, font, Spine,
+  and animation references, with stable resource-key defaults.
+- A representative Crash-game screen test covering live data, actions,
+  resource resolution, controls, and appearance transitions.
+
+### Changed
+
+- Upgraded the `@kurot/ui-document` contract to `^0.4.1`.
+- Split dynamic contracts, resource dispatch, and transitions into focused
+  runtime modules.
+
 ## [0.2.3] — 2026-08-31
 
 ### Added

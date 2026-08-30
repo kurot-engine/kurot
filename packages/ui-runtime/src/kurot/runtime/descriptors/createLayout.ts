@@ -12,7 +12,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 /**
  * Creates and configures a Kurot layout from a canonical layout descriptor.
  */
-export function createLayout(value: UIPropertyValue, path: string): LayoutBase {
+export function createLayout(value: unknown, path: string): LayoutBase {
 	const descriptor = requireObject(value, path);
 	assertExactKeys(descriptor, ['properties', 'type'], path);
 	const type = requireString(descriptor.type, `${path}.type`);
@@ -209,32 +209,32 @@ function assertExactKeys(value: UIPropertyObject, keys: readonly string[], path:
 	}
 }
 
-function requireObject(value: UIPropertyValue, path: string): UIPropertyObject {
+function requireObject(value: unknown, path: string): UIPropertyObject {
 	if (isPropertyObject(value)) return value;
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout descriptor must be an object.', path);
 }
 
-function isPropertyObject(value: UIPropertyValue): value is UIPropertyObject {
+function isPropertyObject(value: unknown): value is UIPropertyObject {
 	return typeof value === 'object' && !Array.isArray(value);
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout property must be a boolean.', path);
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout property must be a number.', path);
 }
 
-function requireNonNegativeNumber(value: UIPropertyValue, path: string): number {
+function requireNonNegativeNumber(value: unknown, path: string): number {
 	const number = requireNumber(value, path);
 	if (number >= 0) return number;
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout property must not be negative.', path);
 }
 
-function requireNonNegativeInteger(value: UIPropertyValue, path: string): number {
+function requireNonNegativeInteger(value: unknown, path: string): number {
 	const number = requireNonNegativeNumber(value, path);
 	if (Number.isInteger(number)) return number;
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout property must be an integer.', path);

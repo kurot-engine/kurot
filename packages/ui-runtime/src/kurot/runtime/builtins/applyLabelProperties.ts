@@ -1,5 +1,4 @@
 import { Label } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,7 +7,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyLabelProperty(
 	target: Label,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -62,17 +61,17 @@ export function applyLabelProperty(
 	}
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw invalidValue('boolean', path);
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw invalidValue('number', path);
 }
 
-function requireString(value: UIPropertyValue, path: string): string {
+function requireString(value: unknown, path: string): string {
 	if (typeof value === 'string') return value;
 	throw invalidValue('string', path);
 }

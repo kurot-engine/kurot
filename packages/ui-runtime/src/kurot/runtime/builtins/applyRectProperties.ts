@@ -1,5 +1,4 @@
 import { Rect } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,7 +7,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyRectProperty(
 	target: Rect,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -38,7 +37,7 @@ export function applyRectProperty(
 	}
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw invalidValue('number', path);
 }

@@ -1,5 +1,4 @@
 import { EditableText } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,7 +7,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyEditableTextProperty(
 	target: EditableText,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -29,17 +28,17 @@ export function applyEditableTextProperty(
 	}
 }
 
-function requireInputType(value: UIPropertyValue, path: string): 'text' {
+function requireInputType(value: unknown, path: string): 'text' {
 	if (value === 'text') return value;
 	throw invalidValue('text', path);
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw invalidValue('number', path);
 }
 
-function requireString(value: UIPropertyValue, path: string): string {
+function requireString(value: unknown, path: string): string {
 	if (typeof value === 'string') return value;
 	throw invalidValue('string', path);
 }

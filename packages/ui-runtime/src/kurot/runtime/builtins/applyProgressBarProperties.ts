@@ -1,5 +1,4 @@
 import { ProgressBar } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,7 +7,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyProgressBarProperty(
 	target: ProgressBar,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -33,7 +32,7 @@ export function applyProgressBarProperty(
 }
 
 function requireDirection(
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): 'btt' | 'ltr' | 'rtl' | 'ttb' {
 	if (value === 'btt' || value === 'ltr' || value === 'rtl' || value === 'ttb') {
@@ -42,7 +41,7 @@ function requireDirection(
 	throw invalidValue('btt, ltr, rtl, or ttb', path);
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw invalidValue('number', path);
 }

@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import { Stage, TouchEvent } from '@kurot/core';
+import { Event, Stage, Texture, TouchEvent } from '@kurot/core';
 import {
 	BasicLayout,
 	Button,
@@ -45,6 +45,114 @@ beforeAll(() => {
 });
 
 describe('createKurotUI', () => {
+	it('applies bounded screen data and emits disposable semantic actions', () => {
+		const actions: string[] = [];
+		const document = createUIDocument({
+			id: 'crash-runtime',
+			contract: createUIAssetContract({
+				dataFields: {
+					multiplierText: { valueType: 'string', defaultValue: '1.00x' },
+				},
+				dataBindings: {
+					multiplier: {
+						source: 'multiplierText',
+						targetId: 'multiplier',
+						property: 'text',
+					},
+				},
+				actions: {
+					cashoutRequested: { sourceId: 'cashout', trigger: 'tap' },
+					soundChanged: { sourceId: 'sound', trigger: 'change' },
+				},
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({ id: 'multiplier', type: 'kui.Label' }),
+					createUINode({ id: 'cashout', type: 'kui.Button' }),
+					createUINode({ id: 'sound', type: 'kui.ToggleButton' }),
+				],
+			}),
+		});
+		const result = createKurotUI(document, {
+			data: { multiplierText: '2.50x' },
+			onAction: action => actions.push(action.action),
+		});
+		const multiplier = requireInstance(
+			result.instances.get('multiplier'),
+			Label,
+		);
+		const cashout = requireInstance(result.instances.get('cashout'), Button);
+		const sound = requireInstance(result.instances.get('sound'), ToggleButton);
+
+		expect(multiplier.text).toBe('2.50x');
+		result.data.setValue('multiplierText', '3.10x');
+		expect(result.data.getValue('multiplierText')).toBe('3.10x');
+		expect(multiplier.text).toBe('3.10x');
+		TouchEvent.dispatchTouchEvent(cashout, TouchEvent.TOUCH_TAP, true);
+		sound.dispatchEventWith(Event.CHANGE);
+		expect(actions).toEqual(['cashoutRequested', 'soundChanged']);
+
+		result.dispose();
+		TouchEvent.dispatchTouchEvent(cashout, TouchEvent.TOUCH_TAP, true);
+		sound.dispatchEventWith(Event.CHANGE);
+		expect(actions).toEqual(['cashoutRequested', 'soundChanged']);
+	});
+
+	it('executes bounded numeric appearance transitions', () => {
+		const appearance = createUIDocument({
+			id: 'transition-button',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				states: {
+					pressed: {
+						overrides: [{
+							targetId: 'background',
+							property: 'alpha',
+							value: 0.6,
+							transition: { duration: 0, easing: 'linear' },
+						}],
+					},
+				},
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'background',
+						type: 'kui.Rect',
+						properties: { alpha: 1 },
+					}),
+				],
+			}),
+		});
+		const document = createUIDocument({
+			id: 'transition-preview',
+			root: createUINode({
+				id: 'button',
+				type: 'kui.Button',
+				appearance: createUIAppearanceReference(appearance.id),
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(appearance);
+		const result = createKurotUI(document, { assets });
+		const button = requireInstance(result.root, Button);
+		const background = requireInstance(
+			result.instances.get('button@appearance:transition-button/background'),
+			Rect,
+		);
+		const stage = new Stage();
+		stage.addChild(button);
+		button.currentState = 'pressed';
+		button.validateNow();
+
+		expect(background.alpha).toBe(0.6);
+	});
+
 	it('materializes the foundation components and inherited properties', () => {
 		const document = createUIDocument({
 			id: 'foundation-preview',
@@ -555,32 +663,55 @@ describe('createKurotUI', () => {
 		});
 	});
 
-	it('resolves registered resources through the application hook', () => {
+	it('resolves registered image resources to runtime Texture objects', () => {
 		const document = createUIDocument({
 			id: 'resource-preview',
 			root: createUINode({
-				id: 'image',
-				type: 'kui.Image',
-				properties: {
-					source: {
-						kind: 'resource',
-						key: 'image.logo',
-						resourceType: 'image',
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'image',
+						type: 'kui.Image',
+						properties: {
+							source: {
+								kind: 'resource',
+								key: 'image.logo',
+								resourceType: 'image',
+							},
 					},
-				},
+					}),
+					createUINode({
+						id: 'button',
+						type: 'kui.Button',
+						properties: {
+							icon: {
+								kind: 'resource',
+								key: 'image.logo',
+								resourceType: 'image',
+							},
+						},
+					}),
+				],
 			}),
 		});
 		const assets = new UIAssetRegistry();
 		assets.registerResource({ key: 'image.logo', resourceType: 'image' });
+		const texture = new Texture();
 
 		const result = createKurotUI(document, {
 			assets,
-			resolveResource: reference => `/assets/${reference.key}.png`,
+			resourceAdapters: {
+				image: () => texture,
+			},
 		});
 
-		expect(requireInstance(result.root, Image).source).toBe(
-			'/assets/image.logo.png',
-		);
+		expect(
+			requireInstance(result.instances.get('image'), Image).source,
+		).toBe(texture);
+		expect(
+			requireInstance(result.instances.get('button'), Button).icon,
+		).toBe(texture);
 	});
 
 	it('reports document validation failures as structured runtime errors', () => {

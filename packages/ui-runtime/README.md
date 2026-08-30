@@ -22,8 +22,11 @@ bindings, variants, part overrides, and projected Slot content. Appearance
 assets become native Kurot skins and states, including the selected appearance
 variant.
 
-Version 0.2 performs full-tree creation. It does not yet provide incremental
-reconciliation, bindings, actions, or transitions.
+Version 0.3 completes the first bounded visual-semantics slice. Contract data
+fields drive declared one-way property bindings, semantic actions expose
+declared `tap` and `change` events, and numeric appearance overrides may use
+bounded transitions. The package still performs full-tree creation; incremental
+preview reconciliation belongs to the next phase.
 
 The result also provides a stable node lookup for editor selection and event
 wiring:
@@ -35,6 +38,9 @@ const internalLabel = result.instances.get('startButton/label');
 const state = result.stateControllers.get('startButton');
 state?.setState('disabled');
 state?.clearState();
+
+result.data.setValue('balanceText', '$1,250.00');
+result.dispose();
 ```
 
 Reusable-component state controllers apply Contract state overrides at runtime
@@ -42,9 +48,27 @@ and restore the exact pre-state values when cleared. Controllers are isolated
 per component instance; an unknown state throws `KurotUIRuntimeError`.
 
 Design tokens resolve from the supplied `UIAssetRegistry`. Resource references
-use their registered key by default; applications can provide
-`resolveResource(reference, definition)` to return the runtime value expected by
-their resource system.
+use their registered key by default. Applications may replace the adapter for
+each semantic category without adding resource-system behavior to the document
+model:
+
+```ts
+const result = createKurotUI(document, {
+	assets,
+	resourceAdapters: {
+		image: reference => resource.getRes(reference.key),
+		font: reference => fontFamilies[reference.key],
+		spine: reference => spineAssets[reference.key],
+		animation: reference => animations[reference.key],
+	},
+	onAction: action => controller.handle(action.action),
+});
+```
+
+Image and sprite-frame references can feed built-in `Image` properties. Spine
+and animation remain project component boundaries: their category adapters
+resolve the registered resource, while a project component adapter owns the
+corresponding runtime object.
 
 Project component types are added by extending a foundation
 `UIComponentRegistry` and supplying a matching runtime adapter. Invalid

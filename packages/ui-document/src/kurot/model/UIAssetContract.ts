@@ -60,13 +60,19 @@ export type UITransitionEasing = 'ease-in' | 'ease-in-out' | 'ease-out' | 'linea
  * Numeric property interpolation attached to one state override.
  */
 export interface UIPropertyTransition {
-	/** Duration in milliseconds. */
+	/**
+	 * Duration in milliseconds.
+	 */
 	readonly duration: number;
 
-	/** Optional delay in milliseconds. */
+	/**
+	 * Optional delay in milliseconds.
+	 */
 	readonly delay?: number;
 
-	/** Deterministic easing curve. */
+	/**
+	 * Deterministic easing curve.
+	 */
 	readonly easing?: UITransitionEasing;
 }
 
@@ -74,13 +80,19 @@ export interface UIPropertyTransition {
  * One-way binding from declared screen data to a node property.
  */
 export interface UIDataBindingDefinition {
-	/** Declared data-field name supplying the value. */
+	/**
+	 * Declared data-field name supplying the value.
+	 */
 	readonly source: string;
 
-	/** Stable target node identifier. */
+	/**
+	 * Stable target node identifier.
+	 */
 	readonly targetId: string;
 
-	/** Public property receiving the data value. */
+	/**
+	 * Public property receiving the data value.
+	 */
 	readonly property: string;
 }
 
@@ -93,13 +105,19 @@ export type UISemanticActionTrigger = 'change' | 'tap';
  * Public semantic action emitted from one node interaction.
  */
 export interface UISemanticActionDefinition {
-	/** Stable source node identifier. */
+	/**
+	 * Stable source node identifier.
+	 */
 	readonly sourceId: string;
 
-	/** Bounded interaction trigger observed by the runtime. */
+	/**
+	 * Bounded interaction trigger observed by the runtime.
+	 */
 	readonly trigger: UISemanticActionTrigger;
 
-	/** Authoring guidance for tools and Agents. */
+	/**
+	 * Authoring guidance for tools and Agents.
+	 */
 	readonly description?: string;
 }
 

@@ -74,9 +74,10 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 	...TEXT_CONTENT_PROPERTIES,
 	bold: booleanProperty(false, 'Whether the text uses a bold font weight.'),
 	fontFamily: {
-		valueType: 'string',
+		valueType: ['string', 'resource-reference'],
+		resourceTypes: ['font'],
 		defaultValue: 'Arial',
-		description: 'CSS font-family name used to render the label.',
+		description: 'CSS font-family name or registered font resource.',
 	},
 	italic: booleanProperty(false, 'Whether the text uses an italic font style.'),
 	lineSpacing: {

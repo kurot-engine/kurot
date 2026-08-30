@@ -1,5 +1,4 @@
 import { Component } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,7 +7,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyComponentProperty(
 	target: Component,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -20,7 +19,7 @@ export function applyComponentProperty(
 	}
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw new KurotUIRuntimeError(
 		'invalid-property',

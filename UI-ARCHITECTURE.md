@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.3.5` currently provides:
+`@kurot/ui-document@0.4.1` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -130,9 +130,13 @@ reusable authoring-asset model, not the full editor or production pipeline.
   containing two instances;
 - semantic operations, atomic transactions, monotonic revisions, deterministic
   diffs, and undo/redo history;
-- explicit parameter-to-internal-property bindings.
+- explicit parameter-to-internal-property bindings;
+- typed external data fields and deterministic one-way property bindings;
+- bounded semantic `tap` and `change` actions;
+- numeric appearance-transition descriptors;
+- typed font references accepted by authored text properties.
 
-`@kurot/ui-runtime@0.2.3` currently provides:
+`@kurot/ui-runtime@0.3.0` currently provides:
 
 - validation before materialization;
 - deterministic construction of the nine audited foundation components,
@@ -153,6 +157,11 @@ reusable authoring-asset model, not the full editor or production pipeline.
   text entry;
 - selected appearance variants applied before native state overrides;
 - per-instance reusable-component state controllers with atomic restoration;
+- runtime data controllers and bounded one-way property updates;
+- disposable semantic-action forwarding;
+- numeric native-skin state transitions;
+- category-specific font, image, sprite-frame, Spine, and animation resource
+  adapter dispatch;
 - structured runtime errors;
 - a real browser preview proving that a semantic document becomes a rendered
   Kurot display tree.
@@ -165,7 +174,6 @@ The existing CLI still compiles EXML for current projects.
 
 The following are still design or implementation work:
 
-- data binding and event/action semantics;
 - incremental runtime reconciliation after an edit;
 - a visual editor shell;
 - Agent tools and context assembly;
@@ -181,10 +189,10 @@ graph as real Kurot components. Its completed boundary is:
 UIAssetRegistry + root UIDocument → validated reusable component tree
 ```
 
-This now proves the document-to-runtime seam, but it is still full-tree
-materialization rather than live reconciliation. Binding, actions, transitions,
-editor interaction, and production compilation remain future work. It does not
-replace EXML in existing projects today.
+This now proves the document-to-runtime seam for the bounded Phase 3 slice, but
+it is still full-tree materialization rather than live reconciliation. Editor
+interaction and production compilation remain future work. It does not replace
+EXML in existing projects today.
 
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
@@ -192,7 +200,7 @@ replace EXML in existing projects today.
 | Foundation component schema | Partial | Nine components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
 | Editable asset kinds and reuse | Implemented for creation and states | Screens, components, compact instances, parameter bindings, parts, Slots, component variants/states, cross-document validation, runtime expansion, and golden fixtures. |
-| Appearance, states, bindings, resources | Partial | Native appearance skins/states, selected variants, and design tokens execute at runtime; typed resources have an application resolver hook. Bindings, actions, transitions, and concrete resource adapters remain pending. |
+| Appearance, states, bindings, resources | Implemented for the first slice | Native appearance states and selected variants, data bindings, semantic actions, numeric transitions, design tokens, and category-specific resource adapters execute at runtime. Project Spine and animation components remain application adapters. |
 | Editing operations and history | Implemented | Typed semantic operations, atomic transactions, expected revisions, inverse operations, deterministic diffs, and monotonic undo/redo history. |
 | Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
 | Agent collaboration | Not started | Schemas exist, but there is no editing tool protocol or context coordinator. |
@@ -738,7 +746,7 @@ properties, reusable-instance values, Contract entries, temporarily invalid
 atomic sequences, stale revisions, inverse transactions, deterministic diffs,
 and monotonic undo/redo.
 
-### Phase 3 — Complete visual semantics
+### Phase 3 — Complete visual semantics: completed for the first slice
 
 - complete the component catalog needed for a first production UI slice;
 - add appearance transition semantics;
@@ -752,6 +760,15 @@ UI component.
 
 Exit condition: one representative screen can be represented without EXML-only
 semantics or handwritten construction of its visual tree.
+
+Completion evidence: the Runtime integration suite materializes a representative
+800×540 Crash-game screen from a `UIDocument`. It verifies live balance,
+multiplier, and round-progress bindings; bet and cash-out actions; image-resource
+resolution; native controls; and an appearance-state transition. A separate
+adapter conformance test verifies deterministic dispatch of font, image,
+sprite-frame, Spine, and animation resource references. The boundary remains
+deliberately finite: project Spine and animation display components are supplied
+through project adapters rather than becoming dependencies of `ui-runtime`.
 
 ### Phase 4 — Preview reconciliation
 
@@ -816,7 +833,11 @@ or dynamic document walker unless the project explicitly selects dynamic UI.
 - reusable components use references and overrides rather than copied trees;
 - the future model is not constrained by EXML compatibility;
 - runtime preview and static compilation share semantic contracts;
-- the initial supported game domain and component catalog remain finite.
+- the initial supported game domain and component catalog remain finite;
+- the first binding contract is direct, typed, and one-way from a named data
+  field to one exact node property;
+- semantic actions expose bounded names through one Runtime callback rather
+  than embedding game logic in the document.
 
 ### Open
 
@@ -824,8 +845,10 @@ or dynamic document walker unless the project explicitly selects dynamic UI.
 - whether appearances are always separate assets or may be embedded for small
   private components;
 - exact parameter, slot, part, state, and variant TypeScript names;
-- the bounded binding expression or view-model contract;
-- how semantic actions connect to handwritten controllers;
+- whether a later binding version needs formatting transforms or nested data
+  paths beyond the direct Phase 3 contract;
+- project conventions for routing named semantic actions into handwritten
+  controllers;
 - when full preview rebuild becomes incremental reconciliation;
 - generated factory API and source-map format;
 - editor packaging and process architecture.

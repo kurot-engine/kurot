@@ -1,5 +1,4 @@
 import { DisplayObject, DisplayObjectContainer } from '@kurot/core';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import type { IUIComponent } from '@kurot/ui';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
@@ -11,7 +10,7 @@ type RuntimeUIComponent = DisplayObject & IUIComponent;
 export function applyUIComponentProperty(
 	target: RuntimeUIComponent,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -74,17 +73,17 @@ function requireContainer(target: DisplayObject, path: string): DisplayObjectCon
 	);
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw invalidValue('boolean', path);
 }
 
-function requireConstraint(value: UIPropertyValue, path: string): number | string {
+function requireConstraint(value: unknown, path: string): number | string {
 	if (typeof value === 'number' || typeof value === 'string') return value;
 	throw invalidValue('number or string', path);
 }
 
-function requireNumber(value: UIPropertyValue, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw invalidValue('number', path);
 }

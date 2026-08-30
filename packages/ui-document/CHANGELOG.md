@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.4.1] — 2026-08-31
+
+### Changed
+
+- Allowed `kui.Label.fontFamily` to consume a registered `font` resource in
+  addition to a direct CSS font-family string, making the Phase 3 font
+  resource-adapter path reachable through the audited catalog.
+
 ## [0.4.0] — 2026-08-31
 
 ### Added

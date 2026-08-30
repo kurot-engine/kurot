@@ -1,10 +1,11 @@
-import type { DisplayObject } from '@kurot/core';
+import type { DisplayObject, Event } from '@kurot/core';
 import type {
 	UIAssetRegistry,
 	UIComponentRegistry,
 	UIPropertyValue,
 	UIResourceDefinition,
 	UIResourceReference,
+	UIResourceType,
 } from '@kurot/ui-document';
 
 /**
@@ -13,6 +14,7 @@ import type {
 export type KurotUIRuntimeErrorCode =
 	| 'component-construction-failed'
 	| 'invalid-document'
+	| 'invalid-data'
 	| 'invalid-layout'
 	| 'invalid-property'
 	| 'invalid-rectangle'
@@ -32,12 +34,13 @@ export interface KurotUIComponentAdapter {
 
 	/**
 	 * Applies a project-defined property not handled by the built-in runtime.
+	 * The value may be a non-serializable object returned by a resource adapter.
 	 * Return true when the property was consumed.
 	 */
 	readonly applyProperty?: (
 		instance: DisplayObject,
 		name: string,
-		value: UIPropertyValue,
+		value: unknown,
 		path: string,
 	) => boolean;
 
@@ -52,12 +55,25 @@ export interface KurotUIComponentAdapter {
 }
 
 /**
- * Resolves one semantic resource reference to a runtime property value.
+ * Resolves one semantic resource reference to a runtime property value, which
+ * may be a non-serializable engine or project object.
  */
 export type KurotUIResourceResolver = (
 	reference: UIResourceReference,
 	definition: UIResourceDefinition,
-) => UIPropertyValue;
+) => unknown;
+
+/**
+ * Resolves one registered resource category into a runtime property value.
+ */
+export type KurotUIResourceAdapter = KurotUIResourceResolver;
+
+/**
+ * Complete category dispatch used by runtime resource resolution.
+ */
+export type KurotUIResourceAdapters = Readonly<
+	Record<UIResourceType, KurotUIResourceAdapter>
+>;
 
 /**
  * Dynamic state boundary for one expanded reusable component instance.
@@ -85,9 +101,69 @@ export interface KurotUIStateController {
 }
 
 /**
+ * Runtime updates for one document Contract's declared data fields.
+ */
+export interface KurotUIDataController {
+	/**
+	 * Declared field names in deterministic order.
+	 */
+	readonly fields: readonly string[];
+
+	/**
+	 * Returns the current value of one declared field.
+	 */
+	getValue(name: string): UIPropertyValue | undefined;
+
+	/**
+	 * Validates and applies one field to every declared binding target.
+	 */
+	setValue(name: string, value: UIPropertyValue): void;
+}
+
+/**
+ * One bounded semantic action emitted by a materialized document.
+ */
+export interface KurotUISemanticAction {
+	/**
+	 * Contract action name selected by the emitted runtime event.
+	 */
+	readonly action: string;
+
+	/**
+	 * Asset whose Contract declared the action.
+	 */
+	readonly assetId: string;
+
+	/**
+	 * Native Kurot event that triggered the semantic action.
+	 */
+	readonly event: Event;
+
+	/**
+	 * Runtime-qualified reusable-component scope, or an empty root scope.
+	 */
+	readonly scope: string;
+
+	/**
+	 * Asset-local node ID declared as the action source.
+	 */
+	readonly sourceId: string;
+}
+
+/**
  * Runtime customization supplied for one materialization operation.
  */
 export interface CreateKurotUIOptions {
+	/**
+	 * Initial values for data fields declared by the root document.
+	 */
+	readonly data?: Readonly<Record<string, UIPropertyValue>>;
+
+	/**
+	 * Receives bounded semantic actions declared by materialized assets.
+	 */
+	readonly onAction?: (action: KurotUISemanticAction) => void;
+
 	/**
 	 * Complete semantic component registry used to validate every asset.
 	 */
@@ -104,9 +180,9 @@ export interface CreateKurotUIOptions {
 	readonly adapters?: Readonly<Record<string, KurotUIComponentAdapter>>;
 
 	/**
-	 * Converts a registered resource reference into its browser runtime value.
+	 * Resource-category adapters used to resolve authored references.
 	 */
-	readonly resolveResource?: KurotUIResourceResolver;
+	readonly resourceAdapters?: Partial<KurotUIResourceAdapters>;
 }
 
 /**
@@ -128,12 +204,37 @@ export interface KurotUICreationResult {
 	 * Dynamic reusable-component state controllers keyed by instance node ID.
 	 */
 	readonly stateControllers: ReadonlyMap<string, KurotUIStateController>;
+
+	/**
+	 * Root document data controller.
+	 */
+	readonly data: KurotUIDataController;
+
+	/**
+	 * Data controllers keyed by root scope (`""`) or reusable instance scope.
+	 */
+	readonly dataControllers: ReadonlyMap<string, KurotUIDataController>;
+
+	/**
+	 * Detaches semantic action listeners owned by this materialization.
+	 */
+	dispose(): void;
 }
 
 /**
  * Internal state shared while recursively materializing one project asset graph.
  */
 export interface KurotUICreationContext {
+	/**
+	 * Data controllers registered per materialized asset scope.
+	 */
+	readonly dataControllers: Map<string, KurotUIDataController>;
+
+	/**
+	 * Listener cleanup callbacks owned by this materialization.
+	 */
+	readonly disposeCallbacks: Array<() => void>;
+
 	/**
 	 * Runtime adapters keyed by canonical component type.
 	 */
@@ -148,6 +249,11 @@ export interface KurotUICreationContext {
 	 * Materialized objects keyed by their runtime-qualified node identity.
 	 */
 	readonly instances: Map<string, DisplayObject>;
+
+	/**
+	 * Optional semantic-action sink selected for this materialization.
+	 */
+	readonly onAction: ((action: KurotUISemanticAction) => void) | undefined;
 
 	/**
 	 * Application resource resolver selected for this materialization.

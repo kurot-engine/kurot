@@ -85,6 +85,10 @@ describe('Kurot UI foundation catalog', () => {
 			valueType: 'string',
 			defaultValue: '',
 		});
+		expect(label?.properties.fontFamily).toMatchObject({
+			valueType: ['string', 'resource-reference'],
+			resourceTypes: ['font'],
+		});
 		expect(label?.properties.left?.valueType).toEqual([
 			'number',
 			'string',
@@ -108,7 +112,10 @@ describe('Kurot UI foundation catalog', () => {
 					createUINode({
 						id: 'title',
 						type: 'kui.Label',
-						properties: { text: 'Kurot' },
+						properties: {
+							fontFamily: createUIResourceReference('font', 'ui_font'),
+							text: 'Kurot',
+						},
 					}),
 					createUINode({
 						id: 'background',

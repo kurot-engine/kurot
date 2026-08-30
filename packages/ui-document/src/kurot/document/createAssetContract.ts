@@ -13,13 +13,19 @@ import type {
  * Input accepted by createUIAssetContract.
  */
 export interface CreateUIAssetContractOptions {
-	/** Typed external data accepted by this asset. */
+	/**
+	 * Typed external data accepted by this asset.
+	 */
 	readonly dataFields?: UIAssetContract['dataFields'];
 
-	/** One-way data assignments into the asset tree. */
+	/**
+	 * One-way data assignments into the asset tree.
+	 */
 	readonly dataBindings?: Readonly<Record<string, UIDataBindingDefinition>>;
 
-	/** Named semantic actions emitted by this asset. */
+	/**
+	 * Named semantic actions emitted by this asset.
+	 */
 	readonly actions?: Readonly<Record<string, UISemanticActionDefinition>>;
 
 	/**

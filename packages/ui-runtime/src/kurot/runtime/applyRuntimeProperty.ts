@@ -23,7 +23,7 @@ export function applyRuntimeProperty(
 
 	if (applyBuiltInProperty(target, name, resolved, path)) {
 		return;
-    }
+	}
 
 	const adapter = context.adapters[type];
 	if (applyAdapterProperty(adapter, target, name, resolved, path)) {
@@ -41,16 +41,16 @@ function applyAdapterProperty(
 	adapter: KurotUIComponentAdapter | undefined,
 	target: DisplayObject,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	if (adapter === undefined) {
 		return false;
-    }
+	}
 
 	if (adapter.applyProperty === undefined) {
 		return false;
 	}
 
-    return adapter.applyProperty(target, name, value, path);
+	return adapter.applyProperty(target, name, value, path);
 }

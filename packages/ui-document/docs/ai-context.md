@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.4.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.4.1`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -99,6 +99,8 @@ src/
   boundary.
 - `Image.source` and `Button.icon` use typed image/sprite-frame references.
   Audited colors and layout measurements accept appropriate design tokens.
+- `Label.fontFamily` accepts either a CSS font-family string or a registered
+  `font` resource reference.
 - Runtime and compatibility fields are not automatically authoring APIs.
   `currentState`, `skinName`, and `hostComponentKey` are deliberately absent;
   states and appearances are modeled directly.
@@ -128,10 +130,9 @@ src/
 ## 5. Important limitations
 
 - Migrations and a final human-facing `.kui` syntax are not implemented.
-- `@kurot/ui-runtime@0.2.x` consumes format version 2 and materializes the
-  implemented static reuse and appearance slice, including selected appearance
-  variants. Runtime execution of 0.4 data, action, and transition contracts
-  requires the matching Phase 3 runtime release; reconciliation remains pending.
+- `@kurot/ui-runtime@0.3.x` consumes format version 2 and executes the current
+  reuse, appearance, data-binding, semantic-action, transition, and typed
+  resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 

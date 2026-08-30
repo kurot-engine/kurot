@@ -1,5 +1,5 @@
+import { Texture } from '@kurot/core';
 import { Image } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { createRectangle } from '../descriptors/createRectangle.js';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
@@ -9,7 +9,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyImageProperty(
 	target: Image,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
@@ -23,24 +23,26 @@ export function applyImageProperty(
 			target.smoothing = requireBoolean(value, path);
 			return true;
 		case 'source':
-			target.source = requireString(value, path);
+			target.source = requireImageSource(value, path);
 			return true;
 		default:
 			return false;
 	}
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw invalidValue('boolean', path);
 }
 
-function requireString(value: UIPropertyValue, path: string): string {
-	if (typeof value === 'string') return value;
-	throw invalidValue('string', path);
+function requireImageSource(value: unknown, path: string): string | Texture {
+	if (typeof value === 'string' || value instanceof Texture) {
+		return value;
+	}
+	throw invalidValue('a string or Texture', path);
 }
 
-function requireFillMode(value: UIPropertyValue, path: string): 'clip' | 'repeat' | 'scale' {
+function requireFillMode(value: unknown, path: string): 'clip' | 'repeat' | 'scale' {
 	if (value === 'clip' || value === 'repeat' || value === 'scale') return value;
 	throw invalidValue('clip, repeat, or scale', path);
 }

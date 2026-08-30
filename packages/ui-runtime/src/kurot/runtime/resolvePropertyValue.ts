@@ -14,24 +14,30 @@ export function resolvePropertyValue(
 	value: UIPropertyValue,
 	path: string,
 	context: KurotUICreationContext,
-): UIPropertyValue {
+): unknown {
 	if (isPropertyArray(value)) {
 		return value.map((item, index) =>
 			resolvePropertyValue(item, `${path}[${index}]`, context),
 		);
 	}
-	if (typeof value !== 'object') return value;
+	if (typeof value !== 'object') {
+		return value;
+	}
 	if (isTokenReference(value)) {
 		const definition = context.assets.getToken(value.key);
-		if (!definition) throw unresolvedReference('design token', value.key, path);
+		if (!definition) {
+			throw unresolvedReference('design token', value.key, path);
+		}
 		return resolvePropertyValue(definition.value, path, context);
 	}
 	if (isResourceReference(value)) {
 		const definition = context.assets.getResource(value.key);
-		if (!definition) throw unresolvedReference('resource', value.key, path);
+		if (!definition) {
+			throw unresolvedReference('resource', value.key, path);
+		}
 		return context.resolveResource(value, definition);
 	}
-	const resolved: Record<string, UIPropertyValue> = {};
+	const resolved: Record<string, unknown> = {};
 	for (const key of Object.keys(value).sort()) {
 		resolved[key] = resolvePropertyValue(value[key], `${path}.${key}`, context);
 	}

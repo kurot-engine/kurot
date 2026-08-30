@@ -247,12 +247,12 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.2.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.3.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
-skins/states. Runtime execution of the new data, action, and transition
-contracts begins with the matching Phase 3 runtime release. Incremental
-reconciliation remains separate runtime work.
+skins/states. It also executes the bounded data, action, and transition
+contracts introduced in 0.4. Incremental reconciliation remains separate
+runtime work.
 
 ## Development
 

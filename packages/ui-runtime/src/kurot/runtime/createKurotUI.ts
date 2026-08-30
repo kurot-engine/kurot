@@ -5,8 +5,10 @@ import {
 	validateUIDocument,
 } from '@kurot/ui-document';
 import type { UIDocument } from '@kurot/ui-document';
+import { activateRuntimeContract } from './dynamics/activateRuntimeContract.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { materializeNode } from './materializeNode.js';
+import { createKurotUIResourceAdapters } from './resources/createKurotUIResourceAdapters.js';
 import type {
 	CreateKurotUIOptions,
 	KurotUICreationContext,
@@ -45,17 +47,46 @@ export function createKurotUI(
 	const context: KurotUICreationContext = {
 		adapters: options.adapters ?? {},
 		assets,
+		dataControllers: new Map(),
+		disposeCallbacks: [],
 		instances: new Map(),
-		resolveResource: options.resolveResource ?? (reference => reference.key),
+		onAction: options.onAction,
+		resolveResource: createResourceResolver(options.resourceAdapters),
 		stateControllers: new Map(),
 		types: new Map(),
 	};
 	const root = materializeNode(document.root, '$.root', '', context);
+	activateRuntimeContract(document, '', context, options.data);
+	const data = context.dataControllers.get('');
+	if (data === undefined) {
+		throw new Error('Root UI data controller was not created.');
+	}
+	let disposed = false;
 	return Object.freeze({
+		data,
+		dataControllers: context.dataControllers,
+		dispose(): void {
+			if (disposed) {
+				return;
+			}
+			disposed = true;
+			for (const dispose of context.disposeCallbacks.splice(0)) {
+				dispose();
+			}
+		},
 		root,
 		instances: context.instances,
 		stateControllers: context.stateControllers,
 	});
+}
+
+function createResourceResolver(
+	overrides: CreateKurotUIOptions['resourceAdapters'],
+): KurotUICreationContext['resolveResource'] {
+	const adapters = createKurotUIResourceAdapters(overrides);
+	return (reference, definition) => {
+		return adapters[reference.resourceType](reference, definition);
+	};
 }
 
 function createRuntimeAssetRegistry(

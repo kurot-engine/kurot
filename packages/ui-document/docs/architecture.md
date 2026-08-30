@@ -112,8 +112,9 @@ primitive and structured property categories, numeric and enum constraints,
 and explicit asset/resource/token-reference categories.
 
 Resource and token properties can further declare accepted categories. For
-example, `kui.Image.source` accepts typed image or sprite-frame references, and
-audited color fields accept color tokens.
+example, `kui.Image.source` accepts typed image or sprite-frame references,
+`kui.Label.fontFamily` accepts typed font references, and audited color fields
+accept color tokens.
 
 The foundation catalog remains curated rather than reflective. It includes
 `kui.Group`, `kui.Label`, `kui.EditableText`, `kui.Image`, `kui.Rect`,
@@ -130,11 +131,12 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.2.x` consumes format version 2 and passes the shared
+`@kurot/ui-runtime@0.3.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
-instances, resolves their static local semantics, and installs native
-appearance skins/states with selected appearance variants. Bindings, actions,
-and incremental reconciliation remain runtime work.
+instances, executes bounded data bindings and semantic actions, dispatches
+typed resources, and installs native appearance skins/states with selected
+variants and numeric transitions. Incremental reconciliation remains runtime
+work.
 
 ## Editing kernel
 

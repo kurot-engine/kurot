@@ -6,6 +6,7 @@ import { materializeNode, qualifyNodeId } from './materializeNode.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
 import type { KurotUICreationContext } from './types.js';
+import { TransitionSetProperty } from './transitions/TransitionSetProperty.js';
 
 /**
  * Applies one reusable appearance asset as a native Kurot Skin.
@@ -110,17 +111,26 @@ function createStates(
 		.map(name => {
 			const definition = appearance.contract.states[name];
 			const path = `$.assets[${JSON.stringify(appearance.id)}]`;
-			const overrides = definition.overrides.map((override, index) =>
-				new SetProperty(
+			const overrides = definition.overrides.map((override, index) => {
+				const value = resolvePropertyValue(
+					override.value,
+					`${path}.contract.states.${name}.overrides[${index}].value`,
+					context,
+				);
+				if (override.transition !== undefined) {
+					return new TransitionSetProperty(
+						override.targetId,
+						override.property,
+						value,
+						override.transition,
+					);
+				}
+				return new SetProperty(
 					override.targetId,
 					override.property,
-					resolvePropertyValue(
-						override.value,
-						`${path}.contract.states.${name}.overrides[${index}].value`,
-						context,
-					),
-				),
-			);
+					value,
+				);
+			});
 			return new State(name, overrides);
 		});
 }

@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.2.3`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.3.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -12,16 +12,18 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 ## Public API
 
 - `createKurotUI(document, options)` validates and materializes one complete
-  document. It returns `{ root, instances, stateControllers }` rather than
-  owning a Stage.
+  document. It returns the root, instance and controller maps, root data
+  controller, and a listener disposer rather than owning a Stage.
 - `CreateKurotUIOptions.registry` replaces the foundation semantic registry;
   extend a foundation registry when custom and built-in types coexist.
 - `CreateKurotUIOptions.assets` supplies the complete project asset, resource,
   and design-token registry. It is required when the root references assets.
 - `CreateKurotUIOptions.adapters` maps project component keys to construction,
   property, and child-attachment hooks.
-- `CreateKurotUIOptions.resolveResource` maps registered resource references to
-  runtime values; the default returns the resource key.
+- `CreateKurotUIOptions.data` supplies initial values for root Contract fields.
+- `CreateKurotUIOptions.onAction` receives declared semantic actions.
+- `CreateKurotUIOptions.resourceAdapters` maps each registered resource
+  category to runtime values; every default returns the stable resource key.
 - `KurotUIRuntimeError` exposes a stable `code`, exact semantic `path`, and any
   document validation `diagnostics`.
 
@@ -61,14 +63,26 @@ materialized skin tree before native states are installed.
 Reusable component Contracts with states receive one `KurotUIStateController`
 per expanded instance. `setState(name)` applies overrides atomically and
 `clearState()` restores the pre-state values. Appearance states continue to use
-native Kurot `Skin` state handling. Incremental reconciliation, bindings,
-actions, and transitions are not implemented.
+native Kurot `Skin` state handling. Numeric state overrides may declare bounded
+duration, delay, and easing transitions.
+
+Every materialized asset scope receives a `KurotUIDataController`. Declared
+one-way bindings are applied in stable name order, and invalid updates fail with
+`invalid-data`. Root initial values come from `CreateKurotUIOptions.data`;
+reusable component scopes currently begin from Contract defaults. Declared
+`tap` and `change` actions are forwarded through `onAction`; `dispose()` removes
+the listeners owned by the materialization.
 
 `Image.source` is forwarded to the existing `@kurot/ui` resource mechanism.
 Appearance assets are materialized as native `Skin` instances and assigned by
 the runtime; `skinName` is not an authored component property. The package does
 not invent resource or Theme lookup. An unskinned `Button` therefore exists and
 behaves as a component but has no automatic visual appearance.
+
+Resource resolution dispatches by exact category: image, sprite-frame, font,
+Spine, or animation. The built-in defaults preserve the registered key. Spine
+and animation rendering still require project component adapters; this package
+does not depend on a particular animation or Spine implementation.
 
 ## Task lookup
 
@@ -78,6 +92,9 @@ behaves as a component but has no automatic visual appearance.
 - Component reuse: `src/kurot/runtime/materializeComponentInstance.ts`
 - Appearances and states: `src/kurot/runtime/materializeAppearance.ts`
 - Reusable component states: `src/kurot/runtime/states/`
+- Contract data and semantic actions: `src/kurot/runtime/dynamics/`
+- Appearance transitions: `src/kurot/runtime/transitions/`
+- Resource-category adapters: `src/kurot/runtime/resources/`
 - Token and resource resolution: `src/kurot/runtime/resolvePropertyValue.ts`
 - Runtime property orchestration: `src/kurot/runtime/applyRuntimeProperty.ts`
 - Built-in property routing: `src/kurot/runtime/builtins/applyBuiltInProperties.ts`
@@ -96,7 +113,7 @@ behaves as a component but has no automatic visual appearance.
 - Rectangle descriptors: `src/kurot/runtime/descriptors/createRectangle.ts`
 - Custom adapter contracts: `src/kurot/runtime/types.ts`
 - Browser smoke preview: `examples/preview/`
-- Runtime tests: `test/createKurotUI.test.ts`
+- Runtime tests: `test/`, including the representative Phase 3 Crash screen
 
 ## Commands
 

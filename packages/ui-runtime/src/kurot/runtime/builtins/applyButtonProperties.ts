@@ -1,5 +1,5 @@
+import { Texture } from '@kurot/core';
 import { Button } from '@kurot/ui';
-import type { UIPropertyValue } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -8,12 +8,12 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 export function applyButtonProperty(
 	target: Button,
 	name: string,
-	value: UIPropertyValue,
+	value: unknown,
 	path: string,
 ): boolean {
 	switch (name) {
 		case 'icon':
-			target.icon = requireString(value, path);
+			target.icon = requireImageSource(value, path);
 			return true;
 		case 'label':
 			target.label = requireString(value, path);
@@ -29,14 +29,21 @@ export function applyButtonProperty(
 	}
 }
 
-function requireBoolean(value: UIPropertyValue, path: string): boolean {
+function requireBoolean(value: unknown, path: string): boolean {
 	if (typeof value === 'boolean') return value;
 	throw invalidValue('boolean', path);
 }
 
-function requireString(value: UIPropertyValue, path: string): string {
+function requireString(value: unknown, path: string): string {
 	if (typeof value === 'string') return value;
 	throw invalidValue('string', path);
+}
+
+function requireImageSource(value: unknown, path: string): string | Texture {
+	if (typeof value === 'string' || value instanceof Texture) {
+		return value;
+	}
+	throw invalidValue('a string or Texture', path);
 }
 
 function invalidValue(type: string, path: string): KurotUIRuntimeError {

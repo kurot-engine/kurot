@@ -6,6 +6,7 @@ import type {
 	UINode,
 } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
+import { activateRuntimeContract } from './dynamics/activateRuntimeContract.js';
 import { applyAppearance } from './materializeAppearance.js';
 import {
 	appendRuntimeChild,
@@ -60,6 +61,7 @@ export function materializeComponentInstance(
 			),
 		);
 	}
+	activateRuntimeContract(source, identity, context);
 	return root;
 }
 
@@ -70,9 +72,13 @@ function applyVariant(
 	path: string,
 	context: KurotUICreationContext,
 ): void {
-	if (!instance.variant) return;
+	if (!instance.variant) {
+		return;
+	}
 	const variant = contract.variants[instance.variant];
-	if (!variant) return;
+	if (!variant) {
+		return;
+	}
 	for (let index = 0; index < variant.overrides.length; index++) {
 		const override = variant.overrides[index];
 		applyScopedProperty(
@@ -96,7 +102,9 @@ function applyParameters(
 	for (const name of Object.keys(contract.parameters).sort()) {
 		const definition = contract.parameters[name];
 		const value = instance.parameters[name] ?? definition.defaultValue;
-		if (value === undefined) continue;
+		if (value === undefined) {
+			continue;
+		}
 		for (const binding of definition.bindings ?? []) {
 			applyScopedProperty(
 				scope,
@@ -120,7 +128,9 @@ function applyOverrides(
 	for (let index = 0; index < instance.overrides.length; index++) {
 		const override = instance.overrides[index];
 		const part = contract.parts[override.part];
-		if (!part) continue;
+		if (!part) {
+			continue;
+		}
 		applyScopedProperty(
 			scope,
 			part.nodeId,
@@ -142,10 +152,14 @@ function projectSlots(
 ): void {
 	for (const name of Object.keys(instance.slots).sort()) {
 		const slot = source.contract.slots[name];
-		if (!slot) continue;
+		if (!slot) {
+			continue;
+		}
 		const target = context.instances.get(qualifyNodeId(componentScope, slot.nodeId));
 		const targetNode = findNode(source.root, slot.nodeId);
-		if (!target || !targetNode) continue;
+		if (!target || !targetNode) {
+			continue;
+		}
 		const adapter = context.adapters[targetNode.type];
 		const nodes = instance.slots[name];
 		for (let index = 0; index < nodes.length; index++) {
@@ -165,9 +179,13 @@ function applyScopedProperty(
 	context: KurotUICreationContext,
 ): void {
 	const target = context.instances.get(qualifyNodeId(scope, targetId));
-	if (!target) return;
+	if (!target) {
+		return;
+	}
 	const type = context.types.get(qualifyNodeId(scope, targetId));
-	if (!type) return;
+	if (!type) {
+		return;
+	}
 	applyRuntimeProperty(target, type, property, value, path, context);
 }
 
@@ -188,15 +206,21 @@ function requireComponentAsset(
 }
 
 function requireInstance(node: UINode): UIComponentInstance {
-	if (node.instance) return node.instance;
+	if (node.instance) {
+		return node.instance;
+	}
 	throw new Error('Expected reusable component instance.');
 }
 
 function findNode(root: UINode, id: string): UINode | undefined {
-	if (root.id === id) return root;
+	if (root.id === id) {
+		return root;
+	}
 	for (const child of root.children) {
 		const match = findNode(child, id);
-		if (match) return match;
+		if (match) {
+			return match;
+		}
 	}
 	return undefined;
 }

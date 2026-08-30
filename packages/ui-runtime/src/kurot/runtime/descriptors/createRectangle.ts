@@ -1,11 +1,11 @@
 import { Rectangle } from '@kurot/core';
-import type { UIPropertyObject, UIPropertyValue } from '@kurot/ui-document';
+import type { UIPropertyObject } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
  * Converts a canonical rectangle object into a Kurot Rectangle instance.
  */
-export function createRectangle(value: UIPropertyValue, path: string): Rectangle {
+export function createRectangle(value: unknown, path: string): Rectangle {
 	const descriptor = requireObject(value, path);
 	const allowed = new Set(['height', 'width', 'x', 'y']);
 	for (const key of Object.keys(descriptor)) {
@@ -25,22 +25,22 @@ export function createRectangle(value: UIPropertyValue, path: string): Rectangle
 	);
 }
 
-function requireObject(value: UIPropertyValue, path: string): UIPropertyObject {
+function requireObject(value: unknown, path: string): UIPropertyObject {
 	if (isPropertyObject(value)) return value;
 	throw new KurotUIRuntimeError('invalid-rectangle', 'Rectangle must be an object.', path);
 }
 
-function isPropertyObject(value: UIPropertyValue): value is UIPropertyObject {
+function isPropertyObject(value: unknown): value is UIPropertyObject {
 	return typeof value === 'object' && !Array.isArray(value);
 }
 
-function requireNumber(value: UIPropertyValue | undefined, path: string): number {
+function requireNumber(value: unknown, path: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) return value;
 	throw new KurotUIRuntimeError('invalid-rectangle', 'Rectangle field must be a number.', path);
 }
 
 function requireNonNegativeNumber(
-	value: UIPropertyValue | undefined,
+	value: unknown,
 	path: string,
 ): number {
 	const number = requireNumber(value, path);
