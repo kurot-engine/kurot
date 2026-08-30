@@ -4,6 +4,21 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.2.2] — 2026-08-31
+
+### Added
+
+- Built-in materialization for `kui.ToggleButton` and `kui.ProgressBar`.
+- Runtime property routing for progress range values, fill direction, and
+  slide duration.
+- Integration coverage for ToggleButton label-part binding and ProgressBar
+  thumb clipping and label updates through native appearance parts.
+- Browser preview examples for both newly supported controls.
+
+### Changed
+
+- Upgraded the `@kurot/ui-document` contract to `^0.3.3`.
+
 ## [0.2.1] — 2026-08-30
 
 ### Added

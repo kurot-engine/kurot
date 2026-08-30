@@ -1,4 +1,5 @@
-import { createPlayer } from '@kurot/core';
+import { createPlayer, Event } from '@kurot/core';
+import { ToggleButton } from '@kurot/ui';
 import type { UIDocument } from '@kurot/ui-document';
 import {
 	createUIAppearanceReference,
@@ -18,6 +19,20 @@ try {
 	const { assets, document } = createPreviewProject();
 	const result = createKurotUI(document, { assets });
 	result.stateControllers.get('settings-action')?.setState('disabled');
+	const soundToggle = result.instances.get('sound-toggle');
+	if (!(soundToggle instanceof ToggleButton)) {
+		throw new Error('Preview ToggleButton was not materialized.');
+	}
+	let toggleChangeCount = 0;
+	const updateToggleStatus = (): void => {
+		const state = soundToggle.selected ? 'ON' : 'OFF';
+		soundToggle.label = `SOUND ${state}`;
+		status.textContent = `Rendered · ToggleButton ${state} · ${toggleChangeCount} changes`;
+	};
+	soundToggle.addEventListener(Event.CHANGE, () => {
+		toggleChangeCount++;
+		updateToggleStatus();
+	});
 	const app = createPlayer({
 		canvas,
 		contentWidth: 800,
@@ -26,7 +41,7 @@ try {
 		scaleMode: 'showAll',
 	});
 	app.start(result.root);
-	status.textContent = 'Rendered';
+	updateToggleStatus();
 	summary.textContent = [
 		`document: ${document.id}`,
 		`root: ${result.root.constructor.name}`,
@@ -46,6 +61,8 @@ function createPreviewProject(): {
 } {
 	const card = createPreviewCard();
 	const buttonAppearance = createPreviewButtonAppearance();
+	const progressAppearance = createPreviewProgressAppearance();
+	const toggleAppearance = createPreviewToggleAppearance();
 	const document = createUIDocument({
 		id: 'ui-runtime-preview',
 		root: createUINode({
@@ -67,7 +84,7 @@ function createPreviewProject(): {
 					type: 'kui.Label',
 					properties: {
 						bold: true,
-						size: 38,
+						size: 30,
 						text: 'UIDocument → live Kurot UI',
 						textColor: 0xffffff,
 						x: 92,
@@ -88,6 +105,7 @@ function createPreviewProject(): {
 									id: 'play-hint',
 									type: 'kui.Label',
 									properties: {
+										size: 16,
 										text: 'Reusable instance A',
 										textColor: 0xbfdbfe,
 									},
@@ -109,11 +127,44 @@ function createPreviewProject(): {
 					}),
 				}),
 				createUINode({
+					id: 'button-caption',
+					type: 'kui.Label',
+					properties: {
+						size: 13,
+						text: 'Button',
+						textColor: 0x94a3b8,
+						x: 40,
+						y: 333,
+					},
+				}),
+				createUINode({
+					id: 'toggle-caption',
+					type: 'kui.Label',
+					properties: {
+						size: 13,
+						text: 'ToggleButton · click repeatedly',
+						textColor: 0x94a3b8,
+						x: 290,
+						y: 333,
+					},
+				}),
+				createUINode({
+					id: 'progress-caption',
+					type: 'kui.Label',
+					properties: {
+						size: 13,
+						text: 'ProgressBar',
+						textColor: 0x94a3b8,
+						x: 540,
+						y: 333,
+					},
+				}),
+				createUINode({
 					id: 'variant-button',
 					type: 'kui.Button',
 					properties: {
-						label: 'APPEARANCE VARIANT',
-						x: 310,
+						label: 'VARIANT BUTTON',
+						x: 40,
 						y: 360,
 					},
 					appearance: createUIAppearanceReference(
@@ -121,12 +172,39 @@ function createPreviewProject(): {
 						'outlined',
 					),
 				}),
+				createUINode({
+					id: 'sound-toggle',
+					type: 'kui.ToggleButton',
+					properties: {
+						label: 'SOUND ON',
+						selected: true,
+						x: 290,
+						y: 360,
+					},
+					appearance: createUIAppearanceReference(toggleAppearance.id),
+				}),
+				createUINode({
+					id: 'loading-progress',
+					type: 'kui.ProgressBar',
+					properties: {
+						direction: 'ltr',
+						maximum: 100,
+						minimum: 0,
+						slideDuration: 0,
+						value: 72,
+						x: 540,
+						y: 370,
+					},
+					appearance: createUIAppearanceReference(progressAppearance.id),
+				}),
 			],
 		}),
 	});
 	const assets = new UIAssetRegistry();
 	assets.registerAsset(card);
 	assets.registerAsset(buttonAppearance);
+	assets.registerAsset(progressAppearance);
+	assets.registerAsset(toggleAppearance);
 	assets.registerAsset(document);
 	assets.registerToken({
 		key: 'color.action.primary',
@@ -134,6 +212,142 @@ function createPreviewProject(): {
 		value: 0x1d4ed8,
 	});
 	return { assets, document };
+}
+
+function createPreviewToggleAppearance(): UIDocument {
+	return createUIDocument({
+		id: 'preview-toggle-appearance',
+		assetKind: 'appearance',
+		contract: createUIAssetContract({
+			targetType: 'kui.ToggleButton',
+			parts: {
+				background: { nodeId: 'background' },
+				labelDisplay: { nodeId: 'labelDisplay' },
+			},
+			states: {
+				down: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'fillColor',
+							value: 0x1e293b,
+						},
+					],
+				},
+				downAndSelected: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'fillColor',
+							value: 0x065f46,
+						},
+					],
+				},
+				up: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'fillColor',
+							value: 0x334155,
+						},
+					],
+				},
+				upAndSelected: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'fillColor',
+							value: 0x047857,
+						},
+					],
+				},
+			},
+		}),
+		root: createUINode({
+			id: 'root',
+			type: 'kui.Group',
+			properties: { height: 58, width: 210 },
+			children: [
+				createUINode({
+					id: 'background',
+					type: 'kui.Rect',
+					properties: {
+						fillColor: 0x334155,
+						height: 58,
+						strokeColor: 0x34d399,
+						strokeWeight: 2,
+						width: 210,
+					},
+				}),
+				createUINode({
+					id: 'labelDisplay',
+					type: 'kui.Label',
+					properties: {
+						height: 58,
+						size: 18,
+						text: 'SOUND ON',
+						textAlign: 'center',
+						textColor: 0xffffff,
+						verticalAlign: 'middle',
+						width: 210,
+					},
+				}),
+			],
+		}),
+	});
+}
+
+function createPreviewProgressAppearance(): UIDocument {
+	return createUIDocument({
+		id: 'preview-progress-appearance',
+		assetKind: 'appearance',
+		contract: createUIAssetContract({
+			targetType: 'kui.ProgressBar',
+			parts: {
+				labelDisplay: { nodeId: 'labelDisplay' },
+				thumb: { nodeId: 'thumb' },
+			},
+		}),
+		root: createUINode({
+			id: 'root',
+			type: 'kui.Group',
+			properties: { height: 38, width: 220 },
+			children: [
+				createUINode({
+					id: 'track',
+					type: 'kui.Rect',
+					properties: {
+						fillColor: 0x1e293b,
+						height: 38,
+						strokeColor: 0x475569,
+						strokeWeight: 2,
+						width: 220,
+					},
+				}),
+				createUINode({
+					id: 'thumb',
+					type: 'kui.Rect',
+					properties: {
+						fillColor: 0x0284c7,
+						height: 38,
+						width: 220,
+					},
+				}),
+				createUINode({
+					id: 'labelDisplay',
+					type: 'kui.Label',
+					properties: {
+						height: 38,
+						size: 16,
+						textAlign: 'center',
+						textColor: 0xffffff,
+						verticalAlign: 'middle',
+						width: 220,
+					},
+				}),
+			],
+		}),
+	});
 }
 
 function createPreviewButtonAppearance(): UIDocument {
@@ -178,7 +392,8 @@ function createPreviewButtonAppearance(): UIDocument {
 					type: 'kui.Label',
 					properties: {
 						height: 58,
-						text: 'APPEARANCE VARIANT',
+						size: 16,
+						text: 'VARIANT BUTTON',
 						textAlign: 'center',
 						textColor: 0xffffff,
 						verticalAlign: 'middle',
@@ -251,7 +466,7 @@ function createPreviewCard(): UIDocument {
 					type: 'kui.Label',
 					properties: {
 						bold: true,
-						size: 28,
+						size: 22,
 						text: 'Action',
 						textColor: 0xffffff,
 						x: 24,

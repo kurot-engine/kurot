@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.2.1`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.2.2`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -28,14 +28,20 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 ## Built-in boundary
 
 The audited built-in types are `kui.Group`, `kui.Label`, `kui.Image`,
-`kui.Rect`, and `kui.Button`. Layout descriptors accept `kui.BasicLayout`,
-`kui.HorizontalLayout`, `kui.VerticalLayout`, and `kui.TileLayout`. Rectangle
-descriptors are converted to `@kurot/core` `Rectangle` instances.
+`kui.Rect`, `kui.Button`, `kui.ToggleButton`, and `kui.ProgressBar`. Layout
+descriptors accept `kui.BasicLayout`, `kui.HorizontalLayout`,
+`kui.VerticalLayout`, and `kui.TileLayout`. Rectangle descriptors are converted
+to `@kurot/core` `Rectangle` instances.
 
 Property names are applied in sorted order and children retain document order.
 Unknown or malformed runtime values fail instead of being assigned dynamically.
 The runtime does not fill in component Schema defaults; Kurot constructors own
 their runtime defaults.
+
+`kui.ToggleButton` uses its real constructor default of `toggle = true`.
+`kui.ProgressBar` accepts `minimum`, `maximum`, `value`, `direction`, and
+`slideDuration`; its `thumb` and `labelDisplay` appearance parts remain owned by
+the native component behavior.
 
 Reusable component internals are materialized under slash-qualified identities,
 for example `play-action/label`. Parameters apply through declared bindings,

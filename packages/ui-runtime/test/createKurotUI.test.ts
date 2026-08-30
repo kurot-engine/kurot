@@ -1,5 +1,6 @@
 /// <reference types="node" />
 
+import { Stage, TouchEvent } from '@kurot/core';
 import {
 	BasicLayout,
 	Button,
@@ -7,12 +8,16 @@ import {
 	HorizontalLayout,
 	Image,
 	Label,
+	ProgressBar,
 	Rect,
 	TileLayout,
+	ToggleButton,
 	VerticalLayout,
 } from '@kurot/ui';
 import {
 	createKurotUIFoundationRegistry,
+	createUIAppearanceReference,
+	createUIAssetContract,
 	createUIDocument,
 	createUINode,
 	parseUIDocument,
@@ -88,6 +93,22 @@ describe('createKurotUI', () => {
 						type: 'kui.Button',
 						properties: { label: 'Continue', selected: true, toggle: true },
 					}),
+					createUINode({
+						id: 'sound-toggle',
+						type: 'kui.ToggleButton',
+						properties: { label: 'Sound', selected: true },
+					}),
+					createUINode({
+						id: 'loading-progress',
+						type: 'kui.ProgressBar',
+						properties: {
+							direction: 'btt',
+							maximum: 200,
+							minimum: 10,
+							slideDuration: 0,
+							value: 125,
+						},
+					}),
 				],
 			}),
 		});
@@ -98,11 +119,19 @@ describe('createKurotUI', () => {
 		const image = requireInstance(result.instances.get('image'), Image);
 		const panel = requireInstance(result.instances.get('panel'), Rect);
 		const action = requireInstance(result.instances.get('action'), Button);
+		const soundToggle = requireInstance(
+			result.instances.get('sound-toggle'),
+			ToggleButton,
+		);
+		const loadingProgress = requireInstance(
+			result.instances.get('loading-progress'),
+			ProgressBar,
+		);
 
 		expect(root.alpha).toBe(0.9);
 		expect(root.width).toBe(640);
 		expect(root.height).toBe(360);
-		expect(root.numChildren).toBe(4);
+		expect(root.numChildren).toBe(6);
 		expect(root.getChildAt(0)).toBe(title);
 		const layout = requireInstance(root.layout, VerticalLayout);
 		expect(layout.gap).toBe(12);
@@ -117,6 +146,14 @@ describe('createKurotUI', () => {
 		expect(action.label).toBe('Continue');
 		expect(action.selected).toBe(true);
 		expect(action.toggle).toBe(true);
+		expect(soundToggle.label).toBe('Sound');
+		expect(soundToggle.selected).toBe(true);
+		expect(soundToggle.toggle).toBe(true);
+		expect(loadingProgress.direction).toBe('btt');
+		expect(loadingProgress.maximum).toBe(200);
+		expect(loadingProgress.minimum).toBe(10);
+		expect(loadingProgress.slideDuration).toBe(0);
+		expect(loadingProgress.value).toBe(125);
 	});
 
 	it('supports project components through a semantic definition and runtime adapter', () => {
@@ -157,6 +194,108 @@ describe('createKurotUI', () => {
 		expect(panel.name).toBe('Inventory');
 		expect(panel.numChildren).toBe(1);
 		expect(result.instances.get('label')).toBeInstanceOf(Label);
+	});
+
+	it('binds ToggleButton and ProgressBar appearance parts to live controls', () => {
+		const toggleAppearance = createUIDocument({
+			id: 'toggle-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.ToggleButton',
+				parts: { labelDisplay: { nodeId: 'labelDisplay' } },
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({ id: 'labelDisplay', type: 'kui.Label' }),
+				],
+			}),
+		});
+		const progressAppearance = createUIDocument({
+			id: 'progress-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.ProgressBar',
+				parts: {
+					labelDisplay: { nodeId: 'labelDisplay' },
+					thumb: { nodeId: 'thumb' },
+				},
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'thumb',
+						type: 'kui.Rect',
+						properties: { height: 30, width: 200 },
+					}),
+					createUINode({ id: 'labelDisplay', type: 'kui.Label' }),
+				],
+			}),
+		});
+		const document = createUIDocument({
+			id: 'control-preview',
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'toggle',
+						type: 'kui.ToggleButton',
+						properties: { label: 'Sound', selected: true },
+						appearance: createUIAppearanceReference(toggleAppearance.id),
+					}),
+					createUINode({
+						id: 'progress',
+						type: 'kui.ProgressBar',
+						properties: { slideDuration: 0, value: 50 },
+						appearance: createUIAppearanceReference(progressAppearance.id),
+					}),
+				],
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(toggleAppearance);
+		assets.registerAsset(progressAppearance);
+
+		const result = createKurotUI(document, { assets });
+		const toggle = requireInstance(result.instances.get('toggle'), ToggleButton);
+		const progress = requireInstance(
+			result.instances.get('progress'),
+			ProgressBar,
+		);
+		const toggleLabel = requireInstance(
+			result.instances.get('toggle@appearance:toggle-appearance/labelDisplay'),
+			Label,
+		);
+		const progressThumb = requireInstance(
+			result.instances.get('progress@appearance:progress-appearance/thumb'),
+			Rect,
+		);
+		const progressLabel = requireInstance(
+			result.instances.get(
+				'progress@appearance:progress-appearance/labelDisplay',
+			),
+			Label,
+		);
+
+		expect(toggle.labelDisplay).toBe(toggleLabel);
+		expect(toggleLabel.text).toBe('Sound');
+		expect(progress.thumb).toBe(progressThumb);
+		expect(progress.labelDisplay).toBe(progressLabel);
+		expect(progress.ratio).toBe(0.5);
+		progress.updateDisplayList(200, 30);
+		expect(progressThumb.scrollRect).toMatchObject({ width: 100, height: 30 });
+		expect(progressLabel.text).toBe('50 / 100');
+
+		const stage = new Stage();
+		stage.addChild(result.root);
+		dispatchTap(toggle);
+		expect(toggle.selected).toBe(false);
+		dispatchTap(toggle);
+		expect(toggle.selected).toBe(true);
 	});
 
 	it('materializes reusable assets and all instance-local semantics', () => {
@@ -394,6 +533,29 @@ function captureRuntimeError(operation: () => void): KurotUIRuntimeError {
 		throw error;
 	}
 	throw new Error('Expected KurotUIRuntimeError.');
+}
+
+function dispatchTap(target: ToggleButton): void {
+	TouchEvent.dispatchTouchEvent(
+		target,
+		TouchEvent.TOUCH_BEGIN,
+		true,
+		false,
+		10,
+		10,
+		1,
+		true,
+	);
+	TouchEvent.dispatchTouchEvent(
+		target,
+		TouchEvent.TOUCH_END,
+		true,
+		false,
+		10,
+		10,
+		1,
+		false,
+	);
 }
 
 function readFixture(name: string): UIDocument {

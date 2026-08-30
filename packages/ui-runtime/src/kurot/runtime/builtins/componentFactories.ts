@@ -1,12 +1,22 @@
 import type { DisplayObject } from '@kurot/core';
-import { Button, Group, Image, Label, Rect } from '@kurot/ui';
+import {
+	Button,
+	Group,
+	Image,
+	Label,
+	ProgressBar,
+	Rect,
+	ToggleButton,
+} from '@kurot/ui';
 
 const BUILT_IN_FACTORIES: Readonly<Record<string, () => DisplayObject>> = {
 	'kui.Button': () => new Button(),
 	'kui.Group': () => new Group(),
 	'kui.Image': () => new Image(),
 	'kui.Label': () => new Label(),
+	'kui.ProgressBar': () => new ProgressBar(),
 	'kui.Rect': () => new Rect(),
+	'kui.ToggleButton': () => new ToggleButton(),
 };
 
 /**

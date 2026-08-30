@@ -11,12 +11,14 @@ const result = createKurotUI(document, { assets });
 stage.addChild(result.root);
 ```
 
-The runtime supports `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and
-`kui.Button`, including their audited inherited properties, children, layout
-descriptors, and nine-slice rectangles. Reusable component assets are expanded
-with parameter bindings, variants, part overrides, and projected Slot content.
-Appearance assets become native Kurot skins and states, including the selected
-appearance variant.
+The runtime supports `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`,
+`kui.Button`, `kui.ToggleButton`, and `kui.ProgressBar`, including their audited
+inherited properties, children, layout descriptors, and nine-slice rectangles.
+ProgressBar appearances bind live thumb and label parts, so authored values
+drive the real runtime clipping and label behavior. Reusable component assets
+are expanded with parameter bindings, variants, part overrides, and projected
+Slot content. Appearance assets become native Kurot skins and states, including
+the selected appearance variant.
 
 Version 0.2 performs full-tree creation. It does not yet provide incremental
 reconciliation, bindings, actions, or transitions.

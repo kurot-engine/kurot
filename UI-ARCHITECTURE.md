@@ -131,10 +131,10 @@ reusable authoring-asset model, not the full editor or production pipeline.
   diffs, and undo/redo history;
 - explicit parameter-to-internal-property bindings.
 
-`@kurot/ui-runtime@0.2.1` currently provides:
+`@kurot/ui-runtime@0.2.2` currently provides:
 
 - validation before materialization;
-- deterministic construction of those five foundation components;
+- deterministic construction of the seven audited foundation components;
 - application of audited display, layout, text, image, rectangle, and button
   properties;
 - Basic, horizontal, vertical, and tile layout descriptors;
@@ -184,7 +184,7 @@ replace EXML in existing projects today.
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
 | Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
-| Foundation component schema | Partial | Five components are audited; the full authoring catalog and structured schemas are incomplete. |
+| Foundation component schema | Partial | Seven components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
 | Editable asset kinds and reuse | Implemented for creation and states | Screens, components, compact instances, parameter bindings, parts, Slots, component variants/states, cross-document validation, runtime expansion, and golden fixtures. |
 | Appearance, states, bindings, resources | Partial | Native appearance skins/states, selected variants, and design tokens execute at runtime; typed resources have an application resolver hook. Bindings, actions, transitions, and concrete resource adapters remain pending. |
