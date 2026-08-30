@@ -45,6 +45,27 @@ export interface KurotUIComponentAdapter {
 	) => boolean;
 
 	/**
+	 * Captures adapter-owned state before a data binding updates the property.
+	 * Provide this together with restoreProperty for non-reflective properties.
+	 */
+	readonly captureProperty?: (
+		instance: DisplayObject,
+		name: string,
+		path: string,
+	) => unknown;
+
+	/**
+	 * Restores adapter-owned state when a later binding target rejects an update.
+	 * Provide this together with captureProperty for non-reflective properties.
+	 */
+	readonly restoreProperty?: (
+		instance: DisplayObject,
+		name: string,
+		value: unknown,
+		path: string,
+	) => void;
+
+	/**
 	 * Attaches one materialized child to a project-defined container.
 	 */
 	readonly appendChild?: (

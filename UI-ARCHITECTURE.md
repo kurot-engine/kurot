@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.4.1` currently provides:
+`@kurot/ui-document@0.5.0` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -134,9 +134,13 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - typed external data fields and deterministic one-way property bindings;
 - bounded semantic `tap` and `change` actions;
 - numeric appearance-transition descriptors;
-- typed font references accepted by authored text properties.
+- typed font references accepted by authored text properties;
+- inherited component capabilities for semantic events, native appearance
+  states, and typed or required appearance parts;
+- directional binding validation across types, ranges, enums, resource
+  categories, and token categories.
 
-`@kurot/ui-runtime@0.3.0` currently provides:
+`@kurot/ui-runtime@0.4.0` currently provides:
 
 - validation before materialization;
 - deterministic construction of the nine audited foundation components,
@@ -158,6 +162,8 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - selected appearance variants applied before native state overrides;
 - per-instance reusable-component state controllers with atomic restoration;
 - runtime data controllers and bounded one-way property updates;
+- required-data enforcement and transactional multi-target binding rollback,
+  including adapter-owned non-reflective state through explicit hooks;
 - disposable semantic-action forwarding;
 - numeric native-skin state transitions;
 - category-specific font, image, sprite-frame, Spine, and animation resource

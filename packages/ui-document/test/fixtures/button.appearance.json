@@ -13,7 +13,7 @@
     },
     "slots": {},
     "states": {
-      "pressed": {
+      "down": {
         "overrides": [
           {
             "targetId": "background",

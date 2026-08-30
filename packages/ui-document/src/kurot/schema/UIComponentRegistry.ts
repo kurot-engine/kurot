@@ -1,4 +1,6 @@
 import type {
+	UIAppearancePartDefinition,
+	UIComponentEvent,
 	UIComponentDefinition,
 	UIPropertyDefinition,
 	UIResolvedComponentDefinition,
@@ -82,10 +84,14 @@ function resolveDefinition(
 	chain: readonly string[],
 ): UIResolvedComponentDefinition | undefined {
 	const cached = cache.get(type);
-	if (cached) return cached;
+	if (cached) {
+		return cached;
+	}
 
 	const definition = definitions.get(type);
-	if (!definition) return undefined;
+	if (!definition) {
+		return undefined;
+	}
 
 	const cycleStart = chain.indexOf(type);
 	if (cycleStart >= 0) {
@@ -111,6 +117,7 @@ function resolveDefinition(
 	}
 
 	const children = definition.children ?? base?.children;
+	const appearance = mergeAppearance(base?.appearance, definition.appearance);
 	const resolved: UIResolvedComponentDefinition = Object.freeze({
 		type: definition.type,
 		baseTypes: Object.freeze(base ? [...base.baseTypes, base.type] : []),
@@ -122,6 +129,8 @@ function resolveDefinition(
 			? {}
 			: { description: definition.description }),
 		...(children === undefined ? {} : { children }),
+		...(appearance === undefined ? {} : { appearance }),
+		events: mergeEvents(base?.events, definition.events),
 		properties: mergeProperties(base?.properties, definition.properties),
 		allowUnknownProperties:
 			definition.allowUnknownProperties ?? base?.allowUnknownProperties ?? false,
@@ -136,7 +145,59 @@ function compareDefinitions(a: UIComponentDefinition, b: UIComponentDefinition):
 
 function normalizeDefinition(definition: UIComponentDefinition): UIComponentDefinition {
 	const properties = normalizeProperties(definition.properties ?? {});
-	return Object.freeze({ ...definition, properties });
+	const appearance = normalizeAppearance(definition.appearance);
+	return Object.freeze({
+		...definition,
+		...(appearance === undefined ? {} : { appearance }),
+		...(definition.events === undefined
+			? {}
+			: { events: Object.freeze([...definition.events]) }),
+		properties,
+	});
+}
+
+function mergeAppearance(
+	base: UIComponentDefinition['appearance'],
+	derived: UIComponentDefinition['appearance'],
+): UIComponentDefinition['appearance'] {
+	if (derived === undefined) {
+		return base;
+	}
+	return Object.freeze({
+		parts: mergeAppearanceParts(base?.parts, derived.parts),
+		states: Object.freeze([...(derived.states ?? base?.states ?? [])]),
+	});
+}
+
+function mergeAppearanceParts(
+	base: NonNullable<UIComponentDefinition['appearance']>['parts'],
+	derived: NonNullable<UIComponentDefinition['appearance']>['parts'],
+): Readonly<Record<string, UIAppearancePartDefinition>> {
+	const entries = Object.entries({ ...base, ...derived }).sort(([a], [b]) =>
+		compareStrings(a, b),
+	);
+	return Object.freeze(Object.fromEntries(entries));
+}
+
+function mergeEvents(
+	base: readonly UIComponentEvent[] | undefined,
+	derived: UIComponentDefinition['events'],
+): readonly UIComponentEvent[] {
+	return Object.freeze(
+		[...new Set([...(base ?? []), ...(derived ?? [])])].sort(compareStrings),
+	);
+}
+
+function normalizeAppearance(
+	appearance: UIComponentDefinition['appearance'],
+): UIComponentDefinition['appearance'] {
+	if (appearance === undefined) {
+		return undefined;
+	}
+	return Object.freeze({
+		parts: mergeAppearanceParts(undefined, appearance.parts),
+		states: Object.freeze([...(appearance.states ?? [])]),
+	});
 }
 
 function mergeProperties(

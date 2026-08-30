@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.3.0`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.4.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -19,7 +19,7 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 - `CreateKurotUIOptions.assets` supplies the complete project asset, resource,
   and design-token registry. It is required when the root references assets.
 - `CreateKurotUIOptions.adapters` maps project component keys to construction,
-  property, and child-attachment hooks.
+  property, child-attachment, and optional binding rollback hooks.
 - `CreateKurotUIOptions.data` supplies initial values for root Contract fields.
 - `CreateKurotUIOptions.onAction` receives declared semantic actions.
 - `CreateKurotUIOptions.resourceAdapters` maps each registered resource
@@ -73,6 +73,12 @@ reusable component scopes currently begin from Contract defaults. Declared
 `tap` and `change` actions are forwarded through `onAction`; `dispose()` removes
 the listeners owned by the materialization.
 
+Required fields need an initial value or Schema default. A data update commits
+its controller value only after every target succeeds; failure restores applied
+targets in reverse order. Reflective properties restore automatically.
+Adapters that keep bound values outside the runtime object must implement both
+`captureProperty` and `restoreProperty`.
+
 `Image.source` is forwarded to the existing `@kurot/ui` resource mechanism.
 Appearance assets are materialized as native `Skin` instances and assigned by
 the runtime; `skinName` is not an authored component property. The package does
@@ -113,7 +119,7 @@ does not depend on a particular animation or Spine implementation.
 - Rectangle descriptors: `src/kurot/runtime/descriptors/createRectangle.ts`
 - Custom adapter contracts: `src/kurot/runtime/types.ts`
 - Browser smoke preview: `examples/preview/`
-- Runtime tests: `test/`, including the representative Phase 3 Crash screen
+- Runtime tests: `test/`, including the representative Crash-game integration
 
 ## Commands
 

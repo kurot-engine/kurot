@@ -4,6 +4,32 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.5.0] — 2026-08-31
+
+### Added
+
+- Component Schema capabilities for supported appearance states, typed native
+  appearance parts, required parts, and emitted semantic events.
+- `isUIPropertyDefinitionAssignable()` for checking complete source-to-target
+  value-domain compatibility.
+- Foundation capability metadata for native Button, ToggleButton, ProgressBar,
+  TextInput, EditableText, and inherited pointer interactions.
+
+### Changed
+
+- Data-field and component-parameter bindings now require every accepted source
+  value to satisfy the destination Schema, including numeric ranges, integer
+  constraints, enums, and resource or token categories.
+- Appearance validation now rejects unsupported target components, invalid
+  native state names, missing required parts, and incompatible part node types.
+- Semantic actions now validate their trigger against events emitted by the
+  source component type.
+- Numeric transitions are limited to appearance states and numeric override
+  values. Screen states and variants are rejected because the runtime has no
+  root screen-state controller.
+- Corrected the foundation Button conformance appearance to use the real
+  `down` state instead of the non-existent `pressed` state.
+
 ## [0.4.1] — 2026-08-31
 
 ### Changed

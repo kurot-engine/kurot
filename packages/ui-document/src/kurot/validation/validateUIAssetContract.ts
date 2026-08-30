@@ -64,6 +64,7 @@ export function validateUIAssetContract(
 
 	validateKnownKeys(value, CONTRACT_KEYS, path, diagnostics);
 	validateContractTypes(value, assetKind, path, diagnostics);
+	validateContractCapabilities(value, assetKind, path, diagnostics);
 	validateDataFields(value.dataFields, `${path}.dataFields`, diagnostics);
 	validateDataBindings(
 		value.dataBindings,
@@ -76,7 +77,13 @@ export function validateUIAssetContract(
 	validateParameters(value.parameters, `${path}.parameters`, diagnostics, nodeIds);
 	validateParts(value.parts, `${path}.parts`, diagnostics, nodeIds);
 	validateSlots(value.slots, `${path}.slots`, diagnostics, nodeIds);
-	validateUIAssetModes(value.states, `${path}.states`, diagnostics, nodeIds, true);
+	validateUIAssetModes(
+		value.states,
+		`${path}.states`,
+		diagnostics,
+		nodeIds,
+		assetKind === 'appearance',
+	);
 	validateUIAssetModes(value.variants, `${path}.variants`, diagnostics, nodeIds, false);
 }
 
@@ -232,6 +239,44 @@ function validateActions(
 			);
 		}
 	}
+}
+
+function validateContractCapabilities(
+	value: Record<string, unknown>,
+	assetKind: UIAssetKind | undefined,
+	path: string,
+	diagnostics: UIDiagnostic[],
+): void {
+	if (assetKind === 'screen') {
+		validateEmptyRecord(value.parameters, `${path}.parameters`, 'parameters', diagnostics);
+		validateEmptyRecord(value.slots, `${path}.slots`, 'Slots', diagnostics);
+		validateEmptyRecord(value.states, `${path}.states`, 'states', diagnostics);
+		validateEmptyRecord(value.variants, `${path}.variants`, 'variants', diagnostics);
+	}
+	if (assetKind === 'appearance') {
+		validateEmptyRecord(value.parameters, `${path}.parameters`, 'parameters', diagnostics);
+		validateEmptyRecord(value.slots, `${path}.slots`, 'Slots', diagnostics);
+		validateEmptyRecord(value.dataFields, `${path}.dataFields`, 'data fields', diagnostics);
+		validateEmptyRecord(value.dataBindings, `${path}.dataBindings`, 'data bindings', diagnostics);
+		validateEmptyRecord(value.actions, `${path}.actions`, 'actions', diagnostics);
+	}
+}
+
+function validateEmptyRecord(
+	value: unknown,
+	path: string,
+	label: string,
+	diagnostics: UIDiagnostic[],
+): void {
+	if (!isPlainRecord(value) || Object.keys(value).length === 0) {
+		return;
+	}
+	addUIDiagnostic(
+		diagnostics,
+		'invalid-asset-contract',
+		path,
+		`This asset kind does not support ${label}.`,
+	);
 }
 
 function validateContractTypes(

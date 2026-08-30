@@ -4,6 +4,7 @@ import {
 	createUIResourceReference,
 	createUIDocument,
 	createUINode,
+	isUIPropertyDefinitionAssignable,
 	matchesUIPropertyDefinition,
 	UIComponentRegistry,
 	validateUIDocumentComponents,
@@ -67,6 +68,39 @@ describe('component property schema', () => {
 			'$.root.properties.count',
 			'$.root.properties.offset',
 		]);
+	});
+
+	it('requires the complete source domain to fit a binding target', () => {
+		expect(
+			isUIPropertyDefinitionAssignable(
+				{ valueType: 'number', minimum: 0, maximum: 1 },
+				{ valueType: 'number', minimum: 0, maximum: 1 },
+			),
+		).toBe(true);
+		expect(
+			isUIPropertyDefinitionAssignable(
+				{ valueType: 'number' },
+				{ valueType: 'number', minimum: 0, maximum: 1 },
+			),
+		).toBe(false);
+		expect(
+			isUIPropertyDefinitionAssignable(
+				{
+					valueType: 'resource-reference',
+					resourceTypes: ['font'],
+				},
+				{
+					valueType: 'resource-reference',
+					resourceTypes: ['image', 'sprite-frame'],
+				},
+			),
+		).toBe(false);
+		expect(
+			isUIPropertyDefinitionAssignable(
+				{ valueType: 'string', enumValues: ['left', 'right'] },
+				{ valueType: 'string', enumValues: ['left', 'right', 'center'] },
+			),
+		).toBe(true);
 	});
 
 	it('keeps structured objects and exact semantic references distinct', () => {

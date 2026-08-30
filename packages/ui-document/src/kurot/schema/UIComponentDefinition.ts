@@ -28,6 +28,41 @@ export type UIPropertyFormat =
 export type UIChildrenPolicy = 'multiple' | 'none' | 'single';
 
 /**
+ * Bounded interaction event that a component can expose to semantic actions.
+ */
+export type UIComponentEvent = 'change' | 'tap';
+
+/**
+ * One named runtime part accepted by a component appearance.
+ */
+export interface UIAppearancePartDefinition {
+	/**
+	 * Whether every appearance for the component must publish this part.
+	 */
+	readonly required?: boolean;
+
+	/**
+	 * Component type required for the authored part node.
+	 */
+	readonly type?: string;
+}
+
+/**
+ * Appearance capabilities exposed by one runtime component type.
+ */
+export interface UIAppearanceDefinition {
+	/**
+	 * Named runtime parts that an appearance may publish.
+	 */
+	readonly parts?: Readonly<Record<string, UIAppearancePartDefinition>>;
+
+	/**
+	 * Exact native view-state names that an appearance may define.
+	 */
+	readonly states?: readonly string[];
+}
+
+/**
  * Semantic description of one public component property.
  */
 export interface UIPropertyDefinition {
@@ -122,6 +157,16 @@ export interface UIComponentDefinition {
 	readonly children?: UIChildrenPolicy;
 
 	/**
+	 * Appearance states and parts supported by this component.
+	 */
+	readonly appearance?: UIAppearanceDefinition;
+
+	/**
+	 * Semantic interaction events emitted by this component.
+	 */
+	readonly events?: readonly UIComponentEvent[];
+
+	/**
 	 * Known public properties keyed by their exact document names.
 	 */
 	readonly properties?: Readonly<Record<string, UIPropertyDefinition>>;
@@ -166,6 +211,16 @@ export interface UIResolvedComponentDefinition {
 	 * Effective child policy inherited from the nearest defining ancestor.
 	 */
 	readonly children?: UIChildrenPolicy;
+
+	/**
+	 * Effective appearance capabilities inherited from the component hierarchy.
+	 */
+	readonly appearance?: UIAppearanceDefinition;
+
+	/**
+	 * Effective semantic interaction events inherited from all ancestors.
+	 */
+	readonly events: readonly UIComponentEvent[];
 
 	/**
 	 * Effective properties after applying base-to-derived overrides.

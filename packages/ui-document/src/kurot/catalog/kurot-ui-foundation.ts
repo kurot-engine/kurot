@@ -23,6 +23,7 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		abstract: true,
 		displayName: 'Display Object',
 		description: 'Shared semantic base for visual objects in Kurot UI documents.',
+		events: ['tap'],
 		properties: DISPLAY_OBJECT_PROPERTIES,
 		allowUnknownProperties: false,
 	},
@@ -40,6 +41,9 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		abstract: true,
 		displayName: 'Component',
 		description: 'Semantic base for skinnable Kurot UI controls.',
+		appearance: {
+			states: ['disabled'],
+		},
 		properties: COMPONENT_PROPERTIES,
 	},
 	{
@@ -64,6 +68,7 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		displayName: 'Editable Text',
 		description: 'Low-level editable text display used primarily as a TextInput appearance part.',
 		children: 'none',
+		events: ['change'],
 		properties: EDITABLE_TEXT_PROPERTIES,
 	},
 	{
@@ -88,6 +93,21 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		displayName: 'Button',
 		description: 'Interactive skinnable button with label, icon, and view states.',
 		children: 'none',
+		appearance: {
+			parts: {
+				iconDisplay: { type: 'kui.Image' },
+				labelDisplay: { type: 'kui.Label' },
+			},
+			states: [
+				'disabled',
+				'disabledAndSelected',
+				'down',
+				'downAndSelected',
+				'up',
+				'upAndSelected',
+			],
+		},
+		events: ['change'],
 		properties: BUTTON_PROPERTIES,
 	},
 	{
@@ -104,6 +124,14 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		displayName: 'Progress Bar',
 		description: 'Skinnable visual indicator for a bounded numeric value.',
 		children: 'none',
+		appearance: {
+			parts: {
+				labelDisplay: { type: 'kui.Label' },
+				thumb: { required: true, type: 'kui.Component' },
+			},
+			states: ['disabled'],
+		},
+		events: ['change'],
 		properties: PROGRESS_BAR_PROPERTIES,
 	},
 	{
@@ -112,6 +140,19 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		displayName: 'Text Input',
 		description: 'Skinnable single-line text entry control with prompt support.',
 		children: 'none',
+		appearance: {
+			parts: {
+				promptDisplay: { type: 'kui.Label' },
+				textDisplay: { required: true, type: 'kui.EditableText' },
+			},
+			states: [
+				'disabled',
+				'disabledWithPrompt',
+				'normal',
+				'normalWithPrompt',
+			],
+		},
+		events: ['change'],
 		properties: TEXT_INPUT_PROPERTIES,
 	},
 ];

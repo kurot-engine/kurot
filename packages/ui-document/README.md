@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.4.x).** The reusable authoring model and headless
+> **Early development (0.5.x).** The reusable authoring model and headless
 > editing kernel are implemented, but the schema remains pre-1.0 and is not yet
 > a production file format.
 
@@ -60,7 +60,7 @@ the corresponding `@kurot/ui` class.
   runtime-neutral states, and authoring variants;
 - typed external data fields, named one-way property bindings, and bounded
   semantic actions;
-- optional numeric transitions on state property overrides;
+- optional numeric transitions on appearance-state property overrides;
 - compact reusable instances containing an asset reference and only their
   parameter values, variant, part overrides, and projected Slot content;
 - typed project resource and design-token references;
@@ -75,9 +75,10 @@ the corresponding `@kurot/ui` class.
 - validated JSON parsing and deterministic serialization with sorted property
   keys;
 - runtime-independent component definitions and an isolated component registry;
+- inherited appearance-state, native-part, and emitted-event capabilities;
 - abstract base definitions, single-parent inheritance, deterministic schema
   resolution, and derived property overrides;
-- optional validation of registered component types, known property categories,
+- validation of registered component types, known property categories,
   required properties, child policies, and abstract types;
 - union-valued properties, enum values, numeric ranges, integer constraints,
   serializable defaults, editor-facing semantic formats, and accepted resource
@@ -230,6 +231,12 @@ States and variants live in asset contracts rather than untyped component
 properties. Compatibility-shaped `currentState`, `skinName`, and
 `hostComponentKey` are not canonical authoring fields.
 
+Component Schemas also declare whether a type accepts an appearance, the exact
+native states that appearance may define, required typed parts, and semantic
+events available to actions. Binding compatibility is directional: the entire
+source value domain must fit the destination rather than merely sharing one
+possible type.
+
 See [Architecture](./docs/architecture.md) for the current contracts and
 package boundaries.
 
@@ -247,7 +254,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.3.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.4.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition

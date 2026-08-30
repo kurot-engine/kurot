@@ -15,8 +15,8 @@ importers:
         specifier: ^1.1.7
         version: 1.1.7(@kurot/core@1.0.15)
       '@kurot/ui-document':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.5.0
+        version: 0.5.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -41,8 +41,8 @@ packages:
   '@kurot/core@1.0.15':
     resolution: {integrity: sha512-X7Z0D7xoepkDre1MP5UpUWlT0bsznwbHBmCZzRvK4myaqMDYzET3hxWyqFU6CH4sU6OcPTKoMA1wJXY6HJ5N0Q==}
 
-  '@kurot/ui-document@0.4.0':
-    resolution: {integrity: sha512-5gLxmYDANM2oBNd7Alw/4xDMy21cqe4pBUq2injoJ7sRTMnXdEiYFx6aVFqr7pJRFFhwBttS7E9+nXI/fnUdpg==}
+  '@kurot/ui-document@0.5.0':
+    resolution: {integrity: sha512-O1ez8LIsJhjPiCL78EEPxYmTPiVuw0iNpbU41C3snF3cVXCDENElSqJTMeu3/mhGftuE6HSqtjipunr8XLA6IQ==}
 
   '@kurot/ui@1.1.7':
     resolution: {integrity: sha512-6nuMCuuiCXqx5U1tcBUqP0vMHPEA968U3CaAquLBtMWxU5yvDUVw1Itl9ZNJCS+MH/GfbfHFrYyaQfn99RLF8w==}
@@ -504,7 +504,7 @@ snapshots:
 
   '@kurot/core@1.0.15': {}
 
-  '@kurot/ui-document@0.4.0': {}
+  '@kurot/ui-document@0.5.0': {}
 
   '@kurot/ui@1.1.7(@kurot/core@1.0.15)':
     dependencies:

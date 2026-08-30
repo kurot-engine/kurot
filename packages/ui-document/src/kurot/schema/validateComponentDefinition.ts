@@ -7,6 +7,8 @@ import {
 	UI_RESOURCE_TYPES,
 } from '../model/UIReference.js';
 import type {
+	UIAppearanceDefinition,
+	UIComponentEvent,
 	UIChildrenPolicy,
 	UIComponentDefinition,
 	UIPropertyDefinition,
@@ -15,6 +17,7 @@ import type {
 } from './UIComponentDefinition.js';
 
 const CHILDREN_POLICIES = new Set<UIChildrenPolicy>(['multiple', 'none', 'single']);
+const COMPONENT_EVENTS = new Set<UIComponentEvent>(['change', 'tap']);
 const PROPERTY_VALUE_TYPES = new Set<UIPropertyValueType>([
 	'array',
 	'asset-reference',
@@ -56,6 +59,8 @@ export function validateComponentDefinition(definition: UIComponentDefinition): 
 	if (definition.children !== undefined && !CHILDREN_POLICIES.has(definition.children)) {
 		throw new Error(`Unsupported child policy "${String(definition.children)}".`);
 	}
+	validateAppearanceDefinition(definition.appearance);
+	validateComponentEvents(definition.events);
 	if (
 		definition.allowUnknownProperties !== undefined &&
 		typeof definition.allowUnknownProperties !== 'boolean'
@@ -66,6 +71,72 @@ export function validateComponentDefinition(definition: UIComponentDefinition): 
 	for (const [name, property] of Object.entries(definition.properties ?? {})) {
 		assertNonEmpty(name, 'Component property name');
 		validatePropertyDefinition(name, property);
+	}
+}
+
+function validateAppearanceDefinition(
+	appearance: UIAppearanceDefinition | undefined,
+): void {
+	if (appearance === undefined) {
+		return;
+	}
+	if (typeof appearance !== 'object' || appearance === null || Array.isArray(appearance)) {
+		throw new Error('Component appearance definition must be an object.');
+	}
+	if (appearance.states !== undefined && !Array.isArray(appearance.states)) {
+		throw new Error('Component appearance states must be an array.');
+	}
+	if (
+		appearance.parts !== undefined &&
+		(typeof appearance.parts !== 'object' ||
+			appearance.parts === null ||
+			Array.isArray(appearance.parts))
+	) {
+		throw new Error('Component appearance parts must be an object.');
+	}
+	const states = appearance.states ?? [];
+	validateUniqueNames(states, 'Appearance state');
+	for (const [name, part] of Object.entries(appearance.parts ?? {})) {
+		assertNonEmpty(name, 'Appearance part name');
+		if (typeof part !== 'object' || part === null || Array.isArray(part)) {
+			throw new Error(`Appearance part "${name}" must be an object.`);
+		}
+		if (part.required !== undefined && typeof part.required !== 'boolean') {
+			throw new Error(`Appearance part "${name}" required flag must be a boolean.`);
+		}
+		if (part.type !== undefined) {
+			assertNonEmpty(part.type, `Appearance part "${name}" type`);
+		}
+	}
+}
+
+function validateComponentEvents(events: readonly UIComponentEvent[] | undefined): void {
+	if (events === undefined) {
+		return;
+	}
+	if (!Array.isArray(events)) {
+		throw new Error('Component events must be an array.');
+	}
+	const uniqueEvents = new Set<UIComponentEvent>();
+	for (const event of events) {
+		if (!COMPONENT_EVENTS.has(event)) {
+			throw new Error(`Unsupported component event "${String(event)}".`);
+		}
+		if (uniqueEvents.has(event)) {
+			throw new Error(`Component contains duplicate event "${event}".`);
+		}
+		uniqueEvents.add(event);
+	}
+}
+
+function validateUniqueNames(values: readonly string[], label: string): void {
+	const names = new Set<string>();
+	for (const value of values) {
+		assertNonEmpty(value, label);
+		if (names.has(value)) {
+			throw new Error(`${label} "${value}" is duplicated.`);
+		}
+		names.add(value);
 	}
 }
 

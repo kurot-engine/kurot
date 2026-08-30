@@ -21,7 +21,7 @@ beforeAll(() => {
 	} as unknown as CanvasRenderingContext2D);
 });
 
-describe('Phase 3 crash-game slice', () => {
+describe('crash-game integration', () => {
 	it('materializes a data-driven screen with resources, actions, and transitions', () => {
 		const buttonAppearance = createCrashButtonAppearance();
 		const document = createCrashScreen(buttonAppearance.id);
@@ -76,7 +76,7 @@ describe('Phase 3 crash-game slice', () => {
 
 		const stage = new Stage();
 		stage.addChild(root);
-		bet.currentState = 'pressed';
+		bet.currentState = 'down';
 		bet.validateNow();
 		const betBackground = requireInstance(
 			result.instances.get(
@@ -216,7 +216,7 @@ function createCrashButtonAppearance(): UIDocument {
 				labelDisplay: { nodeId: 'labelDisplay' },
 			},
 			states: {
-				pressed: {
+				down: {
 					overrides: [{
 						targetId: 'background',
 						property: 'alpha',

@@ -28,21 +28,6 @@ describe('Phase 3 visual semantics', () => {
 				actions: {
 					betRequested: { sourceId: 'primary-action', trigger: 'tap' },
 				},
-				states: {
-					running: {
-						overrides: [
-							{
-								targetId: 'multiplier',
-								property: 'alpha',
-								value: 1,
-								transition: {
-									duration: 180,
-									easing: 'ease-out',
-								},
-							},
-						],
-					},
-				},
 			}),
 			root: createUINode({
 				id: 'root',
@@ -53,11 +38,31 @@ describe('Phase 3 visual semantics', () => {
 				],
 			}),
 		});
+		const appearance = createUIDocument({
+			id: 'primary-action-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				states: {
+					down: {
+						overrides: [{
+							targetId: 'background',
+							property: 'alpha',
+							value: 0.8,
+							transition: { duration: 180, easing: 'ease-out' },
+						}],
+					},
+				},
+			}),
+			root: createUINode({ id: 'background', type: 'kui.Rect' }),
+		});
 		const assets = new UIAssetRegistry();
 		assets.registerAsset(document);
+		assets.registerAsset(appearance);
 
 		expect(validateUIAssetRegistry(assets)).toEqual([]);
 		expect(parseUIDocument(serializeUIDocument(document))).toEqual(document);
+		expect(parseUIDocument(serializeUIDocument(appearance))).toEqual(appearance);
 	});
 
 	it('edits action contracts with an exact inverse', () => {
@@ -86,8 +91,16 @@ describe('Phase 3 visual semantics', () => {
 				dataBindings: {
 					amount: { source: 'amount', targetId: 'label', property: 'text' },
 				},
+			}),
+			root: createUINode({ id: 'label', type: 'kui.Label' }),
+		});
+		const appearance = createUIDocument({
+			id: 'invalid-transition',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
 				states: {
-					active: {
+					down: {
 						overrides: [{
 							targetId: 'label',
 							property: 'text',
@@ -101,13 +114,75 @@ describe('Phase 3 visual semantics', () => {
 		});
 		const assets = new UIAssetRegistry();
 		assets.registerAsset(document);
+		assets.registerAsset(appearance);
 		const diagnostics = validateUIAssetRegistry(assets);
 
 		expect(diagnostics.map(item => item.path)).toContain(
 			'$.assets["invalid-semantics"].contract.dataBindings.amount.source',
 		);
 		expect(diagnostics.map(item => item.path)).toContain(
-			'$.assets["invalid-semantics"].contract.states.active.overrides[0].transition',
+			'$.assets["invalid-transition"].contract.states.down.overrides[0].transition',
+		);
+	});
+
+	it('rejects unsupported actions, resource bindings, states, and required parts', () => {
+		const screen = createUIDocument({
+			id: 'invalid-capabilities',
+			contract: createUIAssetContract({
+				dataFields: {
+					font: {
+						valueType: 'resource-reference',
+						resourceTypes: ['font'],
+					},
+				},
+				dataBindings: {
+					image: { source: 'font', targetId: 'image', property: 'source' },
+				},
+				actions: {
+					changed: { sourceId: 'label', trigger: 'change' },
+				},
+			}),
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				children: [
+					createUINode({ id: 'label', type: 'kui.Label' }),
+					createUINode({ id: 'image', type: 'kui.Image' }),
+				],
+			}),
+		});
+		const buttonAppearance = createUIDocument({
+			id: 'invalid-button-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				states: { pressed: { overrides: [] } },
+			}),
+			root: createUINode({ id: 'root', type: 'kui.Group' }),
+		});
+		const textInputAppearance = createUIDocument({
+			id: 'invalid-text-input-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({ targetType: 'kui.TextInput' }),
+			root: createUINode({ id: 'root', type: 'kui.Group' }),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(screen);
+		assets.registerAsset(buttonAppearance);
+		assets.registerAsset(textInputAppearance);
+
+		const paths = validateUIAssetRegistry(assets).map(item => item.path);
+		expect(paths).toContain(
+			'$.assets["invalid-capabilities"].contract.dataBindings.image.source',
+		);
+		expect(paths).toContain(
+			'$.assets["invalid-capabilities"].contract.actions.changed.trigger',
+		);
+		expect(paths).toContain(
+			'$.assets["invalid-button-appearance"].contract.states.pressed',
+		);
+		expect(paths).toContain(
+			'$.assets["invalid-text-input-appearance"].contract.parts.textDisplay',
 		);
 	});
 });

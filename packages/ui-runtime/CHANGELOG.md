@@ -4,6 +4,30 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.4.0] — 2026-08-31
+
+### Added
+
+- Optional component-adapter property snapshot and restoration hooks for
+  transactional data bindings backed by non-reflective state.
+- Regression coverage for required initial data, failed multi-target binding
+  rollback, and non-zero native appearance transitions.
+
+### Changed
+
+- Upgraded the `@kurot/ui-document` contract to `^0.5.0`, enabling component
+  capability validation for semantic events, appearance states, and skin
+  parts before materialization.
+- Required Contract data fields must now have an explicit initial value or a
+  Schema default.
+- Data controllers commit a new value only after every binding succeeds. A
+  failed target restores earlier targets in reverse order and leaves the
+  controller value unchanged.
+- Split dynamic Contract and appearance-transition integration tests out of
+  the general materialization suite.
+- Corrected Button transition fixtures to use the native `down` state instead
+  of the non-existent `pressed` state.
+
 ## [0.3.0] — 2026-08-31
 
 ### Added

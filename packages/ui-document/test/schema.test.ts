@@ -102,6 +102,39 @@ describe('UIComponentRegistry', () => {
 		]);
 	});
 
+	it('inherits semantic events and merges appearance capabilities', () => {
+		const registry = new UIComponentRegistry();
+		registry.register({
+			type: 'test.Base',
+			abstract: true,
+			events: ['tap'],
+			appearance: {
+				parts: { labelDisplay: { type: 'test.Label' } },
+				states: ['normal', 'disabled'],
+			},
+		});
+		registry.register({
+			type: 'test.Control',
+			extends: 'test.Base',
+			events: ['change'],
+			appearance: {
+				parts: { iconDisplay: { type: 'test.Image' } },
+				states: ['up', 'down'],
+			},
+		});
+
+		expect(registry.resolve('test.Control')).toMatchObject({
+			events: ['change', 'tap'],
+			appearance: {
+				parts: {
+					iconDisplay: { type: 'test.Image' },
+					labelDisplay: { type: 'test.Label' },
+				},
+				states: ['up', 'down'],
+			},
+		});
+	});
+
 	it('produces the same resolution regardless of registration order', () => {
 		const forward = new UIComponentRegistry();
 		forward.register({

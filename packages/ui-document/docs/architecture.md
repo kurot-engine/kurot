@@ -109,7 +109,15 @@ formats must translate losslessly to this model.
 `UIComponentRegistry` describes runtime component capabilities without
 importing `@kurot/ui`. Definitions support inheritance, child policies,
 primitive and structured property categories, numeric and enum constraints,
-and explicit asset/resource/token-reference categories.
+explicit asset/resource/token-reference categories, emitted semantic events,
+and optional appearance capabilities. Appearance capabilities enumerate native
+state names and typed or required skin parts so invalid authoring contracts fail
+before runtime materialization.
+
+Binding compatibility is directional. A data field or component parameter is
+compatible only when its complete accepted value domain fits the target
+property, including numeric ranges, integer and enum restrictions, and resource
+or token categories. Sharing one possible primitive type is insufficient.
 
 Resource and token properties can further declare accepted categories. For
 example, `kui.Image.source` accepts typed image or sprite-frame references,
@@ -131,7 +139,7 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.3.x` consumes format version 2 and passes the shared
+`@kurot/ui-runtime@0.4.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, executes bounded data bindings and semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected

@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.4.1`. This is a headless,
+Package identity: `@kurot/ui-document@0.5.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -37,8 +37,10 @@ src/
   target stable node IDs in the defining asset.
 - Contracts may declare typed external data fields, named one-way bindings to
   node properties, and semantic actions triggered by `tap` or `change`.
-- State overrides may define bounded numeric transitions with duration, delay,
-  and a deterministic easing curve. Variants cannot contain transitions.
+- Appearance-state overrides may define bounded numeric transitions with
+  duration, delay, and a deterministic easing curve. Component and screen
+  states cannot contain transitions; screen states and variants are currently
+  unsupported because no root state controller consumes them.
 - Component parameters may bind explicitly to internal node properties; binding
   records contain stable target IDs and property names, never expressions.
 - A node has `id`, `type`, `properties`, optional `instance`, optional
@@ -79,6 +81,11 @@ src/
   `asset-reference`, `resource-reference`, and `token-reference` categories.
 - `resourceTypes` and `tokenTypes` further constrain which reference categories
   a property accepts.
+- Component definitions declare inherited semantic events and optional
+  appearance capabilities: exact native states plus typed or required parts.
+- Parameter and data bindings are directional. Every value accepted by the
+  source Schema must satisfy the target Schema, including range, enum,
+  integer, resource-category, and token-category constraints.
 - Schema inheritance is single-parent through `extends`; resolution is
   deterministic and detects missing bases and cycles.
 - The foundation catalog contains abstract `kurot.DisplayObject`,
@@ -118,7 +125,8 @@ src/
 - Serialization: `parseUIDocument`, `serializeUIDocument`, parse and validation
   error classes.
 - Schema: component/property definitions, `UIComponentRegistry`, resolution
-  errors, `matchesUIPropertyDefinition`, and component-aware validation.
+  errors, `matchesUIPropertyDefinition`,
+  `isUIPropertyDefinitionAssignable`, and component-aware validation.
 - Catalog: `createKurotUIFoundationRegistry`,
   `registerKurotUIFoundation`.
 - Project assets: `UIAssetRegistry`, project resource/token definitions, and
@@ -130,7 +138,7 @@ src/
 ## 5. Important limitations
 
 - Migrations and a final human-facing `.kui` syntax are not implemented.
-- `@kurot/ui-runtime@0.3.x` consumes format version 2 and executes the current
+- `@kurot/ui-runtime@0.4.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent

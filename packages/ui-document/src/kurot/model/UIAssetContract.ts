@@ -1,4 +1,5 @@
 import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
+import type { UIComponentEvent } from '../schema/UIComponentDefinition.js';
 import type { UIPropertyValue } from './UIPropertyValue.js';
 
 /**
@@ -99,7 +100,7 @@ export interface UIDataBindingDefinition {
 /**
  * Runtime-neutral trigger that emits one semantic action.
  */
-export type UISemanticActionTrigger = 'change' | 'tap';
+export type UISemanticActionTrigger = UIComponentEvent;
 
 /**
  * Public semantic action emitted from one node interaction.

@@ -4,11 +4,13 @@ import type {
 	UIPropertyOverride,
 } from '../model/UIAssetContract.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import { isUIDesignTokenReference } from '../model/UIReference.js';
 import type { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
 import type {
 	UIPropertyDefinition,
 	UIPropertyValueType,
 } from '../schema/UIComponentDefinition.js';
+import { isUIPropertyDefinitionAssignable } from '../schema/isUIPropertyDefinitionAssignable.js';
 import { matchesUIPropertyDefinition } from '../schema/matchesUIPropertyDefinition.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { addUIDiagnostic } from '../validation/validationHelpers.js';
@@ -23,6 +25,8 @@ export function validateUIAssetOverrides(
 	const diagnostics: UIDiagnostic[] = [];
 	validateParameterBindings(document, components, diagnostics);
 	validateDataBindings(document, components, diagnostics);
+	validateActions(document, components, diagnostics);
+	validateAppearanceContract(document, components, diagnostics);
 	validateModes(document, 'states', components, diagnostics);
 	validateModes(document, 'variants', components, diagnostics);
 	return diagnostics;
@@ -62,21 +66,15 @@ function validateDataBinding(
 		return;
 	}
 	const sourceProperty = document.contract.dataFields?.[binding.source];
-	if (!sourceProperty || propertyTypesOverlap(sourceProperty, targetProperty)) return;
+	if (!sourceProperty || isUIPropertyDefinitionAssignable(sourceProperty, targetProperty)) {
+		return;
+	}
 	addUIDiagnostic(
 		diagnostics,
 		'invalid-component-property',
 		`${path}.source`,
 		`Data field "${binding.source}" is not compatible with ${target.type}.${binding.property}.`,
 	);
-}
-
-function propertyTypesOverlap(
-	source: UIPropertyDefinition,
-	target: UIPropertyDefinition,
-): boolean {
-	const sourceTypes = new Set(toValueTypes(source.valueType));
-	return toValueTypes(target.valueType).some(type => sourceTypes.has(type));
 }
 
 function toValueTypes(
@@ -95,14 +93,31 @@ function validateParameterBindings(
 		for (let index = 0; index < bindings.length; index++) {
 			const binding = bindings[index]!;
 			const target = findUINode(document.root, binding.targetId);
-			if (!target) continue;
+			if (!target) {
+				continue;
+			}
 			const definition = components.resolve(target.type);
-			if (!definition || definition.properties[binding.property]) continue;
+			if (!definition) {
+				continue;
+			}
+			const targetProperty = definition.properties[binding.property];
+			if (!targetProperty) {
+				addUIDiagnostic(
+					diagnostics,
+					'unknown-component-property',
+					`$.contract.parameters.${name}.bindings[${index}].property`,
+					`Property "${binding.property}" is not defined for ${target.type}.`,
+				);
+				continue;
+			}
+			if (isUIPropertyDefinitionAssignable(parameter, targetProperty)) {
+				continue;
+			}
 			addUIDiagnostic(
 				diagnostics,
-				'unknown-component-property',
-				`$.contract.parameters.${name}.bindings[${index}].property`,
-				`Property "${binding.property}" is not defined for ${target.type}.`,
+				'invalid-component-property',
+				`$.contract.parameters.${name}.bindings[${index}]`,
+				`Parameter "${name}" is not compatible with ${target.type}.${binding.property}.`,
 			);
 		}
 	}
@@ -132,7 +147,10 @@ function validateUIPropertyOverride(
 		);
 		return;
 	}
-	if (override.transition && !supportsNumericTransition(property)) {
+	if (
+		override.transition &&
+		(!supportsNumericTransition(property) || !isNumericTransitionValue(override.value))
+	) {
 		addUIDiagnostic(
 			diagnostics,
 			'invalid-component-property',
@@ -151,6 +169,105 @@ function validateUIPropertyOverride(
 
 function supportsNumericTransition(property: UIPropertyDefinition): boolean {
 	return toValueTypes(property.valueType).includes('number');
+}
+
+function isNumericTransitionValue(
+	value: UIPropertyOverride['value'],
+): boolean {
+	if (typeof value === 'number') {
+		return true;
+	}
+	return (
+		isUIDesignTokenReference(value) &&
+		(value.tokenType === 'color' ||
+			value.tokenType === 'number' ||
+			value.tokenType === 'spacing')
+	);
+}
+
+function validateActions(
+	document: UIDocument,
+	components: UIComponentRegistry,
+	diagnostics: UIDiagnostic[],
+): void {
+	for (const [name, action] of Object.entries(document.contract.actions ?? {})) {
+		const source = findUINode(document.root, action.sourceId);
+		if (!source) {
+			continue;
+		}
+		const definition = components.resolve(source.type);
+		if (!definition || definition.events.includes(action.trigger)) {
+			continue;
+		}
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-asset-contract',
+			`$.contract.actions.${name}.trigger`,
+			`${source.type} does not emit the "${action.trigger}" semantic event.`,
+		);
+	}
+}
+
+function validateAppearanceContract(
+	document: UIDocument,
+	components: UIComponentRegistry,
+	diagnostics: UIDiagnostic[],
+): void {
+	if (document.assetKind !== 'appearance' || !document.contract.targetType) {
+		return;
+	}
+	const target = components.resolve(document.contract.targetType);
+	if (!target || !target.appearance) {
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-component-source',
+			'$.contract.targetType',
+			`${document.contract.targetType} does not support appearance assets.`,
+		);
+		return;
+	}
+	for (const state of Object.keys(document.contract.states)) {
+		if (target.appearance.states?.includes(state)) {
+			continue;
+		}
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-asset-contract',
+			`$.contract.states.${state}`,
+			`State "${state}" is not supported by ${document.contract.targetType}.`,
+		);
+	}
+	for (const [name, part] of Object.entries(target.appearance.parts ?? {})) {
+		const authoredPart = document.contract.parts[name];
+		if (!authoredPart) {
+			if (part.required) {
+				addUIDiagnostic(
+					diagnostics,
+					'invalid-asset-contract',
+					`$.contract.parts.${name}`,
+					`Appearance for ${document.contract.targetType} requires part "${name}".`,
+				);
+			}
+			continue;
+		}
+		if (!part.type) {
+			continue;
+		}
+		const node = findUINode(document.root, authoredPart.nodeId);
+		if (!node) {
+			continue;
+		}
+		const nodeType = components.resolve(node.type);
+		if (nodeType && (nodeType.type === part.type || nodeType.baseTypes.includes(part.type))) {
+			continue;
+		}
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-component-source',
+			`$.contract.parts.${name}.nodeId`,
+			`Part "${name}" must use ${part.type} or one of its derived types.`,
+		);
+	}
 }
 
 function validateModes(

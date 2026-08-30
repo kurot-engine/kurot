@@ -22,7 +22,8 @@ bindings, variants, part overrides, and projected Slot content. Appearance
 assets become native Kurot skins and states, including the selected appearance
 variant.
 
-Version 0.3 completes the first bounded visual-semantics slice. Contract data
+Version 0.4 completes the first bounded visual-semantics slice with component
+capability validation and transactional data updates. Contract data
 fields drive declared one-way property bindings, semantic actions expose
 declared `tap` and `change` events, and numeric appearance overrides may use
 bounded transitions. The package still performs full-tree creation; incremental
@@ -42,6 +43,13 @@ state?.clearState();
 result.data.setValue('balanceText', '$1,250.00');
 result.dispose();
 ```
+
+Required data fields must receive an initial value or declare a Schema default.
+A later `setValue()` commits only after every binding target succeeds; failure
+restores earlier targets and leaves the controller value unchanged. Built-in
+and ordinary reflective properties are restored automatically. A custom
+adapter that stores bound state outside its runtime object must provide the
+paired `captureProperty` and `restoreProperty` hooks.
 
 Reusable-component state controllers apply Contract state overrides at runtime
 and restore the exact pre-state values when cleared. Controllers are isolated
