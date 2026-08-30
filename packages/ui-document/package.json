@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui-document",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"description": "Headless semantic document model for Kurot UI tooling, editors, CLI workflows, and AI agents",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

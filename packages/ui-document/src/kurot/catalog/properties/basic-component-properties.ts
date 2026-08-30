@@ -1,5 +1,22 @@
 import type { UIPropertyDefinition } from '../../schema/UIComponentDefinition.js';
 
+const TEXT_CONTENT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	displayAsPassword: booleanProperty(false, 'Whether text is rendered as password glyphs.'),
+	maxChars: {
+		valueType: 'number',
+		minimum: 0,
+		integer: true,
+		defaultValue: 0,
+		description: 'Maximum character count; zero means no limit.',
+	},
+	text: {
+		valueType: 'string',
+		defaultValue: '',
+		description: 'Plain text content; newline characters create hard line breaks.',
+	},
+	textColor: colorProperty(0xffffff, 'Text fill RGB color.'),
+};
+
 /**
  * Authoring properties declared directly by Group.
  */
@@ -35,8 +52,8 @@ export const GROUP_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
  * Authoring properties declared directly by Label.
  */
 export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	...TEXT_CONTENT_PROPERTIES,
 	bold: booleanProperty(false, 'Whether the text uses a bold font weight.'),
-	displayAsPassword: booleanProperty(false, 'Whether text is rendered as password glyphs.'),
 	fontFamily: {
 		valueType: 'string',
 		defaultValue: 'Arial',
@@ -47,13 +64,6 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		valueType: 'number',
 		defaultValue: 0,
 		description: 'Additional spacing in pixels between text lines.',
-	},
-	maxChars: {
-		valueType: 'number',
-		minimum: 0,
-		integer: true,
-		defaultValue: 0,
-		description: 'Maximum character count; zero means no limit.',
 	},
 	multiline: booleanProperty(false, 'Whether the label permits multiple rendered lines.'),
 	size: {
@@ -69,18 +79,12 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		description: 'Text outline thickness in pixels.',
 	},
 	strokeColor: colorProperty(0x000000, 'Text outline RGB color.'),
-	text: {
-		valueType: 'string',
-		defaultValue: '',
-		description: 'Plain text displayed by the label; newline characters create hard line breaks.',
-	},
 	textAlign: {
 		valueType: 'string',
 		enumValues: ['left', 'right', 'center', 'justify', 'contentJustify'],
 		defaultValue: 'left',
 		description: 'Horizontal alignment within the label bounds.',
 	},
-	textColor: colorProperty(0xffffff, 'Text fill RGB color.'),
 	verticalAlign: {
 		valueType: 'string',
 		enumValues: ['top', 'bottom', 'middle', 'justify', 'contentJustify'],
@@ -88,6 +92,29 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		description: 'Vertical alignment within the label bounds.',
 	},
 	wordWrap: booleanProperty(false, 'Whether text wraps at the available width.'),
+};
+
+/**
+ * Authoring properties declared directly by TextInput.
+ */
+export const TEXT_INPUT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	...TEXT_CONTENT_PROPERTIES,
+	inputType: {
+		valueType: 'string',
+		enumValues: ['text'],
+		defaultValue: 'text',
+		description: 'Current native input type; only plain text is authored in this phase.',
+	},
+	prompt: {
+		valueType: 'string',
+		defaultValue: '',
+		description: 'Placeholder text shown while the control is empty and unfocused.',
+	},
+	restrict: {
+		valueType: 'string',
+		defaultValue: '',
+		description: 'Egret-compatible character inclusion or exclusion pattern.',
+	},
 };
 
 /**

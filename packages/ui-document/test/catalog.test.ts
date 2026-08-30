@@ -21,6 +21,7 @@ describe('Kurot UI foundation catalog', () => {
 			'kui.Label',
 			'kui.ProgressBar',
 			'kui.Rect',
+			'kui.TextInput',
 			'kui.ToggleButton',
 			'kui.UIComponent',
 			'kurot.DisplayObject',
@@ -35,6 +36,7 @@ describe('Kurot UI foundation catalog', () => {
 		const button = registry.resolve('kui.Button');
 		const toggleButton = registry.resolve('kui.ToggleButton');
 		const progressBar = registry.resolve('kui.ProgressBar');
+		const textInput = registry.resolve('kui.TextInput');
 
 		expect(label).toMatchObject({
 			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component'],
@@ -61,6 +63,11 @@ describe('Kurot UI foundation catalog', () => {
 			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component'],
 			children: 'none',
 		});
+		expect(textInput).toMatchObject({
+			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component'],
+			children: 'none',
+		});
+		expect(textInput?.properties.fontFamily).toBeUndefined();
 		expect(label?.properties.text).toMatchObject({
 			valueType: 'string',
 			defaultValue: '',
@@ -95,6 +102,17 @@ describe('Kurot UI foundation catalog', () => {
 						type: 'kui.Image',
 						properties: {
 							source: createUIResourceReference('image', 'background_png'),
+						},
+					}),
+					createUINode({
+						id: 'player-name',
+						type: 'kui.TextInput',
+						properties: {
+							inputType: 'text',
+							maxChars: 20,
+							prompt: 'Player name',
+							restrict: 'A-Za-z0-9_',
+							text: 'Kurot',
 						},
 					}),
 					createUINode({
@@ -184,6 +202,17 @@ describe('Kurot UI foundation catalog', () => {
 		expect(
 			Object.keys(registry.get('kui.ProgressBar')?.properties ?? {}).sort(),
 		).toEqual(['direction', 'maximum', 'minimum', 'slideDuration', 'value']);
+		expect(
+			Object.keys(registry.get('kui.TextInput')?.properties ?? {}).sort(),
+		).toEqual([
+			'displayAsPassword',
+			'inputType',
+			'maxChars',
+			'prompt',
+			'restrict',
+			'text',
+			'textColor',
+		]);
 	});
 
 	it('rejects invalid basic component values and unknown properties', () => {
@@ -224,6 +253,15 @@ describe('Kurot UI foundation catalog', () => {
 						type: 'kui.ProgressBar',
 						properties: { direction: 'clockwise', slideDuration: -1 },
 					}),
+					createUINode({
+						id: 'text-input',
+						type: 'kui.TextInput',
+						properties: {
+							fontFamily: 'Arial',
+							inputType: 'email',
+							maxChars: 1.5,
+						},
+					}),
 				],
 			}),
 		});
@@ -240,6 +278,9 @@ describe('Kurot UI foundation catalog', () => {
 			'$.root.children[4].properties.selected',
 			'$.root.children[5].properties.direction',
 			'$.root.children[5].properties.slideDuration',
+			'$.root.children[6].properties.fontFamily',
+			'$.root.children[6].properties.inputType',
+			'$.root.children[6].properties.maxChars',
 		]);
 	});
 

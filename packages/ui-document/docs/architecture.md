@@ -117,7 +117,8 @@ audited color fields accept color tokens.
 
 The foundation catalog remains curated rather than reflective. It includes
 `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, `kui.Button`,
-`kui.ToggleButton`, and `kui.ProgressBar` plus their abstract bases.
+`kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput` plus their abstract
+bases.
 Runtime-owned and compatibility-shaped fields are not automatically authoring
 APIs. `currentState`, `skinName`, and `hostComponentKey` are absent because
 states and appearances are first-class semantics.

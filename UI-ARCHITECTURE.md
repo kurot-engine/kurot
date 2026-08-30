@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.3.3` currently provides:
+`@kurot/ui-document@0.3.4` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -117,7 +117,8 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - component definitions, property definitions, inheritance, and deterministic
   registry resolution;
 - an audited foundation catalog for `kui.Group`, `kui.Label`, `kui.Image`,
-  `kui.Rect`, `kui.Button`, `kui.ToggleButton`, and `kui.ProgressBar`;
+  `kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`, and
+  `kui.TextInput`;
 - screen, reusable-component, and appearance asset kinds;
 - public contracts containing typed parameters, parts, Slots, states, and
   variants;
@@ -184,7 +185,7 @@ replace EXML in existing projects today.
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
 | Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
-| Foundation component schema | Partial | Seven components are audited; the full authoring catalog and structured schemas are incomplete. |
+| Foundation component schema | Partial | Eight components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
 | Editable asset kinds and reuse | Implemented for creation and states | Screens, components, compact instances, parameter bindings, parts, Slots, component variants/states, cross-document validation, runtime expansion, and golden fixtures. |
 | Appearance, states, bindings, resources | Partial | Native appearance skins/states, selected variants, and design tokens execute at runtime; typed resources have an application resolver hook. Bindings, actions, transitions, and concrete resource adapters remain pending. |

@@ -4,6 +4,20 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.3.4] — 2026-08-31
+
+### Added
+
+- Audited `kui.TextInput` Schema for text, prompt, color, password display,
+  character limits, restrictions, and the current plain-text input type.
+- Catalog validation coverage for valid TextInput documents, invalid input
+  modes, invalid character limits, and properties owned by appearance parts.
+
+### Changed
+
+- Reused the shared text-content property contracts between Label and
+  TextInput without introducing an incorrect runtime inheritance relationship.
+
 ## [0.3.3] — 2026-08-31
 
 ### Added

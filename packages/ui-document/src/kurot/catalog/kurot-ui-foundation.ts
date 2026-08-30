@@ -12,6 +12,7 @@ import {
 	LABEL_PROPERTIES,
 	PROGRESS_BAR_PROPERTIES,
 	RECT_PROPERTIES,
+	TEXT_INPUT_PROPERTIES,
 	TOGGLE_BUTTON_PROPERTIES,
 } from './properties/basic-component-properties.js';
 
@@ -95,6 +96,14 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		description: 'Skinnable visual indicator for a bounded numeric value.',
 		children: 'none',
 		properties: PROGRESS_BAR_PROPERTIES,
+	},
+	{
+		type: 'kui.TextInput',
+		extends: 'kui.Component',
+		displayName: 'Text Input',
+		description: 'Skinnable single-line text entry control with prompt support.',
+		children: 'none',
+		properties: TEXT_INPUT_PROPERTIES,
 	},
 ];
 

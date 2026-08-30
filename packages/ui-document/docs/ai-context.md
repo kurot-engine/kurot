@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.3.3`. This is a headless,
+Package identity: `@kurot/ui-document@0.3.4`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -80,11 +80,14 @@ src/
 - The foundation catalog contains abstract `kurot.DisplayObject`,
   `kui.UIComponent`, and `kui.Component`, plus concrete `kui.Group`,
   `kui.Label`, `kui.Image`, `kui.Rect`, `kui.Button`, `kui.ToggleButton`, and
-  `kui.ProgressBar`.
+  `kui.ProgressBar`, and `kui.TextInput`.
 - `kui.ToggleButton` inherits the Button contract and changes the authored
   `toggle` default to `true`. `kui.ProgressBar` directly extends
   `kui.Component`, matching the runtime class rather than pretending it
   inherits the separate `Range` implementation.
+- `kui.TextInput` directly extends `kui.Component`. It exposes the properties
+  forwarded by TextInput itself; typography and prompt styling target its
+  appearance parts instead of pretending the control extends Label.
 - `kui.*` is canonical. EUI identifiers belong only at a legacy EXML adapter
   boundary.
 - `Image.source` and `Button.icon` use typed image/sprite-frame references.
