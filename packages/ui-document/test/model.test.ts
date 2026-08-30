@@ -11,10 +11,10 @@ import {
 describe('UI document model', () => {
 	it('creates an explicit current-format document', () => {
 		const properties = { width: 320 };
-		const children = [createUINode({ id: 'title', type: 'eui.Label' })];
+		const children = [createUINode({ id: 'title', type: 'kui.Label' })];
 		const root = createUINode({
 			id: 'root',
-			type: 'eui.Group',
+			type: 'kui.Group',
 			properties,
 			children,
 		});
@@ -27,25 +27,25 @@ describe('UI document model', () => {
 	});
 
 	it('rejects empty required identifiers', () => {
-		expect(() => createUINode({ id: ' ', type: 'eui.Group' })).toThrow(
+		expect(() => createUINode({ id: ' ', type: 'kui.Group' })).toThrow(
 			'Node id must not be empty.',
 		);
 		expect(() =>
 			createUIDocument({
 				id: '',
-				root: createUINode({ id: 'root', type: 'eui.Group' }),
+				root: createUINode({ id: 'root', type: 'kui.Group' }),
 			}),
 		).toThrow('Document id must not be empty.');
 	});
 
 	it('queries nodes in deterministic pre-order', () => {
-		const target = createUINode({ id: 'target', type: 'eui.Label' });
+		const target = createUINode({ id: 'target', type: 'kui.Label' });
 		const root = createUINode({
 			id: 'root',
-			type: 'eui.Group',
+			type: 'kui.Group',
 			children: [
-				createUINode({ id: 'first', type: 'eui.Image', children: [target] }),
-				createUINode({ id: 'last', type: 'eui.Button' }),
+				createUINode({ id: 'first', type: 'kui.Image', children: [target] }),
+				createUINode({ id: 'last', type: 'kui.Button' }),
 			],
 		});
 		const visited: string[] = [];

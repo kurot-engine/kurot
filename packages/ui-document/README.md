@@ -30,12 +30,12 @@ const document = createUIDocument({
   id: 'main-screen',
   root: createUINode({
     id: 'root',
-    type: 'eui.Group',
+    type: 'kui.Group',
     properties: { width: 1280, height: 720 },
     children: [
       createUINode({
         id: 'title',
-        type: 'eui.Label',
+        type: 'kui.Label',
         properties: { text: 'Kurot' },
       }),
     ],
@@ -65,6 +65,8 @@ the corresponding `@kurot/ui` class.
   resolution, and derived property overrides;
 - optional validation of registered component types, known property categories,
   required properties, child policies, and abstract types.
+- union-valued properties, enum values, numeric ranges, integer constraints,
+  serializable defaults, and editor-facing semantic formats.
 
 Component definitions can remain intentionally incomplete while their runtime
 properties are reviewed:
@@ -89,7 +91,38 @@ const resolved = registry.resolve('game.ProfileCard');
 
 Base definitions can be registered after their derived definitions. Resolution
 does not depend on registration order and reports missing bases or inheritance
-cycles explicitly. No concrete `@kurot/ui` component catalog is included yet.
+cycles explicitly. A complete `@kurot/ui` component catalog is not included yet.
+
+## Kurot UI foundation catalog
+
+The first audited catalog subset is available through an explicit registry
+factory:
+
+```ts
+import { createKurotUIFoundationRegistry } from '@kurot/ui-document';
+
+const registry = createKurotUIFoundationRegistry();
+```
+
+It defines the abstract semantic bases `kurot.DisplayObject`,
+`kui.UIComponent`, and `kui.Component`, plus the concrete `kui.Group`,
+`kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` nodes. `Group` accepts
+ordered children; the other four concrete nodes are leaves.
+
+`kui.*` is the canonical Kurot UI namespace. EUI names belong only to legacy
+EXML adapters and are not stored in the semantic document.
+
+The foundation catalog declares the serializable authoring properties inherited
+from Kurot display objects and UI layout elements, then adds the audited direct
+properties of all five concrete components. Unknown properties are rejected.
+
+Runtime-owned values are deliberately excluded. For example, `Image.source`
+stores an asset key or URL rather than a `Texture`, and readonly objects such as
+`Image.bitmap` are not document properties. `Group.layout` and
+`Image.scale9Grid` currently accept semantic objects; their nested shapes will
+be tightened when the layout and structured-value catalogs are introduced.
+State declarations and bindings are also reserved for their own semantic
+layers rather than being accepted as untyped component properties.
 
 See [Architecture](./docs/architecture.md) for the current contracts and
 package boundaries.
@@ -99,8 +132,8 @@ package boundaries.
 The package owns the serializable UI document model and its deterministic
 operations. Planned layers include:
 
-- concrete component catalogs, detailed property constraints, states, bindings,
-  and resource-reference schemas;
+- the remaining component catalog, nested structured-value constraints, states,
+  bindings, and resource-reference schemas;
 - commands, transactions, undo, and redo;
 - document migrations;
 - adapters for formats such as EXML.

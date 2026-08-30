@@ -10,6 +10,16 @@ export type UIPropertyValueType =
 	| 'value';
 
 /**
+ * Semantic presentation used by editors for otherwise generic values.
+ */
+export type UIPropertyFormat =
+	| 'color'
+	| 'layout'
+	| 'rectangle'
+	| 'resource'
+	| 'skin';
+
+/**
  * Structural child policy for a component type.
  */
 export type UIChildrenPolicy = 'multiple' | 'none' | 'single';
@@ -19,9 +29,39 @@ export type UIChildrenPolicy = 'multiple' | 'none' | 'single';
  */
 export interface UIPropertyDefinition {
 	/**
-	 * Broad value category used by document validation and Agent tooling.
+	 * Accepted value category, or categories for a union-valued property.
 	 */
-	readonly valueType: UIPropertyValueType;
+	readonly valueType: UIPropertyValueType | readonly UIPropertyValueType[];
+
+	/**
+	 * Optional semantic presentation used by editors and Agent tools.
+	 */
+	readonly format?: UIPropertyFormat;
+
+	/**
+	 * Exact primitive values accepted by this property.
+	 */
+	readonly enumValues?: readonly UIPropertyPrimitive[];
+
+	/**
+	 * Inclusive lower bound for numeric values.
+	 */
+	readonly minimum?: number;
+
+	/**
+	 * Inclusive upper bound for numeric values.
+	 */
+	readonly maximum?: number;
+
+	/**
+	 * Whether numeric values must be integers.
+	 */
+	readonly integer?: boolean;
+
+	/**
+	 * Runtime value used when the property is omitted, when it is serializable.
+	 */
+	readonly defaultValue?: UIPropertyPrimitive;
 
 	/**
 	 * Whether every node of this component type must provide the property.
@@ -39,7 +79,7 @@ export interface UIPropertyDefinition {
  */
 export interface UIComponentDefinition {
 	/**
-	 * Exact key stored in UINode.type, such as eui.Label.
+	 * Exact key stored in UINode.type, such as kui.Label.
 	 */
 	readonly type: string;
 
@@ -124,3 +164,4 @@ export interface UIResolvedComponentDefinition {
 	 */
 	readonly allowUnknownProperties: boolean;
 }
+import type { UIPropertyPrimitive } from '../model/UIPropertyValue.js';

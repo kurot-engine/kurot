@@ -20,5 +20,13 @@ All notable changes to `@kurot/ui-document` are documented here.
 - Abstract component definitions and single-parent schema inheritance with
   deterministic base-to-derived resolution, property overrides, cache
   invalidation, missing-base/cycle errors, and abstract-node diagnostics.
+- Initial audited Kurot UI foundation catalog with three abstract semantic
+  bases and concrete `Group`, `Label`, `Image`, `Rect`, and `Button` nodes.
+  Their serializable authoring properties are inherited and strictly validated;
+  runtime-only objects are deliberately excluded.
+- Kurot-owned `kui.*` component identities; legacy EUI names are reserved for
+  future EXML adapter boundaries rather than stored in semantic documents.
+- Property schemas with union value types, enum values, numeric ranges, integer
+  constraints, serializable defaults, and editor-facing semantic formats.
 - `UI_DOCUMENT_KIND` and `UI_DOCUMENT_FORMAT_VERSION` as explicit format
   boundaries.

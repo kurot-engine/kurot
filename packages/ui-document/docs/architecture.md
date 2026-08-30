@@ -64,8 +64,13 @@ deterministic.
 
 Concrete catalogs can be introduced gradually. Omitting `children` leaves the
 child policy unvalidated; `allowUnknownProperties: true` preserves properties
-that have not yet been described. Completed definitions should omit that flag
-so property misspellings become diagnostics.
+that have not yet been described. Completed definitions use a false unknown-
+property policy so misspellings become diagnostics.
+
+Property definitions can express a single value category or a union, primitive
+enums, inclusive numeric bounds, integer-only values, serializable defaults,
+and semantic formats used by editor controls. Formats such as `color`,
+`resource`, and `skin` do not introduce runtime dependencies.
 
 ### Inheritance and resolution
 
@@ -89,3 +94,40 @@ Definitions can be registered in any order. Resolution caches only successful
 results, and every later registration clears that cache. Missing bases and
 inheritance cycles raise `UIComponentResolutionError`; component-aware document
 validation converts those failures into structured diagnostics.
+
+## Kurot UI foundation catalog
+
+The built-in foundation catalog is deliberately smaller than the full
+`@kurot/ui` export surface. It establishes only the component identities and
+relationships already verified against the runtime and EXML compiler:
+
+```text
+kurot.DisplayObject (abstract, strict authoring properties)
+└── kui.UIComponent (abstract)
+    ├── kui.Group (ordered children)
+    └── kui.Component (abstract)
+        ├── kui.Label (leaf)
+        ├── kui.Image (leaf)
+        ├── kui.Rect (leaf)
+        └── kui.Button (leaf)
+```
+
+`kui.Component` is a semantic base rather than a directly creatable editor
+node. This also matches the current EXML compiler, which does not register the
+legacy `eui:Component` tag as a usable built-in. The four basic controls are
+leaves because they do not expose an `elementsContent` child contract; `Group`
+does.
+
+Catalog keys use Kurot-owned semantic names such as `kui.Label`. EUI is not a
+document namespace. A legacy EXML adapter is responsible for translating
+between `eui:Label` and `kui.Label`; future editor documents remain independent
+of that compatibility format.
+
+The foundation catalog strictly declares serializable authoring properties from
+the matching Kurot runtime classes. It does not mirror readonly runtime state or
+process-owned objects: `Texture`, `Bitmap`, `Skin`, `LayoutBase`, filters, and
+display masks cannot be embedded in a document. Asset and skin properties use
+stable string identifiers. Layout and rectangle values are semantic objects;
+their nested schemas remain a later catalog layer. State declarations and
+bindings are separate document concerns and are not accepted as untyped
+component properties.

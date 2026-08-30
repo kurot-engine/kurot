@@ -14,7 +14,7 @@ describe('UI document JSON serialization', () => {
 			id: 'main-screen',
 			root: createUINode({
 				id: 'root',
-				type: 'eui.Group',
+				type: 'kui.Group',
 				properties: {
 					zIndex: 2,
 					layout: { verticalGap: 8, horizontalGap: 4 },
@@ -49,7 +49,7 @@ describe('UI document JSON serialization', () => {
 	it('refuses to silently serialize invalid runtime values', () => {
 		const document = createUIDocument({
 			id: 'main-screen',
-			root: createUINode({ id: 'root', type: 'eui.Group' }),
+			root: createUINode({ id: 'root', type: 'kui.Group' }),
 		});
 		const unsafe = {
 			...document,

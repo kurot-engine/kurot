@@ -1,21 +1,10 @@
 import type {
-	UIChildrenPolicy,
 	UIComponentDefinition,
 	UIPropertyDefinition,
-	UIPropertyValueType,
 	UIResolvedComponentDefinition,
 } from './UIComponentDefinition.js';
 import { UIComponentResolutionError } from './UIComponentResolutionError.js';
-
-const CHILDREN_POLICIES = new Set<UIChildrenPolicy>(['multiple', 'none', 'single']);
-const PROPERTY_VALUE_TYPES = new Set<UIPropertyValueType>([
-	'array',
-	'boolean',
-	'number',
-	'object',
-	'string',
-	'value',
-]);
+import { validateComponentDefinition } from './validateComponentDefinition.js';
 
 /**
  * Isolated component catalog used by validators, editors, and Agent adapters.
@@ -28,7 +17,7 @@ export class UIComponentRegistry {
 	 * Adds a definition and rejects accidental replacement of an existing type.
 	 */
 	public register(definition: UIComponentDefinition): void {
-		validateDefinition(definition);
+		validateComponentDefinition(definition);
 		if (this._definitions.has(definition.type)) {
 			throw new Error(`Component type "${definition.type}" is already registered.`);
 		}
@@ -167,58 +156,16 @@ function normalizeProperties(
 	const entries = Object.entries(properties).map(
 		([name, property]): [string, UIPropertyDefinition] => [
 			name,
-			Object.freeze({ ...property }),
+			Object.freeze({
+				...property,
+				valueType: Array.isArray(property.valueType)
+					? Object.freeze([...property.valueType])
+					: property.valueType,
+				...(property.enumValues
+					? { enumValues: Object.freeze([...property.enumValues]) }
+					: {}),
+			}),
 		],
 	);
 	return Object.freeze(Object.fromEntries(entries));
-}
-
-function validateDefinition(definition: UIComponentDefinition): void {
-	assertNonEmpty(definition.type, 'Component type');
-	if (definition.extends !== undefined) {
-		assertNonEmpty(definition.extends, 'Base component type');
-	}
-	if (definition.abstract !== undefined && typeof definition.abstract !== 'boolean') {
-		throw new Error('Component abstract flag must be a boolean.');
-	}
-	if (definition.displayName !== undefined) {
-		assertNonEmpty(definition.displayName, 'Component display name');
-	}
-	if (definition.description !== undefined) {
-		assertNonEmpty(definition.description, 'Component description');
-	}
-	if (definition.children !== undefined && !CHILDREN_POLICIES.has(definition.children)) {
-		throw new Error(`Unsupported child policy "${String(definition.children)}".`);
-	}
-	if (
-		definition.allowUnknownProperties !== undefined &&
-		typeof definition.allowUnknownProperties !== 'boolean'
-	) {
-		throw new Error('allowUnknownProperties must be a boolean.');
-	}
-
-	for (const [name, property] of Object.entries(definition.properties ?? {})) {
-		assertNonEmpty(name, 'Component property name');
-		validatePropertyDefinition(name, property);
-	}
-}
-
-function validatePropertyDefinition(name: string, definition: UIPropertyDefinition): void {
-	if (!PROPERTY_VALUE_TYPES.has(definition.valueType)) {
-		throw new Error(
-			`Unsupported value type "${String(definition.valueType)}" for property "${name}".`,
-		);
-	}
-	if (definition.required !== undefined && typeof definition.required !== 'boolean') {
-		throw new Error(`Property "${name}" required flag must be a boolean.`);
-	}
-	if (definition.description !== undefined) {
-		assertNonEmpty(definition.description, `Property "${name}" description`);
-	}
-}
-
-function assertNonEmpty(value: string, label: string): void {
-	if (typeof value !== 'string' || value.trim().length === 0) {
-		throw new Error(`${label} must be a non-empty string.`);
-	}
 }

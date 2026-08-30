@@ -12,7 +12,7 @@ describe('UI document validation', () => {
 			id: 'main-screen',
 			root: createUINode({
 				id: 'root',
-				type: 'eui.Group',
+				type: 'kui.Group',
 				properties: { visible: true, size: { width: 320, height: 180 } },
 			}),
 		});
@@ -26,10 +26,10 @@ describe('UI document validation', () => {
 			id: 'main-screen',
 			root: createUINode({
 				id: 'root',
-				type: 'eui.Group',
+				type: 'kui.Group',
 				children: [
-					createUINode({ id: 'item', type: 'eui.Label' }),
-					createUINode({ id: 'item', type: 'eui.Image' }),
+					createUINode({ id: 'item', type: 'kui.Label' }),
+					createUINode({ id: 'item', type: 'kui.Image' }),
 				],
 			}),
 		});
@@ -50,7 +50,7 @@ describe('UI document validation', () => {
 			extra: true,
 			root: {
 				id: 'root',
-				type: 'eui.Group',
+				type: 'kui.Group',
 				properties: { width: Number.NaN, createdAt: new Date() },
 				children: [],
 			},

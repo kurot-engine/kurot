@@ -16,30 +16,30 @@ describe('UIComponentRegistry', () => {
 			type: string;
 			properties: { text: { valueType: UIPropertyValueType } };
 		} = {
-			type: 'eui.Label',
+			type: 'kui.Label',
 			properties: {
 				text: { valueType: 'string' },
 			},
 		};
 
 		registry.register(label);
-		registry.register({ type: 'eui.Group', children: 'multiple' });
+		registry.register({ type: 'kui.Group', children: 'multiple' });
 		label.properties.text.valueType = 'number';
 
-		expect(registry.has('eui.Label')).toBe(true);
-		expect(registry.get('eui.Label')?.properties?.text?.valueType).toBe('string');
+		expect(registry.has('kui.Label')).toBe(true);
+		expect(registry.get('kui.Label')?.properties?.text?.valueType).toBe('string');
 		expect(registry.list().map((definition) => definition.type)).toEqual([
-			'eui.Group',
-			'eui.Label',
+			'kui.Group',
+			'kui.Label',
 		]);
 	});
 
 	it('rejects malformed and duplicate definitions', () => {
 		const registry = new UIComponentRegistry();
-		registry.register({ type: 'eui.Label' });
+		registry.register({ type: 'kui.Label' });
 
-		expect(() => registry.register({ type: 'eui.Label' })).toThrow(
-			'Component type "eui.Label" is already registered.',
+		expect(() => registry.register({ type: 'kui.Label' })).toThrow(
+			'Component type "kui.Label" is already registered.',
 		);
 		expect(() => registry.register({ type: ' ' })).toThrow(
 			'Component type must be a non-empty string.',
@@ -166,12 +166,12 @@ describe('component-aware validation', () => {
 	it('reports unknown types, property errors, and child-policy violations', () => {
 		const registry = new UIComponentRegistry();
 		registry.register({
-			type: 'eui.Group',
+			type: 'kui.Group',
 			children: 'multiple',
 			allowUnknownProperties: true,
 		});
 		registry.register({
-			type: 'eui.Label',
+			type: 'kui.Label',
 			children: 'none',
 			properties: {
 				text: { valueType: 'string', required: true },
@@ -181,14 +181,14 @@ describe('component-aware validation', () => {
 			id: 'main-screen',
 			root: createUINode({
 				id: 'root',
-				type: 'eui.Group',
+				type: 'kui.Group',
 				properties: { layoutUnderReview: true },
 				children: [
 					createUINode({
 						id: 'title',
-						type: 'eui.Label',
+						type: 'kui.Label',
 						properties: { text: 42, typo: 'value' },
-						children: [createUINode({ id: 'icon', type: 'eui.Image' })],
+						children: [createUINode({ id: 'icon', type: 'kui.Image' })],
 					}),
 				],
 			}),
@@ -227,14 +227,14 @@ describe('component-aware validation', () => {
 	it('reports missing required properties', () => {
 		const registry = new UIComponentRegistry();
 		registry.register({
-			type: 'eui.Image',
+			type: 'kui.Image',
 			properties: {
 				source: { valueType: 'string', required: true },
 			},
 		});
 		const document = createUIDocument({
 			id: 'image',
-			root: createUINode({ id: 'root', type: 'eui.Image' }),
+			root: createUINode({ id: 'root', type: 'kui.Image' }),
 		});
 
 		expect(validateUIDocumentComponents(document, registry)[0]).toMatchObject({

@@ -1,6 +1,7 @@
 export type {
 	UIChildrenPolicy,
 	UIComponentDefinition,
+	UIPropertyFormat,
 	UIPropertyDefinition,
 	UIPropertyValueType,
 	UIResolvedComponentDefinition,

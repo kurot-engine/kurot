@@ -8,8 +8,8 @@ independent semantic document package for Kurot UI editing workflows. It has
 no runtime dependencies.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` re-exports the `model`,
-`document`, `validation`, `serialization`, and `schema` barrels plus the current
-format version.
+`document`, `validation`, `serialization`, `schema`, and `catalog` barrels plus
+the current format version.
 
 ## 1. Directory map
 
@@ -22,7 +22,8 @@ src/
     ├── document/              Constructors, deterministic traversal, lookup.
     ├── validation/            Strict unknown-input validation + diagnostics.
     ├── serialization/         Validated parse + canonical JSON serialization.
-    └── schema/                Component definitions, registry, semantic checks.
+    ├── schema/                Component definitions, registry, semantic checks.
+    └── catalog/               Audited built-in semantic component subsets.
 ```
 
 ## 2. Current contracts
@@ -46,6 +47,9 @@ src/
 - `allowUnknownProperties: true` marks an intentionally incomplete component
   definition. Omitted `children` likewise means its child policy is not yet
   known. These are incremental catalog controls, not runtime behavior.
+- Property definitions support union value categories, primitive enums,
+  numeric ranges, integer constraints, serializable defaults, and semantic
+  editor formats (`color`, `layout`, `rectangle`, `resource`, `skin`).
 - Component schema inheritance is single-parent through `extends`. Definitions
   can be registered in any order; `resolve()` performs deterministic
   base-to-derived merging and detects missing bases and cycles.
@@ -53,6 +57,20 @@ src/
   `abstract`, `displayName`, and `description` belong to the exact definition.
 - Abstract definitions may be resolved and listed but cannot be used as a
   document node type.
+- The foundation catalog contains three abstract bases and the concrete
+  `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and `kui.Button` nodes.
+  Their serializable authoring properties are audited and unknown properties
+  are rejected.
+- `kui.Component` is an abstract semantic base. The current CLI also does not
+  expose the legacy `eui:Component` tag as a usable built-in.
+- `kui.*` is the canonical Kurot UI namespace. EUI identifiers must appear
+  only at a legacy EXML adapter boundary, which maps them to `kui.*` identities.
+- The catalog is not a reflection of every runtime getter. Readonly state and
+  runtime objects such as `Texture`, `Bitmap`, and `Skin` are excluded. Image
+  resources and skins use strings; layout and rectangle descriptors are
+  objects whose nested schemas are not implemented yet.
+- State declarations and bindings are intentionally absent from ordinary
+  component properties; later semantic layers must define them explicitly.
 
 ## 3. Public API
 
@@ -65,9 +83,11 @@ src/
 - Serialization: `parseUIDocument`, `serializeUIDocument`,
   `UIDocumentParseError`, `UIDocumentValidationError`.
 - Schema: `UIComponentDefinition`, `UIPropertyDefinition`,
-  `UIResolvedComponentDefinition`, `UIPropertyValueType`, `UIChildrenPolicy`,
-  `UIComponentRegistry`, `UIComponentResolutionError`,
+  `UIResolvedComponentDefinition`, `UIPropertyValueType`, `UIPropertyFormat`,
+  `UIChildrenPolicy`, `UIComponentRegistry`, `UIComponentResolutionError`,
   `UIComponentResolutionErrorCode`, `validateUIDocumentComponents`.
+- Catalog: `createKurotUIFoundationRegistry`,
+  `registerKurotUIFoundation`.
 
 ## 4. Package boundary
 
@@ -78,10 +98,10 @@ src/
 - Format adapters translate at the boundary; external formats do not define
   the internal document model.
 
-Concrete component catalogs, detailed property constraints, commands/history,
-states, bindings, resource references, migrations, and EXML adapters are
-planned but are not implemented APIs. Do not infer their shape from Egret,
-Unity, FairyGUI, or other formats.
+The remaining component catalog, nested structured-value constraints,
+commands/history, states, bindings, resource references, migrations, and EXML
+adapters are planned but are not implemented APIs. Do not infer their shape
+from Egret, Unity, FairyGUI, or other formats.
 
 ## 5. Task → file map
 
@@ -92,7 +112,9 @@ Unity, FairyGUI, or other formats.
 | Add an invariant or diagnostic | `validation/validateUIDocument.ts`, `validation/UIDiagnostic.ts` |
 | Change JSON parsing or canonical output | `serialization/json.ts` |
 | Define component metadata or registry behavior | `schema/UIComponentDefinition.ts`, `schema/UIComponentRegistry.ts` |
+| Change component-definition validation | `schema/validateComponentDefinition.ts` |
 | Change component-aware validation | `schema/validateUIDocumentComponents.ts` |
+| Change the audited Kurot UI foundation | `catalog/kurot-ui-foundation.ts`, `catalog/properties/` |
 | Change public exports | the nearest folder `index.ts`, then `src/index.ts` |
 
 ## 6. Commands

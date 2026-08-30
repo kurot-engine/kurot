@@ -85,12 +85,12 @@ function validateNode(
 				}
 				continue;
 			}
-			if (!matchesValueType(value, property.valueType)) {
+			if (!matchesProperty(value, property)) {
 				diagnostics.push({
 					code: 'invalid-component-property',
 					severity: 'error',
 					path: `${path}.properties.${name}`,
-					message: `Property "${name}" on ${node.type} must be ${property.valueType}.`,
+					message: `Property "${name}" on ${node.type} does not satisfy its schema.`,
 				});
 			}
 		}
@@ -123,6 +123,25 @@ function validateChildren(
 				? `Component ${node.type} does not accept children.`
 				: `Component ${node.type} accepts at most one child.`,
 	});
+}
+
+function matchesProperty(
+	value: UIPropertyValue,
+	property: UIResolvedComponentDefinition['properties'][string],
+): boolean {
+	const valueTypes = Array.isArray(property.valueType)
+		? property.valueType
+		: [property.valueType];
+	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;
+	if (property.enumValues && !property.enumValues.some(item => Object.is(item, value))) {
+		return false;
+	}
+	if (typeof value === 'number') {
+		if (property.minimum !== undefined && value < property.minimum) return false;
+		if (property.maximum !== undefined && value > property.maximum) return false;
+		if (property.integer && !Number.isInteger(value)) return false;
+	}
+	return true;
 }
 
 function matchesValueType(value: UIPropertyValue, valueType: UIPropertyValueType): boolean {
