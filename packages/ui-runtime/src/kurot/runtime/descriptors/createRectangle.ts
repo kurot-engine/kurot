@@ -1,6 +1,6 @@
 import { Rectangle } from '@kurot/core';
 import type { UIPropertyObject, UIPropertyValue } from '@kurot/ui-document';
-import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
  * Converts a canonical rectangle object into a Kurot Rectangle instance.

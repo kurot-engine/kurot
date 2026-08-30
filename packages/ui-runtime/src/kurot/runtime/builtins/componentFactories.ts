@@ -10,7 +10,7 @@ const BUILT_IN_FACTORIES: Readonly<Record<string, () => DisplayObject>> = {
 };
 
 /**
- * Returns the built-in factory for one canonical Kurot UI type.
+ * Returns the built-in factory for one canonical Kurot UI component type.
  */
 export function getBuiltInFactory(type: string): (() => DisplayObject) | undefined {
 	return BUILT_IN_FACTORIES[type];

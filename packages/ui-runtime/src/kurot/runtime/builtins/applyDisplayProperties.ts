@@ -1,7 +1,7 @@
 import { DisplayObject, DisplayObjectContainer } from '@kurot/core';
 import type { UIPropertyValue } from '@kurot/ui-document';
 import { isUIComponent } from '@kurot/ui';
-import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
  * Applies one inherited display or UI-layout property when recognized.

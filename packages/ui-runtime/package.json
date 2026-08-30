@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui-runtime",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Runtime materialization layer for validated Kurot UI documents",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

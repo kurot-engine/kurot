@@ -6,9 +6,9 @@ import {
 	validateUIDocumentComponents,
 } from '@kurot/ui-document';
 import type { UIDocument, UINode } from '@kurot/ui-document';
-import { applyComponentProperty } from './applyComponentProperties.js';
-import { applyDisplayProperty } from './applyDisplayProperties.js';
-import { getBuiltInFactory } from './componentFactories.js';
+import { applyComponentProperty } from './builtins/applyComponentProperties.js';
+import { applyDisplayProperty } from './builtins/applyDisplayProperties.js';
+import { getBuiltInFactory } from './builtins/componentFactories.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import type {
 	CreateKurotUIOptions,

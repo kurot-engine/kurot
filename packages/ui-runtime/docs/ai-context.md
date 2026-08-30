@@ -39,12 +39,15 @@ automatic visual appearance.
 
 ## Task lookup
 
-- Component creation: `src/kurot/runtime/componentFactories.ts`
+- Component creation: `src/kurot/runtime/builtins/componentFactories.ts`
 - Recursive tree construction: `src/kurot/runtime/createKurotUI.ts`
-- Common/runtime properties: `src/kurot/runtime/applyDisplayProperties.ts`
-- Component properties: `src/kurot/runtime/applyComponentProperties.ts`
-- Layout descriptors: `src/kurot/runtime/createLayout.ts`
-- Rectangle descriptors: `src/kurot/runtime/createRectangle.ts`
+- Common/runtime properties: `src/kurot/runtime/builtins/applyDisplayProperties.ts`
+- Component property routing: `src/kurot/runtime/builtins/applyComponentProperties.ts`
+- Container properties: `src/kurot/runtime/builtins/applyContainerProperties.ts`
+- Text properties: `src/kurot/runtime/builtins/applyTextProperties.ts`
+- Interactive control properties: `src/kurot/runtime/builtins/applyControlProperties.ts`
+- Layout descriptors: `src/kurot/runtime/descriptors/createLayout.ts`
+- Rectangle descriptors: `src/kurot/runtime/descriptors/createRectangle.ts`
 - Custom adapter contracts: `src/kurot/runtime/types.ts`
 - Browser smoke preview: `examples/preview/`
 - Runtime tests: `test/createKurotUI.test.ts`

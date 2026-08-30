@@ -1,311 +1,831 @@
-# Kurot UI Layer Architecture
+# Kurot UI Authoring Architecture
 
-This document defines the ownership and dependency boundaries of Kurot's UI
-stack. It covers the existing `@kurot/core`, `@kurot/ui`,
-`@kurot/ui-document`, `@kurot/ui-runtime`, and `@kurot/cli` packages, plus the
-future visual UI editor.
+This document defines the intended UI authoring architecture for Kurot. It is
+the source of truth for how editable UI assets, the future visual editor,
+Agent-assisted authoring, runtime preview, reusable components, skins, and
+production compilation fit together.
 
-The short version is:
+The objective is not to replace one markup syntax with another. The objective
+is a durable collaboration loop in which a person can describe a large change
+in natural language, an Agent can produce a safe semantic edit, and the person
+can immediately inspect, adjust, undo, and continue that work in a visual
+editor.
 
-```text
-core          renders
-ui            implements component behavior
-ui-document   describes UI
-ui-runtime    instantiates UI documents
-cli           builds and converts assets
-editor        authors and previews UI
-```
-
-## Layer model
+The shortest description is:
 
 ```text
-                         Future UI Editor
-                         authors UIDocument
-                         previews through ui-runtime
-                                  │
-                   ┌──────────────┴──────────────┐
-                   ▼                             ▼
-          @kurot/ui-document             @kurot/ui-runtime
-          semantic data model ──────────> document execution
-                                                │
-                                                ▼
-                                          @kurot/ui
-                                          UI behavior
-                                                │
-                                                ▼
-                                         @kurot/core
-                                      display and rendering
+natural language + visual editing
+                │
+                ▼
+       semantic edit operations
+                │
+                ▼
+       editable Kurot UI assets
+          │             │
+          ▼             ▼
+  runtime preview    CLI compilation
+          │             │
+          ▼             ▼
+   live Kurot UI    generated TS/JS
 ```
 
-`@kurot/ui-runtime` now provides the first complete materialization path. The
-visual editor and incremental document updates remain planned layers.
+## 1. Non-negotiable principles
 
-## `@kurot/core`
+### 1.1 UI remains an editable asset
 
-`@kurot/core` answers: **How is a visual object displayed and rendered?**
+A screen, reusable component, or visual skin remains an editable source asset
+throughout development. Generated TypeScript or JavaScript is a build artifact,
+not the authoring source and not something the editor must reverse-engineer.
 
-It owns:
-
-- display objects and the display tree;
-- transforms, bounds, hit testing, and low-level input events;
-- bitmap, text, vector graphics, texture, filter, and mask primitives;
-- WebGL and Canvas 2D rendering;
-- rendering instructions, pipes, batching, and render groups;
-- geometry, resources, networking, and foundational media APIs.
-
-It does not own:
-
-- UI measurement and layout;
-- controls such as `Button` and `Label`;
-- semantic UI documents or component schemas;
-- UI authoring and editor workflows.
-
-Every browser-rendered Kurot layer ultimately depends on `@kurot/core`.
-
-## `@kurot/ui`
-
-`@kurot/ui` answers: **How does a UI component behave?**
-
-It owns:
-
-- concrete components such as `Group`, `Label`, `Image`, `Rect`, and `Button`;
-- measurement, layout constraints, and automatic sizing;
-- validation phases such as `commitProperties`, `measure`, and
-  `updateDisplayList`;
-- layouts, skins, states, bindings, themes, collections, and UI events;
-- the runtime behavior of interactive controls.
-
-It does not own:
-
-- the `UIDocument` format;
-- Agent-facing component schemas;
-- document parsing or component-tree materialization;
-- editor panels or editing commands;
-- WebGL and Canvas 2D renderer implementations.
-
-The package remains usable directly without a semantic document:
-
-```ts
-const button = new Button();
-button.label = 'Start';
-stage.addChild(button);
+```text
+editable UI asset  ──compile──>  generated factory  ──bundle──>  game
+       ▲
+       └── human and Agent continue editing this source
 ```
 
-`@kurot/ui` currently preserves EUI-compatible runtime and EXML workflows.
-That compatibility does not make `eui.*` the identity namespace of future UI
-documents.
+The production bundle may omit authoring files, but the project repository must
+retain them.
 
-## `@kurot/ui-document`
+### 1.2 Human and Agent edit the same model
 
-`@kurot/ui-document` answers: **What does a UI contain?**
+There must not be a separate "AI version" of a UI. Dragging a component in the
+editor and asking an Agent to move it both produce changes to the same semantic
+document.
 
-It owns:
+### 1.3 The Agent edits semantics, not generated code
 
-- `UIDocument`, `UINode`, and serializable property values;
-- canonical `kui.*` component identities;
-- component and property schemas;
-- deterministic component inheritance and registry resolution;
-- document validation, parsing, serialization, traversal, and lookup;
-- semantic metadata consumed by Agents, CLIs, and editors.
+The preferred Agent output is a validated transaction of semantic operations,
+not an unrestricted rewrite of a markup file and not generated component code.
+This preserves unrelated human work, supports review and undo, and gives errors
+an exact node and property path.
 
-It does not own:
+### 1.4 The authoring model is not EXML 2.0
 
-- Kurot runtime class instances;
-- component construction or property assignment;
-- Canvas, Stage, DOM, WebGL, or browser lifecycle management;
-- resource loading, skin execution, or runtime layout;
-- editor user interfaces.
+The future model must not inherit EXML namespaces, reflection rules, global
+component exports, stringly typed attributes, or EUI-specific skin lookup merely
+for compatibility. Existing EXML support remains an independent current
+workflow until the new workflow is ready; it does not constrain the new model.
 
-The package is a headless TypeScript data layer with no dependency on
-`@kurot/core` or `@kurot/ui`. A semantic node looks like:
+### 1.5 Serialization syntax is not the semantic model
 
-```json
-{
-  "id": "startButton",
-  "type": "kui.Button",
-  "properties": {
-    "label": "Start",
-    "width": 240,
-    "height": 80
-  },
-  "children": []
-}
-```
+`UIDocument` is the normalized in-memory meaning of an asset. XML, JSON, or a
+future `.kui` syntax may serialize that meaning. The editor, runtime, Agent
+tools, and compiler must depend on the semantic model rather than a particular
+text syntax.
 
-EUI names belong at a legacy format-adapter boundary. For example, a future
-EXML adapter may translate `<eui:Button>` into the canonical `kui.Button`
-identity, but the semantic document does not store the EUI namespace.
+### 1.6 Preview and production share contracts
 
-## `@kurot/ui-runtime`
+Dynamic preview and static compilation must consume the same component keys,
+property definitions, resource references, states, and reuse semantics. An
+editor-only interpretation that differs from production is unacceptable.
 
-`@kurot/ui-runtime` answers: **How does a UI document become a running Kurot
-component tree?**
+## 2. Terminology
 
-It owns:
+The exact public type names remain subject to design, but the concepts are
+distinct.
+
+| Term | Meaning |
+| --- | --- |
+| UI document | Normalized semantic representation of one editable UI asset. |
+| Screen | A top-level page or game view such as a lobby, slot game, or crash game screen. |
+| Reusable component | A project-defined UI composition that can be instantiated by other documents. Comparable to a prefab or FairyGUI component. |
+| Component instance | A reference to a reusable component plus local property, slot, or variant overrides. |
+| Skin / appearance | Editable visual structure and state presentation for a control or reusable component. |
+| Runtime component | A real `@kurot/ui` object such as `Group`, `Label`, or `Button`. |
+| Component schema | Runtime-independent description of a component's properties, children, constraints, and authoring guidance. |
+| Edit operation | One semantic mutation such as creating a node or setting a property. |
+| Transaction | An ordered, atomic group of edit operations with one undo boundary. |
+| Generated factory | Build output that constructs the same runtime tree without dynamically walking the authoring document. |
+
+"Skin" remains a useful concept, but not every editable UI asset is a skin. A
+screen and a reusable inventory row are compositions; a button's normal,
+pressed, selected, and disabled visuals are an appearance or skin.
+
+## 3. Current position
+
+Kurot has completed the lower semantic-to-runtime bridge, not the full
+authoring system.
+
+### 3.1 Implemented
+
+`@kurot/ui-document@0.1.0` currently provides:
+
+- runtime-independent `UIDocument`, `UINode`, and serializable property values;
+- stable document and node identifiers;
+- deterministic traversal, lookup, JSON parsing, and JSON serialization;
+- structural validation with stable diagnostics and exact paths;
+- component definitions, property definitions, inheritance, and deterministic
+  registry resolution;
+- an audited foundation catalog for `kui.Group`, `kui.Label`, `kui.Image`,
+  `kui.Rect`, and `kui.Button`.
+
+`@kurot/ui-runtime@0.1.0` currently provides:
 
 - validation before materialization;
-- component factories such as `kui.Button` to `new Button()`;
-- safe application of inherited and component-specific properties;
-- child-tree construction;
-- layout and rectangle descriptor resolution;
-- resource and skin identifier forwarding to existing UI mechanisms;
-- structured runtime errors containing document node paths;
-- custom component adapters supplied by the owning application;
-- a stable node-ID-to-instance lookup for editor and Agent integration.
+- deterministic construction of those five foundation components;
+- application of audited display, layout, text, image, rectangle, and button
+  properties;
+- Basic, horizontal, vertical, and tile layout descriptors;
+- nine-slice rectangle conversion;
+- recursive child construction;
+- custom component adapters;
+- stable node-ID-to-runtime-instance lookup;
+- structured runtime errors;
+- a real browser preview proving that a semantic document becomes a rendered
+  Kurot display tree.
 
-It may later own incremental document updates and execution of semantic states
-and bindings after those formats are defined by `@kurot/ui-document`.
+The existing `@kurot/ui` package already owns the real UI behavior: measurement,
+layout, validation, skins, states, bindings, collections, themes, and controls.
+The existing CLI still compiles EXML for current projects.
 
-It does not own:
+### 3.2 Not implemented
 
-- the component behavior implemented by `@kurot/ui`;
-- the rendering pipeline implemented by `@kurot/core`;
-- the document format implemented by `@kurot/ui-document`;
-- Canvas and Stage lifecycle management;
-- visual editor panels.
+The following are still design or implementation work:
 
-The initial API returns both the root and a stable instance lookup:
+- document kinds for screens, reusable components, and appearances;
+- reusable component references, slots, parameters, and instance overrides;
+- a runtime-neutral skin, parts, state, and variant model;
+- resource catalogs and typed resource references;
+- design tokens and theme-level values;
+- data binding and event/action semantics;
+- semantic edit operations and atomic transactions;
+- revisions, diffs, undo, redo, and conflict detection;
+- incremental runtime reconciliation after an edit;
+- a visual editor shell;
+- Agent tools and context assembly;
+- static `UIDocument`-to-TypeScript/JavaScript compilation;
+- a final persisted `.kui` syntax and migrations.
+
+### 3.3 Honest interpretation
+
+The current preview constructs a document in TypeScript only because no editor
+or authoring-file parser exists yet. It is a smoke harness for this completed
+boundary:
+
+```text
+UIDocument → validated real component tree
+```
+
+It is not the intended authoring experience and does not replace EXML today.
+
+| Capability | Status | Evidence / missing boundary |
+| --- | --- | --- |
+| Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
+| Foundation component schema | Partial | Five components are audited; the full authoring catalog and structured schemas are incomplete. |
+| Semantic-to-runtime materialization | Implemented for the foundation | Real components, properties, layouts, child trees, adapters, errors, tests, and browser preview. |
+| Editable asset kinds and reuse | Not started | Screens, component definitions, instances, slots, and overrides are not modeled. |
+| Appearance, states, bindings, resources | Not started in the new model | Current `@kurot/ui` behavior exists, but runtime-neutral authoring semantics do not. |
+| Editing operations and history | Not started | No transaction, revision, diff, undo, or redo API exists. |
+| Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
+| Agent collaboration | Not started | Schemas exist, but there is no editing tool protocol or context coordinator. |
+| Static UI compiler | Not started | The CLI still compiles EXML; it does not compile the new semantic assets. |
+
+## 4. Target collaboration workflow
+
+### 4.1 Creating a new screen
+
+```text
+Person: "Create a slot game screen with a balance bar, five reels,
+         a bet selector, and a large spin button."
+                            │
+                            ▼
+Editor assembles bounded context
+  - available component schemas
+  - project reusable components
+  - resources, fonts, Spine assets, and design tokens
+  - target viewport and safe-area rules
+  - project naming and layout conventions
+                            │
+                            ▼
+Agent proposes one transaction
+  - create nodes and component instances
+  - set typed properties and constraints
+  - reference existing assets
+  - assign stable IDs
+                            │
+                            ▼
+Headless validation
+  - schema and property validation
+  - child and reference validation
+  - resource and reuse validation
+  - layout and state validation
+                            │
+                            ▼
+Editor presents change summary and preview
+                            │
+                            ▼
+Person accepts, adjusts visually, or asks for another change
+```
+
+### 4.2 Modifying existing work
+
+For later requests, the Agent should normally emit a patch rather than replace
+the whole document:
+
+```text
+Person: "Move the balance to the top right and make the spin button wider."
+
+Transaction
+├── setProperty(balanceBar, right, 24)
+├── unsetProperty(balanceBar, left)
+├── setLayoutConstraint(balanceBar, top, safeArea.top, offset: 16)
+└── setProperty(spinButton, width, 280)
+```
+
+Unrelated nodes and manual adjustments remain untouched. The transaction is one
+reviewable and undoable history entry.
+
+### 4.3 Human intervention
+
+The visual editor translates direct manipulation into the same operation
+protocol:
+
+```text
+drag node             → setProperty / setLayoutConstraint
+resize handle         → setProperty / setInstanceOverride
+hierarchy reorder     → moveNode
+delete key            → removeNode
+property inspector    → setProperty / unsetProperty
+component insertion   → instantiateComponent
+state editor          → addState / setStateOverride
+```
+
+Natural-language editing and visual editing therefore converge before touching
+the document.
+
+## 5. Editable asset model
+
+The semantic model should support several authoring asset kinds while sharing
+one node and property foundation. The following shape is conceptual, not a
+frozen TypeScript API.
+
+```text
+UIAsset
+├── identity and format version
+├── kind: screen | component | appearance
+├── root composition or appearance template
+├── parameters and exposed parts
+├── variants and states
+├── resource references
+├── component dependencies
+└── editor metadata that does not affect runtime semantics
+```
+
+### 5.1 Screen documents
+
+A screen composes runtime and reusable project components into a top-level view.
+It may expose named parts to handwritten game logic but should not contain
+arbitrary TypeScript.
+
+Examples include:
+
+- `LobbyScreen`;
+- `SlotGameScreen`;
+- `CrashGameScreen`;
+- `PaytableDialog`.
+
+### 5.2 Reusable component documents
+
+A reusable component owns an internal hierarchy and a stable public contract.
+That contract may include:
+
+- typed parameters;
+- exposed parts;
+- named slots for caller content;
+- supported variants;
+- emitted semantic actions or events;
+- default size and layout behavior.
+
+An instance stores a reference plus differences from the definition. It must not
+copy the complete component subtree into every parent document.
+
+```text
+BalanceBar definition
+├── icon
+├── valueLabel
+└── currencyLabel
+
+SlotGameScreen
+└── BalanceBar instance
+    ├── parameter.currency = "USD"
+    └── override.right = 24
+```
+
+Definition changes propagate to instances unless an instance explicitly
+overrides the affected value. Overrides must remain inspectable and removable.
+
+### 5.3 Appearance and skin documents
+
+An appearance describes visual composition and state presentation without
+becoming a second behavior class. It should support concepts such as:
+
+- stable parts consumed by a control contract;
+- normal, pressed, selected, focused, and disabled states where applicable;
+- property overrides per state;
+- transition and animation references;
+- variants such as primary, secondary, compact, or dangerous;
+- design-token and resource references.
+
+The target model must define these concepts directly. It must not expose
+`hostComponentKey`, reflective EUI part discovery, or `skinName` string lookup as
+the authoring foundation. Runtime adapters may translate the new semantics to
+current `@kurot/ui` mechanisms during migration.
+
+### 5.4 Resources and design tokens
+
+Documents should refer to stable project resource keys rather than raw runtime
+objects. The editor context should distinguish at least:
+
+- images and sprite-sheet regions;
+- fonts;
+- Spine assets;
+- MovieClip or animation assets;
+- colors, spacing, typography, and other design tokens;
+- reusable UI documents.
+
+The Schema must describe which resource category a property accepts. Agents
+must select from the project catalog instead of inventing plausible file names.
+
+### 5.5 Behavior boundary
+
+Authoring assets describe structure, presentation, binding, and declarative
+actions. Complex game logic remains handwritten TypeScript.
+
+A document may expose a semantic action such as `spinRequested` or bind a label
+to a declared view-model field. It must not embed unrestricted JavaScript
+expressions. Slot, crash, RPG, and SLG protocol integration should use bounded,
+typed contracts defined separately from visual composition.
+
+## 6. Component and property schema
+
+The component registry is the shared vocabulary of the editor, Agent, runtime,
+and compiler. Every exposed component should provide enough information to use
+it without reading implementation source.
+
+A complete definition eventually needs:
+
+- canonical component key and display name;
+- purpose and usage guidance;
+- inheritance or capability composition;
+- child and slot policies;
+- typed properties, defaults, ranges, enums, and units;
+- resource and reference categories;
+- layout participation and sizing behavior;
+- exposed parts, actions, states, and variants;
+- constraints between properties;
+- short valid examples and common invalid uses;
+- runtime factory and compilation mapping outside the headless schema package.
+
+The authoring catalog must be curated rather than generated mechanically from
+all public runtime getters. Read-only objects, internal caches, implementation
+switches, and compatibility-only fields are not automatically authoring APIs.
+
+## 7. Semantic edit protocol
+
+The edit protocol is the most important AI collaboration boundary. The exact
+names are not frozen, but the first complete set should cover:
+
+### 7.1 Structural operations
+
+- create a node;
+- remove a node or subtree;
+- move a node within or across parents;
+- reorder children;
+- duplicate a subtree with new stable IDs;
+- replace a node type under explicit compatibility rules.
+
+### 7.2 Property operations
+
+- set or unset a property;
+- set a layout constraint;
+- assign or clear a resource reference;
+- apply or remove a design-token reference;
+- set a property for a named state or variant.
+
+### 7.3 Reuse operations
+
+- instantiate a reusable component;
+- assign a parameter;
+- fill or clear a slot;
+- create or remove an instance override;
+- detach an instance only through an explicit destructive conversion.
+
+### 7.4 Document-level operations
+
+- create, rename, and remove a state or variant;
+- expose or hide a part;
+- define or remove a parameter;
+- add or remove a declared binding or semantic action;
+- change asset metadata.
+
+### 7.5 Transaction contract
+
+Every Agent request and meaningful editor gesture should execute as a
+transaction containing:
+
+- a unique transaction ID;
+- the expected document revision;
+- an ordered operation list;
+- a human-readable intent summary;
+- validation diagnostics;
+- inverse operations or an equivalent undo snapshot;
+- the resulting revision when committed.
+
+Application is atomic: either all operations validate and commit, or none do.
+Revision checks prevent a delayed Agent response from silently overwriting work
+performed after its context was captured.
+
+## 8. Agent contract
+
+An Agent cannot create reliable UI from component names alone. Before editing,
+the editor must provide a bounded authoring context.
+
+### 8.1 Required context
+
+- relevant current documents and selected nodes;
+- resolved component schemas;
+- reusable project components and their public contracts;
+- available resources and design tokens;
+- target viewport, orientation, safe areas, and scaling policy;
+- project conventions and approved examples;
+- diagnostics already present in the document;
+- the current document revision.
+
+The complete engine source should not be required for ordinary UI generation.
+Source remains available for engine development and exceptional diagnosis, but
+the Schema and authoring contracts must be sufficient for routine Agent work.
+
+### 8.2 Preferred output
+
+For a new empty asset, an Agent may propose a complete initial transaction. For
+existing assets, it should return semantic operations against stable IDs. It
+should not directly edit generated factories.
+
+### 8.3 Validation and repair loop
+
+```text
+Agent proposal
+    ↓
+structural + schema + reference validation
+    ├── valid   → preview and present for review
+    └── invalid → return bounded diagnostics to the Agent
+                      ↓
+                 repaired transaction
+```
+
+The Agent receives errors such as "property `gap` must be a finite number at
+node `reelRow`" rather than a runtime stack trace. Repair attempts must remain
+bounded and visible to the editor history.
+
+### 8.4 Review experience
+
+Before acceptance, the editor should be able to show:
+
+- nodes created, removed, or moved;
+- properties and overrides changed;
+- resources introduced;
+- before/after preview where useful;
+- warnings and unresolved references;
+- estimated scope, such as the number of affected nodes.
+
+The person can accept the transaction, reject it, undo it later, or continue
+editing manually.
+
+## 9. Visual editor architecture
+
+The future editor is a consumer and orchestrator of headless packages, not the
+owner of a private UI format.
+
+```text
+Editor shell
+├── Document store
+├── Command and transaction engine
+├── Hierarchy panel
+├── Component palette
+├── Property inspector
+├── Resource browser
+├── State / variant editor
+├── Canvas preview host
+├── Selection and transform overlay
+├── History / diff panel
+├── Diagnostics panel
+└── Agent coordinator
+```
+
+### 9.1 Document store
+
+Loads and saves authoring assets, tracks revisions and dirty state, and exposes
+immutable snapshots to Agent requests and preview reconciliation.
+
+### 9.2 Command engine
+
+Is the only mutation path for visual gestures, property edits, and Agent
+transactions. It owns validation, atomic commit, undo, redo, and change events.
+
+### 9.3 Preview host
+
+Owns Canvas and Stage lifecycle, viewport scaling, device presets, refresh,
+runtime errors, and the bridge between node IDs and runtime instances. These
+editor concerns do not belong in `@kurot/ui-runtime`.
+
+### 9.4 Selection bridge
+
+Maps hierarchy selection to `ui-runtime` instances, computes visual bounds, and
+renders resize, anchor, alignment, and layout handles without mutating runtime
+objects behind the document's back.
+
+### 9.5 Agent coordinator
+
+Assembles bounded context, invokes the selected model/provider, validates the
+returned transaction, presents the diff, and feeds diagnostics into repair. It
+does not define UI semantics itself.
+
+## 10. Runtime preview and reconciliation
+
+`@kurot/ui-runtime` is the execution layer used by the editor and optional
+dynamic production features.
+
+### 10.1 Current behavior
+
+The current implementation validates and fully materializes a document:
 
 ```ts
 const result = createKurotUI(document, options);
-stage.addChild(result.root);
-const startButton = result.instances.get('startButton');
+previewStage.addChild(result.root);
+const selected = result.instances.get(selectedNodeId);
 ```
 
-The adapter creates renderable objects, but `@kurot/ui` still performs layout
-and control behavior, while `@kurot/core` performs rendering.
+### 10.2 Required editor behavior
 
-The current audited foundation supports `kui.Group`, `kui.Label`, `kui.Image`,
-`kui.Rect`, and `kui.Button`; Basic, horizontal, vertical, and tile layouts;
-and serializable nine-slice rectangles. Resource loading and skin lookup remain
-the responsibility of the existing UI runtime adapters and Theme system.
+The first editor may rebuild the complete preview after a committed transaction
+if document sizes remain small enough. The eventual runtime should reconcile
+incremental changes:
 
-## `@kurot/cli`
+- update a property on the existing instance when safe;
+- add, remove, move, or reorder affected instances;
+- rebuild an instance when its component type changes;
+- refresh reusable instances when their definition changes;
+- preserve editor selection where stable IDs survive;
+- report exact operation and node paths on failure.
 
-`@kurot/cli` answers: **How is a project built and how are authoring formats
-converted into deployable assets?**
+Incremental reconciliation is an optimization and interaction-quality feature;
+it must not introduce semantics different from full materialization.
 
-It owns:
+## 11. Serialization and file syntax
 
-- project scaffolding and configuration;
-- TypeScript and esbuild orchestration;
-- build-time EXML compilation;
-- resource and custom-component discovery;
-- future EXML-to-`UIDocument` migration tooling;
-- future static compilation from `UIDocument` to TypeScript or JavaScript
-  component factories.
+The persisted authoring syntax remains an open implementation decision. A
+hierarchical XML-like `.kui` format may be concise for humans and Agents; JSON
+is convenient for structured tools and transport. Either can be supported by a
+format adapter.
 
-It does not own:
+The required guarantees are independent of syntax:
 
-- browser rendering or Stage lifecycle;
-- component implementations;
-- live editor interaction;
-- dynamic document execution.
+- lossless round-trip of all semantic data;
+- deterministic output suitable for version control;
+- stable node IDs and ordering;
+- explicit format version;
+- no executable expressions hidden in strings;
+- forward migrations owned by `@kurot/ui-document`;
+- editor metadata clearly separated from runtime semantics;
+- generated factories never used as the editable source.
 
-The CLI is a build-time tool and must not become a browser runtime dependency.
+The current deterministic JSON API remains useful for testing, transport, and
+early tooling. It does not settle the final human-facing `.kui` syntax.
 
-## Future visual UI editor
+## 12. Production compilation
 
-The visual editor answers: **How does a user create, inspect, modify, and
-preview UI?**
-
-It will own:
-
-- the component palette, hierarchy tree, property inspector, and resource
-  browser;
-- selection, drag operations, resize handles, and viewport controls;
-- editing commands, transactions, undo, and redo;
-- Agent-assisted generation and modification workflows;
-- saving and loading `UIDocument`;
-- browser preview hosting, including Canvas, Stage, scaling, refresh, and error
-  presentation.
-
-The editor should use `@kurot/ui-document` as its only stored document model
-and `@kurot/ui-runtime` as its preview execution layer. It must not invent a
-second private component format.
-
-## Dependency rules
-
-The intended dependency direction is:
+Static compilation is the default target for ordinary game UI:
 
 ```text
-@kurot/core
-├── @kurot/ui
-├── @kurot/game
-└── @kurot/ui-runtime
-       ├── @kurot/ui
-       └── @kurot/ui-document
+editable Kurot UI assets
+           ↓
+      @kurot/cli
+           ↓
+generated typed factories
+           ↓
+        esbuild
+           ↓
+      production game
+```
 
-@kurot/ui-document        no engine runtime dependency
+A generated factory may create real components directly:
 
-@kurot/cli
-└── @kurot/ui-document    build-time use only
+```ts
+export function createSlotGameScreen(): Group {
+	const root = new Group();
+	const spinButton = new Button();
+	spinButton.label = 'Spin';
+	root.addChild(spinButton);
+	return root;
+}
+```
 
-Future UI Editor
+The actual generator should preserve stable part access, reusable component
+factories, resource references, states, and source-map diagnostics. Generated
+files are disposable and recreated from authoring assets.
+
+Dynamic execution remains available for editor preview, remote activity UI,
+hot-loaded content, and other cases where shipping a semantic document is a
+feature:
+
+```text
+serialized UI asset → parse and validate → @kurot/ui-runtime → live tree
+```
+
+Static and dynamic paths must pass the same conformance fixtures before either
+is considered production-ready.
+
+## 13. Package ownership
+
+| Package / layer | Owns | Must not own |
+| --- | --- | --- |
+| `@kurot/core` | Display tree, rendering, events, geometry, text, resources, media. | UI authoring semantics or editor behavior. |
+| `@kurot/ui` | Runtime components, measurement, layout, control behavior, current skin and theme execution. | `UIDocument`, Agent schemas, editor transactions. |
+| `@kurot/ui-document` | Semantic assets, schemas, validation, edit operations, transactions, revisions, serialization, migrations. | Runtime classes, DOM, Canvas, filesystem, model-provider calls. |
+| `@kurot/ui-runtime` | Materialization, runtime adapters, instance lookup, eventual reconciliation. | Document syntax ownership, Canvas lifecycle, editor panels, component behavior. |
+| `@kurot/cli` | Authoring-asset discovery, validation orchestration, static factory generation, build integration. | Live editor state or browser runtime execution. |
+| Future editor | Visual editing, preview host, history UI, resource browsing, Agent orchestration. | A second private document model or renderer implementation. |
+
+The dependency direction remains one-way:
+
+```text
+@kurot/ui-document ─────────────┐
+                               ▼
+@kurot/core → @kurot/ui → @kurot/ui-runtime
+       │                       ▲
+       └───────────────────────┘
+
+@kurot/cli ──uses──> @kurot/ui-document
+
+Future editor
 ├── @kurot/ui-document
 └── @kurot/ui-runtime
 ```
 
-The following reverse dependencies are prohibited:
+`@kurot/ui-document` must remain headless. `@kurot/ui` must not depend on the
+authoring packages. The editor must never become a production engine
+dependency.
 
-- `@kurot/core` must not depend on any UI package;
-- `@kurot/ui` must not depend on `@kurot/ui-document` or the editor;
-- `@kurot/ui-document` must not depend on runtime engine packages;
-- `@kurot/ui-runtime` must not define a competing document model;
-- the editor must not become a dependency of runtime or build packages.
+## 14. Delivery roadmap
 
-These rules keep the engine usable without the editor and keep document tooling
-usable without a browser.
+The roadmap is ordered by dependency rather than visual appeal. Building an
+editor shell before the mutation and reuse contracts are stable would create a
+second accidental model inside editor code.
 
-## Dynamic and compiled execution
+### Phase 0 — Semantic-to-runtime proof: completed
 
-The architecture supports two production paths.
+- foundation document and node model;
+- validation and deterministic JSON;
+- component registry and inherited property schemas;
+- five audited foundation components;
+- full runtime materialization and node-instance lookup;
+- layouts, rectangle descriptors, structured errors;
+- unit tests and browser preview.
 
-Dynamic execution is appropriate for the editor, previews, remote UI, and
-rapid iteration:
+This proves the lower boundary but is not yet an authoring workflow.
 
-```text
-UIDocument
-    │
-    ▼
-@kurot/ui-runtime
-    │
-    ▼
-Kurot component tree
-```
+### Phase 1 — Authoring model v0.2
 
-Static compilation is appropriate when startup cost and the smallest runtime
-surface matter:
+- define screen, reusable component, and appearance asset kinds;
+- define component references and dependency identity;
+- define instances, parameters, slots, parts, and overrides;
+- define typed project resource references and design-token references;
+- define runtime-neutral states and variants;
+- audit compatibility-shaped properties such as `skinName` and
+  `hostComponentKey` out of the canonical authoring surface;
+- add cross-document validation and conformance fixtures.
 
-```text
-UIDocument
-    │
-    ▼
-@kurot/cli
-    │
-    ▼
-generated TypeScript/JavaScript factory
-    │
-    ▼
-Kurot component tree
-```
+Exit condition: a small reusable control and a screen containing two instances
+can round-trip without expanding instance internals into the parent document.
 
-Static builds do not need to include the dynamic `@kurot/ui-runtime` document
-walker. Both paths must consume the same component identities and property
-contracts defined by `@kurot/ui-document`.
+### Phase 2 — Headless editing kernel
 
-## Ownership checklist
+- define structural, property, reuse, and document operations;
+- add atomic transactions and document revisions;
+- add deterministic apply, inverse, diff, undo, and redo;
+- add conflict diagnostics for stale revisions;
+- add property and subtree query APIs needed by an editor;
+- test operation sequences and round-trip invariants.
 
-When adding a feature, route it by responsibility:
+Exit condition: the same document can be built and modified entirely through
+operations, with every transaction undoable and redoable.
 
-| Question | Owner |
-| --- | --- |
-| How is it drawn? | `@kurot/core` |
-| How does the component measure, lay out, or react? | `@kurot/ui` |
-| How is the feature represented and validated as data? | `@kurot/ui-document` |
-| How is that data converted into running objects? | `@kurot/ui-runtime` |
-| How is it converted or compiled during a build? | `@kurot/cli` |
-| How does a user manipulate and preview it? | Future UI Editor |
+### Phase 3 — Complete visual semantics
 
-If a feature answers more than one question, split its semantic contract from
-its runtime implementation instead of introducing a reverse dependency.
+- complete the component catalog needed for a first production UI slice;
+- implement appearance parts, states, variants, and transitions;
+- define bounded binding and semantic-action contracts;
+- integrate project resources, fonts, images, Spine, and design tokens;
+- implement matching runtime adapters.
+
+The first slice should stay deliberately finite, such as the controls required
+for one slot or crash-game screen, rather than attempting every possible game
+UI component.
+
+Exit condition: one representative screen can be represented without EXML-only
+semantics or handwritten construction of its visual tree.
+
+### Phase 4 — Preview reconciliation
+
+- apply committed transactions to the live runtime tree;
+- preserve stable instances and selection where possible;
+- refresh component instances when a reusable definition changes;
+- surface runtime diagnostics in document terms;
+- maintain full-rebuild conformance as the reference behavior.
+
+Exit condition: common property and hierarchy edits update an open preview
+without reloading the editor page.
+
+### Phase 5 — Minimum visual editor
+
+- document open/save and revision tracking;
+- hierarchy, component palette, property inspector, and resource browser;
+- Canvas preview with selection and transform overlays;
+- layout and constraint editing;
+- history, diff, diagnostics, and device viewport presets;
+- reusable-component navigation and instance-override inspection.
+
+Exit condition: a person can construct, save, reopen, and visually modify the
+representative screen without editing its serialized text.
+
+### Phase 6 — Agent collaboration
+
+- expose schemas, resources, reusable components, selection, and diagnostics as
+  bounded context;
+- expose the edit protocol as Agent tools;
+- support new-document generation and local modification transactions;
+- show semantic diffs before acceptance;
+- feed validation failures into bounded repair attempts;
+- add evals for preservation of unrelated work, valid resource use, layout
+  intent, reuse, and undo safety.
+
+Exit condition: a person can describe a large UI section, review the generated
+transaction, adjust it visually, and ask for a second targeted modification
+without the Agent overwriting manual changes.
+
+### Phase 7 — Static compiler and production hardening
+
+- compile authoring assets into typed component factories;
+- generate stable part access and reusable factory calls;
+- prove static/dynamic output conformance;
+- integrate incremental CLI watch builds;
+- add migrations, source diagnostics, dependency invalidation, and release
+  gates;
+- test representative devices and production project integration.
+
+Exit condition: the representative screen ships without its authoring document
+or dynamic document walker unless the project explicitly selects dynamic UI.
+
+## 15. Decided and open questions
+
+### Decided
+
+- editable UI assets remain the development source of truth;
+- generated TS/JS is a disposable production artifact;
+- `UIDocument` is the normalized semantic model, not synonymous with JSON;
+- human gestures and Agent requests use one edit protocol;
+- stable IDs, typed schemas, validation, transactions, and undo are mandatory;
+- reusable components use references and overrides rather than copied trees;
+- the future model is not constrained by EXML compatibility;
+- runtime preview and static compilation share semantic contracts;
+- the initial supported game domain and component catalog remain finite.
+
+### Open
+
+- final `.kui` text syntax and file extension;
+- whether appearances are always separate assets or may be embedded for small
+  private components;
+- exact parameter, slot, part, state, and variant TypeScript names;
+- the bounded binding expression or view-model contract;
+- how semantic actions connect to handwritten controllers;
+- when full preview rebuild becomes incremental reconciliation;
+- generated factory API and source-map format;
+- editor packaging and process architecture.
+
+Open questions must be resolved with small conformance examples and end-to-end
+tests rather than by copying the shape of EXML, Unity, LayaAir, FairyGUI, or any
+single existing editor.
+
+## 16. Definition of architectural success
+
+The architecture is successful when all of the following are true:
+
+- a person can create and edit a screen visually without reading serialization;
+- an Agent can generate a large valid section from natural language using only
+  bounded schemas, resources, reusable components, and project context;
+- the person can manually adjust the result and later Agent edits preserve
+  those unrelated adjustments;
+- every Agent change is reviewable, atomic, and undoable;
+- reusable component definition changes propagate predictably to instances;
+- invalid properties, resources, references, states, and bindings fail with
+  exact semantic diagnostics;
+- editor preview and compiled production output are structurally and visually
+  conformant;
+- the game can ship generated factories without authoring syntax parsers;
+- `@kurot/core` and `@kurot/ui` remain usable without any editor or Agent
+  dependency;
+- no ordinary UI generation task requires the Agent to rediscover engine source
+  code or guess private runtime behavior.
+
+Until this loop exists, Kurot has semantic and runtime foundations for future UI
+authoring, not yet an AI-native UI editor.

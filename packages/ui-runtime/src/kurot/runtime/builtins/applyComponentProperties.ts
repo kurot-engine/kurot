@@ -1,9 +1,11 @@
 import type { DisplayObject } from '@kurot/core';
 import type { UIPropertyValue } from '@kurot/ui-document';
-import { Button, Component, Group, Image, Label, Rect } from '@kurot/ui';
-import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
-import { createLayout } from './createLayout.js';
-import { createRectangle } from './createRectangle.js';
+import { Component, Image, Rect } from '@kurot/ui';
+import { createRectangle } from '../descriptors/createRectangle.js';
+import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
+import { applyContainerProperty } from './applyContainerProperties.js';
+import { applyControlProperty } from './applyControlProperties.js';
+import { applyTextProperty } from './applyTextProperties.js';
 
 /**
  * Applies one property declared directly by a built-in Kurot UI component.
@@ -17,10 +19,10 @@ export function applyComponentProperty(
 	if (target instanceof Component && applySkinnableProperty(target, name, value, path)) {
 		return true;
 	}
-	if (target instanceof Group && applyGroupProperty(target, name, value, path)) {
+	if (applyContainerProperty(target, name, value, path)) {
 		return true;
 	}
-	if (target instanceof Label && applyLabelProperty(target, name, value, path)) {
+	if (applyTextProperty(target, name, value, path)) {
 		return true;
 	}
 	if (target instanceof Image && applyImageProperty(target, name, value, path)) {
@@ -29,7 +31,7 @@ export function applyComponentProperty(
 	if (target instanceof Rect && applyRectProperty(target, name, value, path)) {
 		return true;
 	}
-	return target instanceof Button && applyButtonProperty(target, name, value, path);
+	return applyControlProperty(target, name, value, path);
 }
 
 function applySkinnableProperty(
@@ -50,93 +52,6 @@ function applySkinnableProperty(
 			return true;
 		case 'skinName':
 			target.skinName = requireString(value, path);
-			return true;
-		default:
-			return false;
-	}
-}
-
-function applyGroupProperty(
-	target: Group,
-	name: string,
-	value: UIPropertyValue,
-	path: string,
-): boolean {
-	switch (name) {
-		case 'currentState':
-			target.currentState = requireString(value, path);
-			return true;
-		case 'layout':
-			target.layout = createLayout(value, path);
-			return true;
-		case 'scrollEnabled':
-			target.scrollEnabled = requireBoolean(value, path);
-			return true;
-		case 'scrollH':
-			target.scrollH = requireNumber(value, path);
-			return true;
-		case 'scrollV':
-			target.scrollV = requireNumber(value, path);
-			return true;
-		case 'touchThrough':
-			target.touchThrough = requireBoolean(value, path);
-			return true;
-		default:
-			return false;
-	}
-}
-
-function applyLabelProperty(
-	target: Label,
-	name: string,
-	value: UIPropertyValue,
-	path: string,
-): boolean {
-	switch (name) {
-		case 'bold':
-			target.bold = requireBoolean(value, path);
-			return true;
-		case 'displayAsPassword':
-			target.displayAsPassword = requireBoolean(value, path);
-			return true;
-		case 'fontFamily':
-			target.fontFamily = requireString(value, path);
-			return true;
-		case 'italic':
-			target.italic = requireBoolean(value, path);
-			return true;
-		case 'lineSpacing':
-			target.lineSpacing = requireNumber(value, path);
-			return true;
-		case 'maxChars':
-			target.maxChars = requireNumber(value, path);
-			return true;
-		case 'multiline':
-			target.multiline = requireBoolean(value, path);
-			return true;
-		case 'size':
-			target.size = requireNumber(value, path);
-			return true;
-		case 'stroke':
-			target.stroke = requireNumber(value, path);
-			return true;
-		case 'strokeColor':
-			target.strokeColor = requireNumber(value, path);
-			return true;
-		case 'text':
-			target.text = requireString(value, path);
-			return true;
-		case 'textAlign':
-			target.textAlign = requireString(value, path);
-			return true;
-		case 'textColor':
-			target.textColor = requireNumber(value, path);
-			return true;
-		case 'verticalAlign':
-			target.verticalAlign = requireString(value, path);
-			return true;
-		case 'wordWrap':
-			target.wordWrap = requireBoolean(value, path);
 			return true;
 		default:
 			return false;
@@ -194,30 +109,6 @@ function applyRectProperty(
 			return true;
 		case 'strokeWeight':
 			target.strokeWeight = requireNumber(value, path);
-			return true;
-		default:
-			return false;
-	}
-}
-
-function applyButtonProperty(
-	target: Button,
-	name: string,
-	value: UIPropertyValue,
-	path: string,
-): boolean {
-	switch (name) {
-		case 'icon':
-			target.icon = requireString(value, path);
-			return true;
-		case 'label':
-			target.label = requireString(value, path);
-			return true;
-		case 'selected':
-			target.selected = requireBoolean(value, path);
-			return true;
-		case 'toggle':
-			target.toggle = requireBoolean(value, path);
 			return true;
 		default:
 			return false;

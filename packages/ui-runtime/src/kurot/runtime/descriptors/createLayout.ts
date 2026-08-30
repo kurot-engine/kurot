@@ -7,7 +7,7 @@ import {
 	TileLayout,
 	VerticalLayout,
 } from '@kurot/ui';
-import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
  * Creates and configures a Kurot layout from a canonical layout descriptor.
