@@ -46,7 +46,9 @@ export function materializeComponentInstance(
 		context,
 	);
 	applyNodeProperties(root, node, path, context);
-	if (node.appearance) applyAppearance(root, node, identity, path, context);
+	if (node.appearance) {
+		applyAppearance(root, node, identity, path, context);
+	}
 	if (Object.keys(source.contract.states).length > 0) {
 		context.stateControllers.set(
 			identity,

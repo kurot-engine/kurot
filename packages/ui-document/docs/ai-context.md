@@ -115,9 +115,8 @@ src/
 - Actions, data binding, migrations, and a final human-facing `.kui` syntax are
   not implemented.
 - `@kurot/ui-runtime@0.2.x` consumes format version 2 and materializes the
-  implemented static reuse and appearance slice. Appearance variant selection
-  is modeled here but requires `@kurot/ui-runtime@0.2` support. Bindings,
-  actions, and reconciliation remain pending.
+  implemented static reuse and appearance slice, including selected appearance
+  variants. Bindings, actions, and reconciliation remain pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 

@@ -64,12 +64,16 @@ function createRuntimeAssetRegistry(
 ): UIAssetRegistry {
 	const registry = new UIAssetRegistry();
 	for (const asset of source?.listAssets() ?? []) {
-		if (asset.id !== document.id) registry.registerAsset(asset);
+		if (asset.id !== document.id) {
+			registry.registerAsset(asset);
+		}
 	}
 	registry.registerAsset(document);
 	for (const resource of source?.listResources() ?? []) {
 		registry.registerResource(resource);
 	}
-	for (const token of source?.listTokens() ?? []) registry.registerToken(token);
+	for (const token of source?.listTokens() ?? []) {
+		registry.registerToken(token);
+	}
 	return registry;
 }

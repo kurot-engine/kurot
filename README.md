@@ -55,15 +55,16 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)                 | 1.1.3   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.3.2   | `packages/ui-document` | Headless UI assets, appearance variants, validation, operations, transactions, revisions, diffs, and undo/redo | None                  |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.2.0   | `packages/ui-runtime`  | Materializes format-v2 assets and reusable components into real Kurot UI component trees                       | `core`, `ui`, `ui-document` |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.2.0   | `packages/ui-runtime`  | Materializes semantic assets and reusable components into real Kurot UI component trees                        | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
-`@kurot/ui-document` 0.3 provides the reusable format-v2 model and headless
+`@kurot/ui-document` 0.3 provides the reusable semantic model and headless
 editing kernel. `@kurot/ui-runtime` 0.2 validates and renders that model,
 including component instances, Slots, appearances, states, variants, resources,
 and design tokens. Version 0.2 executes component variants, dynamic
-per-instance component states, and native appearance states.
+per-instance component states, selected appearance variants, and native
+appearance states.
 
 ```text
 @kurot/core

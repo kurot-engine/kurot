@@ -1,6 +1,7 @@
 import type { DisplayObject } from '@kurot/core';
 import { Component, SetProperty, Skin, State } from '@kurot/ui';
 import type { UIDocument, UINode } from '@kurot/ui-document';
+import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { materializeNode, qualifyNodeId } from './materializeNode.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
@@ -32,12 +33,40 @@ export function applyAppearance(
 		scope,
 		context,
 	);
+	applyAppearanceVariant(node.appearance.variant, appearance, scope, context);
 	const skin = new Skin();
 	skin.elementsContent = [root];
 	exposeAppearanceNodes(skin, appearance.root, scope, context);
 	exposeParts(skin, appearance, scope, context);
 	skin.states = createStates(appearance, context);
 	target.skinName = skin;
+}
+
+function applyAppearanceVariant(
+	name: string | undefined,
+	appearance: UIDocument,
+	scope: string,
+	context: KurotUICreationContext,
+): void {
+	if (name === undefined) return;
+	const definition = appearance.contract.variants[name];
+	if (!definition) return;
+	const path = `$.assets[${JSON.stringify(appearance.id)}].contract.variants.${name}`;
+	for (let index = 0; index < definition.overrides.length; index++) {
+		const override = definition.overrides[index];
+		const identity = qualifyNodeId(scope, override.targetId);
+		const target = context.instances.get(identity);
+		const type = context.types.get(identity);
+		if (!target || !type) continue;
+		applyRuntimeProperty(
+			target,
+			type,
+			override.property,
+			override.value,
+			`${path}.overrides[${index}].value`,
+			context,
+		);
+	}
 }
 
 function exposeAppearanceNodes(
@@ -47,7 +76,9 @@ function exposeAppearanceNodes(
 	context: KurotUICreationContext,
 ): void {
 	const target = context.instances.get(qualifyNodeId(scope, node.id));
-	if (target) setSkinValue(skin, node.id, target);
+	if (target) {
+		setSkinValue(skin, node.id, target);
+	}
 	for (const child of node.children) {
 		exposeAppearanceNodes(skin, child, scope, context);
 	}
@@ -63,7 +94,9 @@ function exposeParts(
 	for (const name of names) {
 		const part = appearance.contract.parts[name];
 		const target = context.instances.get(qualifyNodeId(scope, part.nodeId));
-		if (target) setSkinValue(skin, name, target);
+		if (target) {
+			setSkinValue(skin, name, target);
+		}
 	}
 	skin.skinParts = names;
 }

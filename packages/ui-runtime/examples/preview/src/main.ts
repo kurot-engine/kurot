@@ -1,6 +1,7 @@
 import { createPlayer } from '@kurot/core';
 import type { UIDocument } from '@kurot/ui-document';
 import {
+	createUIAppearanceReference,
 	createUIAssetContract,
 	createUIComponentInstance,
 	createUIDocument,
@@ -44,6 +45,7 @@ function createPreviewProject(): {
 	readonly document: UIDocument;
 } {
 	const card = createPreviewCard();
+	const buttonAppearance = createPreviewButtonAppearance();
 	const document = createUIDocument({
 		id: 'ui-runtime-preview',
 		root: createUINode({
@@ -106,11 +108,25 @@ function createPreviewProject(): {
 						],
 					}),
 				}),
+				createUINode({
+					id: 'variant-button',
+					type: 'kui.Button',
+					properties: {
+						label: 'APPEARANCE VARIANT',
+						x: 310,
+						y: 360,
+					},
+					appearance: createUIAppearanceReference(
+						buttonAppearance.id,
+						'outlined',
+					),
+				}),
 			],
 		}),
 	});
 	const assets = new UIAssetRegistry();
 	assets.registerAsset(card);
+	assets.registerAsset(buttonAppearance);
 	assets.registerAsset(document);
 	assets.registerToken({
 		key: 'color.action.primary',
@@ -118,6 +134,60 @@ function createPreviewProject(): {
 		value: 0x1d4ed8,
 	});
 	return { assets, document };
+}
+
+function createPreviewButtonAppearance(): UIDocument {
+	return createUIDocument({
+		id: 'preview-button-appearance',
+		assetKind: 'appearance',
+		contract: createUIAssetContract({
+			targetType: 'kui.Button',
+			parts: {
+				background: { nodeId: 'background' },
+				labelDisplay: { nodeId: 'labelDisplay' },
+			},
+			variants: {
+				outlined: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'strokeWeight',
+							value: 4,
+						},
+					],
+				},
+			},
+		}),
+		root: createUINode({
+			id: 'root',
+			type: 'kui.Group',
+			properties: { height: 58, width: 220 },
+			children: [
+				createUINode({
+					id: 'background',
+					type: 'kui.Rect',
+					properties: {
+						fillColor: 0x1e293b,
+						height: 58,
+						strokeColor: 0x38bdf8,
+						width: 220,
+					},
+				}),
+				createUINode({
+					id: 'labelDisplay',
+					type: 'kui.Label',
+					properties: {
+						height: 58,
+						text: 'APPEARANCE VARIANT',
+						textAlign: 'center',
+						textColor: 0xffffff,
+						verticalAlign: 'middle',
+						width: 220,
+					},
+				}),
+			],
+		}),
+	});
 }
 
 function createPreviewCard(): UIDocument {

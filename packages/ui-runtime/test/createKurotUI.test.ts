@@ -213,6 +213,7 @@ describe('createKurotUI', () => {
 		expect(button.skin?.skinParts).toEqual(['background']);
 		expect(button.skin?.states.map(state => state.name)).toEqual(['pressed']);
 		expect(appearanceBackground.fillColor).toBe(0x3366ff);
+		expect(appearanceBackground.strokeWeight).toBe(2);
 		const skin = button.skin;
 		if (!skin) throw new Error('Expected materialized Skin.');
 		skin.states[0]?.overrides[0]?.apply(button, skin);
@@ -234,6 +235,44 @@ describe('createKurotUI', () => {
 		playState?.clearState();
 		expect(playState?.currentState).toBeUndefined();
 		expect(play.alpha).toBe(1);
+	});
+
+	it('rejects an unknown appearance variant before materialization', () => {
+		const actionCard = readFixture('action-card.component.json');
+		const appearance = readFixture('button.appearance.json');
+		const screen = readFixture('lobby.screen.json');
+		const nativeButton = screen.root.children[2]!;
+		const invalidScreen = {
+			...screen,
+			root: {
+				...screen.root,
+				children: [
+					...screen.root.children.slice(0, 2),
+					{
+						...nativeButton,
+						appearance: {
+							...nativeButton.appearance!,
+							variant: 'missing',
+						},
+					},
+				],
+			},
+		};
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(actionCard);
+		assets.registerAsset(appearance);
+		const error = captureRuntimeError(() =>
+			createKurotUI(invalidScreen, { assets }),
+		);
+
+		expect(error.code).toBe('invalid-document');
+		expect(error.diagnostics).toContainEqual({
+			code: 'unknown-variant',
+			severity: 'error',
+			path: '$.assets["lobby-screen"].root.children[2].appearance.variant',
+			message:
+				'Variant "missing" is not published by appearance asset "primary-button-appearance".',
+		});
 	});
 
 	it('resolves registered resources through the application hook', () => {

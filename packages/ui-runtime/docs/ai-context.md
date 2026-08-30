@@ -42,13 +42,14 @@ for example `play-action/label`. Parameters apply through declared bindings,
 then instance overrides apply as the most specific values. Slot children retain
 their owning document scope. Appearance internals use an `@appearance:` scope
 and are installed as a native `Skin`; declared states become `State` and
-`SetProperty` objects.
+`SetProperty` objects. A selected appearance variant is applied to the
+materialized skin tree before native states are installed.
 
 Reusable component Contracts with states receive one `KurotUIStateController`
 per expanded instance. `setState(name)` applies overrides atomically and
 `clearState()` restores the pre-state values. Appearance states continue to use
-native Kurot `Skin` state handling. Appearance-variant selection, incremental
-reconciliation, bindings, actions, and transitions are not implemented.
+native Kurot `Skin` state handling. Incremental reconciliation, bindings,
+actions, and transitions are not implemented.
 
 `Image.source` and `Component.skinName` are forwarded to the existing
 `@kurot/ui` mechanisms. The package does not invent resource or Theme lookup.

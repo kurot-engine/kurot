@@ -13,13 +13,13 @@ stage.addChild(result.root);
 
 The runtime supports `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and
 `kui.Button`, including their audited inherited properties, children, layout
-descriptors, and nine-slice rectangles. Format-v2 component assets are expanded
+descriptors, and nine-slice rectangles. Reusable component assets are expanded
 with parameter bindings, variants, part overrides, and projected Slot content.
-Appearance assets become native Kurot skins and states.
+Appearance assets become native Kurot skins and states, including the selected
+appearance variant.
 
 Version 0.2 performs full-tree creation. It does not yet provide incremental
-reconciliation, appearance-variant selection, bindings, actions, or
-transitions.
+reconciliation, bindings, actions, or transitions.
 
 The result also provides a stable node lookup for editor selection and event
 wiring:

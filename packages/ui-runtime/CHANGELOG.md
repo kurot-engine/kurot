@@ -8,19 +8,20 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ### Added
 
-- Format-v2 project asset materialization through `UIAssetRegistry`.
+- Project asset materialization through `UIAssetRegistry`.
 - Reusable component expansion with parameter bindings, selected variants,
   public-part overrides, and projected Slot content.
 - Design-token resolution and an explicit resource-resolution hook.
 - Appearance assets materialized as native Kurot `Skin` and `State` objects.
+- Selected appearance variants applied as deterministic base-skin overrides.
 - Collision-free slash-qualified lookup keys for reusable component internals.
-- A format-v2 browser preview with two instances of one reusable component.
+- A browser preview covering reusable components and appearance variants.
 - Per-instance reusable-component state controllers with atomic activation,
   exact pre-state restoration, and structured unknown-state errors.
 
 ### Changed
 
-- Upgraded the `@kurot/ui-document` contract to `^0.3.1`.
+- Upgraded the `@kurot/ui-document` contract to `^0.3.2`.
 - Project-wide asset and component validation now runs before materialization.
 - The test suite now has an explicit Node/Vitest TypeScript project and performs
   test type-checking before execution.

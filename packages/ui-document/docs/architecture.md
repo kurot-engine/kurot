@@ -131,9 +131,8 @@ provider calls stay outside it.
 `@kurot/ui-runtime@0.2.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, resolves their static local semantics, and installs native
-appearance skins/states. Appearance variants are now authorable and validated;
-their execution, bindings, actions, and incremental reconciliation remain
-runtime work.
+appearance skins/states with selected appearance variants. Bindings, actions,
+and incremental reconciliation remain runtime work.
 
 ## Editing kernel
 

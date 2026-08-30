@@ -34,7 +34,9 @@ export function materializeNode(
 		const child = materializeNode(node.children[index], childPath, scope, context);
 		appendRuntimeChild(instance, child, node.type, childPath, adapter);
 	}
-	if (node.appearance) applyAppearance(instance, node, identity, path, context);
+	if (node.appearance) {
+		applyAppearance(instance, node, identity, path, context);
+	}
 	return instance;
 }
 
