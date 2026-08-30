@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.3.4` currently provides:
+`@kurot/ui-document@0.3.5` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -116,9 +116,9 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - structural validation with stable diagnostics and exact paths;
 - component definitions, property definitions, inheritance, and deterministic
   registry resolution;
-- an audited foundation catalog for `kui.Group`, `kui.Label`, `kui.Image`,
-  `kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`, and
-  `kui.TextInput`;
+- an audited foundation catalog for `kui.Group`, `kui.Label`,
+  `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
+  `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput`;
 - screen, reusable-component, and appearance asset kinds;
 - public contracts containing typed parameters, parts, Slots, states, and
   variants;

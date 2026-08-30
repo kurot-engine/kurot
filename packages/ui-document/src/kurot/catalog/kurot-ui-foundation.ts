@@ -7,6 +7,7 @@ import {
 } from './properties/foundation-properties.js';
 import {
 	BUTTON_PROPERTIES,
+	EDITABLE_TEXT_PROPERTIES,
 	GROUP_PROPERTIES,
 	IMAGE_PROPERTIES,
 	LABEL_PROPERTIES,
@@ -56,6 +57,14 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		description: 'Non-interactive text display component.',
 		children: 'none',
 		properties: LABEL_PROPERTIES,
+	},
+	{
+		type: 'kui.EditableText',
+		extends: 'kui.Label',
+		displayName: 'Editable Text',
+		description: 'Low-level editable text display used primarily as a TextInput appearance part.',
+		children: 'none',
+		properties: EDITABLE_TEXT_PROPERTIES,
 	},
 	{
 		type: 'kui.Image',

@@ -17,6 +17,25 @@ const TEXT_CONTENT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 	textColor: colorProperty(0xffffff, 'Text fill RGB color.'),
 };
 
+const TEXT_ENTRY_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	inputType: {
+		valueType: 'string',
+		enumValues: ['text'],
+		defaultValue: 'text',
+		description: 'Current native input type; only plain text is authored in this phase.',
+	},
+	prompt: {
+		valueType: 'string',
+		defaultValue: '',
+		description: 'Placeholder text shown while the text entry is empty and unfocused.',
+	},
+	restrict: {
+		valueType: 'string',
+		defaultValue: '',
+		description: 'Egret-compatible character inclusion or exclusion pattern.',
+	},
+};
+
 /**
  * Authoring properties declared directly by Group.
  */
@@ -95,26 +114,19 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 };
 
 /**
+ * Authoring properties declared directly by EditableText.
+ */
+export const EDITABLE_TEXT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
+	...TEXT_ENTRY_PROPERTIES,
+	promptColor: colorProperty(0x999999, 'Placeholder text RGB color.'),
+};
+
+/**
  * Authoring properties declared directly by TextInput.
  */
 export const TEXT_INPUT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	...TEXT_CONTENT_PROPERTIES,
-	inputType: {
-		valueType: 'string',
-		enumValues: ['text'],
-		defaultValue: 'text',
-		description: 'Current native input type; only plain text is authored in this phase.',
-	},
-	prompt: {
-		valueType: 'string',
-		defaultValue: '',
-		description: 'Placeholder text shown while the control is empty and unfocused.',
-	},
-	restrict: {
-		valueType: 'string',
-		defaultValue: '',
-		description: 'Egret-compatible character inclusion or exclusion pattern.',
-	},
+	...TEXT_ENTRY_PROPERTIES,
 };
 
 /**

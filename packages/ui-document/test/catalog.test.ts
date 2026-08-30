@@ -16,6 +16,7 @@ describe('Kurot UI foundation catalog', () => {
 		expect(registry.list().map((definition) => definition.type)).toEqual([
 			'kui.Button',
 			'kui.Component',
+			'kui.EditableText',
 			'kui.Group',
 			'kui.Image',
 			'kui.Label',
@@ -32,6 +33,7 @@ describe('Kurot UI foundation catalog', () => {
 	it('resolves audited properties through the semantic inheritance chain', () => {
 		const registry = createKurotUIFoundationRegistry();
 		const label = registry.resolve('kui.Label');
+		const editableText = registry.resolve('kui.EditableText');
 		const group = registry.resolve('kui.Group');
 		const button = registry.resolve('kui.Button');
 		const toggleButton = registry.resolve('kui.ToggleButton');
@@ -48,6 +50,17 @@ describe('Kurot UI foundation catalog', () => {
 			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent'],
 			children: 'multiple',
 		});
+		expect(editableText).toMatchObject({
+			baseTypes: [
+				'kurot.DisplayObject',
+				'kui.UIComponent',
+				'kui.Component',
+				'kui.Label',
+			],
+			children: 'none',
+		});
+		expect(editableText?.properties.text?.defaultValue).toBe('');
+		expect(editableText?.properties.promptColor?.defaultValue).toBe(0x999999);
 		expect(button?.children).toBe('none');
 		expect(toggleButton).toMatchObject({
 			baseTypes: [
@@ -148,6 +161,24 @@ describe('Kurot UI foundation catalog', () => {
 		expect(validateUIDocumentComponents(document, registry)).toEqual([]);
 	});
 
+	it('validates editable text appearance-part properties', () => {
+		const registry = createKurotUIFoundationRegistry();
+		const document = createUIDocument({
+			id: 'text-input-appearance',
+			root: createUINode({
+				id: 'text-display',
+				type: 'kui.EditableText',
+				properties: {
+					inputType: 'text',
+					prompt: 'Appearance-only prompt',
+					promptColor: 0x999999,
+				},
+			}),
+		});
+
+		expect(validateUIDocumentComponents(document, registry)).toEqual([]);
+	});
+
 	it('declares the exact direct property surface for each basic component', () => {
 		const registry = createKurotUIFoundationRegistry();
 
@@ -175,6 +206,9 @@ describe('Kurot UI foundation catalog', () => {
 			'verticalAlign',
 			'wordWrap',
 		]);
+		expect(
+			Object.keys(registry.get('kui.EditableText')?.properties ?? {}).sort(),
+		).toEqual(['inputType', 'prompt', 'promptColor', 'restrict']);
 		expect(Object.keys(registry.get('kui.Image')?.properties ?? {}).sort()).toEqual([
 			'fillMode',
 			'scale9Grid',
@@ -282,6 +316,22 @@ describe('Kurot UI foundation catalog', () => {
 			'$.root.children[6].properties.inputType',
 			'$.root.children[6].properties.maxChars',
 		]);
+	});
+
+	it('rejects invalid editable text appearance-part values', () => {
+		const registry = createKurotUIFoundationRegistry();
+		const document = createUIDocument({
+			id: 'invalid-editable-text',
+			root: createUINode({
+				id: 'text-display',
+				type: 'kui.EditableText',
+				properties: { inputType: 'tel', promptColor: -1 },
+			}),
+		});
+
+		expect(
+			validateUIDocumentComponents(document, registry).map(item => item.path),
+		).toEqual(['$.root.properties.inputType', '$.root.properties.promptColor']);
 	});
 
 	it('rejects abstract catalog bases as document nodes', () => {

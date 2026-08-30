@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.3.5] — 2026-08-31
+
+### Added
+
+- Audited `kui.EditableText` Schema as the low-level editable appearance part
+  used by `kui.TextInput`, inheriting Label typography and text properties.
+- Shared plain-text input, prompt, and character-restriction contracts between
+  `EditableText` and `TextInput`.
+- Catalog validation for valid and invalid editable appearance-part values.
+
 ## [0.3.4] — 2026-08-31
 
 ### Added
