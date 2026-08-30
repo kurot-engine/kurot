@@ -108,7 +108,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.2.0` currently provides:
+`@kurot/ui-document@0.3.0` currently provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -126,9 +126,12 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - typed project resources and design tokens;
 - project-wide reference, contract, identity, and dependency-cycle validation;
 - golden conformance fixtures for a component, an appearance, and a screen
-  containing two instances.
+  containing two instances;
+- semantic operations, atomic transactions, monotonic revisions, deterministic
+  diffs, and undo/redo history;
+- explicit parameter-to-internal-property bindings.
 
-`@kurot/ui-runtime@0.1.0` currently provides:
+`@kurot/ui-runtime@0.2.0` currently provides:
 
 - validation before materialization;
 - deterministic construction of those five foundation components;
@@ -139,6 +142,10 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - recursive child construction;
 - custom component adapters;
 - stable node-ID-to-runtime-instance lookup;
+- reusable component expansion with bound parameters, selected variants,
+  public-part overrides, and projected Slot content;
+- design-token resolution and an application resource-resolution hook;
+- appearance assets installed as native Kurot skins and states;
 - structured runtime errors;
 - a real browser preview proving that a semantic document becomes a rendered
   Kurot display tree.
@@ -151,12 +158,8 @@ The existing CLI still compiles EXML for current projects.
 
 The following are still design or implementation work:
 
-- declarative parameter-to-internal-property wiring;
-- runtime materialization of version 2 instances, Slots, appearances, states,
-  variants, resources, and tokens;
 - data binding and event/action semantics;
-- semantic edit operations and atomic transactions;
-- revisions, diffs, undo, redo, and conflict detection;
+- dynamic reusable-component state activation and appearance-variant selection;
 - incremental runtime reconciliation after an edit;
 - a visual editor shell;
 - Agent tools and context assembly;
@@ -165,27 +168,26 @@ The following are still design or implementation work:
 
 ### 3.3 Honest interpretation
 
-The current `@kurot/ui-runtime` preview constructs a format-v1 foundation
-document in TypeScript. It remains a smoke harness for this earlier completed
-boundary:
+The current `@kurot/ui-runtime` constructs a validated format-v2 project asset
+graph as real Kurot components. Its completed boundary is:
 
 ```text
-UIDocument → validated real component tree
+UIAssetRegistry + root UIDocument → validated reusable component tree
 ```
 
-Format-v2 authoring assets currently stop at a validated project graph; their
-instances, appearances, resources, states, and variants are not materialized by
-the runtime yet. Neither path is the intended authoring experience, and neither
-replaces EXML today.
+This now proves the document-to-runtime seam, but it is still full-tree
+materialization rather than live reconciliation. Binding, actions, transitions,
+editor interaction, and production compilation remain future work. It does not
+replace EXML in existing projects today.
 
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
 | Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
 | Foundation component schema | Partial | Five components are audited; the full authoring catalog and structured schemas are incomplete. |
-| Semantic-to-runtime materialization | Implemented for the foundation | Real components, properties, layouts, child trees, adapters, errors, tests, and browser preview. |
-| Editable asset kinds and reuse | Implemented in the headless model | Screens, components, compact instances, parameters, parts, Slots, variants, cross-document validation, and golden fixtures. Runtime materialization is pending. |
-| Appearance, states, bindings, resources | Partial | Appearances, states, typed resources, and design tokens are modeled and validated. Data binding, actions, parameter wiring, and runtime execution are pending. |
-| Editing operations and history | Not started | No transaction, revision, diff, undo, or redo API exists. |
+| Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
+| Editable asset kinds and reuse | Implemented for static creation | Screens, components, compact instances, parameter bindings, parts, Slots, component variants, cross-document validation, runtime expansion, and golden fixtures. Dynamic component states remain pending. |
+| Appearance, states, bindings, resources | Partial | Native appearance skins/states and design tokens execute at runtime; typed resources have an application resolver hook. Bindings, actions, appearance variants, transitions, and concrete resource adapters remain pending. |
+| Editing operations and history | Implemented | Typed semantic operations, atomic transactions, expected revisions, inverse operations, deterministic diffs, and monotonic undo/redo history. |
 | Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
 | Agent collaboration | Not started | Schemas exist, but there is no editing tool protocol or context coordinator. |
 | Static UI compiler | Not started | The CLI still compiles EXML; it does not compile the new semantic assets. |
@@ -694,7 +696,7 @@ second accidental model inside editor code.
 
 This proves the lower boundary but is not yet an authoring workflow.
 
-### Phase 1 — Authoring model v0.2: completed
+### Phase 1 — Format-v2 authoring model: completed
 
 - define screen, reusable component, and appearance asset kinds;
 - define component references and dependency identity;
@@ -713,7 +715,7 @@ Completion evidence: the `@kurot/ui-document` golden fixtures contain an
 `ActionCard` instances. Canonical round-trip and project validation pass while
 the screen contains only asset references and local instance differences.
 
-### Phase 2 — Headless editing kernel
+### Phase 2 — Headless editing kernel: completed
 
 - define structural, property, reuse, and document operations;
 - add atomic transactions and document revisions;
@@ -725,14 +727,19 @@ the screen contains only asset references and local instance differences.
 Exit condition: the same document can be built and modified entirely through
 operations, with every transaction undoable and redoable.
 
+Completion evidence: operation tests cover ordinary and Slot child collections,
+properties, reusable-instance values, Contract entries, temporarily invalid
+atomic sequences, stale revisions, inverse transactions, deterministic diffs,
+and monotonic undo/redo.
+
 ### Phase 3 — Complete visual semantics
 
 - complete the component catalog needed for a first production UI slice;
-- implement runtime execution of appearance parts, states, variants, and
-  transitions;
+- add dynamic reusable-component state activation, appearance-variant
+  selection, and transition semantics;
 - define bounded binding and semantic-action contracts;
-- resolve project resources, fonts, images, Spine, and design tokens at runtime;
-- implement matching runtime adapters.
+- implement concrete resource adapters for fonts, images, Spine, and animation;
+- complete matching runtime adapters for the first production component slice.
 
 The first slice should stay deliberately finite, such as the controls required
 for one slot or crash-game screen, rather than attempting every possible game

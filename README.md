@@ -54,14 +54,16 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/ui`](packages/ui/README.md)                   | 1.1.7   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)                 | 1.1.3   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.2.0   | `packages/ui-document` | Headless semantic UI assets, reusable-component contracts, typed project references, and project validation    | None                  |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.1.0   | `packages/ui-runtime`  | Materializes the format-v1 foundation document into real Kurot UI component trees                              | `core`, `ui`, `ui-document` |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.3.0   | `packages/ui-document` | Headless UI assets, validation, semantic operations, transactions, revisions, diffs, and undo/redo             | None                  |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.2.0   | `packages/ui-runtime`  | Materializes format-v2 assets and reusable components into real Kurot UI component trees                       | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
-`@kurot/ui-document` 0.2 introduces the reusable format-v2 authoring model.
-`@kurot/ui-runtime` 0.1 still targets the earlier foundation format and does
-not yet preview format-v2 instances, Slots, appearances, states, or variants.
+`@kurot/ui-document` 0.3 provides the reusable format-v2 model and headless
+editing kernel. `@kurot/ui-runtime` 0.2 validates and renders that model,
+including component instances, Slots, appearances, states, variants, resources,
+and design tokens. Version 0.2 specifically executes component variants and
+native appearance states; dynamic component-state activation remains Phase 3.
 
 ```text
 @kurot/core

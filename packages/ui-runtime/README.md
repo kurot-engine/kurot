@@ -7,20 +7,32 @@ document semantics into the component library.
 ```ts
 import { createKurotUI } from '@kurot/ui-runtime';
 
-const result = createKurotUI(document);
+const result = createKurotUI(document, { assets });
 stage.addChild(result.root);
 ```
 
-The initial runtime supports `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`,
-and `kui.Button`, including their audited inherited properties, children,
-layout descriptors, and nine-slice rectangles.
+The runtime supports `kui.Group`, `kui.Label`, `kui.Image`, `kui.Rect`, and
+`kui.Button`, including their audited inherited properties, children, layout
+descriptors, and nine-slice rectangles. Format-v2 component assets are expanded
+with parameter bindings, variants, part overrides, and projected Slot content.
+Appearance assets become native Kurot skins and states.
+
+Version 0.2 performs full-tree creation. It does not yet provide incremental
+reconciliation, dynamic reusable-component state activation, appearance-variant
+selection, bindings, actions, or transitions.
 
 The result also provides a stable node lookup for editor selection and event
 wiring:
 
 ```ts
 const startButton = result.instances.get('startButton');
+const internalLabel = result.instances.get('startButton/label');
 ```
+
+Design tokens resolve from the supplied `UIAssetRegistry`. Resource references
+use their registered key by default; applications can provide
+`resolveResource(reference, definition)` to return the runtime value expected by
+their resource system.
 
 Project component types are added by extending a foundation
 `UIComponentRegistry` and supplying a matching runtime adapter. Invalid

@@ -9,7 +9,13 @@
       "label": {
         "valueType": "string",
         "required": true,
-        "description": "Visible action label."
+        "description": "Visible action label.",
+        "bindings": [
+          {
+            "targetId": "label",
+            "property": "text"
+          }
+        ]
       }
     },
     "parts": {

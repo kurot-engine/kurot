@@ -4,9 +4,9 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.2.0).** The reusable authoring-asset model is now
-> implemented, but the schema remains pre-1.0 and is not yet a production file
-> format.
+> **Early development (0.3.0).** The reusable authoring model and headless
+> editing kernel are implemented, but the schema remains pre-1.0 and is not yet
+> a production file format.
 
 ## Installation
 
@@ -77,7 +77,10 @@ the corresponding `@kurot/ui` class.
   required properties, child policies, and abstract types;
 - union-valued properties, enum values, numeric ranges, integer constraints,
   serializable defaults, editor-facing semantic formats, and accepted resource
-  or token categories.
+  or token categories;
+- immutable semantic operations with exact inverse generation;
+- atomic transactions, monotonic revisions, stale-edit conflict detection,
+  deterministic diffs, and in-memory undo/redo history.
 
 ## Reusable assets
 
@@ -123,6 +126,41 @@ const diagnostics = validateUIAssetRegistry(registry);
 The component definition owns its internal hierarchy and publishes only its
 stable contract. Definition changes can therefore propagate without expanding
 or rewriting every parent asset.
+
+Component parameters may declare explicit bindings to internal node properties.
+This keeps parameter behavior deterministic without embedding JavaScript or
+expression strings in the document.
+
+## Editing transactions
+
+Editors, Agent tools, and CLI transformations should commit the same semantic
+operations instead of mutating document objects directly:
+
+```ts
+import { UIDocumentHistory } from '@kurot/ui-document';
+
+const history = new UIDocumentHistory(document);
+history.commit({
+  id: 'widen-spin-button',
+  expectedRevision: history.snapshot.revision,
+  summary: 'Make the primary action wider',
+  operations: [
+    {
+      kind: 'set-node-property',
+      nodeId: 'spin-button',
+      property: 'width',
+      value: 320,
+    },
+  ],
+});
+
+history.undo();
+history.redo();
+```
+
+Transactions either commit completely or leave the input snapshot untouched.
+Undo and redo create new monotonically increasing revisions, so an older Agent
+response cannot become current again merely because the user navigated history.
 
 Component definitions can remain intentionally incomplete while their runtime
 properties are reviewed:
@@ -190,8 +228,7 @@ The package owns the serializable UI asset model and its deterministic
 operations. Planned layers include:
 
 - the remaining component catalog and nested structured-value constraints;
-- declarative data binding, actions, and parameter-to-internal-property wiring;
-- commands, transactions, undo, and redo;
+- declarative data binding and actions;
 - document migrations;
 - adapters for formats such as EXML.
 
@@ -200,10 +237,11 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.1.x` targets format version 1 and does not yet materialize
-the version 2 instance, Slot, appearance, state, or variant semantics. Runtime
-preview support is a separate next step; this package does not claim that the
-new authoring assets are renderable today.
+`@kurot/ui-runtime@0.2.x` validates and materializes format-version-2 assets,
+including reusable instances, parameter bindings, Slots, component variants,
+part overrides, design tokens, resource hooks, and native appearance
+skins/states. Incremental reconciliation and the remaining dynamic semantics
+are separate runtime work; they do not belong in this headless package.
 
 ## Development
 

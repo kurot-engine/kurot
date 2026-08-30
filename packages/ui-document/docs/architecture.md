@@ -42,6 +42,10 @@ The parent never receives a copy of the component's private hierarchy. This is
 the core invariant that lets definition changes propagate and keeps diffs small
 and reviewable.
 
+Parameters may publish explicit bindings to internal node properties. Runtime
+adapters can therefore apply one typed instance value to stable destinations
+without evaluating code or relying on naming conventions.
+
 Node IDs remain unique across the parent document, including content projected
 into Slots. Tree traversal uses normal children first, then Slot names in stable
 sorted order while preserving child order within each Slot.
@@ -118,11 +122,25 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.1.x` still consumes format version 1 and therefore cannot
-materialize version 2 reusable instances, Slots, appearances, states, or
-variants. Updating that adapter is separate work; the authoring model does not
-claim preview support before the runtime passes the same conformance fixtures.
+`@kurot/ui-runtime@0.2.x` consumes format version 2 and passes the shared
+component, screen, and appearance conformance fixtures. It expands reusable
+instances, resolves their static local semantics, and installs native
+appearance skins/states. Dynamic component states, appearance variants,
+bindings, actions, and incremental reconciliation remain runtime work.
 
-Parameter contracts and instance values are present, but declarative wiring
-from a parameter to internal node properties is also still pending. That
-binding must become explicit data rather than an expression string.
+## Editing kernel
+
+Every meaningful mutation is represented as a typed semantic operation. The
+operation set covers node structure, ordered children and Slots, properties,
+appearances, reusable-instance values, Part overrides, and public Contract
+entries. Successful operations return exact inverses.
+
+Transactions apply an ordered operation list atomically against an expected
+revision. Only the final snapshot is validated, allowing one intent to cross a
+temporarily invalid intermediate state without exposing it. Failed operations,
+validation errors, and stale revisions leave the original snapshot untouched.
+
+`UIDocumentHistory` builds undo and redo on inverse transactions. Revisions are
+monotonic even across history navigation, which prevents delayed Agent work
+from overwriting a document after an undo. `diffUIDocuments` provides stable
+semantic changes for review panels and Agent summaries.

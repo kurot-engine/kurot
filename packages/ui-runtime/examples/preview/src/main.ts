@@ -1,6 +1,12 @@
 import { createPlayer } from '@kurot/core';
 import type { UIDocument } from '@kurot/ui-document';
-import { createUIDocument, createUINode } from '@kurot/ui-document';
+import {
+	createUIAssetContract,
+	createUIComponentInstance,
+	createUIDocument,
+	createUINode,
+	UIAssetRegistry,
+} from '@kurot/ui-document';
 import { createKurotUI } from '@kurot/ui-runtime';
 
 const canvas = requireElement('#game', HTMLCanvasElement);
@@ -8,8 +14,8 @@ const status = requireElement('#status', HTMLElement);
 const summary = requireElement('#summary', HTMLPreElement);
 
 try {
-	const document = createPreviewDocument();
-	const result = createKurotUI(document);
+	const { assets, document } = createPreviewProject();
+	const result = createKurotUI(document, { assets });
 	const app = createPlayer({
 		canvas,
 		contentWidth: 800,
@@ -32,8 +38,12 @@ try {
 	summary.textContent = error instanceof Error ? error.stack ?? error.message : String(error);
 }
 
-function createPreviewDocument(): UIDocument {
-	return createUIDocument({
+function createPreviewProject(): {
+	readonly assets: UIAssetRegistry;
+	readonly document: UIDocument;
+} {
+	const card = createPreviewCard();
+	const document = createUIDocument({
 		id: 'ui-runtime-preview',
 		root: createUINode({
 			id: 'screen',
@@ -50,19 +60,6 @@ function createPreviewDocument(): UIDocument {
 					},
 				}),
 				createUINode({
-					id: 'accent',
-					type: 'kui.Rect',
-					properties: {
-						ellipseHeight: 24,
-						ellipseWidth: 24,
-						fillColor: 0x1d4ed8,
-						height: 120,
-						width: 680,
-						x: 60,
-						y: 72,
-					},
-				}),
-				createUINode({
 					id: 'title',
 					type: 'kui.Label',
 					properties: {
@@ -71,28 +68,118 @@ function createPreviewDocument(): UIDocument {
 						text: 'UIDocument → live Kurot UI',
 						textColor: 0xffffff,
 						x: 92,
-						y: 102,
+						y: 42,
 					},
 				}),
 				createUINode({
-					id: 'description',
+					id: 'play-action',
+					type: 'preview.ActionCard',
+					properties: { x: 70, y: 135 },
+					instance: createUIComponentInstance({
+						source: { kind: 'asset', assetId: card.id },
+						parameters: { label: 'PLAY' },
+						variant: 'primary',
+						slots: {
+							content: [
+								createUINode({
+									id: 'play-hint',
+									type: 'kui.Label',
+									properties: {
+										text: 'Reusable instance A',
+										textColor: 0xbfdbfe,
+									},
+								}),
+							],
+						},
+					}),
+				}),
+				createUINode({
+					id: 'settings-action',
+					type: 'preview.ActionCard',
+					properties: { x: 430, y: 135 },
+					instance: createUIComponentInstance({
+						source: { kind: 'asset', assetId: card.id },
+						parameters: { label: 'SETTINGS' },
+						overrides: [
+							{ part: 'label', property: 'textColor', value: 0xfde68a },
+						],
+					}),
+				}),
+			],
+		}),
+	});
+	const assets = new UIAssetRegistry();
+	assets.registerAsset(card);
+	assets.registerAsset(document);
+	assets.registerToken({
+		key: 'color.action.primary',
+		tokenType: 'color',
+		value: 0x1d4ed8,
+	});
+	return { assets, document };
+}
+
+function createPreviewCard(): UIDocument {
+	return createUIDocument({
+		id: 'preview-action-card',
+		assetKind: 'component',
+		contract: createUIAssetContract({
+			componentType: 'preview.ActionCard',
+			parameters: {
+				label: {
+					valueType: 'string',
+					required: true,
+					bindings: [{ targetId: 'label', property: 'text' }],
+				},
+			},
+			parts: { label: { nodeId: 'label' } },
+			slots: { content: { nodeId: 'content-slot', capacity: 'multiple' } },
+			variants: {
+				primary: {
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'fillColor',
+							value: {
+								kind: 'token',
+								key: 'color.action.primary',
+								tokenType: 'color',
+							},
+						},
+					],
+				},
+			},
+		}),
+		root: createUINode({
+			id: 'root',
+			type: 'kui.Group',
+			properties: { height: 180, width: 300 },
+			children: [
+				createUINode({
+					id: 'background',
+					type: 'kui.Rect',
+					properties: {
+						fillColor: 0x334155,
+						height: 180,
+						width: 300,
+					},
+				}),
+				createUINode({
+					id: 'label',
 					type: 'kui.Label',
 					properties: {
-						lineSpacing: 9,
-						multiline: true,
-						size: 22,
-						text: 'This display tree was created from semantic data.\nNo EXML parser participates in this preview.',
-						textColor: 0xcbd5e1,
-						width: 620,
-						wordWrap: true,
-						x: 92,
-						y: 238,
+						bold: true,
+						size: 28,
+						text: 'Action',
+						textColor: 0xffffff,
+						x: 24,
+						y: 28,
 					},
 				}),
 				createUINode({
-					id: 'button-model',
-					type: 'kui.Button',
-					properties: { label: 'Semantic Button', name: 'previewAction' },
+					id: 'content-slot',
+					type: 'kui.Group',
+					properties: { x: 24, y: 92 },
 				}),
 			],
 		}),

@@ -1,0 +1,113 @@
+import type { DisplayObject } from '@kurot/core';
+import { Component, SetProperty, Skin, State } from '@kurot/ui';
+import type { UIDocument, UINode } from '@kurot/ui-document';
+import { materializeNode, qualifyNodeId } from './materializeNode.js';
+import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { resolvePropertyValue } from './resolvePropertyValue.js';
+import type { KurotUICreationContext } from './types.js';
+
+/**
+ * Applies one reusable appearance asset as a native Kurot Skin.
+ */
+export function applyAppearance(
+	target: DisplayObject,
+	node: UINode,
+	hostIdentity: string,
+	path: string,
+	context: KurotUICreationContext,
+): void {
+	if (!node.appearance) return;
+	if (!(target instanceof Component)) {
+		throw new KurotUIRuntimeError(
+			'unsupported-appearance',
+			`Runtime component "${node.type}" cannot host an appearance asset.`,
+			`${path}.appearance`,
+		);
+	}
+	const appearance = requireAppearance(node.appearance.assetId, path, context);
+	const scope = `${hostIdentity}@appearance:${appearance.id}`;
+	const root = materializeNode(
+		appearance.root,
+		`$.assets[${JSON.stringify(appearance.id)}].root`,
+		scope,
+		context,
+	);
+	const skin = new Skin();
+	skin.elementsContent = [root];
+	exposeAppearanceNodes(skin, appearance.root, scope, context);
+	exposeParts(skin, appearance, scope, context);
+	skin.states = createStates(appearance, context);
+	target.skinName = skin;
+}
+
+function exposeAppearanceNodes(
+	skin: Skin,
+	node: UINode,
+	scope: string,
+	context: KurotUICreationContext,
+): void {
+	const target = context.instances.get(qualifyNodeId(scope, node.id));
+	if (target) setSkinValue(skin, node.id, target);
+	for (const child of node.children) {
+		exposeAppearanceNodes(skin, child, scope, context);
+	}
+}
+
+function exposeParts(
+	skin: Skin,
+	appearance: UIDocument,
+	scope: string,
+	context: KurotUICreationContext,
+): void {
+	const names = Object.keys(appearance.contract.parts).sort();
+	for (const name of names) {
+		const part = appearance.contract.parts[name];
+		const target = context.instances.get(qualifyNodeId(scope, part.nodeId));
+		if (target) setSkinValue(skin, name, target);
+	}
+	skin.skinParts = names;
+}
+
+function createStates(
+	appearance: UIDocument,
+	context: KurotUICreationContext,
+): State[] {
+	return Object.keys(appearance.contract.states)
+		.sort()
+		.map(name => {
+			const definition = appearance.contract.states[name];
+			const path = `$.assets[${JSON.stringify(appearance.id)}]`;
+			const overrides = definition.overrides.map((override, index) =>
+				new SetProperty(
+					override.targetId,
+					override.property,
+					resolvePropertyValue(
+						override.value,
+						`${path}.contract.states.${name}.overrides[${index}].value`,
+						context,
+					),
+				),
+			);
+			return new State(name, overrides);
+		});
+}
+
+function requireAppearance(
+	id: string,
+	path: string,
+	context: KurotUICreationContext,
+): UIDocument {
+	const appearance = context.assets.getAsset(id);
+	if (!appearance || appearance.assetKind !== 'appearance') {
+		throw new KurotUIRuntimeError(
+			'invalid-document',
+			`Appearance asset "${id}" is unavailable.`,
+			`${path}.appearance.assetId`,
+		);
+	}
+	return appearance;
+}
+
+function setSkinValue(skin: Skin, name: string, value: DisplayObject): void {
+	(skin as unknown as Record<string, unknown>)[name] = value;
+}

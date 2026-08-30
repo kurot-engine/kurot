@@ -2,6 +2,31 @@ import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type { UIPropertyValue } from './UIPropertyValue.js';
 
 /**
+ * Internal property receiving a reusable component parameter value.
+ */
+export interface UIParameterBinding {
+	/**
+	 * Stable node identifier inside the component definition.
+	 */
+	readonly targetId: string;
+
+	/**
+	 * Public property receiving the resolved parameter value.
+	 */
+	readonly property: string;
+}
+
+/**
+ * Typed public component parameter and its explicit internal destinations.
+ */
+export interface UIParameterDefinition extends UIPropertyDefinition {
+	/**
+	 * Internal properties updated when an instance supplies this parameter.
+	 */
+	readonly bindings?: readonly UIParameterBinding[];
+}
+
+/**
  * A node property override activated by a state or variant.
  */
 export interface UIPropertyOverride {
@@ -113,7 +138,7 @@ export interface UIAssetContract {
 	/**
 	 * Typed values accepted by consumers of this asset.
 	 */
-	readonly parameters: Readonly<Record<string, UIPropertyDefinition>>;
+	readonly parameters: Readonly<Record<string, UIParameterDefinition>>;
 
 	/**
 	 * Stable internal nodes intentionally exposed to consumers.

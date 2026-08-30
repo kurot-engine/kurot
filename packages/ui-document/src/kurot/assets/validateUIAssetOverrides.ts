@@ -14,9 +14,33 @@ export function validateUIAssetOverrides(
 	components: UIComponentRegistry,
 ): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
+	validateParameterBindings(document, components, diagnostics);
 	validateModes(document, 'states', components, diagnostics);
 	validateModes(document, 'variants', components, diagnostics);
 	return diagnostics;
+}
+
+function validateParameterBindings(
+	document: UIDocument,
+	components: UIComponentRegistry,
+	diagnostics: UIDiagnostic[],
+): void {
+	for (const [name, parameter] of Object.entries(document.contract.parameters)) {
+		const bindings = parameter.bindings ?? [];
+		for (let index = 0; index < bindings.length; index++) {
+			const binding = bindings[index]!;
+			const target = findUINode(document.root, binding.targetId);
+			if (!target) continue;
+			const definition = components.resolve(target.type);
+			if (!definition || definition.properties[binding.property]) continue;
+			addUIDiagnostic(
+				diagnostics,
+				'unknown-component-property',
+				`$.contract.parameters.${name}.bindings[${index}].property`,
+				`Property "${binding.property}" is not defined for ${target.type}.`,
+			);
+		}
+	}
 }
 
 /**

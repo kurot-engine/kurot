@@ -1,11 +1,11 @@
 import type {
 	UIAssetContract,
+	UIParameterDefinition,
 	UIPartDefinition,
 	UISlotDefinition,
 	UIStateDefinition,
 	UIVariantDefinition,
 } from '../model/UIAssetContract.js';
-import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 
 /**
  * Input accepted by createUIAssetContract.
@@ -24,7 +24,7 @@ export interface CreateUIAssetContractOptions {
 	/**
 	 * Typed public parameter definitions.
 	 */
-	readonly parameters?: Readonly<Record<string, UIPropertyDefinition>>;
+	readonly parameters?: Readonly<Record<string, UIParameterDefinition>>;
 
 	/**
 	 * Public part definitions.

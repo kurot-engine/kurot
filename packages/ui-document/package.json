@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui-document",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "Headless semantic document model for Kurot UI tooling, editors, CLI workflows, and AI agents",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -22,7 +22,7 @@
 		"build": "tsc --build",
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
-		"test": "vitest run",
+		"test": "tsc --project tsconfig.test.json && vitest run",
 		"test:watch": "vitest",
 		"prepublishOnly": "npm run clean && npm run build"
 	},

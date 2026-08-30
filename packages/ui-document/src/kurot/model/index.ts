@@ -1,6 +1,8 @@
 export type { UIAssetKind } from './UIAssetKind.js';
 export type {
 	UIAssetContract,
+	UIParameterBinding,
+	UIParameterDefinition,
 	UIPartDefinition,
 	UIPropertyOverride,
 	UISlotDefinition,

@@ -1,7 +1,10 @@
 import type { DisplayObject } from '@kurot/core';
 import type {
+	UIAssetRegistry,
 	UIComponentRegistry,
 	UIPropertyValue,
+	UIResourceDefinition,
+	UIResourceReference,
 } from '@kurot/ui-document';
 
 /**
@@ -13,6 +16,7 @@ export type KurotUIRuntimeErrorCode =
 	| 'invalid-layout'
 	| 'invalid-property'
 	| 'invalid-rectangle'
+	| 'unsupported-appearance'
 	| 'unsupported-children'
 	| 'unsupported-component';
 
@@ -47,18 +51,36 @@ export interface KurotUIComponentAdapter {
 }
 
 /**
+ * Resolves one semantic resource reference to a runtime property value.
+ */
+export type KurotUIResourceResolver = (
+	reference: UIResourceReference,
+	definition: UIResourceDefinition,
+) => UIPropertyValue;
+
+/**
  * Runtime customization supplied for one materialization operation.
  */
 export interface CreateKurotUIOptions {
 	/**
-	 * Complete semantic registry used to validate the document.
+	 * Complete semantic component registry used to validate every asset.
 	 */
 	readonly registry?: UIComponentRegistry;
+
+	/**
+	 * Project assets, resources, and design tokens used by the root document.
+	 */
+	readonly assets?: UIAssetRegistry;
 
 	/**
 	 * Project-defined runtime adapters keyed by canonical component type.
 	 */
 	readonly adapters?: Readonly<Record<string, KurotUIComponentAdapter>>;
+
+	/**
+	 * Converts a registered resource reference into its browser runtime value.
+	 */
+	readonly resolveResource?: KurotUIResourceResolver;
 }
 
 /**
@@ -71,15 +93,38 @@ export interface KurotUICreationResult {
 	readonly root: DisplayObject;
 
 	/**
-	 * Runtime instances keyed by UIDocument node ID.
+	 * Runtime instances keyed by document node ID. Reusable component internals
+	 * use slash-qualified keys such as `action/label`.
 	 */
 	readonly instances: ReadonlyMap<string, DisplayObject>;
 }
 
 /**
- * Internal state shared while recursively materializing one document.
+ * Internal state shared while recursively materializing one project asset graph.
  */
 export interface KurotUICreationContext {
+	/**
+	 * Runtime adapters keyed by canonical component type.
+	 */
 	readonly adapters: Readonly<Record<string, KurotUIComponentAdapter>>;
+
+	/**
+	 * Validated project catalog used to resolve every reference.
+	 */
+	readonly assets: UIAssetRegistry;
+
+	/**
+	 * Materialized objects keyed by their runtime-qualified node identity.
+	 */
 	readonly instances: Map<string, DisplayObject>;
+
+	/**
+	 * Application resource resolver selected for this materialization.
+	 */
+	readonly resolveResource: KurotUIResourceResolver;
+
+	/**
+	 * Canonical component types keyed by runtime-qualified node identity.
+	 */
+	readonly types: Map<string, string>;
 }

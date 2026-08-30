@@ -21,6 +21,7 @@ const CONTRACT_KEYS = new Set([
 ]);
 const PARAMETER_KEYS = new Set([
 	'defaultValue',
+	'bindings',
 	'description',
 	'enumValues',
 	'format',
@@ -33,6 +34,7 @@ const PARAMETER_KEYS = new Set([
 	'valueType',
 ]);
 const PART_KEYS = new Set(['description', 'nodeId', 'required']);
+const PARAMETER_BINDING_KEYS = new Set(['property', 'targetId']);
 const SLOT_KEYS = new Set(['capacity', 'description', 'nodeId', 'required']);
 
 /**
@@ -57,7 +59,7 @@ export function validateUIAssetContract(
 
 	validateKnownKeys(value, CONTRACT_KEYS, path, diagnostics);
 	validateContractTypes(value, assetKind, path, diagnostics);
-	validateParameters(value.parameters, `${path}.parameters`, diagnostics);
+	validateParameters(value.parameters, `${path}.parameters`, diagnostics, nodeIds);
 	validateParts(value.parts, `${path}.parts`, diagnostics, nodeIds);
 	validateSlots(value.slots, `${path}.slots`, diagnostics, nodeIds);
 	validateUIAssetModes(value.states, `${path}.states`, diagnostics, nodeIds);
@@ -107,6 +109,7 @@ function validateParameters(
 	value: unknown,
 	path: string,
 	diagnostics: UIDiagnostic[],
+	nodeIds: ReadonlySet<string>,
 ): void {
 	if (!validateNamedRecord(value, path, 'parameters', diagnostics)) return;
 	for (const [name, definition] of Object.entries(value)) {
@@ -134,6 +137,66 @@ function validateParameters(
 				error instanceof Error ? error.message : 'Invalid parameter definition.',
 			);
 		}
+		validateParameterBindings(
+			definition.bindings,
+			`${definitionPath}.bindings`,
+			diagnostics,
+			nodeIds,
+		);
+	}
+}
+
+function validateParameterBindings(
+	value: unknown,
+	path: string,
+	diagnostics: UIDiagnostic[],
+	nodeIds: ReadonlySet<string>,
+): void {
+	if (value === undefined) return;
+	if (!Array.isArray(value)) {
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-asset-contract',
+			path,
+			'Parameter bindings must be an array.',
+		);
+		return;
+	}
+	for (let index = 0; index < value.length; index++) {
+		const binding = value[index];
+		const bindingPath = `${path}[${index}]`;
+		if (!isPlainRecord(binding)) {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				bindingPath,
+				'Parameter binding must be an object.',
+			);
+			continue;
+		}
+		validateKnownKeys(binding, PARAMETER_BINDING_KEYS, bindingPath, diagnostics);
+		if (
+			validateNonEmptyString(
+				binding.targetId,
+				`${bindingPath}.targetId`,
+				'Target node id',
+				diagnostics,
+			) &&
+			!nodeIds.has(binding.targetId)
+		) {
+			addUIDiagnostic(
+				diagnostics,
+				'unknown-node-reference',
+				`${bindingPath}.targetId`,
+				`Node "${binding.targetId}" does not exist in this asset.`,
+			);
+		}
+		validateNonEmptyString(
+			binding.property,
+			`${bindingPath}.property`,
+			'Property name',
+			diagnostics,
+		);
 	}
 }
 

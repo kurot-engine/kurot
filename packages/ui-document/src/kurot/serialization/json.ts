@@ -1,5 +1,6 @@
 import type {
 	UIAssetContract,
+	UIParameterDefinition,
 	UIPropertyOverride,
 	UIStateDefinition,
 	UIVariantDefinition,
@@ -102,7 +103,7 @@ function normalizeContract(contract: UIAssetContract): UIAssetContract {
 			? {}
 			: { componentType: contract.componentType }),
 		...(contract.targetType === undefined ? {} : { targetType: contract.targetType }),
-		parameters: mapSortedRecord(contract.parameters, normalizePropertyDefinition),
+		parameters: mapSortedRecord(contract.parameters, normalizeParameterDefinition),
 		parts: mapSortedRecord(contract.parts, value => ({
 			nodeId: value.nodeId,
 			...(value.required === undefined ? {} : { required: value.required }),
@@ -120,6 +121,22 @@ function normalizeContract(contract: UIAssetContract): UIAssetContract {
 		})),
 		states: mapSortedRecord(contract.states, normalizeState),
 		variants: mapSortedRecord(contract.variants, normalizeVariant),
+	};
+}
+
+function normalizeParameterDefinition(
+	definition: UIParameterDefinition,
+): UIParameterDefinition {
+	return {
+		...normalizePropertyDefinition(definition),
+		...(definition.bindings === undefined
+			? {}
+			: {
+					bindings: definition.bindings.map(binding => ({
+						targetId: binding.targetId,
+						property: binding.property,
+					})),
+				}),
 	};
 }
 

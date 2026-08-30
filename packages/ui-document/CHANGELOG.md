@@ -4,6 +4,38 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.3.0] — 2026-08-30
+
+### Added
+
+- Semantic operations for node insertion, removal, movement, type replacement,
+  properties, appearances, reusable instances, parameters, variants, Part
+  overrides, and public Contract entries.
+- Exact inverse generation for every successful operation.
+- Atomic transactions with caller identities, intent summaries, expected
+  revisions, final validation, inverse transactions, and deterministic change
+  summaries.
+- Monotonically increasing revisions and explicit stale-transaction conflict
+  errors for delayed editor or Agent work.
+- `UIDocumentHistory` with undo, redo, branch clearing, and revisions that
+  continue increasing across history navigation.
+- Deterministic semantic document diffs suitable for review interfaces.
+- Explicit parameter bindings from reusable component parameters to internal
+  node properties, enabling runtime-neutral component inputs without embedded
+  expressions.
+
+### Changed
+
+- Tree operations and diffs treat ordinary children and Slot-projected children
+  as first-class ordered collections.
+- Single-operation edits validate immediately, while transactions validate the
+  final snapshot atomically so coordinated operations may temporarily cross an
+  invalid intermediate state.
+- Project validation checks parameter binding destinations and their target
+  component properties.
+- The test suite now has an explicit Node/Vitest TypeScript project and performs
+  test type-checking before execution.
+
 ## [0.2.0] — 2026-08-30
 
 ### Added

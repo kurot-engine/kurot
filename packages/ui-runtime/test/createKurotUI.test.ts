@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import {
 	BasicLayout,
 	Button,
@@ -13,9 +15,20 @@ import {
 	createKurotUIFoundationRegistry,
 	createUIDocument,
 	createUINode,
+	parseUIDocument,
+	UIAssetRegistry,
 } from '@kurot/ui-document';
+import type { UIDocument } from '@kurot/ui-document';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createKurotUI, KurotUIRuntimeError } from '../src/index.js';
+
+const FIXTURE_DIRECTORY = resolve(
+	dirname(fileURLToPath(import.meta.url)),
+	'../../ui-document/test/fixtures',
+);
 
 beforeAll(() => {
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -146,6 +159,94 @@ describe('createKurotUI', () => {
 		expect(result.instances.get('label')).toBeInstanceOf(Label);
 	});
 
+	it('materializes reusable assets and all instance-local semantics', () => {
+		const actionCard = readFixture('action-card.component.json');
+		const appearance = readFixture('button.appearance.json');
+		const screen = readFixture('lobby.screen.json');
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(actionCard);
+		assets.registerAsset(appearance);
+		assets.registerAsset(screen);
+		assets.registerToken({
+			key: 'color.action.primary',
+			tokenType: 'color',
+			value: 0x3366ff,
+		});
+
+		const result = createKurotUI(screen, { assets });
+		const root = requireInstance(result.root, Group);
+		const play = requireInstance(result.instances.get('play-action'), Group);
+		const settings = requireInstance(result.instances.get('settings-action'), Group);
+		const playLabel = requireInstance(result.instances.get('play-action/label'), Label);
+		const settingsLabel = requireInstance(
+			result.instances.get('settings-action/label'),
+			Label,
+		);
+		const playBackground = requireInstance(
+			result.instances.get('play-action/background'),
+			Rect,
+		);
+		const playSlot = requireInstance(
+			result.instances.get('play-action/content-slot'),
+			Group,
+		);
+		const button = requireInstance(result.instances.get('native-button'), Button);
+		const appearanceBackground = requireInstance(
+			result.instances.get(
+				'native-button@appearance:primary-button-appearance/background',
+			),
+			Rect,
+		);
+
+		expect(root.numChildren).toBe(3);
+		expect(root.getChildAt(0)).toBe(play);
+		expect(root.getChildAt(1)).toBe(settings);
+		expect(play.left).toBe(24);
+		expect(settings.right).toBe(24);
+		expect(playLabel.text).toBe('Play');
+		expect(playLabel.textColor).toBe(0xffffff);
+		expect(settingsLabel.text).toBe('Settings');
+		expect(playBackground.fillColor).toBe(0x3366ff);
+		expect(playSlot.numChildren).toBe(1);
+		expect(result.instances.get('play-hint')).toBe(playSlot.getChildAt(0));
+		expect(button.label).toBe('Help');
+		expect(button.skin?.skinParts).toEqual(['background']);
+		expect(button.skin?.states.map(state => state.name)).toEqual(['pressed']);
+		expect(appearanceBackground.fillColor).toBe(0x3366ff);
+		const skin = button.skin;
+		if (!skin) throw new Error('Expected materialized Skin.');
+		skin.states[0]?.overrides[0]?.apply(button, skin);
+		expect(appearanceBackground.alpha).toBe(0.8);
+	});
+
+	it('resolves registered resources through the application hook', () => {
+		const document = createUIDocument({
+			id: 'resource-preview',
+			root: createUINode({
+				id: 'image',
+				type: 'kui.Image',
+				properties: {
+					source: {
+						kind: 'resource',
+						key: 'image.logo',
+						resourceType: 'image',
+					},
+				},
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerResource({ key: 'image.logo', resourceType: 'image' });
+
+		const result = createKurotUI(document, {
+			assets,
+			resolveResource: reference => `/assets/${reference.key}.png`,
+		});
+
+		expect(requireInstance(result.root, Image).source).toBe(
+			'/assets/image.logo.png',
+		);
+	});
+
 	it('reports document validation failures as structured runtime errors', () => {
 		const duplicate = createUINode({ id: 'duplicate', type: 'kui.Label' });
 		const document = createUIDocument({
@@ -237,4 +338,10 @@ function captureRuntimeError(operation: () => void): KurotUIRuntimeError {
 		throw error;
 	}
 	throw new Error('Expected KurotUIRuntimeError.');
+}
+
+function readFixture(name: string): UIDocument {
+	return parseUIDocument(
+		readFileSync(resolve(FIXTURE_DIRECTORY, name), 'utf8'),
+	);
 }

@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.2.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.3.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -21,7 +21,8 @@ src/
     ├── serialization/         Validated parse + canonical JSON serialization.
     ├── schema/                Component definitions, registry, semantic checks.
     ├── catalog/               Audited built-in semantic component subsets.
-    └── assets/                Project catalogs and cross-document validation.
+    ├── assets/                Project catalogs and cross-document validation.
+    └── editing/               Operations, transactions, revisions, diff, history.
 ```
 
 ## 2. Current contracts
@@ -34,6 +35,8 @@ src/
 - Contracts contain parameter schemas, public parts, named Slots, runtime
   states, and authoring variants. Parts, state overrides, and variant overrides
   target stable node IDs in the defining asset.
+- Component parameters may bind explicitly to internal node properties; binding
+  records contain stable target IDs and property names, never expressions.
 - A node has `id`, `type`, `properties`, optional `instance`, optional
   `appearance`, and ordered `children`.
 - A reusable instance stores a stable component-asset reference, parameter
@@ -99,15 +102,17 @@ src/
   `registerKurotUIFoundation`.
 - Project assets: `UIAssetRegistry`, project resource/token definitions, and
   `validateUIAssetRegistry`.
+- Editing: `UIOperation`, `applyUIOperation`, `UITransaction`,
+  `applyUITransaction`, revision snapshots, `diffUIDocuments`,
+  `UIDocumentHistory`, and `UIEditError`.
 
 ## 5. Important limitations
 
-- Parameter declarations and instance values are modeled, but declarative
-  parameter-to-internal-property binding is not implemented yet.
-- Actions, data binding, transactions, revisions, undo/redo, migrations, and a
-  final human-facing `.kui` syntax are not implemented.
-- `@kurot/ui-runtime@0.1.x` consumes format version 1. It does not yet
-  materialize version 2 instances, Slots, appearances, states, or variants.
+- Actions, data binding, migrations, and a final human-facing `.kui` syntax are
+  not implemented.
+- `@kurot/ui-runtime@0.2.x` consumes format version 2 and materializes the
+  implemented static reuse and appearance slice. Dynamic component states,
+  appearance variants, bindings, actions, and reconciliation remain pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 
@@ -122,6 +127,7 @@ src/
 | Change property semantics | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
 | Change built-in component fields | `catalog/properties/` |
 | Change project catalogs or cross-document rules | `assets/` |
+| Change operations, transactions, diff, or history | `editing/` |
 | Change public exports | nearest folder `index.ts`, then `src/index.ts` |
 
 ## 7. Commands

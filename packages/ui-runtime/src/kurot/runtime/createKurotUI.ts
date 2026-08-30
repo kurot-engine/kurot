@@ -1,18 +1,14 @@
-import type { DisplayObject } from '@kurot/core';
-import { Group } from '@kurot/ui';
 import {
 	createKurotUIFoundationRegistry,
+	UIAssetRegistry,
+	validateUIAssetRegistry,
 	validateUIDocument,
-	validateUIDocumentComponents,
 } from '@kurot/ui-document';
-import type { UIDocument, UINode } from '@kurot/ui-document';
-import { applyComponentProperty } from './builtins/applyComponentProperties.js';
-import { applyDisplayProperty } from './builtins/applyDisplayProperties.js';
-import { getBuiltInFactory } from './builtins/componentFactories.js';
+import type { UIDocument } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { materializeNode } from './materializeNode.js';
 import type {
 	CreateKurotUIOptions,
-	KurotUIComponentAdapter,
 	KurotUICreationContext,
 	KurotUICreationResult,
 } from './types.js';
@@ -34,101 +30,41 @@ export function createKurotUI(
 		);
 	}
 
-	const registry = options.registry ?? createKurotUIFoundationRegistry();
-	const componentDiagnostics = validateUIDocumentComponents(document, registry);
-	if (componentDiagnostics.length > 0) {
+	const components = options.registry ?? createKurotUIFoundationRegistry();
+	const assets = createRuntimeAssetRegistry(document, options.assets);
+	const diagnostics = validateUIAssetRegistry(assets, components);
+	if (diagnostics.length > 0) {
 		throw new KurotUIRuntimeError(
 			'invalid-document',
-			'UIDocument failed component validation.',
+			'UI asset registry failed project validation.',
 			'$',
-			componentDiagnostics,
+			diagnostics,
 		);
 	}
 
 	const context: KurotUICreationContext = {
 		adapters: options.adapters ?? {},
+		assets,
 		instances: new Map(),
+		resolveResource: options.resolveResource ?? (reference => reference.key),
+		types: new Map(),
 	};
-	const root = createNode(document.root, '$.root', context);
+	const root = materializeNode(document.root, '$.root', '', context);
 	return Object.freeze({ root, instances: context.instances });
 }
 
-function createNode(
-	node: UINode,
-	path: string,
-	context: KurotUICreationContext,
-): DisplayObject {
-	const adapter = context.adapters[node.type];
-	const instance = createInstance(node, path, adapter);
-	context.instances.set(node.id, instance);
-
-	for (const name of Object.keys(node.properties).sort()) {
-		const value = node.properties[name];
-		const propertyPath = `${path}.properties.${name}`;
-		const handled =
-			applyDisplayProperty(instance, name, value, propertyPath) ||
-			applyComponentProperty(instance, name, value, propertyPath) ||
-			adapter?.applyProperty?.(instance, name, value, propertyPath) === true;
-		if (!handled) {
-			throw new KurotUIRuntimeError(
-				'invalid-property',
-				`Runtime property "${name}" is not supported by ${node.type}.`,
-				propertyPath,
-			);
-		}
+function createRuntimeAssetRegistry(
+	document: UIDocument,
+	source?: UIAssetRegistry,
+): UIAssetRegistry {
+	const registry = new UIAssetRegistry();
+	for (const asset of source?.listAssets() ?? []) {
+		if (asset.id !== document.id) registry.registerAsset(asset);
 	}
-
-	for (let index = 0; index < node.children.length; index++) {
-		const childPath = `${path}.children[${index}]`;
-		const child = createNode(node.children[index], childPath, context);
-		appendChild(instance, child, node.type, childPath, adapter);
+	registry.registerAsset(document);
+	for (const resource of source?.listResources() ?? []) {
+		registry.registerResource(resource);
 	}
-	return instance;
-}
-
-function createInstance(
-	node: UINode,
-	path: string,
-	adapter?: KurotUIComponentAdapter,
-): DisplayObject {
-	const factory = adapter?.create ?? getBuiltInFactory(node.type);
-	if (!factory) {
-		throw new KurotUIRuntimeError(
-			'unsupported-component',
-			`No runtime adapter is registered for component type "${node.type}".`,
-			`${path}.type`,
-		);
-	}
-	try {
-		return factory();
-	} catch (error) {
-		const detail = error instanceof Error ? ` ${error.message}` : '';
-		throw new KurotUIRuntimeError(
-			'component-construction-failed',
-			`Failed to construct component type "${node.type}".${detail}`,
-			`${path}.type`,
-		);
-	}
-}
-
-function appendChild(
-	parent: DisplayObject,
-	child: DisplayObject,
-	parentType: string,
-	path: string,
-	adapter?: KurotUIComponentAdapter,
-): void {
-	if (adapter?.appendChild) {
-		adapter.appendChild(parent, child, path);
-		return;
-	}
-	if (parent instanceof Group) {
-		parent.addChild(child);
-		return;
-	}
-	throw new KurotUIRuntimeError(
-		'unsupported-children',
-		`Runtime component "${parentType}" cannot attach document children.`,
-		path,
-	);
+	for (const token of source?.listTokens() ?? []) registry.registerToken(token);
+	return registry;
 }
