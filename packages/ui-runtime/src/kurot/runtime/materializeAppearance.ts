@@ -3,6 +3,7 @@ import { Component, SetProperty, Skin, State } from '@kurot/ui';
 import type { UIDocument, UINode } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { materializeNode, qualifyNodeId } from './materializeNode.js';
+import { assetPath } from './assetPath.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
 import type { KurotUICreationContext } from './types.js';
@@ -30,7 +31,7 @@ export function applyAppearance(
 	const scope = `${hostIdentity}@appearance:${appearance.id}`;
 	const root = materializeNode(
 		appearance.root,
-		`$.assets[${JSON.stringify(appearance.id)}].root`,
+		assetPath(appearance.id, '.root'),
 		scope,
 		context,
 	);
@@ -52,7 +53,7 @@ function applyAppearanceVariant(
 	if (name === undefined) return;
 	const definition = appearance.contract.variants[name];
 	if (!definition) return;
-	const path = `$.assets[${JSON.stringify(appearance.id)}].contract.variants.${name}`;
+	const path = assetPath(appearance.id, `.contract.variants.${name}`);
 	for (let index = 0; index < definition.overrides.length; index++) {
 		const override = definition.overrides[index];
 		const identity = qualifyNodeId(scope, override.targetId);
@@ -106,15 +107,15 @@ function createStates(
 	appearance: UIDocument,
 	context: KurotUICreationContext,
 ): State[] {
+	const basePath = assetPath(appearance.id);
 	return Object.keys(appearance.contract.states)
 		.sort()
 		.map(name => {
 			const definition = appearance.contract.states[name];
-			const path = `$.assets[${JSON.stringify(appearance.id)}]`;
 			const overrides = definition.overrides.map((override, index) => {
 				const value = resolvePropertyValue(
 					override.value,
-					`${path}.contract.states.${name}.overrides[${index}].value`,
+					`${basePath}.contract.states.${name}.overrides[${index}].value`,
 					context,
 				);
 				if (override.transition !== undefined) {

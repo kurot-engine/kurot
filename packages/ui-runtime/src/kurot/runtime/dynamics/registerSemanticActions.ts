@@ -7,14 +7,15 @@ import type { KurotUICreationContext } from '../types.js';
  * Connects one asset's bounded action declarations to runtime events.
  */
 export function registerSemanticActions(
-	document: UIDocument,
+	asset: UIDocument,
 	scope: string,
 	context: KurotUICreationContext,
 ): void {
-	if (context.onAction === undefined) {
+	const onAction = context.onAction;
+	if (onAction === undefined) {
 		return;
 	}
-	const actions = document.contract.actions ?? {};
+	const actions = asset.contract.actions ?? {};
 	for (const name of Object.keys(actions).sort()) {
 		const definition = actions[name]!;
 		const identity = qualifyNodeId(scope, definition.sourceId);
@@ -24,9 +25,9 @@ export function registerSemanticActions(
 		}
 		const eventType = getEventType(definition.trigger);
 		const listener = (event: Event): void => {
-			context.onAction?.({
+			onAction({
 				action: name,
-				assetId: document.id,
+				assetId: asset.id,
 				event,
 				scope,
 				sourceId: definition.sourceId,

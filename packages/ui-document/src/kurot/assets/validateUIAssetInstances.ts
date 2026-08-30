@@ -1,5 +1,6 @@
 import { findUINode } from '../document/query.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import type { UIComponentInstance } from '../model/UIComponentInstance.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
 import { matchesUIPropertyDefinition } from '../schema/matchesUIPropertyDefinition.js';
@@ -69,6 +70,7 @@ function validateInstance(
 	diagnostics: UIDiagnostic[],
 ): void {
 	if (!node.instance) return;
+	const instance = node.instance;
 	if (node.children.length > 0) {
 		addUIDiagnostic(
 			diagnostics,
@@ -96,19 +98,20 @@ function validateInstance(
 		);
 		return;
 	}
-	validateParameters(node, path, source, diagnostics);
-	validateVariant(node, path, source, diagnostics);
-	validateSlots(node, path, source, diagnostics);
-	validateOverrides(node, path, source, components, diagnostics);
+	validateParameters(instance, node, path, source, diagnostics);
+	validateVariant(instance, node, path, source, diagnostics);
+	validateSlots(instance, node, path, source, diagnostics);
+	validateOverrides(instance, node, path, source, components, diagnostics);
 }
 
 function validateParameters(
+	instance: UIComponentInstance,
 	node: UINode,
 	path: string,
 	source: UIDocument,
 	diagnostics: UIDiagnostic[],
 ): void {
-	const values = node.instance!.parameters;
+	const values = instance.parameters;
 	for (const [name, definition] of Object.entries(source.contract.parameters)) {
 		if (Object.hasOwn(values, name)) continue;
 		if (!definition.required || definition.defaultValue !== undefined) continue;
@@ -140,12 +143,13 @@ function validateParameters(
 }
 
 function validateVariant(
+	instance: UIComponentInstance,
 	node: UINode,
 	path: string,
 	source: UIDocument,
 	diagnostics: UIDiagnostic[],
 ): void {
-	const variant = node.instance!.variant;
+	const variant = instance.variant;
 	if (variant === undefined || Object.hasOwn(source.contract.variants, variant)) return;
 	addUIDiagnostic(
 		diagnostics,
@@ -156,12 +160,13 @@ function validateVariant(
 }
 
 function validateSlots(
+	instance: UIComponentInstance,
 	node: UINode,
 	path: string,
 	source: UIDocument,
 	diagnostics: UIDiagnostic[],
 ): void {
-	const values = node.instance!.slots;
+	const values = instance.slots;
 	for (const [name, definition] of Object.entries(source.contract.slots)) {
 		if (!definition.required || (values[name]?.length ?? 0) > 0) continue;
 		addUIDiagnostic(
@@ -192,14 +197,15 @@ function validateSlots(
 }
 
 function validateOverrides(
+	instance: UIComponentInstance,
 	node: UINode,
 	path: string,
 	source: UIDocument,
 	components: UIComponentRegistry,
 	diagnostics: UIDiagnostic[],
 ): void {
-	for (let index = 0; index < node.instance!.overrides.length; index++) {
-		const override = node.instance!.overrides[index]!;
+	for (let index = 0; index < instance.overrides.length; index++) {
+		const override = instance.overrides[index]!;
 		const part = source.contract.parts[override.part];
 		const overridePath = `${path}.instance.overrides[${index}]`;
 		if (!part) {
@@ -211,6 +217,8 @@ function validateOverrides(
 			);
 			continue;
 		}
+		// Missing part targets and unresolvable part schemas are reported by
+		// the contract validators; only property compatibility is checked here.
 		const target = findUINode(source.root, part.nodeId);
 		if (!target) continue;
 		const definition = components.resolve(target.type);

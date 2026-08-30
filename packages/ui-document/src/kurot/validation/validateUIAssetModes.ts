@@ -3,6 +3,7 @@ import {
 	addUIDiagnostic,
 	isPlainRecord,
 	validateKnownKeys,
+	validateNodeIdReference,
 	validateNonEmptyString,
 	validatePropertyValue,
 } from './validationHelpers.js';
@@ -10,6 +11,7 @@ import {
 const MODE_KEYS = new Set(['description', 'overrides']);
 const OVERRIDE_KEYS = new Set(['property', 'targetId', 'transition', 'value']);
 const TRANSITION_KEYS = new Set(['delay', 'duration', 'easing']);
+const EASINGS = new Set(['ease-in', 'ease-in-out', 'ease-out', 'linear']);
 
 /**
  * Validates a named collection of runtime-neutral states or variants.
@@ -90,17 +92,13 @@ function validatePropertyOverride(
 		return;
 	}
 	validateKnownKeys(value, OVERRIDE_KEYS, path, diagnostics);
-	if (
-		validateNonEmptyString(value.targetId, `${path}.targetId`, 'Target node id', diagnostics) &&
-		!nodeIds.has(value.targetId)
-	) {
-		addUIDiagnostic(
-			diagnostics,
-			'unknown-node-reference',
-			`${path}.targetId`,
-			`Node "${value.targetId}" does not exist in this asset.`,
-		);
-	}
+	validateNodeIdReference(
+		value.targetId,
+		`${path}.targetId`,
+		'Target node id',
+		diagnostics,
+		nodeIds,
+	);
 	validateNonEmptyString(value.property, `${path}.property`, 'Property name', diagnostics);
 	validatePropertyValue(value.value, `${path}.value`, diagnostics);
 	validateTransition(value.transition, `${path}.transition`, diagnostics, allowTransitions);
@@ -129,13 +127,7 @@ function validateTransition(
 	validateKnownKeys(value, TRANSITION_KEYS, path, diagnostics);
 	validateDuration(value.duration, `${path}.duration`, diagnostics);
 	if (value.delay !== undefined) validateDuration(value.delay, `${path}.delay`, diagnostics);
-	if (
-		value.easing !== undefined &&
-		value.easing !== 'linear' &&
-		value.easing !== 'ease-in' &&
-		value.easing !== 'ease-out' &&
-		value.easing !== 'ease-in-out'
-	) {
+	if (value.easing !== undefined && (typeof value.easing !== 'string' || !EASINGS.has(value.easing))) {
 		addUIDiagnostic(
 			diagnostics,
 			'invalid-asset-contract',

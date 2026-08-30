@@ -17,6 +17,7 @@ import type { UIPropertyObject, UIPropertyValue } from '../model/UIPropertyValue
 import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { isUIDocument, validateUIDocument } from '../validation/validateUIDocument.js';
+import { compareStrings } from '../shared/strings.js';
 import { UIDocumentParseError } from './UIDocumentParseError.js';
 import { UIDocumentValidationError } from './UIDocumentValidationError.js';
 
@@ -72,12 +73,9 @@ function normalizeDocument(document: UIDocument): UIDocument {
 }
 
 function normalizeNode(node: UINode): UINode {
-	const entries = Object.keys(node.properties)
-		.sort()
-		.map<[string, UIPropertyValue]>((key) => [
-			key,
-			normalizePropertyValue(node.properties[key]!),
-		]);
+	const entries = Object.entries(node.properties)
+		.sort(([a], [b]) => compareStrings(a, b))
+		.map<[string, UIPropertyValue]>(([key, value]) => [key, normalizePropertyValue(value)]);
 	const properties: Record<string, UIPropertyValue> = Object.fromEntries(entries);
 
 	return {
@@ -264,12 +262,9 @@ function normalizePropertyValue(value: UIPropertyValue): UIPropertyValue {
 	}
 	if (typeof value === 'object') {
 		const objectValue = value as UIPropertyObject;
-		const entries = Object.keys(objectValue)
-			.sort()
-			.map<[string, UIPropertyValue]>((key) => [
-				key,
-				normalizePropertyValue(objectValue[key]!),
-			]);
+		const entries = Object.entries(objectValue)
+			.sort(([a], [b]) => compareStrings(a, b))
+			.map<[string, UIPropertyValue]>(([key, item]) => [key, normalizePropertyValue(item)]);
 		return Object.fromEntries(entries);
 	}
 	return value;
@@ -280,8 +275,8 @@ function mapSortedRecord<TValue, TResult>(
 	map: (value: TValue) => TResult,
 ): Record<string, TResult> {
 	return Object.fromEntries(
-		Object.keys(value)
-			.sort()
-			.map((key) => [key, map(value[key]!)]),
+		Object.entries(value)
+			.sort(([a], [b]) => compareStrings(a, b))
+			.map(([key, item]) => [key, map(item)]),
 	);
 }

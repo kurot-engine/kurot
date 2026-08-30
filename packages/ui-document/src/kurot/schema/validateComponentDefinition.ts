@@ -15,6 +15,8 @@ import type {
 	UIPropertyFormat,
 	UIPropertyValueType,
 } from './UIComponentDefinition.js';
+import { toValueTypes } from './UIComponentDefinition.js';
+import { assertNonEmptyString } from '../shared/strings.js';
 
 const CHILDREN_POLICIES = new Set<UIChildrenPolicy>(['multiple', 'none', 'single']);
 const COMPONENT_EVENTS = new Set<UIComponentEvent>(['change', 'tap']);
@@ -43,18 +45,18 @@ const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
  * Rejects malformed component metadata before it enters a registry.
  */
 export function validateComponentDefinition(definition: UIComponentDefinition): void {
-	assertNonEmpty(definition.type, 'Component type');
+	assertNonEmptyString(definition.type, 'Component type');
 	if (definition.extends !== undefined) {
-		assertNonEmpty(definition.extends, 'Base component type');
+		assertNonEmptyString(definition.extends, 'Base component type');
 	}
 	if (definition.abstract !== undefined && typeof definition.abstract !== 'boolean') {
 		throw new Error('Component abstract flag must be a boolean.');
 	}
 	if (definition.displayName !== undefined) {
-		assertNonEmpty(definition.displayName, 'Component display name');
+		assertNonEmptyString(definition.displayName, 'Component display name');
 	}
 	if (definition.description !== undefined) {
-		assertNonEmpty(definition.description, 'Component description');
+		assertNonEmptyString(definition.description, 'Component description');
 	}
 	if (definition.children !== undefined && !CHILDREN_POLICIES.has(definition.children)) {
 		throw new Error(`Unsupported child policy "${String(definition.children)}".`);
@@ -69,7 +71,7 @@ export function validateComponentDefinition(definition: UIComponentDefinition): 
 	}
 
 	for (const [name, property] of Object.entries(definition.properties ?? {})) {
-		assertNonEmpty(name, 'Component property name');
+		assertNonEmptyString(name, 'Component property name');
 		validatePropertyDefinition(name, property);
 	}
 }
@@ -97,7 +99,7 @@ function validateAppearanceDefinition(
 	const states = appearance.states ?? [];
 	validateUniqueNames(states, 'Appearance state');
 	for (const [name, part] of Object.entries(appearance.parts ?? {})) {
-		assertNonEmpty(name, 'Appearance part name');
+		assertNonEmptyString(name, 'Appearance part name');
 		if (typeof part !== 'object' || part === null || Array.isArray(part)) {
 			throw new Error(`Appearance part "${name}" must be an object.`);
 		}
@@ -105,7 +107,7 @@ function validateAppearanceDefinition(
 			throw new Error(`Appearance part "${name}" required flag must be a boolean.`);
 		}
 		if (part.type !== undefined) {
-			assertNonEmpty(part.type, `Appearance part "${name}" type`);
+			assertNonEmptyString(part.type, `Appearance part "${name}" type`);
 		}
 	}
 }
@@ -132,7 +134,7 @@ function validateComponentEvents(events: readonly UIComponentEvent[] | undefined
 function validateUniqueNames(values: readonly string[], label: string): void {
 	const names = new Set<string>();
 	for (const value of values) {
-		assertNonEmpty(value, label);
+		assertNonEmptyString(value, label);
 		if (names.has(value)) {
 			throw new Error(`${label} "${value}" is duplicated.`);
 		}
@@ -141,9 +143,7 @@ function validateUniqueNames(values: readonly string[], label: string): void {
 }
 
 function validatePropertyDefinition(name: string, definition: UIPropertyDefinition): void {
-	const valueTypes = Array.isArray(definition.valueType)
-		? definition.valueType
-		: [definition.valueType];
+	const valueTypes = toValueTypes(definition.valueType);
 	if (valueTypes.length === 0) {
 		throw new Error(`Property "${name}" must accept at least one value type.`);
 	}
@@ -182,7 +182,7 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 		throw new Error(`Property "${name}" required flag must be a boolean.`);
 	}
 	if (definition.description !== undefined) {
-		assertNonEmpty(definition.description, `Property "${name}" description`);
+		assertNonEmptyString(definition.description, `Property "${name}" description`);
 	}
 	if (definition.integer !== undefined && typeof definition.integer !== 'boolean') {
 		throw new Error(`Property "${name}" integer flag must be a boolean.`);
@@ -299,10 +299,4 @@ function matchesPrimitiveType(
 ): boolean {
 	if (typeof value === 'number' && !Number.isFinite(value)) return false;
 	return valueTypes.has('value') || valueTypes.has(typeof value as UIPropertyValueType);
-}
-
-function assertNonEmpty(value: string, label: string): void {
-	if (typeof value !== 'string' || value.trim().length === 0) {
-		throw new Error(`${label} must be a non-empty string.`);
-	}
 }

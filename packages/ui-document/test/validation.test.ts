@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	createUIAssetContract,
 	createUIDocument,
 	createUINode,
 	isUIDocument,
@@ -40,6 +41,35 @@ describe('UI document validation', () => {
 			path: '$.root.children[1].id',
 			message: 'Node id "item" is already used at $.root.children[0].id.',
 		});
+	});
+
+	it('rejects appearance identifiers that collide with native Skin members', () => {
+		const document = createUIDocument({
+			id: 'invalid-appearance',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				parts: {
+					states: { nodeId: 'setPart' },
+				},
+			}),
+			root: createUINode({ id: 'setPart', type: 'kui.Group' }),
+		});
+
+		expect(validateUIDocument(document)).toEqual(expect.arrayContaining([
+			{
+				code: 'reserved-skin-part-name',
+				severity: 'error',
+				path: '$.root.id',
+				message: 'Skin part name "setPart" conflicts with a reserved runtime member.',
+			},
+			{
+				code: 'reserved-skin-part-name',
+				severity: 'error',
+				path: '$.contract.parts.states',
+				message: 'Skin part name "states" conflicts with a reserved runtime member.',
+			},
+		]));
 	});
 
 	it('rejects unknown schema fields and unsafe property values', () => {

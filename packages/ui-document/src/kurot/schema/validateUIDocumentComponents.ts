@@ -1,6 +1,7 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
+import { addUIDiagnostic } from '../validation/validationHelpers.js';
 import type {
 	UIChildrenPolicy,
 	UIResolvedComponentDefinition,
@@ -34,41 +35,36 @@ function validateNode(
 		definition = registry.resolve(node.type);
 	} catch (error) {
 		if (!(error instanceof UIComponentResolutionError)) throw error;
-		diagnostics.push({
-			code: error.code,
-			severity: 'error',
-			path: `${path}.type`,
-			message: error.message,
-		});
+		addUIDiagnostic(diagnostics, error.code, `${path}.type`, error.message);
 	}
 	if (!definition) {
 		if (!registry.has(node.type) && !node.instance) {
-			diagnostics.push({
-				code: 'unknown-component-type',
-				severity: 'error',
-				path: `${path}.type`,
-				message: `Component type "${node.type}" is not registered.`,
-			});
+			addUIDiagnostic(
+				diagnostics,
+				'unknown-component-type',
+				`${path}.type`,
+				`Component type "${node.type}" is not registered.`,
+			);
 		}
 	} else {
 		if (definition.abstract) {
-			diagnostics.push({
-				code: 'abstract-component-type',
-				severity: 'error',
-				path: `${path}.type`,
-				message: `Abstract component type "${node.type}" cannot be instantiated.`,
-			});
+			addUIDiagnostic(
+				diagnostics,
+				'abstract-component-type',
+				`${path}.type`,
+				`Abstract component type "${node.type}" cannot be instantiated.`,
+			);
 		}
 
 		const properties = definition.properties;
 		for (const [name, property] of Object.entries(properties)) {
 			if (property.required && !Object.hasOwn(node.properties, name)) {
-				diagnostics.push({
-					code: 'missing-component-property',
-					severity: 'error',
-					path: `${path}.properties.${name}`,
-					message: `Required property "${name}" is missing from ${node.type}.`,
-				});
+				addUIDiagnostic(
+					diagnostics,
+					'missing-component-property',
+					`${path}.properties.${name}`,
+					`Required property "${name}" is missing from ${node.type}.`,
+				);
 			}
 		}
 
@@ -76,22 +72,22 @@ function validateNode(
 			const property = properties[name];
 			if (!property) {
 				if (!definition.allowUnknownProperties) {
-					diagnostics.push({
-						code: 'unknown-component-property',
-						severity: 'error',
-						path: `${path}.properties.${name}`,
-						message: `Property "${name}" is not defined for ${node.type}.`,
-					});
+					addUIDiagnostic(
+						diagnostics,
+						'unknown-component-property',
+						`${path}.properties.${name}`,
+						`Property "${name}" is not defined for ${node.type}.`,
+					);
 				}
 				continue;
 			}
 			if (!matchesUIPropertyDefinition(value, property)) {
-				diagnostics.push({
-					code: 'invalid-component-property',
-					severity: 'error',
-					path: `${path}.properties.${name}`,
-					message: `Property "${name}" on ${node.type} does not satisfy its schema.`,
-				});
+				addUIDiagnostic(
+					diagnostics,
+					'invalid-component-property',
+					`${path}.properties.${name}`,
+					`Property "${name}" on ${node.type} does not satisfy its schema.`,
+				);
 			}
 		}
 
@@ -126,13 +122,12 @@ function validateChildren(
 		(policy === 'single' && node.children.length > 1);
 	if (!invalid) return;
 
-	diagnostics.push({
-		code: 'invalid-component-children',
-		severity: 'error',
-		path: `${path}.children`,
-		message:
-			policy === 'none'
-				? `Component ${node.type} does not accept children.`
-				: `Component ${node.type} accepts at most one child.`,
-	});
+	addUIDiagnostic(
+		diagnostics,
+		'invalid-component-children',
+		`${path}.children`,
+		policy === 'none'
+			? `Component ${node.type} does not accept children.`
+			: `Component ${node.type} accepts at most one child.`,
+	);
 }

@@ -16,6 +16,7 @@ import type {
 	UIDesignTokenDefinition,
 	UIResourceDefinition,
 } from './UIProjectDefinition.js';
+import { assertNonEmptyString, compareStrings } from '../shared/strings.js';
 
 const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
 const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
@@ -36,7 +37,7 @@ export class UIAssetRegistry {
 		if (diagnostics.length > 0) {
 			throw new UIDocumentValidationError(diagnostics);
 		}
-		assertNonEmpty(document.id, 'UI asset id');
+		assertNonEmptyString(document.id, 'UI asset id');
 		if (this._assets.has(document.id)) {
 			throw new Error(`UI asset "${document.id}" is already registered.`);
 		}
@@ -47,7 +48,7 @@ export class UIAssetRegistry {
 	 * Registers one project resource without replacing an existing key.
 	 */
 	public registerResource(definition: UIResourceDefinition): void {
-		assertNonEmpty(definition.key, 'UI resource key');
+		assertNonEmptyString(definition.key, 'UI resource key');
 		if (!RESOURCE_TYPES.has(definition.resourceType)) {
 			throw new Error(`Unsupported UI resource type "${String(definition.resourceType)}".`);
 		}
@@ -61,7 +62,7 @@ export class UIAssetRegistry {
 	 * Registers one project design token without replacing an existing key.
 	 */
 	public registerToken(definition: UIDesignTokenDefinition): void {
-		assertNonEmpty(definition.key, 'UI design token key');
+		assertNonEmptyString(definition.key, 'UI design token key');
 		if (!TOKEN_TYPES.has(definition.tokenType)) {
 			throw new Error(`Unsupported UI design token type "${String(definition.tokenType)}".`);
 		}
@@ -120,18 +121,6 @@ export class UIAssetRegistry {
 	public listTokens(): readonly UIDesignTokenDefinition[] {
 		return [...this._tokens.values()].sort((a, b) => compareStrings(a.key, b.key));
 	}
-}
-
-function assertNonEmpty(value: string, label: string): void {
-	if (typeof value !== 'string' || value.trim().length === 0) {
-		throw new Error(`${label} must be a non-empty string.`);
-	}
-}
-
-function compareStrings(a: string, b: string): number {
-	if (a < b) return -1;
-	if (a > b) return 1;
-	return 0;
 }
 
 function matchesTokenValue(

@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.5.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.5.1`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -53,6 +53,15 @@ src/
   validation; projected content must use a Slot declared by the source asset.
 - Node IDs are non-empty and unique across the complete document, including
   trees projected into Slots.
+- **Agent authoring rule for appearance assets:** node IDs and public part names
+  are installed as named properties on a native `@kurot/ui` `Skin`. Do not use
+  a name that collides with `Skin` or its inherited runtime members, such as
+  `setPart`, `getPart`, `states`, or `hostComponent`; names beginning with `$`
+  or `_` are also reserved for runtime internals. Such a collision is invalid
+  authored data: generators and editors must report it and rename the node or
+  part instead of silently adapting the name or choosing alternate storage.
+  Human-authored UI rarely hits this boundary, but Agent generation must treat
+  it as a deterministic naming constraint.
 - Properties accept strings, booleans, finite numbers, arrays, and plain
   string-keyed objects. Undefined, null, functions, platform objects, cyclic
   values, and non-finite numbers are invalid.

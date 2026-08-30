@@ -7,6 +7,7 @@ import type {
 } from './UIComponentDefinition.js';
 import { UIComponentResolutionError } from './UIComponentResolutionError.js';
 import { validateComponentDefinition } from './validateComponentDefinition.js';
+import { compareStrings } from '../shared/strings.js';
 
 /**
  * Isolated component catalog used by validators, editors, and Agent adapters.
@@ -210,12 +211,6 @@ function mergeProperties(
 	}
 	const entries = [...merged.entries()].sort(([a], [b]) => compareStrings(a, b));
 	return Object.freeze(Object.fromEntries(entries));
-}
-
-function compareStrings(a: string, b: string): number {
-	if (a < b) return -1;
-	if (a > b) return 1;
-	return 0;
 }
 
 function normalizeProperties(

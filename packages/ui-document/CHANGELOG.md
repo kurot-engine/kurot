@@ -4,6 +4,24 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.5.1] — 2026-08-31
+
+### Added
+
+- `reserved-skin-part-name` diagnostics for appearance node IDs and public
+  part names that would overwrite native `Skin` or inherited runtime members.
+- Deterministic Agent-facing appearance naming rules, including reserved `$`
+  and `_` prefixes for runtime internals.
+
+### Changed
+
+- Consolidated repeated string assertions, stable ordering, node-reference
+  validation, property value-type normalization, and first-diagnostic message
+  selection without changing canonical document semantics.
+- Removed avoidable non-null assertions from asset and serialization paths.
+
+---
+
 ## [0.5.0] — 2026-08-31
 
 ### Added

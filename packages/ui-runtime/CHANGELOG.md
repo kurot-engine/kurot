@@ -4,6 +4,29 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.4.1] — 2026-08-31
+
+### Added
+
+- `invalid-adapter` configuration errors when `captureProperty` and
+  `restoreProperty` are not supplied together.
+- Regression coverage for mixed built-in and adapter-owned state properties,
+  repeated transactional assignments, and adapter configuration validation.
+
+### Changed
+
+- Transactional property updates now preserve the owning layer of each
+  property: built-in properties restore reflectively, while adapter-owned
+  properties restore through their paired adapter hooks.
+- Reusable component states and data bindings share the same atomic property
+  transaction implementation, including reverse rollback and recovery causes.
+- Runtime diagnostics use canonical asset paths and structured runtime errors
+  for impossible materialization states.
+- Semantic action and transition routing retain exhaustive union handling
+  instead of silently selecting fallback behavior.
+
+---
+
 ## [0.4.0] — 2026-08-31
 
 ### Added

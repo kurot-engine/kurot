@@ -6,6 +6,7 @@ import type {
 	UIResourceReference,
 	UIResourceType,
 } from '../model/UIReference.js';
+import { assertNonEmpty } from '../shared/strings.js';
 
 /**
  * Creates a stable reference to another editable UI asset.
@@ -55,10 +56,4 @@ export function createUIDesignTokenReference(
 	assertNonEmpty(tokenType, 'Token type');
 	assertNonEmpty(key, 'Token key');
 	return { kind: 'token', tokenType, key };
-}
-
-function assertNonEmpty(value: string, label: string): void {
-	if (value.trim().length === 0) {
-		throw new Error(`${label} must not be empty.`);
-	}
 }

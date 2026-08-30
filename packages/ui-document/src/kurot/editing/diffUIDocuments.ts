@@ -2,6 +2,7 @@ import type { UIComponentInstance } from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIChildTarget } from './UIOperation.js';
+import { compareStrings } from '../shared/strings.js';
 
 /**
  * Stable semantic change categories used by review and history interfaces.
@@ -217,10 +218,4 @@ function normalize(value: unknown): unknown {
 
 function nodePath(nodeId: string): string {
 	return `$.nodes[${JSON.stringify(nodeId)}]`;
-}
-
-function compareStrings(a: string, b: string): number {
-	if (a < b) return -1;
-	if (a > b) return 1;
-	return 0;
 }

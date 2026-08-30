@@ -1,6 +1,6 @@
 # @kurot/ui 架构文档
 
-> 当前版本：1.1.7，peerDependency `@kurot/core: ^1.0.12`。逐条变更记录见
+> 当前版本：1.1.9，peerDependency `@kurot/core: ^1.0.12`。逐条变更记录见
 > [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反
 > 直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机

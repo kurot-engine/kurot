@@ -64,7 +64,7 @@ export class TransitionSetProperty implements IOverride {
 		const animation = new Animation((): void => {
 			const elapsed = animation.currentValue * total;
 			const fraction = duration === 0
-				? Number(elapsed >= delay)
+				? elapsed >= delay ? 1 : 0
 				: Math.max(0, Math.min(1, (elapsed - delay) / duration));
 			const eased = ease(fraction, this._transition.easing ?? 'linear');
 			Reflect.set(target, this._name, from + (to - from) * eased);

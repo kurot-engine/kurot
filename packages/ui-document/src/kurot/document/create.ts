@@ -9,6 +9,7 @@ import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
 import { createUIAssetContract } from './createAssetContract.js';
 import { createUIComponentInstance } from './createComponentInstance.js';
+import { assertNonEmpty } from '../shared/strings.js';
 
 /**
  * Input accepted by createUINode.
@@ -105,10 +106,4 @@ export function createUIDocument(options: CreateUIDocumentOptions): UIDocument {
 		contract: createUIAssetContract(options.contract),
 		root: options.root,
 	};
-}
-
-function assertNonEmpty(value: string, label: string): void {
-	if (value.trim().length === 0) {
-		throw new Error(`${label} must not be empty.`);
-	}
 }

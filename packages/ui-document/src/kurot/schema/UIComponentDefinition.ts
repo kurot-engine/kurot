@@ -238,3 +238,13 @@ export interface UIResolvedComponentDefinition {
 	 */
 	readonly allowUnknownProperties: boolean;
 }
+
+/**
+ * Normalizes a property's single-or-array value type declaration to an array.
+ */
+export function toValueTypes(
+	valueType: UIPropertyDefinition['valueType'],
+): readonly UIPropertyValueType[] {
+	// Array.isArray cannot narrow a readonly array union, so re-cast the single form.
+	return Array.isArray(valueType) ? valueType : [valueType as UIPropertyValueType];
+}

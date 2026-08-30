@@ -8,8 +8,8 @@ import { isUIDesignTokenReference } from '../model/UIReference.js';
 import type { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
 import type {
 	UIPropertyDefinition,
-	UIPropertyValueType,
 } from '../schema/UIComponentDefinition.js';
+import { toValueTypes } from '../schema/UIComponentDefinition.js';
 import { isUIPropertyDefinitionAssignable } from '../schema/isUIPropertyDefinitionAssignable.js';
 import { matchesUIPropertyDefinition } from '../schema/matchesUIPropertyDefinition.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
@@ -77,11 +77,6 @@ function validateDataBinding(
 	);
 }
 
-function toValueTypes(
-	value: UIPropertyDefinition['valueType'],
-): readonly UIPropertyValueType[] {
-	return Array.isArray(value) ? value : [value as UIPropertyValueType];
-}
 
 function validateParameterBindings(
 	document: UIDocument,

@@ -11,6 +11,7 @@ import {
 } from '@kurot/ui-document';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createKurotUI } from '../src/index.js';
+import type { CreateKurotUIOptions } from '../src/index.js';
 
 beforeAll(() => {
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -20,6 +21,28 @@ beforeAll(() => {
 });
 
 describe('runtime data and semantic actions', () => {
+	it('rejects adapters with incomplete transactional hooks', () => {
+		const document = createUIDocument({
+			id: 'adapter-contract',
+			root: createUINode({ id: 'root', type: 'kui.Group' }),
+		});
+		const options = {
+			adapters: {
+				'test.Probe': {
+					create: () => new Group(),
+					captureProperty: (): undefined => undefined,
+				},
+			},
+		} as unknown as CreateKurotUIOptions;
+
+		expect(() => createKurotUI(document, options)).toThrowError(
+			expect.objectContaining({
+				code: 'invalid-adapter',
+				path: '$.adapters["test.Probe"]',
+			}),
+		);
+	});
+
 	it('applies bounded screen data and emits disposable semantic actions', () => {
 		const actions: string[] = [];
 		const document = createUIDocument({
@@ -223,6 +246,101 @@ describe('runtime data and semantic actions', () => {
 		controller?.clearState();
 		expect(controller?.currentState).toBeUndefined();
 		expect(adapterState.get(probe)).toBe('ready');
+	});
+
+	it('captures builtin properties reflectively and adapter properties through the adapter', () => {
+		const registry = createKurotUIFoundationRegistry();
+		registry.register({
+			type: 'test.Probe',
+			extends: 'kui.Group',
+			children: 'none',
+			properties: { status: { valueType: 'string' } },
+		});
+		const component = createUIDocument({
+			id: 'mixed-card',
+			assetKind: 'component',
+			contract: createUIAssetContract({
+				componentType: 'test.Probe',
+				states: {
+					busy: {
+						overrides: [
+							{ targetId: 'probe', property: 'status', value: 'busy' },
+							{ targetId: 'probe', property: 'x', value: 200 },
+							{ targetId: 'probe', property: 'status', value: 'active' },
+							{ targetId: 'probe', property: 'x', value: 300 },
+						],
+					},
+				},
+			}),
+			root: createUINode({
+				id: 'card-root',
+				type: 'kui.Group',
+				children: [
+					createUINode({
+						id: 'probe',
+						type: 'test.Probe',
+						properties: { status: 'ready', x: 100 },
+					}),
+				],
+			}),
+		});
+		const screen = createUIDocument({
+			id: 'mixed-screen',
+			root: createUINode({
+				id: 'card',
+				type: 'test.Probe',
+				instance: {
+					source: { kind: 'asset', assetId: 'mixed-card' },
+					parameters: {},
+					overrides: [],
+					slots: {},
+				},
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(component);
+		const adapterState = new WeakMap<object, unknown>();
+		const capturedProperties: string[] = [];
+		const restoredProperties: string[] = [];
+		const result = createKurotUI(screen, {
+			registry,
+			assets,
+			adapters: {
+				'test.Probe': {
+					create: () => new Group(),
+					applyProperty: (instance, name, value) => {
+						if (name !== 'status') {
+							return false;
+						}
+						adapterState.set(instance, value);
+						return true;
+					},
+					captureProperty: (instance, name) => {
+						capturedProperties.push(name);
+						return adapterState.get(instance);
+					},
+					restoreProperty: (instance, name, value) => {
+						restoredProperties.push(name);
+						adapterState.set(instance, value);
+					},
+				},
+			},
+		});
+		const probe = requireInstance(result.instances.get('card/probe'), Group);
+		expect(adapterState.get(probe)).toBe('ready');
+		expect(probe.x).toBe(100);
+		expect(capturedProperties).toEqual([]);
+
+		const controller = result.stateControllers.get('card');
+		controller?.setState('busy');
+		expect(adapterState.get(probe)).toBe('active');
+		expect(probe.x).toBe(300);
+		expect(capturedProperties).toEqual(['status']);
+
+		controller?.clearState();
+		expect(restoredProperties).toEqual(['status']);
+		expect(adapterState.get(probe)).toBe('ready');
+		expect(probe.x).toBe(100);
 	});
 });
 

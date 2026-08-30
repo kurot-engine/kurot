@@ -11,6 +11,7 @@ import { materializeNode } from './materializeNode.js';
 import { createKurotUIResourceAdapters } from './resources/createKurotUIResourceAdapters.js';
 import type {
 	CreateKurotUIOptions,
+	KurotUIComponentAdapter,
 	KurotUICreationContext,
 	KurotUICreationResult,
 } from './types.js';
@@ -43,9 +44,11 @@ export function createKurotUI(
 			diagnostics,
 		);
 	}
+	const adapters = options.adapters ?? {};
+	validateComponentAdapters(adapters);
 
 	const context: KurotUICreationContext = {
-		adapters: options.adapters ?? {},
+		adapters,
 		assets,
 		dataControllers: new Map(),
 		disposeCallbacks: [],
@@ -59,7 +62,11 @@ export function createKurotUI(
 	activateRuntimeContract(document, '', context, options.data);
 	const data = context.dataControllers.get('');
 	if (data === undefined) {
-		throw new Error('Root UI data controller was not created.');
+		throw new KurotUIRuntimeError(
+			'invalid-document',
+			'Root UI data controller was not created.',
+			'$',
+		);
 	}
 	let disposed = false;
 	return Object.freeze({
@@ -78,6 +85,23 @@ export function createKurotUI(
 		instances: context.instances,
 		stateControllers: context.stateControllers,
 	});
+}
+
+function validateComponentAdapters(
+	adapters: Readonly<Record<string, KurotUIComponentAdapter>>,
+): void {
+	for (const [type, adapter] of Object.entries(adapters)) {
+		const hasCapture = adapter.captureProperty !== undefined;
+		const hasRestore = adapter.restoreProperty !== undefined;
+		if (hasCapture === hasRestore) {
+			continue;
+		}
+		throw new KurotUIRuntimeError(
+			'invalid-adapter',
+			`Component adapter "${type}" must provide captureProperty and restoreProperty together.`,
+			`$.adapters[${JSON.stringify(type)}]`,
+		);
+	}
 }
 
 function createResourceResolver(

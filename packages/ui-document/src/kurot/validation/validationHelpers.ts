@@ -69,6 +69,29 @@ export function validateNonEmptyString(
 }
 
 /**
+ * Validates that a value is a non-empty id referencing a node of this asset.
+ */
+export function validateNodeIdReference(
+	value: unknown,
+	path: string,
+	label: string,
+	diagnostics: UIDiagnostic[],
+	nodeIds: ReadonlySet<string>,
+): void {
+	if (!validateNonEmptyString(value, path, label, diagnostics)) {
+		return;
+	}
+	if (!nodeIds.has(value)) {
+		addUIDiagnostic(
+			diagnostics,
+			'unknown-node-reference',
+			path,
+			`Node "${value}" does not exist in this asset.`,
+		);
+	}
+}
+
+/**
  * Validates one recursive serializable property value and tagged references.
  */
 export function validatePropertyValue(

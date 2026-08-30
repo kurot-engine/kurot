@@ -1,4 +1,5 @@
 import type { UINode } from '../model/UINode.js';
+import { compareStrings } from '../shared/strings.js';
 
 /**
  * Visits a node tree in deterministic parent-before-children order.
@@ -9,8 +10,9 @@ export function visitUINodes(root: UINode, visitor: (node: UINode) => void): voi
 		visitUINodes(child, visitor);
 	}
 	if (!root.instance) return;
-	for (const slotName of Object.keys(root.instance.slots).sort()) {
-		for (const child of root.instance.slots[slotName]!) {
+	// Slots are visited in sorted name order for deterministic traversal.
+	for (const [, children] of Object.entries(root.instance.slots).sort(([a], [b]) => compareStrings(a, b))) {
+		for (const child of children) {
 			visitUINodes(child, visitor);
 		}
 	}
@@ -27,8 +29,8 @@ export function findUINode(root: UINode, id: string): UINode | undefined {
 		if (match) return match;
 	}
 	if (!root.instance) return undefined;
-	for (const slotName of Object.keys(root.instance.slots).sort()) {
-		for (const child of root.instance.slots[slotName]!) {
+	for (const [, children] of Object.entries(root.instance.slots).sort(([a], [b]) => compareStrings(a, b))) {
+		for (const child of children) {
 			const match = findUINode(child, id);
 			if (match) return match;
 		}

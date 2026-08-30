@@ -4,8 +4,10 @@ import type {
 	UIComponentInstance,
 	UIDocument,
 	UINode,
+	UIPropertyValue,
 } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
+import { assetPath } from './assetPath.js';
 import { activateRuntimeContract } from './dynamics/activateRuntimeContract.js';
 import { applyAppearance } from './materializeAppearance.js';
 import {
@@ -27,10 +29,10 @@ export function materializeComponentInstance(
 	parentScope: string,
 	context: KurotUICreationContext,
 ): DisplayObject {
-	const specification = requireInstance(node);
+	const specification = requireInstance(node, path);
 	const source = requireComponentAsset(specification, path, context);
 	const identity = qualifyNodeId(parentScope, node.id);
-	const sourcePath = `$.assets[${JSON.stringify(source.id)}].root`;
+	const sourcePath = assetPath(source.id, '.root');
 	const root = materializeNode(source.root, sourcePath, identity, context);
 	context.instances.set(identity, root);
 	context.types.set(identity, node.type);
@@ -56,7 +58,7 @@ export function materializeComponentInstance(
 			createReusableComponentStateController(
 				source.contract,
 				identity,
-				`$.assets[${JSON.stringify(source.id)}].contract`,
+				assetPath(source.id, '.contract'),
 				context,
 			),
 		);
@@ -76,6 +78,7 @@ function applyVariant(
 		return;
 	}
 	const variant = contract.variants[instance.variant];
+	// Unknown variants are rejected by project validation; skip defensively.
 	if (!variant) {
 		return;
 	}
@@ -128,6 +131,7 @@ function applyOverrides(
 	for (let index = 0; index < instance.overrides.length; index++) {
 		const override = instance.overrides[index];
 		const part = contract.parts[override.part];
+		// Unknown parts are rejected by project validation; skip defensively.
 		if (!part) {
 			continue;
 		}
@@ -152,6 +156,7 @@ function projectSlots(
 ): void {
 	for (const name of Object.keys(instance.slots).sort()) {
 		const slot = source.contract.slots[name];
+		// Unknown slots and part nodes are rejected by project validation.
 		if (!slot) {
 			continue;
 		}
@@ -174,11 +179,12 @@ function applyScopedProperty(
 	scope: string,
 	targetId: string,
 	property: string,
-	value: Parameters<typeof applyRuntimeProperty>[3],
+	value: UIPropertyValue,
 	path: string,
 	context: KurotUICreationContext,
 ): void {
 	const target = context.instances.get(qualifyNodeId(scope, targetId));
+	// Binding targets are checked by project validation; missing targets skip.
 	if (!target) {
 		return;
 	}
@@ -205,11 +211,15 @@ function requireComponentAsset(
 	return source;
 }
 
-function requireInstance(node: UINode): UIComponentInstance {
+function requireInstance(node: UINode, path: string): UIComponentInstance {
 	if (node.instance) {
 		return node.instance;
 	}
-	throw new Error('Expected reusable component instance.');
+	throw new KurotUIRuntimeError(
+		'invalid-document',
+		'Expected reusable component instance.',
+		`${path}.instance`,
+	);
 }
 
 function findNode(root: UINode, id: string): UINode | undefined {

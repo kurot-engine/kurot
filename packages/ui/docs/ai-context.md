@@ -6,7 +6,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@1.1.7`, EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@1.1.9`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 
@@ -52,6 +52,13 @@ src/kurot/
   `Component` by `Component._setSkin()`, not onto the skin itself. The skin
   object itself never appears in the display tree — its only job is to
   declare `skinParts`/`states`/bindings.
+- `Skin.setPart(name, value)` is the intentional write-side counterpart to
+  `getPart(name)`: programmatic materializers use it to install authored part
+  names as real Skin properties. This preserves the existing EUI Skin model;
+  it is not an alternate Map-backed namespace. Callers must reject names that
+  collide with `Skin` or inherited runtime members. For Agent-generated UI,
+  treat such a collision as invalid authored data and surface a rename
+  diagnostic rather than silently rewriting or accepting the name.
 - **Two independent, near-duplicate state machines exist.** `Group` implements
   `states`/`currentState`/`_commitCurrentState()` itself (containers have no
   skin). `Component` delegates state application to its attached

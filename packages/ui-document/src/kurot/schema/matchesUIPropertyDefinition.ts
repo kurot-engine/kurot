@@ -11,6 +11,7 @@ import type {
 	UIPropertyDefinition,
 	UIPropertyValueType,
 } from './UIComponentDefinition.js';
+import { toValueTypes } from './UIComponentDefinition.js';
 
 /**
  * Reports whether a serializable value satisfies one semantic property definition.
@@ -19,9 +20,7 @@ export function matchesUIPropertyDefinition(
 	value: UIPropertyValue,
 	property: UIPropertyDefinition,
 ): boolean {
-	const valueTypes = Array.isArray(property.valueType)
-		? property.valueType
-		: [property.valueType];
+	const valueTypes = toValueTypes(property.valueType);
 	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;
 	if (isUIResourceReference(value) && property.resourceTypes) {
 		if (!property.resourceTypes.some(type => type === value.resourceType)) return false;

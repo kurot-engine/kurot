@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { Sprite } from '@kurot/core';
 import { Skin } from '../src/kurot/components/Skin.js';
 import { State } from '../src/kurot/states/State.js';
 import type { IOverride } from '../src/kurot/states/IOverride.js';
@@ -49,6 +50,28 @@ describe('Skin', () => {
 
 			expect(skin.getPart('labelDisplay')).toBe('a-label');
 			expect(skin.getPart('nonexistent')).toBeUndefined();
+		});
+	});
+
+	describe('setPart', () => {
+		it('installs and replaces one programmatic skin part', () => {
+			const skin = new Skin();
+			const first = new Sprite();
+			const second = new Sprite();
+
+			skin.setPart('labelDisplay', first);
+			expect(skin.getPart('labelDisplay')).toBe(first);
+
+			skin.setPart('labelDisplay', second);
+			expect(skin.getPart('labelDisplay')).toBe(second);
+		});
+
+		it('rejects a name that collides with a runtime member', () => {
+			const skin = new Skin();
+
+			expect(() => skin.setPart('states', new Sprite())).toThrow(
+				'Skin part name "states" conflicts with a reserved runtime member.',
+			);
 		});
 	});
 

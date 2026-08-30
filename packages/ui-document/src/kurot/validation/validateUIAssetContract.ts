@@ -6,9 +6,11 @@ import {
 	addUIDiagnostic,
 	isPlainRecord,
 	validateKnownKeys,
+	validateNodeIdReference,
 	validateNonEmptyString,
 } from './validationHelpers.js';
 import { validateUIAssetModes } from './validateUIAssetModes.js';
+import { validateSkinPartName } from './skinPartNames.js';
 
 const CONTRACT_KEYS = new Set([
 	'actions',
@@ -75,7 +77,13 @@ export function validateUIAssetContract(
 	);
 	validateActions(value.actions, `${path}.actions`, diagnostics, nodeIds);
 	validateParameters(value.parameters, `${path}.parameters`, diagnostics, nodeIds);
-	validateParts(value.parts, `${path}.parts`, diagnostics, nodeIds);
+	validateParts(
+		value.parts,
+		`${path}.parts`,
+		diagnostics,
+		nodeIds,
+		assetKind === 'appearance',
+	);
 	validateSlots(value.slots, `${path}.slots`, diagnostics, nodeIds);
 	validateUIAssetModes(
 		value.states,
@@ -159,23 +167,13 @@ function validateDataBindings(
 				);
 			}
 		}
-		if (
-			validateNonEmptyString(
-				binding.targetId,
-				`${bindingPath}.targetId`,
-				'Target node id',
-				diagnostics,
-			)
-		) {
-			if (!nodeIds.has(binding.targetId)) {
-				addUIDiagnostic(
-					diagnostics,
-					'unknown-node-reference',
-					`${bindingPath}.targetId`,
-					`Node "${binding.targetId}" does not exist in this asset.`,
-				);
-			}
-		}
+		validateNodeIdReference(
+			binding.targetId,
+			`${bindingPath}.targetId`,
+			'Target node id',
+			diagnostics,
+			nodeIds,
+		);
 		validateNonEmptyString(
 			binding.property,
 			`${bindingPath}.property`,
@@ -205,23 +203,13 @@ function validateActions(
 			continue;
 		}
 		validateKnownKeys(definition, ACTION_KEYS, definitionPath, diagnostics);
-		if (
-			validateNonEmptyString(
-				definition.sourceId,
-				`${definitionPath}.sourceId`,
-				'Action source node id',
-				diagnostics,
-			)
-		) {
-			if (!nodeIds.has(definition.sourceId)) {
-				addUIDiagnostic(
-					diagnostics,
-					'unknown-node-reference',
-					`${definitionPath}.sourceId`,
-					`Node "${definition.sourceId}" does not exist in this asset.`,
-				);
-			}
-		}
+		validateNodeIdReference(
+			definition.sourceId,
+			`${definitionPath}.sourceId`,
+			'Action source node id',
+			diagnostics,
+			nodeIds,
+		);
 		if (definition.trigger !== 'change' && definition.trigger !== 'tap') {
 			addUIDiagnostic(
 				diagnostics,
@@ -388,22 +376,13 @@ function validateParameterBindings(
 			continue;
 		}
 		validateKnownKeys(binding, PARAMETER_BINDING_KEYS, bindingPath, diagnostics);
-		if (
-			validateNonEmptyString(
-				binding.targetId,
-				`${bindingPath}.targetId`,
-				'Target node id',
-				diagnostics,
-			) &&
-			!nodeIds.has(binding.targetId)
-		) {
-			addUIDiagnostic(
-				diagnostics,
-				'unknown-node-reference',
-				`${bindingPath}.targetId`,
-				`Node "${binding.targetId}" does not exist in this asset.`,
-			);
-		}
+		validateNodeIdReference(
+			binding.targetId,
+			`${bindingPath}.targetId`,
+			'Target node id',
+			diagnostics,
+			nodeIds,
+		);
 		validateNonEmptyString(
 			binding.property,
 			`${bindingPath}.property`,
@@ -418,9 +397,13 @@ function validateParts(
 	path: string,
 	diagnostics: UIDiagnostic[],
 	nodeIds: ReadonlySet<string>,
+	validateSkinNames: boolean,
 ): void {
 	if (!validateNamedRecord(value, path, 'parts', diagnostics)) return;
 	for (const [name, definition] of Object.entries(value)) {
+		if (validateSkinNames) {
+			validateSkinPartName(name, `${path}.${name}`, diagnostics);
+		}
 		validateNodeTargetDefinition(
 			definition,
 			`${path}.${name}`,
@@ -479,17 +462,7 @@ function validateNodeTargetDefinition(
 		return false;
 	}
 	validateKnownKeys(value, keys, path, diagnostics);
-	if (
-		validateNonEmptyString(value.nodeId, `${path}.nodeId`, 'Node id', diagnostics) &&
-		!nodeIds.has(value.nodeId)
-	) {
-		addUIDiagnostic(
-			diagnostics,
-			'unknown-node-reference',
-			`${path}.nodeId`,
-			`Node "${value.nodeId}" does not exist in this asset.`,
-		);
-	}
+	validateNodeIdReference(value.nodeId, `${path}.nodeId`, 'Node id', diagnostics, nodeIds);
 	if (value.required !== undefined && typeof value.required !== 'boolean') {
 		addUIDiagnostic(
 			diagnostics,

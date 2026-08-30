@@ -45,6 +45,7 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	private _hostComponent?: Component;
 	private _currentState = '';
 	private _stateInitialized = false;
+	private readonly _programmaticPartNames = new Set<string>();
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
@@ -113,6 +114,10 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	 * from authored data and therefore cannot be declared as class fields.
 	 */
 	public setPart(name: string, value: DisplayObject): void {
+		if (!this._programmaticPartNames.has(name) && name in this) {
+			throw new Error(`Skin part name "${name}" conflicts with a reserved runtime member.`);
+		}
+		this._programmaticPartNames.add(name);
 		(this as Record<string, unknown>)[name] = value;
 	}
 

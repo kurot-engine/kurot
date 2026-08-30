@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Stable (1.1.7).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Stable (1.1.9).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 

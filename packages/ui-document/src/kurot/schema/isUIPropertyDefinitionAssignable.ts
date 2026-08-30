@@ -1,7 +1,7 @@
 import type {
 	UIPropertyDefinition,
-	UIPropertyValueType,
 } from './UIComponentDefinition.js';
+import { toValueTypes } from './UIComponentDefinition.js';
 import { matchesUIPropertyDefinition } from './matchesUIPropertyDefinition.js';
 
 /**
@@ -35,7 +35,6 @@ export function isUIPropertyDefinitionAssignable(
 	}
 	return numericDomainIsAssignable(source, target);
 }
-
 function numericDomainIsAssignable(
 	source: UIPropertyDefinition,
 	target: UIPropertyDefinition,
@@ -67,12 +66,4 @@ function referenceTypesAreAssignable<TType extends string>(
 		return false;
 	}
 	return source.every(type => target.includes(type));
-}
-
-function toValueTypes(
-	valueType: UIPropertyDefinition['valueType'],
-): readonly UIPropertyValueType[] {
-	return Array.isArray(valueType)
-		? valueType
-		: [valueType as UIPropertyValueType];
 }

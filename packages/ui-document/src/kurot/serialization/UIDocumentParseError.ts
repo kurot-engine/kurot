@@ -1,4 +1,5 @@
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
+import { firstDiagnosticMessage } from './first-diagnostic-message.js';
 
 /**
  * Error raised when JSON cannot be decoded as a current-format UI document.
@@ -10,8 +11,7 @@ export class UIDocumentParseError extends Error {
 	public readonly diagnostics: readonly UIDiagnostic[];
 
 	public constructor(diagnostics: readonly UIDiagnostic[], cause?: Error) {
-		const detail = diagnostics[0]?.message ?? 'Unknown document error.';
-		super(`Unable to parse UI document: ${detail}`, { cause });
+		super(`Unable to parse UI document: ${firstDiagnosticMessage(diagnostics)}`, { cause });
 		this.name = 'UIDocumentParseError';
 		this.diagnostics = diagnostics;
 	}

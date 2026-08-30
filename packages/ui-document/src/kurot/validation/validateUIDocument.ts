@@ -5,6 +5,7 @@ import { UI_DOCUMENT_FORMAT_VERSION } from '../version.js';
 import type { UIDiagnostic } from './UIDiagnostic.js';
 import { validateUIAssetContract } from './validateUIAssetContract.js';
 import { validateUIComponentInstance } from './validateUIComponentInstance.js';
+import { validateSkinPartName } from './skinPartNames.js';
 import {
 	addUIDiagnostic,
 	isPlainRecord,
@@ -49,7 +50,14 @@ export function validateUIDocument(value: unknown): UIDiagnostic[] {
 
 	const nodeIds = new Map<string, string>();
 	const nodeStack = new WeakSet<object>();
-	validateNode(value.root, '$.root', diagnostics, nodeIds, nodeStack);
+	validateNode(
+		value.root,
+		'$.root',
+		diagnostics,
+		nodeIds,
+		nodeStack,
+		assetKind === 'appearance',
+	);
 	validateUIAssetContract(
 		value.contract,
 		assetKind,
@@ -73,6 +81,7 @@ function validateNode(
 	diagnostics: UIDiagnostic[],
 	nodeIds: Map<string, string>,
 	nodeStack: WeakSet<object>,
+	validateSkinNames: boolean,
 ): void {
 	if (!isPlainRecord(value)) {
 		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node must be an object.');
@@ -85,7 +94,7 @@ function validateNode(
 
 	nodeStack.add(value);
 	validateKnownKeys(value, NODE_KEYS, path, diagnostics);
-	validateNodeId(value.id, `${path}.id`, diagnostics, nodeIds);
+	validateNodeId(value.id, `${path}.id`, diagnostics, nodeIds, validateSkinNames);
 	validateNonEmptyString(value.type, `${path}.type`, 'Node type', diagnostics);
 	validateProperties(value.properties, `${path}.properties`, diagnostics);
 	if (value.appearance !== undefined) {
@@ -97,10 +106,24 @@ function validateNode(
 			`${path}.instance`,
 			diagnostics,
 			(child, childPath) =>
-				validateNode(child, childPath, diagnostics, nodeIds, nodeStack),
+				validateNode(
+					child,
+					childPath,
+					diagnostics,
+					nodeIds,
+					nodeStack,
+					validateSkinNames,
+				),
 		);
 	}
-	validateChildren(value.children, `${path}.children`, diagnostics, nodeIds, nodeStack);
+	validateChildren(
+		value.children,
+		`${path}.children`,
+		diagnostics,
+		nodeIds,
+		nodeStack,
+		validateSkinNames,
+	);
 	nodeStack.delete(value);
 }
 
@@ -110,13 +133,21 @@ function validateChildren(
 	diagnostics: UIDiagnostic[],
 	nodeIds: Map<string, string>,
 	nodeStack: WeakSet<object>,
+	validateSkinNames: boolean,
 ): void {
 	if (!Array.isArray(value)) {
 		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node children must be an array.');
 		return;
 	}
 	for (let index = 0; index < value.length; index++) {
-		validateNode(value[index], `${path}[${index}]`, diagnostics, nodeIds, nodeStack);
+		validateNode(
+			value[index],
+			`${path}[${index}]`,
+			diagnostics,
+			nodeIds,
+			nodeStack,
+			validateSkinNames,
+		);
 	}
 }
 
@@ -125,8 +156,12 @@ function validateNodeId(
 	path: string,
 	diagnostics: UIDiagnostic[],
 	nodeIds: Map<string, string>,
+	validateSkinNames: boolean,
 ): void {
 	if (!validateNonEmptyString(value, path, 'Node id', diagnostics)) return;
+	if (validateSkinNames) {
+		validateSkinPartName(value, path, diagnostics);
+	}
 
 	const firstPath = nodeIds.get(value);
 	if (firstPath) {

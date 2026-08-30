@@ -27,6 +27,7 @@ export type UIDiagnosticCode =
 	| 'missing-instance-parameter'
 	| 'missing-slot-content'
 	| 'resource-type-mismatch'
+	| 'reserved-skin-part-name'
 	| 'token-type-mismatch'
 	| 'unexpected-property'
 	| 'unknown-node-reference'

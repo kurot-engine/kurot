@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [1.1.9] — 2026-08-31
+
+### Changed
+
+- `Skin.setPart()` now rejects authored names that collide with native Skin or
+  inherited runtime members while continuing to support replacement of an
+  already installed programmatic part.
+
+---
+
 ## [1.1.8] — 2026-08-31
 
 ### Added

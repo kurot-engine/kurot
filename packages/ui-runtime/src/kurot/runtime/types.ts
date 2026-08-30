@@ -13,6 +13,7 @@ import type {
  */
 export type KurotUIRuntimeErrorCode =
 	| 'component-construction-failed'
+	| 'invalid-adapter'
 	| 'invalid-document'
 	| 'invalid-data'
 	| 'invalid-layout'
@@ -45,8 +46,11 @@ export interface KurotUIComponentAdapter {
 	) => boolean;
 
 	/**
-	 * Captures adapter-owned state before a data binding updates the property.
-	 * Provide this together with restoreProperty for non-reflective properties.
+	 * Captures a candidate adapter-owned property before a transactional update
+	 * invokes applyProperty. The hook must be side-effect-free and accept every
+	 * non-builtin property name routed to this adapter; its captured value is
+	 * discarded when applyProperty returns false. Used by both data bindings and
+	 * reusable component states. Must be provided together with restoreProperty.
 	 */
 	readonly captureProperty?: (
 		instance: DisplayObject,
@@ -55,8 +59,10 @@ export interface KurotUIComponentAdapter {
 	) => unknown;
 
 	/**
-	 * Restores adapter-owned state when a later binding target rejects an update.
-	 * Provide this together with captureProperty for non-reflective properties.
+	 * Restores a value previously captured by captureProperty, either when a
+	 * later target in the same transaction fails or when the owning reusable
+	 * component state is cleared or replaced. Must be provided together with
+	 * captureProperty.
 	 */
 	readonly restoreProperty?: (
 		instance: DisplayObject,
