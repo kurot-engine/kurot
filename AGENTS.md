@@ -83,6 +83,7 @@ Kurot/
 ├── docs/              Contribution rules (docs/code-rules.md) — committed
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
 ├── packages/          The 5 packages above, each with its own docs/ + docs-internal/
+├── tools/             Private repository tooling, including the Agent evaluation harness
 ├── examples/          demo (Vite + hand-written EXML) and my-game (CLI-scaffolded)
 └── reference/         Local read-only reference sources — not distributed via git
 ```

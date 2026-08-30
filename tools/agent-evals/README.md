@@ -2,15 +2,15 @@
 
 Internal evaluation project for measuring whether an Agent can generate,
 run, inspect, and repair Kurot games. It evaluates the complete Kurot toolchain
-and is intentionally located at the repository root instead of inside a single
-runtime package.
+and is intentionally located in the repository tooling area instead of inside
+a runtime or publishable package.
 
 This directory is private infrastructure and is never published to npm.
 
 ## Directory map
 
 ```text
-agent-evals/
+tools/agent-evals/
 ├── tasks/       Versioned task definitions grouped by capability
 ├── fixtures/    Deterministic inputs shared by tasks
 ├── runners/     Future model and browser runner implementations
@@ -27,9 +27,9 @@ This project has an independent install and lockfile, matching the repository's
 non-workspace package model:
 
 ```bash
-pnpm --dir agent-evals install
-pnpm --dir agent-evals build
-pnpm --dir agent-evals test
+pnpm --dir tools/agent-evals install
+pnpm --dir tools/agent-evals build
+pnpm --dir tools/agent-evals test
 ```
 
 ## Initial scope
