@@ -1,0 +1,62 @@
+{
+	"name": "@kurot/ui-runtime",
+	"version": "0.1.0",
+	"description": "Runtime materialization layer for validated Kurot UI documents",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist/**/*",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc --build",
+		"dev": "tsc --watch",
+		"clean": "rm -rf dist",
+		"test": "vitest run --config vitest.config.ts",
+		"test:watch": "vitest --config vitest.config.ts",
+		"preview": "vite --config vite.config.ts",
+		"build:preview": "vite --config vite.config.ts build",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"peerDependencies": {
+		"@kurot/core": "^1.0.15",
+		"@kurot/ui": "^1.1.7",
+		"@kurot/ui-document": "^0.1.0"
+	},
+	"devDependencies": {
+		"@kurot/core": "^1.0.15",
+		"@kurot/ui": "^1.1.7",
+		"@kurot/ui-document": "^0.1.0",
+		"@types/node": "^22.0.0",
+		"happy-dom": "^20.8.9",
+		"typescript": "^5.6.0",
+		"vite": "^8.0.8",
+		"vitest": "^4.1.4"
+	},
+	"keywords": [
+		"kurot",
+		"ui",
+		"runtime",
+		"document-model",
+		"game-editor"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/ui-runtime"
+	},
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": {
+		"access": "public"
+	}
+}

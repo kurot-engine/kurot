@@ -16,6 +16,8 @@ Core features include:
 - A WebGL primary rendering backend with a Canvas 2D fallback backend.
 - EUI-compatible components, layout, states, data binding, and theming system.
 - Build-time EXML → ESM compilation, with no XML parsing at runtime.
+- A headless `kui.*` UI document model and explicit runtime materialization layer
+  for future editors and Agent workflows.
 - Tween, MovieClip, ScrollView, and URLLoader game extensions.
 
 > **Naming note:** the npm packages have migrated to `@kurot/*`. Legacy `blakron` identifiers in the CLI, config files, and source paths will be unified in later migration steps.
@@ -53,8 +55,9 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)                 | 1.1.3   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.1.0   | `packages/ui-document` | Headless semantic UI document foundation shared by future editors, CLI workflows, and Agent tooling            | None                  |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.1.0   | `packages/ui-runtime`  | Validates semantic UI documents and materializes them into real Kurot UI component trees                       | `core`, `ui`, `ui-document` |
 
-Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `cli` is a build-time-only tool, while `ui-document` is a headless editing-time model; neither is pulled into the browser runtime. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
+Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
 ```text
 @kurot/core
@@ -64,6 +67,11 @@ Dependencies flow in one direction: `core` is the foundation package; `ui` and `
 @kurot/cli  (build-time only)
 
 @kurot/ui-document  (headless editing-time document model)
+
+@kurot/ui-runtime
+ ├─ @kurot/ui-document
+ ├─ @kurot/ui
+ └─ @kurot/core
 ```
 
 ## Getting started
@@ -84,14 +92,14 @@ pnpm --dir packages/core build
 pnpm --dir packages/core test
 ```
 
-Replace `core` with `cli`, `ui`, `game`, or `ui-document` to install and build the corresponding package:
+Replace `core` with `cli`, `ui`, `game`, `ui-document`, or `ui-runtime` to install and build the corresponding package:
 
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
 ```
 
-All five packages provide a one-shot test command:
+All six packages provide a one-shot test command:
 
 ```sh
 pnpm --dir packages/<package> test
@@ -114,6 +122,9 @@ pnpm --dir packages/cli blakron -- <command>
 The CLI supports project creation, building, a dev server, and cleanup. Generated projects continue to use the `blakron` command and `blakron.config.ts` config file, for compatibility with the currently published packages.
 
 ## Architecture overview
+
+The ownership and dependency boundaries of the semantic UI stack are recorded
+in [`UI-ARCHITECTURE.md`](UI-ARCHITECTURE.md).
 
 ### Rendering pipeline
 

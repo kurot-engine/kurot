@@ -2,8 +2,8 @@
 
 This document defines the ownership and dependency boundaries of Kurot's UI
 stack. It covers the existing `@kurot/core`, `@kurot/ui`,
-`@kurot/ui-document`, and `@kurot/cli` packages, the planned
-`@kurot/ui-runtime` package, and the future visual UI editor.
+`@kurot/ui-document`, `@kurot/ui-runtime`, and `@kurot/cli` packages, plus the
+future visual UI editor.
 
 The short version is:
 
@@ -37,8 +37,8 @@ editor        authors and previews UI
                                       display and rendering
 ```
 
-`@kurot/ui-runtime` and the visual editor are planned layers. The other
-packages already exist.
+`@kurot/ui-runtime` now provides the first complete materialization path. The
+visual editor and incremental document updates remain planned layers.
 
 ## `@kurot/core`
 
@@ -136,23 +136,27 @@ EUI names belong at a legacy format-adapter boundary. For example, a future
 EXML adapter may translate `<eui:Button>` into the canonical `kui.Button`
 identity, but the semantic document does not store the EUI namespace.
 
-## `@kurot/ui-runtime` (planned)
+## `@kurot/ui-runtime`
 
 `@kurot/ui-runtime` answers: **How does a UI document become a running Kurot
 component tree?**
 
-It will own:
+It owns:
 
 - validation before materialization;
 - component factories such as `kui.Button` to `new Button()`;
 - safe application of inherited and component-specific properties;
 - child-tree construction;
-- layout, rectangle, resource, and skin descriptor resolution;
+- layout and rectangle descriptor resolution;
+- resource and skin identifier forwarding to existing UI mechanisms;
 - structured runtime errors containing document node paths;
-- future incremental document updates;
-- future execution of semantic states and bindings.
+- custom component adapters supplied by the owning application;
+- a stable node-ID-to-instance lookup for editor and Agent integration.
 
-It will not own:
+It may later own incremental document updates and execution of semantic states
+and bindings after those formats are defined by `@kurot/ui-document`.
+
+It does not own:
 
 - the component behavior implemented by `@kurot/ui`;
 - the rendering pipeline implemented by `@kurot/core`;
@@ -160,15 +164,21 @@ It will not own:
 - Canvas and Stage lifecycle management;
 - visual editor panels.
 
-The initial API should follow this shape:
+The initial API returns both the root and a stable instance lookup:
 
 ```ts
-const root = createKurotUI(document, options);
-stage.addChild(root);
+const result = createKurotUI(document, options);
+stage.addChild(result.root);
+const startButton = result.instances.get('startButton');
 ```
 
 The adapter creates renderable objects, but `@kurot/ui` still performs layout
 and control behavior, while `@kurot/core` performs rendering.
+
+The current audited foundation supports `kui.Group`, `kui.Label`, `kui.Image`,
+`kui.Rect`, and `kui.Button`; Basic, horizontal, vertical, and tile layouts;
+and serializable nine-slice rectangles. Resource loading and skin lookup remain
+the responsibility of the existing UI runtime adapters and Theme system.
 
 ## `@kurot/cli`
 

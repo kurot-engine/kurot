@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kurot UI Runtime Preview</title>
+		<link rel="stylesheet" href="./style.css" />
+	</head>
+	<body>
+		<main>
+			<header>
+				<div>
+					<p class="eyebrow">@kurot/ui-runtime</p>
+					<h1>Semantic document preview</h1>
+				</div>
+				<span id="status">Starting…</span>
+			</header>
+			<section class="preview-panel">
+				<canvas id="game"></canvas>
+			</section>
+			<pre id="summary"></pre>
+		</main>
+		<script type="module" src="./src/main.ts"></script>
+	</body>
+</html>
