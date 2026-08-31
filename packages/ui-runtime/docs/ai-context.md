@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.4.1`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.4.2`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -102,6 +102,9 @@ does not depend on a particular animation or Spine implementation.
 - Component creation: `src/kurot/runtime/builtins/componentFactories.ts`
 - Project validation and orchestration: `src/kurot/runtime/createKurotUI.ts`
 - Recursive tree construction: `src/kurot/runtime/materializeNode.ts`
+- Authored node property application: `src/kurot/runtime/apply-node-properties.ts`
+- Child attachment strategy: `src/kurot/runtime/append-runtime-child.ts`
+- Scoped node identity: `src/kurot/runtime/node-identity.ts`
 - Component reuse: `src/kurot/runtime/materializeComponentInstance.ts`
 - Appearances and states: `src/kurot/runtime/materializeAppearance.ts`
 - Reusable component states: `src/kurot/runtime/states/`

@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.4.2] — 2026-08-31
+
+### Changed
+
+- Split child attachment, authored-property application, and scoped node
+  identity into focused kebab-case runtime modules without changing
+  materialization behavior.
+- Updated development dependencies to `@kurot/ui@1.1.9` and
+  `@kurot/ui-document@0.5.1` while retaining the existing compatible peer
+  dependency ranges.
+
+---
+
 ## [0.4.1] — 2026-08-31
 
 ### Added

@@ -1,7 +1,7 @@
 import type { UIAssetContract, UIPropertyValue } from '@kurot/ui-document';
 import { matchesUIPropertyDefinition } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
-import { qualifyNodeId } from '../materializeNode.js';
+import { qualifyNodeId } from '../node-identity.js';
 import { applyPropertyUpdates } from '../propertyTransaction.js';
 import type { RuntimePropertyUpdate } from '../propertyTransaction.js';
 import type { KurotUICreationContext, KurotUIDataController } from '../types.js';

@@ -1,6 +1,6 @@
 import type { UIAssetContract, UIPropertyOverride } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
-import { qualifyNodeId } from '../materializeNode.js';
+import { qualifyNodeId } from '../node-identity.js';
 import {
 	applyPropertyUpdates,
 	attachCause,

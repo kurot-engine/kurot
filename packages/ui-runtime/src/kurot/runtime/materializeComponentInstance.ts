@@ -10,12 +10,10 @@ import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { assetPath } from './assetPath.js';
 import { activateRuntimeContract } from './dynamics/activateRuntimeContract.js';
 import { applyAppearance } from './materializeAppearance.js';
-import {
-	appendRuntimeChild,
-	applyNodeProperties,
-	materializeNode,
-	qualifyNodeId,
-} from './materializeNode.js';
+import { appendRuntimeChild } from './append-runtime-child.js';
+import { applyNodeProperties } from './apply-node-properties.js';
+import { materializeNode } from './materializeNode.js';
+import { qualifyNodeId } from './node-identity.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { createReusableComponentStateController } from './states/createReusableComponentStateController.js';
 import type { KurotUICreationContext } from './types.js';

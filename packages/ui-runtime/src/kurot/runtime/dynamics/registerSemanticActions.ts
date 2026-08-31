@@ -1,6 +1,6 @@
 import { Event, TouchEvent } from '@kurot/core';
 import type { UIDocument, UISemanticActionTrigger } from '@kurot/ui-document';
-import { qualifyNodeId } from '../materializeNode.js';
+import { qualifyNodeId } from '../node-identity.js';
 import type { KurotUICreationContext } from '../types.js';
 
 /**

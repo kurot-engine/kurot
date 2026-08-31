@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.5.2] — 2026-08-31
+
+### Changed
+
+- Renamed document factory modules to kebab-case and updated their internal
+  imports, aligning the package structure with the repository naming rules
+  without changing the public API or document semantics.
+
+---
+
 ## [0.5.1] — 2026-08-31
 
 ### Added

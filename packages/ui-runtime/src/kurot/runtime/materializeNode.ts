@@ -1,11 +1,12 @@
 import type { DisplayObject } from '@kurot/core';
-import { Group } from '@kurot/ui';
 import type { UINode } from '@kurot/ui-document';
-import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { applyAppearance } from './materializeAppearance.js';
+import { appendRuntimeChild } from './append-runtime-child.js';
+import { applyNodeProperties } from './apply-node-properties.js';
 import { materializeComponentInstance } from './materializeComponentInstance.js';
 import { getBuiltInFactory } from './builtins/componentFactories.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
+import { qualifyNodeId } from './node-identity.js';
 import type {
 	KurotUIComponentAdapter,
 	KurotUICreationContext,
@@ -38,59 +39,6 @@ export function materializeNode(
 		applyAppearance(instance, node, identity, path, context);
 	}
 	return instance;
-}
-
-/**
- * Returns a collision-free runtime identity for a node inside a component scope.
- */
-export function qualifyNodeId(scope: string, nodeId: string): string {
-	return scope ? `${scope}/${nodeId}` : nodeId;
-}
-
-/**
- * Applies the node's explicitly authored properties in stable name order.
- */
-export function applyNodeProperties(
-	target: DisplayObject,
-	node: UINode,
-	path: string,
-	context: KurotUICreationContext,
-): void {
-	for (const name of Object.keys(node.properties).sort()) {
-		applyRuntimeProperty(
-			target,
-			node.type,
-			name,
-			node.properties[name],
-			`${path}.properties.${name}`,
-			context,
-		);
-	}
-}
-
-/**
- * Attaches a materialized child through a built-in or project adapter contract.
- */
-export function appendRuntimeChild(
-	parent: DisplayObject,
-	child: DisplayObject,
-	parentType: string,
-	path: string,
-	adapter?: KurotUIComponentAdapter,
-): void {
-	if (adapter?.appendChild) {
-		adapter.appendChild(parent, child, path);
-		return;
-	}
-	if (parent instanceof Group) {
-		parent.addChild(child);
-		return;
-	}
-	throw new KurotUIRuntimeError(
-		'unsupported-children',
-		`Runtime component "${parentType}" cannot attach document children.`,
-		path,
-	);
 }
 
 function createInstance(
