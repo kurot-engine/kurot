@@ -83,9 +83,16 @@ export interface RenderContext {
 
 	// ── Texture upload ──────────────────────────────────────────────────────
 
-	createTexture(source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): TextureHandle;
+	createTexture(
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		sourcePremultipliedAlpha?: boolean,
+	): TextureHandle;
 
-	updateTexture(texture: TextureHandle, source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): void;
+	updateTexture(
+		texture: TextureHandle,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		sourcePremultipliedAlpha?: boolean,
+	): void;
 
 	/**
 	 * Registers `texture` for backend-appropriate cleanup once `owner` is

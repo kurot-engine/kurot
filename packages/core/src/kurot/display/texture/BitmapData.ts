@@ -110,6 +110,7 @@ export class BitmapData {
 	etcAlphaMask?: BitmapData;
 	webGLTexture?: WebGLTexture;
 	contentVersion = 0;
+	premultipliedAlpha = false;
 
 	private _source?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ArrayBuffer;
 

@@ -31,7 +31,7 @@ export class Capabilities {
 	/**
 	 * Current Kurot engine version.
 	 */
-	public static readonly engineVersion: string = '1.0.15';
+	public static readonly engineVersion: string = '1.0.16';
 
 	/**
 	 * Width of the canvas bounding client rect in CSS pixels.

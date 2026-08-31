@@ -274,12 +274,15 @@ export class WebGLRenderContext implements RenderContext {
 
 	// ── Texture ───────────────────────────────────────────────────────────────
 
-	public createTexture(source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): WebGLTexture {
+	public createTexture(
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		sourcePremultipliedAlpha = false,
+	): WebGLTexture {
 		const gl = this.gl;
 		const texture = gl.createTexture()!;
 		(texture as Record<string, unknown>)[SYM_GL_CONTEXT] = gl;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, sourcePremultipliedAlpha ? 0 : 1);
 		(texture as Record<string, unknown>)[SYM_PREMULTIPLIED] = true;
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -289,10 +292,14 @@ export class WebGLRenderContext implements RenderContext {
 		return texture;
 	}
 
-	public updateTexture(texture: WebGLTexture, source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): void {
+	public updateTexture(
+		texture: WebGLTexture,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		sourcePremultipliedAlpha = false,
+	): void {
 		const gl = this.gl;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, sourcePremultipliedAlpha ? 0 : 1);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
 	}
 
@@ -320,7 +327,7 @@ export class WebGLRenderContext implements RenderContext {
 		const source = bitmapData.source;
 		if (!source) return undefined;
 		if (!bitmapData.webGLTexture) {
-			const tex = this.createTexture(source as HTMLImageElement);
+			const tex = this.createTexture(source as HTMLImageElement, bitmapData.premultipliedAlpha);
 			bitmapData.webGLTexture = tex;
 			this._uploadedVersions.set(bitmapData, bitmapData.contentVersion);
 			(tex as Record<string, unknown>)[SYM_SMOOTHING] = true;
@@ -329,7 +336,7 @@ export class WebGLRenderContext implements RenderContext {
 			source instanceof HTMLVideoElement &&
 			this._uploadedVersions.get(bitmapData) !== bitmapData.contentVersion
 		) {
-			this.updateTexture(bitmapData.webGLTexture, source);
+			this.updateTexture(bitmapData.webGLTexture, source, bitmapData.premultipliedAlpha);
 			this._uploadedVersions.set(bitmapData, bitmapData.contentVersion);
 		}
 		return bitmapData.webGLTexture;

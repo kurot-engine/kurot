@@ -4,6 +4,46 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.16] — 2026-09-01
+
+This release adds source-aware alpha handling to the WebGL texture upload
+pipeline. Textures exported with premultiplied alpha can now be uploaded
+without multiplying their edge colors a second time, while ordinary images,
+canvas surfaces, and video textures retain their existing behavior.
+
+### Added
+
+- **Premultiplied source metadata** — `BitmapData.premultipliedAlpha` records
+  whether the source pixels have already been multiplied by alpha. It defaults
+  to `false`, preserving the previous behavior for every existing resource.
+- **Texture-upload regression coverage** — added focused WebGL tests for
+  straight-alpha creation, premultiplied-alpha creation, and dynamic texture
+  updates that switch between the two source modes.
+
+### Changed
+
+- **Source-aware WebGL uploads** — `RenderContext.createTexture()` and
+  `updateTexture()` accept an optional source-alpha flag. WebGL now enables
+  `UNPACK_PREMULTIPLY_ALPHA_WEBGL` for straight-alpha sources and disables it
+  for sources that are already premultiplied.
+- **Explicit unpack state per upload** — both texture creation and update paths
+  set the WebGL unpack state on every upload, preventing one resource's alpha
+  mode from leaking into the next upload.
+
+### Compatibility
+
+- Existing `BitmapData`, ordinary image, canvas, text, graphics, cached-content,
+  and video uploads continue to use the original upload-time premultiplication.
+- Runtime adapters such as Spine can opt in per atlas page when their resource
+  metadata declares that the source texture is already premultiplied.
+
+### Tests
+
+- Full Core unit suite: 59 test files, 644 tests passing.
+- TypeScript implementation and declaration builds passing.
+
+---
+
 ## [1.0.15] — 2026-08-21
 
 This release establishes reproducible renderer validation across Kurot,

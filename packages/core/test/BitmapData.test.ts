@@ -44,6 +44,7 @@ describe('BitmapData', () => {
 		expect(bd.height).toBe(0);
 		expect(bd.source).toBeUndefined();
 		expect(bd.format).toBe('image');
+		expect(bd.premultipliedAlpha).toBe(false);
 	});
 
 	it('constructor with no arg has undefined source', () => {
