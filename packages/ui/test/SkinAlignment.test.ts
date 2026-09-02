@@ -44,7 +44,7 @@ function makeToggleSwitchSkin(): Skin {
 	track.fillColor = 0x636e72;
 
 	const knob = new Rect();
-	knob.x = 4;
+	knob.x = 28;
 	knob.y = 4;
 	knob.width = 20;
 	knob.height = 20;
@@ -52,15 +52,12 @@ function makeToggleSwitchSkin(): Skin {
 
 	skin.elementsContent = [track, knob];
 	skin.states = [
-		new State('up'),
-		new State('down'),
-		new State('disabled'),
-		new State('upAndSelected', [
-			new SetProperty('knob', 'x', 28),
-			new SetProperty('knob', 'fillColor', 0xffffff),
-		]),
-		new State('downAndSelected', [new SetProperty('knob', 'x', 28)]),
-		new State('disabledAndSelected', [new SetProperty('knob', 'x', 28)]),
+		new State('up', [new SetProperty('knob', 'x', 4)]),
+		new State('down', [new SetProperty('knob', 'x', 4)]),
+		new State('disabled', [new SetProperty('knob', 'x', 4)]),
+		new State('upAndSelected', [new SetProperty('knob', 'fillColor', 0xffffff)]),
+		new State('downAndSelected'),
+		new State('disabledAndSelected'),
 	];
 	return skin;
 }
@@ -93,7 +90,7 @@ function makePanelSkin(): Skin {
 }
 
 describe('skin alignment (my-game / cli template)', () => {
-	it('ToggleSwitch knob slides to x=28 when selected', () => {
+	it('applies the initial ToggleSwitch state when attaching its skin', () => {
 		const ts = new ToggleSwitch();
 		const skin = makeToggleSwitchSkin();
 		// Use the internal skin-attach path (equivalent to the protected setSkin).
@@ -103,16 +100,39 @@ describe('skin alignment (my-game / cli template)', () => {
 		const knob = skin.getPart('knob') as Rect;
 		expect(knob).toBeInstanceOf(Rect);
 
-		// Initial: not selected, knob at x=4.
-		ts.currentState = 'up';
-		(skin as unknown as { currentState: string }).currentState = 'up';
+		// The authored base value represents selected; initial up must override it.
 		expect(knob.x).toBe(4);
+		expect(skin.currentState).toBe('up');
 
-		// Selected: currentState switches to upAndSelected, knob should slide to x=28.
 		ts.selected = true;
-		// Simulate commitProperties syncing skin.currentState.
-		(skin as unknown as { currentState: string }).currentState = 'upAndSelected';
+		ts.commitProperties();
 		expect(knob.x).toBe(28);
+		expect(skin.currentState).toBe('upAndSelected');
+	});
+
+	it('applies a selected state that was set before attaching the skin', () => {
+		const ts = new ToggleSwitch();
+		ts.selected = true;
+
+		const skin = makeToggleSwitchSkin();
+		(ts as unknown as { _setSkin: (s: Skin) => void })._setSkin(skin);
+		new Stage().addChild(ts);
+
+		const knob = skin.getPart('knob') as Rect;
+		expect(knob.x).toBe(28);
+		expect(skin.currentState).toBe('upAndSelected');
+	});
+
+	it('applies the initial state when a skin is attached on stage', () => {
+		const ts = new ToggleSwitch();
+		new Stage().addChild(ts);
+
+		const skin = makeToggleSwitchSkin();
+		(ts as unknown as { _setSkin: (s: Skin) => void })._setSkin(skin);
+
+		const knob = skin.getPart('knob') as Rect;
+		expect(knob.x).toBe(4);
+		expect(skin.currentState).toBe('up');
 	});
 
 	it('Panel skin exposes closeButton + moveArea + titleDisplay parts', () => {

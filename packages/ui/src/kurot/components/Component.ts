@@ -643,6 +643,7 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 			for (let i = skin.elementsContent.length - 1; i >= 0; i--) {
 				this.addChildAt(skin.elementsContent[i], 0);
 			}
+			skin.currentState = this.currentState;
 			skin.hostComponent = this;
 		}
 		this.invalidateSize();

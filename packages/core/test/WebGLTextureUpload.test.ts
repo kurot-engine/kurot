@@ -1,15 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
+import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
 import { WebGLRenderContext } from '../src/kurot/player/webgl/WebGLRenderContext.js';
 
 interface TextureUploadHarness {
 	gl: WebGLRenderingContext;
+	_trackedBitmapDatas: Set<WeakRef<BitmapData>>;
+	_uploadedVersions: WeakMap<BitmapData, number>;
 	createTexture(
-		source: HTMLImageElement,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
 		sourcePremultipliedAlpha?: boolean,
 	): WebGLTexture;
+	getWebGLTexture(bitmapData: BitmapData): WebGLTexture | undefined;
 	updateTexture(
 		texture: WebGLTexture,
-		source: HTMLImageElement,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
 		sourcePremultipliedAlpha?: boolean,
 	): void;
 }
@@ -33,6 +37,8 @@ function createHarness(): TextureUploadHarness {
 		texImage2D: vi.fn(),
 		texParameteri: vi.fn(),
 	} as unknown as WebGLRenderingContext;
+	context._trackedBitmapDatas = new Set();
+	context._uploadedVersions = new WeakMap();
 	return context;
 }
 
@@ -77,5 +83,22 @@ describe('WebGL texture upload alpha mode', () => {
 			context.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,
 			1,
 		);
+	});
+
+	it('re-uploads invalidated canvas textures without allocating a new texture', () => {
+		const context = createHarness();
+		const texture = {} as WebGLTexture;
+		const canvas = document.createElement('canvas');
+		const bitmapData = new BitmapData(canvas);
+		context.createTexture = vi.fn(() => texture);
+		context.updateTexture = vi.fn();
+
+		expect(context.getWebGLTexture(bitmapData)).toBe(texture);
+		BitmapData.invalidate(bitmapData);
+		expect(context.getWebGLTexture(bitmapData)).toBe(texture);
+
+		expect(context.createTexture).toHaveBeenCalledTimes(1);
+		expect(context.updateTexture).toHaveBeenCalledOnce();
+		expect(context.updateTexture).toHaveBeenCalledWith(texture, canvas, false);
 	});
 });

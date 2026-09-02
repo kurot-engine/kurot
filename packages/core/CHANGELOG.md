@@ -4,6 +4,21 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.17] — 2026-09-02
+
+### Fixed
+
+- Re-upload invalidated `HTMLCanvasElement`-backed `BitmapData` when its
+  `contentVersion` changes, matching the existing dynamic-video upload path.
+- Preserve the existing `WebGLTexture` while refreshing canvas pixels, avoiding
+  stale cached and procedurally rendered content without unnecessary GPU
+  texture allocation.
+
+### Tests
+
+- Added a WebGL regression test covering canvas invalidation, texture reuse,
+  and version-aware pixel upload.
+
 ## [1.0.16] — 2026-09-01
 
 This release adds source-aware alpha handling to the WebGL texture upload

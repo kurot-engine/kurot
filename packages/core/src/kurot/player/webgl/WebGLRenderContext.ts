@@ -333,7 +333,7 @@ export class WebGLRenderContext implements RenderContext {
 			(tex as Record<string, unknown>)[SYM_SMOOTHING] = true;
 			this._trackedBitmapDatas.add(new WeakRef(bitmapData));
 		} else if (
-			source instanceof HTMLVideoElement &&
+			(source instanceof HTMLCanvasElement || source instanceof HTMLVideoElement) &&
 			this._uploadedVersions.get(bitmapData) !== bitmapData.contentVersion
 		) {
 			this.updateTexture(bitmapData.webGLTexture, source, bitmapData.premultipliedAlpha);

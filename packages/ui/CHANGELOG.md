@@ -4,6 +4,15 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [1.1.10] — 2026-09-02
+
+### Fixed
+
+- Synchronize a component's current view state when attaching a skin, so the
+  initial state overrides are applied before the first render. This prevents
+  controls such as `ToggleButton` and `ToggleSwitch` from displaying their
+  authored base values instead of the initial `up` or selected state.
+
 ## [1.1.9] — 2026-08-31
 
 ### Changed
