@@ -22,6 +22,7 @@ export class EditableText extends Label implements IDisplayText {
 
 	public constructor() {
 		super();
+		this.touchChildren = true;
 		this._textField.type = TextFieldType.INPUT;
 		this.addEventListener(Event.FOCUS_IN, this._onFocusIn);
 		this.addEventListener(Event.FOCUS_OUT, this._onFocusOut);

@@ -34,7 +34,7 @@ export class TextInput extends Component implements IDisplayText {
 
 	public constructor() {
 		super();
-		this.addEventListener(TouchEvent.TOUCH_BEGIN, this._onTouchBegin);
+		this.addEventListener(TouchEvent.TOUCH_TAP, this._onTouchTap);
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
@@ -163,7 +163,7 @@ export class TextInput extends Component implements IDisplayText {
 		this.invalidateState();
 	};
 
-	private _onTouchBegin = (): void => {
+	private _onTouchTap = (): void => {
 		this.textDisplay?.setFocus();
 	};
 }

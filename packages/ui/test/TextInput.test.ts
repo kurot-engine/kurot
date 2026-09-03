@@ -108,6 +108,15 @@ describe('TextInput', () => {
 	});
 
 	describe('focus', () => {
+		it('allows direct EditableText touches to reach its internal input field', () => {
+			const editable = new EditableText();
+			editable.createChildren();
+			editable.updateDisplayList(160, 30);
+
+			expect(editable.touchChildren).toBe(true);
+			expect(editable.$hitTest(10, 10)).not.toBe(editable);
+		});
+
 		it('forwards a touch on the component to the editable skin part', () => {
 			const ti = new TextInput();
 			const ed = new EditableText();
@@ -117,7 +126,7 @@ describe('TextInput', () => {
 			};
 			attachPart(ti, 'textDisplay', ed);
 
-			ti.dispatchEventWith('touchBegin');
+			ti.dispatchEventWith('touchTap');
 
 			expect(focused).toBe(true);
 		});

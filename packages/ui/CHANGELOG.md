@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [1.1.11] — 2026-09-04
+
+### Fixed
+
+- Allow a directly instantiated `EditableText` to receive pointer input by
+  restoring touch handling for its internal input `TextField`.
+- Defer `TextInput` focus forwarding until `TOUCH_TAP`, preserving the internal
+  text field's touch-begin caret calculation and avoiding focus on cancelled
+  gestures.
+
 ## [1.1.10] — 2026-09-02
 
 ### Fixed
