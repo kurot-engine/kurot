@@ -4,6 +4,64 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.19] — 2026-09-04
+
+This release modernizes editable text rendering while preserving the native
+browser input, selection, and IME behavior required across desktop and mobile.
+Input text now remains in Kurot's canonical render path instead of switching
+between Canvas/WebGL text and a visibly overlaid DOM editor.
+
+### Added
+
+- Added synchronized selection and caret state for editable `TextField`
+  instances, including click-to-position behavior and a blinking rendered
+  caret.
+- Added IME composition-range rendering so in-progress text remains visible
+  and underlined until composition completes.
+- Added automatic horizontal scrolling for focused single-line input.
+- Added native pixel-scroll synchronization for multiline input. The hidden
+  `textarea` retains browser-standard keyboard, deletion, touch, and trackpad
+  scrolling while Kurot renders the visible text, selection, and caret.
+- Added password and multiline input cases to the interactive text test page.
+
+### Changed
+
+- Focused input fields remain in the normal text render pipeline, keeping
+  backgrounds, borders, typography, and high-density positioning stable while
+  editing.
+- Input focus now begins after a completed tap, preventing pointer movement
+  from prematurely opening or closing the native editor.
+- Character restrictions are applied after IME composition completes instead
+  of discarding in-progress composition text.
+- Multiline taps now resolve both horizontal and vertical text position,
+  including the current pixel scroll offset.
+- Public `scrollV` remains line-based and is synchronized with the internal
+  multiline pixel offset.
+
+### Fixed
+
+- Fixed input text changing size or moving toward the upper-left after losing
+  focus.
+- Fixed multiline input scrolling too early, failing to follow the caret, or
+  exposing only one line while deleting and navigating existing text.
+- Fixed stale multiline scroll offsets after content becomes shorter.
+- Fixed trailing line breaks failing to produce their final empty line.
+- Fixed transformed touch coordinates using a plain object where the matrix
+  API requires a `Point`, which could prevent input fields from receiving a
+  completed tap.
+
+### Tests
+
+- Added regression coverage for DOM editor geometry, hidden-editor behavior,
+  focus timing, selection, caret, IME composition, horizontal overflow,
+  multiline pixel scrolling, scroll clamping, and touch hit mapping.
+- Added interactive password and multiline cases to the text test page for
+  browser and device validation.
+- Full Core unit suite: 61 test files, 669 tests passing.
+- TypeScript implementation and declaration builds passing.
+
+---
+
 ## [1.0.18] — 2026-09-03
 
 This release completes high-density rendering support across the main WebGL

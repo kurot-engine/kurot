@@ -61,6 +61,11 @@ export class TextField extends DisplayObject {
 	private _selectionAnchor = 0;
 	private _selectionActive = 0;
 	private _isTyping = false;
+	private _inputScrollX = 0;
+	private _inputScrollY = 0;
+	private _caretVisible = false;
+	private _compositionStart = -1;
+	private _compositionEnd = -1;
 	private _inputController?: InputController;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
@@ -229,6 +234,9 @@ export class TextField extends DisplayObject {
 	public set multiline(value: boolean) {
 		if (this._multiline !== value) {
 			this._multiline = value;
+			if (!value) {
+				this._inputScrollY = 0;
+			}
 			this.invalidateText();
 		}
 	}
@@ -250,6 +258,7 @@ export class TextField extends DisplayObject {
 				this._inputController.addStageText();
 			}
 			this._inputController.setText(this._text);
+			this.$setSelectionFromInput(this._text.length, this._text.length);
 		} else {
 			if (this._inputController) {
 				this._inputController.removeStageText();
@@ -264,24 +273,23 @@ export class TextField extends DisplayObject {
 		return this._inputType;
 	}
 	public set inputType(value: TextFieldInputType) {
+		if (this._inputType === value) return;
 		this._inputType = value;
+		this._inputController?.updateProperties();
 	}
 
 	public get text(): string {
-		if (this._type === TextFieldType.INPUT && this._inputController) {
-			return this._inputController.getText();
-		}
 		return this._text;
 	}
 	public set text(value: string) {
 		const normalized = value == null ? '' : String(value);
-		if (this._text === normalized) return;
-		this._text = normalized;
-		this._textFlow = undefined;
+		if (!this.$setTextFromInput(normalized)) return;
 		if (this._inputController) {
 			this._inputController.setText(normalized);
+			if (!this._isTyping) {
+				this.setSelection(normalized.length, normalized.length);
+			}
 		}
-		this.invalidateText();
 	}
 
 	public get displayAsPassword(): boolean {
@@ -298,16 +306,22 @@ export class TextField extends DisplayObject {
 		return this._maxChars;
 	}
 	public set maxChars(value: number) {
+		if (this._maxChars === value) return;
 		this._maxChars = value;
+		this._inputController?.updateProperties();
 	}
 
 	public get scrollV(): number {
 		return Math.min(Math.max(this._scrollV, 1), this.maxScrollV);
 	}
 	public set scrollV(value: number) {
-		value = Math.max(value, 1);
+		value = Math.min(Math.max(value, 1), this.maxScrollV);
 		if (this._scrollV !== value) {
 			this._scrollV = value;
+			if (this._type === TextFieldType.INPUT && this._multiline) {
+				this._inputScrollY = Math.min(this.getScrollYOffset(), this.getMaxInputScrollY());
+				this._inputController?.setScrollTop(this._inputScrollY);
+			}
 			this.$markDirty();
 		}
 	}
@@ -444,6 +458,26 @@ export class TextField extends DisplayObject {
 		return this._isTyping;
 	}
 
+	public get $inputScrollX(): number {
+		return this._inputScrollX;
+	}
+
+	public get $inputScrollY(): number {
+		return this._inputScrollY;
+	}
+
+	public get $caretVisible(): boolean {
+		return this._caretVisible;
+	}
+
+	public get $compositionStart(): number {
+		return this._compositionStart;
+	}
+
+	public get $compositionEnd(): number {
+		return this._compositionEnd;
+	}
+
 	getLinesArr(): ILineElement[] {
 		this.ensureLines();
 		return this._linesArr ?? [];
@@ -491,12 +525,21 @@ export class TextField extends DisplayObject {
 	}
 
 	public setSelection(beginIndex: number, endIndex: number): void {
-		this._selectionAnchor = beginIndex;
-		this._selectionActive = endIndex;
+		this.$setSelectionFromInput(beginIndex, endIndex);
+		this._inputController?.setSelection(this._selectionAnchor, this._selectionActive);
 	}
 
 	setIsTyping(value: boolean): void {
+		if (this._isTyping === value) return;
 		this._isTyping = value;
+		this._caretVisible = value;
+		if (value) {
+			this.updateInputScroll();
+		} else {
+			this._inputScrollX = 0;
+			this._compositionStart = -1;
+			this._compositionEnd = -1;
+		}
 		this.$renderDirty = true;
 		this.$markDirty();
 	}
@@ -506,6 +549,95 @@ export class TextField extends DisplayObject {
 	}
 
 	// ── Internal methods ──────────────────────────────────────────────────────
+
+	public $setTextFromInput(value: string): boolean {
+		if (this._text === value) return false;
+
+		this._text = value;
+		this._textFlow = undefined;
+		this._selectionAnchor = clampIndex(this._selectionAnchor, value.length);
+		this._selectionActive = clampIndex(this._selectionActive, value.length);
+		this.invalidateText();
+		return true;
+	}
+
+	public $setSelectionFromInput(beginIndex: number, endIndex: number): void {
+		const begin = clampIndex(beginIndex, this._text.length);
+		const end = clampIndex(endIndex, this._text.length);
+		if (this._selectionAnchor === begin && this._selectionActive === end) return;
+
+		this._selectionAnchor = begin;
+		this._selectionActive = end;
+		this.updateInputScroll();
+		this.$renderDirty = true;
+		this.$markDirty();
+	}
+
+	public $setCaretVisible(value: boolean): void {
+		if (this._caretVisible === value) return;
+		this._caretVisible = value;
+		this.$renderDirty = true;
+		this.$markDirty();
+	}
+
+	public $setInputScrollY(value: number): void {
+		const normalized = Number.isFinite(value) ? Math.max(0, value) : 0;
+		const scrollY = Math.min(normalized, this.getMaxInputScrollY());
+		const lineHeight = this.getLineHeight();
+		const scrollV = lineHeight > 0
+			? Math.min(Math.floor(scrollY / lineHeight) + 1, this.maxScrollV)
+			: 1;
+		if (this._inputScrollY === scrollY && this._scrollV === scrollV) return;
+		this._inputScrollY = scrollY;
+		this._scrollV = scrollV;
+		this.$renderDirty = true;
+		this.$markDirty();
+	}
+
+	public $setCompositionRange(beginIndex?: number, endIndex?: number): void {
+		const begin = beginIndex === undefined ? -1 : clampIndex(beginIndex, this._text.length);
+		const end = endIndex === undefined ? -1 : clampIndex(endIndex, this._text.length);
+		if (this._compositionStart === begin && this._compositionEnd === end) return;
+
+		this._compositionStart = begin;
+		this._compositionEnd = end;
+		this.$renderDirty = true;
+		this.$markDirty();
+	}
+
+	public $getInputIndexAt(localX: number, localY = 0): number {
+		if (this._multiline) {
+			return this.getMultilineInputIndexAt(localX, localY);
+		}
+
+		const displayText = this.getDisplayText();
+		const width = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
+		const textWidth = measureText(displayText, this._fontFamily, this._fontSize, this._bold, this._italic);
+		let textX = 0;
+		if (textWidth > width && this._isTyping) {
+			textX = 0;
+		} else if (this._textAlign === HorizontalAlign.RIGHT) {
+			textX = width - textWidth;
+		} else if (this._textAlign === HorizontalAlign.CENTER) {
+			textX = (width - textWidth) / 2;
+		}
+		const x = localX - textX + this._inputScrollX;
+		if (x <= 0) return 0;
+
+		let previousWidth = 0;
+		for (let index = 1; index <= displayText.length; index++) {
+			const currentWidth = measureText(
+				displayText.substring(0, index),
+				this._fontFamily,
+				this._fontSize,
+				this._bold,
+				this._italic,
+			);
+			if (x < (previousWidth + currentWidth) / 2) return index - 1;
+			previousWidth = currentWidth;
+		}
+		return displayText.length;
+	}
 
 	override $onAddToStage(stage: Stage, $nestLevel: number): void {
 		super.$onAddToStage(stage, $nestLevel);
@@ -538,6 +670,109 @@ export class TextField extends DisplayObject {
 		this.invalidateFontString();
 		this.$renderDirty = true;
 		this.$markDirty();
+		this.updateInputScroll();
+		if (this._type === TextFieldType.INPUT && this._multiline) {
+			this.$setInputScrollY(this._inputScrollY);
+		}
+		this._inputController?.updateProperties();
+	}
+
+	private updateInputScroll(): void {
+		if (!this._isTyping || this._multiline || isNaN(this.$explicitWidth)) {
+			this._inputScrollX = 0;
+			return;
+		}
+
+		const displayText = this.getDisplayText();
+		const caretText = displayText.substring(0, this._selectionActive);
+		const caretX = measureText(caretText, this._fontFamily, this._fontSize, this._bold, this._italic);
+		const viewportWidth = Math.max(0, this.$explicitWidth - 1);
+		const textWidth = measureText(displayText, this._fontFamily, this._fontSize, this._bold, this._italic);
+		if (textWidth <= viewportWidth) {
+			this._inputScrollX = 0;
+		} else if (caretX < this._inputScrollX) {
+			this._inputScrollX = caretX;
+		} else if (caretX > this._inputScrollX + viewportWidth) {
+			this._inputScrollX = caretX - viewportWidth;
+		}
+	}
+
+	private getMultilineInputIndexAt(localX: number, localY: number): number {
+		this.ensureLines();
+		const lines = this._linesArr ?? [];
+		if (lines.length === 0) return 0;
+
+		const width = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
+		const height = !isNaN(this.$explicitHeight) ? this.$explicitHeight : this.textHeight;
+		let totalTextHeight = 0;
+		for (let i = 0; i < lines.length; i++) {
+			totalTextHeight += lines[i].height;
+			if (i > 0) totalTextHeight += this._lineSpacing;
+		}
+
+		let verticalOffset = 0;
+		if (this._verticalAlign === VerticalAlign.MIDDLE) {
+			verticalOffset = Math.max(0, (height - totalTextHeight) / 2);
+		} else if (this._verticalAlign === VerticalAlign.BOTTOM) {
+			verticalOffset = Math.max(0, height - totalTextHeight);
+		}
+
+		const contentY = localY + this._inputScrollY - verticalOffset;
+		let lineTop = 0;
+		let lineStartIndex = 0;
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			const hitBottom = lineTop + line.height + (i < lines.length - 1 ? this._lineSpacing / 2 : 0);
+			if (contentY <= hitBottom) {
+				let lineX = 0;
+				if (this._textAlign === HorizontalAlign.RIGHT) {
+					lineX = width - line.width;
+				} else if (this._textAlign === HorizontalAlign.CENTER) {
+					lineX = (width - line.width) / 2;
+				}
+
+				const x = localX - lineX;
+				if (x <= 0) return lineStartIndex;
+
+				let elementStartIndex = lineStartIndex;
+				let previousWidth = 0;
+				for (const element of line.elements) {
+					const style = element.style;
+					const fontSize = style?.size ?? this._fontSize;
+					const fontFamily = style?.fontFamily ?? this._fontFamily;
+					const bold = style?.bold ?? this._bold;
+					const italic = style?.italic ?? this._italic;
+					let previousCharacterWidth = previousWidth;
+
+					for (let index = 1; index <= element.text.length; index++) {
+						const currentWidth = previousWidth + measureText(
+							element.text.substring(0, index),
+							fontFamily,
+							fontSize,
+							bold,
+							italic,
+						);
+						if (x < (previousCharacterWidth + currentWidth) / 2) {
+							return elementStartIndex + index - 1;
+						}
+						previousCharacterWidth = currentWidth;
+					}
+					previousWidth += element.width;
+					elementStartIndex += element.text.length;
+				}
+				return elementStartIndex;
+			}
+
+			lineStartIndex += line.charNum;
+			lineTop += line.height + this._lineSpacing;
+		}
+
+		return this._text.length;
+	}
+
+	private getMaxInputScrollY(): number {
+		if (!this._multiline || isNaN(this.$explicitHeight)) return 0;
+		return Math.max(0, this.textHeight - this.$explicitHeight);
 	}
 
 	private invalidateFontString(): void {
@@ -574,6 +809,7 @@ export class TextField extends DisplayObject {
 
 	private calculateLines(): ILineElement[] {
 		const elements = this._textFlow ?? [{ text: this.getDisplayText() }];
+		const hasTrailingLineBreak = /(?:\r\n|\r|\n)$/.test(elements.map(element => element.text).join(''));
 		const maxWidth = !isNaN(this.$explicitWidth) ? this.$explicitWidth : NaN;
 		const isInput = this._type === TextFieldType.INPUT;
 		const lines: ILineElement[] = [];
@@ -690,7 +926,7 @@ export class TextField extends DisplayObject {
 			});
 		}
 
-		if (lines.length === 0) {
+		if (lines.length === 0 || (currentLine.length === 0 && hasTrailingLineBreak)) {
 			lines.push({ width: 0, height: this._fontSize, charNum: 0, hasNextLine: false, elements: [] });
 		}
 
@@ -758,4 +994,9 @@ export class TextField extends DisplayObject {
 		}
 		return undefined;
 	}
+}
+
+function clampIndex(value: number, length: number): number {
+	if (!Number.isFinite(value)) return 0;
+	return Math.max(0, Math.min(Math.trunc(value), length));
 }

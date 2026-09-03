@@ -59,6 +59,7 @@ describe('StageText DOM overlay', () => {
 		expect(input.style.fontFamily).toBe('Arial');
 		expect(input.style.padding).toBe('0px');
 		expect(input.style.boxSizing).toBe('border-box');
+		expect(input.style.opacity).toBe('0');
 	});
 
 	it('positions native input from logical stage size instead of backing-store pixels', () => {
@@ -92,5 +93,52 @@ describe('StageText DOM overlay', () => {
 
 		const wrapper = document.querySelector('input')!.parentElement as HTMLDivElement;
 		expect(wrapper.style.transform).toBe('matrix(0.5,0,0,0.5,10,5)');
+	});
+
+	it('publishes native text and selection while keeping the DOM editor invisible', () => {
+		const field = new TextField();
+		field.width = 160;
+		field.height = 30;
+		const stageText = new StageText();
+		stageText.setTextField(field);
+		stageText.setText('Hello');
+
+		let textUpdates = 0;
+		let selectionUpdates = 0;
+		stageText.addEventListener('updateText', () => textUpdates++);
+		stageText.addEventListener('updateSelection', () => selectionUpdates++);
+		stageText.show();
+
+		const input = document.querySelector('input')!;
+		input.value = 'Hello!';
+		input.setSelectionRange(2, 5);
+		input.dispatchEvent(new globalThis.Event('input'));
+
+		expect(stageText.getText()).toBe('Hello!');
+		expect(stageText.getSelection()).toEqual([2, 5]);
+		expect(textUpdates).toBe(1);
+		expect(selectionUpdates).toBeGreaterThanOrEqual(1);
+		expect(input.style.opacity).toBe('0');
+	});
+
+	it('publishes the native textarea pixel scroll position', () => {
+		const field = new TextField();
+		field.multiline = true;
+		field.width = 160;
+		field.height = 60;
+		const stageText = new StageText();
+		stageText.setTextField(field);
+		stageText.show();
+
+		let scrollUpdates = 0;
+		stageText.addEventListener('updateScroll', () => scrollUpdates++);
+		const textarea = document.querySelector('textarea')!;
+		textarea.scrollTop = 17.5;
+		textarea.dispatchEvent(new globalThis.Event('scroll'));
+
+		expect(stageText.getScrollTop()).toBe(17.5);
+		expect(scrollUpdates).toBe(1);
+		expect(textarea.style.overflowY).toBe('auto');
+		expect(textarea.style.opacity).toBe('0');
 	});
 });

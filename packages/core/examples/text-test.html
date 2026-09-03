@@ -121,6 +121,7 @@
 				HorizontalAlign,
 				VerticalAlign,
 				TextFieldType,
+				TextFieldInputType,
 			} from '../src/index.js';
 
 			// ── Logging ─────────────────────────────────────────────────────────
@@ -499,10 +500,6 @@
 			});
 
 			// --- 18. Input mode ---
-			// Background is drawn by a sibling Shape (skin-style), not by the
-			// TextField itself. This keeps the bg independent of the TextPipe's
-			// INPUT-mode text-texture skip, so the field never loses its bg
-			// while focused (TextField.background would be dropped by TextPipe).
 			define('Input mode (click)', () => {
 				const tf = new TextField();
 				tf.text = 'Click to edit';
@@ -513,17 +510,10 @@
 				tf.type = TextFieldType.INPUT;
 				tf.x = 20;
 				tf.y = 20;
-
-				// Skin-style background: a Shape rect at the same x/y/w/h as the
-				// TextField, sitting one layer below it (added first).
-				const bg = new Shape();
-				bg.graphics.lineStyle(1, 0x6c9cff, 1);
-				bg.graphics.beginFill(0x1a1a2e, 1);
-				bg.graphics.drawRect(0, 0, tf.width, tf.height);
-				bg.graphics.endFill();
-				bg.x = tf.x;
-				bg.y = tf.y;
-				root.addChild(bg);
+				tf.background = true;
+				tf.backgroundColor = 0x1a1a2e;
+				tf.border = true;
+				tf.borderColor = 0x6c9cff;
 
 				root.addChild(tf);
 				assert(tf.type === TextFieldType.INPUT, 'type = INPUT');
@@ -558,6 +548,51 @@
 				tf.y = 20;
 				root.addChild(tf);
 				assert(tf.numLines === 4, 'numLines = 4 (got ' + tf.numLines + ')');
+			});
+
+			// --- 21. Password input ---
+			define('Password input (click)', () => {
+				const tf = new TextField();
+				tf.text = 'secret';
+				tf.textColor = 0xffffff;
+				tf.size = 18;
+				tf.width = 600;
+				tf.height = 34;
+				tf.inputType = TextFieldInputType.PASSWORD;
+				tf.displayAsPassword = true;
+				tf.type = TextFieldType.INPUT;
+				tf.x = 20;
+				tf.y = 20;
+				tf.background = true;
+				tf.backgroundColor = 0x1a1a2e;
+				tf.border = true;
+				tf.borderColor = 0x6c9cff;
+				root.addChild(tf);
+				assert(tf.text === 'secret', 'password value preserved');
+				assert(tf.displayAsPassword === true, 'password masking enabled');
+			});
+
+			// --- 22. Multiline input ---
+			define('Multiline input (click)', () => {
+				const tf = new TextField();
+				tf.text = 'First line\nSecond line';
+				tf.textColor = 0xffffff;
+				tf.size = 18;
+				tf.lineSpacing = 4;
+				tf.width = 600;
+				tf.height = 120;
+				tf.multiline = true;
+				tf.wordWrap = true;
+				tf.type = TextFieldType.INPUT;
+				tf.x = 20;
+				tf.y = 20;
+				tf.background = true;
+				tf.backgroundColor = 0x1a1a2e;
+				tf.border = true;
+				tf.borderColor = 0x6c9cff;
+				root.addChild(tf);
+				assert(tf.multiline === true, 'multiline enabled');
+				assert(tf.numLines === 2, 'two initial lines');
 			});
 
 			// ── Build sidebar buttons ───────────────────────────────────────────

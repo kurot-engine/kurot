@@ -792,8 +792,6 @@ export class CanvasRenderer {
 	private renderTextField(tf: TextField, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): number {
 		tf.getLinesArr();
 
-		const inputFocused = tf.type === TextFieldType.INPUT && tf.isTyping;
-
 		const width = !isNaN(tf.$explicitWidth) ? tf.$explicitWidth : tf.textWidth;
 		const height = !isNaN(tf.$explicitHeight) ? tf.$explicitHeight : tf.textHeight;
 		if (width <= 0 || height <= 0) return 0;
@@ -812,11 +810,6 @@ export class CanvasRenderer {
 			ctx.strokeStyle = colorToString(tf.borderColor);
 			ctx.lineWidth = 1;
 			ctx.strokeRect(0, 0, width, height);
-		}
-
-		if (inputFocused) {
-			ctx.restore();
-			return 0;
 		}
 
 		// ── Clip to visible area (for scrollV support) ────────────────────────
@@ -841,7 +834,22 @@ export class CanvasRenderer {
 		}
 
 		// ── ScrollV offset ────────────────────────────────────────────────────
-		const scrollOffset = tf.getScrollYOffset();
+		const inputActive = tf.type === TextFieldType.INPUT && tf.isTyping;
+		const scrollOffset = tf.type === TextFieldType.INPUT && tf.multiline
+			? tf.$inputScrollY
+			: tf.getScrollYOffset();
+		const inputScrollX = inputActive ? tf.$inputScrollX : 0;
+		const selectionStart = Math.min(tf.selectionBeginIndex, tf.selectionEndIndex);
+		const selectionEnd = Math.max(tf.selectionBeginIndex, tf.selectionEndIndex);
+		const selectionVisible = inputActive && selectionStart !== selectionEnd;
+		const compositionStart = tf.$compositionStart;
+		const compositionEnd = tf.$compositionEnd;
+		const compositionVisible = inputActive && compositionStart >= 0 && compositionStart !== compositionEnd;
+		let characterIndex = 0;
+		let caretX = 0;
+		let caretTop = 0;
+		let caretHeight = tf.size;
+		let caretLocated = false;
 
 		// ── Text lines ───────────────────────────────────────────────────────────
 		let drawY = verticalOffset - scrollOffset;
@@ -853,16 +861,22 @@ export class CanvasRenderer {
 			drawY += h / 2;
 
 			if (drawY + h / 2 < 0 || drawY - h / 2 > height) {
+				characterIndex += line.charNum;
 				drawY += h / 2 + lineSpacing;
 				continue;
 			}
 
 			let lineX = 0;
-			if (tf.textAlign === HorizontalAlign.RIGHT) {
+			if (inputActive && line.width > width) {
+				lineX = 0;
+			} else if (tf.textAlign === HorizontalAlign.RIGHT) {
 				lineX = width - line.width;
 			} else if (tf.textAlign === HorizontalAlign.CENTER) {
 				lineX = (width - line.width) / 2;
 			}
+			lineX -= inputScrollX;
+			const lineStartX = lineX;
+			const lineStartIndex = characterIndex;
 
 			for (const el of line.elements) {
 				const style = el.style;
@@ -880,6 +894,25 @@ export class CanvasRenderer {
 				ctx.textAlign = 'left';
 
 				const textY = drawY + (h - fontSize) / 2;
+				const elementStartIndex = characterIndex;
+				const elementEndIndex = elementStartIndex + el.text.length;
+
+				if (selectionVisible && selectionStart < elementEndIndex && selectionEnd > elementStartIndex) {
+					const localStart = Math.max(selectionStart, elementStartIndex) - elementStartIndex;
+					const localEnd = Math.min(selectionEnd, elementEndIndex) - elementStartIndex;
+					const prefixWidth = ctx.measureText(el.text.substring(0, localStart)).width;
+					const selectionWidth = ctx.measureText(el.text.substring(localStart, localEnd)).width;
+					ctx.fillStyle = 'rgba(51, 144, 255, 0.55)';
+					ctx.fillRect(lineX + prefixWidth, textY - fontSize / 2, selectionWidth, fontSize);
+				}
+
+				if (!caretLocated && tf.caretIndex >= elementStartIndex && tf.caretIndex <= elementEndIndex) {
+					const localCaret = tf.caretIndex - elementStartIndex;
+					caretX = lineX + ctx.measureText(el.text.substring(0, localCaret)).width;
+					caretTop = textY - fontSize / 2;
+					caretHeight = fontSize;
+					caretLocated = true;
+				}
 
 				if (stroke > 0) {
 					ctx.strokeStyle = colorToString(strokeColor);
@@ -893,40 +926,35 @@ export class CanvasRenderer {
 				ctx.fillText(el.text, lineX, textY);
 				drawCalls++;
 
+				if (compositionVisible && compositionStart < elementEndIndex && compositionEnd > elementStartIndex) {
+					const localStart = Math.max(compositionStart, elementStartIndex) - elementStartIndex;
+					const localEnd = Math.min(compositionEnd, elementEndIndex) - elementStartIndex;
+					const prefixWidth = ctx.measureText(el.text.substring(0, localStart)).width;
+					const compositionWidth = ctx.measureText(el.text.substring(localStart, localEnd)).width;
+					ctx.fillStyle = colorToString(textColor);
+					ctx.fillRect(lineX + prefixWidth, textY + fontSize / 2, compositionWidth, 1);
+				}
+
 				lineX += el.width;
+				characterIndex = elementEndIndex;
+			}
+
+			if (!caretLocated && tf.caretIndex === lineStartIndex && line.elements.length === 0) {
+				caretX = lineStartX;
+				caretTop = drawY - tf.size / 2;
+				caretLocated = true;
+			}
+			if (line.hasNextLine) {
+				characterIndex++;
 			}
 
 			drawY += h / 2 + lineSpacing;
 		}
 
 		// ── INPUT cursor ──────────────────────────────────────────────────────
-		if (tf.type === TextFieldType.INPUT && tf.isTyping) {
-			const caretIndex = tf.caretIndex;
-			const fontStr = getFontString(tf.size, tf.fontFamily, tf.bold, tf.italic);
-			ctx.font = fontStr;
-			ctx.textBaseline = 'middle';
-
-			let cursorX = 0;
-			let charCount = 0;
-			for (const line of lines) {
-				for (const el of line.elements) {
-					const elLen = el.text.length;
-					if (charCount + elLen >= caretIndex) {
-						const partial = el.text.substring(0, caretIndex - charCount);
-						cursorX += ctx.measureText(partial).width;
-						charCount = caretIndex;
-						break;
-					}
-					cursorX += el.width;
-					charCount += elLen;
-				}
-				if (charCount >= caretIndex) break;
-				cursorX = 0;
-			}
-
-			const cursorY = verticalOffset - scrollOffset;
+		if (inputActive && tf.$caretVisible && selectionStart === selectionEnd && caretLocated) {
 			ctx.fillStyle = colorToString(tf.textColor);
-			ctx.fillRect(cursorX, cursorY, 1, tf.size);
+			ctx.fillRect(caretX, caretTop, 1, caretHeight);
 			drawCalls++;
 		}
 

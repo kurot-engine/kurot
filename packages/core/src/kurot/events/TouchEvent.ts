@@ -1,6 +1,6 @@
 import { Event } from './Event.js';
 import type { IEventDispatcher } from './IEventDispatcher.js';
-import type { Point } from '../geom/Point.js';
+import { Point } from '../geom/Point.js';
 import { setRequestRenderingFlag } from '../player/SystemTicker.js';
 
 export class TouchEvent extends Event {
@@ -113,7 +113,7 @@ export class TouchEvent extends Event {
 			this._localY = this._stageY;
 			return;
 		}
-		const out = { x: 0, y: 0 } as Point;
+		const out = new Point();
 		target.$getInvertedConcatenatedMatrix().transformPoint(this._stageX, this._stageY, out);
 		this._localX = out.x;
 		this._localY = out.y;

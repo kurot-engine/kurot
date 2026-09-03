@@ -1,5 +1,4 @@
 import type { TextField } from '../../text/TextField.js';
-import { TextFieldType } from '../../text/enums/TextFieldType.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
@@ -73,17 +72,13 @@ export class TextPipe implements RenderPipe<TextField> {
 	}
 
 	/**
-	 * Draws a text instruction unless a focused native input owns its display.
+	 * Draws a text instruction from the TextField's canonical render state.
 	 */
 	public execute(inst: TextInstruction, buffer: RenderBuffer): void {
 		const tf = inst.renderable;
 		tf.getLinesArr();
 
 		if (!this._context) this._context = buffer.context;
-
-		if (tf.type === TextFieldType.INPUT && tf.isTyping) {
-			return;
-		}
 
 		const logicalW = Math.ceil(!isNaN(tf.$explicitWidth) ? tf.$explicitWidth : tf.textWidth);
 		const logicalH = Math.ceil(!isNaN(tf.$explicitHeight) ? tf.$explicitHeight : tf.textHeight);

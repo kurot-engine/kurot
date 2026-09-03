@@ -1,6 +1,7 @@
 import { afterEach, describe, it, expect, vi } from 'vitest';
 import { TextPipe } from '../src/kurot/player/pipes/TextPipe.js';
 import { TextField } from '../src/kurot/text/TextField.js';
+import { TextFieldType } from '../src/kurot/text/enums/TextFieldType.js';
 import type { CanvasRenderer } from '../src/kurot/player/canvas/index.js';
 import type { CanvasBuffer } from '../src/kurot/player/canvas/index.js';
 import type { RenderBuffer } from '../src/kurot/player/RenderBuffer.js';
@@ -74,6 +75,8 @@ describe('TextPipe', () => {
 		tf.text = 'Hi';
 		tf.width = 100;
 		tf.height = 40;
+		tf.type = TextFieldType.INPUT;
+		tf.setIsTyping(true);
 
 		pipe.execute({ renderPipeId: 'text', renderable: tf, offsetX: 0, offsetY: 0 }, buffer);
 
@@ -81,6 +84,7 @@ describe('TextPipe', () => {
 		expect(surface.width).toBe(200);
 		expect(surface.height).toBe(80);
 		expect(context2d.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
+		expect(canvasRenderer.renderTextFieldToContext).toHaveBeenCalledWith(tf, context2d, 0, 0);
 		expect(context.drawTexture).toHaveBeenCalledWith(
 			texture,
 			0,

@@ -10,6 +10,8 @@ export class StageText extends EventDispatcher {
 	private _inputDiv?: HTMLDivElement;
 	private _text = '';
 	private _compositionLock = false;
+	private _compositionStart = -1;
+	private _compositionEnd = -1;
 	private _clearing = false;
 	private _isShowing = false;
 
@@ -21,9 +23,48 @@ export class StageText extends EventDispatcher {
 		return this._text;
 	}
 
+	public get isComposing(): boolean {
+		return this._compositionLock;
+	}
+
+	public getCompositionRange(): [number, number] | undefined {
+		if (!this._compositionLock || this._compositionStart < 0) return undefined;
+		return [this._compositionStart, this._compositionEnd];
+	}
+
 	setText(value: string): void {
 		this._text = value;
 		if (this._inputElement) this._inputElement.value = value;
+	}
+
+	public setSelection(beginIndex: number, endIndex: number): void {
+		const element = this._inputElement;
+		if (!element) return;
+
+		const begin = clampIndex(beginIndex, element.value.length);
+		const end = clampIndex(endIndex, element.value.length);
+		element.setSelectionRange(begin, end);
+	}
+
+	public getSelection(): [number, number] {
+		const element = this._inputElement;
+		if (!element) return [0, 0];
+
+		const begin = element.selectionStart ?? 0;
+		const end = element.selectionEnd ?? begin;
+		return [begin, end];
+	}
+
+	public getScrollTop(): number {
+		return this._inputElement instanceof HTMLTextAreaElement
+			? this._inputElement.scrollTop
+			: 0;
+	}
+
+	public setScrollTop(value: number): void {
+		if (this._inputElement instanceof HTMLTextAreaElement) {
+			this._inputElement.scrollTop = Math.max(0, value);
+		}
 	}
 
 	setColor(value: number): void {
@@ -66,6 +107,7 @@ export class StageText extends EventDispatcher {
 	}
 
 	resetStageText(): void {
+		this.ensureElements();
 		if (!this._textField || !this._inputElement || !this._inputDiv) return;
 		const tf = this._textField;
 		const el = this._inputElement;
@@ -78,11 +120,11 @@ export class StageText extends EventDispatcher {
 		el.style.color = colorString(tf.textColor);
 		if (el instanceof HTMLInputElement) {
 			el.type = tf.inputType;
-			if (tf.maxChars > 0) {
-				el.setAttribute('maxlength', String(tf.maxChars));
-			} else {
-				el.removeAttribute('maxlength');
-			}
+		}
+		if (tf.maxChars > 0) {
+			el.setAttribute('maxlength', String(tf.maxChars));
+		} else {
+			el.removeAttribute('maxlength');
 		}
 
 		el.style.width = tf.width + 'px';
@@ -91,6 +133,12 @@ export class StageText extends EventDispatcher {
 
 		if (tf.multiline) {
 			this.setAreaHeight(tf, el);
+			el.style.overflowX = 'hidden';
+			el.style.overflowY = 'auto';
+			el.style.whiteSpace = 'pre-wrap';
+			el.style.wordBreak = tf.wordWrap ? 'normal' : 'break-all';
+			el.style.overflowWrap = 'break-word';
+			el.scrollTop = tf.$inputScrollY;
 		} else {
 			const remaining = Math.max(0, tf.height - tf.size);
 			const top = remaining * getValign(tf);
@@ -98,18 +146,27 @@ export class StageText extends EventDispatcher {
 			el.style.top = top + 'px';
 			el.style.height = Math.min(tf.size, tf.height) + 'px';
 			el.style.padding = '0px';
+			el.style.overflow = 'hidden';
 		}
 
 		this._inputDiv.style.overflow = 'hidden';
 		this._inputDiv.style.width = tf.width + 'px';
 		this._inputDiv.style.height = tf.height + 'px';
+
+		if (this._isShowing && document.activeElement !== el) {
+			this.executeShow();
+		}
 	}
 
 	// ── Element lifecycle ────────────────────────────────────────────────────
 
 	private ensureElements(): void {
-		if (this._inputDiv && this._inputElement) return;
 		if (!this._textField) return;
+		if (this._inputElement && this._textField.multiline !== (this._inputElement instanceof HTMLTextAreaElement)) {
+			this._inputElement.remove();
+			this._inputElement = undefined;
+		}
+		if (this._inputDiv && this._inputElement) return;
 		if (!this._inputDiv) {
 			const div = document.createElement('div');
 			div.style.position = 'fixed';
@@ -133,6 +190,7 @@ export class StageText extends EventDispatcher {
 			const el = tf.multiline ? document.createElement('textarea') : document.createElement('input');
 			if (el instanceof HTMLTextAreaElement) {
 				el.style.resize = 'none';
+				el.wrap = 'soft';
 			}
 			el.style.position = 'absolute';
 			el.style.boxSizing = 'border-box';
@@ -144,22 +202,28 @@ export class StageText extends EventDispatcher {
 			el.style.outline = 'none';
 			el.style.background = 'none transparent';
 			el.style.overflow = 'hidden';
-			el.style.wordBreak = 'break-all';
 			el.style.opacity = '0';
 			el.style.pointerEvents = 'auto';
 			el.value = this._text;
-			el.addEventListener('input', () => {
-				if (!this._compositionLock) {
-					this.onTextInput();
-				}
-			});
+			el.addEventListener('input', this.onTextInput);
 			el.addEventListener('compositionstart', () => {
 				this._compositionLock = true;
+				const [begin, end] = this.getSelection();
+				this._compositionStart = Math.min(begin, end);
+				this._compositionEnd = Math.max(begin, end);
+				this.dispatchCompositionChange();
 			});
 			el.addEventListener('compositionend', () => {
 				this._compositionLock = false;
 				this.onTextInput();
+				this._compositionStart = -1;
+				this._compositionEnd = -1;
+				this.dispatchCompositionChange();
 			});
+			el.addEventListener('select', this.onSelectionChange);
+			el.addEventListener('keyup', this.onSelectionChange);
+			el.addEventListener('click', this.onSelectionChange);
+			el.addEventListener('scroll', this.onScroll);
 			el.addEventListener('focus', () => {
 				this.dispatchEventWith('focus');
 			});
@@ -216,20 +280,26 @@ export class StageText extends EventDispatcher {
 		if (el.value !== this._text) {
 			el.value = this._text;
 		}
-		el.style.opacity = '1';
+		el.style.opacity = '0';
 		this._isShowing = true;
-		setTimeout(() => {
-			if (!this._isShowing || !this._inputElement) return;
-			el.selectionStart = el.value.length;
-			el.selectionEnd = el.value.length;
-			el.focus();
-		}, 0);
+		const begin = this._textField?.selectionBeginIndex ?? el.value.length;
+		const end = this._textField?.selectionEndIndex ?? begin;
+		this.setSelection(begin, end);
+		if (el instanceof HTMLTextAreaElement) {
+			el.scrollTop = this._textField?.$inputScrollY ?? 0;
+		}
+		el.focus();
+		this.dispatchSelectionChange();
 	}
 
 	private clearInputElement(): void {
 		if (this._clearing) return;
 		this._clearing = true;
 		this._isShowing = false;
+		this._compositionLock = false;
+		this._compositionStart = -1;
+		this._compositionEnd = -1;
+		this.dispatchCompositionChange();
 		const el = this._inputElement;
 		const div = this._inputDiv;
 		if (el) {
@@ -264,20 +334,52 @@ export class StageText extends EventDispatcher {
 			el.style.lineHeight = cssLineH + 'px';
 		} else {
 			el.style.height = tf.height + 'px';
-			const rap = tf.height - tf.size - tf.lineSpacing;
+			const rap = Math.max(0, tf.height - tf.textHeight);
 			const valign = getValign(tf);
-			const top = Math.max(0, rap * valign);
-			const bottom = Math.max(0, rap - top);
+			const top = rap * valign;
+			const bottom = rap - top;
 			el.style.padding = `${top}px 0px ${bottom}px 0px`;
 			el.style.lineHeight = cssLineH + 'px';
 		}
 	}
 
-	private onTextInput(): void {
+	private onTextInput = (): void => {
 		if (this._inputElement) {
 			this._text = this._inputElement.value;
+			if (this._compositionLock) {
+				const [, end] = this.getSelection();
+				this._compositionEnd = Math.max(this._compositionStart, end);
+			}
+			this.dispatchScrollChange();
 			this.dispatchEventWith('updateText');
+			this.dispatchSelectionChange();
+			if (this._compositionLock) {
+				this.dispatchCompositionChange();
+			}
 		}
+	};
+
+	private onSelectionChange = (): void => {
+		this.dispatchScrollChange();
+		this.dispatchSelectionChange();
+	};
+
+	private onScroll = (): void => {
+		this.dispatchScrollChange();
+	};
+
+	private dispatchScrollChange(): void {
+		if (this._inputElement instanceof HTMLTextAreaElement) {
+			this.dispatchEventWith('updateScroll');
+		}
+	}
+
+	private dispatchSelectionChange(): void {
+		this.dispatchEventWith('updateSelection');
+	}
+
+	private dispatchCompositionChange(): void {
+		this.dispatchEventWith('updateComposition');
 	}
 
 	private getCanvas(): HTMLCanvasElement | undefined {
@@ -297,4 +399,9 @@ function colorString(color: number): string {
 	const g = (color >> 8) & 0xff;
 	const b = color & 0xff;
 	return `rgb(${r},${g},${b})`;
+}
+
+function clampIndex(value: number, length: number): number {
+	if (!Number.isFinite(value)) return 0;
+	return Math.max(0, Math.min(Math.trunc(value), length));
 }
