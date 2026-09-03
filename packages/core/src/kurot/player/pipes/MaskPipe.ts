@@ -5,6 +5,7 @@ import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
+import { fitTextureResolution } from '../webgl/WebGLUtils.js';
 
 const INSTRUCTION_POOL_LIMIT = 256;
 
@@ -160,8 +161,19 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 
 		const bw = bounds.width;
 		const bh = bounds.height;
+		const resolution = fitTextureResolution(
+			bw,
+			bh,
+			buffer.resolution,
+			buffer.context.maxTextureSize,
+		);
 
-		const displayBuffer = WGLBuf.create(buffer.context, bw, bh);
+		const displayBuffer = WGLBuf.create(
+			buffer.context,
+			Math.ceil(bw * resolution),
+			Math.ceil(bh * resolution),
+		);
+		displayBuffer.resolution = resolution;
 		displayBuffer.context.pushBuffer(displayBuffer);
 		return displayBuffer;
 	}
@@ -202,19 +214,25 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 
 		const mask = renderable.$mask;
 		if (mask) {
-			const maskBuffer = WGLBuf.create(buffer.context, bw, bh);
+			const resolution = displayBuffer.resolution;
+			const maskBuffer = WGLBuf.create(
+				buffer.context,
+				Math.ceil(bw * resolution),
+				Math.ceil(bh * resolution),
+			);
+			maskBuffer.resolution = resolution;
 			maskBuffer.context.pushBuffer(maskBuffer);
 			const maskMatrix = Matrix.create();
 			maskMatrix.copyFrom(mask.$getConcatenatedMatrix());
 			mask.$getConcatenatedMatrixAt(renderable, maskMatrix);
 			maskMatrix.translate(-bx, -by);
 			maskBuffer.setTransform(
-				maskMatrix.a,
-				maskMatrix.b,
-				maskMatrix.c,
-				maskMatrix.d,
-				maskMatrix.tx,
-				maskMatrix.ty,
+				maskMatrix.a * resolution,
+				maskMatrix.b * resolution,
+				maskMatrix.c * resolution,
+				maskMatrix.d * resolution,
+				maskMatrix.tx * resolution,
+				maskMatrix.ty * resolution,
 			);
 			Matrix.release(maskMatrix);
 			this._drawMaskObject(mask, maskBuffer, 0, 0);

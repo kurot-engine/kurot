@@ -20,6 +20,18 @@ class BoundedDisplayObject extends DisplayObject {
 }
 
 describe('DisplayList texture cache', () => {
+	it('inherits the renderer resolution when none is configured', () => {
+		const displayList = DisplayList.create(new BoundedDisplayObject())!;
+
+		expect(displayList.updateSurfaceSize(Number.POSITIVE_INFINITY, 2)).toBe(true);
+		expect(displayList.resolution).toBe(1);
+		expect(displayList.actualResolution).toBe(2);
+		expect(displayList.canvasBuffer.width).toBe(200);
+		expect(displayList.canvasBuffer.height).toBe(100);
+
+		DisplayList.release(displayList);
+	});
+
 	it('allocates at the configured resolution while preserving logical offsets', () => {
 		const root = new BoundedDisplayObject();
 		const displayList = DisplayList.create(root)!;

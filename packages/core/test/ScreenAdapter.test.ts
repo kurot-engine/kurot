@@ -41,4 +41,36 @@ describe('ScreenAdapter resolution', () => {
 
 		adapter.dispose();
 	});
+
+	it('resizes the backing store when resolution changes at runtime', () => {
+		const container = document.createElement('div');
+		const canvas = document.createElement('canvas');
+		container.appendChild(canvas);
+		document.body.appendChild(container);
+
+		Object.defineProperties(container, {
+			clientWidth: { value: 320 },
+			clientHeight: { value: 480 },
+		});
+
+		const player = {
+			stage: {
+				scaleMode: StageScaleMode.NO_SCALE,
+				setScreenAdapter: vi.fn(),
+			},
+			updateStageSize: vi.fn(),
+		} as unknown as Player;
+		const touchHandler = {
+			updateScale: vi.fn(),
+		} as unknown as TouchHandler;
+		const adapter = new ScreenAdapter(player, canvas, touchHandler, 640, 1136, 1);
+
+		adapter.resolution = 2;
+
+		expect(adapter.resolution).toBe(2);
+		expect(player.updateStageSize).toHaveBeenLastCalledWith(320, 480, 640, 960);
+		expect(touchHandler.updateScale).toHaveBeenLastCalledWith(1, 1);
+
+		adapter.dispose();
+	});
 });

@@ -6,6 +6,7 @@ import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
+import { fitTextureResolution } from '../webgl/WebGLUtils.js';
 
 /**
  * Starts a filtered subtree.
@@ -133,7 +134,18 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		}
 		const offW = Math.ceil(bounds.width + padL + padR);
 		const offH = Math.ceil(bounds.height + padT + padB);
-		const offscreen = WGLBuf.create(buffer.context, offW, offH);
+		const resolution = fitTextureResolution(
+			offW,
+			offH,
+			buffer.resolution,
+			buffer.context.maxTextureSize,
+		);
+		const offscreen = WGLBuf.create(
+			buffer.context,
+			Math.ceil(offW * resolution),
+			Math.ceil(offH * resolution),
+		);
+		offscreen.resolution = resolution;
 		offscreen.filterPadX = padL;
 		offscreen.filterPadY = padT;
 

@@ -20,6 +20,7 @@ export class DisplayList {
 	public resolution = 1;
 	public scaleMode: 'linear' | 'nearest' = 'linear';
 	public actualResolution = 1;
+	private _autoResolution = true;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 	private constructor(root: DisplayObject) {
@@ -56,13 +57,23 @@ export class DisplayList {
 		this.offsetX = 0;
 		this.offsetY = 0;
 		this.resolution = 1;
+		this._autoResolution = true;
 		this.actualResolution = 1;
 		this.scaleMode = 'linear';
 	}
 
 	public configure(options: CacheAsTextureOptions = {}): void {
-		const resolution = Number(options.resolution ?? 1);
-		this.resolution = Number.isFinite(resolution) && resolution > 0 ? resolution : 1;
+		const resolution = options.resolution;
+		if (resolution === undefined) {
+			this.resolution = 1;
+			this._autoResolution = true;
+		} else if (Number.isFinite(resolution) && resolution > 0) {
+			this.resolution = resolution;
+			this._autoResolution = false;
+		} else {
+			this.resolution = 1;
+			this._autoResolution = false;
+		}
 		this.scaleMode = options.scaleMode === 'nearest' ? 'nearest' : 'linear';
 	}
 
@@ -70,11 +81,15 @@ export class DisplayList {
 	 * Resizes the offscreen buffer to fit the root object's bounds.
 	 * Returns false if the object has zero size.
 	 */
-	public updateSurfaceSize(maxTextureSize: number = Number.POSITIVE_INFINITY): boolean {
+	public updateSurfaceSize(
+		maxTextureSize: number = Number.POSITIVE_INFINITY,
+		inheritedResolution = 1,
+	): boolean {
 		const bounds = this.root.$getOriginalBounds();
 		if (bounds.width <= 0 || bounds.height <= 0) return false;
+		const requestedResolution = this._autoResolution ? inheritedResolution : this.resolution;
 		const maxResolution = Math.min(maxTextureSize / bounds.width, maxTextureSize / bounds.height);
-		this.actualResolution = Math.max(Math.min(this.resolution, maxResolution), Number.EPSILON);
+		this.actualResolution = Math.max(Math.min(requestedResolution, maxResolution), Number.EPSILON);
 		const w = Math.max(1, Math.ceil(bounds.width * this.actualResolution));
 		const h = Math.max(1, Math.ceil(bounds.height * this.actualResolution));
 		this.offsetX = -bounds.x;

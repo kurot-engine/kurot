@@ -66,6 +66,7 @@ export class WebGLRenderContext implements RenderContext {
 	private _gpuVertexBufferSize = 0;
 	private _defaultEmptyTexture?: WebGLTexture;
 	private _maxTextureUnits = MultiTextureBatcher.MAX_TEXTURES;
+	private _filterResolution = 1;
 	private readonly _contextRestoredCallbacks: Array<() => void> = [];
 	private readonly _trackedBitmapDatas: Set<WeakRef<BitmapData>> = new Set();
 	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
@@ -577,7 +578,7 @@ export class WebGLRenderContext implements RenderContext {
 
 		for (const filter of filters) {
 			if (filter instanceof BlurFilter && (filter.blurX > 0 || filter.blurY > 0)) {
-				this._drawBlurPingPong(target.texture, w, h, filter, offscreen);
+				this._drawBlurPingPong(target.texture, w, h, filter, offscreen, offscreen.resolution);
 			}
 		}
 
@@ -588,11 +589,25 @@ export class WebGLRenderContext implements RenderContext {
 
 		const nonBlurFilter = filters.find(f => !(f instanceof BlurFilter));
 
+		this._filterResolution = offscreen.resolution;
 		this.activeFilter = nonBlurFilter;
-		this.drawTexture(target.texture, 0, 0, w, h, 0, 0, w, h, w, h);
+		this.drawTexture(
+			target.texture,
+			0,
+			0,
+			w,
+			h,
+			0,
+			0,
+			w / offscreen.resolution,
+			h / offscreen.resolution,
+			w,
+			h,
+		);
 		this.activeFilter = undefined;
 
 		this.flush();
+		this._filterResolution = 1;
 	}
 
 	private _drawBlurPingPong(
@@ -601,6 +616,7 @@ export class WebGLRenderContext implements RenderContext {
 		h: number,
 		filter: BlurFilter,
 		buffer: WebGLRenderBuffer,
+		resolution: number,
 	): void {
 		const gl = this.gl;
 
@@ -629,8 +645,10 @@ export class WebGLRenderContext implements RenderContext {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		// ── Select shader tier based on actual blur radius ────────────────────
-		const hTier = this.blurTierFn(filter.blurX);
-		const vTier = this.blurTierFn(filter.blurY);
+		const blurX = filter.blurX * resolution;
+		const blurY = filter.blurY * resolution;
+		const hTier = this.blurTierFn(blurX);
+		const vTier = this.blurTierFn(blurY);
 		const hKey = `blur_h_${hTier}`;
 		const vKey = `blur_v_${vTier}`;
 
@@ -639,7 +657,7 @@ export class WebGLRenderContext implements RenderContext {
 		this._drawFullscreenQuad(hProg, texture, w, h, prog => {
 			const uBlurX = prog.uniforms['blurX'];
 			const uSize = prog.uniforms['uTextureSize'];
-			if (uBlurX) gl.uniform1f(uBlurX, filter.blurX);
+			if (uBlurX) gl.uniform1f(uBlurX, blurX);
 			if (uSize) gl.uniform2f(uSize, w, h);
 		});
 
@@ -651,7 +669,7 @@ export class WebGLRenderContext implements RenderContext {
 		this._drawFullscreenQuad(vProg, tmpEntry.texture, w, h, prog => {
 			const uBlurY = prog.uniforms['blurY'];
 			const uSize = prog.uniforms['uTextureSize'];
-			if (uBlurY) gl.uniform1f(uBlurY, filter.blurY);
+			if (uBlurY) gl.uniform1f(uBlurY, blurY);
 			if (uSize) gl.uniform2f(uSize, w, h);
 		});
 
@@ -1095,7 +1113,11 @@ export class WebGLRenderContext implements RenderContext {
 		} else if (filter instanceof BlurFilter) {
 			const uBlur = prog.uniforms['blur'];
 			const uSize = prog.uniforms['uTextureSize'];
-			if (uBlur) gl.uniform2f(uBlur, filter.blurX, filter.blurY);
+			if (uBlur) gl.uniform2f(
+				uBlur,
+				filter.blurX * this._filterResolution,
+				filter.blurY * this._filterResolution,
+			);
 			if (uSize) gl.uniform2f(uSize, texW, texH);
 		} else if (filter instanceof GlowFilter || filter instanceof DropShadowFilter) {
 			const uSize = prog.uniforms['uTextureSize'];
@@ -1108,12 +1130,12 @@ export class WebGLRenderContext implements RenderContext {
 			const uStrength = prog.uniforms['strength'];
 			if (uStrength) gl.uniform1f(uStrength, filter.strength);
 			const uBlurX = prog.uniforms['blurX'];
-			if (uBlurX) gl.uniform1f(uBlurX, filter.blurX);
+			if (uBlurX) gl.uniform1f(uBlurX, filter.blurX * this._filterResolution);
 			const uBlurY = prog.uniforms['blurY'];
-			if (uBlurY) gl.uniform1f(uBlurY, filter.blurY);
+			if (uBlurY) gl.uniform1f(uBlurY, filter.blurY * this._filterResolution);
 			if (filter instanceof DropShadowFilter) {
 				const uDist = prog.uniforms['dist'];
-				if (uDist) gl.uniform1f(uDist, filter.distance);
+				if (uDist) gl.uniform1f(uDist, filter.distance * this._filterResolution);
 				const uAngle = prog.uniforms['angle'];
 				if (uAngle) gl.uniform1f(uAngle, -(filter.angle / 180) * Math.PI);
 				const uHide = prog.uniforms['hideObject'];

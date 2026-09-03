@@ -105,6 +105,8 @@ export class WebGLRenderer {
 	private readonly _renderGroupSets = new WeakMap<DisplayObjectContainer, InstructionSet>();
 	private readonly _renderGroupSetList: Array<WeakRef<DisplayObjectContainer>> = [];
 
+	// Logical-stage to physical-render-target transform for the current pass.
+	private readonly _rootTransform = new Matrix();
 	private _nestLevel = 0;
 
 	public constructor() {
@@ -151,6 +153,7 @@ export class WebGLRenderer {
 		const ctx = buffer.context;
 		ctx.pushBuffer(buffer);
 
+		this._rootTransform.copyFrom(matrix);
 		buffer.setTransform(matrix.a, matrix.b, matrix.c, matrix.d, 0, 0);
 
 		const set = this._instructionSet;
@@ -562,13 +565,14 @@ export class WebGLRenderer {
 		inst: LeafInstruction | EffectPushInstruction | RenderGroupInstruction,
 	): void {
 		const cm = obj.$getConcatenatedMatrix();
+		const root = this._rootTransform;
 		const t = inst.transform;
-		t.a = cm.a;
-		t.b = cm.b;
-		t.c = cm.c;
-		t.d = cm.d;
-		t.tx = cm.tx;
-		t.ty = cm.ty;
+		t.a = root.a * cm.a + root.c * cm.b;
+		t.b = root.b * cm.a + root.d * cm.b;
+		t.c = root.a * cm.c + root.c * cm.d;
+		t.d = root.b * cm.c + root.d * cm.d;
+		t.tx = root.a * cm.tx + root.c * cm.ty + root.tx;
+		t.ty = root.b * cm.tx + root.d * cm.ty + root.ty;
 		t.offsetX = 0;
 		t.offsetY = 0;
 		t.alpha = obj.$worldAlpha;
@@ -712,12 +716,13 @@ export class WebGLRenderer {
 		const ty = t.ty + t.b * t.offsetX + t.d * t.offsetY;
 		if (buffer.hasOffscreenTransform) {
 			const inverse = buffer.offscreenInverseTransform;
-			m.a = inverse.a * t.a + inverse.c * t.b;
-			m.b = inverse.b * t.a + inverse.d * t.b;
-			m.c = inverse.a * t.c + inverse.c * t.d;
-			m.d = inverse.b * t.c + inverse.d * t.d;
-			m.tx = inverse.a * tx + inverse.c * ty + inverse.tx + buffer.offscreenLocalX;
-			m.ty = inverse.b * tx + inverse.d * ty + inverse.ty + buffer.offscreenLocalY;
+			const resolution = buffer.resolution;
+			m.a = (inverse.a * t.a + inverse.c * t.b) * resolution;
+			m.b = (inverse.b * t.a + inverse.d * t.b) * resolution;
+			m.c = (inverse.a * t.c + inverse.c * t.d) * resolution;
+			m.d = (inverse.b * t.c + inverse.d * t.d) * resolution;
+			m.tx = (inverse.a * tx + inverse.c * ty + inverse.tx + buffer.offscreenLocalX) * resolution;
+			m.ty = (inverse.b * tx + inverse.d * ty + inverse.ty + buffer.offscreenLocalY) * resolution;
 			buffer.globalAlpha = t.alpha;
 			buffer.globalTintColor = t.tint;
 			return;
@@ -767,8 +772,19 @@ export class WebGLRenderer {
 		const $displayList = obj.$displayList;
 		if (!$displayList) return;
 
-		if (obj.$cacheDirty || obj.$renderDirty) {
-			if ($displayList.updateSurfaceSize(buffer.context.maxTextureSize)) {
+		const previousWidth = $displayList.canvasBuffer.width;
+		const previousHeight = $displayList.canvasBuffer.height;
+		const previousResolution = $displayList.actualResolution;
+		const hasSurface = $displayList.updateSurfaceSize(
+			buffer.context.maxTextureSize,
+			buffer.context.resolution,
+		);
+		const surfaceChanged = previousWidth !== $displayList.canvasBuffer.width ||
+			previousHeight !== $displayList.canvasBuffer.height ||
+			previousResolution !== $displayList.actualResolution;
+
+		if (obj.$cacheDirty || obj.$renderDirty || surfaceChanged) {
+			if (hasSurface) {
 				$displayList.canvasBuffer.clear();
 				const resolution = $displayList.actualResolution;
 				$displayList.canvasBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
@@ -777,6 +793,7 @@ export class WebGLRenderer {
 					$displayList.canvasBuffer.context,
 					$displayList.offsetX,
 					$displayList.offsetY,
+					resolution,
 				);
 				$displayList.updateBitmapData();
 				const bitmapData = $displayList.bitmapData;

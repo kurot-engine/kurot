@@ -43,7 +43,8 @@ export interface DisplayObjectEvents extends EventMap {
  */
 export interface CacheAsTextureOptions {
 	/**
-	 * Raster resolution. Higher values improve sharpness at a memory cost.
+	 * Raster resolution. Defaults to the renderer resolution. Higher values
+	 * improve sharpness at a memory cost.
 	 */
 	resolution?: number;
 	/**

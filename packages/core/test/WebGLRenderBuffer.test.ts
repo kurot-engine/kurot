@@ -49,6 +49,7 @@ describe('WebGLRenderBuffer pool', () => {
 		buffer.offsetY = 9;
 		buffer.currentTexture = {} as WebGLTexture;
 		buffer.drawCalls = 10;
+		buffer.resolution = 2;
 		buffer.offscreenOriginX = 11;
 		buffer.offscreenOriginY = 12;
 		buffer.hasOffscreenTransform = true;
@@ -74,6 +75,7 @@ describe('WebGLRenderBuffer pool', () => {
 		expect(reused.offsetY).toBe(0);
 		expect(reused.currentTexture).toBeUndefined();
 		expect(reused.drawCalls).toBe(0);
+		expect(reused.resolution).toBe(1);
 		expect(reused.offscreenOriginX).toBe(0);
 		expect(reused.offscreenOriginY).toBe(0);
 		expect(reused.hasOffscreenTransform).toBe(false);

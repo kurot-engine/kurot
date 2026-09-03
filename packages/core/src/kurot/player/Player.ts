@@ -136,6 +136,7 @@ export class Player implements Renderable {
 
 		if (this._webglBuffer && this._webglContext) {
 			this._webglContext.resolution = Math.max(scaleX, scaleY);
+			this._webglBuffer.resolution = this._webglContext.resolution;
 			this._webglBuffer.resize(renderWidth, renderHeight);
 			if (transformChanged && this._webglRenderer) {
 				this._webglRenderer.markStructureDirty();

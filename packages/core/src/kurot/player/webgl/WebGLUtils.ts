@@ -50,6 +50,19 @@ export function premultiplyTint(tint: number, alpha: number): number {
 	return ((A << 24) | (R << 16) | (G << 8) | B) >>> 0;
 }
 
+/**
+ * Clamps a requested offscreen resolution to the GPU texture-size limit.
+ */
+export function fitTextureResolution(
+	width: number,
+	height: number,
+	requestedResolution: number,
+	maxTextureSize: number,
+): number {
+	const maxResolution = Math.min(maxTextureSize / width, maxTextureSize / height);
+	return Math.max(Math.min(requestedResolution, maxResolution), Number.EPSILON);
+}
+
 export function checkWebGLSupport(): boolean {
 	try {
 		const canvas = document.createElement('canvas');

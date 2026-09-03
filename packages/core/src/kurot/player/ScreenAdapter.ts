@@ -21,7 +21,7 @@ export class ScreenAdapter {
 	private _touchHandler: TouchHandler;
 	private _contentWidth: number;
 	private _contentHeight: number;
-	private readonly _resolution: number;
+	private _resolution: number;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
@@ -50,6 +50,23 @@ export class ScreenAdapter {
 	public setContentSize(width: number, height: number): void {
 		this._contentWidth = width;
 		this._contentHeight = height;
+		this.updateScreenSize();
+	}
+
+	/**
+	 * Returns the number of backing-store pixels allocated per CSS pixel.
+	 */
+	public get resolution(): number {
+		return this._resolution;
+	}
+
+	/**
+	 * Changes the backing-store pixel density and immediately resizes the renderer.
+	 */
+	public set resolution(value: number) {
+		const resolution = Number.isFinite(value) && value > 0 ? value : 1;
+		if (this._resolution === resolution) return;
+		this._resolution = resolution;
 		this.updateScreenSize();
 	}
 

@@ -4,6 +4,48 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.18] — 2026-09-03
+
+This release completes high-density rendering support across the main WebGL
+target and its offscreen rendering paths. Text, cached display objects, masks,
+and filters now preserve their logical size while rendering at the configured
+pixel density.
+
+### Added
+
+- Added a mutable `ScreenAdapter.resolution` property for changing render
+  density at runtime without recreating the player.
+- Added DPR 2 visual-regression coverage for stage sizing, text rendering,
+  cached content, masks, and filters.
+
+### Changed
+
+- `cacheAsTexture()` now inherits the active renderer resolution by default,
+  while an explicit cache resolution continues to override it.
+- Cached display objects regenerate their backing surfaces when the inherited
+  renderer resolution changes.
+- WebGL mask and filter buffers now allocate at the active resolution, clamped
+  to the GPU maximum texture size.
+- Blur, glow, and drop-shadow sampling parameters now scale with their
+  offscreen render resolution.
+- Canvas-backed cache rendering now propagates its resolution through nested
+  text and graphics rendering.
+
+### Fixed
+
+- Preserve the stage-to-render-target root transform when WebGL instructions
+  are patched in place. This prevents dirty objects, including input text after
+  blur, from shrinking and moving toward the upper-left on high-DPI displays.
+- Preserve the logical dimensions and placement of filtered and masked content
+  while using high-density offscreen buffers.
+
+### Tests
+
+- Full Core unit suite: 61 test files, 656 tests passing.
+- TypeScript implementation and declaration builds passing.
+
+---
+
 ## [1.0.17] — 2026-09-02
 
 ### Fixed

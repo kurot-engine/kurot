@@ -33,6 +33,7 @@ function mockBuffer(): WebGLRenderBuffer {
 		globalMatrix: new Matrix(),
 		globalAlpha: 1,
 		globalTintColor: 0xffffff,
+		resolution: 1,
 		hasOffscreenTransform: false,
 		offscreenOriginX: 0,
 		offscreenOriginY: 0,
@@ -161,6 +162,32 @@ describe('effect transform partial updates', () => {
 		expect(buffer.globalMatrix.d).toBeCloseTo(1);
 		expect(buffer.globalMatrix.tx).toBeCloseTo(0);
 		expect(buffer.globalMatrix.ty).toBeCloseTo(0);
+	});
+
+	it('maps logical offscreen coordinates to physical pixels', () => {
+		const renderer = new WebGLRenderer() as unknown as {
+			_configureOffscreenTransform(buffer: WebGLRenderBuffer, bounds: Rectangle, value: TestTransform): void;
+			_applyTransform(buffer: WebGLRenderBuffer, value: TestTransform): void;
+		};
+		const buffer = mockBuffer();
+		buffer.resolution = 2;
+		const effectTransform: TestTransform = {
+			a: 1,
+			b: 0,
+			c: 0,
+			d: 1,
+			tx: 100,
+			ty: 50,
+			offsetX: 0,
+			offsetY: 0,
+			alpha: 1,
+			tint: 0xffffff,
+		};
+
+		renderer._configureOffscreenTransform(buffer, new Rectangle(0, 0, 80, 80), effectTransform);
+		renderer._applyTransform(buffer, effectTransform);
+
+		expect(buffer.globalMatrix).toMatchObject({ a: 2, b: 0, c: 0, d: 2, tx: 0, ty: 0 });
 	});
 
 	it('applies local instruction offsets through rotation and scale', () => {

@@ -50,6 +50,7 @@ export class CanvasRenderer {
 	private readonly _bitmapTintCache = new WeakMap<Bitmap, TintedCanvasCache>();
 	private readonly _graphicsTintCache = new WeakMap<Graphics, TintedCanvasCache>();
 	private _globalTint = 0xffffff;
+	private _resolution = 1;
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
@@ -59,13 +60,20 @@ export class CanvasRenderer {
 	public render(displayObject: DisplayObject, buffer: CanvasBuffer, matrix?: Matrix): number {
 		const ctx = buffer.context;
 		this._globalTint = 0xffffff;
+		const previousResolution = this._resolution;
+		this._resolution = matrix
+			? Math.max(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d))
+			: 1;
 		if (matrix) {
 			ctx.save();
 			ctx.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 		}
-		const drawCalls = this.drawDisplayObject(displayObject, ctx, 0, 0, true);
-		if (matrix) ctx.restore();
-		return drawCalls;
+		try {
+			return this.drawDisplayObject(displayObject, ctx, 0, 0, true);
+		} finally {
+			if (matrix) ctx.restore();
+			this._resolution = previousResolution;
+		}
 	}
 
 	public renderToContext(
@@ -73,8 +81,15 @@ export class CanvasRenderer {
 		ctx: CanvasRenderingContext2D,
 		offsetX: number,
 		offsetY: number,
+		resolution = 1,
 	): void {
-		this.drawDisplayObject(displayObject, ctx, offsetX, offsetY, true);
+		const previousResolution = this._resolution;
+		this._resolution = resolution;
+		try {
+			this.drawDisplayObject(displayObject, ctx, offsetX, offsetY, true);
+		} finally {
+			this._resolution = previousResolution;
+		}
 	}
 
 	public renderGraphicsToContext(
@@ -118,8 +133,19 @@ export class CanvasRenderer {
 
 		const $displayList = displayObject.$displayList;
 		if ($displayList && !_isStage) {
-			if (displayObject.$cacheDirty || displayObject.$renderDirty) {
-				if ($displayList.updateSurfaceSize()) {
+			const previousWidth = $displayList.canvasBuffer.width;
+			const previousHeight = $displayList.canvasBuffer.height;
+			const previousResolution = $displayList.actualResolution;
+			const hasSurface = $displayList.updateSurfaceSize(
+				Number.POSITIVE_INFINITY,
+				this._resolution,
+			);
+			const surfaceChanged = previousWidth !== $displayList.canvasBuffer.width ||
+				previousHeight !== $displayList.canvasBuffer.height ||
+				previousResolution !== $displayList.actualResolution;
+
+			if (displayObject.$cacheDirty || displayObject.$renderDirty || surfaceChanged) {
+				if (hasSurface) {
 					$displayList.canvasBuffer.clear();
 					const resolution = $displayList.actualResolution;
 					$displayList.canvasBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);

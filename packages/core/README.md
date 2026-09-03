@@ -149,7 +149,9 @@ root.addChild(rect);
 `createPlayer()` automatically uses the device pixel ratio, capped at `2`.
 Pass `resolution` explicitly when a project needs a different sharpness and
 GPU-memory tradeoff. Individual `TextField` instances can also override their
-raster density through `textField.resolution`.
+raster density through `textField.resolution`. The value can be changed while
+the application is running through `app.screenAdapter.resolution`; automatic
+text and `cacheAsTexture(true)` caches will be regenerated at the new density.
 
 ## Development
 

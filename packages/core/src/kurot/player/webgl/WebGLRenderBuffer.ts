@@ -64,6 +64,10 @@ export class WebGLRenderBuffer implements RenderBuffer {
 	public offsetY = 0;
 	public currentTexture?: WebGLTexture;
 	public drawCalls = 0;
+	/**
+	 * Physical pixels allocated for each logical unit in this buffer.
+	 */
+	public resolution = 1;
 
 	public offscreenOriginX = 0;
 	public offscreenOriginY = 0;
@@ -213,6 +217,7 @@ export class WebGLRenderBuffer implements RenderBuffer {
 		this.offsetY = 0;
 		this.currentTexture = undefined;
 		this.drawCalls = 0;
+		this.resolution = 1;
 
 		this.offscreenOriginX = 0;
 		this.offscreenOriginY = 0;

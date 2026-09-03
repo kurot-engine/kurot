@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
 import { InstructionSet } from '../src/kurot/player/InstructionSet.js';
 import { WebGLRenderer } from '../src/kurot/player/webgl/WebGLRenderer.js';
 
@@ -24,7 +25,30 @@ function updateDirty(renderer: WebGLRenderer, set: InstructionSet): void {
 	(renderer as unknown as { _updateDirtyRenderables(value: InstructionSet): void })._updateDirtyRenderables(set);
 }
 
+function setRootTransform(renderer: WebGLRenderer, matrix: Matrix): void {
+	(renderer as unknown as { _rootTransform: Matrix })._rootTransform.copyFrom(matrix);
+}
+
 describe('WebGLRenderer dirty container updates', () => {
+	it('preserves the stage-to-render-target transform during partial updates', () => {
+		const renderer = new WebGLRenderer();
+		const set = new InstructionSet();
+		const object = new Sprite();
+		object.x = 20;
+		object.y = 30;
+		const transform = makeTransform();
+		set.addLeaf({ renderPipeId: 'graphics', renderable: object, transform } as never);
+		setRootTransform(renderer, new Matrix(2, 0, 0, 2, 5, 7));
+
+		set.markRenderableDirty(object);
+		updateDirty(renderer, set);
+
+		expect(transform.a).toBe(2);
+		expect(transform.d).toBe(2);
+		expect(transform.tx).toBe(45);
+		expect(transform.ty).toBe(67);
+	});
+
 	it('refreshes descendant transforms when a parent container moves and scales', () => {
 		const renderer = new WebGLRenderer();
 		const set = new InstructionSet();

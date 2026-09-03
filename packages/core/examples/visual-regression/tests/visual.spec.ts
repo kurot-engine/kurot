@@ -40,6 +40,33 @@ for (const backend of backends) {
 	}
 }
 
+test('webgl2 renders with a high-density backing store', async ({ browser }) => {
+	const context = await browser.newContext({
+		viewport: { width: 640, height: 480 },
+		deviceScaleFactor: 2,
+	});
+	const page = await context.newPage();
+
+	try {
+		await openGolden(page, 'webgl2');
+		const size = await page.locator('#golden').evaluate(canvas => ({
+			width: (canvas as HTMLCanvasElement).width,
+			height: (canvas as HTMLCanvasElement).height,
+			clientWidth: (canvas as HTMLCanvasElement).clientWidth,
+			clientHeight: (canvas as HTMLCanvasElement).clientHeight,
+		}));
+
+		expect(size).toEqual({
+			width: 1280,
+			height: 960,
+			clientWidth: 640,
+			clientHeight: 480,
+		});
+	} finally {
+		await context.close();
+	}
+});
+
 async function openGolden(page: import('@playwright/test').Page, backend: GoldenBackend): Promise<void> {
 	await page.goto(`http://127.0.0.1:4174/visual-regression/?backend=${backend}`);
 	await page.waitForFunction(() => {
