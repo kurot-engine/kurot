@@ -21,6 +21,7 @@ export class ScreenAdapter {
 	private _touchHandler: TouchHandler;
 	private _contentWidth: number;
 	private _contentHeight: number;
+	private readonly _resolution: number;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
@@ -30,12 +31,14 @@ export class ScreenAdapter {
 		touchHandler: TouchHandler,
 		contentWidth: number,
 		contentHeight: number,
+		resolution = 1,
 	) {
 		this._player = player;
 		this._canvas = canvas;
 		this._touchHandler = touchHandler;
 		this._contentWidth = contentWidth;
 		this._contentHeight = contentHeight;
+		this._resolution = Number.isFinite(resolution) && resolution > 0 ? resolution : 1;
 
 		window.addEventListener('resize', this.onResize);
 		this._player.stage.setScreenAdapter(this);
@@ -51,9 +54,7 @@ export class ScreenAdapter {
 	}
 
 	/**
-	 * Resizes the canvas and updates stage and input scaling.
-	 * Input scaling reads the canvas backing size after the player resize because
-	 * updating the root render buffer can change that size.
+	 * Updates CSS display size, high-density backing size, stage size and input scaling.
 	 */
 	public updateScreenSize(): void {
 		const stage = this._player.stage;
@@ -69,20 +70,25 @@ export class ScreenAdapter {
 			this._contentHeight,
 		);
 
-		this._canvas.width = size.displayWidth;
-		this._canvas.height = size.displayHeight;
 		this._canvas.style.width = size.displayWidth + 'px';
 		this._canvas.style.height = size.displayHeight + 'px';
+		const renderWidth = Math.max(1, Math.round(size.displayWidth * this._resolution));
+		const renderHeight = Math.max(1, Math.round(size.displayHeight * this._resolution));
 
-		this._player.updateStageSize(size.stageWidth, size.stageHeight);
+		this._player.updateStageSize(
+			size.stageWidth,
+			size.stageHeight,
+			renderWidth,
+			renderHeight,
+		);
 
 		Capabilities.boundingClientWidth = size.displayWidth;
 		Capabilities.boundingClientHeight = size.displayHeight;
 
 		const innerW = this._canvas.clientWidth || size.displayWidth;
 		const innerH = this._canvas.clientHeight || size.displayHeight;
-		const scaleX = this._canvas.width / innerW;
-		const scaleY = this._canvas.height / innerH;
+		const scaleX = size.stageWidth / innerW;
+		const scaleY = size.stageHeight / innerH;
 		this._touchHandler.updateScale(scaleX, scaleY);
 	}
 

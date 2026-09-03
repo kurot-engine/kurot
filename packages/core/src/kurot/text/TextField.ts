@@ -34,6 +34,7 @@ export class TextField extends DisplayObject {
 	private _textColor = TextField.default_textColor;
 	private _strokeColor = 0x000000;
 	private _stroke = 0;
+	private _resolution?: number;
 	private _lineSpacing = 0;
 	private _wordWrap = false;
 	private _multiline = false;
@@ -181,6 +182,24 @@ export class TextField extends DisplayObject {
 			this._stroke = value;
 			this.$markDirty();
 		}
+	}
+
+	/**
+	 * Raster resolution used by WebGL text caching.
+	 * Undefined follows the renderer's logical-to-physical resolution.
+	 */
+	public get resolution(): number | undefined {
+		return this._resolution;
+	}
+	public set resolution(value: number | undefined) {
+		let resolution = value;
+		if (resolution !== undefined && (!Number.isFinite(resolution) || resolution <= 0)) {
+			resolution = 1;
+		}
+		if (this._resolution === resolution) return;
+		this._resolution = resolution;
+		this.$renderDirty = true;
+		this.$markDirty();
 	}
 
 	public get lineSpacing(): number {

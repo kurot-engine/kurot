@@ -41,4 +41,16 @@ describe('TextField line layout', () => {
 		field.text = null as unknown as string;
 		expect(field.text).toBe('');
 	});
+
+	it('supports automatic and explicit text raster resolution', () => {
+		const field = new TextField();
+
+		expect(field.resolution).toBeUndefined();
+		field.resolution = 2;
+		expect(field.resolution).toBe(2);
+		field.resolution = 0;
+		expect(field.resolution).toBe(1);
+		field.resolution = undefined;
+		expect(field.resolution).toBeUndefined();
+	});
 });

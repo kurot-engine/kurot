@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { Sprite, TextField } from '../src/index.js';
+import { Sprite, Stage, TextField } from '../src/index.js';
 import { StageText } from '../src/kurot/text/StageText.js';
 
 describe('StageText DOM overlay', () => {
@@ -59,5 +59,38 @@ describe('StageText DOM overlay', () => {
 		expect(input.style.fontFamily).toBe('Arial');
 		expect(input.style.padding).toBe('0px');
 		expect(input.style.boxSizing).toBe('border-box');
+	});
+
+	it('positions native input from logical stage size instead of backing-store pixels', () => {
+		const canvas = document.createElement('canvas');
+		canvas.width = 1280;
+		canvas.height = 960;
+		Object.defineProperties(canvas, {
+			clientWidth: { value: 320 },
+			clientHeight: { value: 240 },
+			clientLeft: { value: 0 },
+			clientTop: { value: 0 },
+		});
+		canvas.getBoundingClientRect = () => ({
+			x: 0, y: 0, left: 0, top: 0, right: 320, bottom: 240,
+			width: 320, height: 240, toJSON: () => ({}),
+		});
+		document.body.appendChild(canvas);
+
+		const stage = new Stage();
+		stage.resize(640, 480);
+		const field = new TextField();
+		field.x = 20;
+		field.y = 10;
+		field.width = 100;
+		field.height = 30;
+		stage.addChild(field);
+
+		const stageText = new StageText();
+		stageText.setTextField(field);
+		stageText.show();
+
+		const wrapper = document.querySelector('input')!.parentElement as HTMLDivElement;
+		expect(wrapper.style.transform).toBe('matrix(0.5,0,0,0.5,10,5)');
 	});
 });

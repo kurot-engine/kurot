@@ -52,6 +52,7 @@ export class WebGLRenderContext implements RenderContext {
 	public activeFilter?: Filter;
 	public currentBlendMode = 'source-over';
 	public contextVersion = 0;
+	public resolution = 1;
 
 	// ── Private fields ────────────────────────────────────────────────────────
 

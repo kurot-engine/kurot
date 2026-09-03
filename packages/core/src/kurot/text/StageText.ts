@@ -187,9 +187,12 @@ export class StageText extends EventDispatcher {
 			const rect = canvas.getBoundingClientRect();
 			const borderLeft = canvas.clientLeft;
 			const borderTop = canvas.clientTop;
+			const stage = tf.stage;
+			const logicalWidth = stage?.stageWidth || canvas.width;
+			const logicalHeight = stage?.stageHeight || canvas.height;
 
-			scaleX = (canvas.clientWidth || 1) / (canvas.width || 1);
-			scaleY = (canvas.clientHeight || 1) / (canvas.height || 1);
+			scaleX = (canvas.clientWidth || 1) / (logicalWidth || 1);
+			scaleY = (canvas.clientHeight || 1) / (logicalHeight || 1);
 			left = rect.left + borderLeft;
 			top = rect.top + borderTop;
 		}

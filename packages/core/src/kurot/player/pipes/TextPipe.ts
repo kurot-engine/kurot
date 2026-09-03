@@ -94,8 +94,9 @@ export class TextPipe implements RenderPipe<TextField> {
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
 
-		let canvasScaleX = 1;
-		let canvasScaleY = 1;
+		const requestedResolution = tf.resolution ?? buffer.context.resolution;
+		let canvasScaleX = requestedResolution;
+		let canvasScaleY = requestedResolution;
 
 		const maxTexSize = buffer.context.maxTextureSize;
 		if (logicalW * canvasScaleX > maxTexSize) {

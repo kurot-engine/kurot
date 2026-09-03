@@ -18,6 +18,9 @@ export interface RenderContext {
 	/** Increments whenever backend GPU resources must be recreated. */
 	readonly contextVersion: number;
 
+	/** Physical pixels available for each logical rendering unit. */
+	readonly resolution: number;
+
 	// ── Draw ────────────────────────────────────────────────────────────────
 
 	drawImage(

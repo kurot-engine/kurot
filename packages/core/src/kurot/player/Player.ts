@@ -11,9 +11,6 @@ import { WebGLRenderContext, WebGLRenderBuffer, WebGLRenderer } from './webgl/in
  * Automatically uses WebGL if available, falls back to Canvas 2D.
  */
 export class Player implements Renderable {
-	// ── Static fields ─────────────────────────────────────────────────────────
-	private static readonly _IDENTITY = new Matrix();
-
 	// ── Instance fields ───────────────────────────────────────────────────────
 	public readonly stage: Stage;
 	public readonly perf = {
@@ -38,6 +35,7 @@ export class Player implements Renderable {
 	private _webglBuffer?: WebGLRenderBuffer;
 	private _webglRenderer?: WebGLRenderer;
 	private _webglContext?: WebGLRenderContext;
+	private readonly _renderMatrix = new Matrix();
 	private _unregisterCallbacks: Array<() => void> = [];
 	private _fpsFrames = 0;
 	private _fpsLastTime = performance.now();
@@ -120,12 +118,30 @@ export class Player implements Renderable {
 		DisplayObjectContainer.$onContainerStructureChange = undefined;
 	}
 
-	public updateStageSize(width: number, height: number): void {
+	/**
+	 * Updates the logical Stage size and the physical render-target size.
+	 */
+	public updateStageSize(
+		width: number,
+		height: number,
+		renderWidth: number = width,
+		renderHeight: number = height,
+	): void {
 		this.stage.resize(width, height);
-		if (this._webglBuffer) {
-			this._webglBuffer.resize(width, height);
+
+		const scaleX = renderWidth / width;
+		const scaleY = renderHeight / height;
+		const transformChanged = this._renderMatrix.a !== scaleX || this._renderMatrix.d !== scaleY;
+		this._renderMatrix.setTo(scaleX, 0, 0, scaleY, 0, 0);
+
+		if (this._webglBuffer && this._webglContext) {
+			this._webglContext.resolution = Math.max(scaleX, scaleY);
+			this._webglBuffer.resize(renderWidth, renderHeight);
+			if (transformChanged && this._webglRenderer) {
+				this._webglRenderer.markStructureDirty();
+			}
 		} else {
-			this._canvas2dBuffer?.resize(width, height);
+			this._canvas2dBuffer?.resize(renderWidth, renderHeight);
 		}
 	}
 
@@ -136,10 +152,14 @@ export class Player implements Renderable {
 
 		if (this._webglBuffer && this._webglRenderer) {
 			this._webglBuffer.clear();
-			this.perf.drawCalls = this._webglRenderer.render(this.stage, this._webglBuffer, Player._IDENTITY);
+			this.perf.drawCalls = this._webglRenderer.render(this.stage, this._webglBuffer, this._renderMatrix);
 		} else if (this._canvas2dBuffer && this._canvas2dRenderer) {
 			this._canvas2dBuffer.clear();
-			this.perf.drawCalls = this._canvas2dRenderer.render(this.stage, this._canvas2dBuffer);
+			this.perf.drawCalls = this._canvas2dRenderer.render(
+				this.stage,
+				this._canvas2dBuffer,
+				this._renderMatrix,
+			);
 		}
 
 		const renderTime = performance.now() - t0;

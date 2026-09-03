@@ -329,6 +329,7 @@ app.start(root);
 | `scaleMode`     | `StageScaleMode`    | `'showAll'`     | 屏幕适配模式 |
 | `contentWidth`  | `number`            | `canvas.width`  | 逻辑内容宽度 |
 | `contentHeight` | `number`            | `canvas.height` | 逻辑内容高度 |
+| `resolution`    | `number`            | `min(DPR, 2)`   | 后备缓冲像素密度 |
 | `orientation`   | `OrientationMode`   | `'auto'`        | 屏幕方向     |
 | `maxTouches`    | `number`            | `99`            | 最大触点数   |
 | `background`    | `string`            | —               | CSS 背景色   |

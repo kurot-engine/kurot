@@ -60,6 +60,7 @@ export function createPlayer(options: KurotOptions): KurotApp {
 		scaleMode = StageScaleMode.SHOW_ALL,
 		contentWidth = canvas.width || 640,
 		contentHeight = canvas.height || 1136,
+		resolution = Math.min(window.devicePixelRatio || 1, 2),
 		orientation = OrientationMode.AUTO,
 		maxTouches = 99,
 		background,
@@ -77,7 +78,14 @@ export function createPlayer(options: KurotOptions): KurotApp {
 
 	const player = new Player(canvas, stage);
 	const touchHandler = new TouchHandler(stage, canvas);
-	const screenAdapter = new ScreenAdapter(player, canvas, touchHandler, contentWidth, contentHeight);
+	const screenAdapter = new ScreenAdapter(
+		player,
+		canvas,
+		touchHandler,
+		contentWidth,
+		contentHeight,
+		resolution,
+	);
 	const disposeLifecycle = setupLifecycle(stage);
 	let destroyed = false;
 

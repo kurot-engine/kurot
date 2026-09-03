@@ -31,6 +31,14 @@ export interface KurotOptions {
 	contentHeight?: number;
 
 	/**
+	 * Backing-store pixel density.
+	 *
+	 * Defaults to the device pixel ratio, capped at 2 to balance sharpness and
+	 * GPU memory use. Set this explicitly to override the automatic value.
+	 */
+	resolution?: number;
+
+	/**
 	 * Screen orientation mode (default: 'auto').
 	 */
 	orientation?: OrientationMode;

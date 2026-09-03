@@ -9,6 +9,7 @@ A modern rewrite of the Egret game engine. Maintains Egret-compatible display ob
 **Rendering Engine**
 
 - WebGL-first with automatic Canvas 2D fallback when WebGL initialization fails
+- High-DPI backing stores and resolution-aware WebGL text rasterization
 - WebGL-only InstructionSet pipeline (Build → Execute two-phase, inspired by Pixi.js 8)
 - Multi-texture batching (up to 8 textures per draw call)
 - RenderGroup layers — localize instruction rebuilds to the affected subtree
@@ -144,6 +145,11 @@ root.addChild(rect);
 // stop() is resumable; destroy() performs final lifecycle cleanup.
 // app.destroy();
 ```
+
+`createPlayer()` automatically uses the device pixel ratio, capped at `2`.
+Pass `resolution` explicitly when a project needs a different sharpness and
+GPU-memory tradeoff. Individual `TextField` instances can also override their
+raster density through `textField.resolution`.
 
 ## Development
 
