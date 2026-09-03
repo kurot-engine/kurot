@@ -15,7 +15,7 @@ describe('TextField line layout', () => {
 		vi.restoreAllMocks();
 	});
 
-	it('does not wrap width-constrained text when multiline is false', () => {
+	it('wraps width-constrained dynamic text when multiline is false', () => {
 		const field = new TextField();
 		field.width = 40;
 		field.size = 20;
@@ -23,11 +23,26 @@ describe('TextField line layout', () => {
 		field.wordWrap = false;
 		field.text = 'This is wider than forty pixels';
 
-		expect(field.numLines).toBe(1);
+		expect(field.numLines).toBeGreaterThan(1);
+		expect(field.textHeight).toBeGreaterThan(field.size);
 	});
 
-	it('still wraps width-constrained text when multiline is true', () => {
+	it('does not wrap width-constrained single-line input', () => {
 		const field = new TextField();
+		field.type = TextFieldType.INPUT;
+		field.width = 40;
+		field.size = 20;
+		field.multiline = false;
+		field.wordWrap = true;
+		field.text = 'This is wider than forty pixels';
+
+		expect(field.numLines).toBe(1);
+		expect(field.textHeight).toBe(field.size);
+	});
+
+	it('wraps width-constrained multiline input', () => {
+		const field = new TextField();
+		field.type = TextFieldType.INPUT;
 		field.width = 40;
 		field.size = 20;
 		field.multiline = true;

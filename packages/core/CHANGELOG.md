@@ -4,6 +4,26 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.20] — 2026-09-04
+
+This release restores Egret-compatible wrapping and automatic height
+measurement for width-constrained dynamic text.
+
+### Fixed
+
+- Width-constrained dynamic `TextField` content now wraps even when
+  `multiline` is `false`, allowing EUI `Label` instances to measure their
+  natural multiline height.
+- `multiline` now controls wrapping only for input text: single-line input
+  remains unwrapped, while multiline input continues to wrap.
+
+### Tests
+
+- Added regression coverage for dynamic text wrapping, automatic text height,
+  single-line input, and multiline input.
+- Full Core test suite passes: 61 test files and 670 tests.
+- TypeScript implementation and declaration builds pass.
+
 ## [1.0.19] — 2026-09-04
 
 This release modernizes editable text rendering while preserving the native

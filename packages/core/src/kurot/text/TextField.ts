@@ -812,6 +812,7 @@ export class TextField extends DisplayObject {
 		const hasTrailingLineBreak = /(?:\r\n|\r|\n)$/.test(elements.map(element => element.text).join(''));
 		const maxWidth = !isNaN(this.$explicitWidth) ? this.$explicitWidth : NaN;
 		const isInput = this._type === TextFieldType.INPUT;
+		const canWrap = !isInput || this._multiline;
 		const lines: ILineElement[] = [];
 
 		if (!isNaN(maxWidth) && maxWidth === 0) {
@@ -868,7 +869,7 @@ export class TextField extends DisplayObject {
 				} else {
 					const totalSegWidth = measureText(seg, fontFamily, fontSize, bold, italic);
 
-					if (lineWidth + totalSegWidth <= maxWidth || !this._multiline) {
+					if (lineWidth + totalSegWidth <= maxWidth || !canWrap) {
 						currentLine.push({ text: seg, width: totalSegWidth, style: element.style });
 						lineWidth += totalSegWidth;
 						if (!isInput) lineHeight = Math.max(lineHeight, fontSize);

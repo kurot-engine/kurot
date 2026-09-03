@@ -21,7 +21,7 @@ interface TransformNode {
 
 export class KurotBenchmarkAdapter implements BenchmarkAdapter {
 	public readonly engine = 'Kurot';
-	public readonly version = '1.0.19';
+	public readonly version = '1.0.20';
 	public backend = 'unknown';
 	public root: object = new Sprite();
 
