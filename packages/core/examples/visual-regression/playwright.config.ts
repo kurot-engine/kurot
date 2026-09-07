@@ -5,7 +5,7 @@ const packageRoot = fileURLToPath(new URL('../..', import.meta.url));
 
 export default defineConfig({
 	testDir: './tests',
-	testMatch: 'visual.spec.ts',
+	testMatch: '*.spec.ts',
 	fullyParallel: false,
 	workers: 1,
 	retries: 0,

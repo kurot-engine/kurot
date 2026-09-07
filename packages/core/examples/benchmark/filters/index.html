@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kurot · Filter Lab</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#10151c;color:#e3ebf4;font:14px system-ui,sans-serif}main{max-width:1160px;margin:36px auto;padding:0 24px}header{display:flex;justify-content:space-between;align-items:center}h1{font-size:30px;margin:8px 0}h2{font-size:17px}p{color:#a6b5c6;line-height:1.7}a{color:#8de1c2}small,.muted{color:#a6b5c6}section{margin-top:24px;background:#19212c;border:1px solid #2b3848;border-radius:12px;padding:20px}.controls{display:flex;gap:20px;flex-wrap:wrap;align-items:center}label{display:flex;gap:10px;align-items:center}select,button{background:#263445;color:#edf6ff;border:1px solid #465a70;border-radius:6px;padding:8px 12px;font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}input{accent-color:#8de1c2;width:150px}.labels{display:flex;justify-content:space-around;margin:16px 0 10px;color:#c7d6e6}canvas{display:block;width:100%!important;height:auto!important;aspect-ratio:3/1;background:#080e18;border-radius:6px}#status{min-height:24px;color:#8de1c2}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}td,th{text-align:left;border-bottom:1px solid #2b3848;padding:10px 6px}th{color:#a6b5c6;font-weight:500}.bar{height:6px;background:#8de1c2;border-radius:4px;margin-top:5px;min-width:1px}code{color:#b2e8d5}@media(max-width:650px){main{padding:0 12px;margin:18px auto}section{padding:12px}.controls{gap:12px}table{font-size:11px}}
+</style></head>
+<body><main><header><div><small>KUROT / CORE · WEBGL</small><h1>Filter Lab</h1></div><a href="/">Examples ↗</a></header>
+<p>同一份程序绘制的像素场景，观察滤镜输出、透明边缘和动画更新。此页使用当前源码；左侧关闭滤镜，右侧启用滤镜，不是修改前后的版本对比。</p>
+<section><div class="controls">
+<label>后端 <select id="backend"><option value="webgl2">WebGL 2</option><option value="webgl1">WebGL 1</option></select></label>
+<label>效果 <select id="effect"><option value="bloom">Bloom · 多 pass</option><option value="blur">Blur · 大半径</option><option value="glow">Glow · knockout</option><option value="dissolve">Custom · 溶解</option></select></label>
+<label>强度 / 范围 <input id="amount" type="range" min="0" max="100" value="45"><output id="value">45</output></label>
+<label>质量 <select id="quality"><option>1</option><option>2</option><option>4</option></select></label>
+<button id="pause">暂停动画</button></div>
+<p id="description"></p><div class="labels"><span>基准 · 无滤镜</span><span>当前效果 · 相同场景</span></div><canvas id="scene" width="960" height="320"></canvas><p id="status" role="status">正在初始化…</p></section>
+<section><div class="controls"><h2>固定场景性能测量</h2><button id="measure">运行测量</button><button id="download" disabled>导出 JSON</button></div>
+<p>每项预热 20 帧，再测量 60 帧。计时为 <code>render + gl.finish</code> 的同步耗时，包含 CPU 提交与 GPU 等待，不代表 FPS 或纯 GPU 时间。测量时仅保留右侧场景，固定相同动画输入；不包含像素读取。纹理池数据只统计池内空闲目标；接近 0 ms 的结果受浏览器计时精度影响。</p>
+<table><thead><tr><th>场景</th><th>中位数 / P95 (ms)</th><th>Draw calls</th><th>新建纹理</th><th>池内目标 / MiB</th></tr></thead><tbody id="results"><tr><td colspan="5">点击“运行测量”生成本机结果。不同机器、浏览器和后端请分别比较。</td></tr></tbody></table>
+</section></main><script type="module" src="./FilterLab.ts"></script></body></html>

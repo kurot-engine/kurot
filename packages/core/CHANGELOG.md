@@ -4,6 +4,76 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.21] — 2026-09-07
+
+This release completes the WebGL custom-filter path and adds ordered multi-pass
+effects, bloom, and an interactive Filter Lab. Existing ShaderLib and ShaderLib2
+sources remain unchanged.
+
+### Added
+
+- Added explicit WebGL 1/2 program variants for `CustomFilter`, reflected numeric
+  uniform validation and upload, automatic input/output sizing uniforms, and
+  invalidation when effect parameters change.
+- Added auxiliary `BitmapData` samplers with independent sampling settings,
+  coordinate transforms, content updates, and context-restoration support.
+- Added `MultiPassFilter` with earlier-pass/original-image inputs, per-pass
+  resolution scales, and bounded intermediate render-target reuse.
+- Added `BloomFilter` with brightness threshold, intensity, blur quality, and
+  lower-resolution extraction/blur passes. Bloom is an LDR effect.
+- Added filter resolution controls and downsampling for large blur radii.
+- Added Filter Lab with side-by-side previews, WebGL backend selection,
+  adjustable effects, fixed-workload measurements, and JSON export.
+- Added a filter authoring guide covering shader contracts, coordinates,
+  resource ownership, and multi-pass composition.
+
+### Fixed
+
+- Fixed arbitrary Mesh indices being lost when switching from a multi-texture
+  Bitmap batch to Mesh drawing.
+- Large Mesh inputs now split into bounded batches with remapped indices,
+  preserving triangle order and UVs instead of overflowing fixed GPU buffers.
+- Canvas Mesh sampling now handles rotated atlas regions, including tinted
+  non-square regions. Both backends use local vertex positions directly,
+  without adding atlas trim offsets to Mesh geometry.
+- Filters now execute in array order instead of applying blur first and only
+  retaining the first subsequent non-blur effect.
+- Fixed framebuffer orientation, repeated alpha application, and intermediate
+  blending in filter chains.
+- Fixed Glow knockout behavior and zero-radius Blur selecting a glow program.
+  Blur quality now controls the number of blur pass pairs.
+- Fixed nested filter/clip state, same-object mask/filter composition, and
+  filtered parents clipping descendant filter padding without changing layout
+  bounds.
+- Shader compilation/link failures now report actionable errors, clean up
+  failed resources, and allow following frames to render normally.
+- Custom programs are cached by context and source; auxiliary textures and
+  pooled filter targets are reset on context restoration and released during
+  player destruction.
+
+### Usage notes
+
+- `CustomFilter`, `MultiPassFilter`, and `BloomFilter` require WebGL. The Canvas
+  fallback and Canvas-backed `RenderTexture`/texture caches do not capture
+  these GPU effects.
+- Blur radii must be finite and non-negative; Blur quality must be an integer
+  from 1 to 16. Glow quality still does not change its fixed sampling kernel.
+- Filter Lab timings measure synchronous `render + gl.finish`, not FPS or
+  isolated GPU execution time. Its baseline disables filters on current code;
+  it is not a comparison against the previous release.
+
+### Tests
+
+- Core unit suite: 64 test files, 688 tests passing.
+- Browser regression suite: 46 tests passing, including existing Canvas/WebGL
+  golden scenes and WebGL 1/2 filter, resource-reuse, and restoration coverage.
+- Added 16 Mesh browser regressions and two mesh splitting unit tests for
+  mixed batches, capacity limits, dynamic geometry, and atlas consistency.
+- Two additional Filter Lab browser tests pass, covering both WebGL backends,
+  parameter controls, workload measurements, and JSON downloads.
+- TypeScript implementation/declaration builds, new example type checks, and
+  the benchmark production build pass.
+
 ## [1.0.20] — 2026-09-04
 
 This release restores Egret-compatible wrapping and automatic height

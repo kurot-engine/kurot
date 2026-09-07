@@ -319,7 +319,13 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return this.$filters;
 	}
 	public set filters(value: Filter[]) {
+		for (const filter of this.$filters) {
+			filter.$detach(this);
+		}
 		this.$filters = value ? [...value] : [];
+		for (const filter of this.$filters) {
+			filter.$attach(this);
+		}
 		this.$updateRenderMode();
 		this.$markDirty();
 	}

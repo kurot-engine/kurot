@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
 import { Filter } from '../src/kurot/filters/Filter.js';
+import { BlurFilter } from '../src/kurot/filters/BlurFilter.js';
 import { FilterPipe } from '../src/kurot/player/pipes/FilterPipe.js';
 import { MaskPipe } from '../src/kurot/player/pipes/MaskPipe.js';
 import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
@@ -29,6 +30,17 @@ function createOffscreenBuffer(): WebGLRenderBuffer {
 }
 
 describe('effect render resolution', () => {
+	it('adds the support of consecutive filters', () => {
+		const renderable = new Sprite();
+		renderable.graphics.beginFill(0xffffff);
+		renderable.graphics.drawRect(0, 0, 40, 20);
+		const instruction = FilterPipe.makePush(renderable, [new BlurFilter(4, 2), new BlurFilter(6, 3)], 0, 0);
+		const offscreen = createOffscreenBuffer();
+		const create = vi.spyOn(WGLBuf, 'create').mockReturnValue(offscreen);
+		new FilterPipe().executePush(instruction, createParentBuffer(1));
+		expect(create).toHaveBeenCalledWith(expect.anything(), 60, 30);
+	});
+
 	it('allocates filter buffers at the parent render resolution', () => {
 		const renderable = new Sprite();
 		renderable.graphics.beginFill(0xffffff);

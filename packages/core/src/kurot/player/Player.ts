@@ -111,6 +111,7 @@ export class Player implements Renderable {
 	 */
 	public destroy(): void {
 		this.pause();
+		this._webglContext?.releaseFilterResources();
 		for (const fn of this._unregisterCallbacks) fn();
 		this._unregisterCallbacks = [];
 		DisplayObject.$onStructureChange = undefined;

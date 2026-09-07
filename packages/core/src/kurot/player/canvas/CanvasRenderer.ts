@@ -475,7 +475,7 @@ export class CanvasRenderer {
 
 		const tinted = this._globalTint !== 0xffffff;
 		const source = tinted
-			? this.getTintedBitmapSource(mesh, this._globalTint)
+			? this.getTintedBitmapSource(mesh, this._globalTint, mesh.texture?.rotated ?? false)
 			: (bd.source as CanvasImageSource);
 		const sourceX = tinted ? 0 : mesh.bitmapX;
 		const sourceY = tinted ? 0 : mesh.bitmapY;
@@ -509,8 +509,9 @@ export class CanvasRenderer {
 				i0,
 				i1,
 				i2,
-				offsetX + mesh.bitmapOffsetX,
-				offsetY + mesh.bitmapOffsetY,
+				offsetX,
+				offsetY,
+				mesh.texture?.rotated ?? false,
 			);
 		}
 		return 1;
@@ -549,8 +550,10 @@ export class CanvasRenderer {
 		return 1;
 	}
 
-	private getTintedBitmapSource(bitmap: Bitmap, tint: number): HTMLCanvasElement {
+	private getTintedBitmapSource(bitmap: Bitmap, tint: number, rotated = false): HTMLCanvasElement {
 		const bitmapData = bitmap.bitmapData!;
+		const width = rotated ? bitmap.bitmapHeight : bitmap.bitmapWidth;
+		const height = rotated ? bitmap.bitmapWidth : bitmap.bitmapHeight;
 		let cache = this._bitmapTintCache.get(bitmap);
 		const needsUpdate =
 			!cache ||
@@ -558,8 +561,8 @@ export class CanvasRenderer {
 			cache.contentVersion !== bitmapData.contentVersion ||
 			cache.sourceX !== bitmap.bitmapX ||
 			cache.sourceY !== bitmap.bitmapY ||
-			cache.sourceWidth !== bitmap.bitmapWidth ||
-			cache.sourceHeight !== bitmap.bitmapHeight;
+			cache.sourceWidth !== width ||
+			cache.sourceHeight !== height;
 		if (!cache) {
 			cache = this.createTintedCanvasCache();
 			this._bitmapTintCache.set(bitmap, cache);
@@ -570,8 +573,8 @@ export class CanvasRenderer {
 				bitmapData.source as CanvasImageSource,
 				bitmap.bitmapX,
 				bitmap.bitmapY,
-				bitmap.bitmapWidth,
-				bitmap.bitmapHeight,
+				width,
+				height,
 				tint,
 				bitmapData.contentVersion,
 			);
@@ -657,13 +660,14 @@ export class CanvasRenderer {
 		i2: number,
 		offsetX: number,
 		offsetY: number,
+		rotated: boolean,
 	): void {
-		const sx0 = sourceX + uvs[i0 * 2] * sourceWidth;
-		const sy0 = sourceY + uvs[i0 * 2 + 1] * sourceHeight;
-		const sx1 = sourceX + uvs[i1 * 2] * sourceWidth;
-		const sy1 = sourceY + uvs[i1 * 2 + 1] * sourceHeight;
-		const sx2 = sourceX + uvs[i2 * 2] * sourceWidth;
-		const sy2 = sourceY + uvs[i2 * 2 + 1] * sourceHeight;
+		const sx0 = sourceX + (rotated ? (1 - uvs[i0 * 2 + 1]) * sourceHeight : uvs[i0 * 2] * sourceWidth);
+		const sy0 = sourceY + (rotated ? uvs[i0 * 2] * sourceWidth : uvs[i0 * 2 + 1] * sourceHeight);
+		const sx1 = sourceX + (rotated ? (1 - uvs[i1 * 2 + 1]) * sourceHeight : uvs[i1 * 2] * sourceWidth);
+		const sy1 = sourceY + (rotated ? uvs[i1 * 2] * sourceWidth : uvs[i1 * 2 + 1] * sourceHeight);
+		const sx2 = sourceX + (rotated ? (1 - uvs[i2 * 2 + 1]) * sourceHeight : uvs[i2 * 2] * sourceWidth);
+		const sy2 = sourceY + (rotated ? uvs[i2 * 2] * sourceWidth : uvs[i2 * 2 + 1] * sourceHeight);
 		const dx0 = offsetX + vertices[i0 * 2];
 		const dy0 = offsetY + vertices[i0 * 2 + 1];
 		const dx1 = offsetX + vertices[i1 * 2];

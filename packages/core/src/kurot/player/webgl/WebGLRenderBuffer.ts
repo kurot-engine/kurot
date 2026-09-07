@@ -39,6 +39,7 @@ export class WebGLRenderBuffer implements RenderBuffer {
 	public static release(buf: WebGLRenderBuffer): void {
 		buf.filterPadX = 0;
 		buf.filterPadY = 0;
+		buf.filterBounds = undefined;
 		buf.hasOffscreenTransform = false;
 		if (_pool.length < 6) {
 			_pool.push(buf);
@@ -77,6 +78,7 @@ export class WebGLRenderBuffer implements RenderBuffer {
 	public offscreenLocalY = 0;
 	public filterPadX = 0;
 	public filterPadY = 0;
+	public filterBounds?: Rectangle;
 
 	public stencilList: { x: number; y: number; width: number; height: number }[] = [];
 	public stencilHandleCount = 0;
@@ -227,6 +229,7 @@ export class WebGLRenderBuffer implements RenderBuffer {
 		this.offscreenLocalY = 0;
 		this.filterPadX = 0;
 		this.filterPadY = 0;
+		this.filterBounds = undefined;
 
 		this.stencilList.length = 0;
 		this.stencilHandleCount = 0;

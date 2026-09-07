@@ -11,27 +11,46 @@ export const SYM_SMOOTHING = '__kurotSmoothing';
  */
 export type GL = WebGL2RenderingContext | WebGLRenderingContext;
 
-export function compileShader(gl: GL, type: number, source: string): WebGLShader {
-	const shader = gl.createShader(type)!;
+export function compileShader(gl: GL, type: number, source: string, name = 'unnamed'): WebGLShader {
+	const shader = gl.createShader(type);
+	if (!shader) throw new Error(`Cannot allocate shader: ${name}`);
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+		const log = gl.getShaderInfoLog(shader);
+		gl.deleteShader(shader);
+		const numberedSource = source.split('\n').map((line, index) => `${index + 1}: ${line}`).join('\n');
+		throw new Error(`Shader compile failed (${name}, ${type === gl.VERTEX_SHADER ? 'vertex' : 'fragment'}):\n${log}\n${numberedSource}`);
 	}
 	return shader;
 }
 
-export function createProgram(gl: GL, vertSrc: string, fragSrc: string): WebGLProgram {
-	const vert = compileShader(gl, gl.VERTEX_SHADER, vertSrc);
-	const frag = compileShader(gl, gl.FRAGMENT_SHADER, fragSrc);
-	const program = gl.createProgram()!;
-	gl.attachShader(program, vert);
-	gl.attachShader(program, frag);
-	gl.linkProgram(program);
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		console.error('Program link error:', gl.getProgramInfoLog(program));
+export function createProgram(gl: GL, vertSrc: string, fragSrc: string, name = 'unnamed'): WebGLProgram {
+	const vert = compileShader(gl, gl.VERTEX_SHADER, vertSrc, name);
+	let frag: WebGLShader | undefined;
+	let program: WebGLProgram | undefined;
+	try {
+		frag = compileShader(gl, gl.FRAGMENT_SHADER, fragSrc, name);
+		program = gl.createProgram() ?? undefined;
+		if (!program) throw new Error(`Cannot allocate program: ${name}`);
+		gl.attachShader(program, vert);
+		gl.attachShader(program, frag);
+		gl.linkProgram(program);
+		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+			throw new Error(`Program link failed (${name}):\n${gl.getProgramInfoLog(program)}`);
+		}
+		return program;
+	} catch (error) {
+		if (program) {
+			gl.deleteProgram(program);
+		}
+		throw error;
+	} finally {
+		gl.deleteShader(vert);
+		if (frag) {
+			gl.deleteShader(frag);
+		}
 	}
-	return program;
 }
 
 export function deleteWebGLTexture(gl: GL | undefined, texture: WebGLTexture | undefined): void {

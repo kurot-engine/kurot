@@ -15,6 +15,7 @@ export default defineConfig({
 			input: {
 				index: resolve(__dirname, 'examples/index.html'),
 				benchmark: resolve(__dirname, 'examples/benchmark/index.html'),
+				'filter-lab': resolve(__dirname, 'examples/benchmark/filters/index.html'),
 				'resource-soak': resolve(__dirname, 'examples/benchmark/soak/index.html'),
 				'device-matrix': resolve(__dirname, 'examples/benchmark/device-matrix/index.html'),
 				'visual-regression': resolve(__dirname, 'examples/visual-regression/index.html'),

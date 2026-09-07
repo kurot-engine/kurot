@@ -70,6 +70,7 @@ export class GlowFilter extends Filter {
 		c.x = this._red / 255;
 		c.y = this._green / 255;
 		c.z = this._blue / 255;
+		this.invalidate();
 	}
 
 	public get alpha(): number {
@@ -79,6 +80,7 @@ export class GlowFilter extends Filter {
 		if (this._alpha === value) return;
 		this._alpha = value;
 		this.uniforms.alpha = value;
+		this.invalidate();
 	}
 
 	public get blurX(): number {
@@ -108,6 +110,7 @@ export class GlowFilter extends Filter {
 		if (this._strength === value) return;
 		this._strength = value;
 		this.uniforms.strength = value;
+		this.invalidate();
 	}
 
 	public get quality(): number {
@@ -115,6 +118,7 @@ export class GlowFilter extends Filter {
 	}
 	public set quality(value: number) {
 		this._quality = value;
+		this.invalidate();
 	}
 
 	public get inner(): boolean {
@@ -124,6 +128,7 @@ export class GlowFilter extends Filter {
 		if (this._inner === value) return;
 		this._inner = value;
 		this.uniforms.inner = value ? 1 : 0;
+		this.invalidate();
 	}
 
 	public get knockout(): boolean {
@@ -133,6 +138,7 @@ export class GlowFilter extends Filter {
 		if (this._knockout === value) return;
 		this._knockout = value;
 		this.uniforms.knockout = value ? 0 : 1;
+		this.invalidate();
 	}
 
 	// ── Internal methods ──────────────────────────────────────────────────────

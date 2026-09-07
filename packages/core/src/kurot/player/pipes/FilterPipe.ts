@@ -7,6 +7,7 @@ import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
 import { fitTextureResolution } from '../webgl/WebGLUtils.js';
+import { getFilterContentBounds } from './filter-bounds.js';
 
 /**
  * Starts a filtered subtree.
@@ -44,7 +45,7 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 
 	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PUSH_ID = 'filterPush';
-    public static readonly POP_ID = 'filterPop';
+	public static readonly POP_ID = 'filterPop';
 
 	private static readonly _pushPool: FilterPushInstruction[] = [];
 	private static readonly _popPool: FilterPopInstruction[] = [];
@@ -104,10 +105,12 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		const filters = inst.filters;
 		if (!filters.length) return undefined;
 
-		const bounds = inst.renderable.$getOriginalBounds();
+		const bounds = getFilterContentBounds(inst.renderable);
 		if (bounds.width <= 0 || bounds.height <= 0) return undefined;
 
-		if (!inst.renderable.$mask && filters.length === 1 && filters[0] instanceof ColorMatrixFilter) {
+		if (!inst.renderable.$mask && !inst.renderable.$children?.length
+			&& !buffer.context.activeFilter && filters.length === 1 && filters[0] instanceof ColorMatrixFilter
+			&& filters[0].resolution === undefined) {
 			const hasBlend = inst.renderable.$blendMode !== 0;
 			if (hasBlend) {
 				inst.savedBlendMode = buffer.context.currentBlendMode;
@@ -127,17 +130,17 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 			padB = 0;
 		for (const f of filters) {
 			const p = f.getPadding();
-			if (p.left > padL) padL = p.left;
-			if (p.right > padR) padR = p.right;
-			if (p.top > padT) padT = p.top;
-			if (p.bottom > padB) padB = p.bottom;
+			padL += p.left;
+			padR += p.right;
+			padT += p.top;
+			padB += p.bottom;
 		}
 		const offW = Math.ceil(bounds.width + padL + padR);
 		const offH = Math.ceil(bounds.height + padT + padB);
 		const resolution = fitTextureResolution(
 			offW,
 			offH,
-			buffer.resolution,
+			filters.reduce((resolution, filter) => Math.min(resolution, filter.resolution ?? resolution), buffer.resolution),
 			buffer.context.maxTextureSize,
 		);
 		const offscreen = WGLBuf.create(
@@ -148,6 +151,7 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		offscreen.resolution = resolution;
 		offscreen.filterPadX = padL;
 		offscreen.filterPadY = padT;
+		offscreen.filterBounds = bounds;
 
 		offscreen.context.pushBuffer(offscreen);
 		return offscreen;
@@ -163,7 +167,7 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 	): void {
 		const { renderable, push } = inst;
 		const filters = push.filters;
-		const hasBlend = renderable.$blendMode !== 0;
+		const hasBlend = renderable.$blendMode !== 0 && !renderable.$mask;
 		const blendOp = BLEND_MODES[renderable.$blendMode] ?? 'source-over';
 
 		if (!offscreen) {
@@ -176,7 +180,7 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 
 		offscreen.context.popBuffer();
 
-		const bounds = renderable.$getOriginalBounds();
+		const bounds = offscreen.filterBounds ?? renderable.$getOriginalBounds();
 		const bx = bounds.x;
 		const by = bounds.y;
 
@@ -190,11 +194,14 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		buffer.saveTransform();
 		buffer.useOffset();
 
-		buffer.context.compositeFilterResult(filters, offscreen);
-		buffer.restoreTransform();
-
-		if (hasBlend) buffer.context.setGlobalCompositeOperation(prevBlend);
-
-		WGLBuf.release(offscreen);
+		try {
+			buffer.context.compositeFilterResult(filters, offscreen);
+		} finally {
+			buffer.restoreTransform();
+			if (hasBlend) {
+				buffer.context.setGlobalCompositeOperation(prevBlend);
+			}
+			WGLBuf.release(offscreen);
+		}
 	}
 }

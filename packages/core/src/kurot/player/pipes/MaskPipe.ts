@@ -274,6 +274,10 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			);
 		}
 
+		const previousAlpha = buffer.globalAlpha;
+		const previousTint = buffer.globalTintColor;
+		buffer.globalAlpha = 1;
+		buffer.globalTintColor = 0xffffff;
 		const dw = displayBuffer.rootRenderTarget.width;
 		const dh = displayBuffer.rootRenderTarget.height;
 		if (displayBuffer.rootRenderTarget.texture) {
@@ -292,6 +296,8 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 		if (hasBlend) buffer.context.setGlobalCompositeOperation(prevBlend);
 
 		buffer.context.flush();
+		buffer.globalAlpha = previousAlpha;
+		buffer.globalTintColor = previousTint;
 		WGLBuf.release(displayBuffer);
 	}
 }

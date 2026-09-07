@@ -7,7 +7,9 @@ export class Mesh extends Bitmap {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	/**
-	 * Vertex positions stored as x/y pairs.
+	 * Vertex positions stored as x/y pairs in local display coordinates.
+	 * Atlas trim offsets do not move this geometry; positions already define
+	 * the rendered shape. Use scaleX/scaleY to resize it.
 	 */
 	public vertices: number[] = [];
 
@@ -17,7 +19,8 @@ export class Mesh extends Bitmap {
 	public indices: number[] = [];
 
 	/**
-	 * Texture coordinates stored as u/v pairs.
+	 * Texture coordinates stored as u/v pairs relative to the unrotated atlas
+	 * region. The renderer applies atlas rotation and source rectangle mapping.
 	 */
 	public uvs: number[] = [];
 

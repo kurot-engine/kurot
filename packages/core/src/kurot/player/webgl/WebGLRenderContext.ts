@@ -1,3 +1,11 @@
+import { splitMesh } from './split-mesh.js';
+import { MultiPassFilter } from '../../filters/MultiPassFilter.js';
+import { WebGLFilterSystem } from './WebGLFilterSystem.js';
+import type { FilterSampler } from './WebGLFilterSystem.js';
+import type { WebGLRenderTarget } from './WebGLRenderTarget.js';
+import { CustomFilter } from '../../filters/CustomFilter.js';
+import { uploadCustomUniforms } from './custom-filter-uniforms.js';
+import { WebGLFilterTextures } from './WebGLFilterTextures.js';
 import { BitmapData } from '../../display/texture/BitmapData.js';
 import type { Filter } from '../../filters/Filter.js';
 import { ColorMatrixFilter } from '../../filters/ColorMatrixFilter.js';
@@ -15,15 +23,6 @@ import type { GL } from './WebGLUtils.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
 import type { RenderContext } from '../RenderContext.js';
-
-interface BlurFramebufferEntry {
-	texture: WebGLTexture;
-	fbo: WebGLFramebuffer;
-	byteSize: number;
-}
-
-const BLUR_FRAMEBUFFER_POOL_LIMIT = 16;
-const BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT = 64 * 1024 * 1024;
 
 const _gcRegistry = new FinalizationRegistry<{ gl: GL; texture: WebGLTexture }>(({ gl, texture }) => {
 	gl.deleteTexture(texture);
@@ -57,6 +56,11 @@ export class WebGLRenderContext implements RenderContext {
 	// ── Private fields ────────────────────────────────────────────────────────
 
 	private readonly _vao: WebGLVertexArrayObject;
+	private readonly _filterTextures: WebGLFilterTextures;
+	private readonly _filterSystem: WebGLFilterSystem;
+	private _filterPassInputs: Record<string, FilterSampler> = {};
+	private _filterOutputWidth = 0;
+	private _filterOutputHeight = 0;
 	private readonly _batcher = new MultiTextureBatcher();
 	private readonly _bufferStack: WebGLRenderBuffer[] = [];
 	private _currentBuffer?: WebGLRenderBuffer;
@@ -70,11 +74,6 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _contextRestoredCallbacks: Array<() => void> = [];
 	private readonly _trackedBitmapDatas: Set<WeakRef<BitmapData>> = new Set();
 	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
-
-	// ── Blur FBO pool ─────────────────────────────────────────────────────────
-	private readonly _blurFboPool: Map<string, BlurFramebufferEntry[]> = new Map();
-	private _blurFboPoolSize: number = 0;
-	private _blurFboPoolBytes: number = 0;
 
 	public constructor(canvas: HTMLCanvasElement) {
 		this.surface = canvas;
@@ -99,6 +98,8 @@ export class WebGLRenderContext implements RenderContext {
 		}
 
 		const gl = this.gl;
+		this._filterTextures = new WebGLFilterTextures(this);
+		this._filterSystem = new WebGLFilterSystem(this);
 
 		gl.disable(gl.DEPTH_TEST);
 		gl.disable(gl.CULL_FACE);
@@ -139,12 +140,12 @@ export class WebGLRenderContext implements RenderContext {
 
 	/** Number of reusable framebuffers currently retained by the blur pipeline. */
 	public get blurFramebufferPoolSize(): number {
-		return this._blurFboPoolSize;
+		return this._filterSystem.pool.size;
 	}
 
 	/** Estimated GPU bytes retained by the reusable blur framebuffer pool. */
 	public get blurFramebufferPoolBytes(): number {
-		return this._blurFboPoolBytes;
+		return this._filterSystem.pool.bytes;
 	}
 
 	public get activatedBuffer(): WebGLRenderBuffer | undefined {
@@ -230,10 +231,18 @@ export class WebGLRenderContext implements RenderContext {
 	}
 
 	public enableScissor(x: number, y: number, width: number, height: number): void {
-		this.drawCmdManager.pushEnableScissor(x, y, width, height);
+		this.flush();
+		if (this._currentBuffer) {
+			this._currentBuffer.enableScissor(x, y, width, height);
+			this._currentBuffer.hasScissor = true;
+		}
 	}
 	public disableScissor(): void {
-		this.drawCmdManager.pushDisableScissor();
+		this.flush();
+		if (this._currentBuffer) {
+			this._currentBuffer.disableScissor();
+			this._currentBuffer.hasScissor = false;
+		}
 	}
 
 	// ── Mask (stencil-based) ──────────────────────────────────────────────────
@@ -451,8 +460,15 @@ export class WebGLRenderContext implements RenderContext {
 		const buf = this._currentBuffer;
 
 		if (meshVertices && meshIndices) {
-			const meshNum = meshIndices.length / 3;
-			if (this._vao.reachMaxSize(meshNum * 4, meshNum * 6)) this.flush();
+			if (meshVertices.length / 2 > WebGLVertexArrayObject.MAX_VERTICES || meshIndices.length > WebGLVertexArrayObject.MAX_INDICES) {
+				for (const chunk of splitMesh(meshVertices, meshUVs!, meshIndices)) {
+					this.drawTexture(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY,
+						destWidth, destHeight, textureWidth, textureHeight, chunk.uvs, chunk.vertices,
+						chunk.indices, _bounds, rotated, smoothing, flipY);
+				}
+				return;
+			}
+			if (this._vao.reachMaxSize(meshVertices.length / 2, meshIndices.length)) this.flush();
 		} else {
 			if (this._vao.reachMaxSize()) this.flush();
 		}
@@ -461,7 +477,6 @@ export class WebGLRenderContext implements RenderContext {
 			this.drawCmdManager.pushChangeSmoothing(texture, smoothing);
 		}
 
-		if (meshUVs) this._vao.changeToMeshIndices();
 
 		// ── Multi-texture path (plain quads without filter) ───────────────────
 		const useMulti = !this.activeFilter && !meshVertices && this._maxTextureUnits > 1;
@@ -501,6 +516,7 @@ export class WebGLRenderContext implements RenderContext {
 
 		// ── Single-texture path (filter, mesh, or single-unit device) ─────────
 		if (this._vao.isMultiTexture()) this.flush();
+		if (meshUVs) this._vao.changeToMeshIndices();
 
 		this._vao.cacheArrays(
 			buf,
@@ -567,166 +583,93 @@ export class WebGLRenderContext implements RenderContext {
 	 * framebuffer feedback and state leakage.
 	 */
 	public compositeFilterResult(filters: Filter[], offscreen: WebGLRenderBuffer): void {
-		const target = offscreen.rootRenderTarget;
-		if (!target?.texture) {
-			return;
-		}
-		const w = target.width;
-		const h = target.height;
-
 		this.flush();
-
-		for (const filter of filters) {
-			if (filter instanceof BlurFilter && (filter.blurX > 0 || filter.blurY > 0)) {
-				this._drawBlurPingPong(target.texture, w, h, filter, offscreen, offscreen.resolution);
-			}
-		}
-
-		if (this._currentBuffer) {
-			this._currentBuffer.rootRenderTarget.activate();
-			this.onResize(this._currentBuffer.width, this._currentBuffer.height);
-		}
-
-		const nonBlurFilter = filters.find(f => !(f instanceof BlurFilter));
-
-		this._filterResolution = offscreen.resolution;
-		this.activeFilter = nonBlurFilter;
-		this.drawTexture(
-			target.texture,
-			0,
-			0,
-			w,
-			h,
-			0,
-			0,
-			w / offscreen.resolution,
-			h / offscreen.resolution,
-			w,
-			h,
-		);
-		this.activeFilter = undefined;
-
-		this.flush();
-		this._filterResolution = 1;
-	}
-
-	private _drawBlurPingPong(
-		texture: WebGLTexture,
-		w: number,
-		h: number,
-		filter: BlurFilter,
-		buffer: WebGLRenderBuffer,
-		resolution: number,
-	): void {
+		const parent = this._currentBuffer;
+		if (!parent || !offscreen.rootRenderTarget.texture) return;
 		const gl = this.gl;
-
-		// ── Acquire a temporary FBO from the pool (or create a new one) ───────
-		const poolKey = `${w}x${h}`;
-		let tmpEntry = this._takeBlurFramebuffer(poolKey);
-		if (!tmpEntry) {
-			const tmpTex = gl.createTexture()!;
-			gl.bindTexture(gl.TEXTURE_2D, tmpTex);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-			const tmpFbo = gl.createFramebuffer()!;
-			gl.bindFramebuffer(gl.FRAMEBUFFER, tmpFbo);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tmpTex, 0);
-
-			tmpEntry = { texture: tmpTex, fbo: tmpFbo, byteSize: w * h * 4 };
+		const blend = gl.isEnabled(gl.BLEND);
+		const stencil = gl.isEnabled(gl.STENCIL_TEST);
+		const scissor = gl.isEnabled(gl.SCISSOR_TEST);
+		const alpha = parent.globalAlpha;
+		const tint = parent.globalTintColor;
+		const last = filters[filters.length - 1];
+		const finalFilter = last instanceof BlurFilter || last instanceof MultiPassFilter || last instanceof CustomFilter ? undefined : last;
+		try {
+			gl.disable(gl.BLEND);
+			gl.disable(gl.STENCIL_TEST);
+			gl.disable(gl.SCISSOR_TEST);
+			this._filterSystem.render(finalFilter ? filters.slice(0, -1) : filters, offscreen.rootRenderTarget,
+				offscreen.resolution, output => {
+					parent.rootRenderTarget.activate();
+					this.onResize(parent.width, parent.height);
+					if (blend) { gl.enable(gl.BLEND); }
+					if (stencil) { gl.enable(gl.STENCIL_TEST); }
+					if (scissor) { gl.enable(gl.SCISSOR_TEST); }
+					// Subtree vertices already contain world alpha and tint.
+					parent.globalAlpha = 1;
+					parent.globalTintColor = 0xffffff;
+					this._filterResolution = output.width * offscreen.resolution / offscreen.width;
+					this.activeFilter = finalFilter;
+					this.drawFramebufferTexture(output.texture!, output.width, output.height, 0, 0,
+						offscreen.width / offscreen.resolution, offscreen.height / offscreen.resolution);
+					this.flush();
+				});
+		} finally {
+			this.activeFilter = undefined;
+			this._filterResolution = 1;
+			this._filterPassInputs = {};
+			parent.globalAlpha = alpha;
+			parent.globalTintColor = tint;
+			parent.rootRenderTarget.activate();
+			this.onResize(parent.width, parent.height);
+			if (blend) { gl.enable(gl.BLEND); } else { gl.disable(gl.BLEND); }
+			if (stencil) { gl.enable(gl.STENCIL_TEST); } else { gl.disable(gl.STENCIL_TEST); }
+			if (scissor) { gl.enable(gl.SCISSOR_TEST); } else { gl.disable(gl.SCISSOR_TEST); }
 		}
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, tmpEntry.fbo);
-		gl.viewport(0, 0, w, h);
-		gl.clearColor(0, 0, 0, 0);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		// ── Select shader tier based on actual blur radius ────────────────────
-		const blurX = filter.blurX * resolution;
-		const blurY = filter.blurY * resolution;
-		const hTier = this.blurTierFn(blurX);
-		const vTier = this.blurTierFn(blurY);
-		const hKey = `blur_h_${hTier}`;
-		const vKey = `blur_v_${vTier}`;
-
-		// ── Pass 1: horizontal blur → tmpFbo ──────────────────────────────────
-		const hProg = WebGLProgram.get(gl, this.shaders.fullscreen_vert, this.makeBlurH(hTier), hKey);
-		this._drawFullscreenQuad(hProg, texture, w, h, prog => {
-			const uBlurX = prog.uniforms['blurX'];
-			const uSize = prog.uniforms['uTextureSize'];
-			if (uBlurX) gl.uniform1f(uBlurX, blurX);
-			if (uSize) gl.uniform2f(uSize, w, h);
-		});
-
-		// ── Pass 2: vertical blur → offscreen FBO ────────────────────────────
-		buffer.rootRenderTarget.activate();
-		this.onResize(w, h);
-
-		const vProg = WebGLProgram.get(gl, this.shaders.fullscreen_vert, this.makeBlurV(vTier), vKey);
-		this._drawFullscreenQuad(vProg, tmpEntry.texture, w, h, prog => {
-			const uBlurY = prog.uniforms['blurY'];
-			const uSize = prog.uniforms['uTextureSize'];
-			if (uBlurY) gl.uniform1f(uBlurY, blurY);
-			if (uSize) gl.uniform2f(uSize, w, h);
-		});
-
-		// ── Return the temporary FBO to the pool ──────────────────────────────
-		this._returnBlurFramebuffer(poolKey, tmpEntry);
 	}
 
-	private _takeBlurFramebuffer(key: string): BlurFramebufferEntry | undefined {
-		const entries = this._blurFboPool.get(key);
-		if (!entries) return undefined;
-
-		const entry = entries.pop();
-		if (!entry) return undefined;
-
-		this._blurFboPoolSize--;
-		this._blurFboPoolBytes -= entry.byteSize;
-		if (entries.length === 0) {
-			this._blurFboPool.delete(key);
+	public $drawFilterPass(filter: Filter | undefined, input: WebGLRenderTarget, output: WebGLRenderTarget,
+		resolution: number, textures: Record<string, FilterSampler> = {}): void {
+		if (input === output || Object.values(textures).some(value => value.texture === output.texture)) {
+			throw new Error('A filter cannot read from its output framebuffer.');
 		}
-		return entry;
+		output.activate();
+		this.gl.viewport(0, 0, output.width, output.height);
+		// Custom vertex shaders may cover only part of the output or discard fragments.
+		output.clear();
+		this._filterResolution = filter instanceof CustomFilter ? resolution : resolution * input.width / output.width;
+		this._filterOutputWidth = output.width;
+		this._filterOutputHeight = output.height;
+		this._filterPassInputs = textures;
+		try {
+			this._drawFullscreenQuad(this._getTextureProgram(filter), input.texture!, output.width, output.height,
+				program => this._uploadFilterUniforms(program, filter, input.width, input.height));
+		} finally {
+			this._filterPassInputs = {};
+		}
 	}
 
-	private _returnBlurFramebuffer(key: string, entry: BlurFramebufferEntry): void {
-		if (entry.byteSize > BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT) {
-			this.gl.deleteTexture(entry.texture);
-			this.gl.deleteFramebuffer(entry.fbo);
-			return;
-		}
+	public $drawBlurPass(horizontal: boolean, input: WebGLRenderTarget, output: WebGLRenderTarget, radius: number): void {
+		if (input === output) throw new Error('A blur cannot read from its output framebuffer.');
+		output.activate();
+		this.gl.viewport(0, 0, output.width, output.height);
+		const tier = this.blurTierFn(radius);
+		const source = horizontal ? this.makeBlurH(tier) : this.makeBlurV(tier);
+		const program = WebGLProgram.get(this.gl, this.shaders.fullscreen_vert, source, `blur_${horizontal ? 'h' : 'v'}_${tier}`);
+		this._drawFullscreenQuad(program, input.texture!, output.width, output.height, prog => {
+			const radiusLocation = prog.uniforms[horizontal ? 'blurX' : 'blurY'];
+			if (radiusLocation) { this.gl.uniform1f(radiusLocation, radius); }
+			if (prog.uniforms.uTextureSize) { this.gl.uniform2f(prog.uniforms.uTextureSize, input.width, input.height); }
+		});
+	}
 
-		while (
-			this._blurFboPoolSize >= BLUR_FRAMEBUFFER_POOL_LIMIT ||
-			this._blurFboPoolBytes + entry.byteSize > BLUR_FRAMEBUFFER_POOL_BYTE_LIMIT
-		) {
-			const oldest = this._blurFboPool.entries().next().value as [string, BlurFramebufferEntry[]] | undefined;
-			if (!oldest) break;
-
-			const [oldestKey, entries] = oldest;
-			const evicted = entries.pop();
-			if (evicted) {
-				this.gl.deleteTexture(evicted.texture);
-				this.gl.deleteFramebuffer(evicted.fbo);
-				this._blurFboPoolSize--;
-				this._blurFboPoolBytes -= evicted.byteSize;
-			}
-			if (entries.length === 0) {
-				this._blurFboPool.delete(oldestKey);
-			}
-		}
-
-		let entries = this._blurFboPool.get(key);
-		if (!entries) {
-			entries = [];
-			this._blurFboPool.set(key, entries);
-		}
-		entries.push(entry);
-		this._blurFboPoolSize++;
-		this._blurFboPoolBytes += entry.byteSize;
+	/**
+	 * Releases idle effect targets and auxiliary image uploads. Images remain caller-owned.
+	 */
+	public releaseFilterResources(): void {
+		this.flush();
+		this._filterSystem.pool.clear();
+		this._filterTextures.clear();
 	}
 
 	private _drawFullscreenQuad(
@@ -756,14 +699,15 @@ export class WebGLRenderContext implements RenderContext {
 			gl.vertexAttribPointer(aColor, 4, gl.UNSIGNED_BYTE, true, stride, 16);
 		}
 
+		setUniforms(prog);
 		const uProj = prog.uniforms['projectionVector'];
 		if (uProj) gl.uniform2f(uProj, w / 2, -h / 2);
 
 		const uSampler = prog.uniforms['uSampler'];
 		if (uSampler) gl.uniform1i(uSampler, 0);
 
+		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		setUniforms(prog);
 
 		const f32 = new Float32Array(20);
 		const u32 = new Uint32Array(f32.buffer);
@@ -771,27 +715,28 @@ export class WebGLRenderContext implements RenderContext {
 		f32[0] = 0;
 		f32[1] = 0;
 		f32[2] = 0;
-		f32[3] = 0;
+		f32[3] = 1;
 		u32[4] = packed;
 		f32[5] = w;
 		f32[6] = 0;
 		f32[7] = 1;
-		f32[8] = 0;
+		f32[8] = 1;
 		u32[9] = packed;
 		f32[10] = w;
 		f32[11] = h;
 		f32[12] = 1;
-		f32[13] = 1;
+		f32[13] = 0;
 		u32[14] = packed;
 		f32[15] = 0;
 		f32[16] = h;
 		f32[17] = 0;
-		f32[18] = 1;
+		f32[18] = 0;
 		u32[19] = packed;
 
 		gl.bufferData(gl.ARRAY_BUFFER, f32, gl.STREAM_DRAW);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
 		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+		if (this._currentBuffer) { this._currentBuffer.drawCalls++; }
 
 		gl.bufferData(gl.ARRAY_BUFFER, this._gpuVertexBufferSize, gl.DYNAMIC_DRAW);
 		this._bindIndices = false;
@@ -808,7 +753,40 @@ export class WebGLRenderContext implements RenderContext {
 	// ── Execute ───────────────────────────────────────────────────────────────
 
 	public flush(): void {
-		this._flush();
+		try {
+			this._flush();
+		} catch (error) {
+			this.drawCmdManager.clear();
+			this._vao.clear();
+			this._batcher.reset();
+			this._bindIndices = false;
+			throw error;
+		}
+	}
+
+	public $abortFrame(buffer: WebGLRenderBuffer): void {
+		this.drawCmdManager.clear();
+		this._vao.clear();
+		this._batcher.reset();
+		this._bindIndices = false;
+		this.activeFilter = undefined;
+		this._bufferStack.length = 0;
+		this._bufferStack.push(buffer);
+		this._currentBuffer = buffer;
+		buffer.stencilList.length = 0;
+		buffer.stencilHandleCount = 0;
+		buffer.disableStencil();
+		buffer.disableScissor();
+		buffer.hasScissor = false;
+		buffer.rootRenderTarget.activate();
+		this.gl.activeTexture(this.gl.TEXTURE0);
+		this.gl.enable(this.gl.BLEND);
+		this.gl.disable(this.gl.SCISSOR_TEST);
+		this.gl.disable(this.gl.STENCIL_TEST);
+		this.gl.colorMask(true, true, true, true);
+		this.currentBlendMode = 'source-over';
+		this._applyBlend('source-over');
+		this.onResize(buffer.width, buffer.height);
 	}
 
 	// ── Private — flush & dispatch ────────────────────────────────────────────
@@ -830,7 +808,7 @@ export class WebGLRenderContext implements RenderContext {
 
 		gl.bufferData(gl.ARRAY_BUFFER, this._gpuVertexBufferSize, gl.DYNAMIC_DRAW);
 
-		WebGLProgram.clearCache();
+		WebGLProgram.clearCache(gl, true);
 
 		this._bindIndices = false;
 		this._batcher.reset();
@@ -838,10 +816,9 @@ export class WebGLRenderContext implements RenderContext {
 		this._vao.clear();
 
 		this._defaultEmptyTexture = undefined;
+		this._filterTextures.clear(true);
 
-		this._blurFboPool.clear();
-		this._blurFboPoolSize = 0;
-		this._blurFboPoolBytes = 0;
+		this._filterSystem.pool.clear(true);
 		WebGLRenderBuffer.handleContextRestored(this);
 
 		for (const ref of this._trackedBitmapDatas) {
@@ -1050,6 +1027,10 @@ export class WebGLRenderContext implements RenderContext {
 	}
 
 	private _getTextureProgram(filter?: Filter): WebGLProgram {
+		if (filter instanceof CustomFilter) {
+			const source = filter.$getProgram(this.isWebGL2);
+			return WebGLProgram.get(this.gl, source.vertex ?? this.shaders.fullscreen_vert, source.fragment, 'CustomFilter');
+		}
 		if (filter instanceof ColorMatrixFilter) {
 			return WebGLProgram.get(
 				this.gl,
@@ -1058,7 +1039,7 @@ export class WebGLRenderContext implements RenderContext {
 				'colorTransform',
 			);
 		}
-		if (filter instanceof BlurFilter || filter instanceof GlowFilter || filter instanceof DropShadowFilter) {
+		if (filter instanceof GlowFilter || filter instanceof DropShadowFilter) {
 			return WebGLProgram.get(this.gl, this.shaders.default_vert, this.shaders.glow_frag, 'glow');
 		}
 		return WebGLProgram.get(this.gl, this.shaders.default_vert, this.shaders.texture_frag, 'texture');
@@ -1101,6 +1082,20 @@ export class WebGLRenderContext implements RenderContext {
 
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 
+		this._uploadFilterUniforms(prog, filter, texW, texH);
+
+		gl.drawElements(gl.TRIANGLES, count * 3, gl.UNSIGNED_SHORT, indexOffset * 6);
+	}
+
+	private _uploadFilterUniforms(prog: WebGLProgram, filter: Filter | undefined, texW: number, texH: number): void {
+		const gl = this.gl;
+		if (filter instanceof CustomFilter) {
+			uploadCustomUniforms(gl, prog, filter, texW, texH, this._filterResolution,
+				this._filterOutputWidth || texW, this._filterOutputHeight || texH, this._filterPassInputs);
+			this._filterTextures.bind(prog, filter, this._filterPassInputs);
+			return;
+		}
+
 		if (filter instanceof ColorMatrixFilter) {
 			const uMatrix = prog.uniforms['matrix'];
 			const uAdd = prog.uniforms['colorAdd'];
@@ -1137,7 +1132,7 @@ export class WebGLRenderContext implements RenderContext {
 				const uDist = prog.uniforms['dist'];
 				if (uDist) gl.uniform1f(uDist, filter.distance * this._filterResolution);
 				const uAngle = prog.uniforms['angle'];
-				if (uAngle) gl.uniform1f(uAngle, -(filter.angle / 180) * Math.PI);
+				if (uAngle) gl.uniform1f(uAngle, (filter.angle / 180) * Math.PI);
 				const uHide = prog.uniforms['hideObject'];
 				if (uHide) gl.uniform1f(uHide, filter.hideObject ? 1 : 0);
 			} else {
@@ -1151,10 +1146,9 @@ export class WebGLRenderContext implements RenderContext {
 			const uInner = prog.uniforms['inner'];
 			if (uInner) gl.uniform1f(uInner, filter instanceof GlowFilter && filter.inner ? 1 : 0);
 			const uKnockout = prog.uniforms['knockout'];
-			if (uKnockout) gl.uniform1f(uKnockout, filter instanceof GlowFilter && filter.knockout ? 1 : 0);
+			if (uKnockout) gl.uniform1f(uKnockout, filter instanceof GlowFilter && filter.knockout ? 0 : 1);
 		}
 
-		gl.drawElements(gl.TRIANGLES, count * 3, gl.UNSIGNED_SHORT, indexOffset * 6);
 	}
 
 	private _drawRectBatch(indexOffset: number, count: number): void {

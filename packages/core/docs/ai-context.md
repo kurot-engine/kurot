@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@1.0.20`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@1.0.21`. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -39,7 +39,8 @@ src/kurot/
 │                   8 concrete subclasses (TouchEvent, TimerEvent, ProgressEvent, etc.).
 ├── geom/           Matrix, Point, Rectangle + shared*/create()/release() object pools.
 ├── filters/        Filter base + BlurFilter, GlowFilter, DropShadowFilter, ColorMatrixFilter,
-│                   CustomFilter. Pure data/padding — execution lives in player/pipes/.
+│                   CustomFilter, MultiPassFilter, BloomFilter. GPU execution in player/webgl/;
+│                   push/pop scene integration in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
 │                   HtmlTextParser, InputController, TextMeasurer, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
@@ -103,9 +104,23 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   bypasses it and leaves capability queries stale.
 - `StageText` (a real DOM `<input>` overlaid on the canvas) is only used for
   `TextFieldType.INPUT` — the rest of `TextField` is fully canvas/GPU-drawn.
-- Four built-in effect filters are provided: `BlurFilter`, `GlowFilter`,
-  `DropShadowFilter`, and `ColorMatrixFilter`. Custom effects use
-  `CustomFilter` with raw GLSL.
+- GPU filter arrays execute in order. `CustomFilter.from()` takes explicit
+  WebGL 1/2 sources with numeric uniforms and auxiliary full-image BitmapData
+  bindings. `MultiPassFilter` retains earlier/original inputs for an acyclic
+  pass graph; `BloomFilter` is an LDR extraction/blur/composite example.
+  See `docs/filters.md` for exact UV, alpha, resolution and resource contracts.
+- `BlurFilter.quality` controls pass pairs (1–16); large radii downsample to
+  stay within the existing 32-physical-pixel shader tier. Glow/DropShadow keep
+  their existing fixed-sample shader and do not use their quality metadata.
+- GPU filters are skipped by Canvas 2D, including the Canvas capture used by
+  cacheAsTexture and RenderTexture. Do not cache GPU effects through those APIs.
+- Filter setters invalidate weakly attached users. Direct uniform/binding edits
+  need `filter.invalidate()`. Auxiliary canvas/video edits additionally need
+  `BitmapData.invalidate(source)` for upload refresh.
+- Intermediate filter targets share a 16-entry / 64 MiB idle pool. Active targets,
+  subtree captures and auxiliary uploads are separate. Player.destroy releases
+  idle effect targets and auxiliary uploads. Shader programs are cached per GL
+  context and source; compile/link failures throw and abort the failed frame.
 - `Video` extends `Bitmap` and is directly renderable. It swaps between poster
   and video textures, invalidates `BitmapData` on each available video frame,
   and uses `requestAnimationFrame` only when `requestVideoFrameCallback` is
@@ -139,7 +154,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **Utils**: `NumberUtils`, `Base64Util`, `toColorString`, `Logger`/`LogLevel`, `Timer`/`TimerEvents`, `ByteArray`/`Endian`, `registerFontMapping`/`cacheFontResource`, `DebugLog`.
 - **Display**: enums (`BitmapFillMode`, `BlendMode`/`blendModeToNumber`/`numberToBlendMode`, `CapsStyle`, `GradientType`, `JointStyle`, `OrientationMode`, `StageScaleMode`); `DisplayObject`/`RenderMode`/`RenderObjectType`/`DisplayObjectEvents`/`CacheAsTextureOptions`; `DisplayObjectContainer`, `Stage`, `Graphics`/`setGraphicsHitTest`, `Shape`, `Sprite`, `Bitmap`/`setBitmapPixelHitTest`, `Mesh`; textures: `BitmapData`/`CompressedTextureData`, `Texture`/`textureScaleFactor`, `RenderTexture`, `SpriteSheet`; `PathCommandType`/`GraphicsCommand` (type).
 - **Net**: `HttpMethod`/`HttpMethodType`, `HttpResponseType`/`HttpResponseTypeType`, `HttpRequest`/`HttpRequestEvents`, `ImageLoader`/`ImageLoaderEvents`.
-- **Filters**: `Filter`, `BlurFilter`, `ColorMatrixFilter`, `GlowFilter`, `DropShadowFilter`, `CustomFilter`.
+- **Filters**: `Filter`, `BlurFilter`, `ColorMatrixFilter`, `GlowFilter`, `DropShadowFilter`, `CustomFilter`, `MultiPassFilter`, `BloomFilter`; types `CustomFilterOptions`, `CustomFilterUniform`, `FilterProgramSource`, `FilterTexture`, `FilterPass`, `FilterPassInput`, `BloomFilterOptions`.
 - **Media**: `Sound`/`SoundType`/`SoundEvents`, `SoundChannel`, `Video`.
 - **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`, `START_TIME`, `invalidateRenderFlag`/`setInvalidateRenderFlag`, `requestRenderingFlag`/`setRequestRenderingFlag`, `Renderable`; rendering: `InstructionSet`/`Instruction`, `RenderPipe` (type), `CanvasBuffer`, `hitTestBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`/`StageDisplaySize`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
   - `RenderContext` / `RenderBuffer` (`player/RenderContext.ts`, `player/RenderBuffer.ts`) are internal backend-neutral contracts and are not re-exported.
@@ -177,10 +192,19 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | I want to...                               | Look at                                                                                                          |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | Add a new DisplayObject subclass           | `display/DisplayObject.ts`, model it on `display/Shape.ts`                                                       |
-| Add a new filter                           | `filters/`, follow `BlurFilter.ts`'s ping-pong dual-pass pattern; execution side in `player/pipes/FilterPipe.ts` |
+| Add a new filter                           | `docs/filters.md`, `filters/CustomFilter.ts`, `filters/MultiPassFilter.ts`; execution in `player/webgl/WebGLFilterSystem.ts`, scene integration in `player/pipes/FilterPipe.ts` |
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                      |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                 |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                     |
 | Change text layout/wrapping                | `text/WordWrap.ts`, `text/TextMeasurer.ts`                                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                     |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`  |
+
+### Mesh geometry and batching
+
+Mesh vertices are local positions; texture trim offsets do not shift geometry.
+UVs are relative to the unrotated texture region; both backends map atlas
+rotation during sampling. Resize geometry using scaleX/scaleY. After mutating
+vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
+separate from quad indices and splits oversized meshes into ordered batches
+with local index remapping (player/webgl/split-mesh.ts).

@@ -61,7 +61,8 @@ export class DropShadowFilter extends GlowFilter {
 	public set hideObject(value: boolean) {
 		if (this._hideObject === value) return;
 		this._hideObject = value;
-		this.uniforms.hideObject = value ? 1 : 0;
+        this.uniforms.hideObject = value ? 1 : 0;
+        this.invalidate();
 	}
 
 	// ── Internal methods ──────────────────────────────────────────────────────

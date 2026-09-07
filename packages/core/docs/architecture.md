@@ -54,7 +54,7 @@ packages/core/src/kurot/
 │   │   └── CanvasBuffer.ts          # Canvas 2D 缓冲区（含 hitTestBuffer 像素级命中测试）
 │   └── webgl/                        # WebGL 渲染后端（主渲染器）
 │       ├── WebGLRenderer.ts          # 两阶段渲染器（build + execute，含 RenderGroup/DisplayListCache 支持）
-│       ├── WebGLRenderContext.ts      # WebGL 状态管理 + draw 调度（WebGL1/2 自动选择，含 blurFboPool 对象池）
+│       ├── WebGLRenderContext.ts      # WebGL 状态管理 + draw 调度（WebGL1/2 自动选择，配合 WebGLFilterSystem 管理效果）
 │       ├── WebGLRenderBuffer.ts      # WebGL 缓冲区（含对象池，支持 offscreen/stencil/scissor）
 │       ├── WebGLRenderTarget.ts      # FBO 管理
 │       ├── WebGLVertexArrayObject.ts  # VAO 顶点管理（单纹理 20B + 多纹理 24B 双布局）
@@ -76,7 +76,7 @@ packages/core/src/kurot/
 │           └── ShaderLib2.ts         # GLSL ES 3.00 着色器库（WebGL2）
 ├── events/           # 事件系统（11 个事件类 + EventPhase + IEventDispatcher 接口）
 ├── geom/             # 几何工具（Matrix, Point, Rectangle）
-├── filters/          # 滤镜（Blur, Glow, DropShadow, ColorMatrix, CustomFilter）
+├── filters/          # 滤镜（Blur, Glow, DropShadow, ColorMatrix, CustomFilter, MultiPassFilter, BloomFilter）
 ├── text/             # 文本渲染
 │   ├── TextField.ts                  # 核心文本字段（含 textFlow 富文本、输入模式、密码模式）
 │   ├── BitmapText.ts                 # 位图文本
@@ -240,12 +240,12 @@ Player.render()
 | multi_vert + multi_frag                  | 多纹理批处理（8单元）              | ShaderLib |
 | default_vert + colorTransform_frag       | ColorMatrixFilter                  | ShaderLib |
 | default_vert + glow_frag                 | Glow/DropShadow                    | ShaderLib |
-| default_vert + blur_h_frag / blur_v_frag | 水平/垂直模糊（ping-pong 双 pass） | ShaderLib |
+| fullscreen_vert + makeBlurH/ VFrag | 水平/垂直模糊（ping-pong 双 pass） | ShaderLib |
 | default_vert + primitive_frag            | 纯色矩形（stencil mask）           | ShaderLib |
 | fullscreen_vert                          | 全屏 quad blit（滤镜 pass）        | ShaderLib |
 
 WebGL2（ShaderLib2）提供等价的 GLSL ES 3.00 版本着色器，使用 `in`/`out` 语法替代 `attribute`/`varying`，
-`texture()` 替代 `texture2D()`，blur 着色器使用运行时生成的权重数组。
+`texture()` 替代 `texture2D()`，blur 着色器按 4/8/16/32 档生成固定上限循环，仍使用三角权重核。
 
 ### 4.4 滤镜渲染
 
@@ -256,22 +256,26 @@ WebGL2（ShaderLib2）提供等价的 GLSL ES 3.00 版本着色器，使用 `in`
 
 合成流程（`compositeFilterResult`）：
 
-1. `flush()` — 执行所有待处理的批处理命令，确保离屏 FBO 内容完整
-2. BlurFilter ping-pong — 直接 GL 调用，不经过批处理队列
-3. 显式激活父 buffer FBO — 防止批处理系统的 FBO 状态与实际 GL 状态不一致
-4. `drawTexture()` — 通过批处理路径绘制，利用父 buffer 的 `globalMatrix` 正确定位
-5. 立即 `flush()` — 在 FBO 状态已知正确时执行绘制，防止 feedback loop
+1. `flush()` 确保离屏输入完整。
+2. `WebGLFilterSystem` 按数组顺序执行；中间 pass 关闭 blend/stencil/scissor，使用独立输出。
+3. 显式恢复父 FBO、viewport 与裁剪状态。
+4. 使用 `drawFramebufferTexture()` 合成最终结果，不重复应用已经写入子树的 alpha/tint。
+5. 立即 flush 后归还中间纹理；失败时清理 pass 资源与待执行命令，下一帧可以恢复。
 
-各滤镜实现：
+- **ColorMatrixFilter**：无 mask 的叶子、单滤镜、继承分辨率时保留 inline 快速路径；组与组合走离屏。
+- **BlurFilter**：横纵分离，quality 控制 pass 对数；大半径先降采样，使 shader 半径不超过 32 物理像素。
+- **Glow / DropShadow**：保留原有 `glow_frag`；knockout 绑定与“是否保留原图”的 shader 语义对应。
+- **CustomFilter**：显式 GLSL 100/300 源码、按链接类型校验 numeric uniforms、独立采样的辅助 BitmapData 上传。
+- **MultiPassFilter / BloomFilter**：有序无环 pass 图，可读取原图或较早输出，支持各 pass 缩放。
 
-- **ColorMatrixFilter**：inline 优化路径，无离屏 FBO，直接设置 `activeFilter` 让叶子指令带滤镜绘制
-- **BlurFilter**：ping-pong 双 pass 分离模糊（水平 → 临时 FBO → 垂直 → 离屏 FBO）。blurFboPool 缓存复用 FBO 对
-- **GlowFilter / DropShadowFilter**：单 pass `glow_frag` 着色器，共用同一 shader 程序
-- **CustomFilter**：用户自定义顶点/片段着色器，通过 `shaderKey` 自动缓存编译
+`WebGLFilterTargetPool` 缓存中间 GPU 目标，空闲上限 16 个 / 64 MiB；子树捕获缓冲与辅助图片不计入这个限制。
+`WebGLFilterTextures` 管理辅助图像上传和恢复。着色器编译缓存按 GL context 与实际源码隔离。
 
-Filter padding：离屏 buffer 按 `Filter.getPadding()` 扩展尺寸，`_setOffscreenOrigin` 计算世界坐标偏移，使内容的 bounds 原点落在 buffer 的 `(padX, padY)` 位置。
+Filter padding 按链累加，并包含子级效果的渲染范围，不修改布局 bounds。
+离屏 pass 统一使用 framebuffer UV（左下为 0,0），每一步保持图像方向。
+DropShadow 传入正常角度弧度；辅助 DOM 图片的自动 UV 矩阵负责纵向转换。
 
-**纹理坐标 Y 轴注意事项**：顶点着色器通过 `projectionY = -h/2` 翻转 Y 轴使屏幕坐标系 Y 向下，但纹理坐标未翻转（WebGL 默认 Y=0 在底部）。普通渲染不受影响（UV 在 `cacheArrays` 中已正确映射），但 shader 内部做纹理坐标偏移时需注意方向。DropShadowFilter 的 angle uniform 传入时取反（`-angle`）以补偿 `sin` 分量的 Y 方向差异。
+具体 API、示例、Canvas 与缓存限制见 [GPU filters](filters.md)。
 
 ### 4.5 遮罩渲染
 

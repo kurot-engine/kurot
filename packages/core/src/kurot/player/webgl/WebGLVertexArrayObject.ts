@@ -14,7 +14,9 @@ const MAX_VERTS = MAX_QUADS * 4;
 const MAX_INDICES = MAX_QUADS * 6;
 
 export class WebGLVertexArrayObject {
-	// ── Static fields ─────────────────────────────────────────────────────────
+	// ── Static fields ───────────────────────────────────────────────────────
+	public static readonly MAX_VERTICES: number = MAX_VERTS;
+	public static readonly MAX_INDICES: number = MAX_INDICES;
 
 	/**
 	 * Maximum byte size of the vertex buffer (single-texture layout).

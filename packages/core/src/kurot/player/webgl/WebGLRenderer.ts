@@ -153,43 +153,46 @@ export class WebGLRenderer {
 		const ctx = buffer.context;
 		ctx.pushBuffer(buffer);
 
-		this._rootTransform.copyFrom(matrix);
-		buffer.setTransform(matrix.a, matrix.b, matrix.c, matrix.d, 0, 0);
+		try {
+			this._rootTransform.copyFrom(matrix);
+			buffer.setTransform(matrix.a, matrix.b, matrix.c, matrix.d, 0, 0);
 
-		const set = this._instructionSet;
+			const set = this._instructionSet;
 
-		// ── Phase A: build instructions if scene structure changed ────────────
-		if (set.structureDirty) {
-			this._releaseInstructions(set);
-			set.reset();
-			buffer.globalAlpha = 1;
-			buffer.globalTintColor = 0xffffff;
-			this._buildInstructions(displayObject, set, buffer, matrix.tx, matrix.ty, STAGE_BUILD_OPTIONS);
-			set.structureDirty = false;
-		} else {
-			// ── Partial update: patch GPU data for dirty renderables ──────────
-			this._updateDirtyRenderables(set);
-			this._prepareRenderGroups(set, buffer);
+			// ── Phase A: build instructions if scene structure changed ────────────
+			if (set.structureDirty) {
+				this._releaseInstructions(set);
+				set.reset();
+				buffer.globalAlpha = 1;
+				buffer.globalTintColor = 0xffffff;
+				this._buildInstructions(displayObject, set, buffer, matrix.tx, matrix.ty, STAGE_BUILD_OPTIONS);
+				set.structureDirty = false;
+			} else {
+				// ── Partial update: patch GPU data for dirty renderables ──────────
+				this._updateDirtyRenderables(set);
+				this._prepareRenderGroups(set, buffer);
+			}
+
+			// ── Phase B: execute ──────────────────────────────────────────────────
+			this._executeInstructions(set, buffer);
+
+			ctx.flush();
+			const drawCalls = buffer.drawCalls;
+			buffer.onRenderFinish();
+			displayObject.$renderDirty = false;
+			return drawCalls;
+		} catch (error) {
+			ctx.$abortFrame(buffer);
+			this.markStructureDirty();
+			throw error;
+		} finally {
+			ctx.popBuffer();
+			buffer.setTransform(1, 0, 0, 1, 0, 0);
+			this._nestLevel--;
+			if (this._nestLevel === 0) {
+				WebGLRenderBuffer.release(WebGLRenderBuffer.create(buffer.context, 0, 0));
+			}
 		}
-
-		// ── Phase B: execute ──────────────────────────────────────────────────
-		this._executeInstructions(set, buffer);
-
-		ctx.flush();
-		const drawCalls = buffer.drawCalls;
-		buffer.onRenderFinish();
-
-		ctx.popBuffer();
-
-		buffer.setTransform(1, 0, 0, 1, 0, 0);
-
-		displayObject.$renderDirty = false;
-
-		this._nestLevel--;
-		if (this._nestLevel === 0) {
-			WebGLRenderBuffer.release(WebGLRenderBuffer.create(buffer.context, 0, 0));
-		}
-		return drawCalls;
 	}
 
 	// ── Phase A: build ────────────────────────────────────────────────────────
@@ -356,6 +359,18 @@ export class WebGLRenderer {
 			this._buildInstructions(obj, set, buffer, offsetX, offsetY, options);
 			return;
 		}
+		let clip: MaskPushInstruction | undefined;
+		if (obj.$mask || obj.$scrollRect || obj.$maskRect) {
+			clip = Object.assign(MaskPipe.makePush(obj, offsetX, offsetY), {
+				transform: this._snapshotTransform(buffer, offsetX, offsetY),
+			});
+			clip.isScrollRect = !obj.$mask;
+			set.addIndexed(clip);
+			if (clip.isScrollRect && obj.$scrollRect) {
+				offsetX -= obj.$scrollRect.x;
+				offsetY -= obj.$scrollRect.y;
+			}
+		}
 		const transform = this._snapshotTransform(buffer, offsetX, offsetY);
 		const push = Object.assign(FilterPipe.makePush(obj, filters, offsetX, offsetY), {
 			transform,
@@ -363,6 +378,7 @@ export class WebGLRenderer {
 		set.addIndexed(push);
 		this._buildInstructions(obj, set, buffer, offsetX, offsetY, options);
 		set.add(FilterPipe.makePop(obj, push as FilterPushInstruction));
+		if (clip) { set.add(MaskPipe.makePop(obj, clip)); }
 	}
 
 	private _buildClip(
@@ -589,104 +605,112 @@ export class WebGLRenderer {
 	private _executeInstructions(set: InstructionSet, buffer: WebGLRenderBuffer): void {
 		const offscreenStack: (WebGLRenderBuffer | undefined)[] = [];
 		const scissorStack: boolean[] = [];
+		const parentBuffers: WebGLRenderBuffer[] = [];
 		let activeBuffer = buffer;
 
-		for (let i = 0; i < set.instructionSize; i++) {
-			const inst = set.instructions[i] as AnyInstruction;
+		try {
+			for (let i = 0; i < set.instructionSize; i++) {
+				const inst = set.instructions[i] as AnyInstruction;
 
-			switch (inst.renderPipeId) {
-				// ── Leaf nodes ────────────────────────────────────────────────
-				case 'bitmap':
-				case 'mesh':
-				case 'graphics':
-				case 'text':
-				case 'particle': {
-					const leaf = inst as LeafInstruction;
-					this._applyTransform(activeBuffer, leaf.transform);
-					this._executeLeafInstruction(leaf, activeBuffer);
-					break;
-				}
-
-				// ── DisplayList cache ─────────────────────────────────────────
-				case 'displayListCache': {
-					const cacheInst = inst as DisplayListCacheInstruction;
-					this._applyTransform(activeBuffer, cacheInst.transform);
-					this._executeDisplayListCache(cacheInst.renderable, activeBuffer);
-					break;
-				}
-
-				// ── RenderGroup ───────────────────────────────────────────────
-				case 'renderGroup': {
-					const rgInst = inst as RenderGroupInstruction;
-					this._applyTransform(activeBuffer, rgInst.transform);
-					this._executeInstructions(rgInst.set, activeBuffer);
-					break;
-				}
-
-				// ── Filter push/pop ───────────────────────────────────────────
-				case 'filterPush': {
-					const push = inst as FilterPushInstruction;
-					const pushT = (push as EffectPushInstruction).transform;
-					this._applyTransform(activeBuffer, pushT);
-
-					const offscreen = this._filterPipe.executePush(push, activeBuffer);
-					offscreenStack.push(offscreen);
-					if (offscreen) {
-						this._configureOffscreenTransform(offscreen, push.renderable.$getOriginalBounds(), pushT);
-						activeBuffer = offscreen;
+				switch (inst.renderPipeId) {
+					// ── Leaf nodes ────────────────────────────────────────────────
+					case 'bitmap':
+					case 'mesh':
+					case 'graphics':
+					case 'text':
+					case 'particle': {
+						const leaf = inst as LeafInstruction;
+						this._applyTransform(activeBuffer, leaf.transform);
+						this._executeLeafInstruction(leaf, activeBuffer);
+						break;
 					}
-					break;
-				}
-				case 'filterPop': {
-					const pop = inst as FilterPopInstruction;
-					const offscreen = offscreenStack.pop();
 
-					if (offscreen)
-						activeBuffer =
-							offscreenStack.length > 0 ? (offscreenStack[offscreenStack.length - 1] ?? buffer) : buffer;
-					this._applyTransform(activeBuffer, (pop.push as EffectPushInstruction).transform);
-					this._filterPipe.executePop(pop, activeBuffer, offscreen);
-					break;
-				}
+					// ── DisplayList cache ─────────────────────────────────────────
+					case 'displayListCache': {
+						const cacheInst = inst as DisplayListCacheInstruction;
+						this._applyTransform(activeBuffer, cacheInst.transform);
+						this._executeDisplayListCache(cacheInst.renderable, activeBuffer);
+						break;
+					}
 
-				// ── Mask / clip push/pop ──────────────────────────────────────
-				case 'maskPush': {
-					const push = inst as MaskPushInstruction;
-					const pushT = (push as EffectPushInstruction).transform;
-					this._applyTransform(activeBuffer, pushT);
-					if (push.isScrollRect) {
-						const usedScissor = this._maskPipe.executeScrollRectPush(push, activeBuffer);
-						scissorStack.push(usedScissor);
-						offscreenStack.push(undefined);
-					} else {
-						const displayBuffer = this._maskPipe.executeClipPush(push, activeBuffer);
-						offscreenStack.push(displayBuffer);
-						if (displayBuffer) {
-							this._configureOffscreenTransform(displayBuffer, push.renderable.$getOriginalBounds(), pushT);
-							activeBuffer = displayBuffer;
+					// ── RenderGroup ───────────────────────────────────────────────
+					case 'renderGroup': {
+						const rgInst = inst as RenderGroupInstruction;
+						this._applyTransform(activeBuffer, rgInst.transform);
+						this._executeInstructions(rgInst.set, activeBuffer);
+						break;
+					}
+
+					// ── Filter push/pop ───────────────────────────────────────────
+					case 'filterPush': {
+						const push = inst as FilterPushInstruction;
+						const pushT = (push as EffectPushInstruction).transform;
+						this._applyTransform(activeBuffer, pushT);
+
+						parentBuffers.push(activeBuffer);
+						const offscreen = this._filterPipe.executePush(push, activeBuffer);
+						offscreenStack.push(offscreen);
+						if (offscreen) {
+							this._configureOffscreenTransform(offscreen, offscreen.filterBounds ?? push.renderable.$getOriginalBounds(), pushT);
+							activeBuffer = offscreen;
 						}
+						break;
 					}
-					break;
-				}
-				case 'maskPop': {
-					const pop = inst as MaskPopInstruction;
-					if (pop.push.isScrollRect) {
-						const usedScissor = scissorStack.pop() ?? false;
-						offscreenStack.pop();
-						this._maskPipe.executeScrollRectPop(activeBuffer, usedScissor);
-					} else {
-						const displayBuffer = offscreenStack.pop();
-						if (displayBuffer)
-							activeBuffer =
-								offscreenStack.length > 0
-									? (offscreenStack[offscreenStack.length - 1] ?? buffer)
-									: buffer;
+					case 'filterPop': {
+						const pop = inst as FilterPopInstruction;
+						const offscreen = offscreenStack.pop();
+
+						activeBuffer = parentBuffers.pop() ?? buffer;
 						this._applyTransform(activeBuffer, (pop.push as EffectPushInstruction).transform);
-						this._maskPipe.executeClipPop(pop, activeBuffer, displayBuffer);
+						this._filterPipe.executePop(pop, activeBuffer, offscreen);
+						break;
 					}
-					break;
+
+					// ── Mask / clip push/pop ──────────────────────────────────────
+					case 'maskPush': {
+						const push = inst as MaskPushInstruction;
+						const pushT = (push as EffectPushInstruction).transform;
+						this._applyTransform(activeBuffer, pushT);
+						parentBuffers.push(activeBuffer);
+						if (push.isScrollRect) {
+							const usedScissor = this._maskPipe.executeScrollRectPush(push, activeBuffer);
+							scissorStack.push(usedScissor);
+							offscreenStack.push(undefined);
+						} else {
+							const displayBuffer = this._maskPipe.executeClipPush(push, activeBuffer);
+							offscreenStack.push(displayBuffer);
+							if (displayBuffer) {
+								this._configureOffscreenTransform(displayBuffer, push.renderable.$getOriginalBounds(), pushT);
+								activeBuffer = displayBuffer;
+							}
+						}
+						break;
+					}
+					case 'maskPop': {
+						const pop = inst as MaskPopInstruction;
+						const parentBuffer = parentBuffers.pop() ?? buffer;
+						if (pop.push.isScrollRect) {
+							const usedScissor = scissorStack.pop() ?? false;
+							offscreenStack.pop();
+							this._maskPipe.executeScrollRectPop(activeBuffer, usedScissor);
+						} else {
+							const displayBuffer = offscreenStack.pop();
+							activeBuffer = parentBuffer;
+							this._applyTransform(activeBuffer, (pop.push as EffectPushInstruction).transform);
+							this._maskPipe.executeClipPop(pop, activeBuffer, displayBuffer);
+						}
+						break;
+					}
 				}
 			}
+		} catch (error) {
+			buffer.context.$abortFrame(buffer);
+			for (const offscreen of offscreenStack) {
+				if (offscreen) {
+					WebGLRenderBuffer.release(offscreen);
+				}
+			}
+			throw error;
 		}
 	}
 
