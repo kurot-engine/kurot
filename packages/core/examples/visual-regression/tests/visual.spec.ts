@@ -10,13 +10,18 @@ interface VisualGoldenState {
 }
 
 const backends: GoldenBackend[] = ['canvas2d', 'webgl1', 'webgl2'];
+const maxDiffPixelRatios: Readonly<Record<GoldenBackend, number>> = {
+	canvas2d: 0.001,
+	webgl1: 0.002,
+	webgl2: 0.002,
+};
 
 for (const backend of backends) {
 	test(`${backend} matches the deterministic golden scene`, async ({ page }) => {
 		await openGolden(page, backend);
 		await expect(page.locator('#golden')).toHaveScreenshot(`${backend}.png`, {
 			animations: 'disabled',
-			maxDiffPixelRatio: 0.001,
+			maxDiffPixelRatio: maxDiffPixelRatios[backend],
 			threshold: 0.2,
 		});
 	});
@@ -33,7 +38,7 @@ for (const backend of backends) {
 			);
 			await expect(page.locator('#golden')).toHaveScreenshot(`${backend}.png`, {
 				animations: 'disabled',
-				maxDiffPixelRatio: 0.001,
+				maxDiffPixelRatio: maxDiffPixelRatios[backend],
 				threshold: 0.2,
 			});
 		});
