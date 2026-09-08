@@ -7,6 +7,21 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 1.1.4 — 2026-09-09
+
+### Changed
+
+- New game projects now place the default EUI atlas at
+  `resource/assets/ui/eui/eui.json` and
+  `resource/assets/ui/eui/eui.png`.
+- The generated `default.res.json` now references the atlas through its new
+  `assets/ui/eui/eui.json` path.
+
+### Tests
+
+- Added template regression coverage for the nested EUI atlas layout and the
+  absence of legacy copies under `resource/assets/`.
+
 ## 1.1.3 — 2026-08-30
 
 ### Fixed
