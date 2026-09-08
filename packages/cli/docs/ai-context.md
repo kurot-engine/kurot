@@ -249,7 +249,7 @@ watching itself happens separately, inside `compileSource`'s own
 Confirmed file lists (from directory listing, not the README):
 - **`templates/game/`**: `kurot.config.ts`, `package.json`,
   `pnpm-workspace.yaml`, `tsconfig.json`,
-  `resource/{default.res.json, default.thm.json, assets/{eui.json, eui.png},
+	`resource/{default.res.json, default.thm.json, assets/ui/eui/{eui.json, eui.png},
   skins/*.exml}` (21 skin files), `src/{Main.ts, LoadingUI.ts}`,
   `template/web/{index.html, logo.png}`.
 - **`templates/empty/`**: `kurot.config.ts`, `package.json`,

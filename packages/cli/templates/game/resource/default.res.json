@@ -9,7 +9,7 @@
 		{
 			"name": "eui",
 			"type": "sheet",
-			"url": "assets/eui.json"
+			"url": "assets/ui/eui/eui.json"
 		}
 	]
 }
