@@ -4,6 +4,8 @@ import { Animation } from './Animation.js';
 // ── Constants ──────────────────────────────────────────────────────────
 
 const MAX_VELOCITY_COUNT = 4;
+const MINIMUM_VELOCITY = 0.02;
+const FRICTION_LOG = Math.log(0.998);
 
 function easeOut(ratio: number): number {
 	const inv = ratio - 1.0;
@@ -47,6 +49,7 @@ export class TouchScroll {
 		this._endFunction = endFunction;
 		this._animation = new Animation(this._onScrollingUpdate, this);
 		this._animation.easerFunction = easeOut;
+		this._animation.endFunction = () => this._endFunction();
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────
@@ -104,6 +107,8 @@ export class TouchScroll {
 	}
 
 	public finish(currentScrollPos: number, maxScrollPos: number): void {
+		this._currentScrollPos = currentScrollPos;
+		this._maxScrollPos = maxScrollPos = Math.max(0, maxScrollPos);
 		ticker.stopTick(this._onTick, this);
 		this._started = false;
 
@@ -111,7 +116,20 @@ export class TouchScroll {
 			const posTo = Math.max(0, Math.min(maxScrollPos, currentScrollPos));
 			this._throwTo(posTo, 300);
 		} else {
-			this._endFunction();
+			let velocity = this._velocity * 2;
+			let weight = 2;
+			for (let i = 0; i < this._previousVelocity.length; i++) {
+				velocity += this._previousVelocity[i]! * (i + 1);
+				weight += i + 1;
+			}
+			velocity = velocity / weight * Math.max(0, this.scrollFactor);
+			if (getTimer() - this._previousTime > 100 || Math.abs(velocity) <= MINIMUM_VELOCITY) {
+				this._endFunction();
+				return;
+			}
+			const duration = Math.min(1500, Math.log(MINIMUM_VELOCITY / Math.abs(velocity)) / FRICTION_LOG);
+			const distance = velocity * (1 - Math.exp(FRICTION_LOG * duration)) / -FRICTION_LOG;
+			this._throwTo(Math.max(0, Math.min(maxScrollPos, currentScrollPos - distance)), duration);
 		}
 	}
 

@@ -143,7 +143,7 @@ export abstract class LinearLayoutBase extends LayoutBase {
 		const target = this.target;
 		if (!target) return;
 
-		if (target.numChildren === 0) {
+		if ((this._useVirtualLayout ? target.numElements : target.numChildren) === 0) {
 			target.setContentSize(
 				Math.ceil(this._paddingLeft + this._paddingRight),
 				Math.ceil(this._paddingTop + this._paddingBottom),

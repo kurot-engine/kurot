@@ -228,6 +228,13 @@ export class TileLayout extends LayoutBase {
 		super.clearVirtualLayoutCache();
 		this._maxElementWidth = 0;
 		this._maxElementHeight = 0;
+		this._startIndex = this._endIndex = -1;
+		this._indexInViewCalculated = false;
+	}
+
+	public override getElementIndicesInView(): number[] {
+		if (this._startIndex < 0 || this._endIndex < this._startIndex) return [];
+		return Array.from({ length: this._endIndex - this._startIndex + 1 }, (_, i) => this._startIndex + i);
 	}
 
 	public override scrollPositionChanged(): void {
@@ -306,6 +313,9 @@ export class TileLayout extends LayoutBase {
 		}
 
 		const endIdx = this._endIndex;
+		if (this._useVirtualLayout) {
+			target.setVirtualElementIndicesInView(this._startIndex, endIdx);
+		}
 
 		const orientedByColumns = this._orientation === TileOrientation.COLUMNS;
 		let index = this._startIndex;
@@ -317,7 +327,7 @@ export class TileLayout extends LayoutBase {
 		const rowHeight = this._rowHeight;
 
 		for (let i = this._startIndex; i <= endIdx; i++) {
-			const el = asLayoutElement(target, i);
+			const el = asLayoutElement(target, i, this._useVirtualLayout);
 			if (!el || !el.includeInLayout) {
 				continue;
 			}
@@ -395,7 +405,8 @@ export class TileLayout extends LayoutBase {
 		let maxH = this._maxElementHeight;
 		if (startIdx !== -1 && endIdx !== -1) {
 			for (let i = startIdx; i <= endIdx; i++) {
-				const el = asLayoutElement(this.target!, i);
+				const child = this._useVirtualLayout ? this.target!.getElementAt(i) : this.target!.getChildAt(i);
+				const el = child as IUIComponent | undefined;
 				if (!el || !el.includeInLayout) continue;
 				el.getPreferredBounds(tmpBounds);
 				maxW = Math.max(maxW, tmpBounds.width);
@@ -412,8 +423,8 @@ export class TileLayout extends LayoutBase {
 		const vGap = isNaN(this._verticalGap) ? 0 : this._verticalGap;
 		this._rowCount = this._columnCount = -1;
 
-		let numElements = target.numChildren;
-		for (let i = 0; i < target.numChildren; i++) {
+		let numElements = this._useVirtualLayout ? target.numElements : target.numChildren;
+		for (let i = 0; !this._useVirtualLayout && i < target.numChildren; i++) {
 			const el = asLayoutElement(target, i);
 			if (el && !el.includeInLayout) numElements--;
 		}
@@ -473,12 +484,12 @@ export class TileLayout extends LayoutBase {
 
 	private _getIndexInView(): boolean {
 		const target = this.target;
-		if (!target || target.numChildren === 0) {
+		if (!target || (this._useVirtualLayout ? target.numElements : target.numChildren) === 0) {
 			this._startIndex = this._endIndex = -1;
 			return false;
 		}
 
-		const numElements = target.numChildren;
+		const numElements = this._useVirtualLayout ? target.numElements : target.numChildren;
 		if (!this._useVirtualLayout) {
 			this._startIndex = 0;
 			this._endIndex = numElements - 1;
@@ -622,8 +633,8 @@ export class TileLayout extends LayoutBase {
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
-function asLayoutElement(target: ILayoutTarget, index: number): IUIComponent | undefined {
-	const child = target.getChildAt(index);
+function asLayoutElement(target: ILayoutTarget, index: number, virtual = false): IUIComponent | undefined {
+	const child = virtual ? target.getVirtualElementAt(index) : target.getChildAt(index);
 	if (!child) return undefined;
 	const el = child as unknown as IUIComponent;
 	if (typeof el.getPreferredBounds === 'function') return el;

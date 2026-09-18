@@ -75,7 +75,7 @@ describe('temporary Stage gesture listeners', () => {
 		stage.removeChild(scroller);
 
 		expect(removeListener).toHaveBeenCalledWith(TouchEvent.TOUCH_MOVE, expect.any(Function));
-		expect(removeListener).toHaveBeenCalledWith(TouchEvent.TOUCH_END, expect.any(Function));
-		expect(removeListener).toHaveBeenCalledWith(TouchEvent.TOUCH_CANCEL, expect.any(Function));
+		expect(removeListener).toHaveBeenCalledWith(TouchEvent.TOUCH_END, expect.any(Function), true);
+		expect(removeListener).toHaveBeenCalledWith(TouchEvent.TOUCH_CANCEL, expect.any(Function), true);
 	});
 });

@@ -4,6 +4,29 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [1.1.12] — 2026-09-18
+
+### Fixed
+
+- Handle Scroller touch-end and touch-cancel on Stage in the capture phase,
+  before viewport event suppression. Drag release now clears gesture state
+  and starts rebound instead of leaving the viewport stuck out of bounds.
+- Restore TouchScroll release inertia using recent velocity samples and
+  bounded throw targets. Rebound and throw animations now notify completion,
+  while interrupted animations stop without a stale completion callback.
+- Complete TileLayout virtual item counting, visible renderer creation,
+  offscreen recycling, index reporting, and measurement by data index.
+- Prevent HorizontalLayout and VerticalLayout from treating an unpopulated
+  virtual display list as an empty data source.
+
+### Tests
+
+- Add regressions for propagated drag release, inertia direction and bounds,
+  rebound completion, interruption, and virtual renderer creation/recycling
+  across tile, horizontal, and vertical layouts.
+- Verify virtual tile measurement and empty collections, and retain
+  BasicLayout's explicit non-virtual layout contract.
+
 ## [1.1.11] — 2026-09-04
 
 ### Fixed

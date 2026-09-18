@@ -306,8 +306,9 @@ export class Scroller extends Component {
 		if (stage) {
 			this._touchStage = stage;
 			stage.addEventListener(TouchEvent.TOUCH_MOVE, this._onTouchMove);
-			stage.addEventListener(TouchEvent.TOUCH_END, this._onTouchEnd);
-			stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onTouchEnd);
+			// Finish before viewport capture suppresses the child's touch-end event.
+			stage.addEventListener(TouchEvent.TOUCH_END, this._onTouchEnd, true);
+			stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onTouchEnd, true);
 		}
 	};
 
@@ -315,8 +316,8 @@ export class Scroller extends Component {
 		const stage = this._touchStage;
 		if (stage) {
 			stage.removeEventListener(TouchEvent.TOUCH_MOVE, this._onTouchMove);
-			stage.removeEventListener(TouchEvent.TOUCH_END, this._onTouchEnd);
-			stage.removeEventListener(TouchEvent.TOUCH_CANCEL, this._onTouchEnd);
+			stage.removeEventListener(TouchEvent.TOUCH_END, this._onTouchEnd, true);
+			stage.removeEventListener(TouchEvent.TOUCH_CANCEL, this._onTouchEnd, true);
 		}
 		this._touchStage = undefined;
 	}
