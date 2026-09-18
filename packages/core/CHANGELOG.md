@@ -4,6 +4,26 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.22] — 2026-09-18
+
+### Fixed
+
+- Trimmed atlas Bitmap content and offsets now scale within the original
+  untrimmed canvas size, instead of stretching the cropped image to fill it.
+  This fixes oversized UI icons in both WebGL and Canvas, including tinted
+  Canvas drawing.
+- WebGL nine-slice drawing now subtracts trimmed transparent margins before
+  calculating the stretched area and preserves fixed borders. Texture scale
+  factors are applied when converting between source pixels and logical sizes.
+
+### Tests
+
+- Added 10 regressions covering trimmed and untrimmed Bitmaps, independent
+  axis scaling, rotated texture metadata, zero sizes, nine-slice drawing,
+  small-size fallback, and Canvas tint paths.
+- Core unit suite passes: 65 test files and 698 tests.
+- TypeScript implementation and declaration builds pass.
+
 ## [1.0.21] — 2026-09-07
 
 This release completes the WebGL custom-filter path and adds ordered multi-pass

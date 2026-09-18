@@ -5,7 +5,7 @@ import { Sprite } from '../../display/Sprite.js';
 import { Mesh } from '../../display/Mesh.js';
 import { Graphics, setGraphicsHitTest } from '../../display/Graphics.js';
 import { PathCommandType, type GraphicsCommand } from '../../display/GraphicsPath.js';
-import { Texture } from '../../display/texture/Texture.js';
+import { Texture, textureScaleFactor } from '../../display/texture/Texture.js';
 import { Matrix } from '../../geom/Matrix.js';
 import { Rectangle } from '../../geom/Rectangle.js';
 import { BlurFilter } from '../../filters/BlurFilter.js';
@@ -523,7 +523,15 @@ export class CanvasRenderer {
 
 		const destW = !isNaN(bitmap.width) ? bitmap.width : bitmap.textureWidth;
 		const destH = !isNaN(bitmap.height) ? bitmap.height : bitmap.textureHeight;
-		if (destW <= 0 || destH <= 0) return 0;
+		if (destW <= 0 || destH <= 0 || bitmap.textureWidth <= 0 || bitmap.textureHeight <= 0) return 0;
+
+		// Scale trim offsets and content within the requested untrimmed canvas size.
+		const scaleX = destW / bitmap.textureWidth;
+		const scaleY = destH / bitmap.textureHeight;
+		const drawX = offsetX + bitmap.bitmapOffsetX * scaleX;
+		const drawY = offsetY + bitmap.bitmapOffsetY * scaleY;
+		const drawW = bitmap.bitmapWidth * textureScaleFactor * scaleX;
+		const drawH = bitmap.bitmapHeight * textureScaleFactor * scaleY;
 
 		ctx.imageSmoothingEnabled = bitmap.smoothing;
 		if (this._globalTint === 0xffffff) {
@@ -533,18 +541,18 @@ export class CanvasRenderer {
 				bitmap.bitmapY,
 				bitmap.bitmapWidth,
 				bitmap.bitmapHeight,
-				offsetX + bitmap.bitmapOffsetX,
-				offsetY + bitmap.bitmapOffsetY,
-				destW,
-				destH,
+				drawX,
+				drawY,
+				drawW,
+				drawH,
 			);
 		} else {
 			ctx.drawImage(
 				this.getTintedBitmapSource(bitmap, this._globalTint),
-				offsetX + bitmap.bitmapOffsetX,
-				offsetY + bitmap.bitmapOffsetY,
-				destW,
-				destH,
+				drawX,
+				drawY,
+				drawW,
+				drawH,
 			);
 		}
 		return 1;

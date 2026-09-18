@@ -1,4 +1,5 @@
 import type { Bitmap } from '../../display/Bitmap.js';
+import { textureScaleFactor } from '../../display/texture/Texture.js';
 import type { RenderBuffer } from '../RenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
@@ -45,7 +46,7 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 
 		const destW = !isNaN(bitmap.width) ? bitmap.width : bitmap.textureWidth;
 		const destH = !isNaN(bitmap.height) ? bitmap.height : bitmap.textureHeight;
-		if (destW <= 0 || destH <= 0) return;
+		if (destW <= 0 || destH <= 0 || bitmap.textureWidth <= 0 || bitmap.textureHeight <= 0) return;
 
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
@@ -54,16 +55,19 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 		if (grid) {
 			this._drawScale9(bitmap, bd, grid, destW, destH, buffer);
 		} else {
+			// Destination size describes the untrimmed canvas, not the cropped atlas region.
+			const scaleX = destW / bitmap.textureWidth;
+			const scaleY = destH / bitmap.textureHeight;
 			buffer.context.drawImage(
 				bd,
 				bitmap.bitmapX,
 				bitmap.bitmapY,
 				bitmap.bitmapWidth,
 				bitmap.bitmapHeight,
-				bitmap.bitmapOffsetX,
-				bitmap.bitmapOffsetY,
-				destW,
-				destH,
+				bitmap.bitmapOffsetX * scaleX,
+				bitmap.bitmapOffsetY * scaleY,
+				bitmap.bitmapWidth * textureScaleFactor * scaleX,
+				bitmap.bitmapHeight * textureScaleFactor * scaleY,
 				bitmap.sourceWidth,
 				bitmap.sourceHeight,
 				bitmap.texture?.rotated ?? false,
@@ -108,18 +112,24 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 		const sh = bitmap.sourceHeight;
 		const rotated = bitmap.texture?.rotated ?? false;
 		const smoothing = bitmap.smoothing;
+		const scale = textureScaleFactor;
 
-		const srcW0 = grid.x - ox;
-		const srcH0 = grid.y - oy;
-		const srcW1 = grid.width;
-		const srcH1 = grid.height;
+		// Nine-slice keeps transparent margins and borders fixed, stretching only the inner area.
+		destW -= bitmap.textureWidth - bw * scale;
+		destH -= bitmap.textureHeight - bh * scale;
+		if (destW <= 0 || destH <= 0) return;
+
+		const srcW0 = (grid.x - ox) / scale;
+		const srcH0 = (grid.y - oy) / scale;
+		const srcW1 = grid.width / scale;
+		const srcH1 = grid.height / scale;
 		const srcW2 = bw - srcW0 - srcW1;
 		const srcH2 = bh - srcH0 - srcH1;
 
-		const tgtW0 = srcW0;
-		const tgtH0 = srcH0;
-		const tgtW2 = srcW2;
-		const tgtH2 = srcH2;
+		const tgtW0 = srcW0 * scale;
+		const tgtH0 = srcH0 * scale;
+		const tgtW2 = srcW2 * scale;
+		const tgtH2 = srcH2 * scale;
 
 		if (tgtW0 + tgtW2 > destW || tgtH0 + tgtH2 > destH) {
 			buffer.context.drawImage(bd, bx, by, bw, bh, ox, oy, destW, destH, sw, sh, rotated, smoothing);
