@@ -1,4 +1,4 @@
-import { EventDispatcher, DisplayObjectContainer, type DisplayObject } from '@kurot/core';
+import { EventDispatcher, DisplayObjectContainer, ticker, type DisplayObject } from '@kurot/core';
 import type { IUIComponent } from './IUIComponent.js';
 
 type QueueClient = IUIComponent & DisplayObject;
@@ -7,8 +7,8 @@ type ValidatorClient = QueueClient;
 /**
  * Schedules deferred validation for UI components.
  *
-	 * Validation runs properties from shallowest to deepest, size from deepest
-	 * to shallowest, then display lists from shallowest to deepest.
+ * Validation runs properties from shallowest to deepest, size from deepest
+ * to shallowest, then display lists from shallowest to deepest.
  */
 export class Validator extends EventDispatcher {
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -130,11 +130,7 @@ export class Validator extends EventDispatcher {
 	private _schedule(): void {
 		if (this._scheduled) return;
 		this._scheduled = true;
-		const tick =
-			typeof requestAnimationFrame !== 'undefined'
-				? (cb: () => void) => requestAnimationFrame(cb)
-				: (cb: () => void) => setTimeout(cb, 0);
-		tick(() => this._flush());
+		ticker.callLater(() => this._flush());
 	}
 
 	private _flush(): void {

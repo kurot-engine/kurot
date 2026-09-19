@@ -6,7 +6,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@2.1.0`, EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@2.1.1`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 
@@ -21,7 +21,7 @@ src/kurot/
 ├── core/           Layout contract + state machine + theming.
 │                   IUIComponent (interface every UI component implements),
 │                   UIState (the actual layout state machine — see §3),
-│                   Validator/validator (global RAF-batched validation scheduler),
+│                   Validator/validator (render-preparation validation scheduler),
 │                   Theme/getTheme()/setTheme(), IViewport, IAssetAdapter/IThemeAdapter.
 ├── components/     Group, Component (delegation core — see §2), Skin, and
 │                   concrete widgets: Button, Label, CheckBox, RadioButton,
@@ -124,7 +124,7 @@ Skin` constructors (detected via regex on `Function.prototype.toString()`,
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `UIState`                                          | The actual layout state machine every `Group`/`Component` delegates to via `this.ui`. Owns constraint fields (left/right/top/bottom/center/percent) packed into a `Record<K, number\|boolean>` keyed by a numeric `const enum K`. Talks back to its host only through the narrow `IUIOwner` interface, decoupling it from any specific DisplayObject subclass.                                                    | `core/UIState.ts`                                                                       |
 | `IUIOwner`                                         | The callback interface `UIState` uses to talk back to its host component (`createChildren()`, `commitProperties()`, `measure()`, `updateDisplayList()`, `childrenCreated()`). Implemented by `Group` and `Component`.                                                                                                                                                                                             | `core/UIState.ts`                                                    |
-| Validation cycle                                   | Three RAF-batched phases run in order: **validateProperties** (shallow→deep, `commitProperties()`), **validateSize** (deep→shallow, `measure()`), **validateDisplayList** (shallow→deep, `updateDisplayList()`). Scheduled by the global `Validator`/`validator` singleton, sorted by `$nestLevel` (a **core** `DisplayObject` field, not a UI concept — see `packages/core/src/kurot/display/DisplayObject.ts`). | `core/Validator.ts`                                                                     |
+| Validation cycle                                   | Three deferred phases run in order before core renders: **validateProperties** (shallow→deep, `commitProperties()`), **validateSize** (deep→shallow, `measure()`), **validateDisplayList** (shallow→deep, `updateDisplayList()`). Scheduled through the core ticker's `callLater` queue by the global `Validator`/`validator` singleton and sorted by `$nestLevel` (a **core** `DisplayObject` field, not a UI concept — see `packages/core/src/kurot/display/DisplayObject.ts`). | `core/Validator.ts`                                                                     |
 | `Validator.validateClient(target)`                 | Forces synchronous validation of everything at or below `target`'s depth. Used by `validateNow()` and by the re-add-to-stage path in `UIState`.                                                                                                                                                                                                                                                                   | `core/Validator.ts`                                                                     |
 | `Theme`                                            | Maps a component's class name (`hostComponentKey`) to a default skin class name, loaded via `IThemeAdapter` (network fetch by default). Components created before the theme finishes loading queue into a `_delayList` and get skinned retroactively.                                                                                                                                                             | `core/Theme.ts`                                                                         |
 | `skinParts`                                        | `Skin.skinParts: string[]` lists the complete named part set exposed by a skin. `Component` collects the values into one internal read-only map, exposes it through the public typed `skinParts` accessor, then invokes `onSkinReady()`. Before replacement or removal, `onSkinRemoved()` runs while the old complete map remains available. No dynamic properties are written to the component instance.                                                                            | `components/Skin.ts`, `components/Component.ts`                                         |
@@ -156,15 +156,15 @@ Builds directly on core's `DisplayObject`/`DisplayObjectContainer`/`Sprite`
 **UIState deliberately hooks into core's render-dirty system.** In
 `UIState._setActualSize()`, after updating width/height it explicitly calls
 `this._owner.$markDirty()` — the source comment explains why: a layout size
-change affects rendered bounds, and since UI layout is deferred to the next
-RAF tick via `Validator` (while core's dirty propagation runs synchronously on
-the mutation's own tick), a `cacheAsBitmap`-flagged ancestor could otherwise
+change affects rendered bounds, and since UI layout is deferred to the core
+ticker's render-preparation queue (while core's dirty propagation runs
+synchronously on the mutation's own tick), a `cacheAsBitmap`-flagged ancestor could otherwise
 render a stale bitmap after deferred measurement completes. Similarly,
 `Skin`'s re-add-to-stage path forces `validateNow()` synchronously to avoid
 `structureDirty` firing before the `Validator` has filled in graphics
-commands. **Takeaway: core's render pipeline and UI's validation pipeline are
-two independently-scheduled systems, manually kept in sync at specific
-integration points** (add-to-stage, size changes) — not fully decoupled.
+commands. **Takeaway: UI validation is deferred but runs through core's ticker
+before the corresponding render; add-to-stage and size changes still explicitly
+bridge layout invalidation into core's render-dirty system.**
 
 Also: `Group`/`Component` override several `$`-prefixed **internal** core
 methods (`$updateUseTransform`, `$setMatrix`, `$setAnchorOffsetX/Y`,
@@ -183,5 +183,5 @@ before patching core's transform code.
 | Debug a state not applying                     | `components/Skin.ts` (`currentState` setter, `_applyState`), `states/State.ts`, `states/IOverride.ts`                                                                     |
 | Debug a binding not firing                     | Check the source property's setter actually calls `PropertyEvent.dispatchPropertyEvent` — see `binding/Watcher.ts`                                                        |
 | Add virtual-layout support to a new layout     | `layouts/LayoutBase.ts` (`elementAdded`/`elementRemoved`/`getElementIndicesInView`/`clearVirtualLayoutCache`), reference `layouts/VerticalLayout.ts`'s `elementSizeTable` |
-| Understand the validation/RAF scheduling order | `core/Validator.ts`                                                                                                                                                       |
+| Understand validation/render scheduling order  | `core/Validator.ts`, core `player/SystemTicker.ts`                                                                                                                       |
 | Measure UI validation/rendering performance    | `examples/benchmark/` for the visual runner, scenarios, Playwright automation, and local JSON/Markdown reports                                                           |

@@ -1,6 +1,6 @@
 # @kurot/ui 架构文档
 
-> 当前版本：1.1.9，peerDependency `@kurot/core: ^1.0.12`。逐条变更记录见
+> 当前版本：2.1.1，peerDependency `@kurot/core: ^1.0.12`。逐条变更记录见
 > [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反
 > 直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机
@@ -33,8 +33,8 @@
 ### 2.1 三阶段 + 三个独立队列
 
 UI 组件的布局更新是延迟批处理的：属性修改不会立刻触发重排，而是把组件
-"排队"，等到下一个 `requestAnimationFrame` 才统一处理，避免同一帧内多次
-修改属性导致重复计算。
+"排队"，等到 core ticker 下一次渲染前的 `callLater` 阶段统一处理，避免
+同一帧内多次修改属性导致重复计算，也保证未布局状态不会被渲染出来。
 
 `Validator`（单例 `validator`）内部维护三个独立的 `DepthQueue`：
 `_propsQueue`、`_sizeQueue`、`_displayQueue`。每个队列按 `$nestLevel`
@@ -95,23 +95,24 @@ validateDisplayList()  浅→深   updateDisplayList()
    这个异常路径）。
 4. `_clientPropsFlag`/`_clientSizeFlag` 只有在 `_targetLevel` 不是
    `Infinity`（即当前正处在某次 `validateClient` 调用内）且失效对象的深度
-   落在 target 子树内时才会被置位——普通的 RAF 调度路径完全不会触发这个
+   落在 target 子树内时才会被置位——普通的延迟调度路径完全不会触发这个
    检查，不产生额外开销。
 
-普通的 RAF 调度路径（`_schedule()` → `_flush()`）简单得多：没有打断重来的
+普通的延迟调度路径（`_schedule()` → `_flush()`）简单得多：没有打断重来的
 逻辑，也不追踪重入。三个阶段依次跑一遍，各自用普通的 `shift()`/`pop()`
 清空整棵树的队列（不像 `validateClient` 只处理某个子树）。跑完之后如果
 任何一个标志位仍是 true（说明校验过程中又产生了新的失效），就再排一次
-`requestAnimationFrame`，不会在同一个调用栈里同步循环——这意味着普通路径
+core ticker 的下一次 `callLater`，不会在同一个调用栈里同步循环——这意味着普通路径
 下，一次级联的失效可能跨越好几帧才收敛，而 `validateClient` 保证一次调用
 内同步收敛。这是两条路径在"一致性 vs 延迟"上刻意做出的不同取舍。
 
-### 2.3 非浏览器环境降级
+### 2.3 与渲染循环的顺序保证
 
-`_schedule()` 每次调用都检查一次 `typeof requestAnimationFrame`，如果不
-存在（Node/无 DOM 的测试环境），退化成 `setTimeout(0)`——代价是不再跟
-屏幕刷新率同步。`Validator.test.ts` 用 `vi.useFakeTimers()` +
-`validateClient()` 来避开对任一调度原语的依赖。
+`_schedule()` 通过 core 的 `ticker.callLater()` 安排 `_flush()`。Core 在
+`Player.render()` 之前先执行 `flushCallLaters()`，因此动态挂载的组件会先完成
+属性提交、测量和布局，再产生首帧画面。这个顺序等价于 Egret Validator 通过
+`Event.RENDER` 建立的渲染前校验契约，同时避免 UI 和渲染器各自维护独立 RAF
+所产生的先后竞争。
 
 ---
 
@@ -434,7 +435,7 @@ EUI 的一处差异）存在的意义是让 `List`/`DataGroup` 面对成千上�
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `eui.Component`                                                | `Component`                                                                      | 角色相同，Kurot 用真正的类继承（`extends Sprite`）取代 Egret 的命名空间混入风格。                                                                                                                                                                                            |
 | `eui.Skin`                                                     | `Skin`                                                                           | Egret 的 Skin 通常是 EXML 生成的真实 `DisplayObjectContainer` 子类；Kurot 的 `Skin` 明确**不是**显示对象——这是相对 Egret 最大的结构性偏离（见第三节）。                                                                                                                      |
-| `eui.UIComponent` 的三阶段校验                                 | `UIState` + `Validator`                                                          | 同样的三阶段 RAF 批处理模型（提交属性 → 测量 → 提交显示列表），同样按深度排队——`Validator.ts` 基本是 Egret `UIComponent` 校验内部机制的结构化移植。                                                                                                                          |
+| `eui.UIComponent` 的三阶段校验                                 | `UIState` + `Validator`                                                          | 同样按深度执行三阶段批处理（提交属性 → 测量 → 提交显示列表）。Egret 通过 `Event.RENDER` 保证绘制前校验，Kurot 通过 core ticker 的 `callLater` 队列实现同一时序契约。                                                                                                             |
 | `eui.IThemeAdapter` / 框架内置的主题单例                       | `IThemeAdapter` + `Theme`/`getTheme()`/`setTheme()`                              | Egret 的主题加载策略基本是框架内置的；Kurot 把网络请求策略做成了可通过构造函数注入的接口（见下方"全新设计"）。                                                                                                                                                               |
 | 编译期 EXML 皮肤类的全局命名空间注册                           | `globalThis["skins.X"] = factory` 自注册 ESM 导入                                | 概念上是同一种"全局皮肤注册表"模式，但 Kurot 的编译产物生成的是 **factory 函数**而不是类，专门为了支持用 `.call(this)` 调用来绑定 `this` 上下文——这是类继承重写带来的新问题（原本 Egret 的命名空间混入模式不存在这个绑定问题），Kurot 特有的解法,在 Egret 里没有直接对应物。 |
 | `State`/`SetProperty`/`SetStateProperty`/`AddItems` 覆盖机制   | 同名类，同一个 `IOverride` 接口                                                  | 对 Egret/Flex 视图状态覆盖模式的相当直接的移植。                                                                                                                                                                                                                             |

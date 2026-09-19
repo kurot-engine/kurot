@@ -4,6 +4,21 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.1.1] — 2026-09-20
+
+### Fixed
+
+- Schedule deferred UI validation through the core ticker's render-preparation
+  queue instead of an independent `requestAnimationFrame`. Newly mounted
+  components now finish property commitment, measurement, and layout before
+  the renderer can draw their initial frame, preventing skin elements from
+  briefly appearing at their unlaid-out top-left positions.
+
+### Tests
+
+- Added a regression covering single-pass scheduling and the ordered
+  properties, size, and display-list validation phases.
+
 ## [2.1.0] — 2026-09-20
 
 ### Added

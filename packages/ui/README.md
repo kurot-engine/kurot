@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.1.0.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.1.1.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -63,12 +63,13 @@ Group / Component
 
 ### Layout cycle
 
-Property changes are batched and applied on the next animation frame:
+Property changes are batched and applied during the core ticker's
+render-preparation phase:
 
 ```
 invalidateProperties / invalidateSize / invalidateDisplayList
   → Validator queues the component
-  → requestAnimationFrame tick
+  → core ticker callLater queue (before rendering)
   → validateProperties  (shallow → deep,  commitProperties)
   → validateSize        (deep → shallow,  measure)
   → validateDisplayList (shallow → deep,  updateDisplayList)
