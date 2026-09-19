@@ -1,4 +1,4 @@
-export { Component, type ComponentEvents } from './Component.js';
+export { Component, type ComponentEvents, type SkinPartsMap, type SkinPartsOf } from './Component.js';
 export { Group, type GroupEvents } from './Group.js';
 export { Rect } from './Rect.js';
 export { Image } from './Image.js';

@@ -150,34 +150,6 @@ export class Scroller extends Component {
 
 	// ── Override methods ──────────────────────────────────────────────────
 
-	protected override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-		if (instance instanceof HScrollBar && partName === 'horizontalScrollBar') {
-			this.horizontalScrollBar = instance;
-			instance.touchChildren = false;
-			instance.touchEnabled = false;
-			instance.viewport = this._viewport;
-			if (instance.autoVisibility) instance.visible = false;
-		} else if (instance instanceof VScrollBar && partName === 'verticalScrollBar') {
-			this.verticalScrollBar = instance;
-			instance.touchChildren = false;
-			instance.touchEnabled = false;
-			instance.viewport = this._viewport;
-			if (instance.autoVisibility) instance.visible = false;
-		}
-	}
-
-	protected override partRemoved(partName: string, instance: unknown): void {
-		super.partRemoved(partName, instance);
-		if (partName === 'horizontalScrollBar') {
-			if (instance instanceof HScrollBar) instance.viewport = undefined;
-			this.horizontalScrollBar = undefined;
-		} else if (partName === 'verticalScrollBar') {
-			if (instance instanceof VScrollBar) instance.viewport = undefined;
-			this.verticalScrollBar = undefined;
-		}
-	}
-
 	public override updateDisplayList(unscaledWidth: number, unscaledHeight: number): void {
 		super.updateDisplayList(unscaledWidth, unscaledHeight);
 		const vp = this._viewport;
@@ -189,6 +161,44 @@ export class Scroller extends Component {
 		this._updateScrollBarVisibility();
 	}
 
+	public override $onRemoveFromStage(): void {
+		this._removeStageTouchListeners();
+		this._hScroll.stop();
+		this._vScroll.stop();
+		this._touchPointID = -1;
+		this._clearAutoHideTimer();
+		super.$onRemoveFromStage();
+	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { horizontalScrollBar, verticalScrollBar } = this.skinParts;
+		if (horizontalScrollBar instanceof HScrollBar) {
+			this.horizontalScrollBar = horizontalScrollBar;
+			horizontalScrollBar.touchChildren = false;
+			horizontalScrollBar.touchEnabled = false;
+			horizontalScrollBar.viewport = this._viewport;
+			if (horizontalScrollBar.autoVisibility) horizontalScrollBar.visible = false;
+		}
+		if (verticalScrollBar instanceof VScrollBar) {
+			this.verticalScrollBar = verticalScrollBar;
+			verticalScrollBar.touchChildren = false;
+			verticalScrollBar.touchEnabled = false;
+			verticalScrollBar.viewport = this._viewport;
+			if (verticalScrollBar.autoVisibility) verticalScrollBar.visible = false;
+		}
+	}
+
+	protected override onSkinRemoved(): void {
+		if (this.horizontalScrollBar) this.horizontalScrollBar.viewport = undefined;
+		if (this.verticalScrollBar) this.verticalScrollBar.viewport = undefined;
+		this.horizontalScrollBar = undefined;
+		this.verticalScrollBar = undefined;
+		super.onSkinRemoved();
+	}
+
 	protected override setSkin(skin: Skin | undefined): void {
 		super.setSkin(skin);
 		// Match egret: after the skin (scroll bars) is applied, re-add the viewport
@@ -198,15 +208,6 @@ export class Scroller extends Component {
 		if (vp) {
 			this.addChildAt(vp as unknown as DisplayObject, 0);
 		}
-	}
-
-	public override $onRemoveFromStage(): void {
-		this._removeStageTouchListeners();
-		this._hScroll.stop();
-		this._vScroll.stop();
-		this._touchPointID = -1;
-		this._clearAutoHideTimer();
-		super.$onRemoveFromStage();
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────

@@ -270,9 +270,9 @@ For initialization that requires every EXML skin part to be available, override
 import { Component } from '@kurot/ui';
 
 export class BattlePanel extends Component {
-	protected override childrenCreated(): void {
-		super.childrenCreated();
-		// imgBg, imgFrame, groupField, and other skin parts are now bound.
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		// The complete skin part set is now available through this.skinParts.
 	}
 }
 ```
@@ -285,9 +285,10 @@ import { UIEvent } from '@kurot/ui';
 this.once(UIEvent.CREATION_COMPLETE, this.onCreationComplete);
 ```
 
-Use `partAdded()` and `partRemoved()` only when logic must follow an individual
-skin part across skin replacements. `childrenCreated()` and
-`UIEvent.CREATION_COMPLETE` run once for the component's initial creation.
+Use `onSkinReady()` to initialize logic that depends on skin parts and
+`onSkinRemoved()` to release listeners or other bindings before replacement.
+`childrenCreated()` and `UIEvent.CREATION_COMPLETE` run once for the component's
+initial creation and are not skin-replacement hooks.
 
 EXML skins compiled by the CLI are registered under their complete `class`
 attribute, so an Egret-style value such as

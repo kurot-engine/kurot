@@ -2,7 +2,7 @@ import { Component } from './Component.js';
 import { Event, Rectangle } from '@kurot/core';
 import { Direction } from '../core/Direction.js';
 import { Animation } from './Animation.js';
-import type { Label } from './Label.js';
+import { Label } from './Label.js';
 
 /**
  * ProgressBar component that visualizes the progress of a task over time.
@@ -73,31 +73,6 @@ export class ProgressBar extends Component {
 		}
 	}
 
-	private _applyValue(val: number): void {
-		this._value = val;
-		this._animationValue = val;
-		this.invalidateDisplayList();
-	}
-
-	private _startSlide(targetValue: number): void {
-		if (this._animation.isPlaying) {
-			this._animation.stop();
-		}
-		const range = this._maximum - this._minimum;
-		const distance = Math.abs(targetValue - this._animationValue);
-		const duration = range > 0 ? this._slideDuration * (distance / range) : 0;
-		this._animation.duration = duration === Infinity ? 0 : duration;
-		this._animation.from = this._animationValue;
-		this._animation.to = targetValue;
-		this._animation.play();
-	}
-
-	private _onAnimationUpdate = (_anim: Animation): void => {
-		this._animationValue = _anim.currentValue;
-		this._value = _anim.currentValue;
-		this.invalidateDisplayList();
-	};
-
 	public get direction(): string {
 		return this._direction;
 	}
@@ -118,7 +93,12 @@ export class ProgressBar extends Component {
 		this.invalidateDisplayList();
 	}
 
-	/** Duration (ms) of the value-change slide animation. 0 = instant. @default 500 */
+	/**
+	 * Duration in milliseconds of the value-change slide animation.
+	 * A value of `0` applies changes immediately.
+	 *
+	 * @default 500
+	 */
 	public get slideDuration(): number {
 		return this._slideDuration;
 	}
@@ -183,6 +163,19 @@ export class ProgressBar extends Component {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { thumb, labelDisplay } = this.skinParts;
+		if (thumb instanceof Component) this.thumb = thumb;
+		if (labelDisplay instanceof Label) this.labelDisplay = labelDisplay;
+	}
+
+	protected override onSkinRemoved(): void {
+		this.thumb = undefined;
+		this.labelDisplay = undefined;
+		super.onSkinRemoved();
+	}
+
 	/**
 	 * Converts the current value to display text.
 	 * Override this method to customize the label format.
@@ -194,4 +187,31 @@ export class ProgressBar extends Component {
 		}
 		return value + ' / ' + maximum;
 	}
+
+	// ── Private methods ───────────────────────────────────────────────────
+
+	private _applyValue(val: number): void {
+		this._value = val;
+		this._animationValue = val;
+		this.invalidateDisplayList();
+	}
+
+	private _startSlide(targetValue: number): void {
+		if (this._animation.isPlaying) {
+			this._animation.stop();
+		}
+		const range = this._maximum - this._minimum;
+		const distance = Math.abs(targetValue - this._animationValue);
+		const duration = range > 0 ? this._slideDuration * (distance / range) : 0;
+		this._animation.duration = duration === Infinity ? 0 : duration;
+		this._animation.from = this._animationValue;
+		this._animation.to = targetValue;
+		this._animation.play();
+	}
+
+	private _onAnimationUpdate = (_anim: Animation): void => {
+		this._animationValue = _anim.currentValue;
+		this._value = _anim.currentValue;
+		this.invalidateDisplayList();
+	};
 }

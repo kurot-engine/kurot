@@ -115,40 +115,41 @@ export class TextInput extends Component implements IDisplayText {
 		return hasPrompt && this.skin?.hasState('normalWithPrompt') ? 'normalWithPrompt' : 'normal';
 	}
 
-	protected override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-		if (instance instanceof EditableText && partName === 'textDisplay') {
-			this.textDisplay = instance;
-			if (this._text) instance.text = this._text;
-			if (this._textColor != null) instance.textColor = this._textColor;
-			if (this._displayAsPassword) instance.displayAsPassword = true;
-			if (this._maxChars) instance.maxChars = this._maxChars;
-			if (this._restrict) instance.restrict = this._restrict;
-			if (this._inputType) instance.inputType = this._inputType as never;
-			instance.addEventListener(Event.FOCUS_IN, this._onFocusIn);
-			instance.addEventListener(Event.FOCUS_OUT, this._onFocusOut);
-		} else if (instance instanceof Label && partName === 'promptDisplay') {
-			this.promptDisplay = instance;
-			instance.touchEnabled = false;
-			if (this._prompt) instance.text = this._prompt;
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { textDisplay, promptDisplay } = this.skinParts;
+		if (textDisplay instanceof EditableText) {
+			this.textDisplay = textDisplay;
+			if (this._text) textDisplay.text = this._text;
+			if (this._textColor != null) textDisplay.textColor = this._textColor;
+			if (this._displayAsPassword) textDisplay.displayAsPassword = true;
+			if (this._maxChars) textDisplay.maxChars = this._maxChars;
+			if (this._restrict) textDisplay.restrict = this._restrict;
+			if (this._inputType) textDisplay.inputType = this._inputType as never;
+			textDisplay.addEventListener(Event.FOCUS_IN, this._onFocusIn);
+			textDisplay.addEventListener(Event.FOCUS_OUT, this._onFocusOut);
+		}
+		if (promptDisplay instanceof Label) {
+			this.promptDisplay = promptDisplay;
+			promptDisplay.touchEnabled = false;
+			if (this._prompt) promptDisplay.text = this._prompt;
 		}
 	}
 
-	protected override partRemoved(partName: string, instance: unknown): void {
-		super.partRemoved(partName, instance);
-		if (instance instanceof EditableText && partName === 'textDisplay') {
-			this._text = instance.text;
-			this._textColor = instance.textColor;
-			this._displayAsPassword = instance.displayAsPassword;
-			this._maxChars = instance.maxChars;
-			this._restrict = instance.restrict ?? '';
-			instance.removeEventListener(Event.FOCUS_IN, this._onFocusIn);
-			instance.removeEventListener(Event.FOCUS_OUT, this._onFocusOut);
-			this.textDisplay = undefined;
-		} else if (instance instanceof Label && partName === 'promptDisplay') {
-			this._prompt = instance.text;
-			this.promptDisplay = undefined;
+	protected override onSkinRemoved(): void {
+		if (this.textDisplay) {
+			this._text = this.textDisplay.text;
+			this._textColor = this.textDisplay.textColor;
+			this._displayAsPassword = this.textDisplay.displayAsPassword;
+			this._maxChars = this.textDisplay.maxChars;
+			this._restrict = this.textDisplay.restrict ?? '';
+			this.textDisplay.removeEventListener(Event.FOCUS_IN, this._onFocusIn);
+			this.textDisplay.removeEventListener(Event.FOCUS_OUT, this._onFocusOut);
 		}
+		if (this.promptDisplay) this._prompt = this.promptDisplay.text;
+		this.textDisplay = undefined;
+		this.promptDisplay = undefined;
+		super.onSkinRemoved();
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────

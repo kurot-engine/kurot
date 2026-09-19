@@ -2,7 +2,7 @@ import { DisplayObject, TouchEvent, Event, type Stage } from '@kurot/core';
 import { Component } from './Component.js';
 import { Button } from './Button.js';
 import { UIEvent } from '../events/UIEvent.js';
-import type { Label } from './Label.js';
+import { Label } from './Label.js';
 
 /**
  * Panel — a skinnable container with an optional title bar, close button, and drag area.
@@ -78,29 +78,6 @@ export class Panel extends Component {
 		}
 	}
 
-	protected override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-		if (instance instanceof Button && partName === 'closeButton') {
-			this.closeButton = instance;
-			instance.addEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
-		} else if (instance instanceof DisplayObject && partName === 'moveArea') {
-			this.moveArea = instance;
-			instance.addEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
-		}
-	}
-
-	protected override partRemoved(partName: string, instance: unknown): void {
-		super.partRemoved(partName, instance);
-		if (instance instanceof Button && partName === 'closeButton') {
-			instance.removeEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
-			this.closeButton = undefined;
-		} else if (instance instanceof DisplayObject && partName === 'moveArea') {
-			this._removeDragListeners();
-			instance.removeEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
-			this.moveArea = undefined;
-		}
-	}
-
 	public override $onRemoveFromStage(): void {
 		this._removeDragListeners();
 		super.$onRemoveFromStage();
@@ -114,6 +91,34 @@ export class Panel extends Component {
 	 */
 	public close(): void {
 		if (this.parent) this.parent.removeChild(this);
+	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { titleDisplay, closeButton, moveArea } = this.skinParts;
+		if (titleDisplay instanceof Label) {
+			this.titleDisplay = titleDisplay;
+		}
+		if (closeButton instanceof Button) {
+			this.closeButton = closeButton;
+			closeButton.addEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
+		}
+		if (moveArea instanceof DisplayObject) {
+			this.moveArea = moveArea;
+			moveArea.addEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
+		}
+	}
+
+	protected override onSkinRemoved(): void {
+		this.closeButton?.removeEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
+		this._removeDragListeners();
+		this.moveArea?.removeEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
+		this.titleDisplay = undefined;
+		this.closeButton = undefined;
+		this.moveArea = undefined;
+		super.onSkinRemoved();
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────

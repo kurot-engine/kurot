@@ -10,7 +10,6 @@ import type { IItemRenderer } from '../core/IItemRenderer.js';
  *
  * States: `up` | `down` | `disabled` | `upAndSelected` | `downAndSelected`
  *
- * @skinPart iconDisplay  — optional DisplayObject for an icon
  * @skinPart labelDisplay — optional Label for the item label
  */
 export class ItemRenderer extends Component implements IItemRenderer {
@@ -18,16 +17,16 @@ export class ItemRenderer extends Component implements IItemRenderer {
 
 	public itemIndex = -1;
 
+	/**
+	 * Skin part that displays the item label.
+	 * When present, `data` is automatically synchronized to its text.
+	 */
+	public labelDisplay?: Label;
+
 	private _data: unknown;
 	private _selected = false;
 	private _touchCaptured = false;
 	private _touchStage?: Stage;
-
-	/**
-	 * Skin part: the label. When present, `data` is auto-synced to its `text`
-	 * (fallback for when the EXML `{data}` binding isn't compiled in).
-	 */
-	public labelDisplay?: Label;
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
@@ -61,19 +60,23 @@ export class ItemRenderer extends Component implements IItemRenderer {
 
 	// ── Override methods ──────────────────────────────────────────────────
 
-	protected override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-		if (partName === 'labelDisplay' && instance instanceof Label) {
-			this.labelDisplay = instance;
+	public override $onRemoveFromStage(): void {
+		this._releaseTouchCapture();
+		super.$onRemoveFromStage();
+	}
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { labelDisplay } = this.skinParts;
+		if (labelDisplay instanceof Label) {
+			this.labelDisplay = labelDisplay;
 			this._syncLabel();
 		}
 	}
 
-	protected override partRemoved(partName: string, instance: unknown): void {
-		super.partRemoved(partName, instance);
-		if (partName === 'labelDisplay') {
-			this.labelDisplay = undefined;
-		}
+	protected override onSkinRemoved(): void {
+		this.labelDisplay = undefined;
+		super.onSkinRemoved();
 	}
 
 	protected override getCurrentState(): string {
@@ -86,11 +89,6 @@ export class ItemRenderer extends Component implements IItemRenderer {
 		return 'up';
 	}
 
-	public override $onRemoveFromStage(): void {
-		this._releaseTouchCapture();
-		super.$onRemoveFromStage();
-	}
-
 	// ── Protected methods ─────────────────────────────────────────────────
 
 	/**
@@ -100,13 +98,13 @@ export class ItemRenderer extends Component implements IItemRenderer {
 		this._syncLabel();
 	}
 
+	// ── Private methods ───────────────────────────────────────────────────
+
 	private _syncLabel(): void {
 		if (this.labelDisplay) {
 			this.labelDisplay.text = this._data == null ? '' : String(this._data);
 		}
 	}
-
-	// ── Private methods ───────────────────────────────────────────────────
 
 	private _onTouchBegin = (e: TouchEvent): void => {
 		const stage = this.stage;

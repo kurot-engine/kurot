@@ -13,7 +13,9 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
 export class ListBase extends DataGroup {
 	// ── Sentinel constants ──────────────────────────────────────────────
 
-	/** Sentinel for "no selection" — matches egret `ListBase.NO_SELECTION`. */
+	/**
+	 * Sentinel for no selection.
+	 */
 	protected static readonly NO_SELECTION = -1;
 
 	// ── Instance fields ───────────────────────────────────────────────────
@@ -25,7 +27,9 @@ export class ListBase extends DataGroup {
 	private _requireSelection = false;
 	private _requireSelectionChanged = false;
 
-	/** Item passed to selectedItem setter before dataProvider is available (egret `pendingSelectedItem`). */
+	/**
+	 * Item passed to the selected-item setter before a data provider is available.
+	 */
 	private _pendingSelectedItem: unknown;
 
 	// ── Getters / Setters ─────────────────────────────────────────────────

@@ -4,8 +4,8 @@ import { List } from './List.js';
 import { Scroller } from './Scroller.js';
 import type { ArrayCollection } from '../collections/ArrayCollection.js';
 import type { IDisplayText } from '../core/IDisplayText.js';
-import type { Button } from './Button.js';
-import type { Label } from './Label.js';
+import { Button } from './Button.js';
+import { Label } from './Label.js';
 
 /**
  * ComboBox — a drop-down selection component.
@@ -52,7 +52,9 @@ export class ComboBox extends Component implements IDisplayText {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
-	/** The data provider for the drop-down list items. */
+	/**
+	 * The data provider for the drop-down list items.
+	 */
 	public get dataProvider(): ArrayCollection | undefined {
 		return this._dataProvider;
 	}
@@ -66,7 +68,9 @@ export class ComboBox extends Component implements IDisplayText {
 		this.invalidateProperties();
 	}
 
-	/** Index of the currently selected item, or -1 if nothing is selected. */
+	/**
+	 * Index of the currently selected item, or `-1` if nothing is selected.
+	 */
 	public get selectedIndex(): number {
 		return this._selectedIndex;
 	}
@@ -78,7 +82,9 @@ export class ComboBox extends Component implements IDisplayText {
 		this.invalidateState();
 	}
 
-	/** The currently selected data item. */
+	/**
+	 * The currently selected data item.
+	 */
 	public get selectedItem(): unknown {
 		return this._selectedItem;
 	}
@@ -94,7 +100,9 @@ export class ComboBox extends Component implements IDisplayText {
 		}
 	}
 
-	/** Whether the drop-down list is currently visible. */
+	/**
+	 * Whether the drop-down list is currently visible.
+	 */
 	public get isOpen(): boolean {
 		return this._isOpen;
 	}
@@ -137,7 +145,9 @@ export class ComboBox extends Component implements IDisplayText {
 		this._updateLabel();
 	}
 
-	/** Placeholder text shown when no item is selected. */
+	/**
+	 * Placeholder text shown when no item is selected.
+	 */
 	public get prompt(): string {
 		return this._prompt;
 	}
@@ -149,7 +159,9 @@ export class ComboBox extends Component implements IDisplayText {
 		}
 	}
 
-	/** The displayed text (selected item label or prompt). */
+	/**
+	 * The displayed text, either the selected item label or the prompt.
+	 */
 	public get text(): string {
 		if (this.labelDisplay) return this.labelDisplay.text;
 		return this.itemToLabel(this._selectedItem);
@@ -167,40 +179,6 @@ export class ComboBox extends Component implements IDisplayText {
 
 	// ── Override methods ──────────────────────────────────────────────────
 
-	protected override getCurrentState(): string {
-		if (!this.enabled) return 'disabled';
-		if (this._isOpen) return 'open';
-		return 'normal';
-	}
-
-	public override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-
-		if (partName === 'labelDisplay' && instance === this.labelDisplay) {
-			this._updateLabel();
-		}
-
-		if (partName === 'list' && instance instanceof List) {
-			instance.dataProvider = this._dataProvider;
-			instance.addEventListener(Event.CHANGE, this._onListChange);
-		}
-
-		if (partName === 'dropDown' && instance instanceof Scroller) {
-			instance.visible = this._isOpen;
-		}
-	}
-
-	public override partRemoved(partName: string, instance: unknown): void {
-		if (partName === 'dropDown' && instance === this.dropDown) {
-			this.close();
-		}
-		super.partRemoved(partName, instance);
-
-		if (partName === 'list' && instance instanceof List) {
-			instance.removeEventListener(Event.CHANGE, this._onListChange);
-		}
-	}
-
 	public override $onRemoveFromStage(): void {
 		this.close();
 		super.$onRemoveFromStage();
@@ -216,12 +194,16 @@ export class ComboBox extends Component implements IDisplayText {
 
 	// ── Public methods ────────────────────────────────────────────────────
 
-	/** Open the drop-down list. */
+	/**
+	 * Open the drop-down list.
+	 */
 	public open(): void {
 		this.isOpen = true;
 	}
 
-	/** Close the drop-down list. */
+	/**
+	 * Close the drop-down list.
+	 */
 	public close(): void {
 		this.isOpen = false;
 	}
@@ -239,6 +221,47 @@ export class ComboBox extends Component implements IDisplayText {
 			return String(obj[this._labelField]);
 		}
 		return String(item);
+	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { labelDisplay, button, list, dropDown } = this.skinParts;
+		if (labelDisplay instanceof Label) {
+			this.labelDisplay = labelDisplay;
+			this._updateLabel();
+		}
+		if (button instanceof Button) {
+			this.button = button;
+		}
+		if (list instanceof List) {
+			this.list = list;
+			list.dataProvider = this._dataProvider;
+			list.addEventListener(Event.CHANGE, this._onListChange);
+		}
+		if (dropDown instanceof Scroller) {
+			this.dropDown = dropDown;
+			dropDown.visible = this._isOpen;
+		}
+	}
+
+	protected override onSkinRemoved(): void {
+		if (this.dropDown) {
+			this.close();
+		}
+		this.list?.removeEventListener(Event.CHANGE, this._onListChange);
+		this.labelDisplay = undefined;
+		this.button = undefined;
+		this.list = undefined;
+		this.dropDown = undefined;
+		super.onSkinRemoved();
+	}
+
+	protected override getCurrentState(): string {
+		if (!this.enabled) return 'disabled';
+		if (this._isOpen) return 'open';
+		return 'normal';
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────
@@ -281,7 +304,9 @@ export class ComboBox extends Component implements IDisplayText {
 		}
 	}
 
-	/** Move only the popup to the stage so layout siblings cannot cover it. */
+	/**
+	 * Move only the popup to the stage so layout siblings cannot cover it.
+	 */
 	private _moveDropDownToStage(): boolean {
 		const dropDown = this.dropDown;
 		const stage = this.stage;

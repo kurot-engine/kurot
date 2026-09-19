@@ -4,6 +4,68 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.0.0] — 2026-09-20
+
+### Breaking Changes
+
+- Replaced the Egret-style incremental skin-part lifecycle with an atomic
+  complete-skin lifecycle. `Component.setSkinPart()`, `partAdded()`, and
+  `partRemoved()` have been removed.
+- Custom skinnable components must move skin-dependent initialization to
+  `onSkinReady()` and cleanup to `onSkinRemoved()`.
+- Skin part names are no longer written as dynamic properties on component
+  instances. Subclasses access the complete read-only set through
+  `this.skinParts` while the skin is ready.
+
+### Added
+
+- Added `Component<TSkin>` so generated project declarations can select the
+  exact part set associated with a skin class name.
+- Added the extensible `SkinPartsMap` registry and `SkinPartsOf<TSkin>` helper
+  type as the public foundation for CLI-generated skin declarations.
+- Added the protected `skinReady` state and guarded `skinParts` accessor.
+  Access before attachment or after removal now throws a descriptive error.
+
+### Changed
+
+- Skin parts are collected into a fresh internal map and published as one
+  complete set before `onSkinReady()` runs. Skin replacement invokes
+  `onSkinRemoved()` while the complete old set remains readable, then discards
+  the old map before installing the new one.
+- Migrated Button, ComboBox, ItemRenderer, Panel, ProgressBar, ScrollBarBase,
+  Scroller, SliderBase, and TextInput to the complete-skin lifecycle.
+- Standardized component source ordering and expanded single-line JSDoc
+  comments into the project's required multi-line format.
+
+### Migration
+
+```ts
+// Before
+protected override partAdded(partName: string, instance: unknown): void {
+	if (partName === 'btnClose') {
+		this.btnClose = instance as Button;
+	}
+}
+
+// After
+protected override onSkinReady(): void {
+	super.onSkinReady();
+	this.skinParts.btnClose.addEventListener(TouchEvent.TOUCH_TAP, this.onClose);
+}
+
+protected override onSkinRemoved(): void {
+	this.skinParts.btnClose.removeEventListener(TouchEvent.TOUCH_TAP, this.onClose);
+	super.onSkinRemoved();
+}
+```
+
+### Tests
+
+- Added regressions for complete part-set attachment, atomic skin replacement,
+  guarded access outside the ready lifecycle, absence of dynamic host
+  properties, built-in control part binding, and listener cleanup on removal.
+- 27 test files and 243 tests pass.
+
 ## [1.1.12] — 2026-09-18
 
 ### Fixed

@@ -57,21 +57,6 @@ export class TabBar extends ListBase {
 		}
 	}
 
-	private _onTabBarChange = (): void => {
-		if (!this._viewStack) return;
-		this._indexBeingUpdated = true;
-		this._viewStack.selectedIndex = this.selectedIndex;
-		this._indexBeingUpdated = false;
-	};
-
-	private _onViewStackPropChange = (e: Event): void => {
-		if (!this._viewStack || this._indexBeingUpdated) return;
-		const pe = e as PropertyEvent;
-		if (pe.property === 'selectedIndex') {
-			this.setSelectedIndex(this._viewStack.selectedIndex, false);
-		}
-	};
-
 	public override createChildren(): void {
 		if (!this.layout) {
 			const hl = new HorizontalLayout();
@@ -81,6 +66,8 @@ export class TabBar extends ListBase {
 		}
 		super.createChildren();
 	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
 
 	protected override rendererAdded(renderer: ItemRenderer, _index: number, _item: unknown): void {
 		const handler = (_e: Event): void => {
@@ -99,4 +86,21 @@ export class TabBar extends ListBase {
 			renderer.removeEventListener(TouchEvent.TOUCH_TAP, handler);
 		}
 	}
+
+	// ── Private methods ───────────────────────────────────────────────────
+
+	private _onTabBarChange = (): void => {
+		if (!this._viewStack) return;
+		this._indexBeingUpdated = true;
+		this._viewStack.selectedIndex = this.selectedIndex;
+		this._indexBeingUpdated = false;
+	};
+
+	private _onViewStackPropChange = (e: Event): void => {
+		if (!this._viewStack || this._indexBeingUpdated) return;
+		const pe = e as PropertyEvent;
+		if (pe.property === 'selectedIndex') {
+			this.setSelectedIndex(this._viewStack.selectedIndex, false);
+		}
+	};
 }

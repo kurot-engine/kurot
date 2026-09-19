@@ -3,7 +3,7 @@
  *
  * Verifies that the skins and component APIs from the my-game / CLI templates
  * are aligned:
- * - skin parts are correctly attached via Component.setSkinPart
+ * - complete skin part sets are available during Component skin lifecycle
  * - state changes apply SetProperty (ToggleSwitch knob slides)
  * - Panel's closeButton / moveArea are recognised
  *
@@ -23,6 +23,7 @@ import {
 	RadioButton,
 	Panel,
 	HSlider,
+	HScrollBar,
 	ProgressBar,
 	Component,
 	PropertyEvent,
@@ -30,8 +31,11 @@ import {
 	HorizontalLayout,
 	VerticalLayout,
 } from '../src/index.js';
+import { attachSkin, detachSkin } from './helpers/skin.js';
 
-/** Replicates the compiled ToggleSwitchSkin.exml factory (key states only). */
+/**
+ * Replicates the compiled ToggleSwitchSkin.exml factory for its key states.
+ */
 function makeToggleSwitchSkin(): Skin {
 	const skin = new Skin();
 	skin.skinParts = ['knob'];
@@ -62,7 +66,9 @@ function makeToggleSwitchSkin(): Skin {
 	return skin;
 }
 
-/** Replicates the compiled PanelSkin.exml factory (key parts only). */
+/**
+ * Replicates the compiled PanelSkin.exml factory for its key parts.
+ */
 function makePanelSkin(): Skin {
 	const skin = new Skin();
 	skin.skinParts = ['moveArea', 'titleDisplay', 'closeButton'];
@@ -90,6 +96,78 @@ function makePanelSkin(): Skin {
 }
 
 describe('skin alignment (my-game / cli template)', () => {
+	it('keeps parts in the centralized skin map and runs batch lifecycle hooks in order', () => {
+		class LifecycleComponent extends Component {
+			public readonly calls: string[] = [];
+
+			public get ready(): boolean {
+				return this.skinReady;
+			}
+
+			public getPart(name: string): unknown {
+				return this.skinParts[name];
+			}
+
+			protected override onSkinReady(): void {
+				this.calls.push(`skinReady:${String(this.skinParts.content)}`);
+			}
+
+			protected override onSkinRemoved(): void {
+				this.calls.push(`skinRemoved:${String(this.skinParts.content)}`);
+			}
+		}
+
+		const component = new LifecycleComponent();
+		const skin = new Skin();
+		const content = new Label();
+		content.text = 'ready';
+		(skin as unknown as Record<string, unknown>).content = content;
+		skin.skinParts = ['content'];
+		skin.elementsContent = [content];
+
+		expect(() => component.getPart('content')).toThrow('skin parts are not ready');
+		(component as unknown as { _setSkin: (value: Skin | undefined) => void })._setSkin(skin);
+
+		expect(component.ready).toBe(true);
+		expect(component.getPart('content')).toBe(content);
+		expect(Object.hasOwn(component, 'content')).toBe(false);
+		expect('setSkinPart' in component).toBe(false);
+		expect(component.calls).toEqual(['skinReady:[object Object]']);
+
+		(component as unknown as { _setSkin: (value: Skin | undefined) => void })._setSkin(undefined);
+
+		expect(component.ready).toBe(false);
+		expect(component.calls).toEqual([
+			'skinReady:[object Object]',
+			'skinRemoved:[object Object]',
+		]);
+		expect(() => component.getPart('content')).toThrow('skin parts are not ready');
+	});
+
+	it('replaces the complete part set without exposing a mixed intermediate state', () => {
+		class SnapshotComponent extends Component {
+			public readonly snapshots: string[] = [];
+
+			protected override onSkinReady(): void {
+				this.snapshots.push(`ready:${Object.keys(this.skinParts).join(',')}`);
+			}
+
+			protected override onSkinRemoved(): void {
+				this.snapshots.push(`removed:${Object.keys(this.skinParts).join(',')}`);
+			}
+		}
+
+		const component = new SnapshotComponent();
+		attachSkin(component, { first: new Label() });
+		attachSkin(component, { second: new Button(), third: new Rect() });
+
+		expect(component.snapshots).toEqual([
+			'ready:first',
+			'removed:first',
+			'ready:second,third',
+		]);
+	});
+
 	it('applies the initial ToggleSwitch state when attaching its skin', () => {
 		const ts = new ToggleSwitch();
 		const skin = makeToggleSwitchSkin();
@@ -154,15 +232,47 @@ describe('skin alignment (my-game / cli template)', () => {
 		const panel = new Panel();
 		panel.title = 'Hello';
 		const skin = makePanelSkin();
-		// partAdded writes the title after binding titleDisplay.
+		// The complete-skin lifecycle writes the title after binding titleDisplay.
 		(panel as unknown as { _setSkin: (s: Skin) => void })._setSkin(skin);
 
 		expect(panel.titleDisplay?.text).toBe('Hello');
 	});
 
+	it('built-in controls explicitly bind and release their skin parts', () => {
+		const button = new Button();
+		const buttonLabel = new Label();
+		button.label = 'Play';
+		attachSkin(button, { labelDisplay: buttonLabel });
+		expect(button.labelDisplay).toBe(buttonLabel);
+		expect(buttonLabel.text).toBe('Play');
+		detachSkin(button);
+		expect(button.labelDisplay).toBeUndefined();
+
+		const progress = new ProgressBar();
+		const progressThumb = new Rect();
+		const progressLabel = new Label();
+		attachSkin(progress, { thumb: progressThumb, labelDisplay: progressLabel });
+		expect(progress.thumb).toBe(progressThumb);
+		expect(progress.labelDisplay).toBe(progressLabel);
+
+		const slider = new HSlider();
+		const sliderThumb = new Rect();
+		const sliderTrack = new Rect();
+		attachSkin(slider, { thumb: sliderThumb, track: sliderTrack });
+		expect(slider.thumb).toBe(sliderThumb);
+		expect(slider.track).toBe(sliderTrack);
+
+		const scrollBar = new HScrollBar();
+		const scrollThumb = new Rect();
+		attachSkin(scrollBar, { thumb: scrollThumb });
+		expect(scrollBar.thumb).toBe(scrollThumb);
+	});
+
 	// ── Composite skin: custom component + multiple nested skin parts ──────
 	describe('composite skin (settings-screen pattern)', () => {
-		/** A minimal custom component declaring multiple skin parts, recording partAdded calls. */
+		/**
+		 * Minimal custom component that consumes a complete skin part set.
+		 */
 		class FakeSettingsScreen extends Component {
 			public titleDisplay?: Label;
 			public closeButton?: Button;
@@ -170,13 +280,14 @@ describe('skin alignment (my-game / cli template)', () => {
 			public volumeSlider?: HSlider;
 			public readonly added: string[] = [];
 
-			public override partAdded(partName: string, instance: unknown): void {
-				super.partAdded(partName, instance);
-				this.added.push(partName);
-				if (partName === 'titleDisplay' && instance instanceof Label) this.titleDisplay = instance;
-				if (partName === 'closeButton' && instance instanceof Button) this.closeButton = instance;
-				if (partName === 'soundToggle' && instance instanceof ToggleSwitch) this.soundToggle = instance;
-				if (partName === 'volumeSlider' && instance instanceof HSlider) this.volumeSlider = instance;
+			protected override onSkinReady(): void {
+				super.onSkinReady();
+				const { titleDisplay, closeButton, soundToggle, volumeSlider } = this.skinParts;
+				if (titleDisplay instanceof Label) this.titleDisplay = titleDisplay;
+				if (closeButton instanceof Button) this.closeButton = closeButton;
+				if (soundToggle instanceof ToggleSwitch) this.soundToggle = soundToggle;
+				if (volumeSlider instanceof HSlider) this.volumeSlider = volumeSlider;
+				this.added.push(...Object.keys(this.skinParts));
 			}
 		}
 

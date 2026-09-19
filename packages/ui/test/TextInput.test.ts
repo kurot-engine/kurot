@@ -5,13 +5,9 @@
  * displayAsPassword/maxChars/restrict forwarding, and getCurrentState
  * (normal / normalWithPrompt / disabled).
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Component, TextInput, EditableText, Label } from '../src/index.js';
-
-// Reach the protected partAdded method without repeating the cast.
-function attachPart(ti: TextInput, partName: string, instance: unknown): void {
-	(ti as unknown as { partAdded: (n: string, i: unknown) => void }).partAdded(partName, instance);
-}
+import { attachSkin, detachSkin } from './helpers/skin.js';
 
 describe('TextInput', () => {
 	it('lays out EditableText with EUI constraints', () => {
@@ -58,22 +54,22 @@ describe('TextInput', () => {
 	});
 
 	describe('property forwarding after skin part is attached', () => {
-		it('forwards prompt to promptDisplay on partAdded', () => {
+		it('forwards prompt when the skin becomes ready', () => {
 			const ti = new TextInput();
 			ti.prompt = 'Enter name';
 
 			const label = new Label();
-			attachPart(ti, 'promptDisplay', label);
+			attachSkin(ti, { promptDisplay: label });
 			expect(label.text).toBe('Enter name');
 			expect(label.touchEnabled).toBe(false);
 		});
 
-		it('forwards text to textDisplay on partAdded', () => {
+		it('forwards text when the skin becomes ready', () => {
 			const ti = new TextInput();
 			ti.text = 'hello';
 
 			const ed = new EditableText();
-			attachPart(ti, 'textDisplay', ed);
+			attachSkin(ti, { textDisplay: ed });
 			expect(ed.text).toBe('hello');
 		});
 
@@ -82,28 +78,41 @@ describe('TextInput', () => {
 			ti.prompt = 'Enter name';
 			const ed = new EditableText();
 
-			attachPart(ti, 'textDisplay', ed);
+			attachSkin(ti, { textDisplay: ed });
 
 			expect(ed.prompt).toBe('');
 			expect(ed.text).toBe('');
 		});
 
-		it('forwards displayAsPassword to textDisplay on partAdded', () => {
+		it('forwards displayAsPassword when the skin becomes ready', () => {
 			const ti = new TextInput();
 			ti.displayAsPassword = true;
 
 			const ed = new EditableText();
-			attachPart(ti, 'textDisplay', ed);
+			attachSkin(ti, { textDisplay: ed });
 			expect(ed.displayAsPassword).toBe(true);
 		});
 
 		it('reads back from textDisplay after attachment', () => {
 			const ti = new TextInput();
 			const ed = new EditableText();
-			attachPart(ti, 'textDisplay', ed);
+			attachSkin(ti, { textDisplay: ed });
 
 			ed.text = 'typed text';
 			expect(ti.text).toBe('typed text');
+		});
+
+		it('removes EditableText listeners when the complete skin is detached', () => {
+			const ti = new TextInput();
+			const ed = new EditableText();
+			const removeEventListener = vi.spyOn(ed, 'removeEventListener');
+			attachSkin(ti, { textDisplay: ed });
+
+			detachSkin(ti);
+
+			expect(removeEventListener).toHaveBeenCalledWith('focusIn', expect.any(Function));
+			expect(removeEventListener).toHaveBeenCalledWith('focusOut', expect.any(Function));
+			expect(ti.textDisplay).toBeUndefined();
 		});
 	});
 
@@ -124,7 +133,7 @@ describe('TextInput', () => {
 			ed.setFocus = (): void => {
 				focused = true;
 			};
-			attachPart(ti, 'textDisplay', ed);
+			attachSkin(ti, { textDisplay: ed });
 
 			ti.dispatchEventWith('touchTap');
 

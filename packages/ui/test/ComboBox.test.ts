@@ -5,6 +5,7 @@ import { Group } from '../src/kurot/components/Group.js';
 import { Scroller } from '../src/kurot/components/Scroller.js';
 import { ArrayCollection } from '../src/kurot/collections/ArrayCollection.js';
 import { VerticalLayout } from '../src/kurot/layouts/VerticalLayout.js';
+import { attachSkin, detachSkin } from './helpers/skin.js';
 
 function makeComboBox(items: unknown[] = []): ComboBox {
 	const cb = new ComboBox();
@@ -112,11 +113,11 @@ describe('ComboBox', () => {
 			skin.addChild(dropDown);
 			cb.addChild(skin);
 			stage.addChild(cb);
-			cb.setSkinPart('dropDown', dropDown);
+			attachSkin(cb, { dropDown }, [skin]);
 
 			cb.open();
 			expect(dropDown.parent).toBe(stage);
-			cb.setSkinPart('dropDown', undefined);
+			detachSkin(cb);
 
 			expect(cb.isOpen).toBe(false);
 			expect(dropDown.parent).toBe(skin);

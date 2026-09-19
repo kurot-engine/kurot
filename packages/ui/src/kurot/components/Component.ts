@@ -24,15 +24,30 @@ export interface ComponentEvents extends DisplayObjectEvents {
 }
 
 /**
+ * Project-generated skin part declarations augment this interface.
+ *
+ * Each key is a skin class name and each value is the exact set of parts
+ * exported by that skin.
+ */
+export interface SkinPartsMap {}
+
+/**
+ * Resolve the generated skin parts for a skin class name.
+ */
+export type SkinPartsOf<TSkin extends string> = TSkin extends keyof SkinPartsMap
+	? SkinPartsMap[TSkin]
+	: Readonly<Record<string, unknown>>;
+
+/**
  * Base class for all skinnable UI components.
  *
  * Subclasses should:
  * 1. Override `getCurrentState()` to return the current view-state name.
- * 2. Override `partAdded()` to bind skin parts to component logic.
- * 3. Override `partRemoved()` to clean up skin part bindings.
+ * 2. Override `onSkinReady()` for setup that needs the complete skin.
+ * 3. Override `onSkinRemoved()` to clean up complete-skin bindings.
  * 4. Override `createChildren()` to perform one-time initialization.
  */
-export class Component extends Sprite implements IUIComponent, ILayoutTarget, IUIOwner {
+export class Component<TSkin extends string = string> extends Sprite implements IUIComponent, ILayoutTarget, IUIOwner {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	public readonly ui: UIState;
@@ -46,6 +61,8 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 	private _explicitTouchChildren = true;
 	private _explicitState = '';
 	private _stateIsDirty = false;
+	private _skinReady = false;
+	private _skinParts: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
@@ -310,7 +327,7 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 	}
 
 	public set scrollH(_v: number) {
-		/* no-op for Component */
+		// No-op for Component.
 	}
 
 	public get scrollV(): number {
@@ -318,7 +335,7 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 	}
 
 	public set scrollV(_v: number) {
-		/* no-op for Component */
+		// No-op for Component.
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────
@@ -327,18 +344,6 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 		this._skinName = skinName;
 		this._parseSkinName();
 		this.invalidateProperties();
-	}
-
-	/**
-	 * Bind a skin part instance to this component.
-	 * Called automatically when a skin is attached.
-	 */
-	public setSkinPart(partName: string, instance: unknown): void {
-		const self = this as Record<string, unknown>;
-		const old = self[partName];
-		if (old) this.partRemoved(partName, old);
-		self[partName] = instance;
-		if (instance) this.partAdded(partName, instance);
 	}
 
 	/**
@@ -385,7 +390,7 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 	}
 
 	public setVirtualElementIndicesInView(_startIndex: number, _endIndex: number): void {
-		/* no-op for Component */
+		// No-op for Component.
 	}
 
 	public setContentSize(_w: number, _h: number): void {}
@@ -552,21 +557,39 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	/**
+	 * Whether all parts for the current skin have been attached.
+	 */
+	protected get skinReady(): boolean {
+		return this._skinReady;
+	}
+
+	/**
+	 * Parts exported by the attached skin.
+	 *
+	 * Access is only valid after the skin has completed attachment. Generated
+	 * declarations provide the exact part names and types for known skins.
+	 */
+	protected get skinParts(): Readonly<SkinPartsOf<TSkin>> {
+		if (!this._skinReady) {
+			throw new Error(`${this.constructor.name} skin parts are not ready.`);
+		}
+		return this._skinParts as SkinPartsOf<TSkin>;
+	}
+
 	protected setSkin(skin: Skin | undefined): void {
 		this._setSkin(skin);
 	}
 
 	/**
-	 * Called when a skin part is added. Override to bind event listeners
-	 * or apply cached property values to the part.
+	 * Called after the complete skin and all of its parts have been attached.
 	 */
-	protected partAdded(_partName: string, _instance: unknown): void {}
+	protected onSkinReady(): void {}
 
 	/**
-	 * Called when a skin part is removed. Override to clean up listeners
-	 * and cached references.
+	 * Called before the current skin and its complete part set are detached.
 	 */
-	protected partRemoved(_partName: string, _instance: unknown): void {}
+	protected onSkinRemoved(): void {}
 
 	/**
 	 * Return the current view-state name. Override in subclasses.
@@ -625,26 +648,32 @@ export class Component extends Sprite implements IUIComponent, ILayoutTarget, IU
 		if (oldSkin) {
 			// Exit the active state while its host and display hierarchy are still
 			// intact, then detach bindings, parts and visual elements.
+			if (this._skinReady) {
+				this.onSkinRemoved();
+				this._skinReady = false;
+			}
+			this._skinParts = Object.create(null) as Record<string, unknown>;
 			oldSkin.hostComponent = undefined;
 			oldSkin.unwatchAll();
-			for (const partName of oldSkin.skinParts) {
-				if ((this as Record<string, unknown>)[partName]) this.setSkinPart(partName, undefined);
-			}
 			for (const child of oldSkin.elementsContent) {
 				if (child.parent === this) this.removeChild(child);
 			}
 		}
 		this._skin = skin;
 		if (skin) {
+			const parts = Object.create(null) as Record<string, unknown>;
 			for (const partName of skin.skinParts) {
 				const instance = skin.getPart(partName);
-				if (instance) this.setSkinPart(partName, instance);
+				if (instance !== undefined) parts[partName] = instance;
 			}
+			this._skinParts = parts;
 			for (let i = skin.elementsContent.length - 1; i >= 0; i--) {
 				this.addChildAt(skin.elementsContent[i], 0);
 			}
 			skin.currentState = this.currentState;
 			skin.hostComponent = this;
+			this._skinReady = true;
+			this.onSkinReady();
 		}
 		this.invalidateSize();
 		this.invalidateDisplayList();

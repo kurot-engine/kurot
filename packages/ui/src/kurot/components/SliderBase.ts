@@ -28,7 +28,9 @@ export class SliderBase extends Range {
 	private _touchOffsetX = 0;
 	private _touchOffsetY = 0;
 
-	/** Scratch point reused across frame to avoid per-event allocations (egret `$TempPoint`). */
+	/**
+	 * Scratch point reused across frames to avoid per-event allocations.
+	 */
 	private readonly _scratchPoint = new Point();
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -75,7 +77,10 @@ export class SliderBase extends Range {
 		this._addTrackListeners();
 	}
 
-	/** Whether `value` updates live during drag (default true). If false, value commits on release. */
+	/**
+	 * Whether `value` updates while the thumb is being dragged.
+	 * When disabled, the pending value is committed on release.
+	 */
 	public get liveDragging(): boolean {
 		return this._liveDragging;
 	}
@@ -84,7 +89,9 @@ export class SliderBase extends Range {
 		this._liveDragging = value;
 	}
 
-	/** The not-yet-committed value during interaction (egret parity). */
+	/**
+	 * The value that has not yet been committed during interaction.
+	 */
 	public get pendingValue(): number {
 		return this._pendingValue;
 	}
@@ -94,13 +101,28 @@ export class SliderBase extends Range {
 		this.invalidateDisplayList();
 	}
 
-	protected pointToValue(x: number, y: number): number {
-		return this.minimum;
-	}
-
 	public override $onRemoveFromStage(): void {
 		this._cancelDrag();
 		super.$onRemoveFromStage();
+	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { thumb, track } = this.skinParts;
+		if (thumb instanceof DisplayObject) this.thumb = thumb;
+		if (track instanceof DisplayObject) this.track = track;
+	}
+
+	protected override onSkinRemoved(): void {
+		this.thumb = undefined;
+		this.track = undefined;
+		super.onSkinRemoved();
+	}
+
+	protected pointToValue(_x: number, _y: number): number {
+		return this.minimum;
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────

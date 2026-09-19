@@ -213,13 +213,15 @@ EXML 生成的 `Binding.bindProperty(this, ...)` 调用是必须的，因为绑�
 
 `_setSkin(skin)` 做的事：
 
-1. **拆旧**：`oldSkin.hostComponent = undefined`（触发退出旧状态，这时
-   显示树还完整）→ `oldSkin.unwatchAll()`（清空所有 EXML 生成的
-   `Watcher`）→ 逐个清空皮肤部件绑定 → 把 `elementsContent` 从宿主上摘掉。
-2. **装新**：遍历 `skin.skinParts`，逐个 `skin.getPart(name)` 取值，非空
-   就绑定（触发 `partAdded()` 回调）→ 按声明顺序把 `elementsContent`
-   `addChildAt` 到宿主 → 最后 `skin.hostComponent = this`（这一步才触发
-   `Skin` 自己的状态机初始化）。
+1. **拆旧**：调用 `onSkinRemoved()`，此时旧的完整 `skinParts` 仍可读取
+   → 标记 Skin 未就绪并清空内部 part 映射
+   → `oldSkin.hostComponent = undefined` 退出旧状态
+   → `oldSkin.unwatchAll()` 清空所有 EXML 生成的 `Watcher`
+   → 把 `elementsContent` 从宿主上摘掉。
+2. **装新**：遍历 `skin.skinParts`，通过 `skin.getPart(name)` 一次性构建
+   新的内部 part 映射 → 按声明顺序把 `elementsContent` `addChildAt` 到宿主
+   → 设置 `skin.hostComponent = this` 初始化状态机 → 标记 Skin 就绪并调用
+   `onSkinReady()`。组件实例上不会动态生成同名属性。
 3. 收尾 `invalidateSize()` + `invalidateDisplayList()` + 在*组件*（不是
    皮肤）上派发 `Event.COMPLETE`。
 

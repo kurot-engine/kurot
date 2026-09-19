@@ -63,7 +63,9 @@ export class ViewStack extends Group implements ICollection {
 
 	// ── ICollection implementation ────────────────────────────────────────
 
-	/** The number of child views. */
+	/**
+	 * The number of child views.
+	 */
 	public get length(): number {
 		return this.numChildren;
 	}

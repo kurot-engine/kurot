@@ -8,7 +8,9 @@
 import { describe, it, expect } from 'vitest';
 import { DataGroup, ItemRenderer, ArrayCollection } from '../src/index.js';
 
-/** Custom renderer that records its data for assertion. */
+/**
+ * Custom renderer that records its data for assertions.
+ */
 class TestRenderer extends ItemRenderer {
 	public lastData: unknown = null;
 	protected override dataChanged(): void {
@@ -16,7 +18,9 @@ class TestRenderer extends ItemRenderer {
 	}
 }
 
-/** Subclass that records rendererAdded/rendererRemoved calls. */
+/**
+ * Subclass that records renderer-added and renderer-removed calls.
+ */
 class TrackingDataGroup extends DataGroup {
 	public addedCount = 0;
 	public removedCount = 0;

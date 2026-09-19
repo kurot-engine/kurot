@@ -3,6 +3,7 @@ import type { IViewport } from '../core/IViewport.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 import { Event } from '@kurot/core';
+import { isUIComponent } from '../core/UIComponent.js';
 
 /**
  * Base class for scroll bars.
@@ -42,6 +43,17 @@ export class ScrollBarBase extends Component {
 	}
 
 	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { thumb } = this.skinParts;
+		if (isUIComponent(thumb)) this.thumb = thumb;
+	}
+
+	protected override onSkinRemoved(): void {
+		this.thumb = undefined;
+		super.onSkinRemoved();
+	}
 
 	/**
 	 * Called when viewport properties (scrollH, scrollV, contentWidth, etc.) change.

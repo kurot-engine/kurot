@@ -16,19 +16,7 @@ export class HSlider extends SliderBase {
 		this.direction = Direction.LTR;
 	}
 
-	/**
-	 * Range of thumb movement = track width − thumb width.
-	 */
-	private _getThumbRange(): number {
-		const track = this.track;
-		const thumb = this.thumb;
-		if (!track || !thumb || !isUIComponent(track) || !isUIComponent(thumb)) return 0;
-		const b = new Rectangle();
-		track.getLayoutBounds(b);
-		const trackWidth = b.width;
-		thumb.getLayoutBounds(b);
-		return trackWidth - b.width;
-	}
+	// ── Protected methods ─────────────────────────────────────────────────
 
 	protected override pointToValue(x: number, _y: number): number {
 		const range = this.maximum - this.minimum;
@@ -48,5 +36,21 @@ export class HSlider extends SliderBase {
 		const trackBounds = new Rectangle();
 		track.getLayoutBounds(trackBounds);
 		thumb.x = trackBounds.x + ratio * thumbRange;
+	}
+
+	// ── Private methods ───────────────────────────────────────────────────
+
+	/**
+	 * Return the horizontal distance available for thumb movement.
+	 */
+	private _getThumbRange(): number {
+		const track = this.track;
+		const thumb = this.thumb;
+		if (!track || !thumb || !isUIComponent(track) || !isUIComponent(thumb)) return 0;
+		const b = new Rectangle();
+		track.getLayoutBounds(b);
+		const trackWidth = b.width;
+		thumb.getLayoutBounds(b);
+		return trackWidth - b.width;
 	}
 }

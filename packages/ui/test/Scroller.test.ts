@@ -8,10 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { Event, TouchEvent } from '@kurot/core';
 import { Scroller, Group, HScrollBar, VScrollBar } from '../src/index.js';
-
-function attachPart(scroller: Scroller, partName: string, instance: unknown): void {
-	(scroller as unknown as { partAdded: (name: string, part: unknown) => void }).partAdded(partName, instance);
-}
+import { attachSkin } from './helpers/skin.js';
 
 describe('Scroller', () => {
 	describe('viewport display-list management', () => {
@@ -44,8 +41,7 @@ describe('Scroller', () => {
 			const scroller = new Scroller();
 			const horizontalBar = new HScrollBar();
 			const verticalBar = new VScrollBar();
-			attachPart(scroller, 'horizontalScrollBar', horizontalBar);
-			attachPart(scroller, 'verticalScrollBar', verticalBar);
+			attachSkin(scroller, { horizontalScrollBar: horizontalBar, verticalScrollBar: verticalBar });
 			const viewport = new Group();
 
 			scroller.viewport = viewport;
@@ -58,8 +54,7 @@ describe('Scroller', () => {
 			const scroller = new Scroller();
 			const horizontalBar = new HScrollBar();
 			const verticalBar = new VScrollBar();
-			attachPart(scroller, 'horizontalScrollBar', horizontalBar);
-			attachPart(scroller, 'verticalScrollBar', verticalBar);
+			attachSkin(scroller, { horizontalScrollBar: horizontalBar, verticalScrollBar: verticalBar });
 			scroller.viewport = new Group();
 
 			scroller.viewport = undefined;
@@ -73,8 +68,7 @@ describe('Scroller', () => {
 			const horizontalBar = new HScrollBar();
 			const verticalBar = new VScrollBar();
 
-			attachPart(scroller, 'horizontalScrollBar', horizontalBar);
-			attachPart(scroller, 'verticalScrollBar', verticalBar);
+			attachSkin(scroller, { horizontalScrollBar: horizontalBar, verticalScrollBar: verticalBar });
 
 			expect(horizontalBar.touchEnabled).toBe(false);
 			expect(horizontalBar.touchChildren).toBe(false);

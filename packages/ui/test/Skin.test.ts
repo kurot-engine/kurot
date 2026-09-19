@@ -5,7 +5,9 @@ import { State } from '../src/kurot/states/State.js';
 import type { IOverride } from '../src/kurot/states/IOverride.js';
 import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
-/** Records apply/remove calls so we can assert state-transition behaviour. */
+/**
+ * Records apply and remove calls for state-transition assertions.
+ */
 class RecordingOverride implements IOverride {
 	public applyCalls = 0;
 	public removeCalls = 0;

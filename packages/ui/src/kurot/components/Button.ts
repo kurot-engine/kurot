@@ -2,8 +2,8 @@ import { Component } from './Component.js';
 import { Event, TouchEvent, DisplayObject } from '@kurot/core';
 import type { Stage, Texture } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
-import type { Image } from './Image.js';
-import type { Label } from './Label.js';
+import { Image } from './Image.js';
+import { Label } from './Label.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**
@@ -99,18 +99,30 @@ export class Button extends Component implements IDisplayText {
 
 	// ── Override methods ──────────────────────────────────────────────────
 
-	public override partAdded(partName: string, instance: unknown): void {
-		super.partAdded(partName, instance);
-		if (partName === 'labelDisplay' && this.labelDisplay) {
-			this.labelDisplay.text = this._label;
-		} else if (partName === 'iconDisplay' && this.iconDisplay) {
-			this.iconDisplay.source = this._icon;
-		}
-	}
-
 	public override $onRemoveFromStage(): void {
 		this._cancelTouchCapture();
 		super.$onRemoveFromStage();
+	}
+
+	// ── Protected methods ─────────────────────────────────────────────────
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { labelDisplay, iconDisplay } = this.skinParts;
+		if (labelDisplay instanceof Label) {
+			this.labelDisplay = labelDisplay;
+			labelDisplay.text = this._label;
+		}
+		if (iconDisplay instanceof Image) {
+			this.iconDisplay = iconDisplay;
+			iconDisplay.source = this._icon;
+		}
+	}
+
+	protected override onSkinRemoved(): void {
+		this.labelDisplay = undefined;
+		this.iconDisplay = undefined;
+		super.onSkinRemoved();
 	}
 
 	/**
@@ -139,8 +151,6 @@ export class Button extends Component implements IDisplayText {
 		if (this.skin?.hasState(selectedState)) return selectedState;
 		return state === 'disabled' ? 'disabled' : 'down';
 	}
-
-	// ── Protected methods ─────────────────────────────────────────────────
 
 	/**
 	 * Called when the user taps the button (touch ends within the button bounds).

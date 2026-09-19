@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Stage, TouchEvent } from '@kurot/core';
 import { Button, Group, HSlider, ItemRenderer, Panel, Rect, Scroller } from '../src/index.js';
+import { attachSkin } from './helpers/skin.js';
 
 function expectStageCleanup(stage: Stage, component: { dispatchEvent(event: TouchEvent): boolean }): void {
 	const removeListener = vi.spyOn(stage, 'removeEventListener');
@@ -46,8 +47,7 @@ describe('temporary Stage gesture listeners', () => {
 		const stage = new Stage();
 		const panel = new Panel();
 		const moveArea = new Rect(100, 30, 0xffffff);
-		panel.addChild(moveArea);
-		panel.setSkinPart('moveArea', moveArea);
+		attachSkin(panel, { moveArea });
 		stage.addChild(panel);
 		const removeListener = vi.spyOn(stage, 'removeEventListener');
 

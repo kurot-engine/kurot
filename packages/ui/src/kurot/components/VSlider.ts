@@ -16,19 +16,7 @@ export class VSlider extends SliderBase {
 		this.direction = Direction.BTT;
 	}
 
-	/**
-	 * Range of thumb movement = track height − thumb height.
-	 */
-	private _getThumbRange(): number {
-		const track = this.track;
-		const thumb = this.thumb;
-		if (!track || !thumb || !isUIComponent(track) || !isUIComponent(thumb)) return 0;
-		const b = new Rectangle();
-		track.getLayoutBounds(b);
-		const trackHeight = b.height;
-		thumb.getLayoutBounds(b);
-		return trackHeight - b.height;
-	}
+	// ── Protected methods ─────────────────────────────────────────────────
 
 	protected override pointToValue(_x: number, y: number): number {
 		const range = this.maximum - this.minimum;
@@ -49,5 +37,21 @@ export class VSlider extends SliderBase {
 		const trackBounds = new Rectangle();
 		track.getLayoutBounds(trackBounds);
 		thumb.y = trackBounds.y + (1 - ratio) * thumbRange;
+	}
+
+	// ── Private methods ───────────────────────────────────────────────────
+
+	/**
+	 * Return the vertical distance available for thumb movement.
+	 */
+	private _getThumbRange(): number {
+		const track = this.track;
+		const thumb = this.thumb;
+		if (!track || !thumb || !isUIComponent(track) || !isUIComponent(thumb)) return 0;
+		const b = new Rectangle();
+		track.getLayoutBounds(b);
+		const trackHeight = b.height;
+		thumb.getLayoutBounds(b);
+		return trackHeight - b.height;
 	}
 }

@@ -3,7 +3,9 @@ import { EventDispatcher } from '@kurot/core';
 import { Binding } from '../src/kurot/binding/Binding.js';
 import { PropertyEvent } from '../src/kurot/events/PropertyEvent.js';
 
-/** Minimal bindable host — same shape as in Watcher.test.ts. */
+/**
+ * Minimal bindable host with the same shape as the watcher test host.
+ */
 class BindableHost extends EventDispatcher {
 	constructor(initialProps: Record<string, unknown> = {}) {
 		super();
@@ -15,7 +17,9 @@ class BindableHost extends EventDispatcher {
 	}
 }
 
-/** A simple target whose property we bind into. */
+/**
+ * A simple target whose property receives the bound value.
+ */
 class Target extends EventDispatcher {
 	public value = '';
 }

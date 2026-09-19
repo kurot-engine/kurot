@@ -175,7 +175,9 @@ export class RadioButton extends ToggleButton {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
-	/** Enabled only if both the radio itself and its group are enabled. */
+	/**
+	 * Enabled only when both the radio button and its group are enabled.
+	 */
 	public override get enabled(): boolean {
 		if (!super.enabled) return false;
 		return !this._group || this._group.enabled;
