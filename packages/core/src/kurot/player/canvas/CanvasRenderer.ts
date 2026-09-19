@@ -178,6 +178,10 @@ export class CanvasRenderer {
 			return drawCalls;
 		}
 
+		// This node has now been consumed by the current traversal. Clearing the
+		// flag on every traversed node is required so a later descendant change
+		// can propagate through ordinary containers to the cached ancestor.
+		displayObject.$cacheDirty = false;
 		drawCalls += this.renderSelf(displayObject, ctx, offsetX, offsetY);
 
 		const $children = displayObject.$children;

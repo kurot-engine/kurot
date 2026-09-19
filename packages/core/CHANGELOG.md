@@ -4,6 +4,23 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.23] — 2026-09-19
+
+### Fixed
+
+- Canvas traversal now clears consumed cache-dirty flags on ordinary display
+  objects. Repeated descendant changes can therefore propagate through nested
+  containers and refresh a cached ancestor instead of leaving stale pixels.
+- The fix applies to Canvas rendering and WebGL `cacheAsBitmap`, whose cached
+  subtree is rasterized through the Canvas renderer before texture upload.
+
+### Tests
+
+- Added regressions for repeated descendant updates, propagation through
+  ordinary containers, nested caches, and unchanged-frame cache reuse.
+- Core unit suite passes: 66 test files and 700 tests.
+- TypeScript implementation and declaration builds pass.
+
 ## [1.0.22] — 2026-09-18
 
 ### Fixed
