@@ -16,6 +16,10 @@ export interface BuildOutputs {
 	 */
 	skinsScript?: string;
 	/**
+	 * Generated skin-part declaration path relative to the project root.
+	 */
+	skinPartsDeclaration?: string;
+	/**
 	 * Component catalog path relative to the development output directory.
 	 */
 	componentCatalog?: string;

@@ -2,7 +2,7 @@
 
 CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
-> **Stable (1.1.4).** Requires Node.js 20 or later and emits ES2022 ESM projects.
+> **Current release: 1.2.0.** Requires Node.js 20 or later and emits ES2022 ESM projects.
 
 > Migrating from Egret? See [egret-migration.md](../../docs/egret-migration.md)
 >
@@ -258,21 +258,27 @@ class name within the configured namespace.
 Development builds also emit `.kurot/component-catalog.json` for editor and
 agent tooling. The catalog is intentionally omitted from release output.
 
+Every successful EXML compilation also writes `.kurot/skin-parts.d.ts`. It
+augments `@kurot/ui`'s `SkinPartsMap` with the exact named parts and runtime
+types found in each compiled skin. The generated file is included by the
+template `tsconfig.json`, ignored by git, and never enters browser or release
+bundles.
+
 `exml.namespaces` remains available for advanced manual namespace barrels, but
 its prefix must not conflict with `exml.components.namespace`.
 
 ### Custom component lifecycle
 
-For initialization that requires every EXML skin part to be available, override
-`childrenCreated()`:
+Select the generated part shape through the skin class name and initialize
+skin-dependent behavior in `onSkinReady()`:
 
 ```ts
 import { Component } from '@kurot/ui';
 
-export class BattlePanel extends Component {
+export class BattlePanel extends Component<'game.ui.BattlePanelSkin'> {
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		// The complete skin part set is now available through this.skinParts.
+		this.skinParts.groupField.visible = true;
 	}
 }
 ```
@@ -289,6 +295,10 @@ Use `onSkinReady()` to initialize logic that depends on skin parts and
 `onSkinRemoved()` to release listeners or other bindings before replacement.
 `childrenCreated()` and `UIEvent.CREATION_COMPLETE` run once for the component's
 initial creation and are not skin-replacement hooks.
+
+UI 2.0 no longer copies part names onto component instances and no longer
+supports `setSkinPart()`, `partAdded()`, or `partRemoved()`. Read parts through
+`this.skinParts` only while the skin-ready lifecycle is active.
 
 EXML skins compiled by the CLI are registered under their complete `class`
 attribute, so an Egret-style value such as
@@ -322,6 +332,9 @@ A project created with the default template (`game`) has the following structure
 
 ```
 my-game/
+├── .kurot/
+│   └── skin-parts.d.ts        # Generated typed EXML part declarations
+├── .gitignore                 # Excludes .kurot and build/dependency output
 ├── kurot.config.ts          # Project config (includes exml options)
 ├── package.json               # Dependencies & scripts
 ├── tsconfig.json              # TypeScript config

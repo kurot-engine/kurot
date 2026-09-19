@@ -7,6 +7,31 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 1.2.0 — 2026-09-20
+
+### Added
+
+- EXML compilation now generates `.kurot/skin-parts.d.ts`, augmenting
+  `@kurot/ui`'s `SkinPartsMap` with the exact named parts and component types
+  for every compiled skin.
+- Generated declarations resolve convention-based and manually configured
+  namespace components back to their project TypeScript modules.
+
+### Changed
+
+- New project TypeScript configurations include `.kurot/**/*.d.ts` so typed
+  skin parts are available to editors and `tsc` without entering runtime
+  bundles.
+- New projects ignore the generated `.kurot` directory together with build and
+  dependency output.
+- Updated custom-component guidance for the atomic skin lifecycle introduced by
+  `@kurot/ui@2.0.0`.
+
+### Tests
+
+- Added regression coverage for built-in and project-component skin-part
+  declarations and for the generated-project TypeScript and ignore settings.
+
 ## 1.1.4 — 2026-09-09
 
 ### Changed

@@ -1,6 +1,6 @@
 # @kurot/cli 架构文档
 
-> 当前版本：1.1.4。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
+> 当前版本：1.2.0。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---
@@ -9,7 +9,7 @@
 
 `@kurot/cli` 是 Kurot 游戏引擎的命令行工具，提供 Web 项目的创建、开发、构建和发布能力。它不全局安装，项目通过 `npx`（脚手架）或作为 devDependency 经 npm 脚本调用。命令基于 Commander.js，构建基于 esbuild，并内置一个 EXML → ESM 编译器。
 
-构建过程由一组有序的 `BuildPlugin` 组成。插件共享一个 `BuildContext`（`core/pipeline.ts`），通过 `ctx.outputs` 在步骤间传递产物信息：入口脚本（`entryScript`）、编译后的皮肤模块（`skinsScript`）、引擎/自定义 namespace 的 import-map（`engine`），以及被 namespace chunk 内联的源文件清单（`namespaceModules`）。
+构建过程由一组有序的 `BuildPlugin` 组成。插件共享一个 `BuildContext`（`core/pipeline.ts`），通过 `ctx.outputs` 在步骤间传递产物信息：入口脚本（`entryScript`）、编译后的皮肤模块（`skinsScript`）、项目根目录下的皮肤部件声明（`skinPartsDeclaration`）、引擎/自定义 namespace 的 import-map（`engine`），以及被 namespace chunk 内联的源文件清单（`namespaceModules`）。
 
 ## 二、目录结构
 
@@ -39,6 +39,7 @@ packages/cli/
 │   │   │   ├── exml-parser.ts         # XElement → SkinIR
 │   │   │   ├── ast.ts                 # SkinIR 类型定义
 │   │   │   ├── codegen.ts             # SkinIR → ESM 源码（字符串拼接，非 AST）
+│   │   │   ├── skin-parts-declaration.ts # SkinIR → 类型化 SkinPartsMap 声明
 │   │   │   └── index.ts
 │   │   └── plugins/                   # 管线步骤，按数组顺序执行
 │   │       ├── index.ts               # defaultPlugins()：build 命令的步骤顺序
@@ -85,7 +86,7 @@ copy assets
 各阶段职责如下：
 
 1. `cleanOutput`：清空输出目录，因此每次构建都不是增量的（增量发生在 esbuild 的 watch 层）。
-2. `compileExml`：读取主题配置，编译 EXML，并生成主题 ESM bundle。
+2. `compileExml`：读取主题配置，编译 EXML，生成主题 ESM bundle，并在项目根目录刷新 `.kurot/skin-parts.d.ts`。
 3. `compileEngine`：把 `package.json` 中的 `@kurot/*` 运行时依赖分别打成 chunk。
 4. `compileCustomNamespaces`：把手工 barrel 或 CLI 自动生成的组件入口分别打成 `ns.<prefix>` chunk。
 5. `writeComponentCatalog`：开发模式输出 `.kurot/component-catalog.json`，release 不携带。
@@ -95,6 +96,10 @@ copy assets
 9. `copyAssets`：复制 `resource/`，并在启用 EXML 时跳过源主题文件和 `.exml` 文件。
 
 顺序不能随意交换。自定义 namespace 必须先于应用源码编译，以便应用和皮肤都通过 `#ns/<prefix>` 指向同一个模块实例，避免重复打包导致类身份不一致。
+
+`.kurot/skin-parts.d.ts` 是编辑期类型产物，不属于 `bin-debug` 或
+`bin-release`。它与主题 bundle 使用同一份成功解析的 `SkinIR`，因此不会
+出现运行时皮肤已更新而部件声明仍来自另一套解析结果的情况。
 
 ## 四、模块拆分与 import map
 

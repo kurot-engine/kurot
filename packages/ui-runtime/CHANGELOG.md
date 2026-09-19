@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.0] — 2026-09-20
+
+### Changed
+
+- Upgraded the runtime and development contract to `@kurot/ui@^2.0.0`.
+- Appearance materialization now runs against UI 2.0's atomic complete-skin
+  lifecycle while retaining the existing `Skin.setPart()` authoring boundary.
+
+### Tests
+
+- Revalidated native Button, ProgressBar, and TextInput appearance-part binding,
+  state handling, transitions, data bindings, and disposal against UI 2.0.
+
 ## [0.4.2] — 2026-08-31
 
 ### Changed

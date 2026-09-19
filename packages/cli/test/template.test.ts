@@ -37,5 +37,9 @@ describe('game template components', () => {
 		const config = await fs.readFile(path.join(project, 'kurot.config.ts'), 'utf-8');
 		expect(config).toContain("sourceDir: 'src/components'");
 		expect(config).toContain("skinDir: 'resource/skins/components'");
+		const tsconfig = await fs.readFile(path.join(project, 'tsconfig.json'), 'utf-8');
+		expect(tsconfig).toContain('".kurot/**/*.d.ts"');
+		const gitignore = await fs.readFile(path.join(project, '.gitignore'), 'utf-8');
+		expect(gitignore).toContain('.kurot/');
 	});
 });

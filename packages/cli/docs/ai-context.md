@@ -5,7 +5,7 @@ unfamiliar with Kurot does not need to re-derive the pipeline from scratch
 each session. [`architecture.md`](./architecture.md) covers the same plugin
 pipeline in greater detail.
 
-Package identity: `@kurot/cli@1.1.4`. Node.js build tool, esbuild-powered,
+Package identity: `@kurot/cli@1.2.0`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
 via `npx` (scaffolding) or as a devDependency with npm scripts.
 
@@ -36,7 +36,8 @@ src/
 │   │   ├── xml-parser.ts           Hand-rolled recursive-descent XML parser
 │   │   ├── registry.ts             Namespace prefix map + component tag registry
 │   │   ├── exml-parser.ts          XElement tree -> SkinIR
-│   │   └── codegen.ts              SkinIR -> ESM source text (string building, not AST)
+│   │   ├── codegen.ts              SkinIR -> ESM source text (string building, not AST)
+│   │   └── skin-parts-declaration.ts  SkinIR -> typed SkinPartsMap declaration
 │   └── plugins/                    Pipeline steps, run in array order (see §5)
 │       ├── clean-output.ts, compile-exml.ts, compile-engine.ts,
 │       │   compile-custom-namespaces.ts, component-catalog.ts, compile-source.ts,
@@ -102,6 +103,10 @@ Templates actually scaffolded by `create` live in `templates/game/` and
 - `skin-module-builder.ts` generates every Skin module in a temporary staging
   directory and installs the completed bundle only after all Skin code has
   compiled. This is what preserves the previous bundle during failed watches.
+- A successful EXML build generates project-root `.kurot/skin-parts.d.ts` from
+  the same parsed `SkinIR` used by code generation. It augments
+  `@kurot/ui`'s `SkinPartsMap`; template TypeScript configurations include it,
+  while git and runtime/release bundles exclude it.
 - `parseValue()` in `exml-parser.ts` coerces EXML attribute values in this
   order: binding (`{...}`) → percent (trailing `%`) → boolean literal → `null`
   literal → numeric literal → fallback string. This means literal strings

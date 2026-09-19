@@ -4,6 +4,7 @@ import { writeFile } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
 import { DIAGNOSTIC_CODES } from '../diagnostics/index.js';
 import { buildSkinsModule } from '../exml/skin-module-builder.js';
+import { generateSkinPartsDeclaration, SKIN_PARTS_DECLARATION_PATH } from '../exml/skin-parts-declaration.js';
 import { BuildError } from '../errors.js';
 import type { Dirent } from 'node:fs';
 import type { Diagnostic } from '../diagnostics/index.js';
@@ -50,6 +51,7 @@ export function compileExml(): BuildPlugin {
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
 			if (!project.config.exml || !project.themeFile) return;
+
 			ctx.diagnostics.removeByCodes([
 				DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
 				DIAGNOSTIC_CODES.EXML_COMPILE_FAILED,
@@ -64,17 +66,25 @@ export function compileExml(): BuildPlugin {
 				throwIfInputInvalid(ctx);
 				return;
 			}
+
 			const { files, missingDeclaredPaths } = await resolveExmlFiles(ctx, theme);
 			const skins: CompiledSkin[] = files.map(file => ({ file, className: extractClassName(file) }));
 			reportMissingThemeSkins(ctx, theme, skins, missingDeclaredPaths);
 			throwIfInputInvalid(ctx);
 			if (files.length === 0) {
+				await fs.rm(path.join(project.root, SKIN_PARTS_DECLARATION_PATH), { force: true });
+				delete ctx.outputs.skinPartsDeclaration;
 				logger.step('no .exml files found, skipping');
 				return;
 			}
 
-			const skinsFile = await buildSkinsModule(ctx, skins);
-			ctx.outputs.skinsScript = `js/${skinsFile}`;
+			const built = await buildSkinsModule(ctx, skins);
+			ctx.outputs.skinsScript = `js/${built.filename}`;
+			ctx.outputs.skinPartsDeclaration = SKIN_PARTS_DECLARATION_PATH;
+			await writeFile(
+				path.join(project.root, SKIN_PARTS_DECLARATION_PATH),
+				generateSkinPartsDeclaration(project, built.skins),
+			);
 
 			const relThemePath = project.config.exml.themeFile;
 			const outTheme: ThemeData = { ...theme };
@@ -84,7 +94,7 @@ export function compileExml(): BuildPlugin {
 				...componentSkinMappings(project),
 				...remapSkins(project, theme.skins ?? {}, skins),
 			};
-			outTheme.skinsJs = toPosix(path.relative(path.dirname(relThemePath), `js/${skinsFile}`));
+			outTheme.skinsJs = toPosix(path.relative(path.dirname(relThemePath), `js/${built.filename}`));
 
 			await writeFile(path.join(project.outputDir, relThemePath), JSON.stringify(outTheme, null, '\t'));
 			logger.step(`compiled ${skins.length} skin(s) → ${ctx.outputs.skinsScript}`);

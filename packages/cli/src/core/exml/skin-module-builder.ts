@@ -10,6 +10,7 @@ import { createUnresolvedTagDiagnostics } from './exml-diagnostics.js';
 import { generateCode, parseToIR } from './index.js';
 import type { Diagnostic } from '../diagnostics/index.js';
 import type { BuildContext } from '../pipeline.js';
+import type { SkinIR } from './ast.js';
 
 /**
  * EXML source file resolved for skin compilation.
@@ -41,11 +42,19 @@ export interface CompiledSkin {
 }
 
 /**
+ * Installed skin bundle and the parsed skins used to build it.
+ */
+export interface BuiltSkinsModule {
+	readonly filename: string;
+	readonly skins: readonly SkinIR[];
+}
+
+/**
  * Builds and atomically installs the ESM bundle for a set of EXML skins.
  *
- * @returns The installed bundle's filename relative to the output `js` directory.
+ * @returns The installed bundle filename and the parsed skins used to build it.
  */
-export async function buildSkinsModule(ctx: BuildContext, skins: readonly CompiledSkin[]): Promise<string> {
+export async function buildSkinsModule(ctx: BuildContext, skins: readonly CompiledSkin[]): Promise<BuiltSkinsModule> {
 	const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
 	try {
 		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin)));
@@ -53,22 +62,32 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 			throw new BuildError('EXML compilation failed.');
 		}
 
-		const sources = modules.filter((module): module is string => module !== undefined);
+		const compiledModules = modules.filter(
+			(module): module is { source: string; skin: SkinIR } => module !== undefined,
+		);
 		const stubDir = path.join(temporaryRoot, 'stubs');
 		const bundleDir = path.join(temporaryRoot, 'bundle');
 		await Promise.all([ensureDir(stubDir), ensureDir(bundleDir)]);
-		await Promise.all(sources.map((source, index) => fs.writeFile(path.join(stubDir, `skin${index}.ts`), source)));
+		await Promise.all(
+			compiledModules.map((module, index) => fs.writeFile(path.join(stubDir, `skin${index}.ts`), module.source)),
+		);
 		await fs.writeFile(path.join(stubDir, 'index.ts'), createIndex(skins) + '\n');
 
 		const outputName = await bundleSkins(ctx, stubDir, bundleDir);
 		await installBundle(bundleDir, outputName, path.join(ctx.project.outputDir, 'js'));
-		return outputName;
+		return {
+			filename: outputName,
+			skins: compiledModules.map(module => module.skin),
+		};
 	} finally {
 		await fs.rm(temporaryRoot, { recursive: true, force: true });
 	}
 }
 
-async function generateSkinModule(ctx: BuildContext, skin: CompiledSkin): Promise<string | undefined> {
+async function generateSkinModule(
+	ctx: BuildContext,
+	skin: CompiledSkin,
+): Promise<{ source: string; skin: SkinIR } | undefined> {
 	try {
 		const namespaces = ctx.project.customNamespaces.map(ns => ({
 			prefix: ns.prefix,
@@ -86,7 +105,10 @@ async function generateSkinModule(ctx: BuildContext, skin: CompiledSkin): Promis
 			ctx.diagnostics.report(diagnostic);
 			logger.warn(`${diagnostic.location?.file}: ${diagnostic.message}`);
 		}
-		return generateCode(ir, { format: 'esm' });
+		return {
+			source: generateCode(ir, { format: 'esm' }),
+			skin: ir,
+		};
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		const diagnostic: Diagnostic = {

@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Stable (1.1.9).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.0.0.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -77,23 +77,88 @@ invalidateProperties / invalidateSize / invalidateDisplayList
 ### Skin system
 
 ```ts
-import { Skin, State, SetProperty } from '@kurot/ui';
+import { Rect, Skin, State, SetProperty } from '@kurot/ui';
 
 class MyButtonSkin extends Skin {
+	public bg: Rect;
+
 	constructor() {
 		super();
-		this.skinParts = ['labelDisplay'];
+
+		this.bg = new Rect(120, 36, 0x6c5ce7);
+		this.skinParts = ['bg'];
+		this.elementsContent = [this.bg];
 		this.states = [
 			new State('up'),
 			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
 			new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72)]),
 		];
-		// build visual children...
 	}
 }
 
 btn.skinName = MyButtonSkin;
 ```
+
+### Typed skin parts and lifecycle
+
+UI 2.0 attaches a skin atomically. The complete part set is available in
+`onSkinReady()` and remains available through `onSkinRemoved()`. Accessing
+`skinParts` outside that interval throws, which prevents code from silently
+using a partial or stale skin.
+
+Declare the part shape through the extensible `SkinPartsMap`, then select it
+with the skin class name passed to `Component<TSkin>`:
+
+```ts
+import { TouchEvent } from '@kurot/core';
+import { Button, Component, Label } from '@kurot/ui';
+
+declare module '@kurot/ui' {
+	interface SkinPartsMap {
+		'game.ui.ConfirmPanelSkin': {
+			readonly btnConfirm: Button;
+			readonly lblMessage: Label;
+		};
+	}
+}
+
+class ConfirmPanel extends Component<'game.ui.ConfirmPanelSkin'> {
+	public constructor() {
+		super();
+		this.skinName = 'game.ui.ConfirmPanelSkin';
+	}
+
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		this.skinParts.btnConfirm.addEventListener(
+			TouchEvent.TOUCH_TAP,
+			this.onConfirm,
+		);
+		this.skinParts.lblMessage.text = 'Continue?';
+	}
+
+	protected override onSkinRemoved(): void {
+		this.skinParts.btnConfirm.removeEventListener(
+			TouchEvent.TOUCH_TAP,
+			this.onConfirm,
+		);
+		super.onSkinRemoved();
+	}
+
+	private onConfirm = (): void => {
+		// Handle confirmation.
+	};
+}
+```
+
+Use `onSkinReady()` only for work that requires skin parts. Keep ordinary
+one-time component initialization in `createChildren()`. Remove listeners and
+other bindings created for a skin in `onSkinRemoved()` so replacing a skin
+cannot retain stale objects.
+
+The old incremental APIs `setSkinPart()`, `partAdded()`, and `partRemoved()`
+were removed in 2.0. Skin part names are no longer copied onto the component as
+dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 
 ## Components
 
@@ -297,6 +362,8 @@ cross-framework ranking.
 | Component base | `namespace` + `mixin`       | Standard class inheritance           |
 | Layout state   | Prototype-injected          | `UIState` delegation                 |
 | EXML runtime   | Built-in parser             | Compile-time only (`@kurot/cli`)   |
+| Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`             |
+| Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`      |
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions     |
 | Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true` |
 | i18n           | Built-in                    | Not supported                        |

@@ -97,6 +97,11 @@ describe('compile EXML behavior baseline', () => {
 		expect(script).toContain('new Button()');
 		expect(script).toContain('submitButton.label = "Submit"');
 		expect(script).toContain('globalThis["skins.ValidSkin"] = createValidSkin');
+		const skinParts = await fs.readFile(path.join(ctx.project.root, '.kurot/skin-parts.d.ts'), 'utf-8');
+		expect(ctx.outputs.skinPartsDeclaration).toBe('.kurot/skin-parts.d.ts');
+		expect(skinParts).toContain('import type * as SkinPartModule0 from "@kurot/ui";');
+		expect(skinParts).toContain('"skins.ValidSkin": {');
+		expect(skinParts).toContain('readonly "submitButton": SkinPartModule0.Button;');
 
 		const theme = JSON.parse(
 			await fs.readFile(path.join(outputDir, 'resource/default.thm.json'), 'utf-8'),
@@ -204,7 +209,10 @@ describe('compile EXML behavior baseline', () => {
 
 	it('warns and skips output when a theme-declared EXML file is missing', async () => {
 		const warning = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
-		const { ctx, outputDir } = await createFixtureContext('missing-declared', 'development');
+		const { ctx, outputDir, root } = await createMutableFixtureContext('missing-declared');
+		const declaration = path.join(root, '.kurot/skin-parts.d.ts');
+		await fs.mkdir(path.dirname(declaration), { recursive: true });
+		await fs.writeFile(declaration, 'stale declaration');
 
 		await compileExml().apply(ctx);
 
@@ -218,6 +226,8 @@ describe('compile EXML behavior baseline', () => {
 			}),
 		]);
 		expect(ctx.outputs.skinsScript).toBeUndefined();
+		expect(ctx.outputs.skinPartsDeclaration).toBeUndefined();
+		await expect(fs.access(declaration)).rejects.toThrow();
 		await expect(fs.access(path.join(outputDir, 'resource/default.thm.json'))).rejects.toThrow();
 	});
 
@@ -310,11 +320,12 @@ describe('compile EXML behavior baseline', () => {
 
 async function createFixtureContext(
 	fixtureName: string, mode: BuildMode, strict?: boolean,
-): Promise<{ ctx: ReturnType<typeof createContext>; outputDir: string }> {
-	const root = path.join(fixturesDir, fixtureName);
+): Promise<{ ctx: ReturnType<typeof createContext>; outputDir: string; root: string }> {
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), `kurot-cli-fixture-${fixtureName}-`));
 	const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), `kurot-cli-${fixtureName}-`));
-	temporaryDirs.push(outputDir);
-	return { ctx: createProjectContext(root, outputDir, mode, strict), outputDir };
+	temporaryDirs.push(root, outputDir);
+	await fs.cp(path.join(fixturesDir, fixtureName), root, { recursive: true });
+	return { ctx: createProjectContext(root, outputDir, mode, strict), outputDir, root };
 }
 
 async function createMutableFixtureContext(

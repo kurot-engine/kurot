@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.4.2`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.5.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -66,6 +66,11 @@ them in a separate part store. Authoring tools and Agents must therefore obey
 the `ui-document` appearance naming rule: identifiers that collide with
 `Skin` or inherited runtime members are invalid and should produce a clear
 diagnostic that asks the author or generator to rename them.
+
+Assigning the completed appearance `Skin` to a host uses `@kurot/ui@2`'s
+atomic lifecycle: the host receives one complete part map before built-in
+component binding runs. `Skin.setPart()` remains the write-side materializer
+API and is not the removed `Component.setSkinPart()` lifecycle API.
 
 Reusable component Contracts with states receive one `KurotUIStateController`
 per expanded instance. `setState(name)` applies overrides atomically and

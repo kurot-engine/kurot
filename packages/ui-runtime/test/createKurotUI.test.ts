@@ -435,7 +435,7 @@ describe('createKurotUI', () => {
 		textDisplay.setFocus = (): void => {
 			focused = true;
 		};
-		dispatchTouchBegin(input);
+		dispatchTouchTap(input);
 		expect(focused).toBe(true);
 	});
 
@@ -722,10 +722,10 @@ function dispatchTap(target: ToggleButton): void {
 	);
 }
 
-function dispatchTouchBegin(target: TextInput): void {
+function dispatchTouchTap(target: TextInput): void {
 	TouchEvent.dispatchTouchEvent(
 		target,
-		TouchEvent.TOUCH_BEGIN,
+		TouchEvent.TOUCH_TAP,
 		true,
 		false,
 		10,

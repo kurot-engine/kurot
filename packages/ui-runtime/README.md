@@ -4,6 +4,9 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
+> **Current release: 0.5.0.** Requires `@kurot/ui@^2.0.0` and uses its atomic
+> complete-skin lifecycle for materialized appearances.
+
 ```ts
 import { createKurotUI } from '@kurot/ui-runtime';
 
@@ -22,12 +25,13 @@ bindings, variants, part overrides, and projected Slot content. Appearance
 assets become native Kurot skins and states, including the selected appearance
 variant.
 
-Version 0.4 completes the first bounded visual-semantics slice with component
-capability validation and transactional data updates. Contract data
-fields drive declared one-way property bindings, semantic actions expose
-declared `tap` and `change` events, and numeric appearance overrides may use
-bounded transitions. The package still performs full-tree creation; incremental
-preview reconciliation belongs to the next phase.
+Version 0.5 carries the first bounded visual-semantics slice onto the typed,
+atomic UI 2.0 skin lifecycle while retaining component capability validation
+and transactional data updates. Contract data fields drive declared one-way
+property bindings, semantic actions expose declared `tap` and `change` events,
+and numeric appearance overrides may use bounded transitions. The package still
+performs full-tree creation; incremental preview reconciliation belongs to the
+next phase.
 
 The result also provides a stable node lookup for editor selection and event
 wiring:

@@ -20,8 +20,6 @@ Core features include:
   for future editors and Agent workflows.
 - Tween, MovieClip, ScrollView, and URLLoader game extensions.
 
-> **Naming note:** the npm packages have migrated to `@kurot/*`. Legacy `blakron` identifiers in the CLI, config files, and source paths will be unified in later migration steps.
-
 ## From Egret to Kurot
 
 Kurot is a continuation of Egret 5.4.1 for the modern web platform, not a new
@@ -50,18 +48,18 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
 | ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 1.0.21  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
-| [`@kurot/ui`](packages/ui/README.md)                   | 1.1.10  | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
+| [`@kurot/core`](packages/core/README.md)               | 1.0.23  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
+| [`@kurot/ui`](packages/ui/README.md)                   | 2.0.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)                 | 1.1.3   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.5.1   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                  |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.4.1   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse | `core`, `ui`, `ui-document` |
+| [`@kurot/cli`](packages/cli/README.md)                 | 1.2.0   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.5.2   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                  |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.5.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
 `@kurot/ui-document` 0.5 provides the reusable semantic model, explicit
 component capabilities, bounded dynamic contracts, and headless editing
-kernel. `@kurot/ui-runtime` 0.4 validates and renders that model, including
+kernel. `@kurot/ui-runtime` 0.5 validates and renders that model, including
 component instances, Slots, appearances, states, variants, resources, and
 design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
@@ -125,10 +123,11 @@ pnpm --dir packages/<package> dev
 Without publishing a package, you can invoke the CLI's source entry point directly:
 
 ```sh
-pnpm --dir packages/cli blakron -- <command>
+pnpm --dir packages/cli kurot -- <command>
 ```
 
-The CLI supports project creation, building, a dev server, and cleanup. Generated projects continue to use the `blakron` command and `blakron.config.ts` config file, for compatibility with the currently published packages.
+The CLI supports project creation, building, a dev server, and cleanup through
+the `kurot` command and `kurot.config.ts` project configuration.
 
 ## Architecture overview
 
@@ -200,7 +199,9 @@ cross-device ranking. Commands and measurement details are documented in the
 
 `@kurot/cli` parses `.exml` files into SkinIR at build time and generates ESM modules. At runtime, `@kurot/ui`'s theming system dynamically loads the generated skin factories, so build artifacts don't need to carry or parse EXML source files.
 
-Custom EXML namespaces are explicitly mapped to module entry points via `exml.namespaces` in `blakron.config.ts`, replacing Egret's runtime global namespace reflection.
+Custom EXML namespaces are explicitly mapped to module entry points via
+`exml.namespaces` in `kurot.config.ts`, replacing Egret's runtime global
+namespace reflection.
 
 ## Examples
 

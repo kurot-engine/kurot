@@ -9,12 +9,12 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package            | Version | One-line role                                                                                                                                                                   | Read this first                                                                  |
 | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `@kurot/core`      | 1.0.21  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
-| `@kurot/ui`        | 1.1.10  | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
+| `@kurot/core`      | 1.0.23  | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
+| `@kurot/ui`        | 2.0.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
-| `@kurot/cli`       | 1.1.3   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
+| `@kurot/cli`       | 1.2.0   | Node.js build tool (esbuild-powered) + EXML→ESM compiler + project scaffolding. Build-time only, never runs in the browser.                                                     | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
 | `@kurot/ui-document` | 0.5.2 | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, revisions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime` | 0.4.2 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
+| `@kurot/ui-runtime` | 0.5.0 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
@@ -48,9 +48,32 @@ you need an implementation you haven't already been pointed to.
 - Application-layer code uses `undefined`, never `null` (DOM/WebGL API boundaries are the one exception — `null` is required there by the browser spec).
 - Every exported function declares a return type. Named exports only, no `export default`.
 - Class member order: static fields/methods → instance fields → constructor → getters/setters → public methods → overrides → protected/internal methods → private methods, with `// ── Section ──` comments between non-empty groups when useful.
-- Comments document contracts that types and code cannot express; do not narrate implementation. Use multi-line JSDoc for non-obvious exported APIs, including public class and interface properties. Private/internal members are undocumented by default.
+- Reordering or comment-only cleanup must not change runtime behavior. Keep behavioral changes in an explicit, separately reviewed edit.
+- Comments document contracts that types and code cannot express; do not narrate implementation. JSDoc must always use the multi-line form, even for one sentence. Never write `/** One-line comment. */`; use `//` for an ordinary single-line note. Private/internal members are undocumented by default unless they carry a non-obvious invariant.
+- `if` / `else` / `for` / `while` bodies use braces. A one-line early `return`, `throw`, or `continue` guard may omit them.
 - No `@ts-ignore`/`@ts-expect-error`/new `as any`. New files should stay under 300 lines; do not mechanically split existing large engine files.
 - Full rules, naming conventions, and the "don't write compat code" policy: [`docs/code-rules.md`](docs/code-rules.md).
+
+## Version bump checklist
+
+When the user asks to bump or prepare a package version, the task includes all
+of the following unless the user explicitly narrows the scope:
+
+1. Read this root `AGENTS.md` before editing the package, then read the target
+   package's `docs/ai-context.md` and relevant package documentation.
+2. Update the version in the target package's `package.json`.
+3. Add a dated release entry to the package's `CHANGELOG.md` describing the
+   actual user-visible, internal, and breaking changes as applicable.
+4. Update the package's `README.md` in the same change. At minimum, audit and
+   correct its displayed version, API examples, lifecycle guidance, migration
+   notes, and compatibility requirements; do not leave stale documentation.
+5. Re-check this root `AGENTS.md`. Update the package version table and any
+   dependency or architectural guidance affected by the release.
+6. Find direct package dependants and report stale peer, development, template,
+   example, and application dependency ranges. Do not silently bump unrelated
+   packages unless the user requested that broader change.
+7. Run the target package's build and tests, then run `git diff --check`. Report
+   the exact verification result before declaring the release ready.
 
 ## Commands
 

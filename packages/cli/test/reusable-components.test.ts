@@ -40,6 +40,10 @@ describe('reusable component build', () => {
 			await fs.readFile(path.join(project.outputDir, '.kurot/component-catalog.json'), 'utf-8'),
 		) as { components: Array<{ tag: string }> };
 		expect(catalog.components).toEqual([expect.objectContaining({ tag: 'game:BetButton' })]);
+		const skinParts = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf-8');
+		expect(skinParts).toContain('from "../src/components/BetButton.js";');
+		expect(skinParts).toContain('"skins.HostSkin": {');
+		expect(skinParts).toContain('readonly "betButton": SkinPartModule0.BetButton;');
 	});
 });
 
@@ -56,7 +60,7 @@ async function createFixture(): Promise<string> {
 	await write(
 		root,
 		'resource/skins/HostSkin.exml',
-		'<eui:Skin class="skins.HostSkin" xmlns:eui="http://ns.egret.com/eui" xmlns:game="game.*"><game:BetButton/></eui:Skin>',
+		'<eui:Skin class="skins.HostSkin" xmlns:eui="http://ns.egret.com/eui" xmlns:game="game.*"><game:BetButton id="betButton"/></eui:Skin>',
 	);
 	await write(
 		root,

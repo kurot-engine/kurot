@@ -1,0 +1,4 @@
+.kurot/
+bin-debug/
+bin-release/
+node_modules/
