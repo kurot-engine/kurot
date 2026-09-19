@@ -130,6 +130,7 @@ describe('skin alignment (my-game / cli template)', () => {
 
 		expect(component.ready).toBe(true);
 		expect(component.getPart('content')).toBe(content);
+		expect(component.skinParts.content).toBe(content);
 		expect(Object.hasOwn(component, 'content')).toBe(false);
 		expect('setSkinPart' in component).toBe(false);
 		expect(component.calls).toEqual(['skinReady:[object Object]']);

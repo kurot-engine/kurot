@@ -83,7 +83,7 @@ export function compileExml(): BuildPlugin {
 			ctx.outputs.skinPartsDeclaration = SKIN_PARTS_DECLARATION_PATH;
 			await writeFile(
 				path.join(project.root, SKIN_PARTS_DECLARATION_PATH),
-				generateSkinPartsDeclaration(project, built.skins),
+				await generateSkinPartsDeclaration(project, built.skins),
 			);
 
 			const relThemePath = project.config.exml.themeFile;

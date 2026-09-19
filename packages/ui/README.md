@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.0.0.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.1.0.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -106,23 +106,17 @@ UI 2.0 attaches a skin atomically. The complete part set is available in
 `skinParts` outside that interval throws, which prevents code from silently
 using a partial or stale skin.
 
-Declare the part shape through the extensible `SkinPartsMap`, then select it
-with the skin class name passed to `Component<TSkin>`:
+The Kurot CLI generates `SkinPartsMap` entries and narrows the public
+`skinParts` accessor on project classes. It resolves explicit string-literal
+`skinName` assignments, configured reusable-component pairs, and unambiguous
+`<ClassName>Skin` naming conventions. The runtime skin name remains the source
+of truth whenever it is assigned explicitly:
 
 ```ts
 import { TouchEvent } from '@kurot/core';
-import { Button, Component, Label } from '@kurot/ui';
+import { Component } from '@kurot/ui';
 
-declare module '@kurot/ui' {
-	interface SkinPartsMap {
-		'game.ui.ConfirmPanelSkin': {
-			readonly btnConfirm: Button;
-			readonly lblMessage: Label;
-		};
-	}
-}
-
-class ConfirmPanel extends Component<'game.ui.ConfirmPanelSkin'> {
+export class ConfirmPanel extends Component {
 	public constructor() {
 		super();
 		this.skinName = 'game.ui.ConfirmPanelSkin';
@@ -150,6 +144,17 @@ class ConfirmPanel extends Component<'game.ui.ConfirmPanelSkin'> {
 	};
 }
 ```
+
+Library code without CLI-generated host declarations can still select a shape
+explicitly with `Component<'game.ui.ConfirmPanelSkin'>` or
+`ItemRenderer<'game.ui.ConfirmItemSkin'>`. `skinParts` is the only public,
+read-only part view, so component subclasses, mediators, and composition code
+use the same API.
+
+When a CLI project has exactly one compiled `<ClassName>Skin` candidate, the
+generated host declaration also covers skins supplied externally by a Theme or
+List. An `ItemRenderer` named `MultiplierIR` can therefore use
+`this.skinParts` without repeating `ui.MultiplierIRSkin` in its base type.
 
 Use `onSkinReady()` only for work that requires skin parts. Keep ordinary
 one-time component initialization in `createChildren()`. Remove listeners and

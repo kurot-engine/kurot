@@ -112,6 +112,88 @@ describe('compile EXML behavior baseline', () => {
 		});
 	});
 
+	it('narrows inherited parts for project classes with an explicit skinName', async () => {
+		const { ctx, root } = await createFixtureContext('valid', 'development');
+		const panelSource = path.join(root, 'src/views/ValidPanel.ts');
+		await fs.mkdir(path.dirname(panelSource), { recursive: true });
+		await fs.writeFile(
+			panelSource,
+			[
+				"import { Component } from '@kurot/ui';",
+				'',
+				'export class ValidPanel extends Component {',
+				'\tconstructor() {',
+				'\t\tsuper();',
+				"\t\tthis.skinName = 'skins.ValidSkin';",
+				'\t}',
+				'}',
+				'',
+			].join('\n'),
+		);
+
+		await compileExml().apply(ctx);
+
+		const declaration = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf-8');
+		expect(declaration).toContain('declare module "../src/views/ValidPanel.js" {');
+		expect(declaration).toContain('interface ValidPanel {');
+		expect(declaration).toContain(
+			'readonly skinParts: import("@kurot/ui").SkinPartsOf<"skins.ValidSkin">;',
+		);
+	});
+
+	it('narrows inherited parts from an unambiguous class and skin naming convention', async () => {
+		const { ctx, root } = await createFixtureContext('valid', 'development');
+		const componentSource = path.join(root, 'src/views/Valid.ts');
+		await fs.mkdir(path.dirname(componentSource), { recursive: true });
+		await fs.writeFile(
+			componentSource,
+			[
+				"import { Component } from '@kurot/ui';",
+				'',
+				'export class Valid extends Component {}',
+				'',
+			].join('\n'),
+		);
+
+		await compileExml().apply(ctx);
+
+		const declaration = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf-8');
+		expect(declaration).toContain('declare module "../src/views/Valid.js" {');
+		expect(declaration).toContain('interface Valid {');
+		expect(declaration).toContain(
+			'readonly skinParts: import("@kurot/ui").SkinPartsOf<"skins.ValidSkin">;',
+		);
+	});
+
+	it('does not infer a host skin when the naming convention is ambiguous', async () => {
+		const { ctx, root } = await createFixtureContext('valid', 'development');
+		const componentSource = path.join(root, 'src/views/Valid.ts');
+		const alternateSkin = path.join(root, 'resource/skins/alternate/ValidSkin.exml');
+		await fs.mkdir(path.dirname(componentSource), { recursive: true });
+		await fs.mkdir(path.dirname(alternateSkin), { recursive: true });
+		await fs.writeFile(componentSource, "export class Valid {}\n");
+		await fs.writeFile(
+			alternateSkin,
+			'<eui:Skin class="alternate.ValidSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+		);
+		await fs.writeFile(
+			path.join(root, 'resource/default.thm.json'),
+			JSON.stringify({
+				skins: { 'kurot.ui.Button': 'resource/skins/ValidSkin.exml' },
+				exmls: [
+					'resource/skins/ValidSkin.exml',
+					'resource/skins/alternate/ValidSkin.exml',
+				],
+				autoGenerateExmlsList: false,
+			}),
+		);
+
+		await compileExml().apply(ctx);
+
+		const declaration = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf-8');
+		expect(declaration).not.toContain('declare module "../src/views/Valid.js" {');
+	});
+
 	it('warns and drops an unknown tag in development while still emitting a skin', async () => {
 		const warning = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 		const { ctx, outputDir } = await createFixtureContext('unknown-tag', 'development');

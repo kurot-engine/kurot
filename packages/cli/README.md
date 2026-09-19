@@ -2,7 +2,7 @@
 
 CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
 
-> **Current release: 1.2.0.** Requires Node.js 20 or later and emits ES2022 ESM projects.
+> **Current release: 1.3.0.** Requires Node.js 20 or later and emits ES2022 ESM projects.
 
 > Migrating from Egret? See [egret-migration.md](../../docs/egret-migration.md)
 >
@@ -260,25 +260,51 @@ agent tooling. The catalog is intentionally omitted from release output.
 
 Every successful EXML compilation also writes `.kurot/skin-parts.d.ts`. It
 augments `@kurot/ui`'s `SkinPartsMap` with the exact named parts and runtime
-types found in each compiled skin. The generated file is included by the
-template `tsconfig.json`, ignored by git, and never enters browser or release
-bundles.
+types found in each compiled skin. It also discovers exported project classes
+through a compiled string-literal `this.skinName`, configured reusable-component
+pairs, or a unique `<ClassName>Skin` naming match, then narrows their inherited
+public `skinParts` property automatically. Ambiguous naming matches are left
+untyped instead of being guessed. The generated file is included by the template
+`tsconfig.json`, ignored by git, and never enters browser or release bundles.
 
 `exml.namespaces` remains available for advanced manual namespace barrels, but
 its prefix must not conflict with `exml.components.namespace`.
 
 ### Custom component lifecycle
 
-Select the generated part shape through the skin class name and initialize
-skin-dependent behavior in `onSkinReady()`:
+Assign the runtime skin once and initialize skin-dependent behavior in
+`onSkinReady()`. The generated declaration derives the `skinParts` type from that
+assignment:
 
 ```ts
 import { Component } from '@kurot/ui';
 
-export class BattlePanel extends Component<'game.ui.BattlePanelSkin'> {
+
+export class BattlePanel extends Component {
+	public constructor() {
+		super();
+		this.skinName = 'game.ui.BattlePanelSkin';
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
 		this.skinParts.groupField.visible = true;
+	}
+}
+```
+
+The same declaration narrowing applies when the runtime assigns the skin
+externally. For example, an exported `MultiplierIR` class is matched to a
+unique compiled `ui.MultiplierIRSkin`, so the renderer remains free of a
+repeated generic skin name:
+
+```ts
+import { ItemRenderer } from '@kurot/ui';
+
+export class MultiplierIR extends ItemRenderer {
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		this.skinParts.lblMultiplier.text = '';
 	}
 }
 ```
@@ -298,7 +324,9 @@ initial creation and are not skin-replacement hooks.
 
 UI 2.0 no longer copies part names onto component instances and no longer
 supports `setSkinPart()`, `partAdded()`, or `partRemoved()`. Read parts through
-`this.skinParts` only while the skin-ready lifecycle is active.
+`this.skinParts` only while the skin-ready lifecycle is active. Use an explicit
+generic skin type when generated host declarations are unavailable outside a
+CLI project.
 
 EXML skins compiled by the CLI are registered under their complete `class`
 attribute, so an Egret-style value such as

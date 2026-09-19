@@ -5,7 +5,7 @@ unfamiliar with Kurot does not need to re-derive the pipeline from scratch
 each session. [`architecture.md`](./architecture.md) covers the same plugin
 pipeline in greater detail.
 
-Package identity: `@kurot/cli@1.2.0`. Node.js build tool, esbuild-powered,
+Package identity: `@kurot/cli@1.3.0`. Node.js build tool, esbuild-powered,
 with a built-in EXML → ESM compiler. Not installed globally — projects use it
 via `npx` (scaffolding) or as a devDependency with npm scripts.
 
@@ -105,8 +105,11 @@ Templates actually scaffolded by `create` live in `templates/game/` and
   compiled. This is what preserves the previous bundle during failed watches.
 - A successful EXML build generates project-root `.kurot/skin-parts.d.ts` from
   the same parsed `SkinIR` used by code generation. It augments
-  `@kurot/ui`'s `SkinPartsMap`; template TypeScript configurations include it,
-  while git and runtime/release bundles exclude it.
+  `@kurot/ui`'s `SkinPartsMap` and narrows exported host classes selected by an
+  explicit literal `skinName`, reusable-component configuration, or a unique
+  `<ClassName>Skin` convention. Ambiguous short-name matches are not inferred.
+  Template TypeScript configurations include the declaration, while git and
+  runtime/release bundles exclude it.
 - `parseValue()` in `exml-parser.ts` coerces EXML attribute values in this
   order: binding (`{...}`) → percent (trailing `%`) → boolean literal → `null`
   literal → numeric literal → fallback string. This means literal strings

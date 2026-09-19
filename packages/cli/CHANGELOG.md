@@ -7,6 +7,26 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 1.3.0 — 2026-09-20
+
+### Added
+
+- Generated declarations now narrow each exported project class's public
+  `skinParts` accessor from an explicit string-literal `skinName`, a configured
+  reusable-component pair, or a unique `<ClassName>Skin` naming match.
+- Added ambiguity protection: convention inference is omitted when multiple
+  compiled skins share the same short `<ClassName>Skin` name.
+
+### Changed
+
+- Project classes no longer need to repeat their skin as a base-class generic
+  when the CLI can establish an unambiguous host-to-skin relationship.
+
+### Tests
+
+- Added regression coverage for explicit assignment, reusable-component,
+  unique naming-convention, and ambiguous naming-convention host inference.
+
 ## 1.2.0 — 2026-09-20
 
 ### Added

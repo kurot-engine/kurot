@@ -4,6 +4,26 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.1.0] — 2026-09-20
+
+### Added
+
+- Made `Component.skinParts` a public read-only accessor so mediators and
+  composition code can consume the same generated part contract as component
+  subclasses without an application-level forwarding getter.
+- Added a skin-name generic to `ItemRenderer`, matching `Component<TSkin>` for
+  library or non-CLI renderers that must select their part contract explicitly.
+
+### Changed
+
+- Kept `skinParts` as the single part-access API; no secondary `parts` alias is
+  exposed.
+
+### Tests
+
+- Retained the complete 27-file, 243-test UI regression suite and verified the
+  generated host declarations against the public accessor.
+
 ## [2.0.0] — 2026-09-20
 
 ### Breaking Changes

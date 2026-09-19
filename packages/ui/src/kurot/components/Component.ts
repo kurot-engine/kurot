@@ -338,6 +338,19 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		// No-op for Component.
 	}
 
+	/**
+	 * Parts exported by the attached skin.
+	 *
+	 * Access is only valid after the skin has completed attachment. Generated
+	 * declarations provide the exact part names and types for known skins.
+	 */
+	public get skinParts(): Readonly<SkinPartsOf<TSkin>> {
+		if (!this._skinReady) {
+			throw new Error(`${this.constructor.name} skin parts are not ready.`);
+		}
+		return this._skinParts as SkinPartsOf<TSkin>;
+	}
+
 	// ── Public methods ────────────────────────────────────────────────────
 
 	public _applySkinName(skinName: string): void {
@@ -562,19 +575,6 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	 */
 	protected get skinReady(): boolean {
 		return this._skinReady;
-	}
-
-	/**
-	 * Parts exported by the attached skin.
-	 *
-	 * Access is only valid after the skin has completed attachment. Generated
-	 * declarations provide the exact part names and types for known skins.
-	 */
-	protected get skinParts(): Readonly<SkinPartsOf<TSkin>> {
-		if (!this._skinReady) {
-			throw new Error(`${this.constructor.name} skin parts are not ready.`);
-		}
-		return this._skinParts as SkinPartsOf<TSkin>;
 	}
 
 	protected setSkin(skin: Skin | undefined): void {

@@ -44,6 +44,10 @@ describe('reusable component build', () => {
 		expect(skinParts).toContain('from "../src/components/BetButton.js";');
 		expect(skinParts).toContain('"skins.HostSkin": {');
 		expect(skinParts).toContain('readonly "betButton": SkinPartModule0.BetButton;');
+		expect(skinParts).toContain('declare module "../src/components/BetButton.js" {');
+		expect(skinParts).toContain(
+			'readonly skinParts: import("@kurot/ui").SkinPartsOf<"components.BetButtonSkin">;',
+		);
 	});
 });
 

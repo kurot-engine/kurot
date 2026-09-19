@@ -12,7 +12,7 @@ import type { IItemRenderer } from '../core/IItemRenderer.js';
  *
  * @skinPart labelDisplay — optional Label for the item label
  */
-export class ItemRenderer extends Component implements IItemRenderer {
+export class ItemRenderer<TSkin extends string = string> extends Component<TSkin> implements IItemRenderer {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	public itemIndex = -1;
@@ -67,7 +67,7 @@ export class ItemRenderer extends Component implements IItemRenderer {
 
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { labelDisplay } = this.skinParts;
+		const { labelDisplay } = this.skinParts as Readonly<{ labelDisplay?: unknown }>;
 		if (labelDisplay instanceof Label) {
 			this.labelDisplay = labelDisplay;
 			this._syncLabel();
