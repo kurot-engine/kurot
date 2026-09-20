@@ -34,7 +34,7 @@ import {
 import { attachSkin, detachSkin } from './helpers/skin.js';
 
 /**
- * Replicates the compiled ToggleSwitchSkin.exml factory for its key states.
+ * Replicates the compiled ToggleSwitchSkin.kui.xml factory for its key states.
  */
 function makeToggleSwitchSkin(): Skin {
 	const skin = new Skin();
@@ -67,7 +67,7 @@ function makeToggleSwitchSkin(): Skin {
 }
 
 /**
- * Replicates the compiled PanelSkin.exml factory for its key parts.
+ * Replicates the compiled PanelSkin.kui.xml factory for its key parts.
  */
 function makePanelSkin(): Skin {
 	const skin = new Skin();
@@ -411,7 +411,7 @@ describe('skin alignment (my-game / cli template)', () => {
 			const rb2 = new RadioButton();
 			rb2.groupName = 'quality';
 			rb2.value = 'mid';
-			// selected is set after groupName (same order as EXML selected="true").
+			// selected is set after groupName (same order as the authored selected property).
 			rb2.selected = true;
 
 			const rb3 = new RadioButton();
@@ -419,7 +419,7 @@ describe('skin alignment (my-game / cli template)', () => {
 			rb3.value = 'high';
 
 			expect(rb1.selected).toBe(false);
-			expect(rb2.selected).toBe(true); // EXML-set default selection
+			expect(rb2.selected).toBe(true); // authored default selection
 			expect(rb3.selected).toBe(false);
 
 			// Select rb1.

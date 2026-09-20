@@ -4,6 +4,29 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.6.0] — 2026-09-21
+
+### Added
+
+- Canonical `.kui.xml` parsing and deterministic serialization for Screen,
+  Component, and Skin assets.
+- Direct component tags, custom XML namespaces, typed structured values,
+  reusable component instances, and complete contract metadata in KUI XML.
+- `isDefault` appearance metadata for deriving default runtime skin mappings.
+
+### Changed
+
+- KUI XML is now the package's only authored serialization format.
+- `parseUIDocument()` validates the KUI namespace and root metadata before
+  returning a semantic document.
+
+### Removed
+
+- JSON document parsing and serialization. JSON remains usable as an HTTP
+  transport for in-memory objects, but is no longer an authored file format.
+
+---
+
 ## [0.5.2] — 2026-08-31
 
 ### Changed

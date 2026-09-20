@@ -12,7 +12,7 @@ export const UI_DOCUMENT_KIND = 'kurot-ui-document';
  */
 export interface UIDocument {
 	/**
-	 * Stable discriminator used to reject unrelated JSON documents.
+	 * Stable discriminator used to reject unrelated semantic values.
 	 */
 	readonly kind: typeof UI_DOCUMENT_KIND;
 

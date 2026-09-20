@@ -440,9 +440,9 @@ describe('createKurotUI', () => {
 	});
 
 	it('materializes reusable assets and all instance-local semantics', () => {
-		const actionCard = readFixture('action-card.component.json');
-		const appearance = readFixture('button.appearance.json');
-		const screen = readFixture('lobby.screen.json');
+		const actionCard = readFixture('action-card.component.kui.xml');
+		const appearance = readFixture('button.appearance.kui.xml');
+		const screen = readFixture('lobby.screen.kui.xml');
 		const assets = new UIAssetRegistry();
 		assets.registerAsset(actionCard);
 		assets.registerAsset(appearance);
@@ -518,9 +518,9 @@ describe('createKurotUI', () => {
 	});
 
 	it('rejects an unknown appearance variant before materialization', () => {
-		const actionCard = readFixture('action-card.component.json');
-		const appearance = readFixture('button.appearance.json');
-		const screen = readFixture('lobby.screen.json');
+		const actionCard = readFixture('action-card.component.kui.xml');
+		const appearance = readFixture('button.appearance.kui.xml');
+		const screen = readFixture('lobby.screen.kui.xml');
 		const nativeButton = screen.root.children[2]!;
 		const invalidScreen = {
 			...screen,

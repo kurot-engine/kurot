@@ -31,28 +31,20 @@ export interface StageConfig {
 	readonly frameRate: number;
 }
 
-export interface ExmlConfig {
+export interface KUIConfig {
 	/**
-	 * Path to the Egret-style theme file (e.g. `resource/default.thm.json`),
-	 * relative to the project root.
+	 * Directory containing `.kui.xml` sources, relative to the project root.
 	 */
-	readonly themeFile: string;
+	readonly sourceDir: string;
 	/**
-	 * Custom EXML namespaces for project-defined components, matching Egret's
-	 * `xmlns:game="game.*"` convention. Maps the namespace prefix used in EXML
-	 * (e.g. `game`) to a barrel file that exports every class referenced under
-	 * that namespace (e.g. `src/ui/index.ts` re-exporting `HeroNarrowIR`, etc.).
-	 *
-	 * Each barrel is bundled into its own chunk and wired into both the app and
-	 * skins bundles via an import map, so a class referenced from EXML and from
-	 * game code resolves to the same module instance (no duplicate class identity).
+	 * Custom KUI component namespaces mapped to TypeScript barrel files.
 	 */
 	readonly namespaces?: Readonly<Record<string, string>>;
 	/**
 	 * Convention-based reusable UI components.
 	 *
 	 * A component source `<Name>.ts` under `sourceDir` is paired with
-	 * `<Name>Skin.exml` at the same relative path under `skinDir`. The CLI
+	 * `<Name>Skin.kui.xml` at the same relative path under `skinDir`. The CLI
 	 * exposes paired components through `namespace` without requiring a
 	 * hand-written namespace barrel.
 	 */
@@ -61,7 +53,7 @@ export interface ExmlConfig {
 
 export interface ComponentsConfig {
 	/**
-	 * EXML namespace prefix used to instantiate discovered components.
+	 * KUI namespace prefix used to instantiate discovered components.
 	 */
 	readonly namespace: string;
 	/**
@@ -116,9 +108,9 @@ export interface ProjectConfig {
 	 */
 	readonly stage: StageConfig;
 	/**
-	 * EXML compilation settings. Omit to disable EXML support entirely.
+	 * KUI compilation settings. Omit to disable authored UI compilation.
 	 */
-	readonly exml?: ExmlConfig;
+	readonly ui?: KUIConfig;
 }
 
 const DEFAULTS: ProjectConfig = {
@@ -193,22 +185,30 @@ export async function loadConfig(): Promise<ProjectConfig> {
 		}
 	}
 
-	validateComponentsConfig(config.exml?.components);
+	validateUIConfig(config.ui);
 
 	return config;
+}
+
+function validateUIConfig(ui: KUIConfig | undefined): void {
+	if (!ui) return;
+	if (!ui.sourceDir.trim()) {
+		throw new ConfigError('Invalid config: ui.sourceDir must not be empty');
+	}
+	validateComponentsConfig(ui.components);
 }
 
 function validateComponentsConfig(components: ComponentsConfig | undefined): void {
 	if (!components) return;
 	if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(components.namespace)) {
 		throw new ConfigError(
-			`Invalid config: exml.components.namespace must be a valid XML namespace prefix, got '${components.namespace}'`,
+			`Invalid config: ui.components.namespace must be a valid XML namespace prefix, got '${components.namespace}'`,
 		);
 	}
 	if (!components.sourceDir.trim()) {
-		throw new ConfigError('Invalid config: exml.components.sourceDir must not be empty');
+		throw new ConfigError('Invalid config: ui.components.sourceDir must not be empty');
 	}
 	if (!components.skinDir.trim()) {
-		throw new ConfigError('Invalid config: exml.components.skinDir must not be empty');
+		throw new ConfigError('Invalid config: ui.components.skinDir must not be empty');
 	}
 }

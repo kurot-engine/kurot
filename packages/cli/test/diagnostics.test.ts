@@ -34,7 +34,7 @@ describe('DiagnosticCollector', () => {
 	it('preserves diagnostics that are already errors', () => {
 		const collector = new DiagnosticCollector({ strict: false });
 		const diagnostic: Diagnostic = {
-			code: DIAGNOSTIC_CODES.EXML_COMPILE_FAILED,
+			code: DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 			severity: 'error',
 			message: 'The skin could not be compiled.',
 		};
@@ -57,7 +57,7 @@ describe('DiagnosticCollector', () => {
 		collector.report(makeUnknownTagDiagnostic());
 		collector.report({
 			...makeUnknownTagDiagnostic(),
-			location: { file: 'skins/Main.exml', line: 8, column: 2, offset: 140 },
+			location: { file: 'skins/Main.kui.xml', line: 8, column: 2, offset: 140 },
 		});
 
 		expect(collector.all()).toHaveLength(2);
@@ -66,13 +66,13 @@ describe('DiagnosticCollector', () => {
 	it('sorts by file, line, column, then code', () => {
 		const collector = new DiagnosticCollector({ strict: false });
 		collector.report({
-			code: DIAGNOSTIC_CODES.THEME_SKIN_NOT_FOUND,
+			code: DIAGNOSTIC_CODES.KUI_DUPLICATE_DEFAULT,
 			severity: 'warning',
 			message: 'Missing skin.',
 			location: { file: 'theme.json', line: 4, column: 8 },
 		});
 		collector.report({
-			code: DIAGNOSTIC_CODES.EXML_DECLARED_FILE_NOT_FOUND,
+			code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 			severity: 'warning',
 			message: 'Missing file.',
 			location: { file: 'theme.json', line: 4, column: 2 },
@@ -80,9 +80,9 @@ describe('DiagnosticCollector', () => {
 		collector.report(makeUnknownTagDiagnostic());
 
 		expect(collector.all().map(diagnostic => diagnostic.code)).toEqual([
-			DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
-			DIAGNOSTIC_CODES.EXML_DECLARED_FILE_NOT_FOUND,
-			DIAGNOSTIC_CODES.THEME_SKIN_NOT_FOUND,
+			DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
+			DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
+			DIAGNOSTIC_CODES.KUI_DUPLICATE_DEFAULT,
 		]);
 	});
 
@@ -97,25 +97,25 @@ describe('DiagnosticCollector', () => {
 		const collector = new DiagnosticCollector({ strict: false });
 		collector.report(makeUnknownTagDiagnostic());
 		collector.report({
-			code: DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+			code: DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 			severity: 'error',
 			message: 'Invalid theme.',
 		});
 
-		collector.removeByCodes([DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG]);
+		collector.removeByCodes([DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG]);
 
 		expect(collector.all().map(diagnostic => diagnostic.code)).toEqual([
-			DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+			DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 		]);
 	});
 });
 
 function makeUnknownTagDiagnostic(): Diagnostic {
 	return {
-		code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+		code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 		severity: 'warning',
-		message: 'Unknown EXML tag: eui:Buton.',
-		location: { file: 'skins/ButtonSkin.exml', line: 3, column: 2, offset: 82 },
-		suggestions: ['Did you mean eui:Button?'],
+		message: 'Unknown KUI tag: Buton.',
+		location: { file: 'skins/ButtonSkin.kui.xml', line: 3, column: 2, offset: 82 },
+		suggestions: ['Did you mean Button?'],
 	};
 }

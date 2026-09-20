@@ -2,7 +2,7 @@ import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { firstDiagnosticMessage } from './first-diagnostic-message.js';
 
 /**
- * Error raised when JSON cannot be decoded as a current-format UI document.
+ * Error raised when KUI XML cannot be decoded as a current-format UI document.
  */
 export class UIDocumentParseError extends Error {
 	/**

@@ -15,7 +15,7 @@ export interface ProcessResult {
 	readonly stderr: string;
 }
 
-export async function createCliProject(theme?: string, skin?: string): Promise<string> {
+export async function createCliProject(skin?: string): Promise<string> {
 	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-cli-e2e-'));
 	await fs.mkdir(path.join(root, 'src'), { recursive: true });
 	await fs.mkdir(path.join(root, 'resource/skins'), { recursive: true });
@@ -27,11 +27,10 @@ export async function createCliProject(theme?: string, skin?: string): Promise<s
 	entry: 'src/Main.ts',
 	output: { dir: 'bin-debug' },
 	stage: { width: 640, height: 480, scaleMode: 'showAll', orientation: 'auto', frameRate: 60 },
-	exml: { themeFile: 'resource/default.thm.json' },
+	ui: { sourceDir: 'resource/skins' },
 };\n`,
 	);
-	if (theme !== undefined) await fs.writeFile(path.join(root, 'resource/default.thm.json'), theme);
-	if (skin !== undefined) await fs.writeFile(path.join(root, 'resource/skins/TestSkin.exml'), skin);
+	if (skin !== undefined) await fs.writeFile(path.join(root, 'resource/skins/TestSkin.kui.xml'), skin);
 	return root;
 }
 

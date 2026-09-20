@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.ToggleSwitchSkin" version="2" target="kui.ToggleSwitch" default="true">
+    <contract>
+        <states>
+            <state name="disabled">
+                <set target="node_image1" property="source" value="@resource:image:off_png" />
+            </state>
+            <state name="disabledAndSelected">
+                <set target="node_image2" property="horizontalCenter" value="18" />
+            </state>
+            <state name="down">
+                <set target="node_image1" property="source" value="@resource:image:off_png" />
+            </state>
+            <state name="downAndSelected">
+                <set target="node_image2" property="horizontalCenter" value="18" />
+            </state>
+            <state name="up">
+                <set target="node_image1" property="source" value="@resource:image:off_png" />
+            </state>
+            <state name="upAndSelected">
+                <set target="node_image2" property="horizontalCenter" value="18" />
+            </state>
+        </states>
+    </contract>
+    <Group id="root">
+        <Image id="node_image1" source="@resource:image:on_png" />
+        <Image id="node_image2" horizontalCenter="-18" source="@resource:image:handle_png" verticalCenter="0" />
+    </Group>
+</Skin>

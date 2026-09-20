@@ -25,7 +25,7 @@ interface NamespaceEntry {
 }
 
 /**
- * Bundles each project-defined EXML namespace (`exml.namespaces` in
+ * Bundles each project-defined KUI namespace (`ui.namespaces` in
  * `kurot.config.ts`, matching Egret's `xmlns:game="game.*"` convention)
  * into its own chunk under `js/`.
  *
@@ -33,8 +33,8 @@ interface NamespaceEntry {
  * etc.) is compiled exactly once and wired into the page via the same import
  * map used for `@kurot/*` engine chunks (see `compile-engine.ts`). Both the
  * app bundle (`compile-source.ts`) and the compiled skins bundle
- * (`compile-exml.ts`) mark the namespace specifier as external, so a class
- * referenced from EXML and from game code resolves to the same module
+ * (`compile-kui.ts`) mark the namespace specifier as external, so a class
+ * referenced from KUI and from game code resolves to the same module
  * instance — never two copies with mismatched `instanceof` identity.
  *
  * In watch mode each barrel is rebuilt on change; the browser still needs a

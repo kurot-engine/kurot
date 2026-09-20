@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.CheckBoxSkin" version="2" target="kui.CheckBox" default="true">
+    <contract>
+        <parts>
+            <part name="labelDisplay" node="labelDisplay" />
+        </parts>
+        <states>
+            <state name="disabled">
+                <set target="node_image3" property="alpha" value="0.5" />
+            </state>
+            <state name="disabledAndSelected">
+                <set target="node_image3" property="source" value="@resource:image:checkbox_select_disabled_png" />
+            </state>
+            <state name="down">
+                <set target="node_image3" property="alpha" value="0.7" />
+            </state>
+            <state name="downAndSelected">
+                <set target="node_image3" property="source" value="@resource:image:checkbox_select_down_png" />
+            </state>
+            <state name="up">
+            </state>
+            <state name="upAndSelected">
+                <set target="node_image3" property="source" value="@resource:image:checkbox_select_up_png" />
+            </state>
+        </states>
+    </contract>
+    <Group id="root">
+        <Group id="node_group1" height="100%" width="100%">
+            <properties>
+                <property name="layout">
+                    <object>
+                        <value name="properties">
+                            <object>
+                                <value name="verticalAlign" value="middle" />
+                            </object>
+                        </value>
+                        <value name="type" value="kui.HorizontalLayout" />
+                    </object>
+                </property>
+            </properties>
+            <Image id="node_image3" alpha="1" fillMode="scale" source="@resource:image:checkbox_unselect_png" />
+            <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="7368816" verticalAlign="middle" />
+        </Group>
+    </Group>
+</Skin>

@@ -2,7 +2,7 @@ export type {
 	ProjectConfig,
 	BuildTarget,
 	StageConfig,
-	ExmlConfig,
+	KUIConfig,
 	ComponentsConfig,
 	OutputConfig,
 } from './core/config.js';

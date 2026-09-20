@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.ListSkin" version="2" target="kui.List" default="false">
+    <contract>
+        <parts>
+            <part name="dataGroup" node="dataGroup" />
+            <part name="scroller" node="scroller" />
+        </parts>
+    </contract>
+    <Group id="root" minHeight="20" minWidth="20">
+        <Rect id="node_rect1" fillColor="1710638" height="100%" strokeColor="996448" strokeWeight="1" width="100%" />
+        <Scroller id="scroller" height="100%" width="100%">
+            <DataGroup id="dataGroup" height="100%" width="100%" />
+        </Scroller>
+    </Group>
+</Skin>

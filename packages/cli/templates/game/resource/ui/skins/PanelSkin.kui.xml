@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.PanelSkin" version="2" target="kui.Panel" default="true">
+    <contract>
+        <parts>
+            <part name="closeButton" node="closeButton" />
+            <part name="moveArea" node="moveArea" />
+            <part name="titleDisplay" node="titleDisplay" />
+        </parts>
+    </contract>
+    <Group id="root" minHeight="230" minWidth="450">
+        <Image id="node_image1" bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="@resource:image:border_png" top="0" />
+        <Group id="moveArea" height="45" left="0" right="0" top="0">
+            <Image id="node_image2" bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="@resource:image:header_png" top="0" />
+            <Label id="titleDisplay" fontFamily="Tahoma" left="15" right="5" size="20" textColor="16777215" verticalCenter="0" wordWrap="false" />
+        </Group>
+        <Button id="closeButton" bottom="5" horizontalCenter="0" label="close" />
+    </Group>
+</Skin>

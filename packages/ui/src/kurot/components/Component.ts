@@ -614,23 +614,20 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 			}
 		}
 		this._setSkin(skin);
-		// After the skin is applied, bind any deferred watchers so that
-		// Binding.bindProperty(this, ...) calls inside the factory resolve `this`
-		// to this component.
+		// Generated factories run with the component as their receiver so future
+		// host-aware skin setup can use the same stable invocation contract.
 	}
 
 	/**
 	 * Invoke a skin factory function with `this` (the host component) as context.
 	 *
-	 * EXML-compiled skins are factory functions (not class constructors) that use
-	 * `this` for `Binding.bindProperty(this, ...)`. Calling with `.call(this)` ensures
-	 * the bindings watch the host component, not a `new`-target blank object.
+	 * KUI-compiled skins are factory functions rather than class constructors.
+	 * Calling with `.call(this)` supplies the host component to host-aware setup.
 	 *
 	 * For genuine ES class constructors (e.g. a user-written `class MySkin extends Skin`),
 	 * `.call(this)` would throw `TypeError: Class constructor cannot be invoked without
 	 * 'new'`, so we detect class constructors by their string representation and use `new`
-	 * instead. This secondary path never has correct binding-`this`, so user skins should
-	 * always be factory functions when they contain EXML `{…}` bindings.
+	 * instead.
 	 */
 	private _invokeSkinFactory(factory: (new () => Skin) | ((thisArg: unknown) => Skin)): Skin | undefined {
 		const fn = factory as (...args: unknown[]) => unknown;

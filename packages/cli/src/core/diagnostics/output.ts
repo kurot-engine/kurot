@@ -35,7 +35,7 @@ export interface BuildResultOutput {
  */
 export type DevEvent =
 	| { readonly type: 'server-ready'; readonly url: string }
-	| { readonly type: 'build-start'; readonly reason: 'initial' | 'exml-change' | 'source-change' }
+	| { readonly type: 'build-start'; readonly reason: 'initial' | 'kui-change' | 'source-change' }
 	| { readonly type: 'diagnostic'; readonly diagnostic: Diagnostic }
 	| { readonly type: 'build-complete'; readonly success: boolean; readonly durationMs: number };
 

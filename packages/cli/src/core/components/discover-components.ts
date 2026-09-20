@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { parseUIDocument } from '@kurot/ui-document';
 import { ConfigError } from '../errors.js';
-import { localName, parseXML } from '../exml/index.js';
 import type { Dirent } from 'node:fs';
 import type { ComponentConvention, ProjectComponent } from '../project.js';
 
@@ -17,7 +17,7 @@ export async function discoverComponents(
 
 	const [sourceFiles, skinFiles] = await Promise.all([
 		collectFiles(convention.sourceDir, file => file.endsWith('.ts') && !file.endsWith('.d.ts')),
-		collectFiles(convention.skinDir, file => file.endsWith('Skin.exml')),
+		collectFiles(convention.skinDir, file => file.endsWith('Skin.kui.xml')),
 	]);
 	const sourceByPair = new Map(sourceFiles.map(file => [sourcePairKey(convention.sourceDir, file), file]));
 	const skinByPair = new Map(skinFiles.map(file => [skinPairKey(convention.skinDir, file), file]));
@@ -36,7 +36,7 @@ export async function discoverComponents(
 			continue;
 		}
 		if (!skin) {
-			errors.push(`Component source '${relative(root, source)}' has no matching skin '${pairKey}Skin.exml'.`);
+			errors.push(`Component source '${relative(root, source)}' has no matching skin '${pairKey}Skin.kui.xml'.`);
 			continue;
 		}
 
@@ -64,19 +64,20 @@ export async function discoverComponents(
 
 		let skinClass: string;
 		try {
-			const skinRoot = parseXML(await fs.readFile(skin, 'utf-8'));
-			if (localName(skinRoot.name) !== 'Skin') {
-				errors.push(`Component skin '${relative(root, skin)}' must use an eui:Skin root.`);
+			const skinDocument = parseUIDocument(await fs.readFile(skin, 'utf-8'));
+			if (skinDocument.assetKind !== 'appearance') {
+				errors.push(`Component skin '${relative(root, skin)}' must be a KUI Skin document.`);
 				continue;
 			}
-			skinClass = skinRoot.attributes.find(attribute => attribute.name === 'class')?.value ?? '';
-			if (!skinClass) {
-				errors.push(`Component skin '${relative(root, skin)}' must declare a class attribute.`);
+			const targetType = `${convention.prefix}.${name}`;
+			if (skinDocument.contract.targetType !== targetType) {
+				errors.push(`Component skin '${relative(root, skin)}' must target '${targetType}'.`);
 				continue;
 			}
+			skinClass = skinDocument.id;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			errors.push(`Component skin '${relative(root, skin)}' is invalid EXML: ${message}`);
+			errors.push(`Component skin '${relative(root, skin)}' is invalid KUI XML: ${message}`);
 			continue;
 		}
 
@@ -140,7 +141,7 @@ function sourcePairKey(sourceDir: string, file: string): string {
 }
 
 function skinPairKey(skinDir: string, file: string): string {
-	return toPosix(path.relative(skinDir, file).slice(0, -'Skin.exml'.length));
+	return toPosix(path.relative(skinDir, file).slice(0, -'Skin.kui.xml'.length));
 }
 
 function hasNamedClassExport(source: string, name: string): boolean {

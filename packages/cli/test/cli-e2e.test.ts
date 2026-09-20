@@ -13,10 +13,9 @@ import {
 } from './cli-process-helpers.js';
 
 const projects: string[] = [];
-const validTheme = JSON.stringify({ skins: { Button: 'resource/skins/TestSkin.exml' } });
-const validSkin = '<eui:Skin class="skins.TestSkin" xmlns:eui="http://ns.egret.com/eui"><eui:Button/></eui:Skin>';
-const unknownSkin = '<eui:Skin class="skins.TestSkin" xmlns:eui="http://ns.egret.com/eui"><eui:Buton/></eui:Skin>';
-const malformedSkin = '<eui:Skin class="skins.TestSkin" xmlns:eui="http://ns.egret.com/eui"><eui:Button></eui:Skin>';
+const validSkin = '<Skin xmlns="https://kurot.dev/ui/1" id="skins.TestSkin" version="2" target="kui.Button" default="true"><Group id="root"><Button id="button" /></Group></Skin>';
+const unknownSkin = validSkin.replace('<Button id="button" />', '<Buton id="button" />');
+const malformedSkin = validSkin.replace('</Group>', '</Button>');
 
 afterEach(async () => {
 	await Promise.all(projects.splice(0).map(root => fs.rm(root, { recursive: true, force: true })));
@@ -24,7 +23,7 @@ afterEach(async () => {
 
 describe('CLI process diagnostics', () => {
 	it('preserves human build output', async () => {
-		const root = await project(validTheme, validSkin);
+		const root = await project(validSkin);
 		const result = await runCli(root, ['build']);
 
 		expect(result.exitCode, result.stderr).toBe(0);
@@ -33,7 +32,7 @@ describe('CLI process diagnostics', () => {
 	});
 
 	it('emits a parseable JSON success result', async () => {
-		const root = await project(validTheme, validSkin);
+		const root = await project(validSkin);
 		const result = await runCli(root, ['build', '--diagnostics', 'json']);
 		expect(result.stdout, result.stderr).not.toBe('');
 		const output = JSON.parse(result.stdout) as BuildResultOutput;
@@ -45,8 +44,8 @@ describe('CLI process diagnostics', () => {
 	});
 
 	it('reports unknown tags as warnings normally and errors under strict mode', async () => {
-		const normalRoot = await project(validTheme, unknownSkin);
-		const strictRoot = await project(validTheme, unknownSkin);
+		const normalRoot = await project(unknownSkin);
+		const strictRoot = await project(unknownSkin);
 		const normal = await runCli(normalRoot, ['build', '--diagnostics', 'json']);
 		const strict = await runCli(strictRoot, ['build', '--strict', '--diagnostics', 'json']);
 
@@ -54,39 +53,28 @@ describe('CLI process diagnostics', () => {
 		expect(diagnostic(normal).severity).toBe('warning');
 		expect(strict.exitCode).toBe(1);
 		expect(diagnostic(strict)).toEqual(expect.objectContaining({
-			code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+			code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 			severity: 'error',
-			suggestions: ['Did you mean "eui:Button"?'],
+			suggestions: ['Did you mean "Button"?'],
 		}));
 
-		await fs.writeFile(path.join(strictRoot, 'resource/skins/TestSkin.exml'), unknownSkin.replace('Buton', 'Button'));
+		await fs.writeFile(path.join(strictRoot, 'resource/skins/TestSkin.kui.xml'), unknownSkin.replace('Buton', 'Button'));
 		const repaired = await runCli(strictRoot, ['build', '--strict', '--diagnostics', 'json']);
 		expect(repaired.exitCode).toBe(0);
 		expect((JSON.parse(repaired.stdout) as BuildResultOutput).diagnostics).toEqual([]);
 	});
 
-	it('fails for malformed EXML with its stable diagnostic code', async () => {
-		const root = await project(validTheme, malformedSkin);
+	it('fails for malformed KUI with its stable diagnostic code', async () => {
+		const root = await project(malformedSkin);
 		const result = await runCli(root, ['build', '--diagnostics', 'json']);
 
 		expect(result.exitCode).toBe(1);
-		expect(diagnostic(result).code).toBe(DIAGNOSTIC_CODES.EXML_COMPILE_FAILED);
+		expect(diagnostic(result).code).toBe(DIAGNOSTIC_CODES.KUI_COMPILE_FAILED);
 	});
 
-	it('distinguishes a missing theme from invalid theme JSON', async () => {
-		const missingRoot = await project(undefined, validSkin);
-		const invalidRoot = await project('{ invalid', validSkin);
-		const missing = await runCli(missingRoot, ['build', '--diagnostics', 'json']);
-		const invalid = await runCli(invalidRoot, ['build', '--diagnostics', 'json']);
-
-		expect(missing.exitCode).toBe(0);
-		expect(diagnostic(missing).code).toBe(DIAGNOSTIC_CODES.THEME_FILE_NOT_FOUND);
-		expect(invalid.exitCode).toBe(1);
-		expect(diagnostic(invalid).code).toBe(DIAGNOSTIC_CODES.THEME_INVALID_JSON);
-	});
 
 	it('emits JSONL initial-build and server-ready events', async () => {
-		const root = await project(validTheme, validSkin);
+		const root = await project(validSkin);
 		const port = await availablePort();
 		const child = startCli(root, ['dev', '--port', String(port), '--diagnostics', 'jsonl']);
 		try {
@@ -100,13 +88,13 @@ describe('CLI process diagnostics', () => {
 		}
 	});
 
-	it('keeps dev alive after an EXML failure and recovers after the file is fixed', async () => {
-		const root = await project(validTheme, validSkin);
+	it('keeps dev alive after a KUI failure and recovers after the file is fixed', async () => {
+		const root = await project(validSkin);
 		const port = await availablePort();
 		const child = startCli(root, ['dev', '--port', String(port), '--diagnostics', 'jsonl']);
 		try {
 			await waitForJsonLine<DevEvent>(child, event => event.type === 'server-ready');
-			const skinPath = path.join(root, 'resource/skins/TestSkin.exml');
+			const skinPath = path.join(root, 'resource/skins/TestSkin.kui.xml');
 			const failed = waitForJsonLine<DevEvent>(child, event => event.type === 'build-complete' && !event.success);
 			await fs.writeFile(skinPath, malformedSkin);
 			await expect(failed).resolves.toEqual(expect.objectContaining({ success: false }));
@@ -120,8 +108,8 @@ describe('CLI process diagnostics', () => {
 	});
 });
 
-async function project(theme?: string, skin?: string): Promise<string> {
-	const root = await createCliProject(theme, skin);
+async function project(skin?: string): Promise<string> {
+	const root = await createCliProject(skin);
 	projects.push(root);
 	return root;
 }

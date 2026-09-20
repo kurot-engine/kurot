@@ -12,15 +12,15 @@ import {
 	validateUIAssetRegistry,
 } from '../src/index.js';
 
-const ACTION_CARD = readFixture('action-card.component.json');
-const BUTTON_APPEARANCE = readFixture('button.appearance.json');
-const LOBBY_SCREEN = readFixture('lobby.screen.json');
+const ACTION_CARD = readFixture('action-card.component.kui.xml');
+const BUTTON_APPEARANCE = readFixture('button.appearance.kui.xml');
+const LOBBY_SCREEN = readFixture('lobby.screen.kui.xml');
 
 describe('UI asset registry', () => {
 	it('round-trips all authoring asset kinds with stable golden output', () => {
 		for (const source of [ACTION_CARD, BUTTON_APPEARANCE, LOBBY_SCREEN]) {
 			const document = parseUIDocument(source);
-			expect(serializeUIDocument(document)).toBe(source.trimEnd());
+			expect(serializeUIDocument(document)).toBe(source);
 		}
 	});
 
@@ -29,9 +29,9 @@ describe('UI asset registry', () => {
 		const screenSource = serializeUIDocument(registry.getAsset('lobby-screen')!);
 
 		expect(validateUIAssetRegistry(registry)).toEqual([]);
-		expect(screenSource.match(/"assetId": "action-card"/g)).toHaveLength(2);
-		expect(screenSource).not.toContain('"id": "background"');
-		expect(screenSource).not.toContain('"id": "content-slot"');
+		expect(screenSource.match(/source="action-card"/g)).toHaveLength(2);
+		expect(screenSource).not.toContain('<Rect id="background"');
+		expect(screenSource).not.toContain('<Group id="content-slot"');
 	});
 
 	it('reports invalid instance contracts', () => {

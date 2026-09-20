@@ -41,7 +41,7 @@ describe('component configuration', () => {
 		process.chdir(root);
 
 		await expect(loadConfig()).rejects.toThrow(
-			"exml.components.namespace must be a valid XML namespace prefix, got '9game'",
+			"ui.components.namespace must be a valid XML namespace prefix, got '9game'",
 		);
 	});
 
@@ -54,7 +54,7 @@ describe('component configuration', () => {
 		process.chdir(root);
 
 		await expect(loadProject('development')).rejects.toThrow(
-			'exml.components.sourceDir must be inside the project src directory',
+			'ui.components.sourceDir must be inside the project src directory',
 		);
 	});
 
@@ -70,7 +70,7 @@ describe('component configuration', () => {
 		process.chdir(root);
 
 		await expect(loadProject('development')).rejects.toThrow(
-			"exml.components.namespace 'game' conflicts with exml.namespaces.game",
+			"ui.components.namespace 'game' conflicts with ui.namespaces.game",
 		);
 	});
 });
@@ -100,8 +100,8 @@ async function createProject(
 				orientation: 'auto',
 				frameRate: 60,
 			},
-			exml: {
-				themeFile: 'resource/default.thm.json',
+			ui: {
+				sourceDir: 'resource/skins',
 				components,
 				...(namespaces ? { namespaces } : {}),
 			},

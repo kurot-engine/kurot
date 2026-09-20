@@ -7,6 +7,33 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 2.0.0 — 2026-09-21
+
+This release is scoped to the Kurot Editor toolchain. Existing EXML game
+projects remain supported by the 1.3.x line and are not expected to upgrade or
+change their project configuration.
+
+### Added
+
+- Canonical KUI XML Skin compilation through `@kurot/ui-document`.
+- Generated default theme mappings derived from Skin `target` and `default`
+  metadata, including duplicate-default diagnostics.
+- KUI XML project templates for all 21 built-in UI skins.
+
+### Changed
+
+- Replaced the `exml` project configuration with `ui.sourceDir`,
+  `ui.namespaces`, and `ui.components`.
+- Simplified SkinIR to the runtime operations produced by semantic KUI
+  documents and removed syntax-specific compatibility branches.
+- The theme JSON is generated at the fixed `resource/default.thm.json` output
+  path rather than configured or supplied as an authored input.
+
+### Removed
+
+- EXML parsing, theme-input discovery, `.exml` templates, and compatibility
+  diagnostics.
+
 ## 1.3.0 — 2026-09-20
 
 ### Added

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.LabelSkin" version="2" target="kui.Label" default="false">
+    <contract>
+        <parts>
+            <part name="labelDisplay" node="labelDisplay" />
+        </parts>
+    </contract>
+    <Group id="root">
+        <Label id="labelDisplay" height="100%" size="14" textColor="14673641" width="100%" />
+    </Group>
+</Skin>

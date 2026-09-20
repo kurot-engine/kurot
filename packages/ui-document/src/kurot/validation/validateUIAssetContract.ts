@@ -17,6 +17,7 @@ const CONTRACT_KEYS = new Set([
 	'componentType',
 	'dataBindings',
 	'dataFields',
+	'isDefault',
 	'parameters',
 	'parts',
 	'slots',
@@ -296,12 +297,28 @@ function validateContractTypes(
 			'Appearance target type',
 			diagnostics,
 		);
+		if (value.isDefault !== undefined && typeof value.isDefault !== 'boolean') {
+			addUIDiagnostic(
+				diagnostics,
+				'invalid-asset-contract',
+				`${path}.isDefault`,
+				'Appearance default selection must be a boolean.',
+			);
+		}
 	} else if (value.targetType !== undefined) {
 		addUIDiagnostic(
 			diagnostics,
 			'invalid-asset-contract',
 			`${path}.targetType`,
 			'Only appearance assets may declare a target type.',
+		);
+	}
+	if (assetKind !== 'appearance' && value.isDefault !== undefined) {
+		addUIDiagnostic(
+			diagnostics,
+			'invalid-asset-contract',
+			`${path}.isDefault`,
+			'Only appearance assets may be selected as a default skin.',
 		);
 	}
 }

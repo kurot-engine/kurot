@@ -32,10 +32,10 @@ export class Panel extends Component {
 	private _panelStartY = 0;
 	private _dragStage?: Stage;
 
-	// ── Default property (EXML children) ───────────────────────────────
+	// ── Default property ────────────────────────────────────────────────
 
 	/**
-	 * Write-only: adds EXML-declared children to the panel.
+	 * Write-only: adds declarative children to the panel.
 	 * Mirrors Egret's `registerProperty(Panel, "elementsContent", "Array", true)`.
 	 */
 	public set elementsContent(value: DisplayObject[] | undefined) {

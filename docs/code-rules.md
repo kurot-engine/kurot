@@ -72,7 +72,7 @@ const files: string[] = await fs.readdir(srcDir);
 | 场景                                    | 风格                                 | 示例                                        |
 | --------------------------------------- | ------------------------------------ | ------------------------------------------- |
 | 导出主 class/interface 的文件名           | `PascalCase`                         | `DisplayObject.ts`                          |
-| CLI、配置、工具和功能模块文件名             | `kebab-case`                         | `exml-compiler.ts`                          |
+| CLI、配置、工具和功能模块文件名             | `kebab-case`                         | `kui-compiler.ts`                          |
 | class / interface / type / enum         | `PascalCase`                         | `ProjectConfig`, `BitmapFillMode`           |
 | `const enum`（枚举类型名）              | `PascalCase`                         | `DrawCmdType`                               |
 | 函数 / 方法 / 变量                      | `camelCase`                          | `buildProject`, `getOrAssignSlot`           |
@@ -385,12 +385,12 @@ constructor(canvas: HTMLCanvasElement, shared?: boolean) { ... }
 | 模块               | 职责            |
 | ------------------ | --------------- |
 | `compiler.ts`      | TS 编译编排     |
-| `exml-compiler.ts` | EXML 解析与转换 |
+| `kui-compiler.ts` | KUI XML 解析与转换 |
 | `template.ts`      | 模板文件处理    |
 | `target.ts`        | 平台适配        |
 | `config.ts`        | 配置文件加载    |
 
-禁止"上帝文件"（一个文件做编译+EXML+拷贝+生成 manifest）。
+禁止"上帝文件"（一个文件做编译+KUI XML+拷贝+生成 manifest）。
 
 - 新文件原则上不超过 300 行。
 - 修改既有大文件时不为满足行数进行无意义拆分；新增独立职责时优先提取模块，并通过专项重构逐步降低体积。
@@ -444,7 +444,7 @@ throw 'build failed';
 
 ## 6. 不写兼容性代码
 
-- **只实现文档明确承诺的兼容面**：EXML、EUI API、资源配置等已公开说明的协议可以兼容；不根据 Egret/Pixi 的历史行为推测或添加隐式兼容分支。
+- **只实现文档明确承诺的兼容面**：KUI XML、EUI API、资源配置等已公开说明的协议可以兼容；不根据 Egret/Pixi 的历史行为推测或添加隐式兼容分支。
 - **未列入公开契约的历史行为不做兼容**：新增兼容面必须先更新公开文档和测试。
 - **不兼容旧浏览器**：目标 `ES2022`，不生成 ES5 polyfill。
 - **不写无依据的平台兼容分支**：仅当公开支持矩阵确实存在平台差异时使用 `process.platform` 或能力检测，不用宽泛 `try/catch` 吞掉未知错误。

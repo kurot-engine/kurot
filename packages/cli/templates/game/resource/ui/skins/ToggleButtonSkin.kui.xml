@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.ToggleButtonSkin" version="2" target="kui.ToggleButton" default="false">
+    <contract>
+        <parts>
+            <part name="bg" node="bg" />
+            <part name="labelDisplay" node="labelDisplay" />
+        </parts>
+        <states>
+            <state name="disabled">
+                <set target="bg" property="fillColor" value="2962486" />
+                <set target="labelDisplay" property="textColor" value="6516338" />
+            </state>
+            <state name="disabledAndSelected">
+                <set target="bg" property="fillColor" value="2962486" />
+            </state>
+            <state name="down">
+                <set target="bg" property="fillColor" value="4871257" />
+            </state>
+            <state name="downAndSelected">
+                <set target="bg" property="fillColor" value="5917649" />
+            </state>
+            <state name="up">
+            </state>
+            <state name="upAndSelected">
+                <set target="bg" property="fillColor" value="7101671" />
+                <set target="labelDisplay" property="textColor" value="16777215" />
+            </state>
+        </states>
+    </contract>
+    <Group id="root" minHeight="50" minWidth="100">
+        <Rect id="bg" fillColor="6516338" height="100%" strokeColor="4871257" strokeWeight="1" width="100%" />
+        <Label id="labelDisplay" bottom="8" left="8" right="8" size="16" textAlign="center" textColor="14673641" top="8" verticalAlign="middle" />
+    </Group>
+</Skin>

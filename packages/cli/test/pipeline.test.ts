@@ -15,7 +15,7 @@ describe('build pipeline diagnostics', () => {
 	it('passes strict policy to the diagnostic collector', () => {
 		const ctx = createContext(createProject(), { strict: true });
 		ctx.diagnostics.report({
-			code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+			code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 			severity: 'warning',
 			message: 'Unknown tag.',
 		});
@@ -36,7 +36,7 @@ describe('build pipeline diagnostics', () => {
 		const plugins = [
 			createPlugin('warning', async context => {
 				context.diagnostics.report({
-					code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+					code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 					severity: 'warning',
 					message: 'Unknown tag.',
 				});
@@ -53,9 +53,9 @@ describe('build pipeline diagnostics', () => {
 		const ctx = createContext(createProject());
 		const secondApply = vi.fn(async (): Promise<void> => undefined);
 		const plugins = [
-			createPlugin('invalid EXML', async context => {
+			createPlugin('invalid KUI', async context => {
 				context.diagnostics.report({
-					code: DIAGNOSTIC_CODES.EXML_COMPILE_FAILED,
+					code: DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 					severity: 'error',
 					message: 'Compilation failed.',
 				});
@@ -64,7 +64,7 @@ describe('build pipeline diagnostics', () => {
 		];
 
 		await expect(runPipeline(ctx, plugins)).rejects.toThrow(
-			"Build stopped after 'invalid EXML' with 1 error diagnostic(s).",
+			"Build stopped after 'invalid KUI' with 1 error diagnostic(s).",
 		);
 		expect(secondApply).not.toHaveBeenCalled();
 	});
@@ -73,9 +73,9 @@ describe('build pipeline diagnostics', () => {
 		const ctx = createContext(createProject(), { strict: true });
 		const secondApply = vi.fn(async (): Promise<void> => undefined);
 		const plugins = [
-			createPlugin('strict EXML', async context => {
+			createPlugin('strict KUI', async context => {
 				context.diagnostics.report({
-					code: DIAGNOSTIC_CODES.EXML_UNKNOWN_TAG,
+					code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 					severity: 'warning',
 					message: 'Unknown tag.',
 				});
@@ -84,7 +84,7 @@ describe('build pipeline diagnostics', () => {
 		];
 
 		await expect(runPipeline(ctx, plugins)).rejects.toThrow(
-			"Build stopped after 'strict EXML' with 1 error diagnostic(s).",
+			"Build stopped after 'strict KUI' with 1 error diagnostic(s).",
 		);
 		expect(secondApply).not.toHaveBeenCalled();
 	});
@@ -93,12 +93,12 @@ describe('build pipeline diagnostics', () => {
 		const ctx = createContext(createProject());
 		const plugin = createPlugin('validation', async context => {
 			context.diagnostics.report({
-				code: DIAGNOSTIC_CODES.EXML_COMPILE_FAILED,
+				code: DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 				severity: 'error',
 				message: 'First error.',
 			});
 			context.diagnostics.report({
-				code: DIAGNOSTIC_CODES.THEME_INVALID_JSON,
+				code: DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 				severity: 'error',
 				message: 'Second error.',
 			});

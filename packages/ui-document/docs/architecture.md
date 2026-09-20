@@ -100,9 +100,9 @@ definition, and recursive property-object keys. Golden fixtures pin the output
 for a component definition, an appearance, and a screen containing two compact
 instances.
 
-JSON is currently the canonical transport and conformance syntax. This does
-not decide the eventual human-facing `.kui` syntax; future XML-like or editor
-formats must translate losslessly to this model.
+KUI XML is the canonical transport and authored source syntax. Screens,
+components, and skins use the same `.kui.xml` grammar and translate losslessly
+to the runtime-independent semantic model. See [KUI XML format](./kui-xml.md).
 
 ## Component schema
 

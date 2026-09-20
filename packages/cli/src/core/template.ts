@@ -49,7 +49,7 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 	if (template === 'game') {
 		await Promise.all([
 			ensureDir(path.join(destDir, 'src/components')),
-			ensureDir(path.join(destDir, 'resource/skins/components')),
+			ensureDir(path.join(destDir, 'resource/ui/components')),
 		]);
 	}
 

@@ -279,8 +279,8 @@ export default {
 		frameRate: 60,
 		background: '#000000',
 	},
-	exml: {
-		themeFile: 'resource/default.thm.json',
+	ui: {
+		sourceDir: 'resource/ui',
 	},
 };
 ```
@@ -297,8 +297,9 @@ export default {
 | `data-frame-rate` | `stage.frameRate` | 帧率 |
 | HTML/CSS 背景 | `stage.background` | 页面背景色 |
 | — | `output.dir` | development 输出目录 |
-| 主题配置 | `exml.themeFile` | 主题 JSON 路径 |
-| 自定义 EXML 包 | `exml.namespaces` | prefix 到 barrel file 的映射 |
+| 皮肤源码 | `ui.sourceDir` | KUI XML 文档目录 |
+| 主题输出 | `resource/default.thm.json` | CLI 固定生成，无需配置 |
+| 自定义 KUI 组件 | `ui.namespaces` | XML prefix 到 barrel file 的映射 |
 
 ### 5.3 模块与入口代码迁移
 
@@ -343,119 +344,74 @@ Release 仍会生成 `manifest.json`：
 | `data-entry-class` 自举 | 在应用入口中调用 `createPlayer()` |
 | typescript-plus 特性 | 改写为标准 TypeScript/esbuild 可处理的代码 |
 | 浏览器自动刷新 | 当前 `kurot dev` 需要手动刷新 |
-| 未注册 EXML 组件 | 加入 `exml.namespaces` barrel 或改用已支持组件 |
+| 未注册 KUI 组件 | 加入 `ui.namespaces` barrel 或改用已支持组件 |
 
 ---
 
 ## 六、资源与主题迁移
 
-建议保持以下结构：
+Kurot 不读取 Egret 主题文件或 EXML。资源图集可以继续使用当前资源系统，
+皮肤需要一次性改写为 canonical KUI XML：
 
 ```text
 resource/
 ├── default.res.json
-├── default.thm.json
-└── skins/
-    ├── ButtonSkin.exml
-    └── ...
+└── ui/
+    └── skins/
+        ├── ButtonSkin.kui.xml
+        └── ...
 ```
 
-主题支持两种常见写法：
+`default.thm.json` 是构建输出，不是迁移输入。每个默认皮肤在自身根元素声明
+`target` 和 `default`，CLI 据此生成主题映射：
 
-```jsonc
-// Egret 路径形式
-{
-	"skins": {
-		"eui.Button": "resource/skins/ButtonSkin.exml"
-	},
-	"autoGenerateExmlsList": false,
-	"exmls": ["resource/skins/ButtonSkin.exml"]
-}
+```xml
+<Skin xmlns="https://kurot.dev/ui/1"
+      id="skins.ButtonSkin"
+      version="2"
+      target="kui.Button"
+      default="true">
+    <Group id="root">
+        <Label id="labelDisplay" />
+    </Group>
+</Skin>
 ```
 
-```jsonc
-// Kurot 类名形式
-{
-	"skins": {
-		"eui.Button": "skins.ButtonSkin"
-	}
-}
-```
-
-当 `autoGenerateExmlsList` 为 `false` 且 `exmls` 非空时，CLI 按列表编译；其他情况下递归
-扫描 `resource/`。构建后的主题会把可识别的路径值转换为皮肤类名，删除编译期列表字段，
-并写入 `skinsJs`。启用 EXML 后，产物不会包含原始 `.exml` 文件。
-
-`default.res.json` 可沿用 Egret 常见的 `groups` 和 `resources` 结构，但最终兼容程度由
-当前 Kurot 资源运行时支持的资源类型决定，应在实际项目中逐项验证。
+`default.res.json` 可继续使用 Kurot 资源运行时支持的 `groups` 和 `resources`
+结构。旧图集中的 `eui.json` 与 `eui.png` 是普通资源数据，不是皮肤格式。
 
 ---
 
-## 七、EXML 迁移
+## 七、从 EXML 改写为 KUI XML
 
-### 7.1 内置 namespace
+这是源文件迁移，不是兼容模式。执行以下转换：
 
-```xml
-<eui:Skin
-	xmlns:eui="http://ns.egret.com/eui"
-	xmlns:egret="http://ns.egret.com/egret">
-</eui:Skin>
-```
+- 根元素改为默认 namespace 的 `<Skin>`；
+- `class` 改为 `id`；
+- 组件类型通过 `target` 声明；
+- 默认皮肤增加 `default="true"`；
+- `eui:*` 组件使用无前缀 PascalCase 标签；
+- 项目组件使用明确的 XML prefix，例如 `<game:HealthBar>`；
+- states、variants、parts 和参数写入 `<contract>`；
+- 资源与 token 使用 `@resource:type:key` 和 `@token:type:key`。
 
-这些 URL 是 XML namespace 标识符。CLI 根据 `eui`、`egret`、`w` 和 `core` 前缀在内部解析，
-不会访问 URL，因此无需自行搭建 `ns.egret.com`。
-
-### 7.2 自定义 namespace
-
-Egret 项目常见写法：
-
-```xml
-<eui:Skin xmlns:eui="http://ns.egret.com/eui" xmlns:game="game.*">
-	<game:HealthBar />
-</eui:Skin>
-```
-
-创建一个导出该 namespace 所有类的 barrel file：
-
-```ts
-// src/ui/index.ts
-export { HealthBar } from './HealthBar.js';
-```
-
-然后配置 prefix：
+项目组件 namespace 配置示例：
 
 ```ts
 export default {
-	// ...
-	exml: {
-		themeFile: 'resource/default.thm.json',
-		namespaces: {
-			game: 'src/ui/index.ts',
-		},
-	},
+    ui: {
+        sourceDir: 'resource/ui',
+        namespaces: {
+            game: 'src/ui/index.ts',
+        },
+    },
 };
 ```
 
-CLI 会生成 `#ns/game` import-map 项和 `js/ns.game.js` chunk。EXML 标签名必须与 barrel
-file 的导出名一致。
-
-### 7.3 当前支持范围
-
-支持常见组件与以下 EXML 写法：
-
-- 普通属性和属性节点；
-- `width="100%"` / `height="100%"`；
-- `{expression}` 数据绑定；
-- 根 Skin 的 `minWidth`、`minHeight` 等属性；
-- `<eui:states>` 和 `states="up,down"` 简写；
-- `property.state="value"` 状态属性；
-- `includeIn` 和 `excludeFrom`。
-
-EXML 并非保证与 Egret 全量语法完全兼容。当前 XML 解析器不支持 DTD、ENTITY 和 namespaced
-attributes；组件必须存在于内置 registry 或已配置的自定义 namespace。未知标签会被警告并
-从皮肤中丢弃；strict/release 会将未知标签提升为错误。皮肤解析失败在所有模式下都会停止
-本次构建，不再生成空工厂。因此迁移时必须阅读构建诊断，不能只以
-进程退出码判断成功。
+KUI XML 不接受 EXML 的 `includeIn`、`excludeFrom`、点号状态属性或
+`{expression}` 属性绑定语法。状态差异和数据绑定属于 UIDocument contract，
+由 `@kurot/ui-document` 验证并由相应编译或 runtime 路径执行。完整格式见
+[`packages/ui-document/docs/kui-xml.md`](../packages/ui-document/docs/kui-xml.md)。
 
 ---
 
@@ -465,7 +421,7 @@ attributes；组件必须存在于内置 registry 或已配置的自定义 names
 2. 安装依赖并运行模板，先确认本机环境正常。
 3. 分批迁移源码和资源，不要直接覆盖模板配置。
 4. 将全局 `egret.*`、`eui.*` 和 Tween API 改为 Kurot package imports。
-5. 迁移 `default.res.json`、主题文件和 EXML，处理构建警告。
+5. 迁移 `default.res.json`，并将皮肤改写为 KUI XML，处理构建诊断。
 6. 使用 `pnpm dev` 验证输入、触摸、状态、布局、滚动和资源加载。
 7. 最后运行 `pnpm build -- --release` 验证 release 产物。
 
@@ -476,8 +432,8 @@ attributes；组件必须存在于内置 registry 或已配置的自定义 names
 - [ ] `package.json` 已声明需要的 `@kurot/*` 运行时依赖。
 - [ ] `kurot.config.ts` 的舞台、入口和主题路径正确。
 - [ ] 源码已改用 ESM imports。
-- [ ] 自定义 EXML prefix 已配置对应 barrel file。
-- [ ] 构建日志没有未处理的 EXML warning。
-- [ ] states、`includeIn`、`excludeFrom` 和数据绑定表现正确。
+- [ ] 自定义 KUI XML prefix 已配置对应 barrel file。
+- [ ] 构建日志没有未处理的 KUI diagnostics。
+- [ ] Contract states、variants 和数据绑定表现正确。
 - [ ] TextInput、触摸、Scroller、弹出层等交互已在浏览器验证。
 - [ ] development 与 release 模式均能启动并加载资源。

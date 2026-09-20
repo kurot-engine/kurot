@@ -4,9 +4,8 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.5.x).** The reusable authoring model and headless
-> editing kernel are implemented, but the schema remains pre-1.0 and is not yet
-> a production file format.
+> **Early development (0.6.x).** KUI XML is the canonical authored format. The
+> schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
 
@@ -72,8 +71,7 @@ the corresponding `@kurot/ui` class.
 - strict validation of schema keys, versions, identifiers, unique node IDs,
   plain property values, finite numbers, and acyclic trees;
 - structured diagnostics with stable codes and JSON-style paths;
-- validated JSON parsing and deterministic serialization with sorted property
-  keys;
+- validated KUI XML parsing and deterministic canonical serialization;
 - runtime-independent component definitions and an isolated component registry;
 - inherited appearance-state, native-part, and emitted-event capabilities;
 - abstract base definitions, single-parent inheritance, deterministic schema
@@ -209,8 +207,9 @@ It defines the abstract semantic bases `kurot.DisplayObject`,
 `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput` nodes. `Group`
 accepts ordered children; the other concrete nodes are leaves.
 
-`kui.*` is the canonical Kurot UI namespace. EUI names belong only to legacy
-EXML adapters and are not stored in the semantic document.
+`kui.*` is the canonical Kurot UI namespace. Authored files use the
+[`KUI XML format`](./docs/kui-xml.md); EUI names and EXML are not stored in the
+semantic document.
 
 The foundation catalog declares the serializable authoring properties inherited
 from Kurot display objects and UI layout elements, then adds the audited direct
@@ -242,12 +241,10 @@ package boundaries.
 
 ## Intended boundary
 
-The package owns the serializable UI asset model and its deterministic
-operations. Planned layers include:
+The package owns the serializable UI asset model, KUI XML syntax, and its
+deterministic operations. Planned work includes:
 
-- the remaining component catalog and nested structured-value constraints;
-- document migrations;
-- adapters for formats such as EXML.
+- the remaining component catalog and nested structured-value constraints.
 
 It will not own rendering, runtime UI components, editor panels, filesystem
 or network I/O, or model-provider integration. Those concerns belong to

@@ -31,7 +31,7 @@ describe('component catalog', () => {
 					name: 'BetButton',
 					tag: 'game:BetButton',
 					source: 'src/components/BetButton.ts',
-					skin: 'resource/skins/components/BetButtonSkin.exml',
+					skin: 'resource/skins/components/BetButtonSkin.kui.xml',
 					skinClass: 'components.BetButtonSkin',
 				},
 			],
@@ -60,8 +60,8 @@ async function createProject(mode: BuildMode): Promise<{ project: Project; outpu
 		specifier: '#ns/game',
 		source: path.join(root, 'src/components/BetButton.ts'),
 		sourceRelative: 'src/components/BetButton.ts',
-		skin: path.join(root, 'resource/skins/components/BetButtonSkin.exml'),
-		skinRelative: 'resource/skins/components/BetButtonSkin.exml',
+		skin: path.join(root, 'resource/skins/components/BetButtonSkin.kui.xml'),
+		skinRelative: 'resource/skins/components/BetButtonSkin.kui.xml',
 		skinClass: 'components.BetButtonSkin',
 	};
 	const components = [component];

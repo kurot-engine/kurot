@@ -32,8 +32,7 @@ src/kurot/
 ├── states/         View States: State, IOverride, SetProperty,
 │                   SetStateProperty, AddItems. Declarative skin state-diffing.
 ├── binding/        Watcher (property-chain observer), Binding (static helpers:
-│                   bindProperty/bindHandler/bindProperties). Used by compiled
-│                   EXML {expr} syntax; usable manually too.
+│                   bindProperty/bindHandler/bindProperties). Available to programmatic skins and runtime integration code.
 ├── collections/    ICollection, ArrayCollection. Observable data source for
 │                   DataGroup/List/TabBar/ComboBox.
 ├── layouts/        LayoutBase (abstract), BasicLayout, VerticalLayout,
@@ -66,14 +65,10 @@ src/kurot/
 skin)` signature, but `Group._commitCurrentState()` passes `this` cast
   `as unknown as Skin` — a type-unsafe workaround since Group has neither a
   real Component nor a real Skin.
-- `Component._invokeSkinFactory()` distinguishes EXML-compiled **factory
-  functions** (called with `.call(this)`, so `this` resolves to the host —
-  required for `Binding.bindProperty(this, ...)`) from real `class extends
-Skin` constructors (detected via regex on `Function.prototype.toString()`,
-  invoked with `new`). A hand-written class-based skin using EXML-style
-  `{binding}` syntax will silently get the wrong `this` — the source comment
-  explicitly warns skins with EXML bindings must be factory functions, not
-  classes.
+- `Component._invokeSkinFactory()` distinguishes KUI-compiled factory
+  functions (called with `.call(this)` to supply the host) from real
+  `class extends Skin` constructors (detected from their function source and
+  invoked with `new`).
 - `Component.touchEnabled`/`touchChildren` diverge from the raw `Sprite`
   value while `enabled === false`: the setter stores intent in
   `_explicitTouchEnabled`/`_explicitTouchChildren` but forces the live value

@@ -1,299 +1,133 @@
 # @kurot/cli — AI context map
 
-Read this before exploring `src/`. It is a compressed map so an agent
-unfamiliar with Kurot does not need to re-derive the pipeline from scratch
-each session. [`architecture.md`](./architecture.md) covers the same plugin
-pipeline in greater detail.
+Read this before exploring `src/`. [`architecture.md`](./architecture.md)
+explains the plugin pipeline. The package is `@kurot/cli@2.0.0`, runs on
+Node.js 20+, and is installed as a project dev dependency.
 
-Package identity: `@kurot/cli@1.3.0`. Node.js build tool, esbuild-powered,
-with a built-in EXML → ESM compiler. Not installed globally — projects use it
-via `npx` (scaffolding) or as a devDependency with npm scripts.
+## Directory map
 
-## 1. Directory map
-
-```
+```text
 src/
-├── index.ts                       CLI entry (commander), registers 4 subcommands.
-├── define.ts                      Pure type re-export (ProjectConfig etc.) for
-│                                   kurot.config.ts authoring — no runtime logic.
-├── commands/
-│   ├── build.ts                   build: release/watch/strict + human/JSON diagnostics
-│   ├── dev.ts                     dev: port/sourcemap/strict + human/JSONL diagnostics
-│   ├── create.ts                  create: scaffolds a project from templates/
-│   └── clean.ts                   clean: removes BOTH bin-debug and bin-release
+├── index.ts                       Commander entry
+├── define.ts                      public configuration type exports
+├── commands/                      build, dev, create, clean
 ├── core/
-│   ├── config.ts                  loadConfig() — reads kurot.config.ts/js, merges DEFAULTS
-│   ├── project.ts                 loadProject(mode) — resolves absolute paths, enginePackages,
-│   │                              customNamespaces (#ns/<prefix> specifiers)
-│   ├── pipeline.ts                BuildContext, runPipeline(), disposeContext()
-│   ├── dev-server.ts               startDevServer — static file server + EXML file watcher
-│   ├── namespace-external-plugin.ts  Shared esbuild plugin, see §2
-│   ├── template.ts                 scaffoldProject(), TEMPLATES list
-│   ├── errors.ts                   BuildError, ConfigError
-│   ├── diagnostics/                Serializable diagnostics, strict policy, JSON/JSONL protocol
-│   ├── components/                 Reusable TS/Skin discovery and refresh
-│   ├── exml/                       The EXML → SkinIR → ESM compiler (see §3)
-│   │   ├── xml-parser.ts           Hand-rolled recursive-descent XML parser
-│   │   ├── registry.ts             Namespace prefix map + component tag registry
-│   │   ├── exml-parser.ts          XElement tree -> SkinIR
-│   │   ├── codegen.ts              SkinIR -> ESM source text (string building, not AST)
-│   │   └── skin-parts-declaration.ts  SkinIR -> typed SkinPartsMap declaration
-│   └── plugins/                    Pipeline steps, run in array order (see §5)
-│       ├── clean-output.ts, compile-exml.ts, compile-engine.ts,
-│       │   compile-custom-namespaces.ts, component-catalog.ts, compile-source.ts,
-│       │   generate-html.ts, manifest.ts, copy-assets.ts
-│       └── index.ts                defaultPlugins() — the build-command order
-└── utils/                          Misc helpers
+│   ├── config.ts                  configuration loading and validation
+│   ├── project.ts                 resolved paths, dependencies, namespaces
+│   ├── pipeline.ts                BuildContext and ordered plugin runner
+│   ├── dev-server.ts              static server and watchers
+│   ├── diagnostics/               stable codes and JSON/JSONL output
+│   ├── components/                reusable component discovery
+│   ├── kui/                       UIDocument → SkinIR → ESM compiler
+│   └── plugins/                   build stages
+└── utils/
 ```
 
-Templates actually scaffolded by `create` live in `templates/game/` and
-`templates/empty/` (sibling to `src/`, not under it) — see §6.
+Project templates are under `templates/game` and `templates/empty`.
 
-## 2. Non-obvious behavior
+## KUI compilation
 
-- **`--watch` silently forces development mode**, even if `--release` is also
-  passed (with a warning) — there is no release watch mode.
-- **Real Skin compilation failures abort both development and release builds.**
-  Dev watch catches the failure at the watcher boundary, keeps the process and
-  last successful Skin bundle alive, then retries after the next change. It
-  never emits a stub factory returning `{}`.
-- **Unknown EXML tags are intentionally recoverable only in normal mode.** They
-  produce located `KUROT_EXML_UNKNOWN_TAG` warnings and are omitted from the
-  generated tree. `--strict` and release policy promote them to errors.
-- **Machine output owns stdout.** `build --diagnostics json` emits one result;
-  `dev --diagnostics jsonl` emits one lifecycle event per line. Ordinary logger
-  output is disabled so agents do not need to remove colors or status text.
-- `xmlns:eui="http://ns.egret.com/eui"`-style URIs are **purely cosmetic**.
-  Only the literal prefix string (`eui`) is ever inspected against
-  `registry.ts`'s `NAMESPACE_MODULES` map — the URI value is never
-  dereferenced, fetched, or validated. No network access happens for
-  namespace resolution.
-- **`compileCustomNamespaces` must run before `compileSource`** in the
-  plugin array — `compileSource` reads `ctx.outputs.namespaceModules` to
-  exclude namespace-owned files from per-file dev entries and to mark them
-  external. This ordering is enforced only by comments/convention, not by
-  types — swapping the array order would duplicate namespace classes into
-  the app bundle with mismatched `instanceof` identity.
-- `ctx.outputs.engine` is a **single shared map** holding both `@kurot/*`
-  engine chunks AND `#ns/*` custom-namespace chunks — the import-map
-  generator (`generate-html.ts`) doesn't distinguish between them.
-- Release engine, namespace, and application bundles enable esbuild
-  `keepNames`: `Component.hostComponentKey` and Theme inheritance fallback use
-  `constructor.name`, so ordinary identifier minification would break default
-  Skin lookup even though the ESM export name remained stable.
-- `exml.components` is convention-based: `<Name>.ts` under `sourceDir` must
-  pair with `<Name>Skin.exml` at the same relative path under `skinDir`.
-  Component names are globally unique inside that namespace. The CLI generates
-  the namespace entry, validates exact EXML tags, injects default Theme
-  mappings, and writes `.kurot/component-catalog.json` in development only.
-  The Skin remains a standard `eui:Skin`, so existing visual editors can edit it.
-- A manual `exml.namespaces` barrel remains supported, but its exports are
-  intentionally unknown until esbuild runs. Its prefix may not conflict with
-  `exml.components.namespace`.
-- `namespaceModuleExternalPlugin` (in `namespace-external-plugin.ts`) exists
-  because a plain esbuild `external: [specifier]` list only catches literal
-  `#ns/game`-style imports (what EXML-generated code emits) — it does NOT
-  catch hand-written game code doing a relative import like
-  `./ui/HeroNarrowIR.js` to the same file. Without this plugin, that file
-  would get bundled twice with two different `instanceof` identities. It's
-  applied in `compile-source.ts` and `compile-custom-namespaces.ts`, but
-  deliberately **not** in `compile-exml.ts`'s skin bundler — generated skin
-  code only ever imports via the virtual `#ns/*` specifier, never a relative
-  path, so the plain `external:` list is sufficient there.
-- `skin-module-builder.ts` generates every Skin module in a temporary staging
-  directory and installs the completed bundle only after all Skin code has
-  compiled. This is what preserves the previous bundle during failed watches.
-- A successful EXML build generates project-root `.kurot/skin-parts.d.ts` from
-  the same parsed `SkinIR` used by code generation. It augments
-  `@kurot/ui`'s `SkinPartsMap` and narrows exported host classes selected by an
-  explicit literal `skinName`, reusable-component configuration, or a unique
-  `<ClassName>Skin` convention. Ambiguous short-name matches are not inferred.
-  Template TypeScript configurations include the declaration, while git and
-  runtime/release bundles exclude it.
-- `parseValue()` in `exml-parser.ts` coerces EXML attribute values in this
-  order: binding (`{...}`) → percent (trailing `%`) → boolean literal → `null`
-  literal → numeric literal → fallback string. This means literal strings
-  `"true"`, `"false"`, `"null"`, or any numeric-looking string (`"100"`)
-  **always** become non-string JS values in generated code — there is no
-  escape hatch to force them through as literal text. Fallback strings decode
-  Egret-style `\n` sequences into hard line breaks; this is independent of a
-  Label's `multiline`/automatic-wrapping behavior.
-- `copy-assets.ts` unconditionally skips copying the theme file and all
-  `.exml` files whenever `exml` config is present, **regardless of whether
-  `compile-exml.ts` actually found/compiled anything**. A misconfigured
-  `exml.themeFile` pointing at a real theme with zero matching `.exml` files
-  silently drops the theme JSON from the output entirely — no error, no
-  theme file in `bin-debug`/`bin-release`.
-- `cleanOutput` (first step in `defaultPlugins()`) means **every dev build
-  wipes `bin-debug/` first** — the build pipeline is never incremental at the
-  output level (esbuild's own watch-mode incrementality happens upstream of
-  this). Note `clean.ts` (the standalone command) additionally always removes
-  `bin-release` too, regardless of what mode you're building in — cleaning
-  is more aggressive than a single build's own output-dir wipe.
-- `kurot create` makes **live npm registry HTTP calls** (3s timeout per
-  package) to pin each scaffolded `@kurot/*` dependency to a concrete
-  version, falling back to the literal string `'latest'` on failure/timeout.
-  This is a real network dependency during scaffolding.
-- `writeManifest` is a **no-op outside release mode** — `manifest.json` is
-  only ever written for release builds.
-- Release output path is timestamped (`bin-release/web/<YYMMDDHHmmss>/`) —
-  every release build creates a brand-new folder, nothing is ever overwritten
-  or incrementally updated.
-- `compile-engine.ts` writes throwaway stub files (`export * from '<pkg>';`)
-  into a temp dir **inside the project's own `node_modules`**
-  (`node_modules/.kurot-engine-<random>/`) so esbuild's normal Node resolution
-  can find the real package — always cleaned up in a `finally`.
-  `skin-module-builder.ts` instead uses an OS temp dir
-  (`os.tmpdir()/kurot-skins-*`) — the two compile steps intentionally use
-  different temp-file strategies.
+`.kui.xml` is the only authored UI format. `compile-kui.ts` recursively scans
+`ui.sourceDir` and parses every document with `@kurot/ui-document`. Appearance
+assets are adapted by `kui/kui-parser.ts` to the compiler-private `SkinIR`,
+then `skin-module-builder.ts` bundles generated factories.
 
-## 3. The EXML compiler internals (SkinIR pipeline)
+A Skin document root declares:
 
-Flow: `xml-parser.ts` (raw XML → `XElement`/`XText` tree) → `exml-parser.ts`
-(`parseEXML`/`parseSkinRoot`, tree → `SkinIR`) → `codegen.ts`
-(`generateCode(ir)`, `SkinIR` → ESM source text via string building, not an
-AST-to-AST transform).
+- `id`: generated skin registration name;
+- `target`: runtime component type such as `kui.Button`;
+- `default="true"`: include this skin in the generated default theme map.
 
-- **`registry.ts`** is the "component registry": `NAMESPACE_MODULES`
-  (`{eui: '@kurot/ui', egret: '@kurot/core', w: '@kurot/ui', core:
-  '@kurot/core'}`, prefix-keyed) and `COMPONENTS` (~40 entries mapping short
-  tag names like `Button`/`Panel`/`List` to `{module, defaultProperty?,
-  isArray?}`). `defaultProperty` is where direct child nodes get assigned —
-  e.g. `Skin`/`Group`/`Panel` → `elementsContent` (array), `DataGroup`/
-  `List`/`ComboBox` → `dataProvider` (single value). `lookupComponent()`
-  checks custom namespaces first. Convention-discovered namespaces carry an
-  exact component-name set, so misspelled `<game:...>` tags are rejected with
-  suggestions. Manual `exml.namespaces` barrels remain open-ended because the
-  parser does not introspect their exports.
-- Root element must be locally named `Skin` (any prefix) or the parser
-  throws. `states="a,b,c"` shorthand on the root expands into empty-override
-  `StateDef`s. State collection is **two-pass**: pass 1 scans the whole tree
-  (including inside `<eui:states>` wrappers) to pre-register every
-  `<eui:State>`; pass 2 processes visual/property/`<Declarations>` children,
-  skipping anything already claimed as a state.
-- `includeIn`/`excludeFrom` attributes are converted into synthesized
-  `AddItems` state overrides — nodes carrying either attribute are excluded
-  from the default `elementsContent` list entirely and only appear via
-  per-state `AddItems`.
-- Unknown tags are dropped from the tree and retained as located records in
-  `unresolvedTags`; normal builds warn, while strict/release builds fail.
-  Duplicate `id` attributes on two nodes in the same skin **do** throw a hard
-  error.
-- Codegen: a node with an `id` gets both a local `const varName = new X()`
-  **and** `skin.<id> = varName` — this is how skin parts become accessible
-  on the `Skin` instance at runtime (`skin.skinParts` is emitted as a JSON
-  array of id strings). A node with no `id` but state-specific properties
-  still gets `skin.<varName> = varName` so `SetProperty` overrides can find
-  it via `skin.getPart(varName)`.
-- `scale9Grid="1,3,8,8"` (Egret comma-string encoding) is specifically
-  detected and converted to `new Rectangle(1, 3, 8, 8)` in generated code —
-  the only property with this special-cased conversion.
-- Bindings: `{a.b.c}` → `Binding.bindProperty(this, ["a","b","c"], target,
-  "prop")`; mixed template text (`"Hello {name}!"`) → `Binding.
-  bindProperties(this, [...], [...], target, "prop")`. The generated factory
-  code relies on `this` being bound by the runtime `Skin`/`Component`
-  framework (in `@kurot/ui`, outside this package) when the factory is
-  invoked — not the module scope. See `Component._invokeSkinFactory()` in
-  `@kurot/ui` for the calling convention this depends on.
+The theme JSON at `resource/default.thm.json` is fixed generated output. It is
+derived from the Skin contracts and contains `skins` plus `skinsJs`; it is
+never read as an authored input. Duplicate default skins for one target are
+errors.
 
-## 4. `skinsJs` runtime wiring
+`SkinIR` is intentionally smaller than `UIDocument`. It contains resolved
+runtime classes, assignments, visual children, layout descriptor children,
+and state `SetProperty` overrides. Reuse, data contracts, actions, and editor
+transactions stay in `@kurot/ui-document` and `@kurot/ui-runtime`.
 
-`buildSkinsModule` (in `compile-exml.ts`) bundles every compiled skin
-factory into one ESM entry that, on import, does:
-```js
-globalThis["skins.ButtonSkin"] = createButtonSkin;
-```
-for each skin — **skins register themselves as global-keyed factories under
-their full class name string**, they are not ES exports the app imports
-directly. The theme JSON gets a `skinsJs` field added (POSIX-relative path
-from the theme file's own directory to this bundle, e.g. `js/default.thm.js`)
-— the runtime `Theme` class (in `@kurot/ui`, not this package) reads
-`skinsJs`, dynamically imports that module (populating `globalThis` as a side
-effect), then resolves each `skins` mapping entry against `globalThis` to get
-the factory. The `skins` mapping itself accepts both Egret-style `.exml`
-paths (resolved to the matching compiled skin's class name) and Kurot-style
-class-name strings directly (passed through unchanged).
+Successful compilation writes `.kurot/skin-parts.d.ts` from the same IR. It
+augments `SkinPartsMap` and narrows matching exported component classes. The
+file is development metadata and is excluded from runtime output.
 
-## 5. Pipeline step order
+## Reusable components
 
-`defaultPlugins()` (used by `build`):
-```
-cleanOutput → compileExml → compileEngine → compileCustomNamespaces
-→ compileSource → generateHtml → writeManifest → copyAssets
+With `ui.components`, `<Name>.ts` under `sourceDir` pairs with
+`<Name>Skin.kui.xml` at the same relative path under `skinDir`. The source must
+export `<Name>` and the Skin must target `<namespace>.<Name>`. Discovery creates
+the namespace entry and development component catalog. Component names must be
+unique inside the configured namespace.
+
+Manual `ui.namespaces` entries remain available for project barrel files. A
+manual prefix cannot conflict with `ui.components.namespace`.
+
+## Non-obvious behavior
+
+- `--watch` uses development mode even when `--release` is also supplied.
+- Real KUI parse or code-generation failures abort the current build. Dev watch
+  keeps the last successful bundle and retries on the next edit.
+- Unknown KUI tags are warnings in normal development, and errors under
+  `--strict` or release policy.
+- Machine diagnostic modes own stdout: build emits one JSON result; dev emits
+  JSONL lifecycle events.
+- `compileCustomNamespaces` must precede `compileSource`. Application-relative
+  imports and generated `#ns/<prefix>` imports must resolve to one bundled class
+  identity.
+- Engine and custom namespace chunks share `ctx.outputs.engine` because the
+  import-map writer treats both as external specifier mappings.
+- Release bundles preserve class names. UI theme fallback uses constructor
+  names, so normal identifier minification would break skin lookup.
+- The Skin module builder stages output in a temporary directory and installs a
+  bundle only after every Skin succeeds.
+- `cleanOutput` wipes the active output directory at the start of each build.
+  The standalone `clean` command removes both development and release output.
+- `create` queries the npm registry for current Kurot package versions and falls
+  back to `latest` if the request fails.
+- Release output is timestamped and `manifest.json` exists only in release.
+
+## Plugin order
+
+`defaultPlugins()` currently runs:
+
+1. clean output;
+2. compile KUI;
+3. compile engine packages;
+4. compile project namespaces;
+5. write the development component catalog;
+6. compile application source;
+7. generate HTML;
+8. write the release manifest;
+9. copy runtime assets.
+
+Do not reorder namespace or source compilation without reviewing externalization
+in `namespace-external-plugin.ts`.
+
+## Configuration lookup
+
+| Task | File |
+| --- | --- |
+| Add or validate a config field | `src/core/config.ts` |
+| Resolve an absolute project path | `src/core/project.ts` |
+| Change KUI scanning/theme output | `src/core/plugins/compile-kui.ts` |
+| Change KUI node code generation | `src/core/kui/kui-parser.ts`, `codegen.ts` |
+| Add a built-in component tag | `src/core/kui/registry.ts` |
+| Change generated part types | `src/core/kui/skin-parts-declaration.ts` |
+| Change component pairing | `src/core/components/discover-components.ts` |
+| Change watch behavior | `src/core/dev-server.ts` |
+| Change output HTML/import maps | `src/core/plugins/generate-html.ts` |
+| Change scaffolding | `src/core/template.ts`, `templates/` |
+| Add a diagnostic code | `src/core/diagnostics/codes.ts` |
+
+## Verification
+
+Run commands from this package directory:
+
+```bash
+pnpm build
+pnpm test
 ```
 
-`dev-server.ts`'s list is **shorter** (no `cleanOutput`, no `writeManifest`):
-```
-compileExml → compileEngine → compileCustomNamespaces
-→ compileSource → generateHtml → copyAssets
-```
-
-`runPipeline` iterates the array in order, logs each step name, and stops after
-a plugin finishes if the diagnostic collector contains errors. Nothing in the
-type system enforces the `compileCustomNamespaces`-before-`compileSource`
-dependency; it remains convention + code comments.
-
-`dev-server.ts` additionally runs its own EXML-only resource watcher: it
-watches `project.resourceDir` recursively (only if `config.exml` is set),
-debounced 100ms, and on any `.exml` change re-runs `compileExml().apply(ctx)`
-+ `copyAssets().apply(ctx)` **directly, bypassing `runPipeline`** (no "step"
-log format, and it skips `compileSource`/`generateHtml`). If
-`fs.watch({recursive:true})` isn't supported on the platform, it logs a
-warning and disables EXML watching rather than crashing. App source
-watching itself happens separately, inside `compileSource`'s own
-`esbuild.context().watch()`.
-
-## 6. `create` — what actually gets scaffolded
-
-`scaffoldProject(name, template)`:
-1. Copies `templates/<template>/` verbatim. Scaffolded file contents do not
-   undergo placeholder substitution; HTML build templates are handled
-   separately by `generate-html.ts`.
-2. Rewrites `<name>/package.json`: sets `.name`; pins `@kurot/cli` to
-   `^<version of the CLI binary currently running>`; re-resolves every other
-   `@kurot/*` dependency against the npm registry `latest` tag (3s timeout,
-   falls back to the literal string `'latest'` on failure).
-
-Confirmed file lists (from directory listing, not the README):
-- **`templates/game/`**: `kurot.config.ts`, `package.json`,
-  `pnpm-workspace.yaml`, `tsconfig.json`,
-	`resource/{default.res.json, default.thm.json, assets/ui/eui/{eui.json, eui.png},
-  skins/*.exml}` (21 skin files), `src/{Main.ts, LoadingUI.ts}`,
-  `template/web/{index.html, logo.png}`.
-- **`templates/empty/`**: `kurot.config.ts`, `package.json`,
-  `pnpm-workspace.yaml`, `tsconfig.json`, `src/Main.ts`,
-  `template/web/index.html`. **No `resource/` directory at all** and no
-  `exml` key in its `kurot.config.ts`.
-- Both templates' `pnpm-workspace.yaml` set `allowBuilds: {esbuild: true}`
-  and `minimumReleaseAge: 0` — a pnpm supply-chain-safety config baked into
-  every new project.
-- `game/src/Main.ts`'s lifecycle is `createChildren → runGame →
-  loadResource → installResourceAssetAdapter → loadTheme → createGameScene →
-  startAnimation`. `installResourceAssetAdapter` is a private step between `loadResource` and
-  `loadTheme` that swaps in a custom `AssetAdapter` so EXML `source=
-  "button_up_png"`-style references resolve against the preloaded resource
-  group before falling back to `DefaultAssetAdapter`.
-- Generated project comments (`LoadingUI.ts`, `Main.ts`) are in Simplified
-  Chinese, consistent with this package's own docs.
-
-## 7. Published package surface
-
-The `kurot` executable is the command entry. The package's JavaScript/TypeScript
-entry is `dist/define.js` / `dist/define.d.ts`, generated from `src/define.ts`.
-It exports configuration types only: `ProjectConfig`, `BuildTarget`,
-`StageConfig`, `ExmlConfig`, `ComponentsConfig`, and `OutputConfig`. CLI pipeline, EXML and
-diagnostic internals are not package subpath exports.
-
-## 8. Task → file map
-
-| I want to... | Look at |
-|---|---|
-| Add a new EXML tag / component mapping | `core/exml/registry.ts` (`COMPONENTS`) |
-| Change reusable-component pairing/catalog behavior | `core/components/discover-components.ts`, `core/plugins/component-catalog.ts` |
-| Change how skin factories are generated or bundled | `core/exml/codegen.ts`, `core/exml/skin-module-builder.ts` |
-| Debug why a namespace class is duplicated (`instanceof` breaks) | `core/namespace-external-plugin.ts`, confirm `compileCustomNamespaces` ran before `compileSource` |
-| Add a new build pipeline step | `core/plugins/`, register it in `core/plugins/index.ts`'s `defaultPlugins()` (and `dev-server.ts`'s list if it should also run in dev) |
-| Change the HTML template placeholder contract | `core/plugins/generate-html.ts` (`PLACEHOLDERS`) |
-| Change strict promotion or machine diagnostic output | `core/diagnostics/`, `commands/build.ts`, `commands/dev.ts` |
-| Debug EXML failure recovery in dev | `core/exml/skin-module-builder.ts`, `core/dev-server.ts` |
-| Change what `kurot create` scaffolds | `templates/game/` or `templates/empty/`, plus `core/template.ts` for the package.json rewrite logic |
+CLI end-to-end tests bind localhost and may require permission in a restricted
+execution environment.

@@ -1,6 +1,6 @@
 import type { BuildPlugin } from '../pipeline.js';
 import { cleanOutput } from './clean-output.js';
-import { compileExml } from './compile-exml.js';
+import { compileKUI } from './compile-kui.js';
 import { compileEngine } from './compile-engine.js';
 import { compileCustomNamespaces } from './compile-custom-namespaces.js';
 import { writeComponentCatalog } from './component-catalog.js';
@@ -10,7 +10,7 @@ import { writeManifest } from './manifest.js';
 import { copyAssets } from './copy-assets.js';
 
 export { cleanOutput } from './clean-output.js';
-export { compileExml } from './compile-exml.js';
+export { compileKUI } from './compile-kui.js';
 export { compileEngine } from './compile-engine.js';
 export { compileCustomNamespaces } from './compile-custom-namespaces.js';
 export { writeComponentCatalog } from './component-catalog.js';
@@ -32,7 +32,7 @@ export { copyAssets } from './copy-assets.js';
 export function defaultPlugins(): BuildPlugin[] {
 	return [
 		cleanOutput(),
-		compileExml(),
+		compileKUI(),
 		compileEngine(),
 		compileCustomNamespaces(),
 		writeComponentCatalog(),

@@ -6,7 +6,7 @@ import { createContext, runPipeline } from '../src/core/pipeline.js';
 import { loadProject } from '../src/core/project.js';
 import { writeComponentCatalog } from '../src/core/plugins/component-catalog.js';
 import { compileCustomNamespaces } from '../src/core/plugins/compile-custom-namespaces.js';
-import { compileExml } from '../src/core/plugins/compile-exml.js';
+import { compileKUI } from '../src/core/plugins/compile-kui.js';
 
 const originalCwd = process.cwd();
 const temporaryDirs: string[] = [];
@@ -23,7 +23,7 @@ describe('reusable component build', () => {
 		const project = await loadProject('development');
 		const ctx = createContext(project);
 
-		await runPipeline(ctx, [compileExml(), compileCustomNamespaces(), writeComponentCatalog()]);
+		await runPipeline(ctx, [compileKUI(), compileCustomNamespaces(), writeComponentCatalog()]);
 
 		expect(ctx.diagnostics.all()).toEqual([]);
 		expect(project.components.map(component => component.name)).toEqual(['BetButton']);
@@ -58,18 +58,13 @@ async function createFixture(): Promise<string> {
 	await write(root, 'src/components/BetButton.ts', 'export class BetButton { public amount = 0; }\n');
 	await write(
 		root,
-		'resource/skins/components/BetButtonSkin.exml',
-		'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"><eui:Label/></eui:Skin>',
+		'resource/skins/components/BetButtonSkin.kui.xml',
+		'<Skin xmlns="https://kurot.dev/ui/1" id="components.BetButtonSkin" version="2" target="game.BetButton" default="true"><Group id="root"><Label id="label" /></Group></Skin>',
 	);
 	await write(
 		root,
-		'resource/skins/HostSkin.exml',
-		'<eui:Skin class="skins.HostSkin" xmlns:eui="http://ns.egret.com/eui" xmlns:game="game.*"><game:BetButton id="betButton"/></eui:Skin>',
-	);
-	await write(
-		root,
-		'resource/default.thm.json',
-		JSON.stringify({ skins: {}, autoGenerateExmlsList: true }),
+		'resource/skins/HostSkin.kui.xml',
+		'<Skin xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game" id="skins.HostSkin" version="2" target="kui.Panel"><contract><parts><part name="betButton" node="betButton" /></parts></contract><Group id="root"><game:BetButton id="betButton" /></Group></Skin>',
 	);
 	await write(
 		root,
@@ -85,8 +80,8 @@ async function createFixture(): Promise<string> {
 				orientation: 'auto',
 				frameRate: 60,
 			},
-			exml: {
-				themeFile: 'resource/default.thm.json',
+			ui: {
+				sourceDir: 'resource/skins',
 				components: {
 					namespace: 'game',
 					sourceDir: 'src/components',

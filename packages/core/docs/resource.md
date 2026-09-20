@@ -302,7 +302,7 @@ import { resource, ResourceConfig } from '@kurot/core';
 | 事件系统   | `egret.EventDispatcher` | 轻量 `on/off` 模式                  |
 | 类型安全   | 大量 `any`              | 泛型 `get<T>()`                     |
 | 版本控制   | `VersionController`     | 剔除（构建工具处理）                |
-| XML 解析   | 内置                    | 剔除（EXML compiler 处理）          |
+| XML 解析   | 内置                    | 剔除（KUI XML compiler 处理）          |
 | 国际化     | 内置                    | 剔除（不属于资源加载器职责）        |
 | 解析器类型 | 8 种                    | 5 种（Image/Json/Text/Sound/Sheet） |
 | 代码量     | ~3,000 行               | ~1,400 行                           |
@@ -313,7 +313,7 @@ import { resource, ResourceConfig } from '@kurot/core';
 
 - **VersionController** — CDN 版本控制由现代构建工具（Vite/Webpack）处理
 - **i18n 国际化** — 不属于资源加载器的职责
-- **XML/Bin 分析器** — EXML 由 compiler 预处理，Binary 格式初期不需要
+- **XML/Bin 分析器** — KUI XML 由 compiler 预处理，Binary 格式初期不需要
 - **AnimationAnalyzer** — 初期不需要，后续按需添加
 - **FontAnalyzer** — 初期不需要，后续按需添加
 - **同步 getRes() 的复杂 sheet 子键查找** — 简化为点号语法

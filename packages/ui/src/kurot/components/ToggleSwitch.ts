@@ -8,5 +8,5 @@ import { ToggleButton } from './ToggleButton.js';
  */
 export class ToggleSwitch extends ToggleButton {
 	// ToggleSwitch is purely a skin variant of ToggleButton.
-	// EXML skins will render it as a sliding switch instead of a checkbox.
+	// KUI skins render it as a sliding switch instead of a checkbox.
 }

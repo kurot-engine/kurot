@@ -32,7 +32,7 @@ class Main extends UILayer {
 	}
 
 	/**
-	 * 让 EXML 中的 source="button_up_png" 优先解析为预加载图集的子纹理，
+	 * 让 KUI 皮肤中的资源 key 优先解析为预加载图集的子纹理，
 	 * 普通 URL 图片仍交给默认适配器加载。
 	 */
 	private installResourceAssetAdapter(): void {

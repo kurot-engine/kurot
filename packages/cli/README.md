@@ -1,399 +1,183 @@
 # @kurot/cli
 
-CLI tool for the Kurot game engine — a modern replacement for the legacy Egret CLI. Powered by esbuild for fast compilation, with a built-in EXML skin parser and code generator.
+Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
+ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 1.3.0.** Requires Node.js 20 or later and emits ES2022 ESM projects.
+> **Current release: 2.0.0.** Node.js 20 or later is required.
 
-> Migrating from Egret? See [egret-migration.md](../../docs/egret-migration.md)
->
-> Release history: [CHANGELOG.md](CHANGELOG.md)
+> **Release scope:** 2.0.0 is currently dedicated to Kurot Editor integration.
+> Existing game projects that use EXML, including CrashMaster, should remain on
+> `@kurot/cli@1.3.x`. Version 2.0.0 is not an in-place project upgrade and does
+> not require those projects to change their configuration or UI assets.
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Usage
 
-`@kurot/cli` does **not** require a global install.
-
-### Creating a project
-
-Use `npx` to scaffold a new project — no installation needed:
+The CLI does not require a global install.
 
 ```bash
 npx @kurot/cli create my-game
-npx @kurot/cli create my-lib --template empty
-```
-
-### In-project commands
-
-Scaffolded projects include `@kurot/cli` as a devDependency and expose commands via npm scripts:
-
-```bash
 cd my-game
 pnpm install
-pnpm build    # build
-pnpm dev      # dev server
-pnpm clean    # clean output
+pnpm dev
 ```
 
-You can also add it to an existing project manually:
-
-```bash
-pnpm add -D @kurot/cli
-```
+Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
+Editor-managed KUI XML project, install the package with
+`pnpm add -D @kurot/cli@2`. Existing EXML projects should keep their current
+1.3.x dependency.
 
 ## Commands
 
 ### `kurot create`
 
-Scaffold a new project from a template.
-
 ```bash
-kurot create <name> [options]
+kurot create <name> [--template game|empty]
 ```
 
-| Option                  | Description                 | Default |
-| ----------------------- | --------------------------- | ------- |
-| `--template <template>` | Template: `game` \| `empty` | `game`  |
-
-**Templates:**
-
-| Template | Extends   | Dependencies                                      | Description                                                                      |
-| -------- | --------- | ------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `game`   | `UILayer` | `@kurot/core` + `@kurot/game` + `@kurot/ui` | Full-featured project with resource loading, scene building, and Tween animation |
-| `empty`  | `Sprite`  | `@kurot/core`                                   | Minimal project — pure Canvas rendering, no extra dependencies                   |
-
-**Lifecycle:**
-
-| Template | Entry class            | Lifecycle                                                                                         |
-| -------- | ---------------------- | ------------------------------------------------------------------------------------------------- |
-| `game`   | `Main extends UILayer` | `createChildren` → `runGame` → `loadResource` → `loadTheme` → `createGameScene` → `startAnimation` |
-| `empty`  | `Main extends Sprite`  | constructor → `ADDED_TO_STAGE` → `onAddToStage`                                           |
+The `game` template includes `@kurot/core`, `@kurot/game`, `@kurot/ui`, KUI
+skins, resource loading, and an editable HTML template. The `empty` template
+contains a minimal `Sprite` application.
 
 ### `kurot build`
 
-Compile the project into ESM application, engine, namespace, and theme bundles.
-
 ```bash
-kurot build [options]
+kurot build [--release] [--sourcemap] [--watch] [--analyze]
+            [--strict] [--diagnostics human|json]
 ```
 
-| Option                   | Description                                            | Default |
-| ------------------------ | ------------------------------------------------------ | ------- |
-| `-r, --release`          | Minified, content-hashed release build (→ bin-release) | `false` |
-| `--sourcemap`            | Generate sourcemaps                                    | `false` |
-| `--watch`                | Rebuild source on file changes                         | `false` |
-| `--analyze`              | Print bundle size analysis (esbuild metafile)          | `false` |
-| `--strict`               | Promote supported warnings to build errors             | `false` |
-| `--diagnostics <format>` | Diagnostic output: `human` or `json`                   | `human` |
+Development output is written to `bin-debug/`. Release output is written to
+`bin-release/web/<timestamp>/` with minified, content-hashed files. Engine,
+project namespace, theme, and application code are separate ESM chunks joined
+by the generated HTML import map.
 
-`--diagnostics json` writes exactly one JSON result to stdout. It includes
-`success`, `mode`, `durationMs`, the output directory on success, and all
-structured diagnostics. Release builds use strict diagnostic policy by default.
-
-```bash
-kurot build --strict --diagnostics json
-```
-
-**Output (Egret-aligned shape, ESM under the hood):**
-
-| Mode           | Layout                                                                                                    |
-| -------------- | --------------------------------------------------------------------------------------------------------- |
-| development    | `bin-debug/` — per-file `.js` mirroring `src/` (`Main.js`, `com/.../X.js`) + engine chunks in `js/`       |
-| release (`-r`) | `bin-release/web/<timestamp>/` — `js/main.min_<hash>.js` + `js/kurot.*.min_<hash>.js` + `manifest.json` |
-
-Engine packages (`@kurot/*`) are bundled into separate `js/kurot.<name>.js`
-chunks and wired up through an HTML **import map**, so the app bundle and engine
-resolve bare specifiers (`import { Sprite } from '@kurot/core'`) in the browser
-without duplicating engine code. `resource/` (including the compiled
-`default.thm.json`) is copied with fixed names, since user code references those
-paths directly. The entry script bootstraps via your own `createPlayer()` call.
+`--diagnostics json` reserves stdout for one machine-readable build result.
+Release builds apply strict diagnostic policy by default.
 
 ### `kurot dev`
 
-Start a development server with auto-recompilation on file changes (manual browser refresh required).
-
 ```bash
-kurot dev [options]
+kurot dev [--port 3000] [--sourcemap] [--strict]
+          [--diagnostics human|jsonl]
 ```
 
-| Option                   | Description                                | Default |
-| ------------------------ | ------------------------------------------ | ------- |
-| `-p, --port <port>`      | Port to listen                             | `3000`  |
-| `--sourcemap`            | Generate sourcemaps                        | `false` |
-| `--strict`               | Promote supported warnings to build errors | `false` |
-| `--diagnostics <format>` | Diagnostic output: `human` or `jsonl`      | `human` |
-
-Unlike build's single JSON result, `kurot dev --diagnostics jsonl` writes one
-JSON event per line so an agent can follow initial builds, diagnostics,
-rebuilds, and server readiness incrementally.
-
-```bash
-kurot dev --strict --diagnostics jsonl
-```
-
-Machine-readable modes reserve stdout for their JSON protocol and never include
-ANSI color sequences. Failures set a non-zero process exit code.
+The development server rebuilds TypeScript, KUI XML, custom namespaces, and
+the component catalog as their sources change. Browser refresh is currently
+manual. JSONL mode reserves stdout for incremental build and server events.
 
 ### `kurot clean`
 
-Remove the build output directories (`bin-debug` and `bin-release`).
-
-```bash
-kurot clean
-```
+Removes `bin-debug` and `bin-release`.
 
 ## Configuration
 
-Create a `kurot.config.ts` in your project root:
+Create `kurot.config.ts` in the project root:
 
 ```ts
 export default {
-	target: 'html5',
-	entry: 'src/Main.ts',
-	output: { dir: 'bin-debug' },
-	html: { template: 'template/web/index.html' },
-	stage: {
-		width: 640,
-		height: 1136,
-		scaleMode: 'showAll',
-		orientation: 'auto',
-		frameRate: 60,
-	},
-	// Optional: enable EXML skin compilation
-	exml: {
-		themeFile: 'resource/default.thm.json',
-		// Optional: discover reusable component source/Skin pairs
-		components: {
-			namespace: 'game',
-			sourceDir: 'src/components',
-			skinDir: 'resource/skins/components',
-		},
-	},
+    target: 'html5',
+    entry: 'src/Main.ts',
+    output: { dir: 'bin-debug' },
+    html: { template: 'template/web/index.html' },
+    stage: {
+        width: 640,
+        height: 1136,
+        scaleMode: 'showAll',
+        orientation: 'auto',
+        frameRate: 60,
+    },
+    ui: {
+        sourceDir: 'resource/ui',
+        components: {
+            namespace: 'game',
+            sourceDir: 'src/components',
+            skinDir: 'resource/ui/components',
+        },
+    },
 };
 ```
 
-**Options:**
+`ui.sourceDir` contains `.kui.xml` documents. The build always generates the
+runtime theme manifest at `resource/default.thm.json`; it is not an authored
+input. `ui.namespaces` can map additional XML prefixes to project barrel files.
 
-| Field               | Type     | Description                                                                                                              |
-| ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `target`            | `string` | Build target — currently only `'html5'`                                                                                  |
-| `entry`             | `string` | Entry file path, default `'src/Main.ts'`                                                                                 |
-| `output.dir`        | `string` | Output directory, default `'bin-debug'`                                                                                  |
-| `html.template`     | `string` | Optional project-owned HTML template; the CLI default page is used when omitted                                          |
-| `stage.width`       | `number` | Stage width                                                                                                              |
-| `stage.height`      | `number` | Stage height                                                                                                             |
-| `stage.scaleMode`   | `string` | Scale mode: `showAll` / `noScale` / `exactFit` / `noBorder` / `fixedHeight` / `fixedWidth` / `fixedNarrow` / `fixedWide` |
-| `stage.orientation` | `string` | Orientation: `auto` / `portrait` / `landscape`                                                                           |
-| `stage.frameRate`   | `number` | Frame rate — must be a positive integer                                                                                  |
-| `exml.themeFile`    | `string` | Theme JSON file path                                                                                                     |
-| `exml.components`   | `ComponentsConfig` | Optional reusable-component convention: namespace, TypeScript source directory, and Skin directory        |
-| `exml.namespaces`   | `Record<string, string>` | Optional EXML prefix → source barrel-file mapping                                                          |
+The HTML template must contain these placeholders:
 
-## HTML Template
+- `{{KUROT_IMPORT_MAP}}`
+- `{{KUROT_STAGE_WIDTH}}`
+- `{{KUROT_STAGE_HEIGHT}}`
+- `{{KUROT_SCALE_MODE}}`
+- `{{KUROT_ORIENTATION}}`
+- `{{KUROT_FRAME_RATE}}`
+- `{{KUROT_ENTRY_SCRIPT}}`
 
-New projects include an editable `template/web/index.html`. The build reads
-this file and writes the rendered page to the active output directory. Existing
-projects that do not configure `html.template` continue to use the CLI's
-built-in default page.
+## KUI XML compilation
 
-The following placeholders are required in a configured project template:
+KUI XML is the only authored UI format. A skin declares its runtime target and
+whether it is the default skin directly on the document root:
 
-| Placeholder | Generated value |
-| --- | --- |
-| `{{KUROT_IMPORT_MAP}}` | Engine and custom namespace import map |
-| `{{KUROT_STAGE_WIDTH}}` | Configured stage width |
-| `{{KUROT_STAGE_HEIGHT}}` | Configured stage height |
-| `{{KUROT_SCALE_MODE}}` | Configured scale mode |
-| `{{KUROT_ORIENTATION}}` | Configured orientation |
-| `{{KUROT_FRAME_RATE}}` | Configured frame rate |
-| `{{KUROT_ENTRY_SCRIPT}}` | Compiled application entry script |
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1"
+      id="skins.ButtonSkin"
+      version="2"
+      target="kui.Button"
+      default="true">
+    <Group id="root" minWidth="100" minHeight="50">
+        <Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+    </Group>
+</Skin>
+```
 
-The template may otherwise contain any project-specific HTML, styles, loading
-screen, platform SDK, analytics, fonts, or additional containers. A build fails
-with a clear error when a configured template is missing a required placeholder.
+The pipeline is:
 
-## EXML Skin Compiler
+```text
+.kui.xml → UIDocument → SkinIR → ESM skin factory → theme bundle
+```
 
-The CLI includes a complete EXML skin parsing and code generation pipeline (XML → SkinIR → ESM JavaScript). `.exml` files placed in the `resource/` directory are compiled automatically during `kurot build`.
+Default skin mappings are derived from `target` and `default`; the build writes
+`default.thm.json` with the mappings and the generated `skinsJs` module path.
+Duplicate defaults are errors. Unknown tags are warnings in normal development
+and errors under strict or release builds.
 
-### Features
+Successful compilation also writes `.kurot/skin-parts.d.ts`. It augments the UI
+runtime with the exact named parts and types declared by each skin. This file is
+editor-only, ignored by git, and never enters browser bundles.
 
-- **XML Parsing** — lightweight parser with namespace, CDATA, and comment support
-- **AST / IR Generation** — converts to an intermediate representation (SkinIR)
-- **Code Generation** — outputs ESM factory functions
-- **Component Registry** — built-in `eui:*` / `egret:*` namespace mapping to `@kurot/ui` / `@kurot/core`
-- **Reusable Components** — pairs `src/components/<Name>.ts` with `resource/skins/components/<Name>Skin.exml`, then exposes `<game:Name>` without a hand-written barrel
-- **Custom Namespaces** — retains `exml.namespaces` for advanced manually maintained source barrels
-- **View States** — supports `<eui:states>`, shorthand `states="up,down"`, state properties, `includeIn`, and `excludeFrom`
-- **Skin Properties** — preserves root properties such as `minWidth`, `minHeight`, and state-specific values
-- **Percent Layout** — auto-detects `width="100%"` and converts to `percentWidth`
-- **Data Binding** — parses `{expression}` binding syntax and generates `Binding.bindProperty` calls
-- **Structured Diagnostics** — stable codes, source locations, suggestions, and strict warning promotion
+## Reusable components
 
-Unknown tags remain warnings in normal development builds and are omitted from
-the generated visual tree. Under `--strict` (and in release builds), those
-warnings become errors. Syntax errors, invalid theme JSON, and other genuine
-Skin compilation failures always stop the build; the compiler never substitutes
-an empty Skin factory.
-
-The standard declarations `xmlns:eui="http://ns.egret.com/eui"` and
-`xmlns:egret="http://ns.egret.com/egret"` are namespace identifiers. The CLI
-resolves their prefixes internally and does not access those URLs over the
-network, so the original Egret namespace pages do not need to be hosted.
-
-### Reusable components
-
-The game template keeps reusable component logic and white-Egret-compatible
-skins in parallel directories:
+Convention-based reusable components pair:
 
 ```text
 src/components/<path>/<Name>.ts
-resource/skins/components/<path>/<Name>Skin.exml
+resource/ui/components/<path>/<Name>Skin.kui.xml
 ```
 
-The TypeScript file must export a class named `<Name>`, and the paired EXML
-must use a standard `eui:Skin` root with a `class` attribute. The CLI validates
-the pair, generates the shared `#ns/game` entry, adds the default Theme mapping,
-and accepts `<game:Name />` in other skins. Components are globally unique by
-class name within the configured namespace.
+The TypeScript module must export `<Name>`. The paired skin must target
+`<namespace>.<Name>`. The CLI exposes the component as `<namespace>:<Name>` in
+KUI XML, refreshes the namespace bundle, and emits development catalog data at
+`.kurot/component-catalog.json`.
 
-Development builds also emit `.kurot/component-catalog.json` for editor and
-agent tooling. The catalog is intentionally omitted from release output.
+Use `onSkinReady()` for logic that needs skin parts and `onSkinRemoved()` for
+cleanup before a skin replacement. Access generated parts through
+`this.skinParts`.
 
-Every successful EXML compilation also writes `.kurot/skin-parts.d.ts`. It
-augments `@kurot/ui`'s `SkinPartsMap` with the exact named parts and runtime
-types found in each compiled skin. It also discovers exported project classes
-through a compiled string-literal `this.skinName`, configured reusable-component
-pairs, or a unique `<ClassName>Skin` naming match, then narrows their inherited
-public `skinParts` property automatically. Ambiguous naming matches are left
-untyped instead of being guessed. The generated file is included by the template
-`tsconfig.json`, ignored by git, and never enters browser or release bundles.
+## Generated project shape
 
-`exml.namespaces` remains available for advanced manual namespace barrels, but
-its prefix must not conflict with `exml.components.namespace`.
-
-### Custom component lifecycle
-
-Assign the runtime skin once and initialize skin-dependent behavior in
-`onSkinReady()`. The generated declaration derives the `skinParts` type from that
-assignment:
-
-```ts
-import { Component } from '@kurot/ui';
-
-
-export class BattlePanel extends Component {
-	public constructor() {
-		super();
-		this.skinName = 'game.ui.BattlePanelSkin';
-	}
-
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		this.skinParts.groupField.visible = true;
-	}
-}
-```
-
-The same declaration narrowing applies when the runtime assigns the skin
-externally. For example, an exported `MultiplierIR` class is matched to a
-unique compiled `ui.MultiplierIRSkin`, so the renderer remains free of a
-repeated generic skin name:
-
-```ts
-import { ItemRenderer } from '@kurot/ui';
-
-export class MultiplierIR extends ItemRenderer {
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		this.skinParts.lblMultiplier.text = '';
-	}
-}
-```
-
-The event-based equivalent is useful when initialization is composed externally:
-
-```ts
-import { UIEvent } from '@kurot/ui';
-
-this.once(UIEvent.CREATION_COMPLETE, this.onCreationComplete);
-```
-
-Use `onSkinReady()` to initialize logic that depends on skin parts and
-`onSkinRemoved()` to release listeners or other bindings before replacement.
-`childrenCreated()` and `UIEvent.CREATION_COMPLETE` run once for the component's
-initial creation and are not skin-replacement hooks.
-
-UI 2.0 no longer copies part names onto component instances and no longer
-supports `setSkinPart()`, `partAdded()`, or `partRemoved()`. Read parts through
-`this.skinParts` only while the skin-ready lifecycle is active. Use an explicit
-generic skin type when generated host declarations are unavailable outside a
-CLI project.
-
-EXML skins compiled by the CLI are registered under their complete `class`
-attribute, so an Egret-style value such as
-`skinName = "game.ui.BattlePanelSkin"` works when that EXML is included in the
-loaded theme bundle. A component covered by the theme's `skins` mapping normally
-does not need to assign `skinName` itself. Hand-written `Skin` subclasses may be
-imported and assigned directly instead of using a string.
-
-### Compilation Pipeline
-
-All `.exml` skins compile into a single ESM module — `js/default.thm.js` (dev)
-or `js/default.thm.min_<hash>.js` (release) — that registers each skin factory.
-`default.thm.json` keeps only the component→skin mapping plus a `skinsJs`
-pointer to that module, which the runtime `Theme` imports. No `.exml` is shipped.
-
-```
-resource/skins/**/*.exml
-        ↓ parseXML()
-    XML Element Tree
-        ↓ parseEXML()
-       SkinIR
-        ↓ generateCode({ format: 'esm' })
-    per-skin ESM factories
-        ↓ esbuild bundle (+ minify in release)
-    js/default.thm[.min_<hash>].js   (skins register on globalThis)
-```
-
-## Project Structure
-
-A project created with the default template (`game`) has the following structure:
-
-```
+```text
 my-game/
-├── .kurot/
-│   └── skin-parts.d.ts        # Generated typed EXML part declarations
-├── .gitignore                 # Excludes .kurot and build/dependency output
-├── kurot.config.ts          # Project config (includes exml options)
-├── package.json               # Dependencies & scripts
-├── tsconfig.json              # TypeScript config
-├── template/
-│   └── web/
-│       └── index.html            # Editable output page template
+├── .kurot/skin-parts.d.ts
+├── kurot.config.ts
 ├── resource/
-│   ├── default.res.json       # Resource config
-│   ├── default.thm.json       # Theme file: component → skin mapping
-│   └── skins/                 # EXML skin directory
-│       ├── components/        # Reusable component skins (standard eui:Skin)
-│       └── eui/               # 21 built-in EUI component skins
-│           ├── ButtonSkin.exml
-│           ├── ...
-│           └── ViewStackSkin.exml
-└── src/
-    ├── components/            # Reusable component TypeScript classes
-    ├── Main.ts                # Entry: class Main extends Sprite
-    └── LoadingUI.ts           # Loading progress display
-```
-
-## Quick Start
-
-```bash
-# Full-featured game project (default)
-npx @kurot/cli create my-game
-cd my-game && pnpm install
-pnpm dev
-
-# Minimal project
-npx @kurot/cli create my-lib --template empty
-cd my-lib && pnpm install
-pnpm dev
+│   ├── default.res.json
+│   ├── assets/
+│   └── ui/
+│       ├── components/
+│       └── skins/*.kui.xml
+├── src/
+│   ├── components/
+│   ├── LoadingUI.ts
+│   └── Main.ts
+└── template/web/index.html
 ```

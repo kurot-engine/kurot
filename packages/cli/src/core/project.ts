@@ -11,7 +11,7 @@ import type { ProjectConfig } from './config.js';
 export type BuildMode = 'development' | 'release';
 
 /**
- * A project-defined EXML namespace (Egret's `xmlns:game="game.*"` convention).
+ * A project-defined KUI namespace (Egret's `xmlns:game="game.*"` convention).
  *
  * `specifier` is the virtual module specifier used in generated `import`
  * statements (e.g. `#ns/game`); it is resolved via an HTML import map to the
@@ -69,7 +69,7 @@ export interface ProjectComponent {
 	 */
 	readonly name: string;
 	/**
-	 * Complete EXML tag, including the configured namespace prefix.
+	 * Complete KUI tag, including the configured namespace prefix.
 	 */
 	readonly tag: string;
 	/**
@@ -89,15 +89,15 @@ export interface ProjectComponent {
 	 */
 	readonly sourceRelative: string;
 	/**
-	 * Absolute EXML skin path.
+	 * Absolute KUI skin path.
 	 */
 	readonly skin: string;
 	/**
-	 * POSIX EXML skin path relative to the project root.
+	 * POSIX KUI skin path relative to the project root.
 	 */
 	readonly skinRelative: string;
 	/**
-	 * Skin class declared by the EXML root.
+	 * Skin class declared by the KUI root.
 	 */
 	readonly skinClass: string;
 }
@@ -141,20 +141,20 @@ export interface Project {
 	 */
 	readonly resourceDir: string;
 	/**
+	 * Absolute directory containing authored KUI XML files.
+	 */
+	readonly uiSourceDir?: string;
+	/**
 	 * Absolute path to the project-owned HTML template, when configured.
 	 */
 	readonly htmlTemplate?: string;
-	/**
-	 * Absolute path to the theme file, when EXML is enabled.
-	 */
-	readonly themeFile?: string;
 	/**
 	 * `@kurot/*` engine packages this project depends on (excluding the CLI).
 	 * Each is bundled into its own chunk and wired up via an HTML import map.
 	 */
 	readonly enginePackages: string[];
 	/**
-	 * Project-defined EXML namespaces from manual barrels and the generated
+	 * Project-defined KUI namespaces from manual barrels and the generated
 	 * reusable-component entry.
 	 */
 	readonly customNamespaces: CustomNamespace[];
@@ -176,6 +176,11 @@ const NAMESPACE_SPECIFIER_PREFIX = '#ns/';
 export const OUTPUT_DIRS = { development: 'bin-debug', release: 'bin-release' } as const;
 
 /**
+ * Fixed output path for the generated runtime theme manifest.
+ */
+export const KUI_THEME_OUTPUT_PATH = 'resource/default.thm.json';
+
+/**
  * Loads and resolves the project rooted at the current working directory.
  *
  * @param mode - Build mode to resolve the project for.
@@ -190,11 +195,11 @@ export async function loadProject(mode: BuildMode): Promise<Project> {
 			: path.resolve(root, config.output.dir);
 	const componentConvention = resolveComponentConvention(root, config);
 	const components = await discoverComponents(root, componentConvention);
-	const customNamespaces = resolveCustomNamespaces(root, config.exml?.namespaces);
+	const customNamespaces = resolveCustomNamespaces(root, config.ui?.namespaces);
 	if (componentConvention) {
 		if (customNamespaces.some(namespace => namespace.prefix === componentConvention.prefix)) {
 			throw new ConfigError(
-				`Invalid config: exml.components.namespace '${componentConvention.prefix}' conflicts with exml.namespaces.${componentConvention.prefix}`,
+				`Invalid config: ui.components.namespace '${componentConvention.prefix}' conflicts with ui.namespaces.${componentConvention.prefix}`,
 			);
 		}
 		customNamespaces.push({
@@ -212,8 +217,8 @@ export async function loadProject(mode: BuildMode): Promise<Project> {
 		srcDir: path.resolve(root, 'src'),
 		outputDir,
 		resourceDir: path.resolve(root, 'resource'),
+		uiSourceDir: config.ui ? path.resolve(root, config.ui.sourceDir) : undefined,
 		htmlTemplate: config.html ? path.resolve(root, config.html.template) : undefined,
-		themeFile: config.exml ? path.resolve(root, config.exml.themeFile) : undefined,
 		enginePackages: detectEnginePackages(root),
 		customNamespaces,
 		componentConvention,
@@ -222,7 +227,7 @@ export async function loadProject(mode: BuildMode): Promise<Project> {
 }
 
 /**
- * Resolves `config.exml.namespaces` into `CustomNamespace` entries with
+ * Resolves `config.ui.namespaces` into `CustomNamespace` entries with
  * absolute barrel paths.
  */
 function resolveCustomNamespaces(root: string, namespaces: Record<string, string> | undefined): CustomNamespace[] {
@@ -244,15 +249,15 @@ function resolveCustomNamespaces(root: string, namespaces: Record<string, string
  * @throws {ConfigError} If either configured directory escapes its required project root.
  */
 function resolveComponentConvention(root: string, config: ProjectConfig): ComponentConvention | undefined {
-	const components = config.exml?.components;
+	const components = config.ui?.components;
 	if (!components) return undefined;
 	const sourceDir = path.resolve(root, components.sourceDir);
 	const skinDir = path.resolve(root, components.skinDir);
 	if (!isWithin(path.resolve(root, 'src'), sourceDir)) {
-		throw new ConfigError('Invalid config: exml.components.sourceDir must be inside the project src directory');
+		throw new ConfigError('Invalid config: ui.components.sourceDir must be inside the project src directory');
 	}
 	if (!isWithin(path.resolve(root, 'resource'), skinDir)) {
-		throw new ConfigError('Invalid config: exml.components.skinDir must be inside the project resource directory');
+		throw new ConfigError('Invalid config: ui.components.skinDir must be inside the project resource directory');
 	}
 	return {
 		prefix: components.namespace,

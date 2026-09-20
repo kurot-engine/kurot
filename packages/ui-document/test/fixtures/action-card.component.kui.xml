@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns="https://kurot.dev/ui/1" id="action-card" version="2" type="game.ActionCard">
+    <contract>
+        <parameters>
+            <parameter name="label" type="string" required="true" description="Visible action label.">
+                <bind target="label" property="text" />
+            </parameter>
+        </parameters>
+        <parts>
+            <part name="background" node="background" />
+            <part name="label" node="label" />
+        </parts>
+        <slots>
+            <slot name="content" node="content-slot" capacity="multiple" />
+        </slots>
+        <states>
+            <state name="disabled">
+                <set target="root" property="alpha" value="0.5" />
+            </state>
+        </states>
+        <variants>
+            <variant name="primary">
+                <set target="background" property="fillColor" value="@token:color:color.action.primary" />
+            </variant>
+        </variants>
+    </contract>
+    <Group id="root">
+        <Rect id="background" />
+        <Label id="label" text="Action" />
+        <Group id="content-slot" />
+    </Group>
+</Component>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="primary-button-appearance" version="2" target="kui.Button">
+    <contract>
+        <parts>
+            <part name="background" node="background" />
+        </parts>
+        <states>
+            <state name="down">
+                <set target="background" property="alpha" value="0.8" />
+            </state>
+        </states>
+        <variants>
+            <variant name="compact">
+                <set target="background" property="strokeWeight" value="2" />
+            </variant>
+        </variants>
+    </contract>
+    <Group id="root">
+        <Rect id="background" fillColor="@token:color:color.action.primary" />
+    </Group>
+</Skin>

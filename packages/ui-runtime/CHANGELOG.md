@@ -4,6 +4,16 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.1] — 2026-09-21
+
+### Changed
+
+- Updated the document peer and development dependency to
+  `@kurot/ui-document@^0.6.0` and revalidated runtime materialization with
+  canonical KUI XML fixtures.
+
+---
+
 ## [0.5.0] — 2026-09-20
 
 ### Changed

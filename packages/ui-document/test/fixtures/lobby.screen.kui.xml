@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Screen xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game" id="lobby-screen" version="2">
+    <Group id="root">
+        <game:ActionCard id="play-action" left="24">
+            <instance source="action-card" variant="primary">
+                <parameter name="label" value="Play" />
+                <override part="label" property="textColor" value="16777215" />
+                <slot name="content">
+                    <Label id="play-hint" text="Start game" />
+                </slot>
+            </instance>
+        </game:ActionCard>
+        <game:ActionCard id="settings-action" right="24">
+            <instance source="action-card">
+                <parameter name="label" value="Settings" />
+            </instance>
+        </game:ActionCard>
+        <Button id="native-button" appearance="primary-button-appearance" appearanceVariant="compact" label="Help" />
+    </Group>
+</Screen>

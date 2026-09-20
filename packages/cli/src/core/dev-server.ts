@@ -4,7 +4,7 @@ import * as fsSync from 'node:fs';
 import * as path from 'node:path';
 import { createContext, disposeContext, runPipeline } from './pipeline.js';
 import {
-	compileExml,
+	compileKUI,
 	compileEngine,
 	compileCustomNamespaces,
 	writeComponentCatalog,
@@ -64,7 +64,7 @@ const MIME_TYPES: Record<string, string> = {
  * Starts a development server.
  *
  * The build pipeline runs once with watch enabled: esbuild rebuilds `main.js`
- * on every source change, and an `fs.watch` on `resource/` recompiles EXML and
+ * on every source change, and an `fs.watch` on `resource/` recompiles KUI and
  * re-copies assets. Files are served straight from the output directory.
  * The browser is not auto-reloaded — refresh manually to pick up changes.
  */
@@ -74,7 +74,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 	options.onEvent?.({ type: 'build-start', reason: 'initial' });
 	try {
 		await runPipeline(ctx, [
-			compileExml(),
+			compileKUI(),
 			compileEngine(),
 			compileCustomNamespaces(),
 			writeComponentCatalog(),
@@ -103,7 +103,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 }
 
 /**
- * Recompiles EXML and re-copies assets when a `.exml` file changes.
+ * Recompiles KUI and re-copies assets when a `.kui.xml` file changes.
  */
 function watchResources(
 	project: Project,
@@ -111,13 +111,13 @@ function watchResources(
 	options: DevServerOptions,
 	componentSkinsWatched: boolean,
 ): void {
-	if (!project.config.exml) return;
+	if (!project.config.ui) return;
 
 	let debounce: ReturnType<typeof setTimeout> | undefined;
 	let watcher: fsSync.FSWatcher;
 	try {
 		watcher = fsSync.watch(project.resourceDir, { recursive: true }, (_event, filename) => {
-			if (!filename || !filename.endsWith('.exml')) return;
+			if (!filename || !filename.endsWith('.kui.xml')) return;
 			if (componentSkinsWatched && project.componentConvention) {
 				const changed = path.resolve(project.resourceDir, filename);
 				if (isWithin(project.componentConvention.skinDir, changed)) return;
@@ -125,22 +125,22 @@ function watchResources(
 			clearTimeout(debounce);
 			debounce = setTimeout(async () => {
 				const startedAt = Date.now();
-				options.onEvent?.({ type: 'build-start', reason: 'exml-change' });
-				logger.info(`EXML changed: ${path.basename(filename)}, recompiling...`);
+				options.onEvent?.({ type: 'build-start', reason: 'kui-change' });
+				logger.info(`KUI changed: ${path.basename(filename)}, recompiling...`);
 				try {
-					await compileExml().apply(ctx);
+					await compileKUI().apply(ctx);
 					await copyAssets().apply(ctx);
 					emitDiagnostics(ctx, options);
 					options.onEvent?.({ type: 'build-complete', success: true, durationMs: Date.now() - startedAt });
 				} catch (err) {
 					emitDiagnostics(ctx, options);
 					options.onEvent?.({ type: 'build-complete', success: false, durationMs: Date.now() - startedAt });
-					logger.error(`EXML recompile failed: ${err instanceof Error ? err.message : err}`);
+					logger.error(`KUI recompile failed: ${err instanceof Error ? err.message : err}`);
 				}
 			}, 100);
 		});
 	} catch {
-		logger.warn('EXML watcher unavailable (recursive fs.watch unsupported on this platform).');
+		logger.warn('KUI watcher unavailable (recursive fs.watch unsupported on this platform).');
 		return;
 	}
 	ctx.disposers.push(() => watcher.close());
@@ -164,7 +164,7 @@ function watchComponents(project: Project, ctx: BuildContext, options: DevServer
 			try {
 				await refreshProjectComponents(project);
 				await refreshGeneratedNamespaceEntries(ctx);
-				await compileExml().apply(ctx);
+				await compileKUI().apply(ctx);
 				await writeComponentCatalog().apply(ctx);
 				await copyAssets().apply(ctx);
 				emitDiagnostics(ctx, options);
@@ -179,7 +179,7 @@ function watchComponents(project: Project, ctx: BuildContext, options: DevServer
 
 	for (const [directory, kind, accepts] of [
 		[convention.sourceDir, 'source', (file: string): boolean => file.endsWith('.ts')],
-		[convention.skinDir, 'skin', (file: string): boolean => file.endsWith('Skin.exml')],
+		[convention.skinDir, 'skin', (file: string): boolean => file.endsWith('Skin.kui.xml')],
 	] as const) {
 		try {
 			const watcher = fsSync.watch(directory, { recursive: true }, (_event, filename) => {

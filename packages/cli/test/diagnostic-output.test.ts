@@ -31,7 +31,7 @@ describe('diagnostic output formats', () => {
 		writeMachineOutput({
 			type: 'diagnostic',
 			diagnostic: {
-				code: 'KUROT_EXML_UNKNOWN_TAG',
+				code: 'KUROT_KUI_UNKNOWN_TAG',
 				severity: 'warning',
 				message: 'Unknown tag.',
 			},
@@ -43,7 +43,7 @@ describe('diagnostic output formats', () => {
 		expect(JSON.parse(output)).toEqual({
 			type: 'diagnostic',
 			diagnostic: {
-				code: 'KUROT_EXML_UNKNOWN_TAG',
+				code: 'KUROT_KUI_UNKNOWN_TAG',
 				severity: 'warning',
 				message: 'Unknown tag.',
 			},

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.ProgressBarSkin" version="2" target="kui.ProgressBar" default="true">
+    <contract>
+        <parts>
+            <part name="labelDisplay" node="labelDisplay" />
+            <part name="thumb" node="thumb" />
+        </parts>
+    </contract>
+    <Group id="root" minHeight="18" minWidth="30">
+        <Image id="node_image1" height="100%" scale9Grid="1,1,4,4" source="@resource:image:track_pb_png" verticalCenter="0" width="100%" />
+        <Image id="thumb" height="100%" scale9Grid="1,1,4,4" source="@resource:image:thumb_pb_png" width="100%" />
+        <Label id="labelDisplay" fontFamily="Tahoma" horizontalCenter="0" size="15" textAlign="center" textColor="7368816" verticalAlign="middle" verticalCenter="0" />
+    </Group>
+</Skin>

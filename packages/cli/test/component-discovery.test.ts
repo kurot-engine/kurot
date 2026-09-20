@@ -16,8 +16,8 @@ describe('component discovery', () => {
 		const fixture = await createFixture();
 		await fixture.writeSource('bet/BetButton.ts', 'export class BetButton {}\n');
 		await fixture.writeSkin(
-			'bet/BetButtonSkin.exml',
-			'<eui:Skin class="components.bet.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			'bet/BetButtonSkin.kui.xml',
+			componentSkin('components.bet.BetButtonSkin'),
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).resolves.toEqual([
@@ -25,7 +25,7 @@ describe('component discovery', () => {
 				name: 'BetButton',
 				tag: 'game:BetButton',
 				sourceRelative: 'src/components/bet/BetButton.ts',
-				skinRelative: 'resource/skins/components/bet/BetButtonSkin.exml',
+				skinRelative: 'resource/skins/components/bet/BetButtonSkin.kui.xml',
 				skinClass: 'components.bet.BetButtonSkin',
 			}),
 		]);
@@ -36,19 +36,19 @@ describe('component discovery', () => {
 		await fixture.writeSource('BetButton.ts', 'export class BetButton {}\n');
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
-			"Component source 'src/components/BetButton.ts' has no matching skin 'BetButtonSkin.exml'.",
+			"Component source 'src/components/BetButton.ts' has no matching skin 'BetButtonSkin.kui.xml'.",
 		);
 	});
 
 	it('rejects a skin without its source pair', async () => {
 		const fixture = await createFixture();
 		await fixture.writeSkin(
-			'BetButtonSkin.exml',
-			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			'BetButtonSkin.kui.xml',
+			componentSkin('components.BetButtonSkin'),
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
-			"Component skin 'resource/skins/components/BetButtonSkin.exml' has no matching source 'BetButton.ts'.",
+			"Component skin 'resource/skins/components/BetButtonSkin.kui.xml' has no matching source 'BetButton.ts'.",
 		);
 	});
 
@@ -56,8 +56,8 @@ describe('component discovery', () => {
 		const fixture = await createFixture();
 		await fixture.writeSource('BetButton.ts', 'export class OtherButton {}\n');
 		await fixture.writeSkin(
-			'BetButtonSkin.exml',
-			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			'BetButtonSkin.kui.xml',
+			componentSkin('components.BetButtonSkin'),
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
@@ -69,8 +69,8 @@ describe('component discovery', () => {
 		const fixture = await createFixture();
 		await fixture.writeSource('BetButton.ts', '// export class BetButton {}\nexport class OtherButton {}\n');
 		await fixture.writeSkin(
-			'BetButtonSkin.exml',
-			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			'BetButtonSkin.kui.xml',
+			componentSkin('components.BetButtonSkin'),
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
@@ -78,12 +78,12 @@ describe('component discovery', () => {
 		);
 	});
 
-	it('rejects an abstract component that generated EXML code cannot instantiate', async () => {
+	it('rejects an abstract component that generated KUI code cannot instantiate', async () => {
 		const fixture = await createFixture();
 		await fixture.writeSource('BetButton.ts', 'export abstract class BetButton {}\n');
 		await fixture.writeSkin(
-			'BetButtonSkin.exml',
-			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			'BetButtonSkin.kui.xml',
+			componentSkin('components.BetButtonSkin'),
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
@@ -91,16 +91,16 @@ describe('component discovery', () => {
 		);
 	});
 
-	it('requires a standard Skin root and class attribute', async () => {
+	it('requires a canonical KUI Skin document', async () => {
 		const fixture = await createFixture();
 		await fixture.writeSource('BetButton.ts', 'export class BetButton {}\n');
 		await fixture.writeSkin(
-			'BetButtonSkin.exml',
-			'<eui:Group xmlns:eui="http://ns.egret.com/eui"/>',
+			'BetButtonSkin.kui.xml',
+			'<Group />',
 		);
 
 		await expect(discoverComponents(fixture.root, fixture.convention)).rejects.toThrow(
-			'must use an eui:Skin root',
+			'is invalid KUI XML',
 		);
 	});
 
@@ -109,8 +109,8 @@ describe('component discovery', () => {
 		for (const directory of ['a', 'b']) {
 			await fixture.writeSource(`${directory}/BetButton.ts`, 'export class BetButton {}\n');
 			await fixture.writeSkin(
-				`${directory}/BetButtonSkin.exml`,
-				`<eui:Skin class="components.${directory}.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>`,
+				`${directory}/BetButtonSkin.kui.xml`,
+				componentSkin(`components.${directory}.BetButtonSkin`),
 			);
 		}
 
@@ -119,6 +119,10 @@ describe('component discovery', () => {
 		);
 	});
 });
+
+function componentSkin(id: string): string {
+	return `<Skin xmlns="https://kurot.dev/ui/1" id="${id}" version="2" target="game.BetButton"><Group id="root" /></Skin>`;
+}
 
 async function createFixture(): Promise<{
 	root: string;

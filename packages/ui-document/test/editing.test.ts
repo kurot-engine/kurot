@@ -15,8 +15,8 @@ import {
 	UIEditError,
 } from '../src/index.js';
 
-const ACTION_CARD = readFixture('action-card.component.json');
-const LOBBY_SCREEN = readFixture('lobby.screen.json');
+const ACTION_CARD = readFixture('action-card.component.kui.xml');
+const LOBBY_SCREEN = readFixture('lobby.screen.kui.xml');
 
 describe('semantic UI operations', () => {
 	it('applies immutable property edits and exact inverse operations', () => {

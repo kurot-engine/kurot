@@ -1,3 +1,0 @@
-<eui:Skin class="skins.ValidSkin" xmlns:eui="http://ns.egret.com/eui">
-	<eui:Button label="Valid" />
-</eui:Skin>

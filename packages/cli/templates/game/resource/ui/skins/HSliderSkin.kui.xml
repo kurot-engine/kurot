@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.HSliderSkin" version="2" target="kui.HSlider" default="true">
+    <contract>
+        <parts>
+            <part name="thumb" node="thumb" />
+            <part name="track" node="track" />
+        </parts>
+    </contract>
+    <Group id="root" minHeight="8" minWidth="20">
+        <Image id="track" height="6" scale9Grid="1,1,4,4" source="@resource:image:track_sb_png" verticalCenter="0" width="100%" />
+        <Image id="thumb" source="@resource:image:thumb_png" verticalCenter="0" />
+    </Group>
+</Skin>

@@ -16,7 +16,7 @@ export type UIDiagnosticCode =
 	| 'invalid-component-property'
 	| 'invalid-component-source'
 	| 'invalid-document'
-	| 'invalid-json'
+	| 'invalid-xml'
 	| 'invalid-property-value'
 	| 'invalid-resource-reference'
 	| 'invalid-token-reference'

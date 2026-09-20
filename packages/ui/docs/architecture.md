@@ -156,7 +156,7 @@ Theme(url) 构造
 
 ### 3.3 编译期产物如何在运行时被找到——globalThis 是事实上的皮肤注册表
 
-`@kurot/cli` 编译 EXML 时，为每个主题生成一个索引模块，做的事情等价于：
+`@kurot/cli` 编译 KUI XML Skin 时，为每个主题生成一个索引模块，做的事情等价于：
 
 ```js
 import { createButtonSkin as s0 } from './skin0.js';
@@ -206,18 +206,14 @@ UI 树构建的机制，跟 Egret 的异步主题加载惯例是一致的。
 字符串 → 先查 `globalThis` 再当 factory 调；对象 → 直接当 `Skin` 实例用。
 
 `_invokeSkinFactory()` 用正则 `/^class\s/.test(Function.prototype.toString.call(fn))`
-区分真正的 ES class 构造器（用 `new` 调）和 EXML 编译产生的 factory 函数
-（用 `fn.call(this)` 调，让 factory 内部的 `this` 指向宿主组件——这对
-EXML 生成的 `Binding.bindProperty(this, ...)` 调用是必须的，因为绑定要
-闭包住宿主对象）。手写的 class 皮肤如果用了 EXML 风格的 `{binding}`
-语法就会拿到错误的 `this`——源码里有明确注释警告这一点。
+区分真正的 ES class 构造器（用 `new` 调）和 KUI XML 编译产生的 factory 函数（用 `fn.call(this)` 调，让 factory 获得宿主组件上下文）。
 
 `_setSkin(skin)` 做的事：
 
 1. **拆旧**：调用 `onSkinRemoved()`，此时旧的完整 `skinParts` 仍可读取
    → 标记 Skin 未就绪并清空内部 part 映射
    → `oldSkin.hostComponent = undefined` 退出旧状态
-   → `oldSkin.unwatchAll()` 清空所有 EXML 生成的 `Watcher`
+   → `oldSkin.unwatchAll()` 清空皮肤激活期间注册的 `Watcher`
    → 把 `elementsContent` 从宿主上摘掉。
 2. **装新**：遍历 `skin.skinParts`，通过 `skin.getPart(name)` 一次性构建
    新的内部 part 映射 → 按声明顺序把 `elementsContent` `addChildAt` 到宿主
@@ -318,7 +314,7 @@ override 通常是 `SetStateProperty`，从不真正调用 `skin.getPart()`）�
 `horizontalCenter`/`verticalCenter` 加 `percentWidth`/`percentHeight`。
 只有当对应方向的两个位置约束**没有同时设置**（`left` + `right` 同时给出
 意味着宽度已经被算死了，`unscaledWidth - right - left`，这时优先于
-`percentWidth`）百分比才会生效。字符串形式的约束值（EXML 里写
+`percentWidth`）百分比才会生效。字符串形式的约束值（KUI XML 中写
 `left="10%"`）由 `fmt()` 辅助函数统一解析：以 `%` 结尾的当百分比处理，
 否则强转数字——没有单独的"百分比 vs 像素"类型标签。
 

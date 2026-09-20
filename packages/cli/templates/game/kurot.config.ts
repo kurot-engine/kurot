@@ -10,12 +10,12 @@ export default {
 		orientation: 'auto',
 		frameRate: 60,
 	},
-	exml: {
-		themeFile: 'resource/default.thm.json',
+	ui: {
+		sourceDir: 'resource/ui',
 		components: {
 			namespace: 'game',
 			sourceDir: 'src/components',
-			skinDir: 'resource/skins/components',
+			skinDir: 'resource/ui/components',
 		},
 	},
 };

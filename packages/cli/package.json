@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/cli",
-	"version": "1.3.0",
-	"description": "Kurot CLI - build tool for the Kurot game engine",
+	"version": "2.0.0",
+	"description": "Kurot CLI - build tool for Kurot Editor KUI XML workflows",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -27,6 +27,7 @@
 		"kurot": "tsx src/index.ts"
 	},
 	"dependencies": {
+		"@kurot/ui-document": "^0.6.0",
 		"commander": "^13.0.0",
 		"esbuild": "^0.25.0"
 	},
@@ -40,7 +41,8 @@
 		"kurot",
 		"cli",
 		"game-engine",
-		"exml",
+		"kui",
+		"xml",
 		"typescript"
 	],
 	"repository": {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" id="skins.GroupSkin" version="2" target="kui.Group" default="false">
+    <contract>
+        <parts>
+            <part name="contentGroup" node="contentGroup" />
+        </parts>
+    </contract>
+    <Group id="root">
+        <Group id="contentGroup" height="100%" width="100%" />
+    </Group>
+</Skin>

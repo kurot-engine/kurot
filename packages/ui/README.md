@@ -367,7 +367,7 @@ cross-framework ranking.
 | Namespace      | `eui.*` global              | ES Module named exports              |
 | Component base | `namespace` + `mixin`       | Standard class inheritance           |
 | Layout state   | Prototype-injected          | `UIState` delegation                 |
-| EXML runtime   | Built-in parser             | Compile-time only (`@kurot/cli`)   |
+| Authored skins | EXML runtime parser          | KUI XML compiled by `@kurot/cli`   |
 | Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`             |
 | Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`      |
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions     |

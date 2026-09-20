@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.5.2`. This is a headless,
+Package identity: `@kurot/ui-document@0.6.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -18,7 +18,7 @@ src/
     ├── model/                 Assets, nodes, contracts, instances, references.
     ├── document/              Constructors, deterministic traversal, lookup.
     ├── validation/            Strict single-document validation + diagnostics.
-    ├── serialization/         Validated parse + canonical JSON serialization.
+    ├── serialization/         Validated parse + canonical KUI XML serialization.
     ├── schema/                Component definitions, registry, semantic checks.
     ├── catalog/               Audited built-in semantic component subsets.
     ├── assets/                Project catalogs and cross-document validation.
@@ -111,8 +111,8 @@ src/
 - `kui.EditableText` extends `kui.Label` and exists primarily as TextInput's
   editable `textDisplay` appearance part. Prefer `kui.TextInput` in ordinary
   application UI.
-- `kui.*` is canonical. EUI identifiers belong only at a legacy EXML adapter
-  boundary.
+- `kui.*` is canonical. Authored files use `.kui.xml`; do not add EXML or JSON
+  compatibility paths.
 - `Image.source` and `Button.icon` use typed image/sprite-frame references.
   Audited colors and layout measurements accept appropriate design tokens.
 - `Label.fontFamily` accepts either a CSS font-family string or a registered
@@ -146,7 +146,8 @@ src/
 
 ## 5. Important limitations
 
-- Migrations and a final human-facing `.kui` syntax are not implemented.
+- KUI XML is the single authored syntax; source adapters and migrations are
+  intentionally outside the current format contract.
 - `@kurot/ui-runtime@0.4.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
@@ -160,7 +161,7 @@ src/
 | Change asset/node/reference shapes | `model/` |
 | Add constructors or tree queries | `document/` |
 | Add a structural invariant | `validation/validateUIDocument.ts` and related validators |
-| Change canonical JSON | `serialization/json.ts` and golden fixtures |
+| Change canonical KUI XML | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures |
 | Change property semantics | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
 | Change built-in component fields | `catalog/properties/` |
 | Change project catalogs or cross-document rules | `assets/` |

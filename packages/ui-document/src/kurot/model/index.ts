@@ -26,6 +26,13 @@ export type {
 	UIResourceReference,
 	UIResourceType,
 } from './UIReference.js';
+export {
+	isUIAssetReference,
+	isUIDesignTokenReference,
+	isUIResourceReference,
+	UI_DESIGN_TOKEN_TYPES,
+	UI_RESOURCE_TYPES,
+} from './UIReference.js';
 export { UI_DOCUMENT_KIND } from './UIDocument.js';
 export type { UIDocument } from './UIDocument.js';
 export type { UINode } from './UINode.js';

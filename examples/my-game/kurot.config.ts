@@ -10,7 +10,7 @@ export default {
 		orientation: 'auto',
 		frameRate: 60,
 	},
-	exml: {
-		themeFile: 'resource/default.thm.json',
+	ui: {
+		sourceDir: 'resource/ui',
 	},
 };

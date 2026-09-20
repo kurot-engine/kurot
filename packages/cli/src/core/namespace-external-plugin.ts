@@ -28,7 +28,7 @@ export function normalizeModuleKey(absolutePath: string): string {
  *
  * A custom-namespace class (e.g. `HeroNarrowIR`) can be referenced two ways:
  * game code imports it by relative path (`./ui/HeroNarrowIR.js`), while
- * EXML-generated skins import it by the virtual specifier (`#ns/game`,
+ * KUI-generated skins import it by the virtual specifier (`#ns/game`,
  * resolved via the HTML import map — see `compile-custom-namespaces.ts`).
  * `external: [specifier]` alone only catches the second case; esbuild matches
  * externals by the literal import string, so the relative import would

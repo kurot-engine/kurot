@@ -83,8 +83,8 @@ describe('automatic component namespace compilation', () => {
 		const firstSource = path.join(sourceDir, 'BetButton.ts');
 		await fs.writeFile(firstSource, 'export class BetButton {}\n');
 		await fs.writeFile(
-			path.join(skinDir, 'BetButtonSkin.exml'),
-			'<eui:Skin class="components.BetButtonSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+			path.join(skinDir, 'BetButtonSkin.kui.xml'),
+			componentSkin('components.BetButtonSkin', 'game.BetButton'),
 		);
 		const project = createProject(root, path.join(root, 'bin-debug'), createComponent(root, firstSource));
 		const ctx = createContext(project, { watch: true });
@@ -93,8 +93,8 @@ describe('automatic component namespace compilation', () => {
 			await compileCustomNamespaces().apply(ctx);
 			await fs.writeFile(path.join(sourceDir, 'HistoryItem.ts'), 'export class HistoryItem {}\n');
 			await fs.writeFile(
-				path.join(skinDir, 'HistoryItemSkin.exml'),
-				'<eui:Skin class="components.HistoryItemSkin" xmlns:eui="http://ns.egret.com/eui"/>',
+				path.join(skinDir, 'HistoryItemSkin.kui.xml'),
+				componentSkin('components.HistoryItemSkin', 'game.HistoryItem'),
 			);
 
 			await refreshProjectComponents(project);
@@ -112,6 +112,10 @@ describe('automatic component namespace compilation', () => {
 	});
 });
 
+function componentSkin(id: string, target: string): string {
+	return `<Skin xmlns="https://kurot.dev/ui/1" id="${id}" version="2" target="${target}"><Group id="root" /></Skin>`;
+}
+
 function createComponent(root: string, source: string): ProjectComponent {
 	return {
 		name: 'BetButton',
@@ -120,8 +124,8 @@ function createComponent(root: string, source: string): ProjectComponent {
 		specifier: '#ns/game',
 		source,
 		sourceRelative: 'src/components/BetButton.ts',
-		skin: path.join(root, 'resource/skins/components/BetButtonSkin.exml'),
-		skinRelative: 'resource/skins/components/BetButtonSkin.exml',
+		skin: path.join(root, 'resource/skins/components/BetButtonSkin.kui.xml'),
+		skinRelative: 'resource/skins/components/BetButtonSkin.kui.xml',
 		skinClass: 'components.BetButtonSkin',
 	};
 }

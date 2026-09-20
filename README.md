@@ -1,6 +1,6 @@
 # Kurot
 
-Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, EUI, and EXML developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
+Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, and EUI developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
 
 > Kurot continues Egret 5.4.1's display-object and development model while
 > upgrading its rendering core to a WebGL2-first, InstructionSet/RenderPipe,
@@ -15,7 +15,7 @@ Core features include:
 - A **Build → Execute** rendering flow, with WebGL multi-texture batching and RenderGroup layering.
 - A WebGL primary rendering backend with a Canvas 2D fallback backend.
 - EUI-compatible components, layout, states, data binding, and theming system.
-- Build-time EXML → ESM compilation, with no XML parsing at runtime.
+- Canonical KUI XML authoring with build-time Skin compilation and no XML parsing at runtime.
 - A headless `kui.*` UI document model and explicit runtime materialization layer
   for future editors and Agent workflows.
 - Tween, MovieClip, ScrollView, and URLLoader game extensions.
@@ -24,7 +24,7 @@ Core features include:
 
 Kurot is a continuation of Egret 5.4.1 for the modern web platform, not a new
 API placed on top of the old renderer. It retains the productive display-object,
-event, EUI, and EXML model while replacing the rendering and build foundations.
+event and EUI model while replacing the rendering and build foundations.
 
 | Area | Egret 5.4.1 | Kurot |
 | ---- | ----------- | ----- |
@@ -35,7 +35,7 @@ event, EUI, and EXML model while replacing the rendering and build foundations.
 | Update model | RenderNode/display-tree updates | Separate `structureDirty` rebuilds and `renderDirty` patches |
 | Modules | Namespace/global-oriented runtime | Native ESM |
 | Language target | Legacy web/TypeScript environment | ES2022 with `strict: true` |
-| EXML | Egret runtime/toolchain model | Build-time EXML → ESM compilation |
+| UI documents | EXML runtime/toolchain model | Canonical KUI XML → build-time ESM Skin compilation |
 
 Canvas 2D fallback is a capability shared by both engines; it is not presented
 as a Kurot invention. Kurot's measurable renderer evolution is its modern
@@ -49,11 +49,11 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
 | ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
 | [`@kurot/core`](packages/core/README.md)               | 1.0.23  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
-| [`@kurot/ui`](packages/ui/README.md)                   | 2.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
+| [`@kurot/ui`](packages/ui/README.md)                   | 2.1.1   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)                 | 1.3.0   | `packages/cli`         | Node.js build tooling, project scaffolding, and the EXML compiler                                              | None                  |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.5.2   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                  |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.5.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse | `core`, `ui`, `ui-document` |
+| [`@kurot/cli`](packages/cli/README.md)                 | 2.0.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                    | `ui-document`         |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.6.0   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                  |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.5.1   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
@@ -72,6 +72,7 @@ document.
  └─ @kurot/game
 
 @kurot/cli  (build-time only)
+ └─ @kurot/ui-document
 
 @kurot/ui-document  (headless editing-time document model)
 
@@ -195,17 +196,22 @@ self-baseline from one Chromium environment, not a cross-framework or
 cross-device ranking. Commands and measurement details are documented in the
 [`@kurot/ui` README](packages/ui/README.md#ui-benchmark).
 
-### EXML and EUI
+### KUI XML and EUI
 
-`@kurot/cli` parses `.exml` files into SkinIR at build time and generates ESM modules. At runtime, `@kurot/ui`'s theming system dynamically loads the generated skin factories, so build artifacts don't need to carry or parse EXML source files.
+CLI 2.0 is currently scoped to the Kurot Editor workflow. Existing EXML game
+projects continue to use CLI 1.3.x and do not need to migrate their project
+configuration or UI assets.
 
-Custom EXML namespaces are explicitly mapped to module entry points via
-`exml.namespaces` in `kurot.config.ts`, replacing Egret's runtime global
-namespace reflection.
+`@kurot/ui-document` defines the canonical `.kui.xml` format for screens,
+components, and skins. `@kurot/cli` parses that format at build time and turns
+Skin documents into ESM factories loaded by `@kurot/ui`'s theme system. Default
+skin mappings are derived from the Skin `target` and `default` attributes.
+Project component prefixes are mapped through `ui.namespaces` or discovered
+through `ui.components` in `kurot.config.ts`.
 
 ## Examples
 
-- [`examples/demo`](examples/demo/): a Vite-based example project demonstrating a hand-written EXML compilation integration.
+- [`examples/demo`](examples/demo/): a Vite-based rendering and engine integration example.
 - [`examples/my-game`](examples/my-game/): a standard game project example generated from the CLI template.
 
 ## Repository layout
