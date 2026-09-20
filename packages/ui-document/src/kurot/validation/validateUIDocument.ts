@@ -1,6 +1,7 @@
 import { UI_DOCUMENT_KIND } from '../model/UIDocument.js';
 import type { UIAssetKind } from '../model/UIAssetKind.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import { isSyntheticNodeId } from '../model/synthetic-node-id.js';
 import { UI_DOCUMENT_FORMAT_VERSION } from '../version.js';
 import type { UIDiagnostic } from './UIDiagnostic.js';
 import { validateUIAssetContract } from './validateUIAssetContract.js';
@@ -15,22 +16,8 @@ import {
 	validatePropertyValue,
 } from './validationHelpers.js';
 
-const DOCUMENT_KEYS = new Set([
-	'assetKind',
-	'contract',
-	'formatVersion',
-	'id',
-	'kind',
-	'root',
-]);
-const NODE_KEYS = new Set([
-	'appearance',
-	'children',
-	'id',
-	'instance',
-	'properties',
-	'type',
-]);
+const DOCUMENT_KEYS = new Set(['assetKind', 'contract', 'formatVersion', 'id', 'kind', 'root']);
+const NODE_KEYS = new Set(['appearance', 'children', 'id', 'instance', 'properties', 'type']);
 
 /**
  * Validates unknown input against the current semantic document format.
@@ -50,21 +37,8 @@ export function validateUIDocument(value: unknown): UIDiagnostic[] {
 
 	const nodeIds = new Map<string, string>();
 	const nodeStack = new WeakSet<object>();
-	validateNode(
-		value.root,
-		'$.root',
-		diagnostics,
-		nodeIds,
-		nodeStack,
-		assetKind === 'appearance',
-	);
-	validateUIAssetContract(
-		value.contract,
-		assetKind,
-		'$.contract',
-		diagnostics,
-		new Set(nodeIds.keys()),
-	);
+	validateNode(value.root, '$.root', diagnostics, nodeIds, nodeStack, assetKind === 'appearance');
+	validateUIAssetContract(value.contract, assetKind, '$.contract', diagnostics, new Set(nodeIds.keys()));
 	return diagnostics;
 }
 
@@ -101,29 +75,11 @@ function validateNode(
 		validateAppearanceReference(value.appearance, `${path}.appearance`, diagnostics);
 	}
 	if (value.instance !== undefined) {
-		validateUIComponentInstance(
-			value.instance,
-			`${path}.instance`,
-			diagnostics,
-			(child, childPath) =>
-				validateNode(
-					child,
-					childPath,
-					diagnostics,
-					nodeIds,
-					nodeStack,
-					validateSkinNames,
-				),
+		validateUIComponentInstance(value.instance, `${path}.instance`, diagnostics, (child, childPath) =>
+			validateNode(child, childPath, diagnostics, nodeIds, nodeStack, validateSkinNames),
 		);
 	}
-	validateChildren(
-		value.children,
-		`${path}.children`,
-		diagnostics,
-		nodeIds,
-		nodeStack,
-		validateSkinNames,
-	);
+	validateChildren(value.children, `${path}.children`, diagnostics, nodeIds, nodeStack, validateSkinNames);
 	nodeStack.delete(value);
 }
 
@@ -140,14 +96,7 @@ function validateChildren(
 		return;
 	}
 	for (let index = 0; index < value.length; index++) {
-		validateNode(
-			value[index],
-			`${path}[${index}]`,
-			diagnostics,
-			nodeIds,
-			nodeStack,
-			validateSkinNames,
-		);
+		validateNode(value[index], `${path}[${index}]`, diagnostics, nodeIds, nodeStack, validateSkinNames);
 	}
 }
 
@@ -159,28 +108,19 @@ function validateNodeId(
 	validateSkinNames: boolean,
 ): void {
 	if (!validateNonEmptyString(value, path, 'Node id', diagnostics)) return;
-	if (validateSkinNames) {
+	if (validateSkinNames && !isSyntheticNodeId(value)) {
 		validateSkinPartName(value, path, diagnostics);
 	}
 
 	const firstPath = nodeIds.get(value);
 	if (firstPath) {
-		addUIDiagnostic(
-			diagnostics,
-			'duplicate-node-id',
-			path,
-			`Node id "${value}" is already used at ${firstPath}.`,
-		);
+		addUIDiagnostic(diagnostics, 'duplicate-node-id', path, `Node id "${value}" is already used at ${firstPath}.`);
 		return;
 	}
 	nodeIds.set(value, path);
 }
 
-function validateProperties(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateProperties(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
 	if (!isPlainRecord(value)) {
 		addUIDiagnostic(diagnostics, 'invalid-value', path, 'Node properties must be an object.');
 		return;
@@ -191,10 +131,7 @@ function validateProperties(
 	}
 }
 
-function validateAssetKind(
-	value: unknown,
-	diagnostics: UIDiagnostic[],
-): UIAssetKind | undefined {
+function validateAssetKind(value: unknown, diagnostics: UIDiagnostic[]): UIAssetKind | undefined {
 	if (value === 'appearance' || value === 'component' || value === 'screen') {
 		return value;
 	}
@@ -209,12 +146,7 @@ function validateAssetKind(
 
 function validateFormatVersion(value: unknown, diagnostics: UIDiagnostic[]): void {
 	if (!Number.isInteger(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-value',
-			'$.formatVersion',
-			'Format version must be an integer.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-value', '$.formatVersion', 'Format version must be an integer.');
 		return;
 	}
 	if (value !== UI_DOCUMENT_FORMAT_VERSION) {
@@ -227,18 +159,8 @@ function validateFormatVersion(value: unknown, diagnostics: UIDiagnostic[]): voi
 	}
 }
 
-function validateExactValue(
-	value: unknown,
-	expected: string,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateExactValue(value: unknown, expected: string, path: string, diagnostics: UIDiagnostic[]): void {
 	if (value !== expected) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-value',
-			path,
-			`Value must be "${expected}".`,
-		);
+		addUIDiagnostic(diagnostics, 'invalid-value', path, `Value must be "${expected}".`);
 	}
 }

@@ -1,12 +1,5 @@
 import type { UIPropertyObject, UIPropertyValue } from '@kurot/ui-document';
-import {
-	BasicLayout,
-	HorizontalLayout,
-	LayoutBase,
-	LinearLayoutBase,
-	TileLayout,
-	VerticalLayout,
-} from '@kurot/ui';
+import { BasicLayout, HorizontalLayout, LayoutBase, LinearLayoutBase, TileLayout, VerticalLayout } from '@kurot/ui';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 
 /**
@@ -17,9 +10,7 @@ export function createLayout(value: unknown, path: string): LayoutBase {
 	assertExactKeys(descriptor, ['properties', 'type'], path);
 	const type = requireString(descriptor.type, `${path}.type`);
 	const properties =
-		descriptor.properties === undefined
-			? {}
-			: requireObject(descriptor.properties, `${path}.properties`);
+		descriptor.properties === undefined ? {} : requireObject(descriptor.properties, `${path}.properties`);
 
 	let layout: LayoutBase;
 	switch (type) {
@@ -36,11 +27,7 @@ export function createLayout(value: unknown, path: string): LayoutBase {
 			layout = new VerticalLayout();
 			break;
 		default:
-			throw new KurotUIRuntimeError(
-				'invalid-layout',
-				`Layout type "${type}" is not supported.`,
-				`${path}.type`,
-			);
+			throw new KurotUIRuntimeError('invalid-layout', `Layout type "${type}" is not supported.`, `${path}.type`);
 	}
 
 	for (const name of Object.keys(properties).sort()) {
@@ -49,20 +36,11 @@ export function createLayout(value: unknown, path: string): LayoutBase {
 	return layout;
 }
 
-function applyLayoutProperty(
-	layout: LayoutBase,
-	name: string,
-	value: UIPropertyValue,
-	path: string,
-): void {
+function applyLayoutProperty(layout: LayoutBase, name: string, value: UIPropertyValue, path: string): void {
 	if (name === 'useVirtualLayout') {
 		const enabled = requireBoolean(value, path);
 		if (layout instanceof BasicLayout && enabled) {
-			throw new KurotUIRuntimeError(
-				'invalid-layout',
-				'BasicLayout does not support virtual layout.',
-				path,
-			);
+			throw new KurotUIRuntimeError('invalid-layout', 'BasicLayout does not support virtual layout.', path);
 		}
 		layout.useVirtualLayout = enabled;
 		return;
@@ -94,11 +72,7 @@ function applyLinearLayoutProperty(
 			layout.gap = requireNumber(value, path);
 			return true;
 		case 'horizontalAlign':
-			layout.horizontalAlign = requireEnum(
-				value,
-				['left', 'center', 'right', 'justify', 'contentJustify'],
-				path,
-			);
+			layout.horizontalAlign = requireEnum(value, ['left', 'center', 'right', 'justify', 'contentJustify'], path);
 			return true;
 		case 'paddingBottom':
 			layout.paddingBottom = requireNumber(value, path);
@@ -113,40 +87,23 @@ function applyLinearLayoutProperty(
 			layout.paddingTop = requireNumber(value, path);
 			return true;
 		case 'verticalAlign':
-			layout.verticalAlign = requireEnum(
-				value,
-				['top', 'middle', 'bottom', 'justify', 'contentJustify'],
-				path,
-			);
+			layout.verticalAlign = requireEnum(value, ['top', 'middle', 'bottom', 'justify', 'contentJustify'], path);
 			return true;
 		default:
 			return false;
 	}
 }
 
-function applyTileLayoutProperty(
-	layout: TileLayout,
-	name: string,
-	value: UIPropertyValue,
-	path: string,
-): boolean {
+function applyTileLayoutProperty(layout: TileLayout, name: string, value: UIPropertyValue, path: string): boolean {
 	switch (name) {
 		case 'columnAlign':
-			layout.columnAlign = requireEnum(
-				value,
-				['left', 'justifyUsingGap', 'justifyUsingWidth'],
-				path,
-			);
+			layout.columnAlign = requireEnum(value, ['left', 'justifyUsingGap', 'justifyUsingWidth'], path);
 			return true;
 		case 'columnWidth':
 			layout.columnWidth = requireNonNegativeNumber(value, path);
 			return true;
 		case 'horizontalAlign':
-			layout.horizontalAlign = requireEnum(
-				value,
-				['left', 'center', 'right', 'justify', 'contentJustify'],
-				path,
-			);
+			layout.horizontalAlign = requireEnum(value, ['left', 'center', 'right', 'justify', 'contentJustify'], path);
 			return true;
 		case 'horizontalGap':
 			layout.horizontalGap = requireNumber(value, path);
@@ -173,21 +130,13 @@ function applyTileLayoutProperty(
 			layout.requestedRowCount = requireNonNegativeInteger(value, path);
 			return true;
 		case 'rowAlign':
-			layout.rowAlign = requireEnum(
-				value,
-				['top', 'justifyUsingGap', 'justifyUsingHeight'],
-				path,
-			);
+			layout.rowAlign = requireEnum(value, ['top', 'justifyUsingGap', 'justifyUsingHeight'], path);
 			return true;
 		case 'rowHeight':
 			layout.rowHeight = requireNonNegativeNumber(value, path);
 			return true;
 		case 'verticalAlign':
-			layout.verticalAlign = requireEnum(
-				value,
-				['top', 'middle', 'bottom', 'justify', 'contentJustify'],
-				path,
-			);
+			layout.verticalAlign = requireEnum(value, ['top', 'middle', 'bottom', 'justify', 'contentJustify'], path);
 			return true;
 		case 'verticalGap':
 			layout.verticalGap = requireNumber(value, path);
@@ -245,15 +194,7 @@ function requireString(value: UIPropertyValue | undefined, path: string): string
 	throw new KurotUIRuntimeError('invalid-layout', 'Layout type must be a non-empty string.', path);
 }
 
-function requireEnum(
-	value: UIPropertyValue,
-	values: readonly string[],
-	path: string,
-): string {
+function requireEnum(value: UIPropertyValue, values: readonly string[], path: string): string {
 	if (typeof value === 'string' && values.includes(value)) return value;
-	throw new KurotUIRuntimeError(
-		'invalid-layout',
-		`Layout property must be one of: ${values.join(', ')}.`,
-		path,
-	);
+	throw new KurotUIRuntimeError('invalid-layout', `Layout property must be one of: ${values.join(', ')}.`, path);
 }

@@ -5,12 +5,7 @@ import { requireBoolean, requireString, invalidRuntimeValue } from './valueGuard
 /**
  * Applies one property declared by Button and inherited by its subclasses.
  */
-export function applyButtonProperty(
-	target: Button,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyButtonProperty(target: Button, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'icon':
 			target.icon = requireImageSource(value, path);

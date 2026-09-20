@@ -6,12 +6,7 @@ import { requireBoolean, invalidRuntimeValue } from './valueGuards.js';
 /**
  * Applies one property declared directly by Image.
  */
-export function applyImageProperty(
-	target: Image,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyImageProperty(target: Image, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'fillMode':
 			target.fillMode = requireFillMode(value, path);

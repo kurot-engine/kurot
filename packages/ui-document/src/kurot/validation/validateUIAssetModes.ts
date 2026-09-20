@@ -37,20 +37,9 @@ export function validateUIAssetModes(
 		}
 		validateKnownKeys(definition, MODE_KEYS, definitionPath, diagnostics);
 		if (definition.description !== undefined) {
-			validateNonEmptyString(
-				definition.description,
-				`${definitionPath}.description`,
-				'Description',
-				diagnostics,
-			);
+			validateNonEmptyString(definition.description, `${definitionPath}.description`, 'Description', diagnostics);
 		}
-		validateOverrides(
-			definition.overrides,
-			`${definitionPath}.overrides`,
-			diagnostics,
-			nodeIds,
-			allowTransitions,
-		);
+		validateOverrides(definition.overrides, `${definitionPath}.overrides`, diagnostics, nodeIds, allowTransitions);
 	}
 }
 
@@ -62,12 +51,7 @@ function validateOverrides(
 	allowTransitions: boolean,
 ): void {
 	if (!Array.isArray(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'State or variant overrides must be an array.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'State or variant overrides must be an array.');
 		return;
 	}
 	for (let index = 0; index < value.length; index++) {
@@ -83,33 +67,17 @@ function validatePropertyOverride(
 	allowTransitions: boolean,
 ): void {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'Property override must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'Property override must be an object.');
 		return;
 	}
 	validateKnownKeys(value, OVERRIDE_KEYS, path, diagnostics);
-	validateNodeIdReference(
-		value.targetId,
-		`${path}.targetId`,
-		'Target node id',
-		diagnostics,
-		nodeIds,
-	);
+	validateNodeIdReference(value.targetId, `${path}.targetId`, 'Target node id', diagnostics, nodeIds);
 	validateNonEmptyString(value.property, `${path}.property`, 'Property name', diagnostics);
 	validatePropertyValue(value.value, `${path}.value`, diagnostics);
 	validateTransition(value.transition, `${path}.transition`, diagnostics, allowTransitions);
 }
 
-function validateTransition(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-	allowed: boolean,
-): void {
+function validateTransition(value: unknown, path: string, diagnostics: UIDiagnostic[], allowed: boolean): void {
 	if (value === undefined) return;
 	if (!allowed) {
 		addUIDiagnostic(
@@ -128,12 +96,7 @@ function validateTransition(
 	validateDuration(value.duration, `${path}.duration`, diagnostics);
 	if (value.delay !== undefined) validateDuration(value.delay, `${path}.delay`, diagnostics);
 	if (value.easing !== undefined && (typeof value.easing !== 'string' || !EASINGS.has(value.easing))) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			`${path}.easing`,
-			'Transition easing is not supported.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', `${path}.easing`, 'Transition easing is not supported.');
 	}
 }
 
@@ -163,12 +126,7 @@ function validateNamedModes(
 	}
 	for (const name of Object.keys(value)) {
 		if (name.trim().length > 0) continue;
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'State and variant names must not be empty.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'State and variant names must not be empty.');
 	}
 	return true;
 }

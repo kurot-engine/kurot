@@ -59,12 +59,12 @@ async function createFixture(): Promise<string> {
 	await write(
 		root,
 		'resource/skins/components/BetButtonSkin.kui.xml',
-		'<Skin xmlns="https://kurot.dev/ui/1" id="components.BetButtonSkin" version="2" target="game.BetButton" default="true"><Group id="root"><Label id="label" /></Group></Skin>',
+		'<Skin xmlns="https://kurot.dev/ui/1" class="components.BetButtonSkin"><Group id="root"><Label id="label" /></Group></Skin>',
 	);
 	await write(
 		root,
 		'resource/skins/HostSkin.kui.xml',
-		'<Skin xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game" id="skins.HostSkin" version="2" target="kui.Panel"><contract><parts><part name="betButton" node="betButton" /></parts></contract><Group id="root"><game:BetButton id="betButton" /></Group></Skin>',
+		'<Skin xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game" class="skins.HostSkin"><Group id="root"><game:BetButton id="betButton" /></Group></Skin>',
 	);
 	await write(
 		root,

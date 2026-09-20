@@ -65,15 +65,6 @@ export async function discoverComponents(
 		let skinClass: string;
 		try {
 			const skinDocument = parseUIDocument(await fs.readFile(skin, 'utf-8'));
-			if (skinDocument.assetKind !== 'appearance') {
-				errors.push(`Component skin '${relative(root, skin)}' must be a KUI Skin document.`);
-				continue;
-			}
-			const targetType = `${convention.prefix}.${name}`;
-			if (skinDocument.contract.targetType !== targetType) {
-				errors.push(`Component skin '${relative(root, skin)}' must target '${targetType}'.`);
-				continue;
-			}
 			skinClass = skinDocument.id;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);

@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.6.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.6.1`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -30,8 +30,10 @@ src/
 - A document has exactly `kind`, `formatVersion`, `id`, `assetKind`, `contract`,
   and `root`.
 - `assetKind` is `screen`, `component`, or `appearance`.
-- A component asset must publish `contract.componentType`; an appearance must
-  publish `contract.targetType`. Other asset kinds may not use those fields.
+- A component asset must publish `contract.componentType`. An appearance may
+  publish `contract.targetType` for programmatic cross-asset validation, but
+  authored Skin XML does not expose it; the build derives associations from
+  project conventions. Other asset kinds may not use those fields.
 - Contracts contain parameter schemas, public parts, named Slots, runtime
   states, and authoring variants. Parts, state overrides, and variant overrides
   target stable node IDs in the defining asset.
@@ -111,8 +113,8 @@ src/
 - `kui.EditableText` extends `kui.Label` and exists primarily as TextInput's
   editable `textDisplay` appearance part. Prefer `kui.TextInput` in ordinary
   application UI.
-- `kui.*` is canonical. Authored files use `.kui.xml`; do not add EXML or JSON
-  compatibility paths.
+- `kui.*` is canonical. Authored Skin files use `.kui.xml`; do not add EXML or
+  JSON compatibility paths.
 - `Image.source` and `Button.icon` use typed image/sprite-frame references.
   Audited colors and layout measurements accept appropriate design tokens.
 - `Label.fontFamily` accepts either a CSS font-family string or a registered
@@ -146,9 +148,9 @@ src/
 
 ## 5. Important limitations
 
-- KUI XML is the single authored syntax; source adapters and migrations are
-  intentionally outside the current format contract.
-- `@kurot/ui-runtime@0.4.x` consumes format version 2 and executes the current
+- KUI XML is the single authored Skin syntax; Screen and reusable-component
+  documents remain programmatic, and migrations stay outside the format.
+- `@kurot/ui-runtime@0.5.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent

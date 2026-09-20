@@ -1,11 +1,5 @@
 import type { DisplayObject } from '@kurot/core';
-import type {
-	UIAssetContract,
-	UIComponentInstance,
-	UIDocument,
-	UINode,
-	UIPropertyValue,
-} from '@kurot/ui-document';
+import type { UIAssetContract, UIComponentInstance, UIDocument, UINode, UIPropertyValue } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { assetPath } from './assetPath.js';
 import { activateRuntimeContract } from './dynamics/activateRuntimeContract.js';
@@ -38,14 +32,7 @@ export function materializeComponentInstance(
 	applyVariant(specification, source.contract, identity, path, context);
 	applyParameters(specification, source.contract, identity, path, context);
 	applyOverrides(specification, source.contract, identity, path, context);
-	projectSlots(
-		specification,
-		source,
-		identity,
-		parentScope,
-		path,
-		context,
-	);
+	projectSlots(specification, source, identity, parentScope, path, context);
 	applyNodeProperties(root, node, path, context);
 	if (node.appearance) {
 		applyAppearance(root, node, identity, path, context);
@@ -213,11 +200,7 @@ function requireInstance(node: UINode, path: string): UIComponentInstance {
 	if (node.instance) {
 		return node.instance;
 	}
-	throw new KurotUIRuntimeError(
-		'invalid-document',
-		'Expected reusable component instance.',
-		`${path}.instance`,
-	);
+	throw new KurotUIRuntimeError('invalid-document', 'Expected reusable component instance.', `${path}.instance`);
 }
 
 function findNode(root: UINode, id: string): UINode | undefined {

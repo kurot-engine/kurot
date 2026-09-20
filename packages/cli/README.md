@@ -3,11 +3,11 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 2.0.0.** Node.js 20 or later is required.
+> **Current release: 2.0.1.** Node.js 20 or later is required.
 
-> **Release scope:** 2.0.0 is currently dedicated to Kurot Editor integration.
+> **Release scope:** The 2.0.x line is currently dedicated to Kurot Editor integration.
 > Existing game projects that use EXML, including CrashMaster, should remain on
-> `@kurot/cli@1.3.x`. Version 2.0.0 is not an in-place project upgrade and does
+> `@kurot/cli@1.3.x`. Version 2.0.x is not an in-place project upgrade and does
 > not require those projects to change their configuration or UI assets.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
@@ -114,21 +114,23 @@ The HTML template must contain these placeholders:
 
 ## KUI XML compilation
 
-KUI XML is the only authored UI format. A skin declares its runtime target and
-whether it is the default skin directly on the document root:
+KUI XML is the authored Skin format. A Skin root declares its generated class
+name and, when needed, its state names:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1"
-      id="skins.ButtonSkin"
-      version="2"
-      target="kui.Button"
-      default="true">
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled">
     <Group id="root" minWidth="100" minHeight="50">
+        <Rect fillColor="#315A9D" fillColor.down="#244474" alpha.disabled="0.5" />
         <Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
     </Group>
 </Skin>
 ```
+
+Only nodes exposed as runtime skin parts need an `id`. State-specific values
+use `property.state` on the affected node, so internal graphics remain unnamed.
+Image sources use their resource key directly, for example
+`source="button_up_png"`.
 
 The pipeline is:
 
@@ -136,14 +138,16 @@ The pipeline is:
 .kui.xml → UIDocument → SkinIR → ESM skin factory → theme bundle
 ```
 
-Default skin mappings are derived from `target` and `default`; the build writes
-`default.thm.json` with the mappings and the generated `skinsJs` module path.
-Duplicate defaults are errors. Unknown tags are warnings in normal development
-and errors under strict or release builds.
+The build derives default skin mappings from built-in component conventions and
+configured project component pairs. The build writes `default.thm.json` with
+those mappings and the generated `skinsJs` module path. Duplicate conventional
+mappings are errors. Unknown tags are warnings in normal development and errors
+under strict or release builds.
 
-Successful compilation also writes `.kurot/skin-parts.d.ts`. It augments the UI
-runtime with the exact named parts and types declared by each skin. This file is
-editor-only, ignored by git, and never enters browser bundles.
+Successful compilation also writes `.kurot/skin-parts.d.ts`. Every identified
+node below the visual root is inferred as a skin part; its `id` is the part
+name. The declaration augments the UI runtime with those exact names and types.
+This file is editor-only, ignored by git, and never enters browser bundles.
 
 ## Reusable components
 

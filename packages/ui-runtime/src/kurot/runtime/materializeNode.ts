@@ -7,10 +7,7 @@ import { materializeComponentInstance } from './materializeComponentInstance.js'
 import { getBuiltInFactory } from './builtins/componentFactories.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { qualifyNodeId } from './node-identity.js';
-import type {
-	KurotUIComponentAdapter,
-	KurotUICreationContext,
-} from './types.js';
+import type { KurotUIComponentAdapter, KurotUICreationContext } from './types.js';
 
 /**
  * Materializes one semantic node, including nested reusable instances.
@@ -41,11 +38,7 @@ export function materializeNode(
 	return instance;
 }
 
-function createInstance(
-	node: UINode,
-	path: string,
-	adapter?: KurotUIComponentAdapter,
-): DisplayObject {
+function createInstance(node: UINode, path: string, adapter?: KurotUIComponentAdapter): DisplayObject {
 	const factory = adapter?.create ?? getBuiltInFactory(node.type);
 	if (!factory) {
 		throw new KurotUIRuntimeError(

@@ -6,11 +6,7 @@ import type { KurotUICreationContext } from '../types.js';
 /**
  * Connects one asset's bounded action declarations to runtime events.
  */
-export function registerSemanticActions(
-	asset: UIDocument,
-	scope: string,
-	context: KurotUICreationContext,
-): void {
+export function registerSemanticActions(asset: UIDocument, scope: string, context: KurotUICreationContext): void {
 	const onAction = context.onAction;
 	if (onAction === undefined) {
 		return;

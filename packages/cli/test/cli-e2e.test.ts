@@ -13,7 +13,7 @@ import {
 } from './cli-process-helpers.js';
 
 const projects: string[] = [];
-const validSkin = '<Skin xmlns="https://kurot.dev/ui/1" id="skins.TestSkin" version="2" target="kui.Button" default="true"><Group id="root"><Button id="button" /></Group></Skin>';
+const validSkin = '<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin"><Group id="root"><Button id="button" /></Group></Skin>';
 const unknownSkin = validSkin.replace('<Button id="button" />', '<Buton id="button" />');
 const malformedSkin = validSkin.replace('</Group>', '</Button>');
 

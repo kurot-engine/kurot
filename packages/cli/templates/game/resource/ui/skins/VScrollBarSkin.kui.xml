@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" id="skins.VScrollBarSkin" version="2" target="kui.VScrollBar" default="true">
-    <contract>
-        <parts>
-            <part name="thumb" node="thumb" />
-        </parts>
-    </contract>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.VScrollBarSkin">
     <Group id="root" minHeight="20" minWidth="8">
-        <Image id="thumb" height="30" horizontalCenter="0" scale9Grid="3,3,2,2" source="@resource:image:roundthumb_png" width="8" />
+        <Image id="thumb" height="30" horizontalCenter="0" scale9Grid="3,3,2,2" source="roundthumb_png" width="8" />
     </Group>
 </Skin>

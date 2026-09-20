@@ -38,12 +38,7 @@ export interface KurotUIComponentAdapter {
 	 * The value may be a non-serializable object returned by a resource adapter.
 	 * Return true when the property was consumed.
 	 */
-	readonly applyProperty?: (
-		instance: DisplayObject,
-		name: string,
-		value: unknown,
-		path: string,
-	) => boolean;
+	readonly applyProperty?: (instance: DisplayObject, name: string, value: unknown, path: string) => boolean;
 
 	/**
 	 * Captures a candidate adapter-owned property before a transactional update
@@ -52,11 +47,7 @@ export interface KurotUIComponentAdapter {
 	 * discarded when applyProperty returns false. Used by both data bindings and
 	 * reusable component states. Must be provided together with restoreProperty.
 	 */
-	readonly captureProperty?: (
-		instance: DisplayObject,
-		name: string,
-		path: string,
-	) => unknown;
+	readonly captureProperty?: (instance: DisplayObject, name: string, path: string) => unknown;
 
 	/**
 	 * Restores a value previously captured by captureProperty, either when a
@@ -64,31 +55,19 @@ export interface KurotUIComponentAdapter {
 	 * component state is cleared or replaced. Must be provided together with
 	 * captureProperty.
 	 */
-	readonly restoreProperty?: (
-		instance: DisplayObject,
-		name: string,
-		value: unknown,
-		path: string,
-	) => void;
+	readonly restoreProperty?: (instance: DisplayObject, name: string, value: unknown, path: string) => void;
 
 	/**
 	 * Attaches one materialized child to a project-defined container.
 	 */
-	readonly appendChild?: (
-		parent: DisplayObject,
-		child: DisplayObject,
-		path: string,
-	) => void;
+	readonly appendChild?: (parent: DisplayObject, child: DisplayObject, path: string) => void;
 }
 
 /**
  * Resolves one semantic resource reference to a runtime property value, which
  * may be a non-serializable engine or project object.
  */
-export type KurotUIResourceResolver = (
-	reference: UIResourceReference,
-	definition: UIResourceDefinition,
-) => unknown;
+export type KurotUIResourceResolver = (reference: UIResourceReference, definition: UIResourceDefinition) => unknown;
 
 /**
  * Resolves one registered resource category into a runtime property value.
@@ -98,9 +77,7 @@ export type KurotUIResourceAdapter = KurotUIResourceResolver;
 /**
  * Complete category dispatch used by runtime resource resolution.
  */
-export type KurotUIResourceAdapters = Readonly<
-	Record<UIResourceType, KurotUIResourceAdapter>
->;
+export type KurotUIResourceAdapters = Readonly<Record<UIResourceType, KurotUIResourceAdapter>>;
 
 /**
  * Dynamic state boundary for one expanded reusable component instance.

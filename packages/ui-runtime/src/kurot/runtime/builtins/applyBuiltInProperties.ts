@@ -26,12 +26,7 @@ import { applyUIComponentProperty } from './applyUIComponentProperties.js';
 /**
  * Routes one property to the matching built-in component layer.
  */
-export function applyBuiltInProperty(
-	target: DisplayObject,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyBuiltInProperty(target: DisplayObject, name: string, value: unknown, path: string): boolean {
 	if (applyDisplayObjectProperty(target, name, value, path)) return true;
 	if (isUIComponent(target)) {
 		if (applyUIComponentProperty(target, name, value, path)) return true;

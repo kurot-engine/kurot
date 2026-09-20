@@ -3,10 +3,7 @@ import type { UIPropertyValue } from '@kurot/ui-document';
 import { applyBuiltInProperty } from './builtins/applyBuiltInProperties.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
-import type {
-	KurotUIComponentAdapter,
-	KurotUICreationContext,
-} from './types.js';
+import type { KurotUIComponentAdapter, KurotUICreationContext } from './types.js';
 
 /**
  * One property assignment to apply transactionally.
@@ -102,9 +99,7 @@ export function applyPropertyUpdates(
  * layer. Throws the first restore failure after attempting every remaining
  * restore.
  */
-export function restorePropertyBackups(
-	backups: readonly RuntimePropertyBackup[],
-): void {
+export function restorePropertyBackups(backups: readonly RuntimePropertyBackup[]): void {
 	let failure: unknown;
 	for (let index = backups.length - 1; index >= 0; index--) {
 		const backup = backups[index];
@@ -113,12 +108,7 @@ export function restorePropertyBackups(
 		}
 		try {
 			if (backup.adapter?.restoreProperty !== undefined) {
-				backup.adapter.restoreProperty(
-					backup.target,
-					backup.property,
-					backup.value,
-					backup.path,
-				);
+				backup.adapter.restoreProperty(backup.target, backup.property, backup.value, backup.path);
 			} else {
 				Reflect.set(backup.target, backup.property, backup.value);
 			}
@@ -180,9 +170,10 @@ function captureAndApply(
 			path: update.path,
 			property: update.property,
 			target: update.target,
-			value: adapter.captureProperty !== undefined
-				? adapter.captureProperty(update.target, update.property, update.path)
-				: Reflect.get(update.target, update.property),
+			value:
+				adapter.captureProperty !== undefined
+					? adapter.captureProperty(update.target, update.property, update.path)
+					: Reflect.get(update.target, update.property),
 		};
 		byProperty.set(update.property, owned);
 		backups.push(owned);
@@ -205,12 +196,7 @@ function applyThroughOwner(
 ): void {
 	const resolved = resolvePropertyValue(update.value, update.path, context);
 	if (backup.adapter?.applyProperty !== undefined) {
-		if (!backup.adapter.applyProperty(
-			update.target,
-			update.property,
-			resolved,
-			update.path,
-		)) {
+		if (!backup.adapter.applyProperty(update.target, update.property, resolved, update.path)) {
 			throw unsupportedProperty(update);
 		}
 	} else if (!applyBuiltInProperty(update.target, update.property, resolved, update.path)) {

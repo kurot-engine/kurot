@@ -14,12 +14,7 @@ export class TransitionSetProperty implements IOverride {
 	private _oldValue: unknown;
 	private _applied = false;
 
-	public constructor(
-		target: string,
-		name: string,
-		value: unknown,
-		transition: UIPropertyTransition,
-	) {
+	public constructor(target: string, name: string, value: unknown, transition: UIPropertyTransition) {
 		this._target = target;
 		this._name = name;
 		this._value = value;
@@ -63,9 +58,8 @@ export class TransitionSetProperty implements IOverride {
 		}
 		const animation = new Animation((): void => {
 			const elapsed = animation.currentValue * total;
-			const fraction = duration === 0
-				? elapsed >= delay ? 1 : 0
-				: Math.max(0, Math.min(1, (elapsed - delay) / duration));
+			const fraction =
+				duration === 0 ? (elapsed >= delay ? 1 : 0) : Math.max(0, Math.min(1, (elapsed - delay) / duration));
 			const eased = ease(fraction, this._transition.easing ?? 'linear');
 			Reflect.set(target, this._name, from + (to - from) * eased);
 		}, this);
@@ -91,17 +85,12 @@ export class TransitionSetProperty implements IOverride {
 	}
 }
 
-function ease(
-	value: number,
-	type: NonNullable<UIPropertyTransition['easing']>,
-): number {
+function ease(value: number, type: NonNullable<UIPropertyTransition['easing']>): number {
 	switch (type) {
 		case 'ease-in':
 			return value * value;
 		case 'ease-in-out':
-			return value < 0.5
-				? 2 * value * value
-				: 1 - Math.pow(-2 * value + 2, 2) / 2;
+			return value < 0.5 ? 2 * value * value : 1 - Math.pow(-2 * value + 2, 2) / 2;
 		case 'ease-out':
 			return 1 - (1 - value) * (1 - value);
 		case 'linear':

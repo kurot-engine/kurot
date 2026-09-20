@@ -19,10 +19,7 @@ import type {
 /**
  * Validates and materializes a semantic UI document into Kurot display objects.
  */
-export function createKurotUI(
-	document: UIDocument,
-	options: CreateKurotUIOptions = {},
-): KurotUICreationResult {
+export function createKurotUI(document: UIDocument, options: CreateKurotUIOptions = {}): KurotUICreationResult {
 	const documentDiagnostics = validateUIDocument(document);
 	if (documentDiagnostics.length > 0) {
 		throw new KurotUIRuntimeError(
@@ -62,11 +59,7 @@ export function createKurotUI(
 	activateRuntimeContract(document, '', context, options.data);
 	const data = context.dataControllers.get('');
 	if (data === undefined) {
-		throw new KurotUIRuntimeError(
-			'invalid-document',
-			'Root UI data controller was not created.',
-			'$',
-		);
+		throw new KurotUIRuntimeError('invalid-document', 'Root UI data controller was not created.', '$');
 	}
 	let disposed = false;
 	return Object.freeze({
@@ -87,9 +80,7 @@ export function createKurotUI(
 	});
 }
 
-function validateComponentAdapters(
-	adapters: Readonly<Record<string, KurotUIComponentAdapter>>,
-): void {
+function validateComponentAdapters(adapters: Readonly<Record<string, KurotUIComponentAdapter>>): void {
 	for (const [type, adapter] of Object.entries(adapters)) {
 		const hasCapture = adapter.captureProperty !== undefined;
 		const hasRestore = adapter.restoreProperty !== undefined;
@@ -113,10 +104,7 @@ function createResourceResolver(
 	};
 }
 
-function createRuntimeAssetRegistry(
-	document: UIDocument,
-	source?: UIAssetRegistry,
-): UIAssetRegistry {
+function createRuntimeAssetRegistry(document: UIDocument, source?: UIAssetRegistry): UIAssetRegistry {
 	const registry = new UIAssetRegistry();
 	for (const asset of source?.listAssets() ?? []) {
 		if (asset.id !== document.id) {

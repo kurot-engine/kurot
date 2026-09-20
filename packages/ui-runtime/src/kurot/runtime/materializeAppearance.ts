@@ -30,12 +30,7 @@ export function applyAppearance(
 	}
 	const appearance = requireAppearance(node.appearance.assetId, path, context);
 	const scope = `${hostIdentity}@appearance:${appearance.id}`;
-	const root = materializeNode(
-		appearance.root,
-		assetPath(appearance.id, '.root'),
-		scope,
-		context,
-	);
+	const root = materializeNode(appearance.root, assetPath(appearance.id, '.root'), scope, context);
 	applyAppearanceVariant(node.appearance.variant, appearance, scope, context);
 	const skin = new Skin();
 	skin.elementsContent = [root];
@@ -72,12 +67,7 @@ function applyAppearanceVariant(
 	}
 }
 
-function exposeAppearanceNodes(
-	skin: Skin,
-	node: UINode,
-	scope: string,
-	context: KurotUICreationContext,
-): void {
+function exposeAppearanceNodes(skin: Skin, node: UINode, scope: string, context: KurotUICreationContext): void {
 	const target = context.instances.get(qualifyNodeId(scope, node.id));
 	if (target) {
 		skin.setPart(node.id, target);
@@ -87,12 +77,7 @@ function exposeAppearanceNodes(
 	}
 }
 
-function exposeParts(
-	skin: Skin,
-	appearance: UIDocument,
-	scope: string,
-	context: KurotUICreationContext,
-): void {
+function exposeParts(skin: Skin, appearance: UIDocument, scope: string, context: KurotUICreationContext): void {
 	const names = Object.keys(appearance.contract.parts).sort();
 	for (const name of names) {
 		const part = appearance.contract.parts[name];
@@ -104,10 +89,7 @@ function exposeParts(
 	skin.skinParts = names;
 }
 
-function createStates(
-	appearance: UIDocument,
-	context: KurotUICreationContext,
-): State[] {
+function createStates(appearance: UIDocument, context: KurotUICreationContext): State[] {
 	const basePath = assetPath(appearance.id);
 	return Object.keys(appearance.contract.states)
 		.sort()
@@ -120,28 +102,15 @@ function createStates(
 					context,
 				);
 				if (override.transition !== undefined) {
-					return new TransitionSetProperty(
-						override.targetId,
-						override.property,
-						value,
-						override.transition,
-					);
+					return new TransitionSetProperty(override.targetId, override.property, value, override.transition);
 				}
-				return new SetProperty(
-					override.targetId,
-					override.property,
-					value,
-				);
+				return new SetProperty(override.targetId, override.property, value);
 			});
 			return new State(name, overrides);
 		});
 }
 
-function requireAppearance(
-	id: string,
-	path: string,
-	context: KurotUICreationContext,
-): UIDocument {
+function requireAppearance(id: string, path: string, context: KurotUICreationContext): UIDocument {
 	const appearance = context.assets.getAsset(id);
 	if (!appearance || appearance.assetKind !== 'appearance') {
 		throw new KurotUIRuntimeError(

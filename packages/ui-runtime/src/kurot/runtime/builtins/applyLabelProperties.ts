@@ -4,12 +4,7 @@ import { requireBoolean, requireNumber, requireString } from './valueGuards.js';
 /**
  * Applies one property owned by Label and inherited by its subclasses.
  */
-export function applyLabelProperty(
-	target: Label,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyLabelProperty(target: Label, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'bold':
 			target.bold = requireBoolean(value, path);

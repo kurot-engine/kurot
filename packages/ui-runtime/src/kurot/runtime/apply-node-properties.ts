@@ -13,13 +13,6 @@ export function applyNodeProperties(
 	context: KurotUICreationContext,
 ): void {
 	for (const name of Object.keys(node.properties).sort()) {
-		applyRuntimeProperty(
-			target,
-			node.type,
-			name,
-			node.properties[name],
-			`${path}.properties.${name}`,
-			context,
-		);
+		applyRuntimeProperty(target, node.type, name, node.properties[name], `${path}.properties.${name}`, context);
 	}
 }

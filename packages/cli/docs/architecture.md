@@ -39,9 +39,11 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-The authored `Skin` root supplies `target` and `default`. The compiler derives
-the generated theme map from those attributes and rejects duplicate defaults.
-The generated theme JSON is an output artifact, never an authored source.
+The authored `Skin` root supplies its generated `class` and optional state
+names. State values live on their target nodes as `property.state`. The compiler
+derives the theme map from built-in naming conventions and configured project
+component pairs, and rejects duplicate conventional mappings. The generated
+theme JSON is an output artifact, never an authored source.
 
 ## Output ownership
 

@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@2.0.0`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@2.0.1`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -32,33 +32,34 @@ Project templates are under `templates/game` and `templates/empty`.
 assets are adapted by `kui/kui-parser.ts` to the compiler-private `SkinIR`,
 then `skin-module-builder.ts` bundles generated factories.
 
-A Skin document root declares:
-
-- `id`: generated skin registration name;
-- `target`: runtime component type such as `kui.Button`;
-- `default="true"`: include this skin in the generated default theme map.
+A Skin document root declares `class`, the generated skin registration name,
+and may declare `states`. Overrides use local `property.state` attributes.
+Storage IDs and runtime mapping metadata are not authored XML fields.
 
 The theme JSON at `resource/default.thm.json` is fixed generated output. It is
-derived from the Skin contracts and contains `skins` plus `skinsJs`; it is
-never read as an authored input. Duplicate default skins for one target are
-errors.
+derived from built-in naming conventions and configured project component
+pairs, and contains `skins` plus `skinsJs`; it is never read as an authored
+input. Duplicate conventional mappings are errors.
 
 `SkinIR` is intentionally smaller than `UIDocument`. It contains resolved
 runtime classes, assignments, visual children, layout descriptor children,
 and state `SetProperty` overrides. Reuse, data contracts, actions, and editor
 transactions stay in `@kurot/ui-document` and `@kurot/ui-runtime`.
 
-Successful compilation writes `.kurot/skin-parts.d.ts` from the same IR. It
-augments `SkinPartsMap` and narrows matching exported component classes. The
-file is development metadata and is excluded from runtime output.
+Successful compilation writes `.kurot/skin-parts.d.ts` from the same IR. Every
+explicitly identified node below the visual root is a skin part, with its `id`
+as the part name. Internal nodes can omit `id`; the declaration augments
+`SkinPartsMap` and narrows matching exported
+component classes. The file is development metadata and is excluded from
+runtime output.
 
 ## Reusable components
 
 With `ui.components`, `<Name>.ts` under `sourceDir` pairs with
 `<Name>Skin.kui.xml` at the same relative path under `skinDir`. The source must
-export `<Name>` and the Skin must target `<namespace>.<Name>`. Discovery creates
-the namespace entry and development component catalog. Component names must be
-unique inside the configured namespace.
+export `<Name>`; the paired Skin supplies its own `class`. Discovery creates the
+namespace entry, skin association, and development component catalog. Component
+names must be unique inside the configured namespace.
 
 Manual `ui.namespaces` entries remain available for project barrel files. A
 manual prefix cannot conflict with `ui.components.namespace`.

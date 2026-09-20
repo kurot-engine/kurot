@@ -84,7 +84,7 @@ describe('automatic component namespace compilation', () => {
 		await fs.writeFile(firstSource, 'export class BetButton {}\n');
 		await fs.writeFile(
 			path.join(skinDir, 'BetButtonSkin.kui.xml'),
-			componentSkin('components.BetButtonSkin', 'game.BetButton'),
+			componentSkin('components.BetButtonSkin'),
 		);
 		const project = createProject(root, path.join(root, 'bin-debug'), createComponent(root, firstSource));
 		const ctx = createContext(project, { watch: true });
@@ -94,7 +94,7 @@ describe('automatic component namespace compilation', () => {
 			await fs.writeFile(path.join(sourceDir, 'HistoryItem.ts'), 'export class HistoryItem {}\n');
 			await fs.writeFile(
 				path.join(skinDir, 'HistoryItemSkin.kui.xml'),
-				componentSkin('components.HistoryItemSkin', 'game.HistoryItem'),
+				componentSkin('components.HistoryItemSkin'),
 			);
 
 			await refreshProjectComponents(project);
@@ -112,8 +112,8 @@ describe('automatic component namespace compilation', () => {
 	});
 });
 
-function componentSkin(id: string, target: string): string {
-	return `<Skin xmlns="https://kurot.dev/ui/1" id="${id}" version="2" target="${target}"><Group id="root" /></Skin>`;
+function componentSkin(id: string): string {
+	return `<Skin xmlns="https://kurot.dev/ui/1" class="${id}"><Group id="root" /></Skin>`;
 }
 
 function createComponent(root: string, source: string): ProjectComponent {

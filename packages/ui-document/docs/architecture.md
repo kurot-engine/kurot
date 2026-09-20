@@ -89,20 +89,14 @@ Constructors make valid shapes concise but do not replace validation. Local
 validation owns exact shapes, serializable values, stable IDs, and references;
 project validation owns cross-asset resolution.
 
-Format version 1 is rejected. There is no compatibility layer because the 0.1
-model was an initial proof rather than a production authoring format.
-
 ## Deterministic serialization
 
 `serializeUIDocument` validates before writing. It preserves semantic array
 order and normalizes document, contract, node, instance, reference, property
-definition, and recursive property-object keys. Golden fixtures pin the output
-for a component definition, an appearance, and a screen containing two compact
-instances.
-
-KUI XML is the canonical transport and authored source syntax. Screens,
-components, and skins use the same `.kui.xml` grammar and translate losslessly
-to the runtime-independent semantic model. See [KUI XML format](./kui-xml.md).
+definition, and recursive property-object keys. KUI XML is the authored Skin
+syntax and is intentionally limited to appearance documents. Screen and
+reusable-component documents stay in the programmatic semantic model instead
+of sharing the Skin compiler pipeline. See [KUI Skin XML format](./kui-xml.md).
 
 ## Component schema
 
@@ -139,7 +133,7 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.4.x` consumes format version 2 and passes the shared
+`@kurot/ui-runtime@0.5.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, executes bounded data bindings and semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected

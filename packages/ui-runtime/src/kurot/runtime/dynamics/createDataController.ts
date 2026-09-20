@@ -42,9 +42,7 @@ export function createDataController(
 
 	for (const name of fields) {
 		const definition = definitions[name]!;
-		const value = Object.hasOwn(initialValues, name)
-			? initialValues[name]
-			: definition.defaultValue;
+		const value = Object.hasOwn(initialValues, name) ? initialValues[name] : definition.defaultValue;
 		if (value !== undefined) {
 			controller.setValue(name, value);
 		}
@@ -94,11 +92,7 @@ function assertValidInitialValues(
 			throw invalidData(`Initial data field "${name}" is not declared.`, assetId, name);
 		}
 		if (!matchesUIPropertyDefinition(value, definition)) {
-			throw invalidData(
-				`Initial data field "${name}" does not satisfy its Schema.`,
-				assetId,
-				name,
-			);
+			throw invalidData(`Initial data field "${name}" does not satisfy its Schema.`, assetId, name);
 		}
 	}
 }
@@ -109,26 +103,14 @@ function assertRequiredInitialValues(
 	assetId: string,
 ): void {
 	for (const [name, definition] of Object.entries(definitions ?? {})) {
-		if (
-			definition.required !== true ||
-			definition.defaultValue !== undefined ||
-			Object.hasOwn(values, name)
-		) {
+		if (definition.required !== true || definition.defaultValue !== undefined || Object.hasOwn(values, name)) {
 			continue;
 		}
-		throw invalidData(
-			`Required data field "${name}" has no initial or default value.`,
-			assetId,
-			name,
-		);
+		throw invalidData(`Required data field "${name}" has no initial or default value.`, assetId, name);
 	}
 }
 
-function invalidData(
-	message: string,
-	assetId: string,
-	name: string,
-): KurotUIRuntimeError {
+function invalidData(message: string, assetId: string, name: string): KurotUIRuntimeError {
 	return new KurotUIRuntimeError(
 		'invalid-data',
 		message,

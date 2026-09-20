@@ -14,11 +14,6 @@ import type {
  */
 export interface CreateUIAssetContractOptions {
 	/**
-	 * Whether this appearance is the project's default for its target type.
-	 */
-	readonly isDefault?: boolean;
-
-	/**
 	 * Typed external data accepted by this asset.
 	 */
 	readonly dataFields?: UIAssetContract['dataFields'];
@@ -76,7 +71,6 @@ export function createUIAssetContract(
 	options: CreateUIAssetContractOptions = {},
 ): UIAssetContract {
 	return {
-		...(options.isDefault === undefined ? {} : { isDefault: options.isDefault }),
 		...(options.componentType === undefined
 			? {}
 			: { componentType: options.componentType }),

@@ -33,12 +33,14 @@ describe('appearance transitions', () => {
 				targetType: 'kui.Button',
 				states: {
 					down: {
-						overrides: [{
-							targetId: 'background',
-							property: 'alpha',
-							value: 0.6,
-							transition: { duration: 30, easing: 'linear' },
-						}],
+						overrides: [
+							{
+								targetId: 'background',
+								property: 'alpha',
+								value: 0.6,
+								transition: { duration: 30, easing: 'linear' },
+							},
+						],
 					},
 				},
 			}),
@@ -85,10 +87,7 @@ describe('appearance transitions', () => {
 	});
 });
 
-function requireInstance<T>(
-	value: unknown,
-	type: abstract new (...args: never[]) => T,
-): T {
+function requireInstance<T>(value: unknown, type: abstract new (...args: never[]) => T): T {
 	if (value instanceof type) {
 		return value;
 	}

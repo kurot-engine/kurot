@@ -92,7 +92,6 @@ class CodeGenerator {
 			const uiImports = moduleImports.get('@kurot/ui')!;
 			uiImports.add('State');
 			uiImports.add('SetProperty');
-			uiImports.add('SetProperty');
 		}
 
 		for (const [modulePath, classes] of moduleImports) {
@@ -167,7 +166,7 @@ class CodeGenerator {
 	private emitNodeCreation(node: SkinNode): void {
 		this.line(`const ${node.varName} = new ${node.className}();`);
 		if (node.id) {
-			this.line(`skin.${node.id} = ${node.varName};`);
+			this.line(`skin[${JSON.stringify(node.id)}] = ${node.varName};`);
 		}
 	}
 

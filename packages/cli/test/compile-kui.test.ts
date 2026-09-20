@@ -18,9 +18,10 @@ afterEach(async () => {
 });
 
 describe('compile KUI', () => {
-	it('builds skin factories and generates default theme mappings from Skin metadata', async () => {
+	it('builds skin factories and generates default theme mappings from internal conventions', async () => {
 		const { context, outputDirectory, root } = await createFixture([
-			skin('skins.ButtonSkin', 'kui.Button', true),
+			skin('skins.ButtonSkin'),
+			skin('skins.ToggleButtonSkin'),
 		]);
 
 		await compileKUI().apply(context);
@@ -32,7 +33,10 @@ describe('compile KUI', () => {
 			await fs.readFile(path.join(outputDirectory, 'resource/default.thm.json'), 'utf8'),
 		) as { skins: Record<string, string>; skinsJs: string };
 		expect(theme).toEqual({
-			skins: { Button: 'skins.ButtonSkin' },
+			skins: {
+				Button: 'skins.ButtonSkin',
+				ToggleButton: 'skins.ToggleButtonSkin',
+			},
 			skinsJs: '../js/default.thm.js',
 		});
 		const declaration = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf8');
@@ -40,10 +44,10 @@ describe('compile KUI', () => {
 		expect(declaration).toContain('readonly "labelDisplay"');
 	});
 
-	it('reports duplicate default skins for one target', async () => {
+	it('reports duplicate conventional default skins for one component', async () => {
 		const { context } = await createFixture([
-			skin('skins.ButtonSkin', 'kui.Button', true),
-			skin('skins.AlternateButtonSkin', 'kui.Button', true),
+			skin('skins.ButtonSkin'),
+			skin('alternate.ButtonSkin'),
 		]);
 
 		await expect(compileKUI().apply(context)).rejects.toThrow('KUI input validation failed.');
@@ -58,7 +62,7 @@ describe('compile KUI', () => {
 	});
 
 	it('does not emit a theme when no Skin documents exist', async () => {
-		const { context, outputDirectory } = await createFixture([screen()]);
+		const { context, outputDirectory } = await createFixture([]);
 
 		await compileKUI().apply(context);
 
@@ -106,17 +110,10 @@ async function createFixture(sources: readonly string[]): Promise<{
 	return { context: createContext(project, {}), outputDirectory, root };
 }
 
-function skin(id: string, target: string, isDefault: boolean): string {
+function skin(className: string): string {
 	return `<?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" id="${id}" version="2" target="${target}" default="${isDefault}">
-	<contract><parts><part name="labelDisplay" node="labelDisplay" /></parts></contract>
+<Skin xmlns="https://kurot.dev/ui/1" class="${className}">
 	<Group id="root"><Label id="labelDisplay" text="Play" /></Group>
 </Skin>
-`;
-}
-
-function screen(): string {
-	return `<?xml version="1.0" encoding="utf-8"?>
-<Screen xmlns="https://kurot.dev/ui/1" id="main" version="2"><Group id="root" /></Screen>
 `;
 }

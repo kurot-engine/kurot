@@ -4,11 +4,7 @@ import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
  * Builds the shared failure for one runtime property value of the wrong type.
  */
 export function invalidRuntimeValue(type: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property must be ${type}.`,
-		path,
-	);
+	return new KurotUIRuntimeError('invalid-property', `Runtime property must be ${type}.`, path);
 }
 
 /**

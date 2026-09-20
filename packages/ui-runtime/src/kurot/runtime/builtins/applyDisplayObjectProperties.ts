@@ -4,12 +4,7 @@ import { requireBoolean, requireNumber, requireString } from './valueGuards.js';
 /**
  * Applies one property declared by kurot.DisplayObject.
  */
-export function applyDisplayObjectProperty(
-	target: DisplayObject,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyDisplayObjectProperty(target: DisplayObject, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'alpha':
 			target.alpha = requireNumber(value, path);

@@ -4,12 +4,7 @@ import { requireNumber } from './valueGuards.js';
 /**
  * Applies one property declared directly by Rect.
  */
-export function applyRectProperty(
-	target: Rect,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyRectProperty(target: Rect, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'ellipseHeight':
 			target.ellipseHeight = requireNumber(value, path);

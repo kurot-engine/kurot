@@ -1,7 +1,4 @@
-import {
-	UI_DESIGN_TOKEN_TYPES,
-	UI_RESOURCE_TYPES,
-} from '../model/UIReference.js';
+import { UI_DESIGN_TOKEN_TYPES, UI_RESOURCE_TYPES } from '../model/UIReference.js';
 import type { UIDiagnostic, UIDiagnosticCode } from './UIDiagnostic.js';
 
 const RESOURCE_TYPES = new Set<string>(UI_RESOURCE_TYPES);
@@ -82,12 +79,7 @@ export function validateNodeIdReference(
 		return;
 	}
 	if (!nodeIds.has(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'unknown-node-reference',
-			path,
-			`Node "${value}" does not exist in this asset.`,
-		);
+		addUIDiagnostic(diagnostics, 'unknown-node-reference', path, `Node "${value}" does not exist in this asset.`);
 	}
 }
 
@@ -103,12 +95,7 @@ export function validatePropertyValue(
 	if (typeof value === 'string' || typeof value === 'boolean') return;
 	if (typeof value === 'number') {
 		if (!Number.isFinite(value)) {
-			addUIDiagnostic(
-				diagnostics,
-				'invalid-property-value',
-				path,
-				'Numeric property values must be finite.',
-			);
+			addUIDiagnostic(diagnostics, 'invalid-property-value', path, 'Numeric property values must be finite.');
 		}
 		return;
 	}
@@ -155,46 +142,19 @@ export function validatePropertyValue(
 /**
  * Validates a stable reference to another editable UI asset.
  */
-export function validateAssetReference(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
-	validateAssetReferenceShape(
-		value,
-		path,
-		diagnostics,
-		ASSET_REFERENCE_KEYS,
-		'Asset reference',
-	);
+export function validateAssetReference(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
+	validateAssetReferenceShape(value, path, diagnostics, ASSET_REFERENCE_KEYS, 'Asset reference');
 }
 
 /**
  * Validates an appearance asset reference and its optional variant selection.
  */
-export function validateAppearanceReference(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
-	if (
-		!validateAssetReferenceShape(
-			value,
-			path,
-			diagnostics,
-			APPEARANCE_REFERENCE_KEYS,
-			'Appearance reference',
-		)
-	) {
+export function validateAppearanceReference(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
+	if (!validateAssetReferenceShape(value, path, diagnostics, APPEARANCE_REFERENCE_KEYS, 'Appearance reference')) {
 		return;
 	}
 	if (value.variant !== undefined) {
-		validateNonEmptyString(
-			value.variant,
-			`${path}.variant`,
-			'Appearance variant',
-			diagnostics,
-		);
+		validateNonEmptyString(value.variant, `${path}.variant`, 'Appearance variant', diagnostics);
 	}
 }
 
@@ -206,32 +166,18 @@ function validateAssetReferenceShape(
 	label: string,
 ): value is Record<string, unknown> {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-reference',
-			path,
-			`${label} must be an object.`,
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-reference', path, `${label} must be an object.`);
 		return false;
 	}
 	validateKnownKeys(value, knownKeys, path, diagnostics);
 	if (value.kind !== 'asset') {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-reference',
-			`${path}.kind`,
-			`${label} kind must be "asset".`,
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-reference', `${path}.kind`, `${label} kind must be "asset".`);
 	}
 	validateNonEmptyString(value.assetId, `${path}.assetId`, 'Asset id', diagnostics);
 	return true;
 }
 
-function validateTaggedReference(
-	value: Record<string, unknown>,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateTaggedReference(value: Record<string, unknown>, path: string, diagnostics: UIDiagnostic[]): void {
 	if (value.kind === 'resource') {
 		validateKnownKeys(value, RESOURCE_REFERENCE_KEYS, path, diagnostics);
 		validateNonEmptyString(value.key, `${path}.key`, 'Resource key', diagnostics);

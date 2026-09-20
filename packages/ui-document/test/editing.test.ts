@@ -1,7 +1,3 @@
-/// <reference types="node" />
-
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
 	applyUIOperation,
@@ -10,17 +6,14 @@ import {
 	createUINode,
 	diffUIDocuments,
 	findUINode,
-	parseUIDocument,
 	UIDocumentHistory,
 	UIEditError,
 } from '../src/index.js';
-
-const ACTION_CARD = readFixture('action-card.component.kui.xml');
-const LOBBY_SCREEN = readFixture('lobby.screen.kui.xml');
+import { createActionCardDocument, createLobbyDocument } from './document-fixtures.js';
 
 describe('semantic UI operations', () => {
 	it('applies immutable property edits and exact inverse operations', () => {
-		const document = parseUIDocument(LOBBY_SCREEN);
+		const document = createLobbyDocument();
 		const result = applyUIOperation(document, {
 			kind: 'set-node-property',
 			nodeId: 'native-button',
@@ -36,7 +29,7 @@ describe('semantic UI operations', () => {
 	});
 
 	it('inserts and moves nodes through ordinary and Slot child collections', () => {
-		const document = parseUIDocument(LOBBY_SCREEN);
+		const document = createLobbyDocument();
 		const inserted = createUINode({ id: 'secondary-hint', type: 'kui.Label' });
 		const withHint = applyUIOperation(document, {
 			kind: 'insert-node',
@@ -62,14 +55,14 @@ describe('semantic UI operations', () => {
 	});
 
 	it('edits reusable instance values and contract entries', () => {
-		const screen = parseUIDocument(LOBBY_SCREEN);
+		const screen = createLobbyDocument();
 		const parameter = applyUIOperation(screen, {
 			kind: 'set-instance-parameter',
 			nodeId: 'settings-action',
 			parameter: 'label',
 			value: 'Options',
 		});
-		const component = parseUIDocument(ACTION_CARD);
+		const component = createActionCardDocument();
 		const state = applyUIOperation(component, {
 			kind: 'set-contract-state',
 			name: 'focused',
@@ -84,7 +77,7 @@ describe('semantic UI operations', () => {
 	});
 
 	it('preserves appearance variants through edits and inverse operations', () => {
-		const document = parseUIDocument(LOBBY_SCREEN);
+		const document = createLobbyDocument();
 		const result = applyUIOperation(document, {
 			kind: 'set-node-appearance',
 			nodeId: 'native-button',
@@ -103,7 +96,7 @@ describe('semantic UI operations', () => {
 
 describe('UI transactions and history', () => {
 	it('commits temporarily invalid edits atomically and produces an inverse', () => {
-		const document = parseUIDocument(ACTION_CARD);
+		const document = createActionCardDocument();
 		const result = applyUITransaction(
 			{ document, revision: 4 },
 			{
@@ -127,7 +120,7 @@ describe('UI transactions and history', () => {
 	});
 
 	it('rejects stale or partially failing transactions without changing input', () => {
-		const document = parseUIDocument(LOBBY_SCREEN);
+		const document = createLobbyDocument();
 		expect(() =>
 			applyUITransaction(
 				{ document, revision: 2 },
@@ -165,7 +158,7 @@ describe('UI transactions and history', () => {
 	});
 
 	it('supports monotonic undo and redo revisions', () => {
-		const document = parseUIDocument(LOBBY_SCREEN);
+		const document = createLobbyDocument();
 		const history = new UIDocumentHistory(document);
 		history.commit({
 			id: 'rename-help',
@@ -196,7 +189,7 @@ describe('UI transactions and history', () => {
 	});
 
 	it('produces deterministic semantic diffs', () => {
-		const before = parseUIDocument(LOBBY_SCREEN);
+		const before = createLobbyDocument();
 		const after = applyUIOperation(before, {
 			kind: 'set-node-property',
 			nodeId: 'native-button',
@@ -215,10 +208,3 @@ describe('UI transactions and history', () => {
 		]);
 	});
 });
-
-function readFixture(name: string): string {
-	return readFileSync(
-		fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url)),
-		'utf8',
-	);
-}

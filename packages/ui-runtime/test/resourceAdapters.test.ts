@@ -12,13 +12,7 @@ import type { UIResourceType } from '@kurot/ui-document';
 import { describe, expect, it } from 'vitest';
 import { createKurotUI } from '../src/index.js';
 
-const RESOURCE_TYPES: readonly UIResourceType[] = [
-	'animation',
-	'font',
-	'image',
-	'spine',
-	'sprite-frame',
-];
+const RESOURCE_TYPES: readonly UIResourceType[] = ['animation', 'font', 'image', 'spine', 'sprite-frame'];
 
 describe('resource adapters', () => {
 	it('dispatches every semantic resource category to its matching adapter', () => {
@@ -28,10 +22,7 @@ describe('resource adapters', () => {
 			extends: 'kui.Group',
 			children: 'none',
 			properties: Object.fromEntries(
-				RESOURCE_TYPES.map(type => [
-					type,
-					{ valueType: 'resource-reference', resourceTypes: [type] },
-				]),
+				RESOURCE_TYPES.map(type => [type, { valueType: 'resource-reference', resourceTypes: [type] }]),
 			),
 		});
 		const document = createUIDocument({
@@ -40,10 +31,7 @@ describe('resource adapters', () => {
 				id: 'probe',
 				type: 'test.ResourceProbe',
 				properties: Object.fromEntries(
-					RESOURCE_TYPES.map(type => [
-						type,
-						createUIResourceReference(type, `${type}.primary`),
-					]),
+					RESOURCE_TYPES.map(type => [type, createUIResourceReference(type, `${type}.primary`)]),
 				),
 			}),
 		});
@@ -83,9 +71,7 @@ describe('resource adapters', () => {
 
 		expect(calls).toEqual(RESOURCE_TYPES);
 		expect(Object.fromEntries(applied)).toEqual(
-			Object.fromEntries(
-				RESOURCE_TYPES.map(type => [type, `resolved:${type}.primary`]),
-			),
+			Object.fromEntries(RESOURCE_TYPES.map(type => [type, `resolved:${type}.primary`])),
 		);
 	});
 });

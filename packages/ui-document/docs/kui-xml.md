@@ -1,94 +1,86 @@
-# KUI XML format
+# KUI Skin XML format
 
-KUI XML is the single authored source format for Kurot UI screens, reusable
-components, and skins. Files use the `.kui.xml` suffix and the namespace
+KUI XML is the authored skin format consumed by Kurot Editor and
+`@kurot/cli`. Files use the `.kui.xml` suffix and the namespace
 `https://kurot.dev/ui/1`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<Screen xmlns="https://kurot.dev/ui/1"
-        xmlns:game="https://kurot.dev/components/game"
-        id="main" version="2">
+<Skin xmlns="https://kurot.dev/ui/1"
+      xmlns:game="https://kurot.dev/components/game"
+      class="game.TestSkin">
     <Group id="root" width="640" height="400">
-        <Label id="title" text="Kurot" />
+        <Rect id="background" fillColor="#121D30" width="640" height="400" />
         <game:ActionCard id="play" />
     </Group>
-</Screen>
-```
-
-The document root is `Screen`, `Component`, or `Skin`. A `Component` declares
-its published type with `type`; a `Skin` declares its runtime target with
-`target`.
-
-```xml
-<Component xmlns="https://kurot.dev/ui/1"
-           id="action-card" version="2" type="game.ActionCard">
-    <Group id="root" />
-</Component>
-
-<Skin xmlns="https://kurot.dev/ui/1"
-      id="primary-button" version="2" target="kui.Button" default="true">
-    <Group id="root" />
 </Skin>
 ```
 
-`default="true"` marks the Skin as the default appearance for `target`. Build
-tools derive their theme mapping from this metadata. The Skin's single root
-component is a real visual node and remains present when the document is
-materialized or compiled.
+The root has one authored identity: `class`, the generated skin class name.
+Storage IDs, format versions, runtime targets, and default-skin flags are not
+part of the file. Storage owns its record identity, while the CLI derives skin
+associations from built-in and project component conventions.
 
-Built-in `kui.*` types use unprefixed PascalCase tags. Project component types
-use an XML namespace prefix. The prefix is also the semantic type namespace:
-`game:ActionCard` maps to `game.ActionCard`.
+The Skin contains exactly one visual root component. Built-in `kui.*` types
+use unprefixed PascalCase tags. Project component types use an XML namespace
+prefix; `game:ActionCard` maps to the semantic type `game.ActionCard`.
 
 ## Values
 
 Primitive node properties are attributes. Unescaped `true` and `false` are
 booleans and numeric literals are numbers. A string that looks like one of
-those values starts with `\`; the parser removes that escape. References use
-explicit forms:
+those values starts with `\`; the parser removes that escape. Resource
+properties use their keys directly; design tokens stay explicit:
 
 ```xml
-<Image id="logo" source="@resource:image:ui.logo" />
-<Rect id="background" fillColor="@token:color:color.panel" />
+<Image id="logo" source="ui.logo" />
+<Rect id="background" fillColor="#121D30" />
+<Rect id="accent" fillColor="@token:color:color.accent" />
 ```
 
-Arrays and objects use a `properties` block so structured values remain typed
-without embedded JSON:
+Catalog-defined color properties use canonical `#RRGGBB` notation. The parser
+also accepts `0xRRGGBB` when source is edited by hand; serialization normalizes
+it back to `#RRGGBB`.
+
+Group layouts keep the same property-element shape used by EUI rather than the
+generic object form:
 
 ```xml
-<Group id="list">
-    <properties>
-        <property name="layout">
-            <object>
-                <value name="gap" value="8" />
-                <value name="direction" value="vertical" />
-            </object>
-        </property>
-    </properties>
+<Group id="content">
+    <layout>
+        <HorizontalLayout gap="8" verticalAlign="middle" />
+    </layout>
+    <Image id="icon" />
+    <Label id="labelDisplay" />
 </Group>
 ```
 
-## Contracts and instances
+`BasicLayout`, `HorizontalLayout`, `VerticalLayout`, and `TileLayout` are
+supported. The parser converts this syntax to the internal serializable layout
+descriptor used by the editor and runtime.
 
-Optional `contract` metadata precedes the root component. It declares
-parameters, parts, slots, states, variants, data fields, bindings, and actions.
-Reusable instances store their source and local differences only.
+## Parts and states
+
+Every explicitly identified node below the visual root is available as a skin
+part. The node `id` is the part name, so internal visual nodes can omit `id`
+instead of maintaining names that have no runtime meaning.
+
+Optional states are declared on the Skin. An override is written on its target
+node as `property.state`, so an internal state target does not need an `id`.
 
 ```xml
-<game:ActionCard id="play">
-    <instance source="action-card" variant="primary">
-        <parameter name="label" value="Play" />
-        <override part="label" property="textColor" value="16777215" />
-        <slot name="content">
-            <Label id="hint" text="Start game" />
-        </slot>
-    </instance>
-</game:ActionCard>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled">
+    <Group id="root">
+        <Rect alpha.down="0.8" alpha.disabled="0.5" />
+        <Label id="labelDisplay" />
+    </Group>
+</Skin>
 ```
 
 `serializeUIDocument` emits a deterministic canonical form and validates the
 semantic model before writing. Canonical output uses four-space indentation.
-`parseUIDocument` accepts XML comments and an
-XML declaration, builds the runtime-independent `UIDocument`, then runs the
-same structural validation.
+`parseUIDocument` accepts XML comments and an XML declaration, builds the
+runtime-independent Skin document, then runs the same structural validation.
+Screen and reusable-component semantic models remain programmatic APIs; they
+do not share this authored Skin XML pipeline. Their parameters, Slots,
+variants, data bindings, and actions are not Skin XML syntax.

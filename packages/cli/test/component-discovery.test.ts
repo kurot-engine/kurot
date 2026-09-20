@@ -121,7 +121,7 @@ describe('component discovery', () => {
 });
 
 function componentSkin(id: string): string {
-	return `<Skin xmlns="https://kurot.dev/ui/1" id="${id}" version="2" target="game.BetButton"><Group id="root" /></Skin>`;
+	return `<Skin xmlns="https://kurot.dev/ui/1" class="${id}"><Group id="root" /></Skin>`;
 }
 
 async function createFixture(): Promise<{

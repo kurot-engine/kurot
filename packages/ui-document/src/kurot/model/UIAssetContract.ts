@@ -202,11 +202,6 @@ export interface UIVariantDefinition {
  */
 export interface UIAssetContract {
 	/**
-	 * Whether this appearance is the project's default for its target type.
-	 */
-	readonly isDefault?: boolean;
-
-	/**
 	 * Canonical component key published by a component asset.
 	 */
 	readonly componentType?: string;

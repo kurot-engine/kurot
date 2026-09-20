@@ -4,12 +4,7 @@ import { requireNumber, requireString, invalidRuntimeValue } from './valueGuards
 /**
  * Applies one property declared directly by EditableText.
  */
-export function applyEditableTextProperty(
-	target: EditableText,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyEditableTextProperty(target: EditableText, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'inputType':
 			target.inputType = requireInputType(value, path);

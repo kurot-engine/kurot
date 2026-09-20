@@ -1,19 +1,9 @@
 import type { UIAssetContract, UIPropertyOverride } from '@kurot/ui-document';
 import { KurotUIRuntimeError } from '../KurotUIRuntimeError.js';
 import { qualifyNodeId } from '../node-identity.js';
-import {
-	applyPropertyUpdates,
-	attachCause,
-	restorePropertyBackups,
-} from '../propertyTransaction.js';
-import type {
-	RuntimePropertyBackup,
-	RuntimePropertyUpdate,
-} from '../propertyTransaction.js';
-import type {
-	KurotUICreationContext,
-	KurotUIStateController,
-} from '../types.js';
+import { applyPropertyUpdates, attachCause, restorePropertyBackups } from '../propertyTransaction.js';
+import type { RuntimePropertyBackup, RuntimePropertyUpdate } from '../propertyTransaction.js';
+import type { KurotUICreationContext, KurotUIStateController } from '../types.js';
 
 /**
  * Creates a state controller over one fully initialized reusable instance.
@@ -44,19 +34,12 @@ export function createReusableComponentStateController(
 			}
 			if (currentState === name) return;
 			const previousState = currentState;
-			const previousDefinition = previousState
-				? contract.states[previousState]
-				: undefined;
+			const previousDefinition = previousState ? contract.states[previousState] : undefined;
 			restorePropertyBackups(backups);
 			backups = [];
 			currentState = undefined;
 			try {
-				backups = applyStateOverrides(
-					definition.overrides,
-					scope,
-					`${contractPath}.states.${name}`,
-					context,
-				);
+				backups = applyStateOverrides(definition.overrides, scope, `${contractPath}.states.${name}`, context);
 				currentState = name;
 			} catch (error) {
 				if (previousState && previousDefinition) {

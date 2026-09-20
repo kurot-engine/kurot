@@ -4,12 +4,7 @@ import { requireNumber, invalidRuntimeValue } from './valueGuards.js';
 /**
  * Applies one property declared directly by ProgressBar.
  */
-export function applyProgressBarProperty(
-	target: ProgressBar,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyProgressBarProperty(target: ProgressBar, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'direction':
 			target.direction = requireDirection(value, path);
@@ -31,10 +26,7 @@ export function applyProgressBarProperty(
 	}
 }
 
-function requireDirection(
-	value: unknown,
-	path: string,
-): 'btt' | 'ltr' | 'rtl' | 'ttb' {
+function requireDirection(value: unknown, path: string): 'btt' | 'ltr' | 'rtl' | 'ttb' {
 	if (value === 'btt' || value === 'ltr' || value === 'rtl' || value === 'ttb') {
 		return value;
 	}

@@ -4,12 +4,7 @@ import { requireBoolean, requireNumber, requireString, invalidRuntimeValue } fro
 /**
  * Applies one property declared directly by TextInput.
  */
-export function applyTextInputProperty(
-	target: TextInput,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyTextInputProperty(target: TextInput, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'displayAsPassword':
 			target.displayAsPassword = requireBoolean(value, path);

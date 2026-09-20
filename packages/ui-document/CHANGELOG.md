@@ -4,15 +4,46 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.6.1] — 2026-09-21
+
+### Fixed
+
+- Canonical XML now writes catalog-defined color properties as readable
+  `#RRGGBB` values instead of decimal integers.
+- Color properties accept both `#RRGGBB` and `0xRRGGBB` when parsing edited
+  XML source.
+
+### Changed
+
+- Authored KUI XML now has a single Skin pipeline. Its root contains the skin
+  `class` and optional state names; storage IDs, format versions, targets, and
+  default flags are no longer exposed as authored metadata.
+- Screen and reusable-component documents remain programmatic semantic models
+  and are no longer accepted by the Skin XML parser or serializer.
+- Removed the generic `<contract>` block from Skin XML. Node IDs provide skin
+  part names, while internal nodes may omit IDs. States use the EUI-style root
+  `states` list and local `property.state` attributes, avoiding separate target
+  IDs and centralized override blocks.
+- Group layouts now use the EUI-style `<layout><HorizontalLayout ... /></layout>`
+  property syntax instead of exposing the internal generic object descriptor.
+- Catalog resource properties such as `Image.source` use the resource key
+  directly instead of repeating an `@resource:image:` type prefix.
+
+### Removed
+
+- Removed generic `<properties>`, `<instance>`, and nested appearance metadata
+  from authored Skin XML. Those programmatic semantic-model features no longer
+  leak into the Skin compiler format.
+
+---
+
 ## [0.6.0] — 2026-09-21
 
 ### Added
 
-- Canonical `.kui.xml` parsing and deterministic serialization for Screen,
-  Component, and Skin assets.
+- Canonical `.kui.xml` parsing and deterministic serialization.
 - Direct component tags, custom XML namespaces, typed structured values,
   reusable component instances, and complete contract metadata in KUI XML.
-- `isDefault` appearance metadata for deriving default runtime skin mappings.
 
 ### Changed
 

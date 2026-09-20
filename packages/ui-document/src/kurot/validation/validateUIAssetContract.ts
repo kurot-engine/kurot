@@ -17,7 +17,6 @@ const CONTRACT_KEYS = new Set([
 	'componentType',
 	'dataBindings',
 	'dataFields',
-	'isDefault',
 	'parameters',
 	'parts',
 	'slots',
@@ -56,12 +55,7 @@ export function validateUIAssetContract(
 	nodeIds: ReadonlySet<string>,
 ): void {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'Asset contract must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'Asset contract must be an object.');
 		return;
 	}
 
@@ -69,38 +63,16 @@ export function validateUIAssetContract(
 	validateContractTypes(value, assetKind, path, diagnostics);
 	validateContractCapabilities(value, assetKind, path, diagnostics);
 	validateDataFields(value.dataFields, `${path}.dataFields`, diagnostics);
-	validateDataBindings(
-		value.dataBindings,
-		`${path}.dataBindings`,
-		diagnostics,
-		nodeIds,
-		value.dataFields,
-	);
+	validateDataBindings(value.dataBindings, `${path}.dataBindings`, diagnostics, nodeIds, value.dataFields);
 	validateActions(value.actions, `${path}.actions`, diagnostics, nodeIds);
 	validateParameters(value.parameters, `${path}.parameters`, diagnostics, nodeIds);
-	validateParts(
-		value.parts,
-		`${path}.parts`,
-		diagnostics,
-		nodeIds,
-		assetKind === 'appearance',
-	);
+	validateParts(value.parts, `${path}.parts`, diagnostics, nodeIds, assetKind === 'appearance');
 	validateSlots(value.slots, `${path}.slots`, diagnostics, nodeIds);
-	validateUIAssetModes(
-		value.states,
-		`${path}.states`,
-		diagnostics,
-		nodeIds,
-		assetKind === 'appearance',
-	);
+	validateUIAssetModes(value.states, `${path}.states`, diagnostics, nodeIds, assetKind === 'appearance');
 	validateUIAssetModes(value.variants, `${path}.variants`, diagnostics, nodeIds, false);
 }
 
-function validateDataFields(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateDataFields(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
 	if (value === undefined) return;
 	if (!validateNamedRecord(value, path, 'data fields', diagnostics)) return;
 	for (const [name, definition] of Object.entries(value)) {
@@ -142,23 +114,11 @@ function validateDataBindings(
 	for (const [name, binding] of Object.entries(value)) {
 		const bindingPath = `${path}.${name}`;
 		if (!isPlainRecord(binding)) {
-			addUIDiagnostic(
-				diagnostics,
-				'invalid-asset-contract',
-				bindingPath,
-				'Data binding must be an object.',
-			);
+			addUIDiagnostic(diagnostics, 'invalid-asset-contract', bindingPath, 'Data binding must be an object.');
 			continue;
 		}
 		validateKnownKeys(binding, DATA_BINDING_KEYS, bindingPath, diagnostics);
-		if (
-			validateNonEmptyString(
-				binding.source,
-				`${bindingPath}.source`,
-				'Data source',
-				diagnostics,
-			)
-		) {
+		if (validateNonEmptyString(binding.source, `${bindingPath}.source`, 'Data source', diagnostics)) {
 			if (!(binding.source in fields)) {
 				addUIDiagnostic(
 					diagnostics,
@@ -168,19 +128,8 @@ function validateDataBindings(
 				);
 			}
 		}
-		validateNodeIdReference(
-			binding.targetId,
-			`${bindingPath}.targetId`,
-			'Target node id',
-			diagnostics,
-			nodeIds,
-		);
-		validateNonEmptyString(
-			binding.property,
-			`${bindingPath}.property`,
-			'Property name',
-			diagnostics,
-		);
+		validateNodeIdReference(binding.targetId, `${bindingPath}.targetId`, 'Target node id', diagnostics, nodeIds);
+		validateNonEmptyString(binding.property, `${bindingPath}.property`, 'Property name', diagnostics);
 	}
 }
 
@@ -220,12 +169,7 @@ function validateActions(
 			);
 		}
 		if (definition.description !== undefined) {
-			validateNonEmptyString(
-				definition.description,
-				`${definitionPath}.description`,
-				'Description',
-				diagnostics,
-			);
+			validateNonEmptyString(definition.description, `${definitionPath}.description`, 'Description', diagnostics);
 		}
 	}
 }
@@ -251,21 +195,11 @@ function validateContractCapabilities(
 	}
 }
 
-function validateEmptyRecord(
-	value: unknown,
-	path: string,
-	label: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateEmptyRecord(value: unknown, path: string, label: string, diagnostics: UIDiagnostic[]): void {
 	if (!isPlainRecord(value) || Object.keys(value).length === 0) {
 		return;
 	}
-	addUIDiagnostic(
-		diagnostics,
-		'invalid-asset-contract',
-		path,
-		`This asset kind does not support ${label}.`,
-	);
+	addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, `This asset kind does not support ${label}.`);
 }
 
 function validateContractTypes(
@@ -275,12 +209,7 @@ function validateContractTypes(
 	diagnostics: UIDiagnostic[],
 ): void {
 	if (assetKind === 'component') {
-		validateNonEmptyString(
-			value.componentType,
-			`${path}.componentType`,
-			'Component type',
-			diagnostics,
-		);
+		validateNonEmptyString(value.componentType, `${path}.componentType`, 'Component type', diagnostics);
 	} else if (value.componentType !== undefined) {
 		addUIDiagnostic(
 			diagnostics,
@@ -291,19 +220,8 @@ function validateContractTypes(
 	}
 
 	if (assetKind === 'appearance') {
-		validateNonEmptyString(
-			value.targetType,
-			`${path}.targetType`,
-			'Appearance target type',
-			diagnostics,
-		);
-		if (value.isDefault !== undefined && typeof value.isDefault !== 'boolean') {
-			addUIDiagnostic(
-				diagnostics,
-				'invalid-asset-contract',
-				`${path}.isDefault`,
-				'Appearance default selection must be a boolean.',
-			);
+		if (value.targetType !== undefined) {
+			validateNonEmptyString(value.targetType, `${path}.targetType`, 'Appearance target type', diagnostics);
 		}
 	} else if (value.targetType !== undefined) {
 		addUIDiagnostic(
@@ -311,14 +229,6 @@ function validateContractTypes(
 			'invalid-asset-contract',
 			`${path}.targetType`,
 			'Only appearance assets may declare a target type.',
-		);
-	}
-	if (assetKind !== 'appearance' && value.isDefault !== undefined) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			`${path}.isDefault`,
-			'Only appearance assets may be selected as a default skin.',
 		);
 	}
 }
@@ -355,12 +265,7 @@ function validateParameters(
 				error instanceof Error ? error.message : 'Invalid parameter definition.',
 			);
 		}
-		validateParameterBindings(
-			definition.bindings,
-			`${definitionPath}.bindings`,
-			diagnostics,
-			nodeIds,
-		);
+		validateParameterBindings(definition.bindings, `${definitionPath}.bindings`, diagnostics, nodeIds);
 	}
 }
 
@@ -372,40 +277,19 @@ function validateParameterBindings(
 ): void {
 	if (value === undefined) return;
 	if (!Array.isArray(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'Parameter bindings must be an array.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'Parameter bindings must be an array.');
 		return;
 	}
 	for (let index = 0; index < value.length; index++) {
 		const binding = value[index];
 		const bindingPath = `${path}[${index}]`;
 		if (!isPlainRecord(binding)) {
-			addUIDiagnostic(
-				diagnostics,
-				'invalid-asset-contract',
-				bindingPath,
-				'Parameter binding must be an object.',
-			);
+			addUIDiagnostic(diagnostics, 'invalid-asset-contract', bindingPath, 'Parameter binding must be an object.');
 			continue;
 		}
 		validateKnownKeys(binding, PARAMETER_BINDING_KEYS, bindingPath, diagnostics);
-		validateNodeIdReference(
-			binding.targetId,
-			`${bindingPath}.targetId`,
-			'Target node id',
-			diagnostics,
-			nodeIds,
-		);
-		validateNonEmptyString(
-			binding.property,
-			`${bindingPath}.property`,
-			'Property name',
-			diagnostics,
-		);
+		validateNodeIdReference(binding.targetId, `${bindingPath}.targetId`, 'Target node id', diagnostics, nodeIds);
+		validateNonEmptyString(binding.property, `${bindingPath}.property`, 'Property name', diagnostics);
 	}
 }
 
@@ -421,34 +305,15 @@ function validateParts(
 		if (validateSkinNames) {
 			validateSkinPartName(name, `${path}.${name}`, diagnostics);
 		}
-		validateNodeTargetDefinition(
-			definition,
-			`${path}.${name}`,
-			PART_KEYS,
-			diagnostics,
-			nodeIds,
-		);
+		validateNodeTargetDefinition(definition, `${path}.${name}`, PART_KEYS, diagnostics, nodeIds);
 	}
 }
 
-function validateSlots(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-	nodeIds: ReadonlySet<string>,
-): void {
+function validateSlots(value: unknown, path: string, diagnostics: UIDiagnostic[], nodeIds: ReadonlySet<string>): void {
 	if (!validateNamedRecord(value, path, 'slots', diagnostics)) return;
 	for (const [name, definition] of Object.entries(value)) {
 		const definitionPath = `${path}.${name}`;
-		if (
-			!validateNodeTargetDefinition(
-				definition,
-				definitionPath,
-				SLOT_KEYS,
-				diagnostics,
-				nodeIds,
-			)
-		) {
+		if (!validateNodeTargetDefinition(definition, definitionPath, SLOT_KEYS, diagnostics, nodeIds)) {
 			continue;
 		}
 		if (definition.capacity !== 'single' && definition.capacity !== 'multiple') {
@@ -470,23 +335,13 @@ function validateNodeTargetDefinition(
 	nodeIds: ReadonlySet<string>,
 ): value is Record<string, unknown> {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			'Definition must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, 'Definition must be an object.');
 		return false;
 	}
 	validateKnownKeys(value, keys, path, diagnostics);
 	validateNodeIdReference(value.nodeId, `${path}.nodeId`, 'Node id', diagnostics, nodeIds);
 	if (value.required !== undefined && typeof value.required !== 'boolean') {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			`${path}.required`,
-			'Required flag must be a boolean.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', `${path}.required`, 'Required flag must be a boolean.');
 	}
 	if (value.description !== undefined) {
 		validateNonEmptyString(value.description, `${path}.description`, 'Description', diagnostics);
@@ -501,12 +356,7 @@ function validateNamedRecord(
 	diagnostics: UIDiagnostic[],
 ): value is Record<string, unknown> {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-asset-contract',
-			path,
-			`Asset contract ${label} must be an object.`,
-		);
+		addUIDiagnostic(diagnostics, 'invalid-asset-contract', path, `Asset contract ${label} must be an object.`);
 		return false;
 	}
 	for (const name of Object.keys(value)) {

@@ -8,16 +8,33 @@ import { buildSkinsModule } from '../kui/skin-module-builder.js';
 import { generateSkinPartsDeclaration, SKIN_PARTS_DECLARATION_PATH } from '../kui/skin-parts-declaration.js';
 import { BuildError } from '../errors.js';
 import { KUI_THEME_OUTPUT_PATH } from '../project.js';
-import type { UIDocument } from '@kurot/ui-document';
 import type { Dirent } from 'node:fs';
 import type { Diagnostic } from '../diagnostics/index.js';
 import type { CompiledSkin, KUIFile } from '../kui/skin-module-builder.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
+import type { ProjectComponent } from '../project.js';
 
 interface ParsedSkin {
-	readonly document: UIDocument;
 	readonly skin: CompiledSkin;
 }
+
+const DEFAULT_BUILTIN_COMPONENTS = new Set([
+	'Button',
+	'CheckBox',
+	'ComboBox',
+	'HScrollBar',
+	'HSlider',
+	'ItemRenderer',
+	'Panel',
+	'ProgressBar',
+	'RadioButton',
+	'Scroller',
+	'TextInput',
+	'ToggleButton',
+	'ToggleSwitch',
+	'VScrollBar',
+	'VSlider',
+]);
 
 interface GeneratedTheme {
 	readonly skins: Readonly<Record<string, string>>;
@@ -50,7 +67,7 @@ export function compileKUI(): BuildPlugin {
 				return;
 			}
 
-			const mappings = createDefaultMappings(ctx, parsed);
+			const mappings = createDefaultMappings(ctx, parsed, project.components);
 			throwIfInputInvalid(ctx);
 			const built = await buildSkinsModule(ctx, parsed.map(item => item.skin));
 			ctx.outputs.skinsScript = `js/${built.filename}`;
@@ -79,9 +96,7 @@ function parseSkins(ctx: BuildContext, files: readonly KUIFile[]): ParsedSkin[] 
 	for (const file of files) {
 		try {
 			const document = parseUIDocument(file.contents);
-			if (document.assetKind !== 'appearance') continue;
 			parsed.push({
-				document,
 				skin: { file, className: document.id },
 			});
 		} catch (error) {
@@ -96,20 +111,24 @@ function parseSkins(ctx: BuildContext, files: readonly KUIFile[]): ParsedSkin[] 
 	return parsed;
 }
 
-function createDefaultMappings(ctx: BuildContext, skins: readonly ParsedSkin[]): Record<string, string> {
+function createDefaultMappings(
+	ctx: BuildContext,
+	skins: readonly ParsedSkin[],
+	components: readonly ProjectComponent[],
+): Record<string, string> {
 	const result: Record<string, string> = {};
 	const sources = new Map<string, string>();
 	for (const item of skins) {
-		if (item.document.contract.isDefault !== true) continue;
-		const target = item.document.contract.targetType;
-		if (!target) continue;
-		const key = target.split('.').pop() ?? target;
+		const key = defaultComponentName(item.skin.className, components);
+		if (!key) {
+			continue;
+		}
 		const previous = sources.get(key);
 		if (previous) {
 			reportDiagnostic(ctx, {
 				code: DIAGNOSTIC_CODES.KUI_DUPLICATE_DEFAULT,
 				severity: 'error',
-				message: `Default KUI skins for "${target}" are duplicated by ${previous} and ${item.skin.file.relPath}.`,
+				message: `Default KUI skins for "${key}" are duplicated by ${previous} and ${item.skin.file.relPath}.`,
 				location: { file: item.skin.file.relPath },
 			});
 			continue;
@@ -118,6 +137,22 @@ function createDefaultMappings(ctx: BuildContext, skins: readonly ParsedSkin[]):
 		result[key] = item.skin.className;
 	}
 	return result;
+}
+
+function defaultComponentName(
+	skinClass: string,
+	components: readonly ProjectComponent[],
+): string | undefined {
+	const projectComponent = components.find(component => component.skinClass === skinClass);
+	if (projectComponent) {
+		return projectComponent.name;
+	}
+	const shortName = skinClass.split('.').pop();
+	if (!shortName?.endsWith('Skin')) {
+		return undefined;
+	}
+	const componentName = shortName.slice(0, -'Skin'.length);
+	return DEFAULT_BUILTIN_COMPONENTS.has(componentName) ? componentName : undefined;
 }
 
 async function collectKUIFiles(sourceDir: string, resourceDir: string): Promise<KUIFile[]> {

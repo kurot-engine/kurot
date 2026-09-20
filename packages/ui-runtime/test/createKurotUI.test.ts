@@ -22,20 +22,12 @@ import {
 	createUIAssetContract,
 	createUIDocument,
 	createUINode,
-	parseUIDocument,
 	UIAssetRegistry,
 } from '@kurot/ui-document';
 import type { UIDocument } from '@kurot/ui-document';
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createKurotUI, KurotUIRuntimeError } from '../src/index.js';
-
-const FIXTURE_DIRECTORY = resolve(
-	dirname(fileURLToPath(import.meta.url)),
-	'../../ui-document/test/fixtures',
-);
+import { createActionCardDocument, createButtonAppearanceDocument, createLobbyDocument } from './document-fixtures.js';
 
 beforeAll(() => {
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -127,14 +119,8 @@ describe('createKurotUI', () => {
 		const image = requireInstance(result.instances.get('image'), Image);
 		const panel = requireInstance(result.instances.get('panel'), Rect);
 		const action = requireInstance(result.instances.get('action'), Button);
-		const soundToggle = requireInstance(
-			result.instances.get('sound-toggle'),
-			ToggleButton,
-		);
-		const loadingProgress = requireInstance(
-			result.instances.get('loading-progress'),
-			ProgressBar,
-		);
+		const soundToggle = requireInstance(result.instances.get('sound-toggle'), ToggleButton);
+		const loadingProgress = requireInstance(result.instances.get('loading-progress'), ProgressBar);
 
 		expect(root.alpha).toBe(0.9);
 		expect(root.left).toBe(24);
@@ -217,9 +203,7 @@ describe('createKurotUI', () => {
 			root: createUINode({
 				id: 'root',
 				type: 'kui.Group',
-				children: [
-					createUINode({ id: 'labelDisplay', type: 'kui.Label' }),
-				],
+				children: [createUINode({ id: 'labelDisplay', type: 'kui.Label' })],
 			}),
 		});
 		const progressAppearance = createUIDocument({
@@ -272,10 +256,7 @@ describe('createKurotUI', () => {
 
 		const result = createKurotUI(document, { assets });
 		const toggle = requireInstance(result.instances.get('toggle'), ToggleButton);
-		const progress = requireInstance(
-			result.instances.get('progress'),
-			ProgressBar,
-		);
+		const progress = requireInstance(result.instances.get('progress'), ProgressBar);
 		const toggleLabel = requireInstance(
 			result.instances.get('toggle@appearance:toggle-appearance/labelDisplay'),
 			Label,
@@ -285,9 +266,7 @@ describe('createKurotUI', () => {
 			Rect,
 		);
 		const progressLabel = requireInstance(
-			result.instances.get(
-				'progress@appearance:progress-appearance/labelDisplay',
-			),
+			result.instances.get('progress@appearance:progress-appearance/labelDisplay'),
 			Label,
 		);
 
@@ -325,10 +304,7 @@ describe('createKurotUI', () => {
 			}),
 		});
 
-		const editableText = requireInstance(
-			createKurotUI(document).root,
-			EditableText,
-		);
+		const editableText = requireInstance(createKurotUI(document).root, EditableText);
 
 		expect(editableText.inputType).toBe('text');
 		expect(editableText.maxChars).toBe(24);
@@ -398,15 +374,11 @@ describe('createKurotUI', () => {
 		const result = createKurotUI(document, { assets });
 		const input = requireInstance(result.root, TextInput);
 		const textDisplay = requireInstance(
-			result.instances.get(
-				'player-name@appearance:text-input-appearance/textDisplay',
-			),
+			result.instances.get('player-name@appearance:text-input-appearance/textDisplay'),
 			EditableText,
 		);
 		const promptDisplay = requireInstance(
-			result.instances.get(
-				'player-name@appearance:text-input-appearance/promptDisplay',
-			),
+			result.instances.get('player-name@appearance:text-input-appearance/promptDisplay'),
 			Label,
 		);
 
@@ -440,9 +412,9 @@ describe('createKurotUI', () => {
 	});
 
 	it('materializes reusable assets and all instance-local semantics', () => {
-		const actionCard = readFixture('action-card.component.kui.xml');
-		const appearance = readFixture('button.appearance.kui.xml');
-		const screen = readFixture('lobby.screen.kui.xml');
+		const actionCard = createActionCardDocument();
+		const appearance = createButtonAppearanceDocument();
+		const screen = createLobbyDocument();
 		const assets = new UIAssetRegistry();
 		assets.registerAsset(actionCard);
 		assets.registerAsset(appearance);
@@ -458,23 +430,12 @@ describe('createKurotUI', () => {
 		const play = requireInstance(result.instances.get('play-action'), Group);
 		const settings = requireInstance(result.instances.get('settings-action'), Group);
 		const playLabel = requireInstance(result.instances.get('play-action/label'), Label);
-		const settingsLabel = requireInstance(
-			result.instances.get('settings-action/label'),
-			Label,
-		);
-		const playBackground = requireInstance(
-			result.instances.get('play-action/background'),
-			Rect,
-		);
-		const playSlot = requireInstance(
-			result.instances.get('play-action/content-slot'),
-			Group,
-		);
+		const settingsLabel = requireInstance(result.instances.get('settings-action/label'), Label);
+		const playBackground = requireInstance(result.instances.get('play-action/background'), Rect);
+		const playSlot = requireInstance(result.instances.get('play-action/content-slot'), Group);
 		const button = requireInstance(result.instances.get('native-button'), Button);
 		const appearanceBackground = requireInstance(
-			result.instances.get(
-				'native-button@appearance:primary-button-appearance/background',
-			),
+			result.instances.get('native-button@appearance:primary-button-appearance/background'),
 			Rect,
 		);
 
@@ -507,9 +468,7 @@ describe('createKurotUI', () => {
 		expect(playState?.currentState).toBe('disabled');
 		expect(play.alpha).toBe(0.5);
 		expect(settings.alpha).toBe(1);
-		expect(() => playState?.setState('missing')).toThrowError(
-			expect.objectContaining({ code: 'unknown-state' }),
-		);
+		expect(() => playState?.setState('missing')).toThrowError(expect.objectContaining({ code: 'unknown-state' }));
 		expect(playState?.currentState).toBe('disabled');
 		expect(play.alpha).toBe(0.5);
 		playState?.clearState();
@@ -518,9 +477,9 @@ describe('createKurotUI', () => {
 	});
 
 	it('rejects an unknown appearance variant before materialization', () => {
-		const actionCard = readFixture('action-card.component.kui.xml');
-		const appearance = readFixture('button.appearance.kui.xml');
-		const screen = readFixture('lobby.screen.kui.xml');
+		const actionCard = createActionCardDocument();
+		const appearance = createButtonAppearanceDocument();
+		const screen = createLobbyDocument();
 		const nativeButton = screen.root.children[2]!;
 		const invalidScreen = {
 			...screen,
@@ -541,17 +500,14 @@ describe('createKurotUI', () => {
 		const assets = new UIAssetRegistry();
 		assets.registerAsset(actionCard);
 		assets.registerAsset(appearance);
-		const error = captureRuntimeError(() =>
-			createKurotUI(invalidScreen, { assets }),
-		);
+		const error = captureRuntimeError(() => createKurotUI(invalidScreen, { assets }));
 
 		expect(error.code).toBe('invalid-document');
 		expect(error.diagnostics).toContainEqual({
 			code: 'unknown-variant',
 			severity: 'error',
 			path: '$.assets["lobby-screen"].root.children[2].appearance.variant',
-			message:
-				'Variant "missing" is not published by appearance asset "primary-button-appearance".',
+			message: 'Variant "missing" is not published by appearance asset "primary-button-appearance".',
 		});
 	});
 
@@ -571,7 +527,7 @@ describe('createKurotUI', () => {
 								key: 'image.logo',
 								resourceType: 'image',
 							},
-					},
+						},
 					}),
 					createUINode({
 						id: 'button',
@@ -598,12 +554,8 @@ describe('createKurotUI', () => {
 			},
 		});
 
-		expect(
-			requireInstance(result.instances.get('image'), Image).source,
-		).toBe(texture);
-		expect(
-			requireInstance(result.instances.get('button'), Button).icon,
-		).toBe(texture);
+		expect(requireInstance(result.instances.get('image'), Image).source).toBe(texture);
+		expect(requireInstance(result.instances.get('button'), Button).icon).toBe(texture);
 	});
 
 	it('reports document validation failures as structured runtime errors', () => {
@@ -681,10 +633,7 @@ describe('createKurotUI', () => {
 	});
 });
 
-function requireInstance<T extends object>(
-	value: object | undefined,
-	type: abstract new (...args: never[]) => T,
-): T {
+function requireInstance<T extends object>(value: object | undefined, type: abstract new (...args: never[]) => T): T {
 	if (value instanceof type) return value;
 	throw new Error(`Expected ${type.name} instance.`);
 }
@@ -700,43 +649,10 @@ function captureRuntimeError(operation: () => void): KurotUIRuntimeError {
 }
 
 function dispatchTap(target: ToggleButton): void {
-	TouchEvent.dispatchTouchEvent(
-		target,
-		TouchEvent.TOUCH_BEGIN,
-		true,
-		false,
-		10,
-		10,
-		1,
-		true,
-	);
-	TouchEvent.dispatchTouchEvent(
-		target,
-		TouchEvent.TOUCH_END,
-		true,
-		false,
-		10,
-		10,
-		1,
-		false,
-	);
+	TouchEvent.dispatchTouchEvent(target, TouchEvent.TOUCH_BEGIN, true, false, 10, 10, 1, true);
+	TouchEvent.dispatchTouchEvent(target, TouchEvent.TOUCH_END, true, false, 10, 10, 1, false);
 }
 
 function dispatchTouchTap(target: TextInput): void {
-	TouchEvent.dispatchTouchEvent(
-		target,
-		TouchEvent.TOUCH_TAP,
-		true,
-		false,
-		10,
-		10,
-		1,
-		true,
-	);
-}
-
-function readFixture(name: string): UIDocument {
-	return parseUIDocument(
-		readFileSync(resolve(FIXTURE_DIRECTORY, name), 'utf8'),
-	);
+	TouchEvent.dispatchTouchEvent(target, TouchEvent.TOUCH_TAP, true, false, 10, 10, 1, true);
 }

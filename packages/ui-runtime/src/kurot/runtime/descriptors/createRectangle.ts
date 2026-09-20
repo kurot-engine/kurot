@@ -39,15 +39,8 @@ function requireNumber(value: unknown, path: string): number {
 	throw new KurotUIRuntimeError('invalid-rectangle', 'Rectangle field must be a number.', path);
 }
 
-function requireNonNegativeNumber(
-	value: unknown,
-	path: string,
-): number {
+function requireNonNegativeNumber(value: unknown, path: string): number {
 	const number = requireNumber(value, path);
 	if (number >= 0) return number;
-	throw new KurotUIRuntimeError(
-		'invalid-rectangle',
-		'Rectangle size must not be negative.',
-		path,
-	);
+	throw new KurotUIRuntimeError('invalid-rectangle', 'Rectangle size must not be negative.', path);
 }

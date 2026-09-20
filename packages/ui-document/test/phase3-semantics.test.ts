@@ -3,15 +3,13 @@ import {
 	createUIAssetContract,
 	createUIDocument,
 	createUINode,
-	parseUIDocument,
-	serializeUIDocument,
 	UIAssetRegistry,
 	validateUIAssetRegistry,
 } from '../src/index.js';
 import { describe, expect, it } from 'vitest';
 
 describe('Phase 3 visual semantics', () => {
-	it('round-trips bounded data, actions, and state transitions', () => {
+	it('validates bounded data, actions, and state transitions', () => {
 		const document = createUIDocument({
 			id: 'crash-screen',
 			contract: createUIAssetContract({
@@ -61,8 +59,6 @@ describe('Phase 3 visual semantics', () => {
 		assets.registerAsset(appearance);
 
 		expect(validateUIAssetRegistry(assets)).toEqual([]);
-		expect(parseUIDocument(serializeUIDocument(document))).toEqual(document);
-		expect(parseUIDocument(serializeUIDocument(appearance))).toEqual(appearance);
 	});
 
 	it('edits action contracts with an exact inverse', () => {

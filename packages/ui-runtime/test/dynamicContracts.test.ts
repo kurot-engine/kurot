@@ -161,9 +161,7 @@ describe('runtime data and semantic actions', () => {
 		const label = requireInstance(result.instances.get('label'), Label);
 		const probe = requireInstance(result.instances.get('probe'), Group);
 
-		expect(() => result.data.setValue('status', 'failed')).toThrow(
-			'Adapter rejected the update.',
-		);
+		expect(() => result.data.setValue('status', 'failed')).toThrow('Adapter rejected the update.');
 		expect(result.data.getValue('status')).toBe('ready');
 		expect(label.text).toBe('ready');
 		expect(adapterState.get(probe)).toBe('ready');
@@ -184,9 +182,7 @@ describe('runtime data and semantic actions', () => {
 				componentType: 'test.Probe',
 				states: {
 					busy: {
-						overrides: [
-							{ targetId: 'probe', property: 'status', value: 'busy' },
-						],
+						overrides: [{ targetId: 'probe', property: 'status', value: 'busy' }],
 					},
 				},
 			}),
@@ -344,10 +340,7 @@ describe('runtime data and semantic actions', () => {
 	});
 });
 
-function requireInstance<T>(
-	value: unknown,
-	type: abstract new (...args: never[]) => T,
-): T {
+function requireInstance<T>(value: unknown, type: abstract new (...args: never[]) => T): T {
 	if (value instanceof type) {
 		return value;
 	}

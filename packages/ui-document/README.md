@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Early development (0.6.x).** KUI XML is the canonical authored format. The
+> **Current release: 0.6.1.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -27,8 +27,8 @@ import {
 } from '@kurot/ui-document';
 
 const document = createUIDocument({
-  id: 'main-screen',
-  assetKind: 'screen',
+  id: 'game.MainSkin',
+  assetKind: 'appearance',
   root: createUINode({
     id: 'root',
     type: 'kui.Group',
@@ -50,6 +50,10 @@ const source = serializeUIDocument(document);
 `UIDocument` and `UINode` are runtime-independent semantic data. A component
 `type` is an external registry key; this package does not import or instantiate
 the corresponding `@kurot/ui` class.
+
+KUI XML serializes Skin documents only. Screen and reusable-component
+documents are programmatic semantic models and do not share the authored Skin
+file pipeline.
 
 ## Current capabilities
 
@@ -207,7 +211,7 @@ It defines the abstract semantic bases `kurot.DisplayObject`,
 `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput` nodes. `Group`
 accepts ordered children; the other concrete nodes are leaves.
 
-`kui.*` is the canonical Kurot UI namespace. Authored files use the
+`kui.*` is the canonical Kurot UI namespace. Authored Skin files use the
 [`KUI XML format`](./docs/kui-xml.md); EUI names and EXML are not stored in the
 semantic document.
 
@@ -251,7 +255,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.4.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.5.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition

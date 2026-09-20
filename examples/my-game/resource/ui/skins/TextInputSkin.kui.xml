@@ -1,28 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" id="skins.TextInputSkin" version="2" target="kui.TextInput" default="true">
-    <contract>
-        <parts>
-            <part name="promptDisplay" node="promptDisplay" />
-            <part name="textDisplay" node="textDisplay" />
-        </parts>
-        <states>
-            <state name="disabled">
-                <set target="node_rect1" property="alpha" value="0.5" />
-                <set target="textDisplay" property="textColor" value="16711680" />
-            </state>
-            <state name="disabledWithPrompt">
-                <set target="promptDisplay" property="visible" value="true" />
-            </state>
-            <state name="normal">
-            </state>
-            <state name="normalWithPrompt">
-                <set target="promptDisplay" property="visible" value="true" />
-            </state>
-        </states>
-    </contract>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.TextInputSkin" states="disabled,disabledWithPrompt,normal,normalWithPrompt">
     <Group id="root" minHeight="40" minWidth="300">
-        <Rect id="node_rect1" fillColor="16777215" height="100%" width="100%" />
-        <EditableText id="textDisplay" height="24" left="10" right="10" size="20" textColor="0" verticalAlign="middle" verticalCenter="0" />
-        <Label id="promptDisplay" height="24" left="10" multiline="false" right="10" size="20" textColor="11119017" touchEnabled="false" verticalAlign="middle" verticalCenter="0" visible="false" wordWrap="false" />
+        <Rect fillColor="#FFFFFF" height="100%" width="100%" alpha.disabled="0.5" />
+        <EditableText id="textDisplay" height="24" left="10" right="10" size="20" textColor="#000000" verticalAlign="middle" verticalCenter="0" textColor.disabled="#FF0000" />
+        <Label id="promptDisplay" height="24" left="10" multiline="false" right="10" size="20" textColor="#A9A9A9" touchEnabled="false" verticalAlign="middle" verticalCenter="0" visible="false" wordWrap="false" visible.disabledWithPrompt="true" visible.normalWithPrompt="true" />
     </Group>
 </Skin>

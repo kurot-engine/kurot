@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/cli",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Kurot CLI - build tool for Kurot Editor KUI XML workflows",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -27,7 +27,7 @@
 		"kurot": "tsx src/index.ts"
 	},
 	"dependencies": {
-		"@kurot/ui-document": "^0.6.0",
+		"@kurot/ui-document": "^0.6.1",
 		"commander": "^13.0.0",
 		"esbuild": "^0.25.0"
 	},

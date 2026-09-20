@@ -1,37 +1,21 @@
-/// <reference types="node" />
-
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
 	createUIAssetReference,
 	createUIResourceReference,
-	parseUIDocument,
-	serializeUIDocument,
 	UIAssetRegistry,
 	validateUIAssetRegistry,
 } from '../src/index.js';
-
-const ACTION_CARD = readFixture('action-card.component.kui.xml');
-const BUTTON_APPEARANCE = readFixture('button.appearance.kui.xml');
-const LOBBY_SCREEN = readFixture('lobby.screen.kui.xml');
+import {
+	createActionCardDocument,
+	createButtonAppearanceDocument,
+	createLobbyDocument,
+} from './document-fixtures.js';
 
 describe('UI asset registry', () => {
-	it('round-trips all authoring asset kinds with stable golden output', () => {
-		for (const source of [ACTION_CARD, BUTTON_APPEARANCE, LOBBY_SCREEN]) {
-			const document = parseUIDocument(source);
-			expect(serializeUIDocument(document)).toBe(source);
-		}
-	});
-
 	it('keeps two reusable instances compact and validates their project graph', () => {
 		const registry = createFixtureRegistry();
-		const screenSource = serializeUIDocument(registry.getAsset('lobby-screen')!);
-
 		expect(validateUIAssetRegistry(registry)).toEqual([]);
-		expect(screenSource.match(/source="action-card"/g)).toHaveLength(2);
-		expect(screenSource).not.toContain('<Rect id="background"');
-		expect(screenSource).not.toContain('<Group id="content-slot"');
+		expect(registry.getAsset('lobby-screen')?.root.children.filter(node => node.instance)).toHaveLength(2);
 	});
 
 	it('reports invalid instance contracts', () => {
@@ -69,7 +53,7 @@ describe('UI asset registry', () => {
 			},
 		};
 		const invalidRegistry = new UIAssetRegistry();
-		const component = parseUIDocument(ACTION_CARD);
+		const component = createActionCardDocument();
 		invalidRegistry.registerAsset({
 			...component,
 			contract: {
@@ -93,7 +77,7 @@ describe('UI asset registry', () => {
 	});
 
 	it('detects circular reusable asset dependencies', () => {
-		const component = parseUIDocument(ACTION_CARD);
+		const component = createActionCardDocument();
 		const circular = {
 			...component,
 			root: {
@@ -162,7 +146,7 @@ describe('UI asset registry', () => {
 	});
 
 	it('checks registered resource and token categories', () => {
-		const screen = parseUIDocument(LOBBY_SCREEN);
+		const screen = createLobbyDocument();
 		const nativeButton = screen.root.children[2]!;
 		const withIcon = {
 			...screen,
@@ -181,8 +165,8 @@ describe('UI asset registry', () => {
 			},
 		};
 		const registry = new UIAssetRegistry();
-		registry.registerAsset(parseUIDocument(ACTION_CARD));
-		registry.registerAsset(parseUIDocument(BUTTON_APPEARANCE));
+		registry.registerAsset(createActionCardDocument());
+		registry.registerAsset(createButtonAppearanceDocument());
 		registry.registerAsset(withIcon);
 		registry.registerResource({ key: 'font.main', resourceType: 'font' });
 		registry.registerToken({
@@ -199,20 +183,13 @@ describe('UI asset registry', () => {
 
 function createFixtureRegistry(): UIAssetRegistry {
 	const registry = new UIAssetRegistry();
-	registry.registerAsset(parseUIDocument(ACTION_CARD));
-	registry.registerAsset(parseUIDocument(BUTTON_APPEARANCE));
-	registry.registerAsset(parseUIDocument(LOBBY_SCREEN));
+	registry.registerAsset(createActionCardDocument());
+	registry.registerAsset(createButtonAppearanceDocument());
+	registry.registerAsset(createLobbyDocument());
 	registry.registerToken({
 		key: 'color.action.primary',
 		tokenType: 'color',
 		value: 0x3366ff,
 	});
 	return registry;
-}
-
-function readFixture(name: string): string {
-	return readFileSync(
-		fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url)),
-		'utf8',
-	);
 }

@@ -12,13 +12,7 @@ export function activateRuntimeContract(
 	context: KurotUICreationContext,
 	initialData: Readonly<Record<string, UIPropertyValue>> = {},
 ): void {
-	const controller = createDataController(
-		asset.contract,
-		asset.id,
-		scope,
-		context,
-		initialData,
-	);
+	const controller = createDataController(asset.contract, asset.id, scope, context, initialData);
 	context.dataControllers.set(scope, controller);
 	registerSemanticActions(asset, scope, context);
 }

@@ -79,9 +79,7 @@ describe('crash-game integration', () => {
 		bet.currentState = 'down';
 		bet.validateNow();
 		const betBackground = requireInstance(
-			result.instances.get(
-				'bet-action@appearance:crash-button-appearance/background',
-			),
+			result.instances.get('bet-action@appearance:crash-button-appearance/background'),
 			Rect,
 		);
 		expect(betBackground.alpha).toBe(0.72);
@@ -174,18 +172,8 @@ function createCrashScreen(buttonAppearanceId: string): UIDocument {
 						y: 300,
 					},
 				}),
-				createCrashActionNode(
-					'bet-action',
-					'PLACE BET',
-					80,
-					buttonAppearanceId,
-				),
-				createCrashActionNode(
-					'cashout-action',
-					'CASH OUT',
-					430,
-					buttonAppearanceId,
-				),
+				createCrashActionNode('bet-action', 'PLACE BET', 80, buttonAppearanceId),
+				createCrashActionNode('cashout-action', 'CASH OUT', 430, buttonAppearanceId),
 			],
 		}),
 	});
@@ -217,12 +205,14 @@ function createCrashButtonAppearance(): UIDocument {
 			},
 			states: {
 				down: {
-					overrides: [{
-						targetId: 'background',
-						property: 'alpha',
-						value: 0.72,
-						transition: { duration: 0, easing: 'ease-out' },
-					}],
+					overrides: [
+						{
+							targetId: 'background',
+							property: 'alpha',
+							value: 0.72,
+							transition: { duration: 0, easing: 'ease-out' },
+						},
+					],
 				},
 			},
 		}),
@@ -260,10 +250,7 @@ function createCrashButtonAppearance(): UIDocument {
 	});
 }
 
-function requireInstance<T>(
-	value: unknown,
-	type: abstract new (...args: never[]) => T,
-): T {
+function requireInstance<T>(value: unknown, type: abstract new (...args: never[]) => T): T {
 	if (value instanceof type) {
 		return value;
 	}

@@ -2,6 +2,7 @@ import {
 	isUIAssetReference,
 	isUIDesignTokenReference,
 	isUIResourceReference,
+	isSyntheticNodeId,
 	parseUIDocument,
 } from '@kurot/ui-document';
 import type { UIDocument, UINode, UIPropertyValue } from '@kurot/ui-document';
@@ -26,9 +27,6 @@ export function parseKUISkin(
 	customNamespaces: readonly NamespaceModule[] = [],
 ): SkinIR {
 	const document = parseUIDocument(source);
-	if (document.assetKind !== 'appearance') {
-		throw new Error(`KUI compiler expected a Skin document, received ${document.assetKind}.`);
-	}
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 
@@ -36,7 +34,6 @@ class KUIParseContext {
 	private readonly _imports = new Map<string, string>([['Skin', '@kurot/ui']]);
 	private readonly _skinParts: string[] = [];
 	private readonly _unresolvedTags: UnresolvedTag[] = [];
-	private readonly _partIds: ReadonlySet<string>;
 	private _variable = 0;
 
 	public constructor(
@@ -44,9 +41,7 @@ class KUIParseContext {
 		private readonly _document: UIDocument,
 		private readonly _className: string,
 		private readonly _customNamespaces: readonly NamespaceModule[],
-	) {
-		this._partIds = new Set(Object.values(this._document.contract.parts).map(part => part.nodeId));
-	}
+	) {}
 
 	public parse(): SkinIR {
 		const root = this._document.root;
@@ -55,7 +50,7 @@ class KUIParseContext {
 		}
 		const width = numericProperty(root.properties.width);
 		const height = numericProperty(root.properties.height);
-		const rootNode = this._node(root);
+		const rootNode = this._node(root, false);
 		return {
 			className: this._className,
 			...(width === undefined ? {} : { width }),
@@ -71,7 +66,7 @@ class KUIParseContext {
 		};
 	}
 
-	private _node(node: UINode): SkinNode | undefined {
+	private _node(node: UINode, exposeAsPart = true): SkinNode | undefined {
 		if (node.instance !== undefined) {
 			throw new Error(`KUI Skin node "${node.id}" cannot be a reusable component instance.`);
 		}
@@ -83,7 +78,9 @@ class KUIParseContext {
 		}
 		const className = localName(tag);
 		this._imports.set(className, info.module);
-		if (this._partIds.has(node.id)) this._skinParts.push(node.id);
+		if (exposeAsPart && !isSyntheticNodeId(node.id)) {
+			this._skinParts.push(node.id);
+		}
 
 		const propertyChildren: PropertyChild[] = [];
 		const properties: PropertyAssignment[] = [];
@@ -114,7 +111,7 @@ class KUIParseContext {
 			type: value.type,
 			properties,
 			children: [],
-		});
+		}, false);
 		return node === undefined ? undefined : { propertyName: name, nodes: [node] };
 	}
 

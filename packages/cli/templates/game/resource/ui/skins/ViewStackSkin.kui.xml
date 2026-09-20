@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" id="skins.ViewStackSkin" version="2" target="kui.ViewStack" default="false">
-    <contract>
-        <parts>
-            <part name="contentGroup" node="contentGroup" />
-        </parts>
-    </contract>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ViewStackSkin">
     <Group id="root">
         <Group id="contentGroup" height="100%" width="100%" />
     </Group>

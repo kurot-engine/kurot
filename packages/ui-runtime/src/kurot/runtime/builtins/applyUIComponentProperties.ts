@@ -67,11 +67,7 @@ export function applyUIComponentProperty(
 
 function requireContainer(target: DisplayObject, path: string): DisplayObjectContainer {
 	if (target instanceof DisplayObjectContainer) return target;
-	throw new KurotUIRuntimeError(
-		'invalid-property',
-		'Property requires a display-object container.',
-		path,
-	);
+	throw new KurotUIRuntimeError('invalid-property', 'Property requires a display-object container.', path);
 }
 
 function requireConstraint(value: unknown, path: string): number | string {

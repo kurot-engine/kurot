@@ -1,24 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" id="skins.ButtonSkin" version="2" target="kui.Button" default="true">
-    <contract>
-        <parts>
-            <part name="iconDisplay" node="iconDisplay" />
-            <part name="labelDisplay" node="labelDisplay" />
-        </parts>
-        <states>
-            <state name="disabled">
-                <set target="node_image1" property="alpha" value="0.5" />
-            </state>
-            <state name="down">
-                <set target="node_image1" property="source" value="@resource:image:button_down_png" />
-            </state>
-            <state name="up">
-            </state>
-        </states>
-    </contract>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="disabled,down,up">
     <Group id="root" minHeight="50" minWidth="100">
-        <Image id="node_image1" height="100%" scale9Grid="1,3,8,8" source="@resource:image:button_up_png" width="100%" />
-        <Label id="labelDisplay" bottom="8" left="8" right="8" size="20" textAlign="center" textColor="16777215" top="8" verticalAlign="middle" />
+        <Image height="100%" scale9Grid="1,3,8,8" source="button_up_png" width="100%" alpha.disabled="0.5" source.down="button_down_png" />
+        <Label id="labelDisplay" bottom="8" left="8" right="8" size="20" textAlign="center" textColor="#FFFFFF" top="8" verticalAlign="middle" />
         <Image id="iconDisplay" horizontalCenter="0" verticalCenter="0" />
     </Group>
 </Skin>

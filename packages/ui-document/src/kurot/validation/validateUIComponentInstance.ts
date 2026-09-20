@@ -8,13 +8,7 @@ import {
 	validatePropertyValue,
 } from './validationHelpers.js';
 
-const INSTANCE_KEYS = new Set([
-	'overrides',
-	'parameters',
-	'slots',
-	'source',
-	'variant',
-]);
+const INSTANCE_KEYS = new Set(['overrides', 'parameters', 'slots', 'source', 'variant']);
 const OVERRIDE_KEYS = new Set(['part', 'property', 'value']);
 
 /**
@@ -27,12 +21,7 @@ export function validateUIComponentInstance(
 	validateNode: (value: unknown, path: string) => void,
 ): void {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-component-instance',
-			path,
-			'Component instance must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-component-instance', path, 'Component instance must be an object.');
 		return;
 	}
 
@@ -46,18 +35,9 @@ export function validateUIComponentInstance(
 	validateSlots(value.slots, `${path}.slots`, diagnostics, validateNode);
 }
 
-function validateParameters(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateParameters(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-component-instance',
-			path,
-			'Instance parameters must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-component-instance', path, 'Instance parameters must be an object.');
 		return;
 	}
 	for (const [name, parameter] of Object.entries(value)) {
@@ -74,18 +54,9 @@ function validateParameters(
 	}
 }
 
-function validateOverrides(
-	value: unknown,
-	path: string,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateOverrides(value: unknown, path: string, diagnostics: UIDiagnostic[]): void {
 	if (!Array.isArray(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-component-instance',
-			path,
-			'Instance overrides must be an array.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-component-instance', path, 'Instance overrides must be an array.');
 		return;
 	}
 	for (let index = 0; index < value.length; index++) {
@@ -102,12 +73,7 @@ function validateOverrides(
 		}
 		validateKnownKeys(override, OVERRIDE_KEYS, overridePath, diagnostics);
 		validateNonEmptyString(override.part, `${overridePath}.part`, 'Part name', diagnostics);
-		validateNonEmptyString(
-			override.property,
-			`${overridePath}.property`,
-			'Property name',
-			diagnostics,
-		);
+		validateNonEmptyString(override.property, `${overridePath}.property`, 'Property name', diagnostics);
 		validatePropertyValue(override.value, `${overridePath}.value`, diagnostics);
 	}
 }
@@ -119,23 +85,13 @@ function validateSlots(
 	validateNode: (value: unknown, path: string) => void,
 ): void {
 	if (!isPlainRecord(value)) {
-		addUIDiagnostic(
-			diagnostics,
-			'invalid-component-instance',
-			path,
-			'Instance slots must be an object.',
-		);
+		addUIDiagnostic(diagnostics, 'invalid-component-instance', path, 'Instance slots must be an object.');
 		return;
 	}
 	for (const [name, children] of Object.entries(value)) {
 		const slotPath = `${path}.${name}`;
 		if (name.trim().length === 0) {
-			addUIDiagnostic(
-				diagnostics,
-				'invalid-component-instance',
-				path,
-				'Instance slot names must not be empty.',
-			);
+			addUIDiagnostic(diagnostics, 'invalid-component-instance', path, 'Instance slot names must not be empty.');
 		}
 		if (!Array.isArray(children)) {
 			addUIDiagnostic(

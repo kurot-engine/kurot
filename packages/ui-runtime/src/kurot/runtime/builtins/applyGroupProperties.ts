@@ -5,12 +5,7 @@ import { requireBoolean, requireNumber } from './valueGuards.js';
 /**
  * Applies one property declared directly by Group.
  */
-export function applyGroupProperty(
-	target: Group,
-	name: string,
-	value: unknown,
-	path: string,
-): boolean {
+export function applyGroupProperty(target: Group, name: string, value: unknown, path: string): boolean {
 	switch (name) {
 		case 'layout':
 			target.layout = createLayout(value, path);

@@ -3,10 +3,7 @@ import type { UIPropertyValue } from '@kurot/ui-document';
 import { applyBuiltInProperty } from './builtins/applyBuiltInProperties.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
-import type {
-	KurotUIComponentAdapter,
-	KurotUICreationContext,
-} from './types.js';
+import type { KurotUIComponentAdapter, KurotUICreationContext } from './types.js';
 
 /**
  * Applies one resolved semantic property to an existing runtime object.
@@ -30,11 +27,7 @@ export function applyRuntimeProperty(
 		return;
 	}
 
-	throw new KurotUIRuntimeError(
-		'invalid-property',
-		`Runtime property "${name}" is not supported by ${type}.`,
-		path,
-	);
+	throw new KurotUIRuntimeError('invalid-property', `Runtime property "${name}" is not supported by ${type}.`, path);
 }
 
 function applyAdapterProperty(

@@ -1,13 +1,11 @@
-import type { UIAssetContract } from '../model/UIAssetContract.js';
-import type { UIAssetKind } from '../model/UIAssetKind.js';
+import { createUIAssetContract } from '../document/create-asset-contract.js';
 import { UI_DOCUMENT_KIND } from '../model/UIDocument.js';
 import type { UIDocument } from '../model/UIDocument.js';
+import { UI_DOCUMENT_FORMAT_VERSION } from '../version.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { isUIDocument, validateUIDocument } from '../validation/validateUIDocument.js';
 import { UIDocumentParseError } from './UIDocumentParseError.js';
 import { UIDocumentValidationError } from './UIDocumentValidationError.js';
-import { parseContract } from './xml/xml-contract-parser.js';
-import { serializeContract } from './xml/xml-contract-serializer.js';
 import { collectNodePrefixes, parseNode, serializeNode } from './xml/xml-node.js';
 import { parseXML } from './xml/xml-parser.js';
 import { escapeXML } from './xml/xml-values.js';
@@ -22,7 +20,22 @@ export const KUI_XML_NAMESPACE = 'https://kurot.dev/ui/1';
  */
 export function serializeUIDocument(document: UIDocument): string {
 	const diagnostics = validateUIDocument(document);
-	if (diagnostics.length > 0) throw new UIDocumentValidationError(diagnostics);
+	if (diagnostics.length > 0) {
+		throw new UIDocumentValidationError(diagnostics);
+	}
+
+	if (document.assetKind !== 'appearance') {
+		throw new Error('KUI XML serializes Skin documents only.');
+	}
+	if (document.contract.targetType !== undefined) {
+		throw new Error('Skin XML does not serialize runtime target metadata.');
+	}
+	if (Object.values(document.contract.states).some(state => state.description !== undefined)) {
+		throw new Error('Skin XML does not serialize state descriptions.');
+	}
+	if (hasUnsupportedContractContent(document)) {
+		throw new Error('Skin XML supports state definitions only; other asset contracts are programmatic.');
+	}
 
 	const prefixes = new Set<string>();
 	collectNodePrefixes(document.root, prefixes);
@@ -30,14 +43,17 @@ export function serializeUIDocument(document: UIDocument): string {
 		.sort()
 		.map(prefix => ` xmlns:${prefix}="https://kurot.dev/components/${escapeXML(prefix)}"`)
 		.join('');
-	const tag = rootTag(document.assetKind);
+	const stateNames = Object.keys(document.contract.states);
+	validateStateNames(stateNames);
+	const stateAttribute = stateNames.length === 0
+		? ''
+		: ` states="${escapeXML(stateNames.join(','))}"`;
 	const lines = [
 		'<?xml version="1.0" encoding="utf-8"?>',
-		`<${tag} xmlns="${KUI_XML_NAMESPACE}"${namespaces} id="${escapeXML(document.id)}" version="${document.formatVersion}"${rootContractAttributes(document.assetKind, document.contract)}>`
+		`<Skin xmlns="${KUI_XML_NAMESPACE}"${namespaces} class="${escapeXML(document.id)}"${stateAttribute}>`,
 	];
-	if (hasContractBody(document.contract)) lines.push(...serializeContract(document.contract, 1));
-	lines.push(...serializeNode(document.root, 1));
-	lines.push(`</${tag}>`);
+	lines.push(...serializeNode(document.root, 1, document.contract.states));
+	lines.push('</Skin>');
 	return `${lines.join('\n')}\n`;
 }
 
@@ -47,20 +63,17 @@ export function serializeUIDocument(document: UIDocument): string {
 export function parseUIDocument(source: string): UIDocument {
 	try {
 		const element = parseXML(source);
-		const assetKind = assetKindFromRoot(element.name);
+		if (element.name !== 'Skin') {
+			throw new Error(`KUI skin root must be <Skin>; received <${element.name}>.`);
+		}
 		if (element.attributes.xmlns !== KUI_XML_NAMESPACE) {
 			throw new Error(`KUI XML root must declare xmlns="${KUI_XML_NAMESPACE}".`);
 		}
-		validateRootAttributes(assetKind, element.attributes);
-		const contractElements = element.children.filter(child => child.name === 'contract');
-		if (contractElements.length > 1) {
-			throw new Error(`<${element.name}> cannot contain more than one <contract>.`);
+		validateRootAttributes(element.attributes);
+		if (element.children.some(child => child.name === 'contract')) {
+			throw new Error('Unexpected <contract> inside <Skin>.');
 		}
-		const contractElement = contractElements[0];
-		if (contractElement !== undefined && element.children[0] !== contractElement) {
-			throw new Error(`<contract> must precede the root component in <${element.name}>.`);
-		}
-		const componentElements = element.children.filter(child => child.name !== 'contract');
+		const componentElements = element.children;
 		if (componentElements.length !== 1 || componentElements[0] === undefined) {
 			throw new Error(`<${element.name}> must contain exactly one root component.`);
 		}
@@ -69,112 +82,95 @@ export function parseUIDocument(source: string): UIDocument {
 				.filter(([name]) => name.startsWith('xmlns:'))
 				.map(([name, value]) => [name.slice('xmlns:'.length), value]),
 		);
-		const parsedContract = parseContract(contractElement);
-		const contract = applyRootContractAttributes(assetKind, parsedContract, element.attributes);
+		const stateNames = parseStateNames(element.attributes.states);
+		const stateOverrides = new Map(stateNames.map(name => [name, []]));
+		const root = parseNode(componentElements[0], {
+			prefixes,
+			states: new Set(stateNames),
+			stateOverrides,
+		});
+		const states = Object.fromEntries(stateNames.map(name => [name, {
+			overrides: stateOverrides.get(name) ?? [],
+		}]));
 		const value: UIDocument = {
 			kind: UI_DOCUMENT_KIND,
-			formatVersion: Number(requiredAttribute(element.name, element.attributes, 'version')),
-			id: requiredAttribute(element.name, element.attributes, 'id'),
-			assetKind,
-			contract,
-			root: parseNode(componentElements[0], { prefixes }),
+			formatVersion: UI_DOCUMENT_FORMAT_VERSION,
+			id: requiredAttribute(element.name, element.attributes, 'class'),
+			assetKind: 'appearance',
+			contract: createUIAssetContract({ states }),
+			root,
 		};
-		if (!isUIDocument(value)) throw new UIDocumentParseError(validateUIDocument(value));
+		if (!isUIDocument(value)) {
+			throw new UIDocumentParseError(validateUIDocument(value));
+		}
 		return value;
 	} catch (error) {
-		if (error instanceof UIDocumentParseError) throw error;
+		if (error instanceof UIDocumentParseError) {
+			throw error;
+		}
 		const message = error instanceof Error ? error.message : 'Input is not valid KUI XML.';
-		const diagnostics: UIDiagnostic[] = [{
-			code: 'invalid-xml',
-			severity: 'error',
-			path: '$',
-			message,
-		}];
+		const diagnostics: UIDiagnostic[] = [
+			{
+				code: 'invalid-xml',
+				severity: 'error',
+				path: '$',
+				message,
+			},
+		];
 		throw new UIDocumentParseError(diagnostics, error instanceof Error ? error : undefined);
 	}
 }
 
-function validateRootAttributes(
-	assetKind: UIAssetKind,
-	attributes: Readonly<Record<string, string>>,
-): void {
-	const allowed = new Set(['id', 'version', 'xmlns']);
-	if (assetKind === 'component') {
-		allowed.add('type');
-	}
-	if (assetKind === 'appearance') {
-		allowed.add('target');
-		allowed.add('default');
-	}
+function validateRootAttributes(attributes: Readonly<Record<string, string>>): void {
+	const allowed = new Set(['class', 'states', 'xmlns']);
 	for (const name of Object.keys(attributes)) {
 		if (!allowed.has(name) && !name.startsWith('xmlns:')) {
-			throw new Error(`Unexpected attribute "${name}" on <${rootTag(assetKind)}>.`);
+			throw new Error(`Unexpected attribute "${name}" on <Skin>.`);
 		}
 	}
 }
 
-function rootTag(assetKind: UIAssetKind): 'Component' | 'Screen' | 'Skin' {
-	switch (assetKind) {
-		case 'appearance': return 'Skin';
-		case 'component': return 'Component';
-		case 'screen': return 'Screen';
+function parseStateNames(value: string | undefined): string[] {
+	if (value === undefined || value.trim().length === 0) {
+		return [];
+	}
+	const names = value.split(',').map(name => name.trim());
+	if (names.some(name => name.length === 0)) {
+		throw new Error('<Skin> states must be a comma-separated list of names.');
+	}
+	if (new Set(names).size !== names.length) {
+		throw new Error('<Skin> states must not contain duplicate names.');
+	}
+	validateStateNames(names);
+	return names;
+}
+
+function validateStateNames(names: readonly string[]): void {
+	for (const name of names) {
+		if (!/^[A-Za-z_][\w-]*$/.test(name)) {
+			throw new Error(`Skin state name "${name}" is not valid in a property.state attribute.`);
+		}
 	}
 }
 
-function assetKindFromRoot(name: string): UIAssetKind {
-	switch (name) {
-		case 'Component': return 'component';
-		case 'Screen': return 'screen';
-		case 'Skin': return 'appearance';
-		default: throw new Error(`KUI XML root must be <Screen>, <Component>, or <Skin>; received <${name}>.`);
-	}
-}
-
-function rootContractAttributes(assetKind: UIAssetKind, contract: UIAssetContract): string {
-	if (assetKind === 'component' && contract.componentType !== undefined) {
-		return ` type="${escapeXML(contract.componentType)}"`;
-	}
-	if (assetKind === 'appearance' && contract.targetType !== undefined) {
-		return ` target="${escapeXML(contract.targetType)}"${contract.isDefault === undefined ? '' : ` default="${contract.isDefault}"`}`;
-	}
-	return '';
-}
-
-function applyRootContractAttributes(
-	assetKind: UIAssetKind,
-	contract: UIAssetContract,
-	attributes: Readonly<Record<string, string>>,
-): UIAssetContract {
-	const isDefault = attributes.default === undefined
-		? undefined
-		: parseBooleanAttribute(rootTag(assetKind), 'default', attributes.default);
-	return {
-		...contract,
-		...(assetKind === 'component' && attributes.type !== undefined ? { componentType: attributes.type } : {}),
-		...(assetKind === 'appearance' && attributes.target !== undefined ? { targetType: attributes.target } : {}),
-		...(assetKind === 'appearance' && isDefault !== undefined ? { isDefault } : {}),
-	};
-}
-
-function parseBooleanAttribute(tag: string, name: string, value: string): boolean {
-	if (value === 'true') return true;
-	if (value === 'false') return false;
-	throw new Error(`<${tag}> attribute ${name} must be true or false.`);
-}
-
-function hasContractBody(contract: UIAssetContract): boolean {
-	return Object.keys(contract.parameters).length > 0
-		|| Object.keys(contract.parts).length > 0
-		|| Object.keys(contract.slots).length > 0
-		|| Object.keys(contract.states).length > 0
-		|| Object.keys(contract.variants).length > 0
-		|| Object.keys(contract.dataFields ?? {}).length > 0
-		|| Object.keys(contract.dataBindings ?? {}).length > 0
-		|| Object.keys(contract.actions ?? {}).length > 0;
+function hasUnsupportedContractContent(document: UIDocument): boolean {
+	const contract = document.contract;
+	return (
+		Object.keys(contract.parameters).length > 0 ||
+		Object.keys(contract.parts).length > 0 ||
+		Object.keys(contract.slots).length > 0 ||
+		Object.keys(contract.variants).length > 0 ||
+		Object.keys(contract.dataFields ?? {}).length > 0 ||
+		Object.keys(contract.dataBindings ?? {}).length > 0 ||
+		Object.keys(contract.actions ?? {}).length > 0 ||
+		contract.componentType !== undefined
+	);
 }
 
 function requiredAttribute(tag: string, attributes: Readonly<Record<string, string>>, name: string): string {
 	const value = attributes[name];
-	if (value === undefined || value.length === 0) throw new Error(`<${tag}> requires ${name}.`);
+	if (value === undefined || value.length === 0) {
+		throw new Error(`<${tag}> requires ${name}.`);
+	}
 	return value;
 }

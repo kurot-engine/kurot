@@ -7,6 +7,22 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Unreleased
 
+## 2.0.1 — 2026-09-21
+
+### Changed
+
+- Raised the `@kurot/ui-document` requirement to `^0.6.1` for canonical Skin
+  state and internal-node handling.
+- Simplified the authored Skin root to `class`; storage IDs, format versions,
+  runtime targets, and default flags are no longer user-edited XML metadata.
+- Default theme mappings now come from internal built-in conventions and
+  configured project component pairs.
+- Skin parts are inferred from identified visual nodes; internal nodes can omit
+  IDs. States use the root `states` list and local `property.state` attributes,
+  so state-only targets do not require artificial part names.
+- Image `source` values use plain resource keys without an
+  `@resource:image:` prefix.
+
 ## 2.0.0 — 2026-09-21
 
 This release is scoped to the Kurot Editor toolchain. Existing EXML game

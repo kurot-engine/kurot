@@ -10,15 +10,9 @@ import type { KurotUICreationContext } from './types.js';
 /**
  * Resolves nested token and resource references into runtime property values.
  */
-export function resolvePropertyValue(
-	value: UIPropertyValue,
-	path: string,
-	context: KurotUICreationContext,
-): unknown {
+export function resolvePropertyValue(value: UIPropertyValue, path: string, context: KurotUICreationContext): unknown {
 	if (isPropertyArray(value)) {
-		return value.map((item, index) =>
-			resolvePropertyValue(item, `${path}[${index}]`, context),
-		);
+		return value.map((item, index) => resolvePropertyValue(item, `${path}[${index}]`, context));
 	}
 	if (typeof value !== 'object') {
 		return value;
@@ -44,9 +38,7 @@ export function resolvePropertyValue(
 	return resolved;
 }
 
-function isPropertyArray(
-	value: UIPropertyValue,
-): value is readonly UIPropertyValue[] {
+function isPropertyArray(value: UIPropertyValue): value is readonly UIPropertyValue[] {
 	return Array.isArray(value);
 }
 
@@ -59,9 +51,5 @@ function isResourceReference(value: UIPropertyObject): value is UIResourceRefere
 }
 
 function unresolvedReference(kind: string, key: string, path: string): KurotUIRuntimeError {
-	return new KurotUIRuntimeError(
-		'invalid-property',
-		`Cannot resolve UI ${kind} "${key}".`,
-		path,
-	);
+	return new KurotUIRuntimeError('invalid-property', `Cannot resolve UI ${kind} "${key}".`, path);
 }
