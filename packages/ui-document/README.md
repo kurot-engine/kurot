@@ -86,6 +86,8 @@ file pipeline.
   serializable defaults, editor-facing semantic formats, and accepted resource
   or token categories;
 - immutable semantic operations with exact inverse generation;
+- atomic node-ID edits that update every contract reference and can remove an
+  authored XML ID while retaining an internal editor identity;
 - atomic transactions, monotonic revisions, stale-edit conflict detection,
   deterministic diffs, and in-memory undo/redo history.
 
@@ -164,6 +166,11 @@ history.commit({
 history.undo();
 history.redo();
 ```
+
+`set-node-id` changes a node identity and every state, variant, binding, action,
+part, and Slot reference to it as one operation. Omitting `id` removes the
+authored XML ID; the document retains a hidden synthetic identity so selection,
+history, and inline state properties continue to work.
 
 Transactions either commit completely or leave the input snapshot untouched.
 Undo and redo create new monotonically increasing revisions, so an older Agent

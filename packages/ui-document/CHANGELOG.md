@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## Unreleased
+
+### Added
+
+- Added the reversible `set-node-id` editing operation. It updates node identity
+  and every contract reference atomically; omitting the new ID removes the
+  authored XML ID while retaining an internal synthetic identity.
+
 ## [0.6.1] — 2026-09-21
 
 ### Fixed

@@ -55,15 +55,16 @@ src/
   validation; projected content must use a Slot declared by the source asset.
 - Node IDs are non-empty and unique across the complete document, including
   trees projected into Slots.
-- **Agent authoring rule for appearance assets:** node IDs and public part names
-  are installed as named properties on a native `@kurot/ui` `Skin`. Do not use
-  a name that collides with `Skin` or its inherited runtime members, such as
-  `setPart`, `getPart`, `states`, or `hostComponent`; names beginning with `$`
-  or `_` are also reserved for runtime internals. Such a collision is invalid
-  authored data: generators and editors must report it and rename the node or
-  part instead of silently adapting the name or choosing alternate storage.
-  Human-authored UI rarely hits this boundary, but Agent generation must treat
-  it as a deterministic naming constraint.
+- Skin XML nodes may omit `id`. Parsing assigns a deterministic synthetic ID
+  for editor selection, state overrides, history, and other internal references;
+  serialization omits that synthetic value again. An explicit child-node ID is
+  an authored public skin-part name. The Skin root is never a public part.
+- **Agent authoring rule for appearance assets:** explicit child-node IDs and
+  public part names are installed as named properties on a native `@kurot/ui`
+  `Skin`. Do not use a name that collides with `Skin` or its inherited runtime
+  members, such as `setPart`, `getPart`, `states`, or `hostComponent`; names
+  beginning with `$` or `_` are reserved for runtime internals. Such a collision
+  is invalid authored data.
 - Properties accept strings, booleans, finite numbers, arrays, and plain
   string-keyed objects. Undefined, null, functions, platform objects, cyclic
   values, and non-finite numbers are invalid.
@@ -142,7 +143,8 @@ src/
   `registerKurotUIFoundation`.
 - Project assets: `UIAssetRegistry`, project resource/token definitions, and
   `validateUIAssetRegistry`.
-- Editing: `UIOperation`, `applyUIOperation`, `UITransaction`,
+- Editing: `UIOperation` (including atomic `set-node-id` reference updates),
+  `applyUIOperation`, `UITransaction`,
   `applyUITransaction`, revision snapshots, `diffUIDocuments`,
   `UIDocumentHistory`, and `UIEditError`.
 

@@ -48,6 +48,11 @@ export type UIOperation =
 			readonly target: UIChildTarget;
 			readonly index: number;
 	  }
+	| {
+			readonly kind: 'set-node-id';
+			readonly nodeId: string;
+			readonly id?: string;
+	  }
 	| { readonly kind: 'replace-node-type'; readonly nodeId: string; readonly type: string }
 	| {
 			readonly kind: 'set-node-property';

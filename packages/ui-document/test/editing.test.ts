@@ -6,10 +6,15 @@ import {
 	createUINode,
 	diffUIDocuments,
 	findUINode,
+	parseUIDocument,
+	serializeUIDocument,
 	UIDocumentHistory,
 	UIEditError,
 } from '../src/index.js';
-import { createActionCardDocument, createLobbyDocument } from './document-fixtures.js';
+import {
+	createActionCardDocument,
+	createLobbyDocument,
+} from './document-fixtures.js';
 
 describe('semantic UI operations', () => {
 	it('applies immutable property edits and exact inverse operations', () => {
@@ -90,6 +95,74 @@ describe('semantic UI operations', () => {
 		expect(findUINode(result.document.root, 'native-button')?.appearance?.variant).toBe(
 			'prominent',
 		);
+		expect(applyUIOperation(result.document, result.inverse).document).toEqual(document);
+	});
+
+	it('renames node ids together with every contract reference and supports exact undo', () => {
+		const source = createActionCardDocument();
+		const document = {
+			...source,
+			contract: {
+				...source.contract,
+				dataFields: { title: { valueType: 'string' as const } },
+				dataBindings: { title: { source: 'title', targetId: 'label', property: 'text' } },
+				actions: { activate: { sourceId: 'label', trigger: 'tap' as const } },
+			},
+		};
+		const background = applyUIOperation(document, {
+			kind: 'set-node-id',
+			nodeId: 'background',
+			id: 'surface',
+		});
+		const label = applyUIOperation(background.document, {
+			kind: 'set-node-id',
+			nodeId: 'label',
+			id: 'caption',
+		});
+		const slot = applyUIOperation(label.document, {
+			kind: 'set-node-id',
+			nodeId: 'content-slot',
+			id: 'content',
+		});
+		const root = applyUIOperation(slot.document, {
+			kind: 'set-node-id',
+			nodeId: 'root',
+			id: 'container',
+		});
+
+		expect(root.document.contract.parts.background?.nodeId).toBe('surface');
+		expect(root.document.contract.variants.primary?.overrides[0]?.targetId).toBe('surface');
+		expect(root.document.contract.parts.label?.nodeId).toBe('caption');
+		expect(root.document.contract.parameters.label?.bindings?.[0]?.targetId).toBe('caption');
+		expect(root.document.contract.dataBindings?.title?.targetId).toBe('caption');
+		expect(root.document.contract.actions?.activate?.sourceId).toBe('caption');
+		expect(root.document.contract.slots.content?.nodeId).toBe('content');
+		expect(root.document.contract.states.disabled?.overrides[0]?.targetId).toBe('container');
+		expect(applyUIOperation(root.document, root.inverse).document).toEqual(slot.document);
+		expect(() => applyUIOperation(root.document, {
+			kind: 'set-node-id',
+			nodeId: 'caption',
+			id: 'surface',
+		})).toThrowError(expect.objectContaining({ code: 'duplicate-node-id' }));
+	});
+
+	it('clears authored node ids while retaining internal state targets', () => {
+		const document = parseUIDocument(`<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="down">
+    <Group>
+        <Rect id="background" alpha.down="0.8" />
+    </Group>
+</Skin>
+`);
+		const result = applyUIOperation(document, {
+			kind: 'set-node-id',
+			nodeId: 'background',
+		});
+		const background = result.document.root.children[0];
+
+		expect(background?.id).toMatch(/^__kui_node_/);
+		expect(result.document.contract.states.down?.overrides[0]?.targetId).toBe(background?.id);
+		expect(serializeUIDocument(result.document)).not.toContain('id="background"');
 		expect(applyUIOperation(result.document, result.inverse).document).toEqual(document);
 	});
 });
