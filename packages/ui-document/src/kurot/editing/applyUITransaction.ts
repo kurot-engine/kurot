@@ -37,17 +37,9 @@ export function applyUITransaction(
 		}
 	}
 
-	const diagnostics = [
-		...validateUIDocument(document),
-		...(options.validate?.(document) ?? []),
-	];
+	const diagnostics = [...validateUIDocument(document), ...(options.validate?.(document) ?? [])];
 	if (diagnostics.length > 0) {
-		throw new UIEditError(
-			'invalid-edit-result',
-			'Transaction produced an invalid UI document.',
-			'$',
-			diagnostics,
-		);
+		throw new UIEditError('invalid-edit-result', 'Transaction produced an invalid UI document.', '$', diagnostics);
 	}
 
 	const revision = snapshot.revision + 1;
@@ -65,46 +57,23 @@ export function applyUITransaction(
 	});
 }
 
-function validateTransaction(
-	snapshot: UIRevisionSnapshot,
-	transaction: UITransaction,
-): void {
+function validateTransaction(snapshot: UIRevisionSnapshot, transaction: UITransaction): void {
 	if (!Number.isInteger(snapshot.revision) || snapshot.revision < 0) {
-		throw new UIEditError(
-			'invalid-operation',
-			'Snapshot revision must be a non-negative integer.',
-			'$.revision',
-		);
+		throw new UIEditError('invalid-operation', 'Snapshot revision must be a non-negative integer.', '$.revision');
 	}
 	if (transaction.expectedRevision !== snapshot.revision) {
 		const message =
 			`Transaction expected revision ${transaction.expectedRevision}, ` +
 			`but the current revision is ${snapshot.revision}.`;
-		throw new UIEditError(
-			'revision-conflict',
-			message,
-			'$.expectedRevision',
-		);
+		throw new UIEditError('revision-conflict', message, '$.expectedRevision');
 	}
 	if (transaction.id.trim().length === 0) {
-		throw new UIEditError(
-			'invalid-operation',
-			'Transaction id must not be empty.',
-			'$.id',
-		);
+		throw new UIEditError('invalid-operation', 'Transaction id must not be empty.', '$.id');
 	}
 	if (transaction.summary.trim().length === 0) {
-		throw new UIEditError(
-			'invalid-operation',
-			'Transaction summary must not be empty.',
-			'$.summary',
-		);
+		throw new UIEditError('invalid-operation', 'Transaction summary must not be empty.', '$.summary');
 	}
 	if (transaction.operations.length === 0) {
-		throw new UIEditError(
-			'transaction-empty',
-			'Transaction must contain at least one operation.',
-			'$.operations',
-		);
+		throw new UIEditError('transaction-empty', 'Transaction must contain at least one operation.', '$.operations');
 	}
 }

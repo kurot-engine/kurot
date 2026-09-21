@@ -2,10 +2,7 @@ import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { addUIDiagnostic } from '../validation/validationHelpers.js';
-import type {
-	UIChildrenPolicy,
-	UIResolvedComponentDefinition,
-} from './UIComponentDefinition.js';
+import type { UIChildrenPolicy, UIResolvedComponentDefinition } from './UIComponentDefinition.js';
 import type { UIComponentRegistry } from './UIComponentRegistry.js';
 import { UIComponentResolutionError } from './UIComponentResolutionError.js';
 import { matchesUIPropertyDefinition } from './matchesUIPropertyDefinition.js';
@@ -15,21 +12,13 @@ import { matchesUIPropertyDefinition } from './matchesUIPropertyDefinition.js';
  * Reusable instance types are resolved by project asset validation instead.
  * The document must first pass validateUIDocument.
  */
-export function validateUIDocumentComponents(
-	document: UIDocument,
-	registry: UIComponentRegistry,
-): UIDiagnostic[] {
+export function validateUIDocumentComponents(document: UIDocument, registry: UIComponentRegistry): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
 	validateNode(document.root, '$.root', registry, diagnostics);
 	return diagnostics;
 }
 
-function validateNode(
-	node: UINode,
-	path: string,
-	registry: UIComponentRegistry,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateNode(node: UINode, path: string, registry: UIComponentRegistry, diagnostics: UIDiagnostic[]): void {
 	let definition: UIResolvedComponentDefinition | undefined;
 	try {
 		definition = registry.resolve(node.type);
@@ -101,25 +90,14 @@ function validateNode(
 	for (const slotName of Object.keys(node.instance.slots).sort()) {
 		const children = node.instance.slots[slotName]!;
 		for (let index = 0; index < children.length; index++) {
-			validateNode(
-				children[index]!,
-				`${path}.instance.slots.${slotName}[${index}]`,
-				registry,
-				diagnostics,
-			);
+			validateNode(children[index]!, `${path}.instance.slots.${slotName}[${index}]`, registry, diagnostics);
 		}
 	}
 }
 
-function validateChildren(
-	node: UINode,
-	path: string,
-	diagnostics: UIDiagnostic[],
-	policy?: UIChildrenPolicy,
-): void {
+function validateChildren(node: UINode, path: string, diagnostics: UIDiagnostic[], policy?: UIChildrenPolicy): void {
 	const invalid =
-		(policy === 'none' && node.children.length !== 0) ||
-		(policy === 'single' && node.children.length > 1);
+		(policy === 'none' && node.children.length !== 0) || (policy === 'single' && node.children.length > 1);
 	if (!invalid) return;
 
 	addUIDiagnostic(

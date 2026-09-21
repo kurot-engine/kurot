@@ -1,9 +1,7 @@
 /**
  * Stable failure categories produced while resolving component inheritance.
  */
-export type UIComponentResolutionErrorCode =
-	| 'circular-component-inheritance'
-	| 'missing-component-base';
+export type UIComponentResolutionErrorCode = 'circular-component-inheritance' | 'missing-component-base';
 
 /**
  * Error raised when registered component definitions cannot be resolved.
@@ -19,11 +17,7 @@ export class UIComponentResolutionError extends Error {
 	 */
 	public readonly chain: readonly string[];
 
-	public constructor(
-		code: UIComponentResolutionErrorCode,
-		message: string,
-		chain: readonly string[],
-	) {
+	public constructor(code: UIComponentResolutionErrorCode, message: string, chain: readonly string[]) {
 		super(message);
 		this.name = 'UIComponentResolutionError';
 		this.code = code;

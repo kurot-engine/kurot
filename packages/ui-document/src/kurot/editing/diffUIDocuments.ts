@@ -56,10 +56,7 @@ interface IndexedNode {
 /**
  * Produces a deterministic semantic summary without mutating either document.
  */
-export function diffUIDocuments(
-	before: UIDocument,
-	after: UIDocument,
-): readonly UIDocumentChange[] {
+export function diffUIDocuments(before: UIDocument, after: UIDocument): readonly UIDocumentChange[] {
 	const changes: UIDocumentChange[] = [];
 	if (!equalValue(before.contract, after.contract)) {
 		changes.push({
@@ -132,15 +129,8 @@ function diffNode(
 	}
 }
 
-function diffProperties(
-	nodeId: string,
-	before: UINode,
-	after: UINode,
-	changes: UIDocumentChange[],
-): void {
-	const names = [
-		...new Set([...Object.keys(before.properties), ...Object.keys(after.properties)]),
-	].sort();
+function diffProperties(nodeId: string, before: UINode, after: UINode, changes: UIDocumentChange[]): void {
+	const names = [...new Set([...Object.keys(before.properties), ...Object.keys(after.properties)])].sort();
 	for (const name of names) {
 		if (equalValue(before.properties[name], after.properties[name])) continue;
 		changes.push({
@@ -159,35 +149,20 @@ function indexNodes(root: UINode): ReadonlyMap<string, IndexedNode> {
 	return nodes;
 }
 
-function visit(
-	node: UINode,
-	target: UIChildTarget | undefined,
-	index: number,
-	nodes: Map<string, IndexedNode>,
-): void {
+function visit(node: UINode, target: UIChildTarget | undefined, index: number, nodes: Map<string, IndexedNode>): void {
 	nodes.set(node.id, {
 		node,
 		...(target === undefined ? {} : { target }),
 		index,
 	});
 	for (let childIndex = 0; childIndex < node.children.length; childIndex++) {
-		visit(
-			node.children[childIndex]!,
-			{ collection: 'children', parentId: node.id },
-			childIndex,
-			nodes,
-		);
+		visit(node.children[childIndex]!, { collection: 'children', parentId: node.id }, childIndex, nodes);
 	}
 	if (!node.instance) return;
 	for (const slot of Object.keys(node.instance.slots).sort()) {
 		const children = node.instance.slots[slot]!;
 		for (let childIndex = 0; childIndex < children.length; childIndex++) {
-			visit(
-				children[childIndex]!,
-				{ collection: 'slot', parentId: node.id, slot },
-				childIndex,
-				nodes,
-			);
+			visit(children[childIndex]!, { collection: 'slot', parentId: node.id, slot }, childIndex, nodes);
 		}
 	}
 }

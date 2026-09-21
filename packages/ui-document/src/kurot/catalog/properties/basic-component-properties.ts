@@ -257,10 +257,6 @@ function colorProperty(defaultValue: number, description: string): UIPropertyDef
 	};
 }
 
-function numberProperty(
-	defaultValue: number,
-	minimum: number,
-	description: string,
-): UIPropertyDefinition {
+function numberProperty(defaultValue: number, minimum: number, description: string): UIPropertyDefinition {
 	return { valueType: 'number', minimum, defaultValue, description };
 }

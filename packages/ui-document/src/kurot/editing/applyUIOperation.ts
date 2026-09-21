@@ -9,19 +9,11 @@ import type { UIOperation, UIOperationResult } from './UIOperation.js';
 /**
  * Applies one semantic operation and rejects an invalid resulting document.
  */
-export function applyUIOperation(
-	document: UIDocument,
-	operation: UIOperation,
-): UIOperationResult {
+export function applyUIOperation(document: UIDocument, operation: UIOperation): UIOperationResult {
 	const result = applyUIOperationUnchecked(document, operation);
 	const diagnostics = validateUIDocument(result.document);
 	if (diagnostics.length > 0) {
-		throw new UIEditError(
-			'invalid-edit-result',
-			'Operation produced an invalid UI document.',
-			'$',
-			diagnostics,
-		);
+		throw new UIEditError('invalid-edit-result', 'Operation produced an invalid UI document.', '$', diagnostics);
 	}
 	return result;
 }
@@ -29,10 +21,7 @@ export function applyUIOperation(
 /**
  * Applies one operation without final validation so transactions may be atomic.
  */
-export function applyUIOperationUnchecked(
-	document: UIDocument,
-	operation: UIOperation,
-): UIOperationResult {
+export function applyUIOperationUnchecked(document: UIDocument, operation: UIOperation): UIOperationResult {
 	switch (operation.kind) {
 		case 'set-contract-data-field':
 		case 'remove-contract-data-field':

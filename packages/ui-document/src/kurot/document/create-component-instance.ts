@@ -1,7 +1,4 @@
-import type {
-	UIComponentInstance,
-	UIInstanceOverride,
-} from '../model/UIComponentInstance.js';
+import type { UIComponentInstance, UIInstanceOverride } from '../model/UIComponentInstance.js';
 import type { UIAssetReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
@@ -39,16 +36,12 @@ export interface CreateUIComponentInstanceOptions {
 /**
  * Creates an explicit reusable component instance descriptor.
  */
-export function createUIComponentInstance(
-	options: CreateUIComponentInstanceOptions,
-): UIComponentInstance {
+export function createUIComponentInstance(options: CreateUIComponentInstanceOptions): UIComponentInstance {
 	return {
 		source: { ...options.source },
 		parameters: { ...options.parameters },
 		...(options.variant === undefined ? {} : { variant: options.variant }),
 		overrides: [...(options.overrides ?? [])],
-		slots: Object.fromEntries(
-			Object.entries(options.slots ?? {}).map(([name, nodes]) => [name, [...nodes]]),
-		),
+		slots: Object.fromEntries(Object.entries(options.slots ?? {}).map(([name, nodes]) => [name, [...nodes]])),
 	};
 }

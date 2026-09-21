@@ -1,12 +1,6 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIOperation, UIOperationResult } from './UIOperation.js';
-import {
-	missingInstance,
-	missingValue,
-	requireName,
-	updateInstance,
-	updateNode,
-} from './editHelpers.js';
+import { missingInstance, missingValue, requireName, updateInstance, updateNode } from './editHelpers.js';
 
 type UIInstanceOperation = Extract<
 	UIOperation,
@@ -26,10 +20,7 @@ type UIInstanceOperation = Extract<
 /**
  * Applies one reusable-instance operation and returns its exact inverse.
  */
-export function applyInstanceOperation(
-	document: UIDocument,
-	operation: UIInstanceOperation,
-): UIOperationResult {
+export function applyInstanceOperation(document: UIDocument, operation: UIInstanceOperation): UIOperationResult {
 	switch (operation.kind) {
 		case 'set-node-instance':
 			return setNodeInstance(document, operation);
@@ -155,9 +146,7 @@ function setInstanceOverride(
 ): UIOperationResult {
 	return updateInstance(document, operation.nodeId, instance => {
 		const index = instance.overrides.findIndex(
-			item =>
-				item.part === operation.override.part &&
-				item.property === operation.override.property,
+			item => item.part === operation.override.part && item.property === operation.override.property,
 		);
 		const overrides = [...instance.overrides];
 		if (index >= 0) {
@@ -196,10 +185,7 @@ function removeInstanceOverride(
 		return {
 			instance: {
 				...instance,
-				overrides: [
-					...instance.overrides.slice(0, index),
-					...instance.overrides.slice(index + 1),
-				],
+				overrides: [...instance.overrides.slice(0, index), ...instance.overrides.slice(index + 1)],
 			},
 			inverse: {
 				kind: 'set-instance-override',

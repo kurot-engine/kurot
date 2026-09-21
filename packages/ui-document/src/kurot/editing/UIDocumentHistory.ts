@@ -23,11 +23,7 @@ export class UIDocumentHistory {
 	private readonly _undoEntries: UIHistoryEntry[] = [];
 	private readonly _redoEntries: UIHistoryEntry[] = [];
 
-	public constructor(
-		document: UIDocument,
-		options: ApplyUITransactionOptions = {},
-		initialRevision = 0,
-	) {
+	public constructor(document: UIDocument, options: ApplyUITransactionOptions = {}, initialRevision = 0) {
 		const diagnostics = validateUIDocument(document);
 		if (diagnostics.length > 0) {
 			throw new UIEditError(

@@ -25,12 +25,7 @@ export function validateUIAssetInstances(
 	return diagnostics;
 }
 
-function validateAppearance(
-	node: UINode,
-	path: string,
-	registry: UIAssetRegistry,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateAppearance(node: UINode, path: string, registry: UIAssetRegistry, diagnostics: UIDiagnostic[]): void {
 	if (!node.appearance) return;
 	const source = registry.getAsset(node.appearance.assetId);
 	if (!source) {

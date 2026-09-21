@@ -1,8 +1,5 @@
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
-import type {
-	UIDesignTokenType,
-	UIResourceType,
-} from '../model/UIReference.js';
+import type { UIDesignTokenType, UIResourceType } from '../model/UIReference.js';
 
 /**
  * Project resource identity available to semantic UI assets.

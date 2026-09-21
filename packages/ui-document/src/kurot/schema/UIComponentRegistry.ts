@@ -46,21 +46,14 @@ export class UIComponentRegistry {
 	 * Returns all definitions sorted by type for deterministic tools and prompts.
 	 */
 	public list(): readonly UIComponentDefinition[] {
-		return Object.freeze(
-			[...this._definitions.values()].sort(compareDefinitions),
-		);
+		return Object.freeze([...this._definitions.values()].sort(compareDefinitions));
 	}
 
 	/**
 	 * Resolves inherited properties and policies for one exact component type.
 	 */
 	public resolve(type: string): UIResolvedComponentDefinition | undefined {
-		return resolveDefinition(
-			type,
-			this._definitions,
-			this._resolvedDefinitions,
-			[],
-		);
+		return resolveDefinition(type, this._definitions, this._resolvedDefinitions, []);
 	}
 
 	/**
@@ -123,18 +116,13 @@ function resolveDefinition(
 		type: definition.type,
 		baseTypes: Object.freeze(base ? [...base.baseTypes, base.type] : []),
 		abstract: definition.abstract ?? false,
-		...(definition.displayName === undefined
-			? {}
-			: { displayName: definition.displayName }),
-		...(definition.description === undefined
-			? {}
-			: { description: definition.description }),
+		...(definition.displayName === undefined ? {} : { displayName: definition.displayName }),
+		...(definition.description === undefined ? {} : { description: definition.description }),
 		...(children === undefined ? {} : { children }),
 		...(appearance === undefined ? {} : { appearance }),
 		events: mergeEvents(base?.events, definition.events),
 		properties: mergeProperties(base?.properties, definition.properties),
-		allowUnknownProperties:
-			definition.allowUnknownProperties ?? base?.allowUnknownProperties ?? false,
+		allowUnknownProperties: definition.allowUnknownProperties ?? base?.allowUnknownProperties ?? false,
 	});
 	cache.set(type, resolved);
 	return resolved;
@@ -150,9 +138,7 @@ function normalizeDefinition(definition: UIComponentDefinition): UIComponentDefi
 	return Object.freeze({
 		...definition,
 		...(appearance === undefined ? {} : { appearance }),
-		...(definition.events === undefined
-			? {}
-			: { events: Object.freeze([...definition.events]) }),
+		...(definition.events === undefined ? {} : { events: Object.freeze([...definition.events]) }),
 		properties,
 	});
 }
@@ -174,9 +160,7 @@ function mergeAppearanceParts(
 	base: NonNullable<UIComponentDefinition['appearance']>['parts'],
 	derived: NonNullable<UIComponentDefinition['appearance']>['parts'],
 ): Readonly<Record<string, UIAppearancePartDefinition>> {
-	const entries = Object.entries({ ...base, ...derived }).sort(([a], [b]) =>
-		compareStrings(a, b),
-	);
+	const entries = Object.entries({ ...base, ...derived }).sort(([a], [b]) => compareStrings(a, b));
 	return Object.freeze(Object.fromEntries(entries));
 }
 
@@ -184,14 +168,10 @@ function mergeEvents(
 	base: readonly UIComponentEvent[] | undefined,
 	derived: UIComponentDefinition['events'],
 ): readonly UIComponentEvent[] {
-	return Object.freeze(
-		[...new Set([...(base ?? []), ...(derived ?? [])])].sort(compareStrings),
-	);
+	return Object.freeze([...new Set([...(base ?? []), ...(derived ?? [])])].sort(compareStrings));
 }
 
-function normalizeAppearance(
-	appearance: UIComponentDefinition['appearance'],
-): UIComponentDefinition['appearance'] {
+function normalizeAppearance(appearance: UIComponentDefinition['appearance']): UIComponentDefinition['appearance'] {
 	if (appearance === undefined) {
 		return undefined;
 	}
@@ -216,25 +196,15 @@ function mergeProperties(
 function normalizeProperties(
 	properties: Readonly<Record<string, UIPropertyDefinition>>,
 ): Readonly<Record<string, UIPropertyDefinition>> {
-	const entries = Object.entries(properties).map(
-		([name, property]): [string, UIPropertyDefinition] => [
-			name,
-			Object.freeze({
-				...property,
-				valueType: Array.isArray(property.valueType)
-					? Object.freeze([...property.valueType])
-					: property.valueType,
-				...(property.enumValues
-					? { enumValues: Object.freeze([...property.enumValues]) }
-					: {}),
-				...(property.resourceTypes
-					? { resourceTypes: Object.freeze([...property.resourceTypes]) }
-					: {}),
-				...(property.tokenTypes
-					? { tokenTypes: Object.freeze([...property.tokenTypes]) }
-					: {}),
-			}),
-		],
-	);
+	const entries = Object.entries(properties).map(([name, property]): [string, UIPropertyDefinition] => [
+		name,
+		Object.freeze({
+			...property,
+			valueType: Array.isArray(property.valueType) ? Object.freeze([...property.valueType]) : property.valueType,
+			...(property.enumValues ? { enumValues: Object.freeze([...property.enumValues]) } : {}),
+			...(property.resourceTypes ? { resourceTypes: Object.freeze([...property.resourceTypes]) } : {}),
+			...(property.tokenTypes ? { tokenTypes: Object.freeze([...property.tokenTypes]) } : {}),
+		}),
+	]);
 	return Object.freeze(Object.fromEntries(entries));
 }

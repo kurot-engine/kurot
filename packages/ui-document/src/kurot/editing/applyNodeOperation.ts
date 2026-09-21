@@ -1,8 +1,5 @@
 import { findUINode } from '../document/query.js';
-import type {
-	UIAssetContract,
-	UIPropertyOverride,
-} from '../model/UIAssetContract.js';
+import type { UIAssetContract, UIPropertyOverride } from '../model/UIAssetContract.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import { UIEditError } from './UIEditError.js';
 import type { UIOperation, UIOperationResult } from './UIOperation.js';
@@ -35,10 +32,7 @@ type UINodeOperation = Extract<
 /**
  * Applies one structural or node-property operation and returns its inverse.
  */
-export function applyNodeOperation(
-	document: UIDocument,
-	operation: UINodeOperation,
-): UIOperationResult {
+export function applyNodeOperation(document: UIDocument, operation: UINodeOperation): UIOperationResult {
 	switch (operation.kind) {
 		case 'insert-node':
 			return insertNode(document, operation);
@@ -70,16 +64,10 @@ function setNodeId(
 ): UIOperationResult {
 	const node = findUINode(document.root, operation.nodeId);
 	if (!node) throw nodeNotFound(operation.nodeId, '$.nodeId');
-	const id = operation.id === undefined
-		? availableSyntheticNodeId(document)
-		: requireName(operation.id, 'Node id');
+	const id = operation.id === undefined ? availableSyntheticNodeId(document) : requireName(operation.id, 'Node id');
 	const duplicate = findUINode(document.root, id);
 	if (duplicate && duplicate !== node) {
-		throw new UIEditError(
-			'duplicate-node-id',
-			`Node id "${id}" is already present in the document.`,
-			'$.id',
-		);
+		throw new UIEditError('duplicate-node-id', `Node id "${id}" is already present in the document.`, '$.id');
 	}
 	if (id === node.id) {
 		throw new UIEditError('invalid-operation', `Node id is already "${id}".`, '$.id');
@@ -107,47 +95,62 @@ function availableSyntheticNodeId(document: UIDocument): string {
 function replaceContractNodeId(contract: UIAssetContract, previous: string, next: string): UIAssetContract {
 	return {
 		...contract,
-		parameters: Object.fromEntries(Object.entries(contract.parameters).map(([name, definition]) => [
-			name,
-			definition.bindings
-				? {
-						...definition,
-						bindings: definition.bindings.map(binding =>
-							binding.targetId === previous ? { ...binding, targetId: next } : binding),
-					}
-				: definition,
-		])),
-		parts: Object.fromEntries(Object.entries(contract.parts).map(([name, definition]) => [
-			name,
-			definition.nodeId === previous ? { ...definition, nodeId: next } : definition,
-		])),
-		slots: Object.fromEntries(Object.entries(contract.slots).map(([name, definition]) => [
-			name,
-			definition.nodeId === previous ? { ...definition, nodeId: next } : definition,
-		])),
-		states: Object.fromEntries(Object.entries(contract.states).map(([name, definition]) => [
-			name,
-			{ ...definition, overrides: replaceOverrideTargets(definition.overrides, previous, next) },
-		])),
-		variants: Object.fromEntries(Object.entries(contract.variants).map(([name, definition]) => [
-			name,
-			{ ...definition, overrides: replaceOverrideTargets(definition.overrides, previous, next) },
-		])),
+		parameters: Object.fromEntries(
+			Object.entries(contract.parameters).map(([name, definition]) => [
+				name,
+				definition.bindings
+					? {
+							...definition,
+							bindings: definition.bindings.map(binding =>
+								binding.targetId === previous ? { ...binding, targetId: next } : binding,
+							),
+						}
+					: definition,
+			]),
+		),
+		parts: Object.fromEntries(
+			Object.entries(contract.parts).map(([name, definition]) => [
+				name,
+				definition.nodeId === previous ? { ...definition, nodeId: next } : definition,
+			]),
+		),
+		slots: Object.fromEntries(
+			Object.entries(contract.slots).map(([name, definition]) => [
+				name,
+				definition.nodeId === previous ? { ...definition, nodeId: next } : definition,
+			]),
+		),
+		states: Object.fromEntries(
+			Object.entries(contract.states).map(([name, definition]) => [
+				name,
+				{ ...definition, overrides: replaceOverrideTargets(definition.overrides, previous, next) },
+			]),
+		),
+		variants: Object.fromEntries(
+			Object.entries(contract.variants).map(([name, definition]) => [
+				name,
+				{ ...definition, overrides: replaceOverrideTargets(definition.overrides, previous, next) },
+			]),
+		),
 		...(contract.dataBindings === undefined
 			? {}
 			: {
-					dataBindings: Object.fromEntries(Object.entries(contract.dataBindings).map(([name, definition]) => [
-						name,
-						definition.targetId === previous ? { ...definition, targetId: next } : definition,
-					])),
+					dataBindings: Object.fromEntries(
+						Object.entries(contract.dataBindings).map(([name, definition]) => [
+							name,
+							definition.targetId === previous ? { ...definition, targetId: next } : definition,
+						]),
+					),
 				}),
 		...(contract.actions === undefined
 			? {}
 			: {
-					actions: Object.fromEntries(Object.entries(contract.actions).map(([name, definition]) => [
-						name,
-						definition.sourceId === previous ? { ...definition, sourceId: next } : definition,
-					])),
+					actions: Object.fromEntries(
+						Object.entries(contract.actions).map(([name, definition]) => [
+							name,
+							definition.sourceId === previous ? { ...definition, sourceId: next } : definition,
+						]),
+					),
 				}),
 	};
 }
@@ -157,8 +160,7 @@ function replaceOverrideTargets(
 	previous: string,
 	next: string,
 ): UIPropertyOverride[] {
-	return overrides.map(override =>
-		override.targetId === previous ? { ...override, targetId: next } : override);
+	return overrides.map(override => (override.targetId === previous ? { ...override, targetId: next } : override));
 }
 
 function insertNode(

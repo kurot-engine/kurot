@@ -1,11 +1,5 @@
-import type {
-	UIDesignTokenType,
-	UIResourceType,
-} from '../model/UIReference.js';
-import {
-	UI_DESIGN_TOKEN_TYPES,
-	UI_RESOURCE_TYPES,
-} from '../model/UIReference.js';
+import type { UIDesignTokenType, UIResourceType } from '../model/UIReference.js';
+import { UI_DESIGN_TOKEN_TYPES, UI_RESOURCE_TYPES } from '../model/UIReference.js';
 import type {
 	UIAppearanceDefinition,
 	UIComponentEvent,
@@ -31,13 +25,7 @@ const PROPERTY_VALUE_TYPES = new Set<UIPropertyValueType>([
 	'token-reference',
 	'value',
 ]);
-const PROPERTY_FORMATS = new Set<UIPropertyFormat>([
-	'color',
-	'layout',
-	'rectangle',
-	'resource',
-	'token',
-]);
+const PROPERTY_FORMATS = new Set<UIPropertyFormat>(['color', 'layout', 'rectangle', 'resource', 'token']);
 const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
 const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
 
@@ -63,10 +51,7 @@ export function validateComponentDefinition(definition: UIComponentDefinition): 
 	}
 	validateAppearanceDefinition(definition.appearance);
 	validateComponentEvents(definition.events);
-	if (
-		definition.allowUnknownProperties !== undefined &&
-		typeof definition.allowUnknownProperties !== 'boolean'
-	) {
+	if (definition.allowUnknownProperties !== undefined && typeof definition.allowUnknownProperties !== 'boolean') {
 		throw new Error('allowUnknownProperties must be a boolean.');
 	}
 
@@ -76,9 +61,7 @@ export function validateComponentDefinition(definition: UIComponentDefinition): 
 	}
 }
 
-function validateAppearanceDefinition(
-	appearance: UIAppearanceDefinition | undefined,
-): void {
+function validateAppearanceDefinition(appearance: UIAppearanceDefinition | undefined): void {
 	if (appearance === undefined) {
 		return;
 	}
@@ -90,9 +73,7 @@ function validateAppearanceDefinition(
 	}
 	if (
 		appearance.parts !== undefined &&
-		(typeof appearance.parts !== 'object' ||
-			appearance.parts === null ||
-			Array.isArray(appearance.parts))
+		(typeof appearance.parts !== 'object' || appearance.parts === null || Array.isArray(appearance.parts))
 	) {
 		throw new Error('Component appearance parts must be an object.');
 	}
@@ -150,9 +131,7 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 	const uniqueValueTypes = new Set<UIPropertyValueType>();
 	for (const valueType of valueTypes) {
 		if (!PROPERTY_VALUE_TYPES.has(valueType)) {
-			throw new Error(
-				`Unsupported value type "${String(valueType)}" for property "${name}".`,
-			);
+			throw new Error(`Unsupported value type "${String(valueType)}" for property "${name}".`);
 		}
 		if (uniqueValueTypes.has(valueType)) {
 			throw new Error(`Property "${name}" contains duplicate value type "${valueType}".`);
@@ -170,14 +149,7 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 		uniqueValueTypes,
 		'resource-reference',
 	);
-	validateReferenceTypes(
-		name,
-		'tokenTypes',
-		definition.tokenTypes,
-		TOKEN_TYPES,
-		uniqueValueTypes,
-		'token-reference',
-	);
+	validateReferenceTypes(name, 'tokenTypes', definition.tokenTypes, TOKEN_TYPES, uniqueValueTypes, 'token-reference');
 	if (definition.required !== undefined && typeof definition.required !== 'boolean') {
 		throw new Error(`Property "${name}" required flag must be a boolean.`);
 	}
@@ -187,11 +159,7 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 	if (definition.integer !== undefined && typeof definition.integer !== 'boolean') {
 		throw new Error(`Property "${name}" integer flag must be a boolean.`);
 	}
-	if (
-		definition.integer &&
-		!uniqueValueTypes.has('number') &&
-		!uniqueValueTypes.has('value')
-	) {
+	if (definition.integer && !uniqueValueTypes.has('number') && !uniqueValueTypes.has('value')) {
 		throw new Error(`Property "${name}" integer flag requires a numeric value type.`);
 	}
 	validateNumericConstraint(name, 'minimum', definition.minimum, uniqueValueTypes);
@@ -225,9 +193,7 @@ function validateReferenceTypes<TType extends string>(
 		throw new Error(`Property "${name}" ${label} must be a non-empty array.`);
 	}
 	if (!valueTypes.has(requiredValueType)) {
-		throw new Error(
-			`Property "${name}" ${label} requires value type "${requiredValueType}".`,
-		);
+		throw new Error(`Property "${name}" ${label} requires value type "${requiredValueType}".`);
 	}
 	const uniqueValues = new Set<TType>();
 	for (const value of values) {
@@ -293,10 +259,7 @@ function matchesPropertyConstraints(
 	return !definition.integer || Number.isInteger(value);
 }
 
-function matchesPrimitiveType(
-	value: boolean | number | string,
-	valueTypes: ReadonlySet<UIPropertyValueType>,
-): boolean {
+function matchesPrimitiveType(value: boolean | number | string, valueTypes: ReadonlySet<UIPropertyValueType>): boolean {
 	if (typeof value === 'number' && !Number.isFinite(value)) return false;
 	return valueTypes.has('value') || valueTypes.has(typeof value as UIPropertyValueType);
 }

@@ -67,13 +67,9 @@ export interface CreateUIAssetContractOptions {
 /**
  * Creates an explicit asset contract with independent top-level collections.
  */
-export function createUIAssetContract(
-	options: CreateUIAssetContractOptions = {},
-): UIAssetContract {
+export function createUIAssetContract(options: CreateUIAssetContractOptions = {}): UIAssetContract {
 	return {
-		...(options.componentType === undefined
-			? {}
-			: { componentType: options.componentType }),
+		...(options.componentType === undefined ? {} : { componentType: options.componentType }),
 		...(options.targetType === undefined ? {} : { targetType: options.targetType }),
 		parameters: { ...options.parameters },
 		parts: { ...options.parts },

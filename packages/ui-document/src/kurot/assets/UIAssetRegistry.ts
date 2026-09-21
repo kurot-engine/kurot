@@ -1,21 +1,12 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
-import type {
-	UIDesignTokenType,
-	UIResourceType,
-} from '../model/UIReference.js';
-import {
-	UI_DESIGN_TOKEN_TYPES,
-	UI_RESOURCE_TYPES,
-} from '../model/UIReference.js';
+import type { UIDesignTokenType, UIResourceType } from '../model/UIReference.js';
+import { UI_DESIGN_TOKEN_TYPES, UI_RESOURCE_TYPES } from '../model/UIReference.js';
 import { UIDocumentValidationError } from '../serialization/UIDocumentValidationError.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { validateUIDocument } from '../validation/validateUIDocument.js';
 import { validatePropertyValue } from '../validation/validationHelpers.js';
-import type {
-	UIDesignTokenDefinition,
-	UIResourceDefinition,
-} from './UIProjectDefinition.js';
+import type { UIDesignTokenDefinition, UIResourceDefinition } from './UIProjectDefinition.js';
 import { assertNonEmptyString, compareStrings } from '../shared/strings.js';
 
 const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
@@ -68,10 +59,7 @@ export class UIAssetRegistry {
 		}
 		const diagnostics: UIDiagnostic[] = [];
 		validatePropertyValue(definition.value, '$.value', diagnostics);
-		if (
-			diagnostics.length > 0 ||
-			!matchesTokenValue(definition.tokenType, definition.value)
-		) {
+		if (diagnostics.length > 0 || !matchesTokenValue(definition.tokenType, definition.value)) {
 			throw new Error(`UI design token "${definition.key}" has an invalid value.`);
 		}
 		if (this._tokens.has(definition.key)) {
@@ -123,18 +111,10 @@ export class UIAssetRegistry {
 	}
 }
 
-function matchesTokenValue(
-	tokenType: UIDesignTokenType,
-	value: UIPropertyValue,
-): boolean {
+function matchesTokenValue(tokenType: UIDesignTokenType, value: UIPropertyValue): boolean {
 	switch (tokenType) {
 		case 'color':
-			return (
-				typeof value === 'number' &&
-				Number.isInteger(value) &&
-				value >= 0 &&
-				value <= 0xffffff
-			);
+			return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 0xffffff;
 		case 'number':
 			return typeof value === 'number';
 		case 'spacing':

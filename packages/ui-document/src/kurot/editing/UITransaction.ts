@@ -46,9 +46,7 @@ export interface UITransaction {
 /**
  * Optional semantic validation performed against the final transaction result.
  */
-export type UITransactionValidator = (
-	document: UIDocument,
-) => readonly UIDiagnostic[];
+export type UITransactionValidator = (document: UIDocument) => readonly UIDiagnostic[];
 
 /**
  * Transaction application customization.

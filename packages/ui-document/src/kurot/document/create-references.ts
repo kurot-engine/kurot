@@ -19,10 +19,7 @@ export function createUIAssetReference(assetId: string): UIAssetReference {
 /**
  * Creates an appearance reference with an optional published variant.
  */
-export function createUIAppearanceReference(
-	assetId: string,
-	variant?: string,
-): UIAppearanceReference {
+export function createUIAppearanceReference(assetId: string, variant?: string): UIAppearanceReference {
 	assertNonEmpty(assetId, 'Asset id');
 	if (variant !== undefined) {
 		assertNonEmpty(variant, 'Appearance variant');
@@ -37,10 +34,7 @@ export function createUIAppearanceReference(
 /**
  * Creates a typed reference to one project resource.
  */
-export function createUIResourceReference(
-	resourceType: UIResourceType,
-	key: string,
-): UIResourceReference {
+export function createUIResourceReference(resourceType: UIResourceType, key: string): UIResourceReference {
 	assertNonEmpty(resourceType, 'Resource type');
 	assertNonEmpty(key, 'Resource key');
 	return { kind: 'resource', resourceType, key };
@@ -49,10 +43,7 @@ export function createUIResourceReference(
 /**
  * Creates a typed reference to one project design token.
  */
-export function createUIDesignTokenReference(
-	tokenType: UIDesignTokenType,
-	key: string,
-): UIDesignTokenReference {
+export function createUIDesignTokenReference(tokenType: UIDesignTokenType, key: string): UIDesignTokenReference {
 	assertNonEmpty(tokenType, 'Token type');
 	assertNonEmpty(key, 'Token key');
 	return { kind: 'token', tokenType, key };

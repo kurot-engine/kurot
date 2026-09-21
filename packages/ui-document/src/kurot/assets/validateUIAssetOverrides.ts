@@ -1,14 +1,9 @@
 import { findUINode } from '../document/query.js';
-import type {
-	UIDataBindingDefinition,
-	UIPropertyOverride,
-} from '../model/UIAssetContract.js';
+import type { UIDataBindingDefinition, UIPropertyOverride } from '../model/UIAssetContract.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import { isUIDesignTokenReference } from '../model/UIReference.js';
 import type { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
-import type {
-	UIPropertyDefinition,
-} from '../schema/UIComponentDefinition.js';
+import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import { toValueTypes } from '../schema/UIComponentDefinition.js';
 import { isUIPropertyDefinitionAssignable } from '../schema/isUIPropertyDefinitionAssignable.js';
 import { matchesUIPropertyDefinition } from '../schema/matchesUIPropertyDefinition.js';
@@ -18,10 +13,7 @@ import { addUIDiagnostic } from '../validation/validationHelpers.js';
 /**
  * Validates state and variant override properties against component schemas.
  */
-export function validateUIAssetOverrides(
-	document: UIDocument,
-	components: UIComponentRegistry,
-): UIDiagnostic[] {
+export function validateUIAssetOverrides(document: UIDocument, components: UIComponentRegistry): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
 	validateParameterBindings(document, components, diagnostics);
 	validateDataBindings(document, components, diagnostics);
@@ -76,7 +68,6 @@ function validateDataBinding(
 		`Data field "${binding.source}" is not compatible with ${target.type}.${binding.property}.`,
 	);
 }
-
 
 function validateParameterBindings(
 	document: UIDocument,
@@ -142,10 +133,7 @@ function validateUIPropertyOverride(
 		);
 		return;
 	}
-	if (
-		override.transition &&
-		(!supportsNumericTransition(property) || !isNumericTransitionValue(override.value))
-	) {
+	if (override.transition && (!supportsNumericTransition(property) || !isNumericTransitionValue(override.value))) {
 		addUIDiagnostic(
 			diagnostics,
 			'invalid-component-property',
@@ -166,25 +154,17 @@ function supportsNumericTransition(property: UIPropertyDefinition): boolean {
 	return toValueTypes(property.valueType).includes('number');
 }
 
-function isNumericTransitionValue(
-	value: UIPropertyOverride['value'],
-): boolean {
+function isNumericTransitionValue(value: UIPropertyOverride['value']): boolean {
 	if (typeof value === 'number') {
 		return true;
 	}
 	return (
 		isUIDesignTokenReference(value) &&
-		(value.tokenType === 'color' ||
-			value.tokenType === 'number' ||
-			value.tokenType === 'spacing')
+		(value.tokenType === 'color' || value.tokenType === 'number' || value.tokenType === 'spacing')
 	);
 }
 
-function validateActions(
-	document: UIDocument,
-	components: UIComponentRegistry,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateActions(document: UIDocument, components: UIComponentRegistry, diagnostics: UIDiagnostic[]): void {
 	for (const [name, action] of Object.entries(document.contract.actions ?? {})) {
 		const source = findUINode(document.root, action.sourceId);
 		if (!source) {

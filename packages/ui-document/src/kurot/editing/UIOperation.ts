@@ -8,10 +8,7 @@ import type {
 	UIVariantDefinition,
 } from '../model/UIAssetContract.js';
 import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
-import type {
-	UIComponentInstance,
-	UIInstanceOverride,
-} from '../model/UIComponentInstance.js';
+import type { UIComponentInstance, UIInstanceOverride } from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIAppearanceReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';

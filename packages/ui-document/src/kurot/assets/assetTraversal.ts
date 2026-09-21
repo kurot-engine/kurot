@@ -18,11 +18,7 @@ export interface UIAssetDependency {
 /**
  * Visits ordinary and Slot-projected node trees with deterministic paths.
  */
-export function visitUINodesWithPath(
-	node: UINode,
-	path: string,
-	visitor: (node: UINode, path: string) => void,
-): void {
+export function visitUINodesWithPath(node: UINode, path: string, visitor: (node: UINode, path: string) => void): void {
 	visitor(node, path);
 	for (let index = 0; index < node.children.length; index++) {
 		visitUINodesWithPath(node.children[index]!, `${path}.children[${index}]`, visitor);
@@ -31,11 +27,7 @@ export function visitUINodesWithPath(
 	for (const slotName of Object.keys(node.instance.slots).sort()) {
 		const children = node.instance.slots[slotName]!;
 		for (let index = 0; index < children.length; index++) {
-			visitUINodesWithPath(
-				children[index]!,
-				`${path}.instance.slots.${slotName}[${index}]`,
-				visitor,
-			);
+			visitUINodesWithPath(children[index]!, `${path}.instance.slots.${slotName}[${index}]`, visitor);
 		}
 	}
 }
@@ -70,9 +62,7 @@ export function visitUIDocumentPropertyValues(
 /**
  * Collects explicit and property-level UI asset dependencies with source paths.
  */
-export function collectUIAssetDependencies(
-	document: UIDocument,
-): readonly UIAssetDependency[] {
+export function collectUIAssetDependencies(document: UIDocument): readonly UIAssetDependency[] {
 	const dependencies: UIAssetDependency[] = [];
 	visitUINodesWithPath(document.root, '$.root', (node, path) => {
 		if (node.appearance) {

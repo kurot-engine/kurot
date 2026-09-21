@@ -1,25 +1,12 @@
-import type {
-	UIPropertyObject,
-	UIPropertyValue,
-} from '../model/UIPropertyValue.js';
-import {
-	isUIAssetReference,
-	isUIDesignTokenReference,
-	isUIResourceReference,
-} from '../model/UIReference.js';
-import type {
-	UIPropertyDefinition,
-	UIPropertyValueType,
-} from './UIComponentDefinition.js';
+import type { UIPropertyObject, UIPropertyValue } from '../model/UIPropertyValue.js';
+import { isUIAssetReference, isUIDesignTokenReference, isUIResourceReference } from '../model/UIReference.js';
+import type { UIPropertyDefinition, UIPropertyValueType } from './UIComponentDefinition.js';
 import { toValueTypes } from './UIComponentDefinition.js';
 
 /**
  * Reports whether a serializable value satisfies one semantic property definition.
  */
-export function matchesUIPropertyDefinition(
-	value: UIPropertyValue,
-	property: UIPropertyDefinition,
-): boolean {
+export function matchesUIPropertyDefinition(value: UIPropertyValue, property: UIPropertyDefinition): boolean {
 	const valueTypes = toValueTypes(property.valueType);
 	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;
 	if (isUIResourceReference(value) && property.resourceTypes) {
@@ -39,10 +26,7 @@ export function matchesUIPropertyDefinition(
 	return true;
 }
 
-function matchesValueType(
-	value: UIPropertyValue,
-	valueType: UIPropertyValueType,
-): boolean {
+function matchesValueType(value: UIPropertyValue, valueType: UIPropertyValueType): boolean {
 	switch (valueType) {
 		case 'array':
 			return Array.isArray(value);

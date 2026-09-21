@@ -26,11 +26,7 @@ export interface UIRemovedNode {
 /**
  * Immutably updates a node across ordinary and projected Slot children.
  */
-export function updateUINode(
-	root: UINode,
-	nodeId: string,
-	update: (node: UINode) => UINode,
-): UINode | undefined {
+export function updateUINode(root: UINode, nodeId: string, update: (node: UINode) => UINode): UINode | undefined {
 	if (root.id === nodeId) return update(root);
 
 	let changed = false;
@@ -65,12 +61,7 @@ export function updateUINode(
 /**
  * Immutably inserts a subtree into an ordinary or projected child collection.
  */
-export function insertUINode(
-	root: UINode,
-	target: UIChildTarget,
-	index: number,
-	node: UINode,
-): UINode | undefined {
+export function insertUINode(root: UINode, target: UIChildTarget, index: number, node: UINode): UINode | undefined {
 	return updateUINode(root, target.parentId, parent => {
 		if (target.collection === 'children') {
 			const children = insertAt(parent.children, index, node);
@@ -102,16 +93,13 @@ export function getUIChildCount(root: UINode, target: UIChildTarget): number | u
 		count =
 			target.collection === 'children'
 				? parent.children.length
-				: parent.instance?.slots[target.slot]?.length ?? 0;
+				: (parent.instance?.slots[target.slot]?.length ?? 0);
 		return parent;
 	});
 	return count;
 }
 
-function removeFromDescendants(
-	parent: UINode,
-	nodeId: string,
-): UIRemovedNode | undefined {
+function removeFromDescendants(parent: UINode, nodeId: string): UIRemovedNode | undefined {
 	const childIndex = parent.children.findIndex(child => child.id === nodeId);
 	if (childIndex >= 0) {
 		return {
@@ -159,9 +147,7 @@ function removeNested(parent: UINode, nodeId: string): UIRemovedNode | undefined
 			...removed,
 			root: {
 				...parent,
-				children: parent.children.map(item =>
-					item.id === child.id ? removed.root : item,
-				),
+				children: parent.children.map(item => (item.id === child.id ? removed.root : item)),
 			},
 		};
 	}
@@ -179,9 +165,7 @@ function removeNested(parent: UINode, nodeId: string): UIRemovedNode | undefined
 						...parent.instance,
 						slots: {
 							...parent.instance.slots,
-							[slot]: nodes.map(item =>
-								item.id === child.id ? removed.root : item,
-							),
+							[slot]: nodes.map(item => (item.id === child.id ? removed.root : item)),
 						},
 					},
 				},

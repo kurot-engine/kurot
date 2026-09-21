@@ -13,104 +13,108 @@ import type { UIPropertyDefinition } from '../schema/UIComponentDefinition.js';
 import type { UIOperation, UIOperationResult } from './UIOperation.js';
 import { missingValue, requireName } from './editHelpers.js';
 
-type UIContractOperation = Extract<
-	UIOperation,
-	{ readonly kind: `${'remove' | 'set'}-contract-${string}` }
->;
+type UIContractOperation = Extract<UIOperation, { readonly kind: `${'remove' | 'set'}-contract-${string}` }>;
 
 /**
  * Applies one contract-entry operation and returns its exact inverse.
  */
-export function applyContractOperation(
-	document: UIDocument,
-	operation: UIContractOperation,
-): UIOperationResult {
+export function applyContractOperation(document: UIDocument, operation: UIContractOperation): UIOperationResult {
 	switch (operation.kind) {
 		case 'set-contract-data-field':
-			return setEntry(document, operation.name, 'dataFields', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'dataFields', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-data-field', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-data-field', name: operation.name });
+					: { kind: 'remove-contract-data-field', name: operation.name },
+			);
 		case 'remove-contract-data-field':
 			return removeEntry<UIPropertyDefinition>(document, operation.name, 'dataFields', previous => ({
-				kind: 'set-contract-data-field', name: operation.name, definition: previous,
+				kind: 'set-contract-data-field',
+				name: operation.name,
+				definition: previous,
 			}));
 		case 'set-contract-data-binding':
-			return setEntry(document, operation.name, 'dataBindings', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'dataBindings', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-data-binding', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-data-binding', name: operation.name });
+					: { kind: 'remove-contract-data-binding', name: operation.name },
+			);
 		case 'remove-contract-data-binding':
-			return removeEntry<UIDataBindingDefinition>(
-				document,
-				operation.name,
-				'dataBindings',
-				previous => ({
-					kind: 'set-contract-data-binding',
-					name: operation.name,
-					definition: previous,
-				}),
-			);
+			return removeEntry<UIDataBindingDefinition>(document, operation.name, 'dataBindings', previous => ({
+				kind: 'set-contract-data-binding',
+				name: operation.name,
+				definition: previous,
+			}));
 		case 'set-contract-action':
-			return setEntry(document, operation.name, 'actions', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'actions', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-action', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-action', name: operation.name });
-		case 'remove-contract-action':
-			return removeEntry<UISemanticActionDefinition>(
-				document,
-				operation.name,
-				'actions',
-				previous => ({
-					kind: 'set-contract-action',
-					name: operation.name,
-					definition: previous,
-				}),
+					: { kind: 'remove-contract-action', name: operation.name },
 			);
+		case 'remove-contract-action':
+			return removeEntry<UISemanticActionDefinition>(document, operation.name, 'actions', previous => ({
+				kind: 'set-contract-action',
+				name: operation.name,
+				definition: previous,
+			}));
 		case 'set-contract-parameter':
-			return setEntry(document, operation.name, 'parameters', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'parameters', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-parameter', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-parameter', name: operation.name });
+					: { kind: 'remove-contract-parameter', name: operation.name },
+			);
 		case 'remove-contract-parameter':
 			return removeEntry<UIParameterDefinition>(document, operation.name, 'parameters', previous => ({
-				kind: 'set-contract-parameter', name: operation.name, definition: previous,
+				kind: 'set-contract-parameter',
+				name: operation.name,
+				definition: previous,
 			}));
 		case 'set-contract-part':
-			return setEntry(document, operation.name, 'parts', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'parts', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-part', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-part', name: operation.name });
+					: { kind: 'remove-contract-part', name: operation.name },
+			);
 		case 'remove-contract-part':
 			return removeEntry<UIPartDefinition>(document, operation.name, 'parts', previous => ({
-				kind: 'set-contract-part', name: operation.name, definition: previous,
+				kind: 'set-contract-part',
+				name: operation.name,
+				definition: previous,
 			}));
 		case 'set-contract-slot':
-			return setEntry(document, operation.name, 'slots', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'slots', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-slot', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-slot', name: operation.name });
+					: { kind: 'remove-contract-slot', name: operation.name },
+			);
 		case 'remove-contract-slot':
 			return removeEntry<UISlotDefinition>(document, operation.name, 'slots', previous => ({
-				kind: 'set-contract-slot', name: operation.name, definition: previous,
+				kind: 'set-contract-slot',
+				name: operation.name,
+				definition: previous,
 			}));
 		case 'set-contract-state':
-			return setEntry(document, operation.name, 'states', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'states', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-state', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-state', name: operation.name });
+					: { kind: 'remove-contract-state', name: operation.name },
+			);
 		case 'remove-contract-state':
 			return removeEntry<UIStateDefinition>(document, operation.name, 'states', previous => ({
-				kind: 'set-contract-state', name: operation.name, definition: previous,
+				kind: 'set-contract-state',
+				name: operation.name,
+				definition: previous,
 			}));
 		case 'set-contract-variant':
-			return setEntry(document, operation.name, 'variants', operation.definition,
-				previous => previous
+			return setEntry(document, operation.name, 'variants', operation.definition, previous =>
+				previous
 					? { kind: 'set-contract-variant', name: operation.name, definition: previous }
-					: { kind: 'remove-contract-variant', name: operation.name });
+					: { kind: 'remove-contract-variant', name: operation.name },
+			);
 		case 'remove-contract-variant':
 			return removeEntry<UIVariantDefinition>(document, operation.name, 'variants', previous => ({
-				kind: 'set-contract-variant', name: operation.name, definition: previous,
+				kind: 'set-contract-variant',
+				name: operation.name,
+				definition: previous,
 			}));
 	}
 }
@@ -156,12 +160,5 @@ function removeEntry<TValue>(
 
 type ContractCollection = keyof Pick<
 	UIAssetContract,
-	| 'actions'
-	| 'dataBindings'
-	| 'dataFields'
-	| 'parameters'
-	| 'parts'
-	| 'slots'
-	| 'states'
-	| 'variants'
+	'actions' | 'dataBindings' | 'dataFields' | 'parameters' | 'parts' | 'slots' | 'states' | 'variants'
 >;

@@ -1,10 +1,6 @@
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
-import {
-	isUIAssetReference,
-	isUIDesignTokenReference,
-	isUIResourceReference,
-} from '../model/UIReference.js';
+import { isUIAssetReference, isUIDesignTokenReference, isUIResourceReference } from '../model/UIReference.js';
 import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { addUIDiagnostic } from '../validation/validationHelpers.js';
 import type { UIAssetRegistry } from './UIAssetRegistry.js';
@@ -13,10 +9,7 @@ import { visitUIDocumentPropertyValues } from './assetTraversal.js';
 /**
  * Validates typed resource, token, and generic asset references in one document.
  */
-export function validateUIProjectReferences(
-	document: UIDocument,
-	registry: UIAssetRegistry,
-): UIDiagnostic[] {
+export function validateUIProjectReferences(document: UIDocument, registry: UIAssetRegistry): UIDiagnostic[] {
 	const diagnostics: UIDiagnostic[] = [];
 	visitUIDocumentPropertyValues(document, (value, path) => {
 		validateResourceReference(value, path, registry, diagnostics);

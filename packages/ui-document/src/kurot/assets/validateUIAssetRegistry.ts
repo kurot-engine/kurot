@@ -21,26 +21,10 @@ export function validateUIAssetRegistry(
 	const componentTypes = new Map<string, string>();
 	for (const document of registry.listAssets()) {
 		validateComponentIdentity(document, componentTypes, diagnostics);
-		appendAssetDiagnostics(
-			document,
-			validateUIDocumentComponents(document, components),
-			diagnostics,
-		);
-		appendAssetDiagnostics(
-			document,
-			validateUIAssetInstances(document, registry, components),
-			diagnostics,
-		);
-		appendAssetDiagnostics(
-			document,
-			validateUIAssetOverrides(document, components),
-			diagnostics,
-		);
-		appendAssetDiagnostics(
-			document,
-			validateUIProjectReferences(document, registry),
-			diagnostics,
-		);
+		appendAssetDiagnostics(document, validateUIDocumentComponents(document, components), diagnostics);
+		appendAssetDiagnostics(document, validateUIAssetInstances(document, registry, components), diagnostics);
+		appendAssetDiagnostics(document, validateUIAssetOverrides(document, components), diagnostics);
+		appendAssetDiagnostics(document, validateUIProjectReferences(document, registry), diagnostics);
 	}
 	validateDependencyCycles(registry, diagnostics);
 	return diagnostics;
@@ -80,10 +64,7 @@ function appendAssetDiagnostics(
 	}
 }
 
-function validateDependencyCycles(
-	registry: UIAssetRegistry,
-	diagnostics: UIDiagnostic[],
-): void {
+function validateDependencyCycles(registry: UIAssetRegistry, diagnostics: UIDiagnostic[]): void {
 	const visited = new Set<string>();
 	const active = new Set<string>();
 	const reported = new Set<string>();

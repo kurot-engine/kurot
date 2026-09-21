@@ -3,11 +3,7 @@ import type { UIComponentInstance } from '../model/UIComponentInstance.js';
 import type { UIDocument } from '../model/UIDocument.js';
 import type { UINode } from '../model/UINode.js';
 import { UIEditError } from './UIEditError.js';
-import type {
-	UIChildTarget,
-	UIOperation,
-	UIOperationResult,
-} from './UIOperation.js';
+import type { UIChildTarget, UIOperation, UIOperationResult } from './UIOperation.js';
 import { getUIChildCount, updateUINode } from './nodeTree.js';
 
 /**
@@ -55,11 +51,7 @@ export function updateInstance(
 /**
  * Verifies that a child collection exists and accepts the requested index.
  */
-export function validateTarget(
-	root: UINode,
-	target: UIChildTarget,
-	index: number,
-): void {
+export function validateTarget(root: UINode, target: UIChildTarget, index: number): void {
 	const parent = findUINode(root, target.parentId);
 	if (!parent) throw nodeNotFound(target.parentId, '$.target.parentId');
 	if (target.collection === 'children' && parent.instance) {
@@ -124,11 +116,7 @@ export function nodeNotFound(nodeId: string, path: string): UIEditError {
  * Creates the standard missing-instance edit error.
  */
 export function missingInstance(nodeId: string): UIEditError {
-	return new UIEditError(
-		'missing-instance',
-		`Node "${nodeId}" is not a reusable component instance.`,
-		'$.nodeId',
-	);
+	return new UIEditError('missing-instance', `Node "${nodeId}" is not a reusable component instance.`, '$.nodeId');
 }
 
 /**

@@ -14,10 +14,7 @@ export type {
 	UITransitionEasing,
 	UIVariantDefinition,
 } from './UIAssetContract.js';
-export type {
-	UIComponentInstance,
-	UIInstanceOverride,
-} from './UIComponentInstance.js';
+export type { UIComponentInstance, UIInstanceOverride } from './UIComponentInstance.js';
 export type {
 	UIAssetReference,
 	UIAppearanceReference,
@@ -37,8 +34,4 @@ export { UI_DOCUMENT_KIND } from './UIDocument.js';
 export type { UIDocument } from './UIDocument.js';
 export type { UINode } from './UINode.js';
 export { isSyntheticNodeId } from './synthetic-node-id.js';
-export type {
-	UIPropertyObject,
-	UIPropertyPrimitive,
-	UIPropertyValue,
-} from './UIPropertyValue.js';
+export type { UIPropertyObject, UIPropertyPrimitive, UIPropertyValue } from './UIPropertyValue.js';

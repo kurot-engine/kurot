@@ -1,8 +1,5 @@
 import type { UIPropertyPrimitive } from '../model/UIPropertyValue.js';
-import type {
-	UIDesignTokenType,
-	UIResourceType,
-} from '../model/UIReference.js';
+import type { UIDesignTokenType, UIResourceType } from '../model/UIReference.js';
 
 /**
  * Broad serializable value category accepted by a component property.
@@ -21,12 +18,7 @@ export type UIPropertyValueType =
 /**
  * Semantic presentation used by editors for otherwise generic values.
  */
-export type UIPropertyFormat =
-	| 'color'
-	| 'layout'
-	| 'rectangle'
-	| 'resource'
-	| 'token';
+export type UIPropertyFormat = 'color' | 'layout' | 'rectangle' | 'resource' | 'token';
 
 /**
  * Structural child policy for a component type.
@@ -242,9 +234,7 @@ export interface UIResolvedComponentDefinition {
 /**
  * Normalizes a property's single-or-array value type declaration to an array.
  */
-export function toValueTypes(
-	valueType: UIPropertyDefinition['valueType'],
-): readonly UIPropertyValueType[] {
+export function toValueTypes(valueType: UIPropertyDefinition['valueType']): readonly UIPropertyValueType[] {
 	// Array.isArray cannot narrow a readonly array union, so re-cast the single form.
 	return Array.isArray(valueType) ? valueType : [valueType as UIPropertyValueType];
 }

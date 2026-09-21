@@ -14,7 +14,4 @@ export interface UIPropertyObject {
  * Serializable value stored in a node property.
  * Undefined, null, functions, and non-finite numbers are not valid values.
  */
-export type UIPropertyValue =
-	| UIPropertyPrimitive
-	| readonly UIPropertyValue[]
-	| UIPropertyObject;
+export type UIPropertyValue = UIPropertyPrimitive | readonly UIPropertyValue[] | UIPropertyObject;

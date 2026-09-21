@@ -1,9 +1,6 @@
 import type { UIPropertyValue } from '../../model/UIPropertyValue.js';
 import type { UIPropertyDefinition } from '../../schema/UIComponentDefinition.js';
-import {
-	isUIDesignTokenReference,
-	isUIResourceReference,
-} from '../../model/UIReference.js';
+import { isUIDesignTokenReference, isUIResourceReference } from '../../model/UIReference.js';
 
 const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 const HEX_COLOR_PATTERN = /^(?:#|0x)([0-9a-f]{6})$/i;
@@ -12,10 +9,7 @@ const REFERENCE_PATTERN = /^@token:/;
 /**
  * Encodes a scalar or reference value for an XML attribute.
  */
-export function encodeXMLValue(
-	value: UIPropertyValue,
-	definition?: UIPropertyDefinition,
-): string | undefined {
+export function encodeXMLValue(value: UIPropertyValue, definition?: UIPropertyDefinition): string | undefined {
 	if (typeof value === 'number' && definition?.format === 'color') {
 		return `#${value.toString(16).padStart(6, '0').toUpperCase()}`;
 	}
@@ -40,10 +34,7 @@ export function encodeXMLValue(
 /**
  * Decodes the canonical scalar and reference attribute syntax.
  */
-export function decodeXMLValue(
-	source: string,
-	definition?: UIPropertyDefinition,
-): UIPropertyValue {
+export function decodeXMLValue(source: string, definition?: UIPropertyDefinition): UIPropertyValue {
 	if (source.startsWith('\\')) return source.slice(1);
 	const color = definition?.format === 'color' ? HEX_COLOR_PATTERN.exec(source) : undefined;
 	if (color?.[1] !== undefined) return Number.parseInt(color[1], 16);
@@ -71,13 +62,15 @@ export function decodeXMLValue(
  * Escapes text for a double-quoted XML attribute.
  */
 export function escapeXML(value: string): string {
-	return value
-		.replaceAll('&', '&amp;')
-		.replaceAll('"', '&quot;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;');
+	return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
 function needsStringEscape(value: string): boolean {
-	return value.startsWith('\\') || value === 'true' || value === 'false' || NUMBER_PATTERN.test(value) || REFERENCE_PATTERN.test(value);
+	return (
+		value.startsWith('\\') ||
+		value === 'true' ||
+		value === 'false' ||
+		NUMBER_PATTERN.test(value) ||
+		REFERENCE_PATTERN.test(value)
+	);
 }
