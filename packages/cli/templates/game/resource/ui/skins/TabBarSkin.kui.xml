@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.TabBarSkin">
-    <Group id="root" minHeight="40" minWidth="100">
-        <Rect fillColor="#16213E" height="100%" width="100%" />
-        <DataGroup id="dataGroup" height="100%" width="100%" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.TabBarSkin" minHeight="40" minWidth="100">
+    <Rect fillColor="#16213E" height="100%" width="100%" />
+    <DataGroup id="dataGroup" height="100%" width="100%" />
 </Skin>

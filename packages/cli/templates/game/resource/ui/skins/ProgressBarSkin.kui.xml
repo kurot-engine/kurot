@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ProgressBarSkin">
-    <Group id="root" minHeight="18" minWidth="30">
-        <Image height="100%" scale9Grid="1,1,4,4" source="track_pb_png" verticalCenter="0" width="100%" />
-        <Image id="thumb" height="100%" scale9Grid="1,1,4,4" source="thumb_pb_png" width="100%" />
-        <Label id="labelDisplay" fontFamily="Tahoma" horizontalCenter="0" size="15" textAlign="center" textColor="#707070" verticalAlign="middle" verticalCenter="0" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ProgressBarSkin" minHeight="18" minWidth="30">
+    <Image height="100%" scale9Grid="1,1,4,4" source="track_pb_png" verticalCenter="0" width="100%" />
+    <Image id="thumb" height="100%" scale9Grid="1,1,4,4" source="thumb_pb_png" width="100%" />
+    <Label id="labelDisplay" fontFamily="Tahoma" horizontalCenter="0" size="15" textAlign="center" textColor="#707070" verticalAlign="middle" verticalCenter="0" />
 </Skin>

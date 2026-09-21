@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@2.0.1`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@2.0.2`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -33,8 +33,11 @@ assets are adapted by `kui/kui-parser.ts` to the compiler-private `SkinIR`,
 then `skin-module-builder.ts` bundles generated factories.
 
 A Skin document root declares `class`, the generated skin registration name,
-and may declare `states`. Overrides use local `property.state` attributes.
-Storage IDs and runtime mapping metadata are not authored XML fields.
+and may declare `states`. The Skin is the visual root container: its properties
+and layout apply to the runtime Skin, and its direct visual children become
+`skin.elementsContent` without an extra Group. Overrides use local
+`property.state` attributes. Storage IDs and runtime mapping metadata are not
+authored XML fields.
 
 The theme JSON at `resource/default.thm.json` is fixed generated output. It is
 derived from built-in naming conventions and configured project component
@@ -47,7 +50,7 @@ and state `SetProperty` overrides. Reuse, data contracts, actions, and editor
 transactions stay in `@kurot/ui-document` and `@kurot/ui-runtime`.
 
 Successful compilation writes `.kurot/skin-parts.d.ts` from the same IR. Every
-explicitly identified node below the visual root is a skin part, with its `id`
+explicitly identified node inside the Skin is a skin part, with its `id`
 as the part name. Internal nodes can omit `id`; the declaration augments
 `SkinPartsMap` and narrows matching exported
 component classes. The file is development metadata and is excluded from

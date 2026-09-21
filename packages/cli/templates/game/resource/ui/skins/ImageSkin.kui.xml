@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.ImageSkin">
-    <Group id="root">
-        <Image id="imageDisplay" height="100%" width="100%" />
-    </Group>
+    <Image id="imageDisplay" height="100%" width="100%" />
 </Skin>

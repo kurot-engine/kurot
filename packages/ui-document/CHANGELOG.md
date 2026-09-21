@@ -4,13 +4,21 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
-## Unreleased
+## [0.6.2] — 2026-09-22
 
 ### Added
 
+- Added `createUISkinRoot()` for constructing the internal Group represented by
+  the authored `<Skin>` element without assigning it a user-facing node ID.
 - Added the reversible `set-node-id` editing operation. It updates node identity
   and every contract reference atomically; omitting the new ID removes the
   authored XML ID while retaining an internal synthetic identity.
+
+### Changed
+
+- `<Skin>` is now the authored visual root container. Root size and layout
+  properties are written on the Skin, and visual nodes are direct children;
+  redundant root `<Group>` wrappers are no longer serialized.
 
 ## [0.6.1] — 2026-09-21
 

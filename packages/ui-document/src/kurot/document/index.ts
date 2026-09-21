@@ -1,5 +1,5 @@
-export { createUIDocument, createUINode } from './create.js';
-export type { CreateUIDocumentOptions, CreateUINodeOptions } from './create.js';
+export { createUIDocument, createUINode, createUISkinRoot } from './create.js';
+export type { CreateUIDocumentOptions, CreateUINodeOptions, CreateUISkinRootOptions } from './create.js';
 export { createUIAssetContract } from './create-asset-contract.js';
 export type { CreateUIAssetContractOptions } from './create-asset-contract.js';
 export { createUIComponentInstance } from './create-component-instance.js';

@@ -113,7 +113,7 @@ async function createFixture(sources: readonly string[]): Promise<{
 function skin(className: string): string {
 	return `<?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="${className}">
-	<Group id="root"><Label id="labelDisplay" text="Play" /></Group>
+	<Label id="labelDisplay" text="Play" />
 </Skin>
 `;
 }

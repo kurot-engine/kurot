@@ -149,9 +149,7 @@ describe('semantic UI operations', () => {
 	it('clears authored node ids while retaining internal state targets', () => {
 		const document = parseUIDocument(`<?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="down">
-    <Group>
-        <Rect id="background" alpha.down="0.8" />
-    </Group>
+	<Rect id="background" alpha.down="0.8" />
 </Skin>
 `);
 		const result = applyUIOperation(document, {

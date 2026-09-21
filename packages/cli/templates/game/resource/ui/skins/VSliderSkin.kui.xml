@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.VSliderSkin">
-    <Group id="root" minHeight="30" minWidth="25">
-        <Image id="track" height="100%" horizontalCenter="0" scale9Grid="1,1,4,4" source="track_png" width="7" />
-        <Image id="thumb" horizontalCenter="0" source="thumb_png" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.VSliderSkin" minHeight="30" minWidth="25">
+    <Image id="track" height="100%" horizontalCenter="0" scale9Grid="1,1,4,4" source="track_png" width="7" />
+    <Image id="thumb" horizontalCenter="0" source="thumb_png" />
 </Skin>

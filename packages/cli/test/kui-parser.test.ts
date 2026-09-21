@@ -13,11 +13,9 @@ const TEMPLATE_DIRECTORY = fileURLToPath(
 describe('KUI Skin compiler', () => {
 	it('compiles canonical component tags, typed resources, inferred parts, and states', () => {
 		const source = `<?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="down">
-	<Group id="root" minWidth="100">
-		<Image source="button_up_png" width="100%" alpha.down="0.8" />
-		<Label id="labelDisplay" text="Play" />
-	</Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="down" minWidth="100">
+	<Image source="button_up_png" width="100%" alpha.down="0.8" />
+	<Label id="labelDisplay" text="Play" />
 </Skin>
 `;
 		const ir = parseKUISkin(source);
@@ -25,8 +23,8 @@ describe('KUI Skin compiler', () => {
 
 		expect(ir.className).toBe('skins.ButtonSkin');
 		expect(ir.skinParts).toEqual(['labelDisplay']);
-		expect(generated).toContain('skin.elementsContent = [root];');
-		expect(generated).toContain('root.elementsContent = [__kui_node_0_0, labelDisplay];');
+		expect(generated).toContain('skin.minWidth = 100;');
+		expect(generated).toContain('skin.elementsContent = [__kui_node_0_0, labelDisplay];');
 		expect(generated).toContain('__kui_node_0_0.source = "button_up_png";');
 		expect(generated).toContain('__kui_node_0_0.percentWidth = 100;');
 		expect(generated).toContain('skin["labelDisplay"] = labelDisplay;');
@@ -37,7 +35,7 @@ describe('KUI Skin compiler', () => {
 		const source = `
 <Skin xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game"
 	class="skins.HostSkin">
-	<Group id="root"><game:Badge id="badge" /></Group>
+	<game:Badge id="badge" />
 </Skin>`;
 		const ir = parseKUISkin(source, undefined, [{
 			prefix: 'game',
@@ -52,12 +50,12 @@ describe('KUI Skin compiler', () => {
 	it('keeps unknown tags as source-located diagnostics input', () => {
 		const source = `
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.Invalid">
-	<Group id="root"><Buton id="broken" /></Group>
+	<Buton id="broken" />
 </Skin>`;
 		const ir = parseKUISkin(source);
 
 		expect(ir.unresolvedTags[0]).toMatchObject({ name: 'Buton' });
-		expect(ir.children[0]?.children).toEqual([]);
+		expect(ir.children).toEqual([]);
 	});
 
 	it('compiles every bundled template skin', async () => {

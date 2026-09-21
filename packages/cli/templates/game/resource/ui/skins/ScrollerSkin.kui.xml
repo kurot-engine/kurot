@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ScrollerSkin">
-    <Group id="root" minHeight="20" minWidth="20">
-        <HScrollBar id="horizontalScrollBar" autoVisibility="false" bottom="0" height="12" left="0" right="12" visible="false" />
-        <VScrollBar id="verticalScrollBar" autoVisibility="false" bottom="12" right="0" top="0" visible="false" width="12" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ScrollerSkin" minHeight="20" minWidth="20">
+    <HScrollBar id="horizontalScrollBar" autoVisibility="false" bottom="0" height="12" left="0" right="12" visible="false" />
+    <VScrollBar id="verticalScrollBar" autoVisibility="false" bottom="12" right="0" top="0" visible="false" width="12" />
 </Skin>

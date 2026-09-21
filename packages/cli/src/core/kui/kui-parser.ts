@@ -50,16 +50,16 @@ class KUIParseContext {
 		}
 		const width = numericProperty(root.properties.width);
 		const height = numericProperty(root.properties.height);
-		const rootNode = this._node(root, false);
+		const rootProperties = this._properties(root, new Set(['height', 'width']));
 		return {
 			className: this._className,
 			...(width === undefined ? {} : { width }),
 			...(height === undefined ? {} : { height }),
-			properties: [],
+			properties: rootProperties.properties,
 			imports: this._imports,
 			skinParts: this._skinParts,
-			children: rootNode === undefined ? [] : [rootNode],
-			propertyChildren: [],
+			children: root.children.map(child => this._node(child)).filter(isSkinNode),
+			propertyChildren: rootProperties.propertyChildren,
 			states: this._states(),
 			declarations: [],
 			unresolvedTags: this._unresolvedTags,
@@ -82,16 +82,7 @@ class KUIParseContext {
 			this._skinParts.push(node.id);
 		}
 
-		const propertyChildren: PropertyChild[] = [];
-		const properties: PropertyAssignment[] = [];
-		for (const [name, value] of Object.entries(node.properties)) {
-			const semanticChild = this._semanticChild(name, value);
-			if (semanticChild) {
-				propertyChildren.push(semanticChild);
-			} else {
-				properties.push({ name, value: propertyValue(value) });
-			}
-		}
+		const { properties, propertyChildren } = this._properties(node);
 		return {
 			className,
 			module: info.module,
@@ -103,15 +94,36 @@ class KUIParseContext {
 		};
 	}
 
+	private _properties(
+		node: UINode,
+		excluded = new Set<string>(),
+	): { properties: PropertyAssignment[]; propertyChildren: PropertyChild[] } {
+		const properties: PropertyAssignment[] = [];
+		const propertyChildren: PropertyChild[] = [];
+		for (const [name, value] of Object.entries(node.properties)) {
+			if (excluded.has(name)) continue;
+			const semanticChild = this._semanticChild(name, value);
+			if (semanticChild) {
+				propertyChildren.push(semanticChild);
+			} else {
+				properties.push({ name, value: propertyValue(value) });
+			}
+		}
+		return { properties, propertyChildren };
+	}
+
 	private _semanticChild(name: string, value: UIPropertyValue): PropertyChild | undefined {
 		if (!isPlainObject(value) || typeof value.type !== 'string') return undefined;
 		const properties = isPlainObject(value.properties) ? value.properties : {};
-		const node = this._node({
-			id: `_${name}${this._variable + 1}`,
-			type: value.type,
-			properties,
-			children: [],
-		}, false);
+		const node = this._node(
+			{
+				id: `_${name}${this._variable + 1}`,
+				type: value.type,
+				properties,
+				children: [],
+			},
+			false,
+		);
 		return node === undefined ? undefined : { propertyName: name, nodes: [node] };
 	}
 
@@ -124,7 +136,7 @@ class KUIParseContext {
 				}
 				return {
 					type: 'SetProperty' as const,
-					targetId: override.targetId,
+					targetId: override.targetId === this._document.root.id ? '' : override.targetId,
 					name: override.property,
 					value: propertyValue(override.value),
 				};

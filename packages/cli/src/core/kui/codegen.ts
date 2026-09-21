@@ -5,14 +5,7 @@
  * Skin instances with all components, states, and bindings.
  */
 
-import type {
-	SkinIR,
-	SkinNode,
-	PropertyValue,
-	StateDef,
-	StateOverride,
-	LiteralValue,
-} from './ast.js';
+import type { LiteralValue, PropertyChild, PropertyValue, SkinIR, SkinNode, StateDef, StateOverride } from './ast.js';
 import { lookupComponent } from './registry.js';
 
 // ── Public API ───────────────────────────────────────────────────────
@@ -121,6 +114,7 @@ class CodeGenerator {
 		for (const prop of this._ir.properties) {
 			this.emitPropertyAssignment('skin', prop.name, prop.value);
 		}
+		this.emitPropertyChildren('skin', this._ir.propertyChildren);
 
 		this.emitNodeDeclarations(this._ir.children);
 
@@ -193,11 +187,15 @@ class CodeGenerator {
 	}
 
 	private emitNodePropertyChildren(node: SkinNode): void {
-		for (const pc of node.propertyChildren) {
+		this.emitPropertyChildren(node.varName, node.propertyChildren);
+	}
+
+	private emitPropertyChildren(target: string, propertyChildren: readonly PropertyChild[]): void {
+		for (const pc of propertyChildren) {
 			for (const child of pc.nodes) {
 				this.emitNodeCreation(child);
 				this.emitNodeProperties(child);
-				this.line(`${node.varName}.${pc.propertyName} = ${child.varName};`);
+				this.line(`${target}.${pc.propertyName} = ${child.varName};`);
 			}
 		}
 	}

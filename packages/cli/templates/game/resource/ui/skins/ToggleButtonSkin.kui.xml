@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ToggleButtonSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected">
-    <Group id="root" minHeight="50" minWidth="100">
-        <Rect fillColor="#636E72" height="100%" strokeColor="#4A5459" strokeWeight="1" width="100%" fillColor.disabled="#2D3436" fillColor.disabledAndSelected="#2D3436" fillColor.down="#4A5459" fillColor.downAndSelected="#5A4BD1" fillColor.upAndSelected="#6C5CE7" />
-        <Label id="labelDisplay" bottom="8" left="8" right="8" size="16" textAlign="center" textColor="#DFE6E9" top="8" verticalAlign="middle" textColor.disabled="#636E72" textColor.upAndSelected="#FFFFFF" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ToggleButtonSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected" minHeight="50" minWidth="100">
+    <Rect fillColor="#636E72" height="100%" strokeColor="#4A5459" strokeWeight="1" width="100%" fillColor.disabled="#2D3436" fillColor.disabledAndSelected="#2D3436" fillColor.down="#4A5459" fillColor.downAndSelected="#5A4BD1" fillColor.upAndSelected="#6C5CE7" />
+    <Label id="labelDisplay" bottom="8" left="8" right="8" size="16" textAlign="center" textColor="#DFE6E9" top="8" verticalAlign="middle" textColor.disabled="#636E72" textColor.upAndSelected="#FFFFFF" />
 </Skin>

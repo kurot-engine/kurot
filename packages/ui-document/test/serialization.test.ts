@@ -10,13 +10,15 @@ import {
 	UIDocumentValidationError,
 } from '../src/index.js';
 
+const SKIN_ROOT_ID = '__kui_node_0';
+
 describe('KUI XML serialization', () => {
 	it('uses stable property-key ordering and round-trips documents', () => {
 		const document = createUIDocument({
 			id: 'skins.MainSkin',
 			assetKind: 'appearance',
 			root: createUINode({
-				id: 'root',
+				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
 				properties: {
 					zIndex: 2,
@@ -32,7 +34,7 @@ describe('KUI XML serialization', () => {
 		const source = serializeUIDocument(document);
 
 		expect(source).toContain(
-			'<layout>\n            <HorizontalLayout horizontalGap="4" verticalGap="8" />\n        </layout>',
+			'<layout>\n        <HorizontalLayout horizontalGap="4" verticalGap="8" />\n    </layout>',
 		);
 		expect(parseUIDocument(source)).toEqual(document);
 	});
@@ -49,13 +51,17 @@ describe('KUI XML serialization', () => {
 				},
 			}),
 			root: createUINode({
-				id: 'background',
-				type: 'kui.Rect',
-				properties: {
-					alpha: 1,
-					fillColor: 0x121d30,
-					strokeColor: 0x73a9ff,
-				},
+				id: SKIN_ROOT_ID,
+				type: 'kui.Group',
+				children: [createUINode({
+					id: 'background',
+					type: 'kui.Rect',
+					properties: {
+						alpha: 1,
+						fillColor: 0x121d30,
+						strokeColor: 0x73a9ff,
+					},
+				})],
 			}),
 		});
 
@@ -73,7 +79,7 @@ describe('KUI XML serialization', () => {
 			id: 'skins.ImageSkin',
 			assetKind: 'appearance',
 			root: createUINode({
-				id: 'root',
+				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
 				children: [createUINode({
 					id: 'imageDisplay',
@@ -113,7 +119,7 @@ describe('KUI XML serialization', () => {
 			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><contract /><Group id="root" /></Skin>',
 		)).toThrow(/Unexpected <contract> inside <Skin>/);
 		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down"><Group id="root" alpha.unknown="0.5" /></Skin>',
+			'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down" alpha.unknown="0.5" />',
 		)).toThrow(/undeclared state/);
 		expect(() => parseUIDocument(
 			'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down.alt"><Group id="root" /></Skin>',
@@ -144,7 +150,7 @@ describe('KUI XML serialization', () => {
 				},
 			}),
 			root: createUINode({
-				id: 'root',
+				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
 				children: [createUINode({ id: 'background', type: 'kui.Rect' })],
 			}),
@@ -161,10 +167,8 @@ describe('KUI XML serialization', () => {
 	it('does not require authored ids for internal state targets', () => {
 		const source = `<?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled">
-    <Group id="root">
-        <Image source="up.png" source.down="down.png" alpha.disabled="0.5" />
-        <Label id="labelDisplay" />
-    </Group>
+    <Image source="up.png" source.down="down.png" alpha.disabled="0.5" />
+    <Label id="labelDisplay" />
 </Skin>
 `;
 
@@ -195,9 +199,13 @@ describe('KUI XML serialization', () => {
 			id: 'skins.CustomSkin',
 			assetKind: 'appearance',
 			root: createUINode({
-				id: 'root',
-				type: 'game.Custom',
-				properties: { options: ['a', 'b'] },
+				id: SKIN_ROOT_ID,
+				type: 'kui.Group',
+				children: [createUINode({
+					id: 'custom',
+					type: 'game.Custom',
+					properties: { options: ['a', 'b'] },
+				})],
 			}),
 		});
 
@@ -208,7 +216,7 @@ describe('KUI XML serialization', () => {
 		const document = createUIDocument({
 			id: 'skins.ButtonSkin',
 			assetKind: 'appearance',
-			root: createUINode({ id: 'root', type: 'kui.Group' }),
+			root: createUINode({ id: SKIN_ROOT_ID, type: 'kui.Group' }),
 		});
 		const source = serializeUIDocument(document);
 		const skinTag = source.split('\n')[1];
@@ -220,7 +228,7 @@ describe('KUI XML serialization', () => {
 		const document = createUIDocument({
 			id: 'skins.MainSkin',
 			assetKind: 'appearance',
-			root: createUINode({ id: 'root', type: 'kui.Group' }),
+			root: createUINode({ id: SKIN_ROOT_ID, type: 'kui.Group' }),
 		});
 		const unsafe = {
 			...document,

@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 2.0.1.** Node.js 20 or later is required.
+> **Current release: 2.0.2.** Node.js 20 or later is required.
 
 > **Release scope:** The 2.0.x line is currently dedicated to Kurot Editor integration.
 > Existing game projects that use EXML, including CrashMaster, should remain on
@@ -115,15 +115,16 @@ The HTML template must contain these placeholders:
 ## KUI XML compilation
 
 KUI XML is the authored Skin format. A Skin root declares its generated class
-name and, when needed, its state names:
+name and, when needed, its state names. The Skin itself is the visual root
+container, so size and layout properties belong on `<Skin>` and visual nodes
+are direct children:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled">
-    <Group id="root" minWidth="100" minHeight="50">
-        <Rect fillColor="#315A9D" fillColor.down="#244474" alpha.disabled="0.5" />
-        <Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled"
+      minWidth="100" minHeight="50">
+    <Rect fillColor="#315A9D" fillColor.down="#244474" alpha.disabled="0.5" />
+    <Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
 </Skin>
 ```
 
@@ -145,7 +146,7 @@ mappings are errors. Unknown tags are warnings in normal development and errors
 under strict or release builds.
 
 Successful compilation also writes `.kurot/skin-parts.d.ts`. Every identified
-node below the visual root is inferred as a skin part; its `id` is the part
+node inside the Skin is inferred as a skin part; its `id` is the part
 name. The declaration augments the UI runtime with those exact names and types.
 This file is editor-only, ignored by git, and never enters browser bundles.
 

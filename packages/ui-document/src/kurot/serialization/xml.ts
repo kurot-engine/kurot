@@ -1,3 +1,4 @@
+import { createKurotUIFoundationRegistry } from '../catalog/kurot-ui-foundation.js';
 import { createUIAssetContract } from '../document/create-asset-contract.js';
 import { UI_DOCUMENT_KIND } from '../model/UIDocument.js';
 import type { UIDocument } from '../model/UIDocument.js';
@@ -6,7 +7,7 @@ import type { UIDiagnostic } from '../validation/UIDiagnostic.js';
 import { isUIDocument, validateUIDocument } from '../validation/validateUIDocument.js';
 import { UIDocumentParseError } from './UIDocumentParseError.js';
 import { UIDocumentValidationError } from './UIDocumentValidationError.js';
-import { collectNodePrefixes, parseNode, serializeNode } from './xml/xml-node.js';
+import { collectNodePrefixes, parseSkinRoot, serializeSkinRoot } from './xml/xml-node.js';
 import { parseXML } from './xml/xml-parser.js';
 import { escapeXML } from './xml/xml-values.js';
 
@@ -45,14 +46,14 @@ export function serializeUIDocument(document: UIDocument): string {
 		.join('');
 	const stateNames = Object.keys(document.contract.states);
 	validateStateNames(stateNames);
-	const stateAttribute = stateNames.length === 0
-		? ''
-		: ` states="${escapeXML(stateNames.join(','))}"`;
+	const stateAttribute = stateNames.length === 0 ? '' : ` states="${escapeXML(stateNames.join(','))}"`;
+	const root = serializeSkinRoot(document.root, document.contract.states);
+	const rootAttributes = root.attributes.length === 0 ? '' : ` ${root.attributes.join(' ')}`;
 	const lines = [
 		'<?xml version="1.0" encoding="utf-8"?>',
-		`<Skin xmlns="${KUI_XML_NAMESPACE}"${namespaces} class="${escapeXML(document.id)}"${stateAttribute}>`,
+		`<Skin xmlns="${KUI_XML_NAMESPACE}"${namespaces} class="${escapeXML(document.id)}"${stateAttribute}${rootAttributes}>`,
 	];
-	lines.push(...serializeNode(document.root, 1, document.contract.states));
+	lines.push(...root.contents);
 	lines.push('</Skin>');
 	return `${lines.join('\n')}\n`;
 }
@@ -73,10 +74,6 @@ export function parseUIDocument(source: string): UIDocument {
 		if (element.children.some(child => child.name === 'contract')) {
 			throw new Error('Unexpected <contract> inside <Skin>.');
 		}
-		const componentElements = element.children;
-		if (componentElements.length !== 1 || componentElements[0] === undefined) {
-			throw new Error(`<${element.name}> must contain exactly one root component.`);
-		}
 		const prefixes = Object.fromEntries(
 			Object.entries(element.attributes)
 				.filter(([name]) => name.startsWith('xmlns:'))
@@ -84,14 +81,19 @@ export function parseUIDocument(source: string): UIDocument {
 		);
 		const stateNames = parseStateNames(element.attributes.states);
 		const stateOverrides = new Map(stateNames.map(name => [name, []]));
-		const root = parseNode(componentElements[0], {
+		const root = parseSkinRoot(element, {
 			prefixes,
 			states: new Set(stateNames),
 			stateOverrides,
 		});
-		const states = Object.fromEntries(stateNames.map(name => [name, {
-			overrides: stateOverrides.get(name) ?? [],
-		}]));
+		const states = Object.fromEntries(
+			stateNames.map(name => [
+				name,
+				{
+					overrides: stateOverrides.get(name) ?? [],
+				},
+			]),
+		);
 		const value: UIDocument = {
 			kind: UI_DOCUMENT_KIND,
 			formatVersion: UI_DOCUMENT_FORMAT_VERSION,
@@ -123,8 +125,10 @@ export function parseUIDocument(source: string): UIDocument {
 
 function validateRootAttributes(attributes: Readonly<Record<string, string>>): void {
 	const allowed = new Set(['class', 'states', 'xmlns']);
+	const groupProperties = createKurotUIFoundationRegistry().resolve('kui.Group')?.properties ?? {};
 	for (const name of Object.keys(attributes)) {
-		if (!allowed.has(name) && !name.startsWith('xmlns:')) {
+		const property = name.split('.')[0] ?? name;
+		if (!allowed.has(name) && !name.startsWith('xmlns:') && !Object.hasOwn(groupProperties, property)) {
 			throw new Error(`Unexpected attribute "${name}" on <Skin>.`);
 		}
 	}

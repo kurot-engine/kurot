@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.RadioButtonSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected">
-    <Group id="root">
-        <Group height="100%" width="100%">
-            <layout>
-                <HorizontalLayout verticalAlign="middle" />
-            </layout>
-            <Image alpha="1" fillMode="scale" source="radiobutton_unselect_png" alpha.disabled="0.5" source.disabledAndSelected="radiobutton_select_disabled_png" alpha.down="0.7" source.downAndSelected="radiobutton_select_down_png" source.upAndSelected="radiobutton_select_up_png" />
-            <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
-        </Group>
+    <Group height="100%" width="100%">
+        <layout>
+            <HorizontalLayout verticalAlign="middle" />
+        </layout>
+        <Image alpha="1" fillMode="scale" source="radiobutton_unselect_png" alpha.disabled="0.5" source.disabledAndSelected="radiobutton_select_disabled_png" alpha.down="0.7" source.downAndSelected="radiobutton_select_down_png" source.upAndSelected="radiobutton_select_up_png" />
+        <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
     </Group>
 </Skin>

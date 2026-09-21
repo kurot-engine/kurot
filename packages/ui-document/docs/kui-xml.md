@@ -8,11 +8,11 @@ KUI XML is the authored skin format consumed by Kurot Editor and
 <?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1"
       xmlns:game="https://kurot.dev/components/game"
-      class="game.TestSkin">
-    <Group id="root" width="640" height="400">
-        <Rect id="background" fillColor="#121D30" width="640" height="400" />
-        <game:ActionCard id="play" />
-    </Group>
+      class="game.TestSkin"
+      width="640"
+      height="400">
+    <Rect id="background" fillColor="#121D30" width="640" height="400" />
+    <game:ActionCard id="play" />
 </Skin>
 ```
 
@@ -21,9 +21,12 @@ Storage IDs, format versions, runtime targets, and default-skin flags are not
 part of the file. Storage owns its record identity, while the CLI derives skin
 associations from built-in and project component conventions.
 
-The Skin contains exactly one visual root component. Built-in `kui.*` types
-use unprefixed PascalCase tags. Project component types use an XML namespace
-prefix; `game:ActionCard` maps to the semantic type `game.ActionCard`.
+The Skin is the visual root container. Its layout and size properties belong on
+`<Skin>`, and its visual children are written directly inside it; an extra root
+`<Group>` has no meaning. A nested Group remains valid when the design actually
+needs a separate layout container. Built-in `kui.*` types use unprefixed
+PascalCase tags. Project component types use an XML namespace prefix;
+`game:ActionCard` maps to the semantic type `game.ActionCard`.
 
 ## Values
 
@@ -61,7 +64,7 @@ descriptor used by the editor and runtime.
 
 ## Parts and states
 
-Every explicitly identified node below the visual root is available as a skin
+Every explicitly identified node inside the Skin is available as a skin
 part. The node `id` is the part name, so internal visual nodes can omit `id`
 instead of maintaining names that have no runtime meaning.
 
@@ -70,10 +73,8 @@ node as `property.state`, so an internal state target does not need an `id`.
 
 ```xml
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="up,down,disabled">
-    <Group id="root">
-        <Rect alpha.down="0.8" alpha.disabled="0.5" />
-        <Label id="labelDisplay" />
-    </Group>
+    <Rect alpha.down="0.8" alpha.disabled="0.5" />
+    <Label id="labelDisplay" />
 </Skin>
 ```
 

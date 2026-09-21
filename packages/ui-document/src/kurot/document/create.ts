@@ -7,6 +7,7 @@ import type { UIDocument } from '../model/UIDocument.js';
 import type { UIAppearanceReference } from '../model/UIReference.js';
 import type { UINode } from '../model/UINode.js';
 import type { UIPropertyValue } from '../model/UIPropertyValue.js';
+import { createSyntheticNodeId } from '../model/synthetic-node-id.js';
 import { createUIAssetContract } from './create-asset-contract.js';
 import { createUIComponentInstance } from './create-component-instance.js';
 import { assertNonEmpty } from '../shared/strings.js';
@@ -72,6 +73,11 @@ export interface CreateUIDocumentOptions {
 }
 
 /**
+ * Input accepted by createUISkinRoot.
+ */
+export type CreateUISkinRootOptions = Omit<CreateUINodeOptions, 'id' | 'type'>;
+
+/**
  * Creates a node with explicit empty property and child collections.
  */
 export function createUINode(options: CreateUINodeOptions): UINode {
@@ -82,14 +88,21 @@ export function createUINode(options: CreateUINodeOptions): UINode {
 		id: options.id,
 		type: options.type,
 		properties: { ...options.properties },
-		...(options.instance === undefined
-			? {}
-			: { instance: createUIComponentInstance(options.instance) }),
-		...(options.appearance === undefined
-			? {}
-			: { appearance: { ...options.appearance } }),
+		...(options.instance === undefined ? {} : { instance: createUIComponentInstance(options.instance) }),
+		...(options.appearance === undefined ? {} : { appearance: { ...options.appearance } }),
 		children: [...(options.children ?? [])],
 	};
+}
+
+/**
+ * Creates the internal Group represented by the authored Skin element.
+ */
+export function createUISkinRoot(options: CreateUISkinRootOptions = {}): UINode {
+	return createUINode({
+		...options,
+		id: createSyntheticNodeId('0'),
+		type: 'kui.Group',
+	});
 }
 
 /**

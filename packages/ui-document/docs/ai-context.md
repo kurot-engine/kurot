@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.6.1`. This is a headless,
+Package identity: `@kurot/ui-document@0.6.2`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -129,7 +129,7 @@ src/
 - Model: `UIDocument`, `UIAssetKind`, `UIAssetContract`, `UINode`,
   `UIComponentInstance`, reference types, property-value types,
   `UI_DOCUMENT_KIND`, `UI_DOCUMENT_FORMAT_VERSION`.
-- Creation/query: `createUIDocument`, `createUINode`,
+- Creation/query: `createUIDocument`, `createUISkinRoot`, `createUINode`,
   `createUIAssetContract`, `createUIComponentInstance`, reference constructors,
   `findUINode`, `visitUINodes`.
 - Single-document validation: `validateUIDocument`, `isUIDocument`, and

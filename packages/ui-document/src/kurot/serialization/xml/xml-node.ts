@@ -20,6 +20,11 @@ export interface XMLNodeParseContext extends XMLNamespaces {
 	readonly stateOverrides: Map<string, UIPropertyOverride[]>;
 }
 
+export interface XMLSkinRootSerialization {
+	readonly attributes: readonly string[];
+	readonly contents: readonly string[];
+}
+
 /**
  * Collects custom component namespace prefixes used by a node tree.
  */
@@ -42,52 +47,7 @@ export function serializeNode(
 ): string[] {
 	const indent = '    '.repeat(depth);
 	const tag = componentTag(node.type);
-	const attributes = isSyntheticNodeId(node.id) ? [] : [`id="${escapeXML(node.id)}"`];
-	const stateProperties = new Set<string>();
-	let layout: UIPropertyValue | undefined;
-
-	if (node.appearance !== undefined || node.instance !== undefined) {
-		throw new Error('Skin XML nodes do not serialize semantic asset composition metadata.');
-	}
-
-	for (const [name, value] of sortedEntries(node.properties)) {
-		if (name === 'layout') {
-			layout = value;
-			continue;
-		}
-		if (name.includes('.')) {
-			throw new Error(`Skin property name "${name}" must not contain a dot.`);
-		}
-		const encoded = encodeXMLValue(value, propertyDefinition(node.type, name));
-		if (encoded === undefined || RESERVED_ATTRIBUTES.has(name) || name.startsWith('xmlns')) {
-			throw new Error(`Skin property "${name}" must be a scalar value.`);
-		}
-		attributes.push(`${name}="${escapeXML(encoded)}"`);
-	}
-
-	for (const [stateName, state] of Object.entries(states)) {
-		for (const override of state.overrides) {
-			if (override.targetId !== node.id) continue;
-			if (override.property.includes('.')) {
-				throw new Error(`Skin state property name "${override.property}" must not contain a dot.`);
-			}
-			const stateProperty = `${override.property}.${stateName}`;
-			if (stateProperties.has(stateProperty)) {
-				throw new Error(`Skin XML cannot serialize duplicate state property "${stateProperty}".`);
-			}
-			stateProperties.add(stateProperty);
-			if (override.transition !== undefined) {
-				throw new Error(`Skin XML does not serialize transitions for state "${stateName}".`);
-			}
-			const encoded = encodeXMLValue(override.value, propertyDefinition(node.type, override.property));
-			if (encoded === undefined) {
-				throw new Error(
-					`State property "${override.property}.${stateName}" must be a scalar value.`,
-				);
-			}
-			attributes.push(`${stateProperty}="${escapeXML(encoded)}"`);
-		}
-	}
+	const { attributes, layout } = serializeNodeMetadata(node, states, true);
 
 	const attributeSuffix = attributes.length === 0 ? '' : ` ${attributes.join(' ')}`;
 
@@ -104,6 +64,27 @@ export function serializeNode(
 	}
 	lines.push(`${indent}</${tag}>`);
 	return lines;
+}
+
+/**
+ * Serializes the implicit Group represented by the Skin element itself.
+ */
+export function serializeSkinRoot(
+	node: UINode,
+	states: Readonly<Record<string, UIStateDefinition>> = {},
+): XMLSkinRootSerialization {
+	if (node.type !== 'kui.Group') {
+		throw new Error('Skin document root must be an implicit kui.Group.');
+	}
+	const { attributes, layout } = serializeNodeMetadata(node, states, false);
+	const contents: string[] = [];
+	if (layout !== undefined) {
+		contents.push(...serializeLayout(layout, 1));
+	}
+	for (const child of node.children) {
+		contents.push(...serializeNode(child, 1, states));
+	}
+	return { attributes, contents };
 }
 
 /**
@@ -168,6 +149,71 @@ export function parseNode(element: XMLElement, context: XMLNodeParseContext, pat
 	};
 }
 
+/**
+ * Parses Skin attributes and direct children as one implicit Group node.
+ */
+export function parseSkinRoot(element: XMLElement, context: XMLNodeParseContext): UINode {
+	const attributes = Object.fromEntries(
+		Object.entries(element.attributes).filter(
+			([name]) => name !== 'class' && name !== 'states' && name !== 'xmlns' && !name.startsWith('xmlns:'),
+		),
+	);
+	return parseNode({ name: 'Group', attributes, children: element.children }, context);
+}
+
+function serializeNodeMetadata(
+	node: UINode,
+	states: Readonly<Record<string, UIStateDefinition>>,
+	includeId: boolean,
+): { attributes: string[]; layout?: UIPropertyValue } {
+	const attributes = includeId && !isSyntheticNodeId(node.id) ? [`id="${escapeXML(node.id)}"`] : [];
+	const stateProperties = new Set<string>();
+	let layout: UIPropertyValue | undefined;
+
+	if (node.appearance !== undefined || node.instance !== undefined) {
+		throw new Error('Skin XML nodes do not serialize semantic asset composition metadata.');
+	}
+
+	for (const [name, value] of sortedEntries(node.properties)) {
+		if (name === 'layout') {
+			layout = value;
+			continue;
+		}
+		if (name.includes('.')) {
+			throw new Error(`Skin property name "${name}" must not contain a dot.`);
+		}
+		const encoded = encodeXMLValue(value, propertyDefinition(node.type, name));
+		if (encoded === undefined || RESERVED_ATTRIBUTES.has(name) || name.startsWith('xmlns')) {
+			throw new Error(`Skin property "${name}" must be a scalar value.`);
+		}
+		attributes.push(`${name}="${escapeXML(encoded)}"`);
+	}
+
+	for (const [stateName, state] of Object.entries(states)) {
+		for (const override of state.overrides) {
+			if (override.targetId !== node.id) continue;
+			if (override.property.includes('.')) {
+				throw new Error(`Skin state property name "${override.property}" must not contain a dot.`);
+			}
+			const stateProperty = `${override.property}.${stateName}`;
+			if (stateProperties.has(stateProperty)) {
+				throw new Error(`Skin XML cannot serialize duplicate state property "${stateProperty}".`);
+			}
+			stateProperties.add(stateProperty);
+			if (override.transition !== undefined) {
+				throw new Error(`Skin XML does not serialize transitions for state "${stateName}".`);
+			}
+			const encoded = encodeXMLValue(override.value, propertyDefinition(node.type, override.property));
+			if (encoded === undefined) {
+				throw new Error(`State property "${override.property}.${stateName}" must be a scalar value.`);
+			}
+			attributes.push(`${stateProperty}="${escapeXML(encoded)}"`);
+		}
+	}
+
+	return layout === undefined ? { attributes } : { attributes, layout };
+}
+
 function serializeLayout(value: UIPropertyValue, depth: number): string[] {
 	const descriptor = requirePropertyObject(value, 'Layout descriptor');
 	const type = descriptor.type;
@@ -178,9 +224,8 @@ function serializeLayout(value: UIPropertyValue, depth: number): string[] {
 	if (!LAYOUT_TYPES.has(name)) {
 		throw new Error(`Unsupported layout type "${type}".`);
 	}
-	const properties = descriptor.properties === undefined
-		? {}
-		: requirePropertyObject(descriptor.properties, 'Layout properties');
+	const properties =
+		descriptor.properties === undefined ? {} : requirePropertyObject(descriptor.properties, 'Layout properties');
 	const attributes: string[] = [];
 	for (const [property, propertyValue] of sortedEntries(properties)) {
 		const encoded = encodeXMLValue(propertyValue);
@@ -191,11 +236,7 @@ function serializeLayout(value: UIPropertyValue, depth: number): string[] {
 	}
 	const indent = '    '.repeat(depth);
 	const suffix = attributes.length === 0 ? '' : ` ${attributes.join(' ')}`;
-	return [
-		`${indent}<layout>`,
-		`${indent}    <${name}${suffix} />`,
-		`${indent}</layout>`,
-	];
+	return [`${indent}<layout>`, `${indent}    <${name}${suffix} />`, `${indent}</layout>`];
 }
 
 function parseLayout(element: XMLElement): UIPropertyValue {

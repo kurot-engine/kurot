@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.PanelSkin">
-    <Group id="root" minHeight="230" minWidth="450">
-        <Image bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="border_png" top="0" />
-        <Group id="moveArea" height="45" left="0" right="0" top="0">
-            <Image bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="header_png" top="0" />
-            <Label id="titleDisplay" fontFamily="Tahoma" left="15" right="5" size="20" textColor="#FFFFFF" verticalCenter="0" wordWrap="false" />
-        </Group>
-        <Button id="closeButton" bottom="5" horizontalCenter="0" label="close" />
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.PanelSkin" minHeight="230" minWidth="450">
+    <Image bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="border_png" top="0" />
+    <Group id="moveArea" height="45" left="0" right="0" top="0">
+        <Image bottom="0" left="0" right="0" scale9Grid="2,2,12,12" source="header_png" top="0" />
+        <Label id="titleDisplay" fontFamily="Tahoma" left="15" right="5" size="20" textColor="#FFFFFF" verticalCenter="0" wordWrap="false" />
     </Group>
+    <Button id="closeButton" bottom="5" horizontalCenter="0" label="close" />
 </Skin>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ComboBoxSkin" states="disabled,normal,open">
-    <Group id="root" minHeight="36" minWidth="100">
-        <Rect fillColor="#1A1A2E" height="36" strokeColor="#0F3460" strokeWeight="1" width="100%" fillColor.disabled="#16213E" strokeColor.disabled="#4A5459" fillColor.open="#16213E" strokeColor.open="#6C5CE7" />
-        <Label id="labelDisplay" height="36" left="10" right="36" size="14" textColor="#DFE6E9" top="0" verticalAlign="middle" textColor.disabled="#636E72" />
-        <Label height="36" right="4" size="10" text="▼" textAlign="center" textColor="#636E72" top="0" verticalAlign="middle" width="24" textColor.open="#6C5CE7" />
-        <Scroller id="dropDown" height="180" left="0" right="0" top="36" visible="false">
-            <List id="list" height="180" width="100%" />
-        </Scroller>
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ComboBoxSkin" states="disabled,normal,open" minHeight="36" minWidth="100">
+    <Rect fillColor="#1A1A2E" height="36" strokeColor="#0F3460" strokeWeight="1" width="100%" fillColor.disabled="#16213E" strokeColor.disabled="#4A5459" fillColor.open="#16213E" strokeColor.open="#6C5CE7" />
+    <Label id="labelDisplay" height="36" left="10" right="36" size="14" textColor="#DFE6E9" top="0" verticalAlign="middle" textColor.disabled="#636E72" />
+    <Label height="36" right="4" size="10" text="▼" textAlign="center" textColor="#636E72" top="0" verticalAlign="middle" width="24" textColor.open="#6C5CE7" />
+    <Scroller id="dropDown" height="180" left="0" right="0" top="36" visible="false">
+        <List id="list" height="180" width="100%" />
+    </Scroller>
 </Skin>

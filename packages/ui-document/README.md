@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.6.1.** KUI XML is the canonical authored format. The
+> **Current release: 0.6.2.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -21,6 +21,7 @@ models UI documents but does not instantiate or render runtime components.
 ```ts
 import {
   createUIDocument,
+  createUISkinRoot,
   createUINode,
   serializeUIDocument,
   validateUIDocument,
@@ -29,9 +30,7 @@ import {
 const document = createUIDocument({
   id: 'game.MainSkin',
   assetKind: 'appearance',
-  root: createUINode({
-    id: 'root',
-    type: 'kui.Group',
+  root: createUISkinRoot({
     properties: { width: 1280, height: 720 },
     children: [
       createUINode({
@@ -54,6 +53,12 @@ the corresponding `@kurot/ui` class.
 KUI XML serializes Skin documents only. Screen and reusable-component
 documents are programmatic semantic models and do not share the authored Skin
 file pipeline.
+
+The authored `<Skin>` element is the visual root container: root size and
+layout properties are written on it, and visual nodes are direct children.
+Use `createUISkinRoot()` for the corresponding internal Group when constructing
+a Skin document in TypeScript. Only child nodes exposed as skin parts need an
+authored `id`.
 
 ## Current capabilities
 

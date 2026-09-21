@@ -5,7 +5,15 @@ All notable changes to `@kurot/cli` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 2.0.2 — 2026-09-22
+
+### Changed
+
+- Raised the `@kurot/ui-document` requirement to `^0.6.2`.
+- KUI compilation now treats `<Skin>` as the visual root container: Skin
+  properties and layouts apply directly to the runtime Skin, and direct XML
+  children become `skin.elementsContent` without generating an extra Group.
+- Updated all bundled default skins to remove their redundant root Group.
 
 ## 2.0.1 — 2026-09-21
 

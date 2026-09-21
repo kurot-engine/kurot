@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ItemRendererSkin" states="disabled,down,up">
-    <Group id="root" minHeight="50" minWidth="100">
-        <Image height="100%" scale9Grid="1,3,8,8" source="button_up_png" width="100%" alpha.disabled="0.5" source.down="button_down_png" />
-        <Label id="labelDisplay" bottom="8" fontFamily="Tahoma" left="8" right="8" size="20" textAlign="center" textColor="#FFFFFF" top="8" verticalAlign="middle" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ItemRendererSkin" states="disabled,down,up" minHeight="50" minWidth="100">
+    <Image height="100%" scale9Grid="1,3,8,8" source="button_up_png" width="100%" alpha.disabled="0.5" source.down="button_down_png" />
+    <Label id="labelDisplay" bottom="8" fontFamily="Tahoma" left="8" right="8" size="20" textAlign="center" textColor="#FFFFFF" top="8" verticalAlign="middle" />
 </Skin>

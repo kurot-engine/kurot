@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ListSkin">
-    <Group id="root" minHeight="20" minWidth="20">
-        <Rect fillColor="#1A1A2E" height="100%" strokeColor="#0F3460" strokeWeight="1" width="100%" />
-        <Scroller id="scroller" height="100%" width="100%">
-            <DataGroup id="dataGroup" height="100%" width="100%" />
-        </Scroller>
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ListSkin" minHeight="20" minWidth="20">
+    <Rect fillColor="#1A1A2E" height="100%" strokeColor="#0F3460" strokeWeight="1" width="100%" />
+    <Scroller id="scroller" height="100%" width="100%">
+        <DataGroup id="dataGroup" height="100%" width="100%" />
+    </Scroller>
 </Skin>
