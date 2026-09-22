@@ -253,6 +253,7 @@ export class WebGLRenderContext implements RenderContext {
 		}
 		this.drawCmdManager.pushPushMask();
 		const buf = this._currentBuffer!;
+		buf.stencilList.push({ x, y, width, height });
 		this._vao.cacheArrays(buf, 0, 0, width, height, x, y, width, height, width, height);
 	}
 
@@ -262,7 +263,7 @@ export class WebGLRenderContext implements RenderContext {
 		}
 		this.drawCmdManager.pushPopMask();
 		const buf = this._currentBuffer!;
-		const rect = buf.stencilList[buf.stencilList.length - 1];
+		const rect = buf.stencilList.pop();
 		if (rect) {
 			this._vao.cacheArrays(
 				buf,

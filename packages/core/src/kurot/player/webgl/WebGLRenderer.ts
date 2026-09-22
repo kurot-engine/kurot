@@ -692,6 +692,8 @@ export class WebGLRenderer {
 						if (pop.push.isScrollRect) {
 							const usedScissor = scissorStack.pop() ?? false;
 							offscreenStack.pop();
+							activeBuffer = parentBuffer;
+							this._applyTransform(activeBuffer, (pop.push as EffectPushInstruction).transform);
 							this._maskPipe.executeScrollRectPop(activeBuffer, usedScissor);
 						} else {
 							const displayBuffer = offscreenStack.pop();

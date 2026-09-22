@@ -21,7 +21,7 @@ function createBuffer(): WebGLRenderBuffer {
 		globalMatrix: new Matrix(),
 		offsetX: 0,
 		offsetY: 0,
-		stencilList: [{ x: 10, y: 20, width: 30, height: 40 }],
+		stencilList: [],
 	} as WebGLRenderBuffer;
 }
 
@@ -30,26 +30,43 @@ function createHarness(): MaskContextHarness {
 	context._currentBuffer = createBuffer();
 	context._vao = new WebGLVertexArrayObject();
 	context.drawCmdManager = new WebGLDrawCmdManager();
-	context.flush = vi.fn(() => context._vao.clear());
+	context.flush = vi.fn(() => {
+		context.drawCmdManager.clear();
+		context._vao.clear();
+	});
 	return context;
 }
 
 describe('WebGL mask vertex format', () => {
-	it.each(['push', 'pop'] as const)('flushes a multi-texture batch before %s mask geometry', operation => {
+	it('flushes a multi-texture batch before push mask geometry', () => {
 		const context = createHarness();
 		context._vao.setMultiTexture(true);
 		context._vao.cacheArrays(context._currentBuffer, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1);
 
-		if (operation === 'push') {
-			context.pushMask(10, 20, 30, 40);
-		} else {
-			context.popMask();
-		}
+		context.pushMask(10, 20, 30, 40);
 
 		expect(context.flush).toHaveBeenCalledOnce();
 		expect(context._vao.isMultiTexture()).toBe(false);
 		expect(context._vao.getVertices()).toHaveLength(20);
 		expect(context.drawCmdManager.drawDataLen).toBe(1);
 		expect(context.drawCmdManager.drawData[0]?.count).toBe(2);
+		expect(context._currentBuffer.stencilList).toEqual([{ x: 10, y: 20, width: 30, height: 40 }]);
+	});
+
+	it('uses the matching pushed rectangle for pop mask geometry', () => {
+		const context = createHarness();
+		context.pushMask(10, 20, 30, 40);
+		context.flush();
+		context._vao.setMultiTexture(true);
+		context._vao.cacheArrays(context._currentBuffer, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1);
+
+		context.popMask();
+
+		expect(context.flush).toHaveBeenCalledTimes(2);
+		expect(context._vao.isMultiTexture()).toBe(false);
+		expect(context._vao.getVertices()).toHaveLength(20);
+		expect(context.drawCmdManager.drawDataLen).toBe(1);
+		expect(context.drawCmdManager.drawData[0]?.count).toBe(2);
+		expect(context._currentBuffer.stencilList).toEqual([]);
 	});
 });

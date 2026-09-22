@@ -48,7 +48,7 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
 | ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 1.0.24  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
+| [`@kurot/core`](packages/core/README.md)               | 1.0.25  | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
 | [`@kurot/ui`](packages/ui/README.md)                   | 2.1.1   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)               | 1.0.6   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)                 | 2.0.2   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                    | `ui-document`         |
