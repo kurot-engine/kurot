@@ -83,6 +83,20 @@ describe('Graphics', () => {
 		expect(bounds.height).toBeGreaterThan(0);
 	});
 
+	it('inset strokes of odd and even widths stay inside the rectangle dimensions', () => {
+		for (const strokeWidth of [1, 2, 3, 4]) {
+			const g = new Graphics();
+			g.lineStyle(strokeWidth);
+			g.drawRect(strokeWidth / 2, strokeWidth / 2, 10 - strokeWidth, 20 - strokeWidth);
+			const bounds = new Rectangle();
+			g.$measureContentBounds(bounds);
+			expect(bounds.x).toBe(0);
+			expect(bounds.y).toBe(0);
+			expect(bounds.width).toBe(10);
+			expect(bounds.height).toBe(20);
+		}
+	});
+
 	it('clear resets commands and bounds', () => {
 		const g = new Graphics();
 		g.drawRect(10, 20, 100, 50);

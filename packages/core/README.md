@@ -2,14 +2,14 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Stable (1.0.26).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Stable (1.0.27).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
 **Rendering Engine**
 
 - WebGL-first with automatic Canvas 2D fallback when WebGL initialization fails
-- High-DPI backing stores and resolution-aware WebGL text rasterization
+- High-DPI backing stores and resolution-aware WebGL text and vector graphics rasterization
 - WebGL-only InstructionSet pipeline (Build → Execute two-phase, inspired by Pixi.js 8)
 - Multi-texture batching (up to 8 textures per draw call)
 - RenderGroup layers — localize instruction rebuilds to the affected subtree
@@ -152,13 +152,15 @@ GPU-memory tradeoff. Individual `TextField` instances can also override their
 raster density through `textField.resolution`. The value can be changed while
 the application is running through `app.screenAdapter.resolution`; automatic
 text and `cacheAsTexture(true)` caches will be regenerated at the new density.
+WebGL vector graphics are also re-rasterized when their display scale increases;
+their cached sampling scale is capped at 8× to bound zoom-related memory use.
 
 ## Development
 
 ```bash
 pnpm install
 pnpm run build        # compile
-pnpm run test         # run tests (641 cases)
+pnpm run test         # run tests (704 cases)
 pnpm run dev          # watch mode
 ```
 

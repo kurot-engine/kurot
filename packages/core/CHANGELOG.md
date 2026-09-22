@@ -4,6 +4,19 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.27] — 2026-09-23
+
+### Fixed
+
+- WebGL vector graphics are rasterized at the display scale when zoomed, so
+  thin strokes remain sharp instead of enlarging a low-resolution cached
+  texture. Cached rasterization is reused at the same scale and limited to
+  eight times the logical size, the device texture limit, and a bounded
+  supersampling pixel budget.
+- Graphics bounds now account for half the stroke width on each side. An
+  inset stroke on a rectangle therefore remains within its declared outer
+  dimensions for both odd and even line widths.
+
 ## [1.0.26] — 2026-09-23
 
 ### Fixed

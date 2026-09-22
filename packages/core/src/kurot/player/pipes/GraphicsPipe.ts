@@ -10,6 +10,8 @@ import type { CanvasRenderer } from '../canvas/index.js';
 import { CanvasBuffer } from '../canvas/index.js';
 
 const _scratchBounds = new Rectangle();
+const MAX_CACHE_PIXELS = 4 * 1024 * 1024;
+const MAX_RASTER_SCALE = 8;
 
 export interface GraphicsInstruction extends Instruction {
 	readonly renderPipeId: 'graphics';
@@ -24,6 +26,8 @@ interface GraphicsCache {
 	texture: TextureHandle;
 	textureWidth: number;
 	textureHeight: number;
+	rasterScaleX: number;
+	rasterScaleY: number;
 	boundsX: number;
 	boundsY: number;
 	contextVersion: number;
@@ -97,6 +101,20 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		if (w <= 0 || h <= 0) {
 			return;
 		}
+		const matrix = buffer.globalMatrix;
+		let rasterScaleX = Math.min(MAX_RASTER_SCALE, Math.max(1, Math.ceil(Math.hypot(matrix.a, matrix.b))));
+		let rasterScaleY = Math.min(MAX_RASTER_SCALE, Math.max(1, Math.ceil(Math.hypot(matrix.c, matrix.d))));
+		const maxTextureSize = buffer.context.maxTextureSize;
+		const cacheLimit = Math.min(
+			1,
+			maxTextureSize / (w * rasterScaleX),
+			maxTextureSize / (h * rasterScaleY),
+			Math.sqrt(Math.max(MAX_CACHE_PIXELS, w * h) / (w * h * rasterScaleX * rasterScaleY)),
+		);
+		rasterScaleX *= cacheLimit;
+		rasterScaleY *= cacheLimit;
+		const pixelW = Math.ceil(w * rasterScaleX);
+		const pixelH = Math.ceil(h * rasterScaleY);
 
 		const ox = inst.offsetX;
 		const oy = inst.offsetY;
@@ -114,10 +132,12 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 		}
 		if (!cache) {
 			cache = {
-				canvasBuffer: new CanvasBuffer(w, h),
+				canvasBuffer: new CanvasBuffer(pixelW, pixelH),
 				texture: undefined,
 				textureWidth: 0,
 				textureHeight: 0,
+				rasterScaleX,
+				rasterScaleY,
 				boundsX: bounds.x,
 				boundsY: bounds.y,
 				contextVersion: buffer.context.contextVersion,
@@ -125,13 +145,19 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			this._cache.set(graphics, cache);
 		}
 
-		const needsRebuild = graphics.canvasCacheDirty || cache.textureWidth !== w || cache.textureHeight !== h;
+		const needsRebuild =
+			graphics.canvasCacheDirty ||
+			cache.textureWidth !== pixelW ||
+			cache.textureHeight !== pixelH ||
+			cache.rasterScaleX !== rasterScaleX ||
+			cache.rasterScaleY !== rasterScaleY;
 
 		if (needsRebuild) {
-			if (cache.canvasBuffer.width !== w || cache.canvasBuffer.height !== h) {
-				cache.canvasBuffer.resize(w, h);
+			if (cache.canvasBuffer.width !== pixelW || cache.canvasBuffer.height !== pixelH) {
+				cache.canvasBuffer.resize(pixelW, pixelH);
 			}
 			cache.canvasBuffer.clear();
+			cache.canvasBuffer.context.setTransform(rasterScaleX, 0, 0, rasterScaleY, 0, 0);
 			this._canvasRenderer.renderGraphicsToContext(
 				graphics,
 				cache.canvasBuffer.context,
@@ -154,8 +180,10 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 				buffer.context.registerTextureForGC(graphics, cache.texture, token);
 				this._registryTokens.set(graphics, token);
 			}
-			cache.textureWidth = w;
-			cache.textureHeight = h;
+			cache.textureWidth = pixelW;
+			cache.textureHeight = pixelH;
+			cache.rasterScaleX = rasterScaleX;
+			cache.rasterScaleY = rasterScaleY;
 			cache.boundsX = bounds.x;
 			cache.boundsY = bounds.y;
 			graphics.canvasCacheDirty = false;
@@ -170,7 +198,7 @@ export class GraphicsPipe implements RenderPipe<DisplayObject> {
 			buffer.globalMatrix.append(1, 0, 0, 1, cache.boundsX, cache.boundsY);
 		}
 
-		buffer.context.drawTexture(cache.texture, 0, 0, w, h, 0, 0, w, h, w, h);
+		buffer.context.drawTexture(cache.texture, 0, 0, pixelW, pixelH, 0, 0, w, h, pixelW, pixelH);
 
 		buffer.restoreTransform();
 	}

@@ -9,6 +9,7 @@ import {
 	createPlayer,
 } from '../../src/index.js';
 import type { KurotApp } from '../../src/index.js';
+import { WEBGL_CONTEXT_ATTRIBUTES } from '../../src/kurot/player/webgl/WebGLUtils.js';
 import type { BenchmarkAdapter, BenchmarkBackend, RenderMetrics } from './BenchmarkAdapter.js';
 import { DrawCallCounter } from './DrawCallCounter.js';
 
@@ -21,7 +22,7 @@ interface TransformNode {
 
 export class KurotBenchmarkAdapter implements BenchmarkAdapter {
 	public readonly engine = 'Kurot';
-	public readonly version = '1.0.26';
+	public readonly version = '1.0.27';
 	public backend = 'unknown';
 	public root: object = new Sprite();
 
@@ -40,10 +41,11 @@ export class KurotBenchmarkAdapter implements BenchmarkAdapter {
 		canvas.height = height * resolution;
 		canvas.style.width = `${width}px`;
 		canvas.style.height = `${height}px`;
+		const contextAttributes = { ...WEBGL_CONTEXT_ATTRIBUTES, antialias: false };
 		const context =
 			requestedBackend === 'webgl2'
-				? canvas.getContext('webgl2', { antialias: false })
-				: canvas.getContext('webgl', { antialias: false });
+				? canvas.getContext('webgl2', contextAttributes)
+				: canvas.getContext('webgl', contextAttributes);
 		if (!context) {
 			throw new Error(`${requestedBackend.toUpperCase()} is unavailable for the Kurot benchmark.`);
 		}

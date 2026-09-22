@@ -301,17 +301,9 @@ export class Graphics {
 	// ── Private methods ───────────────────────────────────────────────────────
 
 	private setStrokeWidth(width: number): void {
-		if (width === 1) {
-			this._topLeftStrokeWidth = 0;
-			this._bottomRightStrokeWidth = 1;
-		} else if (width === 3) {
-			this._topLeftStrokeWidth = 1;
-			this._bottomRightStrokeWidth = 2;
-		} else {
-			const half = Math.ceil(width * 0.5) | 0;
-			this._topLeftStrokeWidth = half;
-			this._bottomRightStrokeWidth = half;
-		}
+		const half = width / 2;
+		this._topLeftStrokeWidth = half;
+		this._bottomRightStrokeWidth = half;
 	}
 
 	private dirty(): void {
