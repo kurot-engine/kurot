@@ -40,13 +40,13 @@ export function applyAppearance(
 		materializeNode(child, assetPath(appearance.id, `.root.children[${index}]`), scope, context),
 	);
 	const skin = new Skin();
-	const partNames = new Set<string>();
+	const publicPartNames = new Set<string>();
 	applySkinProperties(skin, appearance.root.properties, appearance.id, context);
 	applyAppearanceVariant(node.appearance.variant, appearance, scope, skin, context);
 	skin.elementsContent = elements;
-	exposeAppearanceNodes(skin, appearance.root, scope, context, partNames);
-	exposeParts(skin, appearance, scope, context, partNames);
-	skin.skinParts = [...partNames].sort();
+	registerAppearanceNodeTargets(skin, appearance.root, scope, context, publicPartNames);
+	exposeParts(skin, appearance, scope, context, publicPartNames);
+	skin.skinParts = [...publicPartNames].sort();
 	skin.states = createStates(appearance, context);
 	target.skinName = skin;
 }
@@ -107,31 +107,28 @@ function applyAppearanceVariant(
 		const target = context.instances.get(identity);
 		const type = context.types.get(identity);
 		if (!target || !type) continue;
-		applyRuntimeProperty(
-			target,
-			type,
-			override.property,
-			override.value,
-			valuePath,
-			context,
-		);
+		applyRuntimeProperty(target, type, override.property, override.value, valuePath, context);
 	}
 }
 
-function exposeAppearanceNodes(
+function registerAppearanceNodeTargets(
 	skin: Skin,
 	node: UINode,
 	scope: string,
 	context: KurotUICreationContext,
-	partNames: Set<string>,
+	publicPartNames: Set<string>,
 ): void {
 	const target = context.instances.get(qualifyNodeId(scope, node.id));
-	if (target && !isSyntheticNodeId(node.id)) {
+	if (target) {
+		// Native state overrides resolve targets through Skin.getPart(), including
+		// anonymous nodes. Only authored IDs belong to the host's public skin parts.
 		skin.setPart(node.id, target);
-		partNames.add(node.id);
+		if (!isSyntheticNodeId(node.id)) {
+			publicPartNames.add(node.id);
+		}
 	}
 	for (const child of node.children) {
-		exposeAppearanceNodes(skin, child, scope, context, partNames);
+		registerAppearanceNodeTargets(skin, child, scope, context, publicPartNames);
 	}
 }
 

@@ -326,6 +326,52 @@ describe('createKurotUI', () => {
 		expect(label.text).toBe('Continue');
 	});
 
+	it('applies native states to anonymous appearance nodes without exposing their synthetic IDs', () => {
+		const backgroundId = '__kui_node_0_0';
+		const appearance = createUIDocument({
+			id: 'button-skin',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				states: {
+					down: {
+						overrides: [{ targetId: backgroundId, property: 'alpha', value: 0.5 }],
+					},
+				},
+			}),
+			root: createUISkinRoot({
+				children: [
+					createUINode({ id: backgroundId, type: 'kui.Rect', properties: { alpha: 1 } }),
+				],
+			}),
+		});
+		const document = createUIDocument({
+			id: 'button-preview',
+			root: createUINode({
+				id: 'button',
+				type: 'kui.Button',
+				appearance: createUIAppearanceReference(appearance.id),
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(appearance);
+
+		const result = createKurotUI(document, { assets });
+		const button = requireInstance(result.root, Button);
+		const background = requireInstance(
+			result.instances.get(`button@appearance:button-skin/${backgroundId}`),
+			Rect,
+		);
+		const skin = button.skin;
+		if (!skin) throw new Error('Expected the button appearance to create a Skin.');
+
+		expect(skin.skinParts).toEqual([]);
+		skin.currentState = 'down';
+		const stage = new Stage();
+		stage.addChild(button);
+		expect(background.alpha).toBe(0.5);
+	});
+
 	it('lays out appearance children against a constrained host size', () => {
 		const skinRoot = createUISkinRoot({
 			properties: {

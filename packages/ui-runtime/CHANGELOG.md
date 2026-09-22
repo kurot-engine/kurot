@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.6] — 2026-09-23
+
+### Fixed
+
+- Native appearance states can now update anonymous Skin children. Synthetic
+  node IDs remain absent from public `skinParts` while staying available to
+  internal state overrides such as `source.down`.
+
 ## [0.5.5] — 2026-09-23
 
 ### Fixed

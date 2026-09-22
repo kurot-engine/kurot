@@ -140,7 +140,7 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - directional binding validation across types, ranges, enums, resource
   categories, and token categories.
 
-`@kurot/ui-runtime@0.4.0` currently provides:
+`@kurot/ui-runtime@0.5.6` currently provides:
 
 - validation before materialization;
 - deterministic construction of the nine audited foundation components,

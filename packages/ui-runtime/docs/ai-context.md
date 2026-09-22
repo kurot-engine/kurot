@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.5.5`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.5.6`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -103,9 +103,11 @@ Authored `skinName` values are forwarded to the native component and resolved
 through the generated Skin factories registered by the KUI build. Semantic
 appearance assets are materialized as native `Skin` instances and assigned
 directly. The package does not invent resource or Theme lookup.
-Every non-synthetic appearance node ID becomes a native Skin part name;
-explicit contract parts may add aliases. This preserves the canonical Skin XML
-rule that authored IDs expose parts without a separate contract block.
+Every appearance node is registered in the native Skin so state overrides can
+address anonymous nodes through their synthetic IDs. Only non-synthetic IDs
+become public `skinParts`; explicit contract parts may add aliases. This keeps
+anonymous nodes internal while preserving the canonical Skin XML rule that
+authored IDs expose parts without a separate contract block.
 
 Resource resolution dispatches by exact category: image, sprite-frame, font,
 Spine, or animation. The built-in defaults preserve the registered key. Spine
