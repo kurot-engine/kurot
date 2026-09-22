@@ -11,6 +11,11 @@ import { resolvePropertyValue } from './resolvePropertyValue.js';
 import type { KurotUICreationContext } from './types.js';
 import { TransitionSetProperty } from './transitions/TransitionSetProperty.js';
 
+const SKIN_SIZE_PROPERTIES = ['width', 'height', 'minWidth', 'maxWidth', 'minHeight', 'maxHeight'] as const;
+const SKIN_SIZE_PROPERTY_NAMES = new Set<string>(SKIN_SIZE_PROPERTIES);
+
+type SkinSizeProperty = (typeof SKIN_SIZE_PROPERTIES)[number];
+
 /**
  * Applies one reusable appearance asset as a native Kurot Skin.
  */
@@ -31,11 +36,14 @@ export function applyAppearance(
 	}
 	const appearance = requireAppearance(node.appearance.assetId, path, context);
 	const scope = `${hostIdentity}@appearance:${appearance.id}`;
-	const root = materializeNode(appearance.root, assetPath(appearance.id, '.root'), scope, context);
-	applyAppearanceVariant(node.appearance.variant, appearance, scope, context);
+	const elements = appearance.root.children.map((child, index) =>
+		materializeNode(child, assetPath(appearance.id, `.root.children[${index}]`), scope, context),
+	);
 	const skin = new Skin();
 	const partNames = new Set<string>();
-	skin.elementsContent = [root];
+	applySkinProperties(skin, appearance.root.properties, appearance.id, context);
+	applyAppearanceVariant(node.appearance.variant, appearance, scope, skin, context);
+	skin.elementsContent = elements;
 	exposeAppearanceNodes(skin, appearance.root, scope, context, partNames);
 	exposeParts(skin, appearance, scope, context, partNames);
 	skin.skinParts = [...partNames].sort();
@@ -43,10 +51,45 @@ export function applyAppearance(
 	target.skinName = skin;
 }
 
+function applySkinProperties(
+	skin: Skin,
+	properties: UINode['properties'],
+	appearanceId: string,
+	context: KurotUICreationContext,
+): void {
+	for (const name of SKIN_SIZE_PROPERTIES) {
+		const value = properties[name];
+		if (value === undefined) {
+			continue;
+		}
+		const path = assetPath(appearanceId, `.root.properties.${name}`);
+		applySkinProperty(skin, name, value, path, context);
+	}
+}
+
+function applySkinProperty(
+	skin: Skin,
+	name: SkinSizeProperty,
+	value: UINode['properties'][string],
+	path: string,
+	context: KurotUICreationContext,
+): void {
+	const resolved = resolvePropertyValue(value, path, context);
+	if (typeof resolved !== 'number') {
+		throw new KurotUIRuntimeError('invalid-property', `Skin property "${name}" requires a number.`, path);
+	}
+	skin[name] = resolved;
+}
+
+function isSkinSizeProperty(name: string): name is SkinSizeProperty {
+	return SKIN_SIZE_PROPERTY_NAMES.has(name);
+}
+
 function applyAppearanceVariant(
 	name: string | undefined,
 	appearance: UIDocument,
 	scope: string,
+	skin: Skin,
 	context: KurotUICreationContext,
 ): void {
 	if (name === undefined) return;
@@ -55,6 +98,11 @@ function applyAppearanceVariant(
 	const path = assetPath(appearance.id, `.contract.variants.${name}`);
 	for (let index = 0; index < definition.overrides.length; index++) {
 		const override = definition.overrides[index];
+		const valuePath = `${path}.overrides[${index}].value`;
+		if (override.targetId === appearance.root.id && isSkinSizeProperty(override.property)) {
+			applySkinProperty(skin, override.property, override.value, valuePath, context);
+			continue;
+		}
 		const identity = qualifyNodeId(scope, override.targetId);
 		const target = context.instances.get(identity);
 		const type = context.types.get(identity);
@@ -64,7 +112,7 @@ function applyAppearanceVariant(
 			type,
 			override.property,
 			override.value,
-			`${path}.overrides[${index}].value`,
+			valuePath,
 			context,
 		);
 	}
@@ -112,15 +160,16 @@ function createStates(appearance: UIDocument, context: KurotUICreationContext): 
 		.map(name => {
 			const definition = appearance.contract.states[name];
 			const overrides = definition.overrides.map((override, index) => {
+				const targetId = override.targetId === appearance.root.id ? '' : override.targetId;
 				const value = resolvePropertyValue(
 					override.value,
 					`${basePath}.contract.states.${name}.overrides[${index}].value`,
 					context,
 				);
 				if (override.transition !== undefined) {
-					return new TransitionSetProperty(override.targetId, override.property, value, override.transition);
+					return new TransitionSetProperty(targetId, override.property, value, override.transition);
 				}
-				return new SetProperty(override.targetId, override.property, value);
+				return new SetProperty(targetId, override.property, value);
 			});
 			return new State(name, overrides);
 		});

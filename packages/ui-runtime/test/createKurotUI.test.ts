@@ -20,6 +20,7 @@ import {
 	createKurotUIFoundationRegistry,
 	createUIAppearanceReference,
 	createUIAssetContract,
+	createUIDesignTokenReference,
 	createUIDocument,
 	createUISkinRoot,
 	createUINode,
@@ -323,6 +324,94 @@ describe('createKurotUI', () => {
 		expect(button.skin?.skinParts).toEqual(['labelDisplay']);
 		expect(button.labelDisplay).toBe(label);
 		expect(label.text).toBe('Continue');
+	});
+
+	it('lays out appearance children against a constrained host size', () => {
+		const skinRoot = createUISkinRoot({
+			properties: {
+				minHeight: 50,
+				minWidth: createUIDesignTokenReference('spacing', 'size.button.minimum'),
+			},
+			children: [
+				createUINode({
+					id: 'background',
+					type: 'kui.Rect',
+					properties: { percentHeight: 100, percentWidth: 100 },
+				}),
+				createUINode({
+					id: 'labelDisplay',
+					type: 'kui.Label',
+					properties: { bottom: 8, left: 8, right: 8, top: 8 },
+				}),
+			],
+		});
+		const appearance = createUIDocument({
+			id: 'button-skin',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({
+				targetType: 'kui.Button',
+				states: {
+					down: {
+						overrides: [{ targetId: skinRoot.id, property: 'minWidth', value: 120 }],
+					},
+				},
+				variants: {
+					compact: {
+						overrides: [{ targetId: skinRoot.id, property: 'minHeight', value: 40 }],
+					},
+				},
+			}),
+			root: skinRoot,
+		});
+		const document = createUIDocument({
+			id: 'button-preview',
+			root: createUINode({
+				id: 'root',
+				type: 'kui.Group',
+				properties: { height: 400, width: 640 },
+				children: [
+					createUINode({
+						id: 'button',
+						type: 'kui.Button',
+						properties: { height: 52, right: 0, width: 172 },
+						appearance: createUIAppearanceReference(appearance.id, 'compact'),
+					}),
+				],
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(appearance);
+		assets.registerToken({
+			key: 'size.button.minimum',
+			tokenType: 'spacing',
+			value: 100,
+		});
+
+		const result = createKurotUI(document, { assets });
+		const root = requireInstance(result.root, Group);
+		const button = requireInstance(result.instances.get('button'), Button);
+		const background = requireInstance(
+			result.instances.get('button@appearance:button-skin/background'),
+			Rect,
+		);
+		const skin = button.skin;
+		if (skin === undefined) {
+			throw new Error('Expected the button appearance to create a Skin.');
+		}
+		const stage = new Stage();
+		stage.addChild(root);
+		root.validateNow();
+
+		expect(button.x).toBe(468);
+		expect(button.width).toBe(172);
+		expect(background.width).toBe(172);
+		expect(skin.minHeight).toBe(40);
+		expect(skin.minWidth).toBe(100);
+		expect(skin.elementsContent).toEqual([background, button.labelDisplay]);
+		skin.currentState = 'down';
+		expect(skin.minWidth).toBe(120);
+		skin.currentState = '';
+		expect(skin.minWidth).toBe(100);
 	});
 
 	it('materializes EditableText as an authored appearance part', () => {

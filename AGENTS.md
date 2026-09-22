@@ -14,7 +14,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/game`      | 1.0.6   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
 | `@kurot/cli`       | 2.0.2   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                         | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
 | `@kurot/ui-document` | 0.6.4 | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, revisions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime` | 0.5.3 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
+| `@kurot/ui-runtime` | 0.5.4 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 

@@ -4,7 +4,7 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.5.3.** Requires `@kurot/ui@^2.0.0` and
+> **Current release: 0.5.4.** Requires `@kurot/ui@^2.0.0` and
 > `@kurot/ui-document@^0.6.4`, and uses UI's atomic complete-skin lifecycle for
 > materialized appearances.
 
@@ -28,7 +28,12 @@ variant. Authored `skinName` values are forwarded to skinnable controls and
 resolved through the generated Skin factories registered by the KUI build.
 Authored IDs inside appearance documents are exposed as native Skin parts, so
 controls can bind conventional parts such as `labelDisplay` without a separate
-contract block in Skin XML.
+contract block in Skin XML. The implicit Skin root remains authoring metadata:
+its direct children are installed on the host component and laid out against
+the host's actual size, while its width and size-limit properties configure the
+native Skin. Size-limit design tokens resolve through the project registry, and
+state or variant properties authored on the implicit root apply to that native
+Skin.
 
 Version 0.5 carries the first bounded visual-semantics slice onto the typed,
 atomic UI 2.0 skin lifecycle while retaining component capability validation

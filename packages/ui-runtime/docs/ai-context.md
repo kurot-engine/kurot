@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.5.3`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.5.4`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -71,6 +71,13 @@ Assigning the completed appearance `Skin` to a host uses `@kurot/ui@2`'s
 atomic lifecycle: the host receives one complete part map before built-in
 component binding runs. `Skin.setPart()` remains the write-side materializer
 API and is not the removed `Component.setSkinPart()` lifecycle API.
+The synthetic Group represented by the authored `<Skin>` element is metadata,
+not a display child. Its direct children become `Skin.elementsContent`, and
+its width, height, and size limits configure the native Skin so percentage and
+edge constraints resolve against the host component's actual dimensions.
+Size-limit token references resolve through the project registry. State
+and variant overrides targeting the synthetic root apply to the native Skin
+itself.
 
 Reusable component Contracts with states receive one `KurotUIStateController`
 per expanded instance. `setState(name)` applies overrides atomically and

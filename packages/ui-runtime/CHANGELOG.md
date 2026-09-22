@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.4] — 2026-09-22
+
+### Fixed
+
+- Semantic appearance materialization now treats the Skin root Group as
+  authoring metadata instead of a rendered wrapper, matching CLI-generated
+  skins. Direct skin children consequently size and position against the host
+  component rather than the Skin root's minimum dimensions.
+- Skin width, height, and minimum/maximum size metadata are now transferred to
+  the native Skin instance. Size-limit token references resolve through the
+  project registry, and state or variant overrides authored on the Skin root
+  target that native instance.
+
 ## [0.5.3] — 2026-09-22
 
 ### Fixed
