@@ -4,6 +4,22 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.24] — 2026-09-23
+
+### Fixed
+
+- WebGL stencil masks now flush an active multi-texture batch before writing
+  mask geometry, so mask vertices use the expected single-texture vertex
+  format instead of being interpreted with the preceding batch layout.
+- Mask push and pop commands no longer enqueue an additional rectangle draw
+  command for geometry already consumed by the stencil operation.
+
+### Tests
+
+- Added regressions covering mask push and pop after multi-texture batches.
+- Core unit suite passes: 67 test files and 702 tests.
+- TypeScript implementation and declaration builds pass.
+
 ## [1.0.23] — 2026-09-19
 
 ### Fixed

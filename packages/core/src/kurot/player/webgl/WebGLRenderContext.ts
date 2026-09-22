@@ -248,13 +248,18 @@ export class WebGLRenderContext implements RenderContext {
 	// ── Mask (stencil-based) ──────────────────────────────────────────────────
 
 	public pushMask(x: number, y: number, width: number, height: number): void {
+		if (this._vao.isMultiTexture()) {
+			this.flush();
+		}
 		this.drawCmdManager.pushPushMask();
 		const buf = this._currentBuffer!;
 		this._vao.cacheArrays(buf, 0, 0, width, height, x, y, width, height, width, height);
-		this.drawCmdManager.pushDrawRect();
 	}
 
 	public popMask(): void {
+		if (this._vao.isMultiTexture()) {
+			this.flush();
+		}
 		this.drawCmdManager.pushPopMask();
 		const buf = this._currentBuffer!;
 		const rect = buf.stencilList[buf.stencilList.length - 1];
@@ -272,7 +277,6 @@ export class WebGLRenderContext implements RenderContext {
 				rect.width,
 				rect.height,
 			);
-			this.drawCmdManager.pushDrawRect();
 		}
 	}
 
