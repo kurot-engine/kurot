@@ -4,6 +4,15 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.5] — 2026-09-23
+
+### Fixed
+
+- Skin size-limit metadata now resolves number and spacing design-token
+  references through the project registry.
+- State and variant overrides targeting the synthetic Skin root now apply to
+  the native Skin instance instead of being silently skipped.
+
 ## [0.5.4] — 2026-09-22
 
 ### Fixed
@@ -13,9 +22,7 @@ All notable changes to `@kurot/ui-runtime` are documented here.
   skins. Direct skin children consequently size and position against the host
   component rather than the Skin root's minimum dimensions.
 - Skin width, height, and minimum/maximum size metadata are now transferred to
-  the native Skin instance. Size-limit token references resolve through the
-  project registry, and state or variant overrides authored on the Skin root
-  target that native instance.
+  the native Skin instance.
 
 ## [0.5.3] — 2026-09-22
 

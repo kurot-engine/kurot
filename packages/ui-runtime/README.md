@@ -4,7 +4,7 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.5.4.** Requires `@kurot/ui@^2.0.0` and
+> **Current release: 0.5.5.** Requires `@kurot/ui@^2.0.0` and
 > `@kurot/ui-document@^0.6.4`, and uses UI's atomic complete-skin lifecycle for
 > materialized appearances.
 
