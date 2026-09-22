@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.3] — 2026-09-22
+
+### Fixed
+
+- Authored appearance node IDs now remain available as native Skin parts when
+  the semantic contract has no explicit part aliases. Controls such as Button
+  can therefore bind `labelDisplay` and `iconDisplay` from canonical Skin XML.
+
 ## [0.5.2] — 2026-09-22
 
 ### Added

@@ -5,6 +5,7 @@ import {
 	createUIComponentInstance,
 	createUIDesignTokenReference,
 	createUIDocument,
+	createUISkinRoot,
 	createUINode,
 } from '@kurot/ui-document';
 import type { UIDocument } from '@kurot/ui-document';
@@ -69,9 +70,7 @@ export function createButtonAppearanceDocument(): UIDocument {
 				compact: { overrides: [{ targetId: 'background', property: 'strokeWeight', value: 2 }] },
 			},
 		}),
-		root: createUINode({
-			id: 'root',
-			type: 'kui.Group',
+		root: createUISkinRoot({
 			children: [
 				createUINode({
 					id: 'background',

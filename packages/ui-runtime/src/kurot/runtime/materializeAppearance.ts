@@ -1,5 +1,6 @@
 import type { DisplayObject } from '@kurot/core';
 import { Component, SetProperty, Skin, State } from '@kurot/ui';
+import { isSyntheticNodeId } from '@kurot/ui-document';
 import type { UIDocument, UINode } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { materializeNode } from './materializeNode.js';
@@ -33,9 +34,11 @@ export function applyAppearance(
 	const root = materializeNode(appearance.root, assetPath(appearance.id, '.root'), scope, context);
 	applyAppearanceVariant(node.appearance.variant, appearance, scope, context);
 	const skin = new Skin();
+	const partNames = new Set<string>();
 	skin.elementsContent = [root];
-	exposeAppearanceNodes(skin, appearance.root, scope, context);
-	exposeParts(skin, appearance, scope, context);
+	exposeAppearanceNodes(skin, appearance.root, scope, context, partNames);
+	exposeParts(skin, appearance, scope, context, partNames);
+	skin.skinParts = [...partNames].sort();
 	skin.states = createStates(appearance, context);
 	target.skinName = skin;
 }
@@ -67,26 +70,39 @@ function applyAppearanceVariant(
 	}
 }
 
-function exposeAppearanceNodes(skin: Skin, node: UINode, scope: string, context: KurotUICreationContext): void {
+function exposeAppearanceNodes(
+	skin: Skin,
+	node: UINode,
+	scope: string,
+	context: KurotUICreationContext,
+	partNames: Set<string>,
+): void {
 	const target = context.instances.get(qualifyNodeId(scope, node.id));
-	if (target) {
+	if (target && !isSyntheticNodeId(node.id)) {
 		skin.setPart(node.id, target);
+		partNames.add(node.id);
 	}
 	for (const child of node.children) {
-		exposeAppearanceNodes(skin, child, scope, context);
+		exposeAppearanceNodes(skin, child, scope, context, partNames);
 	}
 }
 
-function exposeParts(skin: Skin, appearance: UIDocument, scope: string, context: KurotUICreationContext): void {
+function exposeParts(
+	skin: Skin,
+	appearance: UIDocument,
+	scope: string,
+	context: KurotUICreationContext,
+	partNames: Set<string>,
+): void {
 	const names = Object.keys(appearance.contract.parts).sort();
 	for (const name of names) {
 		const part = appearance.contract.parts[name];
 		const target = context.instances.get(qualifyNodeId(scope, part.nodeId));
 		if (target) {
 			skin.setPart(name, target);
+			partNames.add(name);
 		}
 	}
-	skin.skinParts = names;
 }
 
 function createStates(appearance: UIDocument, context: KurotUICreationContext): State[] {

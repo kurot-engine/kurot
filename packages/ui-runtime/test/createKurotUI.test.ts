@@ -21,6 +21,7 @@ import {
 	createUIAppearanceReference,
 	createUIAssetContract,
 	createUIDocument,
+	createUISkinRoot,
 	createUINode,
 	UIAssetRegistry,
 } from '@kurot/ui-document';
@@ -292,6 +293,36 @@ describe('createKurotUI', () => {
 		expect(toggle.selected).toBe(false);
 		dispatchTap(toggle);
 		expect(toggle.selected).toBe(true);
+	});
+
+	it('exposes authored appearance node IDs as native skin parts', () => {
+		const appearance = createUIDocument({
+			id: 'button-skin',
+			assetKind: 'appearance',
+			contract: createUIAssetContract({ targetType: 'kui.Button' }),
+			root: createUISkinRoot({
+				children: [createUINode({ id: 'labelDisplay', type: 'kui.Label' })],
+			}),
+		});
+		const document = createUIDocument({
+			id: 'button-preview',
+			root: createUINode({
+				id: 'button',
+				type: 'kui.Button',
+				properties: { label: 'Continue' },
+				appearance: createUIAppearanceReference(appearance.id),
+			}),
+		});
+		const assets = new UIAssetRegistry();
+		assets.registerAsset(appearance);
+
+		const result = createKurotUI(document, { assets });
+		const button = requireInstance(result.root, Button);
+		const label = requireInstance(result.instances.get('button@appearance:button-skin/labelDisplay'), Label);
+
+		expect(button.skin?.skinParts).toEqual(['labelDisplay']);
+		expect(button.labelDisplay).toBe(label);
+		expect(label.text).toBe('Continue');
 	});
 
 	it('materializes EditableText as an authored appearance part', () => {
