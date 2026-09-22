@@ -4,6 +4,27 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.26] — 2026-09-23
+
+### Fixed
+
+- WebGL context creation and capability checks now share a 2D renderer
+  configuration: no depth buffer and a required stencil buffer. When a
+  `scrollRect` is nested inside another clip, its stencil mask can limit drawing on the
+  main canvas. This restores the correct fill length of `ProgressBar` in the
+  Editor's preview mode.
+
+### Tests
+
+- The player initialization test checks that both WebGL 2 and WebGL 1 request
+  stencil support.
+- Added WebGL 1/2 pixel regressions for a 65% fill nested inside a document
+  clip; the complete visual suite passes (66 tests).
+- Verified the Editor preview canvas has 8 stencil bits and displays a
+  65 / 100 progress bar with partial fill and visible text.
+- Core unit suite passes (67 files, 702 tests), and implementation and
+  declaration builds pass.
+
 ## [1.0.25] — 2026-09-23
 
 ### Fixed

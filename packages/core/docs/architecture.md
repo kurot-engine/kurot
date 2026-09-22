@@ -1,6 +1,6 @@
 # @kurot/core 架构文档
 
-> 当前版本：1.0.25。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
+> 当前版本：1.0.26。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---
@@ -279,8 +279,8 @@ DropShadow 传入正常角度弧度；辅助 DOM 图片的自动 UV 矩阵负责
 
 ### 4.5 遮罩渲染
 
-- scrollRect/maskRect 无旋转：scissor 裁剪（GPU 硬件加速）
-- scrollRect/maskRect 有旋转：stencil 裁剪
+- scrollRect/maskRect 无旋转且没有外层 scissor：scissor 裁剪（GPU 硬件加速）
+- scrollRect/maskRect 有旋转或嵌套在外层 scissor 内：stencil 裁剪；WebGL 主画布与能力探测共用 2D 上下文配置（不申请 depth，申请 stencil）
 - DisplayObject mask：离屏 buffer + destination-in 合成
 
 ---

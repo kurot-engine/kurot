@@ -18,8 +18,14 @@ import { WebGLDrawCmdManager, DrawCmdType } from './WebGLDrawCmdManager.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib, getBlurTier, makeBlurHFrag, makeBlurVFrag } from './shaders/ShaderLib.js';
 import { ShaderLib2, getBlurTier2, makeBlurHFrag2, makeBlurVFrag2 } from './shaders/ShaderLib2.js';
-import { SYM_GL_CONTEXT, SYM_PREMULTIPLIED, SYM_DEFAULT_EMPTY, SYM_SMOOTHING } from './WebGLUtils.js';
-import type { GL } from './WebGLUtils.js';
+import {
+	SYM_GL_CONTEXT,
+	SYM_PREMULTIPLIED,
+	SYM_DEFAULT_EMPTY,
+	SYM_SMOOTHING,
+	WEBGL_CONTEXT_ATTRIBUTES,
+	type GL,
+} from './WebGLUtils.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
 import type { RenderContext } from '../RenderContext.js';
@@ -78,7 +84,7 @@ export class WebGLRenderContext implements RenderContext {
 	public constructor(canvas: HTMLCanvasElement) {
 		this.surface = canvas;
 
-		const gl2 = canvas.getContext('webgl2') as WebGL2RenderingContext | null;
+		const gl2 = canvas.getContext('webgl2', WEBGL_CONTEXT_ATTRIBUTES) as WebGL2RenderingContext | null;
 		if (gl2) {
 			this.gl = gl2;
 			this.isWebGL2 = true;
@@ -87,7 +93,7 @@ export class WebGLRenderContext implements RenderContext {
 			this.makeBlurH = makeBlurHFrag2;
 			this.makeBlurV = makeBlurVFrag2;
 		} else {
-			const gl1 = canvas.getContext('webgl') as WebGLRenderingContext | null;
+			const gl1 = canvas.getContext('webgl', WEBGL_CONTEXT_ATTRIBUTES) as WebGLRenderingContext | null;
 			if (!gl1) throw new Error('WebGL not supported');
 			this.gl = gl1;
 			this.isWebGL2 = false;

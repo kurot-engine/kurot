@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Stable (1.0.25).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Stable (1.0.26).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
@@ -14,7 +14,7 @@ A modern rewrite of the Egret game engine. Maintains Egret-compatible display ob
 - Multi-texture batching (up to 8 textures per draw call)
 - RenderGroup layers — localize instruction rebuilds to the affected subtree
 - Filters: Blur (ping-pong dual-pass), Glow, DropShadow, ColorMatrix, custom shaders
-- Masks: automatic selection between scissor / stencil / offscreen compositing
+- Masks: automatic selection between scissor / stencil / offscreen compositing, including nested scroll clips
 - PixiJS-style `cacheAsTexture()` plus Egret-compatible `cacheAsBitmap`
 - WebGL Context Lost recovery
 

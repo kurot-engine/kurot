@@ -11,6 +11,9 @@ export const SYM_SMOOTHING = '__kurotSmoothing';
  */
 export type GL = WebGL2RenderingContext | WebGLRenderingContext;
 
+// The 2D renderer never depth-tests, but nested and rotated clips need stencil.
+export const WEBGL_CONTEXT_ATTRIBUTES: WebGLContextAttributes = { depth: false, stencil: true };
+
 export function compileShader(gl: GL, type: number, source: string, name = 'unnamed'): WebGLShader {
 	const shader = gl.createShader(type);
 	if (!shader) throw new Error(`Cannot allocate shader: ${name}`);
@@ -85,7 +88,10 @@ export function fitTextureResolution(
 export function checkWebGLSupport(): boolean {
 	try {
 		const canvas = document.createElement('canvas');
-		return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+		return !!(
+			canvas.getContext('webgl2', WEBGL_CONTEXT_ATTRIBUTES) ||
+			canvas.getContext('webgl', WEBGL_CONTEXT_ATTRIBUTES)
+		);
 	} catch {
 		return false;
 	}

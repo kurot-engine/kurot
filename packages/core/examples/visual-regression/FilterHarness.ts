@@ -1,6 +1,5 @@
 import * as kurot from '../../src/index.js';
-import { createProgram } from '../../src/kurot/player/webgl/WebGLUtils.js';
-import type { GL } from '../../src/kurot/player/webgl/WebGLUtils.js';
+import { createProgram, WEBGL_CONTEXT_ATTRIBUTES, type GL } from '../../src/kurot/player/webgl/WebGLUtils.js';
 import { ShaderLib2 } from '../../src/kurot/player/webgl/shaders/ShaderLib2.js';
 
 export interface FilterHarness {
@@ -24,7 +23,7 @@ declare global {
 const canvas = document.querySelector<HTMLCanvasElement>('#filters')!;
 const params = new URLSearchParams(location.search);
 const backend = params.get('backend') === 'webgl1' ? 'webgl' : 'webgl2';
-const gl = canvas.getContext(backend) as GL | null;
+const gl = canvas.getContext(backend, WEBGL_CONTEXT_ATTRIBUTES) as GL | null;
 if (!gl) throw new Error(`Unavailable backend: ${backend}`);
 const resolution = Number(params.get('resolution') ?? 1);
 const app = kurot.createPlayer({ canvas, contentWidth: 256, contentHeight: 256, resolution });

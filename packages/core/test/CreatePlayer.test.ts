@@ -49,8 +49,8 @@ describe('createPlayer lifecycle', () => {
 
 		const player = new Player(canvas);
 
-		expect(getContext).toHaveBeenNthCalledWith(1, 'webgl2');
-		expect(getContext).toHaveBeenNthCalledWith(2, 'webgl');
+		expect(getContext).toHaveBeenNthCalledWith(1, 'webgl2', { depth: false, stencil: true });
+		expect(getContext).toHaveBeenNthCalledWith(2, 'webgl', { depth: false, stencil: true });
 		expect(getContext).toHaveBeenNthCalledWith(3, '2d');
 		// Canvas fallback creates one CanvasBuffer; there is no additional
 		// temporary canvas used solely to probe WebGL support.
