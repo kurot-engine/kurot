@@ -62,6 +62,7 @@ describe('Kurot UI foundation catalog', () => {
 		expect(editableText?.properties.text?.defaultValue).toBe('');
 		expect(editableText?.properties.promptColor?.defaultValue).toBe(0x999999);
 		expect(button?.children).toBe('none');
+		expect(button?.properties.skinName).toMatchObject({ valueType: 'string' });
 		expect(toggleButton).toMatchObject({
 			baseTypes: [
 				'kurot.DisplayObject',

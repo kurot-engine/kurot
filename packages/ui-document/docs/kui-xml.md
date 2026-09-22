@@ -45,6 +45,19 @@ Catalog-defined color properties use canonical `#RRGGBB` notation. The parser
 also accepts `0xRRGGBB` when source is edited by hand; serialization normalizes
 it back to `#RRGGBB`.
 
+Fixed and percentage sizes share the authored `width` and `height` attributes.
+A number is a fixed pixel size; a value with a `%` suffix is relative to the
+parent. `percentWidth` and `percentHeight` remain internal semantic properties
+and are not authored XML attributes.
+
+```xml
+<Group width="320" height="80" />
+<Group width="100%" height="75%" />
+```
+
+One axis cannot define both a fixed and percentage size. State-specific sizes
+use the same syntax, for example `width.compact="50%"`.
+
 Group layouts keep the same property-element shape used by EUI rather than the
 generic object form:
 

@@ -4,6 +4,34 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.6.4] — 2026-09-22
+
+### Added
+
+- Added the optional `skinName` string property to the shared component
+  catalog so skinnable controls can select a generated Skin class in authored
+  KUI XML.
+
+### Changed
+
+- Skin assignments now participate in normal catalog validation and canonical
+  XML parsing and serialization instead of requiring editor-only handling.
+
+## [0.6.3] — 2026-09-22
+
+### Changed
+
+- Fixed and percentage sizes now share the authored `width` and `height` XML
+  attributes. Percentage values use a `%` suffix and continue to map to the
+  separate `percentWidth` and `percentHeight` semantic properties.
+- State-specific size overrides use the same XML form, such as
+  `width.compact="50%"`.
+
+### Fixed
+
+- Serialization now rejects nodes that define both fixed and percentage sizes
+  on the same axis instead of emitting ambiguous Skin XML.
+
 ## [0.6.2] — 2026-09-22
 
 ### Added

@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.6.2`. This is a headless,
+Package identity: `@kurot/ui-document@0.6.4`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -121,8 +121,9 @@ src/
 - `Label.fontFamily` accepts either a CSS font-family string or a registered
   `font` resource reference.
 - Runtime and compatibility fields are not automatically authoring APIs.
-  `currentState`, `skinName`, and `hostComponentKey` are deliberately absent;
-  states and appearances are modeled directly.
+  `currentState` and `hostComponentKey` remain deliberately absent. Skinnable
+  controls expose `skinName` because compiled KUI Skin modules register their
+  generated factory by qualified class name.
 
 ## 4. Public API groups
 
@@ -152,6 +153,9 @@ src/
 
 - KUI XML is the single authored Skin syntax; Screen and reusable-component
   documents remain programmatic, and migrations stay outside the format.
+- Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
+  to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
+  internal property names as XML attributes.
 - `@kurot/ui-runtime@0.5.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.

@@ -39,6 +39,18 @@ describe('KUI XML serialization', () => {
 		expect(parseUIDocument(source)).toEqual(document);
 	});
 
+	it('round-trips authored component skin names', () => {
+		const source = `<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.PanelSkin">
+    <Button id="closeButton" skinName="skins.IconButtonSkin" />
+</Skin>
+`;
+
+		const document = parseUIDocument(source);
+		expect(document.root.children[0]?.properties.skinName).toBe('skins.IconButtonSkin');
+		expect(serializeUIDocument(document)).toBe(source);
+	});
+
 	it('serializes catalog color properties as readable hexadecimal values', () => {
 		const document = createUIDocument({
 			id: 'skins.ColorSkin',
@@ -93,6 +105,49 @@ describe('KUI XML serialization', () => {
 		expect(source).toContain('source="roundthumb_png"');
 		expect(source).not.toContain('@resource:image:');
 		expect(parseUIDocument(source)).toEqual(document);
+	});
+
+	it('uses width and height attributes for fixed and percentage sizes', () => {
+		const source = `<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.SizeSkin" states="compact">
+    <Group id="fixed" height="80" width="320" />
+    <Group id="fluid" height="75%" width="100%" height.compact="50%" width.compact="240" />
+</Skin>
+`;
+		const document = parseUIDocument(source);
+		const fixed = document.root.children[0];
+		const fluid = document.root.children[1];
+
+		expect(fixed?.properties).toMatchObject({ height: 80, width: 320 });
+		expect(fluid?.properties).toMatchObject({ percentHeight: 75, percentWidth: 100 });
+		expect(document.contract.states.compact?.overrides).toEqual([
+			{ targetId: 'fluid', property: 'percentHeight', value: 50 },
+			{ targetId: 'fluid', property: 'width', value: 240 },
+		]);
+		expect(serializeUIDocument(document)).toBe(source);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="skins.SizeSkin"><Group percentWidth="100" /></Skin>',
+			),
+		).toThrow(/uses width="\.\.\.%"/);
+	});
+
+	it('refuses conflicting fixed and percentage sizes', () => {
+		const document = createUIDocument({
+			id: 'skins.SizeSkin',
+			assetKind: 'appearance',
+			root: createUINode({
+				id: SKIN_ROOT_ID,
+				type: 'kui.Group',
+				children: [createUINode({
+					id: 'conflict',
+					type: 'kui.Group',
+					properties: { width: 320, percentWidth: 100 },
+				})],
+			}),
+		});
+
+		expect(() => serializeUIDocument(document)).toThrow(/cannot define both width and percentWidth/);
 	});
 
 	it('returns structured diagnostics for invalid XML and schema input', () => {

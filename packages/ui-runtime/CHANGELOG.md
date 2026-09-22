@@ -4,6 +4,18 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.5.2] — 2026-09-22
+
+### Added
+
+- Added built-in property routing for authored `skinName` values so skinnable
+  controls can resolve generated KUI Skin factories.
+
+### Changed
+
+- Raised the `@kurot/ui-document` peer and development dependency to `^0.6.4`
+  for the catalog-defined `skinName` contract.
+
 ## [0.5.1] — 2026-09-21
 
 ### Changed

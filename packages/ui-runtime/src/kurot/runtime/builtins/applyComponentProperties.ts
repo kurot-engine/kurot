@@ -1,5 +1,5 @@
 import { Component } from '@kurot/ui';
-import { requireBoolean } from './valueGuards.js';
+import { requireBoolean, requireString } from './valueGuards.js';
 
 /**
  * Applies one property declared directly by Component.
@@ -8,6 +8,9 @@ export function applyComponentProperty(target: Component, name: string, value: u
 	switch (name) {
 		case 'enabled':
 			target.enabled = requireBoolean(value, path);
+			return true;
+		case 'skinName':
+			target.skinName = requireString(value, path);
 			return true;
 		default:
 			return false;

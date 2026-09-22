@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.5.1`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.5.2`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -92,10 +92,10 @@ Adapters that keep bound values outside the runtime object must implement both
 `captureProperty` and `restoreProperty`.
 
 `Image.source` is forwarded to the existing `@kurot/ui` resource mechanism.
-Appearance assets are materialized as native `Skin` instances and assigned by
-the runtime; `skinName` is not an authored component property. The package does
-not invent resource or Theme lookup. An unskinned `Button` therefore exists and
-behaves as a component but has no automatic visual appearance.
+Authored `skinName` values are forwarded to the native component and resolved
+through the generated Skin factories registered by the KUI build. Semantic
+appearance assets are materialized as native `Skin` instances and assigned
+directly. The package does not invent resource or Theme lookup.
 
 Resource resolution dispatches by exact category: image, sprite-frame, font,
 Spine, or animation. The built-in defaults preserve the registered key. Spine

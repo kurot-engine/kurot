@@ -10,6 +10,15 @@ import { decodeXMLValue, encodeXMLValue, escapeXML } from './xml-values.js';
 const RESERVED_ATTRIBUTES = new Set(['id', 'xmlns']);
 const FOUNDATION_COMPONENTS = createKurotUIFoundationRegistry();
 const LAYOUT_TYPES = new Set(['BasicLayout', 'HorizontalLayout', 'TileLayout', 'VerticalLayout']);
+const PERCENT_SIZE_PROPERTIES = {
+	percentHeight: 'height',
+	percentWidth: 'width',
+} as const;
+const SIZE_PERCENT_PROPERTIES = {
+	height: 'percentHeight',
+	width: 'percentWidth',
+} as const;
+const PERCENT_SIZE_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d+)?%$/;
 
 export interface XMLNamespaces {
 	readonly prefixes: Readonly<Record<string, string>>;
@@ -107,23 +116,25 @@ export function parseNode(element: XMLElement, context: XMLNodeParseContext, pat
 		}
 		const stateSeparator = name.lastIndexOf('.');
 		if (stateSeparator !== -1) {
-			const property = name.slice(0, stateSeparator);
+			const authoredProperty = name.slice(0, stateSeparator);
 			const stateName = name.slice(stateSeparator + 1);
-			if (property.length === 0 || !context.states.has(stateName)) {
+			if (authoredProperty.length === 0 || !context.states.has(stateName)) {
 				throw new Error(`State property "${name}" references an undeclared state.`);
 			}
 			const overrides = context.stateOverrides.get(stateName);
 			if (overrides === undefined) {
 				throw new Error(`State "${stateName}" has no override collection.`);
 			}
+			const property = decodeSizeProperty(type, authoredProperty, value);
 			overrides.push({
 				targetId: id,
-				property,
-				value: decodeXMLValue(value, propertyDefinition(type, property)),
+				property: property.name,
+				value: property.value,
 			});
 			continue;
 		}
-		properties[name] = decodeXMLValue(value, propertyDefinition(type, name));
+		const property = decodeSizeProperty(type, name, value);
+		properties[property.name] = property.value;
 	}
 
 	let childIndex = 0;
@@ -182,11 +193,15 @@ function serializeNodeMetadata(
 		if (name.includes('.')) {
 			throw new Error(`Skin property name "${name}" must not contain a dot.`);
 		}
-		const encoded = encodeXMLValue(value, propertyDefinition(node.type, name));
-		if (encoded === undefined || RESERVED_ATTRIBUTES.has(name) || name.startsWith('xmlns')) {
+		const property = encodeSizeProperty(node, name, value, true);
+		if (
+			property.value === undefined ||
+			RESERVED_ATTRIBUTES.has(property.name) ||
+			property.name.startsWith('xmlns')
+		) {
 			throw new Error(`Skin property "${name}" must be a scalar value.`);
 		}
-		attributes.push(`${name}="${escapeXML(encoded)}"`);
+		attributes.push(`${property.name}="${escapeXML(property.value)}"`);
 	}
 
 	for (const [stateName, state] of Object.entries(states)) {
@@ -195,7 +210,8 @@ function serializeNodeMetadata(
 			if (override.property.includes('.')) {
 				throw new Error(`Skin state property name "${override.property}" must not contain a dot.`);
 			}
-			const stateProperty = `${override.property}.${stateName}`;
+			const property = encodeSizeProperty(node, override.property, override.value);
+			const stateProperty = `${property.name}.${stateName}`;
 			if (stateProperties.has(stateProperty)) {
 				throw new Error(`Skin XML cannot serialize duplicate state property "${stateProperty}".`);
 			}
@@ -203,11 +219,10 @@ function serializeNodeMetadata(
 			if (override.transition !== undefined) {
 				throw new Error(`Skin XML does not serialize transitions for state "${stateName}".`);
 			}
-			const encoded = encodeXMLValue(override.value, propertyDefinition(node.type, override.property));
-			if (encoded === undefined) {
+			if (property.value === undefined) {
 				throw new Error(`State property "${override.property}.${stateName}" must be a scalar value.`);
 			}
-			attributes.push(`${stateProperty}="${escapeXML(encoded)}"`);
+			attributes.push(`${stateProperty}="${escapeXML(property.value)}"`);
 		}
 	}
 
@@ -293,4 +308,45 @@ function sortedEntries<T>(record: Readonly<Record<string, T>>): [string, T][] {
 
 function propertyDefinition(type: string, property: string) {
 	return FOUNDATION_COMPONENTS.resolve(type)?.properties[property];
+}
+
+function decodeSizeProperty(
+	type: string,
+	name: string,
+	source: string,
+): { name: string; value: UIPropertyValue } {
+	if (name === 'percentWidth' || name === 'percentHeight') {
+		throw new Error(`Skin XML uses ${PERCENT_SIZE_PROPERTIES[name]}="...%" instead of ${name}.`);
+	}
+	if ((name === 'width' || name === 'height') && source.endsWith('%')) {
+		if (!PERCENT_SIZE_PATTERN.test(source)) {
+			throw new Error(`Skin property "${name}" has an invalid percentage value "${source}".`);
+		}
+		const percentProperty = SIZE_PERCENT_PROPERTIES[name];
+		return {
+			name: percentProperty,
+			value: Number(source.slice(0, -1)),
+		};
+	}
+	return {
+		name,
+		value: decodeXMLValue(source, propertyDefinition(type, name)),
+	};
+}
+
+function encodeSizeProperty(
+	node: UINode,
+	name: string,
+	value: UIPropertyValue,
+	checkNodeConflict = false,
+): { name: string; value: string | undefined } {
+	if (name === 'percentWidth' || name === 'percentHeight') {
+		const sizeProperty = PERCENT_SIZE_PROPERTIES[name];
+		if (checkNodeConflict && node.properties[sizeProperty] !== undefined) {
+			throw new Error(`Skin component cannot define both ${sizeProperty} and ${name}.`);
+		}
+		const encoded = encodeXMLValue(value, propertyDefinition(node.type, name));
+		return { name: sizeProperty, value: encoded === undefined ? undefined : `${encoded}%` };
+	}
+	return { name, value: encodeXMLValue(value, propertyDefinition(node.type, name)) };
 }

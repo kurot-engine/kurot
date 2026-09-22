@@ -180,6 +180,10 @@ export const COMPONENT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>
 		defaultValue: true,
 		description: 'Whether the control accepts interaction and uses enabled states.',
 	},
+	skinName: {
+		valueType: 'string',
+		description: 'Qualified class name of the generated Skin assigned to this control.',
+	},
 };
 
 function anchorConstraint(description: string): UIPropertyDefinition {

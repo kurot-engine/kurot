@@ -27,6 +27,7 @@ import {
 import type { UIDocument } from '@kurot/ui-document';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createKurotUI, KurotUIRuntimeError } from '../src/index.js';
+import { applyComponentProperty } from '../src/kurot/runtime/builtins/applyComponentProperties.js';
 import { createActionCardDocument, createButtonAppearanceDocument, createLobbyDocument } from './document-fixtures.js';
 
 beforeAll(() => {
@@ -150,6 +151,12 @@ describe('createKurotUI', () => {
 		expect(loadingProgress.minimum).toBe(10);
 		expect(loadingProgress.slideDuration).toBe(0);
 		expect(loadingProgress.value).toBe(125);
+	});
+
+	it('applies authored skin class names to skinnable components', () => {
+		const button = new Button();
+		expect(applyComponentProperty(button, 'skinName', 'skins.ActionButtonSkin', '$.skinName')).toBe(true);
+		expect(button.skinName).toBe('skins.ActionButtonSkin');
 	});
 
 	it('supports project components through a semantic definition and runtime adapter', () => {

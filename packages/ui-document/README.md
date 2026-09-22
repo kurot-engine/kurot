@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.6.2.** KUI XML is the canonical authored format. The
+> **Current release: 0.6.4.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -58,7 +58,10 @@ The authored `<Skin>` element is the visual root container: root size and
 layout properties are written on it, and visual nodes are direct children.
 Use `createUISkinRoot()` for the corresponding internal Group when constructing
 a Skin document in TypeScript. Only child nodes exposed as skin parts need an
-authored `id`.
+authored `id`. Fixed and percentage sizes use the same XML attributes:
+`width="320"` is fixed while `width="100%"` is relative to the parent. The
+semantic model retains separate `width` and `percentWidth` properties so
+editing and runtime layout do not mix unlike units in one value.
 
 ## Current capabilities
 
@@ -230,6 +233,9 @@ semantic document.
 The foundation catalog declares the serializable authoring properties inherited
 from Kurot display objects and UI layout elements, then adds the audited direct
 properties of all nine concrete components. Unknown properties are rejected.
+Skinnable controls inherit the optional `skinName` property, whose value is the
+qualified class name of a generated Skin, for example
+`<Button skinName="game.ButtonSkin" />`.
 
 TextInput exposes only properties forwarded by the real control. Font, size,
 alignment, and prompt styling belong to its `textDisplay` and `promptDisplay`
@@ -243,8 +249,8 @@ objects such as `Image.bitmap` are not document properties. `Group.layout` and
 `Image.scale9Grid` currently accept semantic objects; their nested shapes will
 be tightened when the layout and structured-value catalogs are introduced.
 States and variants live in asset contracts rather than untyped component
-properties. Compatibility-shaped `currentState`, `skinName`, and
-`hostComponentKey` are not canonical authoring fields.
+properties. Compatibility-shaped `currentState` and `hostComponentKey` are not
+canonical authoring fields.
 
 Component Schemas also declare whether a type accepts an appearance, the exact
 native states that appearance may define, required typed parts, and semantic
