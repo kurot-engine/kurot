@@ -22,8 +22,13 @@ export function compileShader(gl: GL, type: number, source: string, name = 'unna
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 		const log = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
-		const numberedSource = source.split('\n').map((line, index) => `${index + 1}: ${line}`).join('\n');
-		throw new Error(`Shader compile failed (${name}, ${type === gl.VERTEX_SHADER ? 'vertex' : 'fragment'}):\n${log}\n${numberedSource}`);
+		const numberedSource = source
+			.split('\n')
+			.map((line, index) => `${index + 1}: ${line}`)
+			.join('\n');
+		throw new Error(
+			`Shader compile failed (${name}, ${type === gl.VERTEX_SHADER ? 'vertex' : 'fragment'}):\n${log}\n${numberedSource}`,
+		);
 	}
 	return shader;
 }

@@ -43,8 +43,7 @@ function colorToString(color: number): string {
  * Traverses a display-object tree and renders it with Canvas 2D.
  */
 export class CanvasRenderer {
-
-    // ── Instance fields ───────────────────────────────────────────────────────
+	// ── Instance fields ───────────────────────────────────────────────────────
 	private _hasFill = false;
 	private _hasStroke = false;
 	private readonly _bitmapTintCache = new WeakMap<Bitmap, TintedCanvasCache>();
@@ -61,9 +60,7 @@ export class CanvasRenderer {
 		const ctx = buffer.context;
 		this._globalTint = 0xffffff;
 		const previousResolution = this._resolution;
-		this._resolution = matrix
-			? Math.max(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d))
-			: 1;
+		this._resolution = matrix ? Math.max(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d)) : 1;
 		if (matrix) {
 			ctx.save();
 			ctx.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
@@ -136,11 +133,9 @@ export class CanvasRenderer {
 			const previousWidth = $displayList.canvasBuffer.width;
 			const previousHeight = $displayList.canvasBuffer.height;
 			const previousResolution = $displayList.actualResolution;
-			const hasSurface = $displayList.updateSurfaceSize(
-				Number.POSITIVE_INFINITY,
-				this._resolution,
-			);
-			const surfaceChanged = previousWidth !== $displayList.canvasBuffer.width ||
+			const hasSurface = $displayList.updateSurfaceSize(Number.POSITIVE_INFINITY, this._resolution);
+			const surfaceChanged =
+				previousWidth !== $displayList.canvasBuffer.width ||
 				previousHeight !== $displayList.canvasBuffer.height ||
 				previousResolution !== $displayList.actualResolution;
 
@@ -551,13 +546,7 @@ export class CanvasRenderer {
 				drawH,
 			);
 		} else {
-			ctx.drawImage(
-				this.getTintedBitmapSource(bitmap, this._globalTint),
-				drawX,
-				drawY,
-				drawW,
-				drawH,
-			);
+			ctx.drawImage(this.getTintedBitmapSource(bitmap, this._globalTint), drawX, drawY, drawW, drawH);
 		}
 		return 1;
 	}
@@ -694,14 +683,10 @@ export class CanvasRenderer {
 		const c = (dx0 * (sx2 - sx1) + dx1 * (sx0 - sx2) + dx2 * (sx1 - sx0)) / determinant;
 		const d = (dy0 * (sx2 - sx1) + dy1 * (sx0 - sx2) + dy2 * (sx1 - sx0)) / determinant;
 		const e =
-			(dx0 * (sx1 * sy2 - sx2 * sy1) +
-				dx1 * (sx2 * sy0 - sx0 * sy2) +
-				dx2 * (sx0 * sy1 - sx1 * sy0)) /
+			(dx0 * (sx1 * sy2 - sx2 * sy1) + dx1 * (sx2 * sy0 - sx0 * sy2) + dx2 * (sx0 * sy1 - sx1 * sy0)) /
 			determinant;
 		const f =
-			(dy0 * (sx1 * sy2 - sx2 * sy1) +
-				dy1 * (sx2 * sy0 - sx0 * sy2) +
-				dy2 * (sx0 * sy1 - sx1 * sy0)) /
+			(dy0 * (sx1 * sy2 - sx2 * sy1) + dy1 * (sx2 * sy0 - sx0 * sy2) + dy2 * (sx0 * sy1 - sx1 * sy0)) /
 			determinant;
 
 		ctx.save();
@@ -851,9 +836,7 @@ export class CanvasRenderer {
 
 		// ── ScrollV offset ────────────────────────────────────────────────────
 		const inputActive = tf.type === TextFieldType.INPUT && tf.isTyping;
-		const scrollOffset = tf.type === TextFieldType.INPUT && tf.multiline
-			? tf.$inputScrollY
-			: tf.getScrollYOffset();
+		const scrollOffset = tf.type === TextFieldType.INPUT && tf.multiline ? tf.$inputScrollY : tf.getScrollYOffset();
 		const inputScrollX = inputActive ? tf.$inputScrollX : 0;
 		const selectionStart = Math.min(tf.selectionBeginIndex, tf.selectionEndIndex);
 		const selectionEnd = Math.max(tf.selectionBeginIndex, tf.selectionEndIndex);

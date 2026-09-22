@@ -28,18 +28,17 @@ interface TextCache {
  * Rasterizes text fields into cached textures for render-buffer drawing.
  */
 export class TextPipe implements RenderPipe<TextField> {
-
-    // ── Static fields ─────────────────────────────────────────────────────────
+	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'text';
 
-    private static readonly _pool: TextInstruction[] = [];
+	private static readonly _pool: TextInstruction[] = [];
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 	private readonly _canvasRenderer: CanvasRenderer;
 	private readonly _cache = new WeakMap<TextField, TextCache>();
 	private readonly _registryTokens = new WeakMap<TextField, object>();
 
-    private _context?: RenderContext;
+	private _context?: RenderContext;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 	public constructor(canvasRenderer: CanvasRenderer) {

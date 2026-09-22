@@ -14,8 +14,12 @@ export class WebGLFilterTargetPool {
 
 	public constructor(private readonly _gl: GL) {}
 
-	public get size(): number { return this._size; }
-	public get bytes(): number { return this._bytes; }
+	public get size(): number {
+		return this._size;
+	}
+	public get bytes(): number {
+		return this._bytes;
+	}
 
 	public acquire(width: number, height: number): WebGLRenderTarget {
 		const key = `${width}x${height}`;
@@ -24,7 +28,9 @@ export class WebGLFilterTargetPool {
 		if (target) {
 			this._size--;
 			this._bytes -= width * height * 4;
-			if (!bucket!.length) { this._targets.delete(key); }
+			if (!bucket!.length) {
+				this._targets.delete(key);
+			}
 			return target;
 		}
 		const result = new WebGLRenderTarget(this._gl, width, height);
@@ -42,7 +48,10 @@ export class WebGLFilterTargetPool {
 
 	public release(target: WebGLRenderTarget): void {
 		const bytes = target.width * target.height * 4;
-		if (bytes > BYTE_LIMIT) { target.dispose(); return; }
+		if (bytes > BYTE_LIMIT) {
+			target.dispose();
+			return;
+		}
 		while (this._size >= COUNT_LIMIT || this._bytes + bytes > BYTE_LIMIT) {
 			const oldest = this._targets.entries().next().value;
 			if (!oldest) break;
@@ -51,7 +60,9 @@ export class WebGLFilterTargetPool {
 			this._size--;
 			this._bytes -= removed.width * removed.height * 4;
 			removed.dispose();
-			if (!bucket.length) { this._targets.delete(key); }
+			if (!bucket.length) {
+				this._targets.delete(key);
+			}
 		}
 		const key = `${target.width}x${target.height}`;
 		const bucket = this._targets.get(key) ?? [];
@@ -64,7 +75,9 @@ export class WebGLFilterTargetPool {
 	public clear(contextLost = false): void {
 		if (!contextLost) {
 			for (const bucket of this._targets.values()) {
-				for (const target of bucket) { target.dispose(); }
+				for (const target of bucket) {
+					target.dispose();
+				}
 			}
 		}
 		this._targets.clear();

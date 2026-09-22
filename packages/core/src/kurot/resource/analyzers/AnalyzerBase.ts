@@ -42,6 +42,5 @@ export abstract class AnalyzerBase {
 		return false;
 	}
 
-	protected onResourceDestroy(_resource: unknown): void {
-	}
+	protected onResourceDestroy(_resource: unknown): void {}
 }

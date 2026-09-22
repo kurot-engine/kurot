@@ -16,8 +16,7 @@ export interface MeshInstruction extends Instruction {
  * Draws textured mesh instructions through a render buffer.
  */
 export class MeshPipe implements RenderPipe<Mesh> {
-
-    // ── Static fields ─────────────────────────────────────────────────────────
+	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'mesh';
 
 	private static readonly _pool: MeshInstruction[] = [];

@@ -33,18 +33,17 @@ interface GraphicsCache {
  * Rasterizes graphics into cached textures for render-buffer drawing.
  */
 export class GraphicsPipe implements RenderPipe<DisplayObject> {
-
 	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'graphics';
 
-    private static readonly _pool: GraphicsInstruction[] = [];
+	private static readonly _pool: GraphicsInstruction[] = [];
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 	private readonly _canvasRenderer: CanvasRenderer;
 	private readonly _cache = new WeakMap<Graphics, GraphicsCache>();
 	private readonly _registryTokens = new WeakMap<Graphics, object>();
 
-    private _context?: RenderContext;
+	private _context?: RenderContext;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 	public constructor(canvasRenderer: CanvasRenderer) {

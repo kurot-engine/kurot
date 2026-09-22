@@ -44,11 +44,7 @@ const MASK_BUILD_OPTIONS: InstructionBuildOptions = { inlineRenderGroups: true }
 // ── Augmented instruction types ───────────────────────────────────────────────
 
 type BaseLeafInstruction =
-	| BitmapInstruction
-	| GraphicsInstruction
-	| MeshInstruction
-	| TextInstruction
-	| ParticleInstruction;
+	BitmapInstruction | GraphicsInstruction | MeshInstruction | TextInstruction | ParticleInstruction;
 
 type LeafInstruction = BaseLeafInstruction & {
 	transform: TransformState;
@@ -211,11 +207,7 @@ export class WebGLRenderer {
 			if (inst) set.addLeaf(inst);
 			return;
 		}
-		const childOptions = options?.isStage
-			? options.inlineRenderGroups
-				? MASK_BUILD_OPTIONS
-				: undefined
-			: options;
+		const childOptions = options?.isStage ? (options.inlineRenderGroups ? MASK_BUILD_OPTIONS : undefined) : options;
 
 		this._buildLeaf(displayObject, set, buffer, offsetX, offsetY);
 
@@ -378,7 +370,9 @@ export class WebGLRenderer {
 		set.addIndexed(push);
 		this._buildInstructions(obj, set, buffer, offsetX, offsetY, options);
 		set.add(FilterPipe.makePop(obj, push as FilterPushInstruction));
-		if (clip) { set.add(MaskPipe.makePop(obj, clip)); }
+		if (clip) {
+			set.add(MaskPipe.makePop(obj, clip));
+		}
 	}
 
 	private _buildClip(
@@ -561,7 +555,8 @@ export class WebGLRenderer {
 				const count = typeof indices === 'number' ? 1 : indices.length;
 				for (let index = 0; index < count; index++) {
 					const idx = typeof indices === 'number' ? indices : indices[index];
-					const inst = set.instructions[idx] as LeafInstruction | EffectPushInstruction | RenderGroupInstruction;
+					const inst = set.instructions[idx] as
+						LeafInstruction | EffectPushInstruction | RenderGroupInstruction;
 					if (inst) this._refreshInstructionTransform(child, inst);
 				}
 			}
@@ -651,7 +646,11 @@ export class WebGLRenderer {
 						const offscreen = this._filterPipe.executePush(push, activeBuffer);
 						offscreenStack.push(offscreen);
 						if (offscreen) {
-							this._configureOffscreenTransform(offscreen, offscreen.filterBounds ?? push.renderable.$getOriginalBounds(), pushT);
+							this._configureOffscreenTransform(
+								offscreen,
+								offscreen.filterBounds ?? push.renderable.$getOriginalBounds(),
+								pushT,
+							);
 							activeBuffer = offscreen;
 						}
 						break;
@@ -680,7 +679,11 @@ export class WebGLRenderer {
 							const displayBuffer = this._maskPipe.executeClipPush(push, activeBuffer);
 							offscreenStack.push(displayBuffer);
 							if (displayBuffer) {
-								this._configureOffscreenTransform(displayBuffer, push.renderable.$getOriginalBounds(), pushT);
+								this._configureOffscreenTransform(
+									displayBuffer,
+									push.renderable.$getOriginalBounds(),
+									pushT,
+								);
 								activeBuffer = displayBuffer;
 							}
 						}
@@ -791,21 +794,16 @@ export class WebGLRenderer {
 		buf.hasOffscreenTransform = true;
 	}
 
-	private _executeDisplayListCache(
-		obj: DisplayObject,
-		buffer: WebGLRenderBuffer,
-	): void {
+	private _executeDisplayListCache(obj: DisplayObject, buffer: WebGLRenderBuffer): void {
 		const $displayList = obj.$displayList;
 		if (!$displayList) return;
 
 		const previousWidth = $displayList.canvasBuffer.width;
 		const previousHeight = $displayList.canvasBuffer.height;
 		const previousResolution = $displayList.actualResolution;
-		const hasSurface = $displayList.updateSurfaceSize(
-			buffer.context.maxTextureSize,
-			buffer.context.resolution,
-		);
-		const surfaceChanged = previousWidth !== $displayList.canvasBuffer.width ||
+		const hasSurface = $displayList.updateSurfaceSize(buffer.context.maxTextureSize, buffer.context.resolution);
+		const surfaceChanged =
+			previousWidth !== $displayList.canvasBuffer.width ||
 			previousHeight !== $displayList.canvasBuffer.height ||
 			previousResolution !== $displayList.actualResolution;
 
@@ -854,12 +852,7 @@ export class WebGLRenderer {
 		);
 	}
 
-	private _renderMaskObject(
-		obj: DisplayObject,
-		buffer: WebGLRenderBuffer,
-		offsetX: number,
-		offsetY: number,
-	): void {
+	private _renderMaskObject(obj: DisplayObject, buffer: WebGLRenderBuffer, offsetX: number, offsetY: number): void {
 		const depth = this._maskInstructionDepth++;
 		let set = this._maskInstructionSets[depth];
 		if (!set) {

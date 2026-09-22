@@ -25,40 +25,77 @@ export class WebGLFilterTextures {
 	public bind(program: WebGLProgram, filter: CustomFilter, inputs: Record<string, FilterSampler> = {}): void {
 		const gl = this._context.gl;
 		for (const name of Object.keys({ ...filter.textures, ...inputs })) {
-			if (['uSampler', 'projectionVector', 'uTextureSize', 'uInputSize', 'uInputClamp', 'uOutputSize', 'uResolution'].includes(name)
-				|| (inputs[name] && filter.textures[name])) throw new Error(`Conflicting filter pass texture ${name}.`);
+			if (
+				[
+					'uSampler',
+					'projectionVector',
+					'uTextureSize',
+					'uInputSize',
+					'uInputClamp',
+					'uOutputSize',
+					'uResolution',
+				].includes(name) ||
+				(inputs[name] && filter.textures[name])
+			)
+				throw new Error(`Conflicting filter pass texture ${name}.`);
 		}
-		const resources = Object.keys({ ...filter.textures, ...inputs }).filter(name =>
-			program.uniforms[name] || program.uniforms[`${name}Matrix`] || program.uniforms[`${name}Clamp`]);
-		if (resources.length >= this._maxUnits) throw new Error('CustomFilter exceeds available texture units (including uSampler).');
+		const resources = Object.keys({ ...filter.textures, ...inputs }).filter(
+			name => program.uniforms[name] || program.uniforms[`${name}Matrix`] || program.uniforms[`${name}Clamp`],
+		);
+		if (resources.length >= this._maxUnits)
+			throw new Error('CustomFilter exceeds available texture units (including uSampler).');
 		try {
 			for (let i = 0; i < resources.length; i++) {
 				const name = resources[i];
-				for (const [suffix, type] of [['Matrix', gl.FLOAT_MAT3], ['Clamp', gl.FLOAT_VEC4]] as const) {
+				for (const [suffix, type] of [
+					['Matrix', gl.FLOAT_MAT3],
+					['Clamp', gl.FLOAT_VEC4],
+				] as const) {
 					const info = program.uniformInfo[`${name}${suffix}`];
 					if (info && (info.type !== type || info.size !== 1)) {
 						throw new Error(`CustomFilter ${name}${suffix} has an invalid automatic uniform type.`);
 					}
 				}
-				if (program.uniformInfo[name] && (program.uniformInfo[name].type !== gl.SAMPLER_2D || program.uniformInfo[name].size !== 1)) {
+				if (
+					program.uniformInfo[name] &&
+					(program.uniformInfo[name].type !== gl.SAMPLER_2D || program.uniformInfo[name].size !== 1)
+				) {
 					throw new Error(`CustomFilter texture ${name} requires a scalar sampler2D.`);
 				}
 				const borrowed = inputs[name];
 				if (borrowed) {
 					gl.activeTexture(gl.TEXTURE0 + i + 1);
 					gl.bindTexture(gl.TEXTURE_2D, borrowed.texture);
-					if (program.uniforms[name]) { gl.uniform1i(program.uniforms[name], i + 1); }
+					if (program.uniforms[name]) {
+						gl.uniform1i(program.uniforms[name], i + 1);
+					}
 					const matrix = program.uniforms[`${name}Matrix`];
-					if (matrix) { gl.uniformMatrix3fv(matrix, false, new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1])); }
+					if (matrix) {
+						gl.uniformMatrix3fv(matrix, false, new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]));
+					}
 					const clamp = program.uniforms[`${name}Clamp`];
-					if (clamp) { gl.uniform4f(clamp, 0.5 / borrowed.width, 0.5 / borrowed.height, 1 - 0.5 / borrowed.width, 1 - 0.5 / borrowed.height); }
+					if (clamp) {
+						gl.uniform4f(
+							clamp,
+							0.5 / borrowed.width,
+							0.5 / borrowed.height,
+							1 - 0.5 / borrowed.width,
+							1 - 0.5 / borrowed.height,
+						);
+					}
 					continue;
 				}
 				const resource = filter.textures[name];
 				const data = resource.source;
 				const source = data.source;
-				if (!source || source instanceof ArrayBuffer) throw new Error(`CustomFilter texture ${name} has no image source.`);
-				if (data.width <= 0 || data.height <= 0 || data.width > this._context.maxTextureSize || data.height > this._context.maxTextureSize) {
+				if (!source || source instanceof ArrayBuffer)
+					throw new Error(`CustomFilter texture ${name} has no image source.`);
+				if (
+					data.width <= 0 ||
+					data.height <= 0 ||
+					data.width > this._context.maxTextureSize ||
+					data.height > this._context.maxTextureSize
+				) {
 					throw new Error(`CustomFilter texture ${name} has invalid dimensions.`);
 				}
 				const transform = resource.transform ?? [1, 0, 0, -1, 0, 1];
@@ -78,7 +115,9 @@ export class WebGLFilterTextures {
 					entry = { texture, version: data.contentVersion, token: {} };
 					variants.set(smoothing, entry);
 					for (const ref of this._entries) {
-						if (!ref.deref()) { this._entries.delete(ref); }
+						if (!ref.deref()) {
+							this._entries.delete(ref);
+						}
 					}
 					this._entries.add(new WeakRef(entry));
 					this._context.registerTextureForGC(entry, texture, entry.token);
@@ -90,7 +129,9 @@ export class WebGLFilterTextures {
 					entry.version = data.contentVersion;
 				}
 				gl.bindTexture(gl.TEXTURE_2D, entry.texture);
-				if (program.uniforms[name]) { gl.uniform1i(program.uniforms[name], i + 1); }
+				if (program.uniforms[name]) {
+					gl.uniform1i(program.uniforms[name], i + 1);
+				}
 				const matrix = program.uniforms[`${name}Matrix`];
 				if (matrix) {
 					const [a, b, c, d, tx, ty] = transform;
@@ -98,7 +139,13 @@ export class WebGLFilterTextures {
 				}
 				const clamp = program.uniforms[`${name}Clamp`];
 				if (clamp) {
-					gl.uniform4f(clamp, 0.5 / data.width, 0.5 / data.height, 1 - 0.5 / data.width, 1 - 0.5 / data.height);
+					gl.uniform4f(
+						clamp,
+						0.5 / data.width,
+						0.5 / data.height,
+						1 - 0.5 / data.width,
+						1 - 0.5 / data.height,
+					);
 				}
 			}
 		} finally {

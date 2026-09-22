@@ -17,8 +17,7 @@ export interface ParticleInstruction extends Instruction {
  * Draws particle systems supplied through the game package's structural contract.
  */
 export class ParticlePipe implements RenderPipe<DisplayObject> {
-
-    // ── Static fields ─────────────────────────────────────────────────────────
+	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'particle';
 
 	// ── Public methods ────────────────────────────────────────────────────────

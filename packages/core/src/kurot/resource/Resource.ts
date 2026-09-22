@@ -413,8 +413,7 @@ export class Resource {
 			for (const listener of set) {
 				try {
 					listener(event);
-				} catch {
-				}
+				} catch {}
 			}
 		}
 	}

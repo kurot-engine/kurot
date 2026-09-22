@@ -179,9 +179,12 @@ export class Video extends Bitmap {
 			return;
 		}
 		this._userPlay = false;
-		void this._video.play().then(() => this.scheduleFrameUpdate()).catch(() => {
-			IOErrorEvent.dispatchIOErrorEvent(this);
-		});
+		void this._video
+			.play()
+			.then(() => this.scheduleFrameUpdate())
+			.catch(() => {
+				IOErrorEvent.dispatchIOErrorEvent(this);
+			});
 	}
 
 	private enterFullscreen(): void {

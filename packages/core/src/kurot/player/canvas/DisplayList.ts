@@ -7,7 +7,6 @@ import { CanvasBuffer } from './CanvasBuffer.js';
  * Caches a display-object subtree in an offscreen bitmap.
  */
 export class DisplayList {
-
 	// ── Static fields ─────────────────────────────────────────────────────────
 	private static _pool: DisplayList[] = [];
 
@@ -81,10 +80,7 @@ export class DisplayList {
 	 * Resizes the offscreen buffer to fit the root object's bounds.
 	 * Returns false if the object has zero size.
 	 */
-	public updateSurfaceSize(
-		maxTextureSize: number = Number.POSITIVE_INFINITY,
-		inheritedResolution = 1,
-	): boolean {
+	public updateSurfaceSize(maxTextureSize: number = Number.POSITIVE_INFINITY, inheritedResolution = 1): boolean {
 		const bounds = this.root.$getOriginalBounds();
 		if (bounds.width <= 0 || bounds.height <= 0) return false;
 		const requestedResolution = this._autoResolution ? inheritedResolution : this.resolution;

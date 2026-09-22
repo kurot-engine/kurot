@@ -30,10 +30,9 @@ export interface MaskPopInstruction extends Instruction {
  * Renders masks and clipping regions through paired push and pop instructions.
  */
 export class MaskPipe implements RenderPipe<DisplayObject> {
-
-    // ── Static fields ─────────────────────────────────────────────────────────
+	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PUSH_ID = 'maskPush';
-    public static readonly POP_ID = 'maskPop';
+	public static readonly POP_ID = 'maskPop';
 
 	private static readonly _pushPool: MaskPushInstruction[] = [];
 	private static readonly _popPool: MaskPopInstruction[] = [];
@@ -129,10 +128,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 	/**
 	 * Activates an offscreen buffer when object masking requires compositing.
 	 */
-	public executeClipPush(
-		inst: MaskPushInstruction,
-		buffer: WebGLRenderBuffer,
-	): WebGLRenderBuffer | undefined {
+	public executeClipPush(inst: MaskPushInstruction, buffer: WebGLRenderBuffer): WebGLRenderBuffer | undefined {
 		const { renderable } = inst;
 		const scrollRect = renderable.$scrollRect ?? renderable.$maskRect;
 
@@ -140,7 +136,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			if (renderable.$blendMode !== 0) {
 				inst.savedBlendMode = buffer.context.currentBlendMode;
 				buffer.context.setGlobalCompositeOperation(
-					({ 1: 'lighter', 2: 'destination-out' }[renderable.$blendMode] ?? 'source-over'),
+					{ 1: 'lighter', 2: 'destination-out' }[renderable.$blendMode] ?? 'source-over',
 				);
 			}
 			if (scrollRect) {
@@ -161,18 +157,9 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 
 		const bw = bounds.width;
 		const bh = bounds.height;
-		const resolution = fitTextureResolution(
-			bw,
-			bh,
-			buffer.resolution,
-			buffer.context.maxTextureSize,
-		);
+		const resolution = fitTextureResolution(bw, bh, buffer.resolution, buffer.context.maxTextureSize);
 
-		const displayBuffer = WGLBuf.create(
-			buffer.context,
-			Math.ceil(bw * resolution),
-			Math.ceil(bh * resolution),
-		);
+		const displayBuffer = WGLBuf.create(buffer.context, Math.ceil(bw * resolution), Math.ceil(bh * resolution));
 		displayBuffer.resolution = resolution;
 		displayBuffer.context.pushBuffer(displayBuffer);
 		return displayBuffer;
@@ -215,11 +202,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 		const mask = renderable.$mask;
 		if (mask) {
 			const resolution = displayBuffer.resolution;
-			const maskBuffer = WGLBuf.create(
-				buffer.context,
-				Math.ceil(bw * resolution),
-				Math.ceil(bh * resolution),
-			);
+			const maskBuffer = WGLBuf.create(buffer.context, Math.ceil(bw * resolution), Math.ceil(bh * resolution));
 			maskBuffer.resolution = resolution;
 			maskBuffer.context.pushBuffer(maskBuffer);
 			const maskMatrix = Matrix.create();
@@ -246,15 +229,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			const mw = maskBuffer.rootRenderTarget.width;
 			const mh = maskBuffer.rootRenderTarget.height;
 			if (maskBuffer.rootRenderTarget.texture) {
-				displayBuffer.context.drawFramebufferTexture(
-					maskBuffer.rootRenderTarget.texture,
-					mw,
-					mh,
-					0,
-					0,
-					mw,
-					mh,
-				);
+				displayBuffer.context.drawFramebufferTexture(maskBuffer.rootRenderTarget.texture, mw, mh, 0, 0, mw, mh);
 			}
 			displayBuffer.context.flush();
 			displayBuffer.context.setGlobalCompositeOperation('source-over');
@@ -281,15 +256,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 		const dw = displayBuffer.rootRenderTarget.width;
 		const dh = displayBuffer.rootRenderTarget.height;
 		if (displayBuffer.rootRenderTarget.texture) {
-			buffer.context.drawFramebufferTexture(
-				displayBuffer.rootRenderTarget.texture,
-				dw,
-				dh,
-				bx,
-				by,
-				bw,
-				bh,
-			);
+			buffer.context.drawFramebufferTexture(displayBuffer.rootRenderTarget.texture, dw, dh, bx, by, bw, bh);
 		}
 
 		if (scrollRect) buffer.context.popMask();

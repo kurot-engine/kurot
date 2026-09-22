@@ -16,7 +16,6 @@ export interface BitmapInstruction extends Instruction {
  * Renders bitmap instructions through a render buffer.
  */
 export class BitmapPipe implements RenderPipe<Bitmap> {
-
 	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PIPE_ID = 'bitmap';
 

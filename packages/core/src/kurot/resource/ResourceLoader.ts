@@ -21,7 +21,6 @@ export class ResourceLoader {
 	 */
 	public retryCount = 3;
 
-
 	/**
 	 * Called for each successfully loaded item
 	 */
@@ -34,7 +33,6 @@ export class ResourceLoader {
 	 * Called with (loaded, total) progress
 	 */
 	public onProgress?: (loaded: number, total: number) => void;
-
 
 	private pendingList: ResourceItem[] = [];
 	private loadingList: ResourceItem[] = [];
@@ -178,7 +176,6 @@ export class ResourceLoader {
 	private safeNotify(callback: () => void): void {
 		try {
 			callback();
-		} catch {
-		}
+		} catch {}
 	}
 }

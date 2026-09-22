@@ -42,7 +42,6 @@ const INSTRUCTION_POOL_LIMIT = 256;
  * Renders filtered subtrees through paired push and pop instructions.
  */
 export class FilterPipe implements RenderPipe<DisplayObject> {
-
 	// ── Static fields ─────────────────────────────────────────────────────────
 	public static readonly PUSH_ID = 'filterPush';
 	public static readonly POP_ID = 'filterPop';
@@ -108,15 +107,18 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		const bounds = getFilterContentBounds(inst.renderable);
 		if (bounds.width <= 0 || bounds.height <= 0) return undefined;
 
-		if (!inst.renderable.$mask && !inst.renderable.$children?.length
-			&& !buffer.context.activeFilter && filters.length === 1 && filters[0] instanceof ColorMatrixFilter
-			&& filters[0].resolution === undefined) {
+		if (
+			!inst.renderable.$mask &&
+			!inst.renderable.$children?.length &&
+			!buffer.context.activeFilter &&
+			filters.length === 1 &&
+			filters[0] instanceof ColorMatrixFilter &&
+			filters[0].resolution === undefined
+		) {
 			const hasBlend = inst.renderable.$blendMode !== 0;
 			if (hasBlend) {
 				inst.savedBlendMode = buffer.context.currentBlendMode;
-				buffer.context.setGlobalCompositeOperation(
-					BLEND_MODES[inst.renderable.$blendMode] ?? 'source-over',
-				);
+				buffer.context.setGlobalCompositeOperation(BLEND_MODES[inst.renderable.$blendMode] ?? 'source-over');
 			}
 			buffer.context.flush();
 			buffer.context.pushBuffer(buffer);
@@ -140,14 +142,13 @@ export class FilterPipe implements RenderPipe<DisplayObject> {
 		const resolution = fitTextureResolution(
 			offW,
 			offH,
-			filters.reduce((resolution, filter) => Math.min(resolution, filter.resolution ?? resolution), buffer.resolution),
+			filters.reduce(
+				(resolution, filter) => Math.min(resolution, filter.resolution ?? resolution),
+				buffer.resolution,
+			),
 			buffer.context.maxTextureSize,
 		);
-		const offscreen = WGLBuf.create(
-			buffer.context,
-			Math.ceil(offW * resolution),
-			Math.ceil(offH * resolution),
-		);
+		const offscreen = WGLBuf.create(buffer.context, Math.ceil(offW * resolution), Math.ceil(offH * resolution));
 		offscreen.resolution = resolution;
 		offscreen.filterPadX = padL;
 		offscreen.filterPadY = padT;
