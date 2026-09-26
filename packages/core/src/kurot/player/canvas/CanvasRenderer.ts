@@ -524,6 +524,21 @@ export class CanvasRenderer {
 		const destH = !isNaN(bitmap.height) ? bitmap.height : bitmap.textureHeight;
 		if (destW <= 0 || destH <= 0 || bitmap.textureWidth <= 0 || bitmap.textureHeight <= 0) return 0;
 
+		ctx.imageSmoothingEnabled = bitmap.smoothing;
+		const grid = bitmap.scale9Grid;
+		if (grid) {
+			const tinted = this._globalTint !== 0xffffff;
+			const source = tinted
+				? this.getTintedBitmapSource(bitmap, this._globalTint)
+				: bd.source as CanvasImageSource;
+			this.drawScale9Bitmap(
+				bitmap, grid, ctx, source,
+				tinted ? 0 : bitmap.bitmapX, tinted ? 0 : bitmap.bitmapY,
+				offsetX, offsetY, destW, destH,
+			);
+			return 1;
+		}
+
 		// Scale trim offsets and content within the requested untrimmed canvas size.
 		const scaleX = destW / bitmap.textureWidth;
 		const scaleY = destH / bitmap.textureHeight;
@@ -531,8 +546,6 @@ export class CanvasRenderer {
 		const drawY = offsetY + bitmap.bitmapOffsetY * scaleY;
 		const drawW = bitmap.bitmapWidth * textureScaleFactor * scaleX;
 		const drawH = bitmap.bitmapHeight * textureScaleFactor * scaleY;
-
-		ctx.imageSmoothingEnabled = bitmap.smoothing;
 		if (this._globalTint === 0xffffff) {
 			ctx.drawImage(
 				bd.source as CanvasImageSource,
@@ -549,6 +562,59 @@ export class CanvasRenderer {
 			ctx.drawImage(this.getTintedBitmapSource(bitmap, this._globalTint), drawX, drawY, drawW, drawH);
 		}
 		return 1;
+	}
+
+	private drawScale9Bitmap(
+		bitmap: Bitmap,
+		grid: Rectangle,
+		ctx: CanvasRenderingContext2D,
+		source: CanvasImageSource,
+		sourceX: number,
+		sourceY: number,
+		offsetX: number,
+		offsetY: number,
+		destW: number,
+		destH: number,
+	): void {
+		const scale = textureScaleFactor;
+		const bw = bitmap.bitmapWidth;
+		const bh = bitmap.bitmapHeight;
+		const ox = bitmap.bitmapOffsetX;
+		const oy = bitmap.bitmapOffsetY;
+		destW -= bitmap.textureWidth - bw * scale;
+		destH -= bitmap.textureHeight - bh * scale;
+		if (destW <= 0 || destH <= 0) return;
+
+		const srcW0 = (grid.x - ox) / scale;
+		const srcH0 = (grid.y - oy) / scale;
+		const srcW1 = grid.width / scale;
+		const srcH1 = grid.height / scale;
+		const srcW2 = bw - srcW0 - srcW1;
+		const srcH2 = bh - srcH0 - srcH1;
+		const tgtW0 = srcW0 * scale;
+		const tgtH0 = srcH0 * scale;
+		const tgtW2 = srcW2 * scale;
+		const tgtH2 = srcH2 * scale;
+
+		if (tgtW0 + tgtW2 > destW || tgtH0 + tgtH2 > destH) {
+			ctx.drawImage(source, sourceX, sourceY, bw, bh, offsetX + ox, offsetY + oy, destW, destH);
+			return;
+		}
+
+		const srcXs = [sourceX, sourceX + srcW0, sourceX + srcW0 + srcW1];
+		const srcYs = [sourceY, sourceY + srcH0, sourceY + srcH0 + srcH1];
+		const srcWs = [srcW0, srcW1, srcW2];
+		const srcHs = [srcH0, srcH1, srcH2];
+		const tgtXs = [offsetX + ox, offsetX + ox + tgtW0, offsetX + ox + destW - tgtW2];
+		const tgtYs = [offsetY + oy, offsetY + oy + tgtH0, offsetY + oy + destH - tgtH2];
+		const tgtWs = [tgtW0, destW - tgtW0 - tgtW2, tgtW2];
+		const tgtHs = [tgtH0, destH - tgtH0 - tgtH2, tgtH2];
+		for (let row = 0; row < 3; row++) {
+			for (let col = 0; col < 3; col++) {
+				if (srcWs[col] <= 0 || srcHs[row] <= 0 || tgtWs[col] <= 0 || tgtHs[row] <= 0) continue;
+				ctx.drawImage(source, srcXs[col], srcYs[row], srcWs[col], srcHs[row], tgtXs[col], tgtYs[row], tgtWs[col], tgtHs[row]);
+			}
+		}
 	}
 
 	private getTintedBitmapSource(bitmap: Bitmap, tint: number, rotated = false): HTMLCanvasElement {

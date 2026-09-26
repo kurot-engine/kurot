@@ -4,6 +4,22 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.1.2] — 2026-09-26
+
+### Fixed
+
+- Scroller now preserves a skin's `autoVisibility="false" visible="false"`
+  scroll bars through layout, content-size changes, and touch gestures. These
+  bars remain hidden while the viewport can still scroll.
+- Automatically visible scroll bars stay hidden until a drag passes the touch
+  threshold, then appear for the gesture and retain the existing auto-hide
+  behavior.
+
+### Tests
+
+- Added regressions for skin-hidden scroll bars, continued touch scrolling,
+  and automatic scroll bar visibility after the drag threshold.
+
 ## [2.1.1] — 2026-09-20
 
 ### Fixed

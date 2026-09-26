@@ -133,6 +133,44 @@ describe('effect transform partial updates', () => {
 		expect(childTransform.alpha).toBeCloseTo(0.7);
 	});
 
+	it('keeps a scrolled viewport clip fixed when an ancestor transform is patched', () => {
+		const renderer = new WebGLRenderer();
+		const set = new InstructionSet();
+		const window = new Sprite();
+		const viewport = new Sprite();
+		const child = new Sprite();
+		window.addChild(viewport);
+		viewport.addChild(child);
+		window.x = 10;
+		window.y = 20;
+		window.scaleX = 1.2;
+		window.scaleY = 1.2;
+		viewport.x = 30;
+		viewport.y = 40;
+		viewport.scrollRect = new Rectangle(5, 60, 100, 100);
+		child.y = 80;
+
+		const clipTransform = transform();
+		const childTransform = transform();
+		set.addIndexed({
+			renderPipeId: 'maskPush',
+			renderable: viewport,
+			offsetX: 0,
+			offsetY: 0,
+			isScrollRect: true,
+			transform: clipTransform,
+		} as never);
+		set.addLeaf({ renderPipeId: 'graphics', renderable: child, transform: childTransform } as never);
+
+		set.markRenderableDirty(window);
+		updateDirty(renderer, set);
+
+		expect(clipTransform.tx).toBeCloseTo(46);
+		expect(clipTransform.ty).toBeCloseTo(68);
+		expect(childTransform.tx).toBeCloseTo(40);
+		expect(childTransform.ty).toBeCloseTo(92);
+	});
+
 	it('removes the outer effect transform while drawing into an offscreen buffer', () => {
 		const renderer = new WebGLRenderer() as unknown as {
 			_configureOffscreenTransform(buffer: WebGLRenderBuffer, bounds: Rectangle, value: TestTransform): void;

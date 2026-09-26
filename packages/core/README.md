@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Stable (1.0.27).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Stable (1.0.28).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
@@ -50,6 +50,8 @@ console.log(app.player.isWebGL ? 'WebGL' : 'Canvas 2D');
 ```
 
 The flat InstructionSet pipeline and multi-texture batching apply to the WebGL backend. The full-scene Canvas fallback uses direct display-tree traversal. Canvas support is still part of the normal WebGL path: text, Graphics, RenderTexture, and pixel hit testing may be rasterized through Canvas before being uploaded or composited by WebGL.
+Bitmap nine-slice rendering also works in Canvas, including WebGL
+`cacheAsBitmap` subtrees that use Canvas for their offscreen texture.
 
 **Migrating from Egret (1.0.0 breaking changes)**
 
@@ -160,7 +162,7 @@ their cached sampling scale is capped at 8× to bound zoom-related memory use.
 ```bash
 pnpm install
 pnpm run build        # compile
-pnpm run test         # run tests (704 cases)
+pnpm run test         # run tests (706 cases)
 pnpm run dev          # watch mode
 ```
 

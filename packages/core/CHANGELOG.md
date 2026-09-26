@@ -4,6 +4,23 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [1.0.28] — 2026-09-26
+
+### Fixed
+
+- WebGL partial transform updates keep a scrolled viewport's clipping rectangle
+  fixed while its contents move. This prevents content outside the viewport
+  from briefly appearing after a transform update.
+- Canvas rendering now applies `scale9Grid` to bitmaps, including those inside
+  `cacheAsBitmap` subtrees rasterized for WebGL. Nine-slice borders retain their
+  size when the center is stretched.
+
+### Tests
+
+- Added a regression for a scrolled clip under an updated ancestor transform.
+- Added a Canvas nine-slice regression using an atlas image stretched from
+  80×50 to 130×50 with `scale9Grid="38,0,3,50"`.
+
 ## [1.0.27] — 2026-09-23
 
 ### Fixed

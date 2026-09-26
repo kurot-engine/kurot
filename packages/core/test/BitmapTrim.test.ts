@@ -92,6 +92,26 @@ describe('trimmed bitmap rendering', () => {
 		expect(calls[8].slice(5, 9)).toEqual([77, 77, 15, 15]);
 	});
 
+	it('Canvas cache preserves the multiplier button borders when nine-slice stretches its center', () => {
+		const texture = new Texture();
+		texture.bitmapData = new BitmapData(document.createElement('canvas'));
+		texture.initData(147, 767, 80, 50, 0, 0, 80, 50, 1024, 1024);
+		const bitmap = new Bitmap(texture);
+		bitmap.width = 130;
+		bitmap.height = 50;
+		bitmap.scale9Grid = new Rectangle(38, 0, 3, 50);
+		const drawImage = vi.fn();
+		const context = { drawImage, imageSmoothingEnabled: true } as unknown as CanvasRenderingContext2D;
+
+		new CanvasRenderer().renderBitmapToContext(bitmap, context, 0, 0);
+
+		expect(drawImage.mock.calls.map(call => call.slice(1))).toEqual([
+			[147, 767, 38, 50, 0, 0, 38, 50],
+			[185, 767, 3, 50, 38, 0, 53, 50],
+			[188, 767, 39, 50, 91, 0, 39, 50],
+		]);
+	});
+
 	it.each([0xffffff, 0xff0000])('Canvas preserves scaled trim geometry with tint %s', tint => {
 		const bitmap = makeBitmap();
 		bitmap.width = 92;

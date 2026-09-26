@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.1.1.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.1.2.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -200,6 +200,12 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 | `ViewStack` | Shows one child at a time. Set `selectedIndex` or `selectedChild` to switch.                 |
 | `Scroller`  | Touch-scrolling wrapper for any `IViewport`. Supports bounce, scroll bars, scroll policies.  |
 | `UILayer`   | Full-screen overlay container.                                                               |
+
+`Scroller` keeps its default `auto` scroll policies when scroll bars are hidden.
+To hide a bar while retaining touch scrolling, set the bar's skin properties
+`autoVisibility="false" visible="false"`. With the default `autoVisibility`,
+the bar appears after a drag passes the touch threshold and hides after the
+gesture. Set `visible="true" autoVisibility="false"` to keep a bar visible.
 
 ### Data-Driven
 

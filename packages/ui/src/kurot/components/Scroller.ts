@@ -212,7 +212,7 @@ export class Scroller extends Component {
 
 	// ── Private methods ───────────────────────────────────────────────────
 
-	private _updateScrollBarVisibility(): void {
+	private _updateScrollBarVisibility(showAutoBars = false): void {
 		const vp = this._viewport;
 		if (!vp) return;
 
@@ -222,30 +222,26 @@ export class Scroller extends Component {
 		const vpHeight = b.height;
 
 		const hsb = this.horizontalScrollBar;
-		if (hsb) {
+		if (hsb?.autoVisibility) {
 			const maxScrollH = Math.max(0, vp.contentWidth - vpWidth);
 			const canScrollH = maxScrollH > 0;
 			const policy = this._horizontalScrollPolicy;
-			if (policy === ScrollPolicy.ON) {
-				hsb.visible = true;
-			} else if (policy === ScrollPolicy.OFF) {
+			if (policy === ScrollPolicy.OFF || (policy === ScrollPolicy.AUTO && !canScrollH)) {
 				hsb.visible = false;
-			} else {
-				hsb.visible = canScrollH;
+			} else if (showAutoBars) {
+				hsb.visible = true;
 			}
 		}
 
 		const vsb = this.verticalScrollBar;
-		if (vsb) {
+		if (vsb?.autoVisibility) {
 			const maxScrollV = Math.max(0, vp.contentHeight - vpHeight);
 			const canScrollV = maxScrollV > 0;
 			const policy = this._verticalScrollPolicy;
-			if (policy === ScrollPolicy.ON) {
-				vsb.visible = true;
-			} else if (policy === ScrollPolicy.OFF) {
+			if (policy === ScrollPolicy.OFF || (policy === ScrollPolicy.AUTO && !canScrollV)) {
 				vsb.visible = false;
-			} else {
-				vsb.visible = canScrollV;
+			} else if (showAutoBars) {
+				vsb.visible = true;
 			}
 		}
 	}
@@ -301,7 +297,6 @@ export class Scroller extends Component {
 		this._hScroll.stop();
 		this._vScroll.stop();
 		this._clearAutoHideTimer();
-		this._updateScrollBarVisibility();
 
 		const stage = this.stage;
 		if (stage) {
@@ -340,6 +335,7 @@ export class Scroller extends Component {
 			// components (e.g. List items) don't receive a false "click".
 			this._touchCancelled = true;
 			this._touchMoved = true;
+			this._updateScrollBarVisibility(true);
 
 			// Dispatch CHANGE_START once per gesture (egret parity).
 			if (!this._changeStartDispatched) {

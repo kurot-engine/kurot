@@ -584,10 +584,25 @@ export class WebGLRenderer {
 		t.d = root.b * cm.c + root.d * cm.d;
 		t.tx = root.a * cm.tx + root.c * cm.ty + root.tx;
 		t.ty = root.b * cm.tx + root.d * cm.ty + root.ty;
+		if (inst.renderPipeId === 'maskPush') {
+			this._adjustMaskPushClipPosition(obj, inst, t);
+		}
 		t.offsetX = 0;
 		t.offsetY = 0;
 		t.alpha = obj.$worldAlpha;
 		t.tint = obj.$worldTint;
+	}
+
+	private _adjustMaskPushClipPosition(
+		obj: DisplayObject,
+		inst: MaskPushInstruction,
+		transform: TransformState,
+	): void {
+		if (!inst.isScrollRect || !obj.$scrollRect) return;
+		// The content matrix includes the viewport's scroll offset; its clip does not.
+		const rect = obj.$scrollRect;
+		transform.tx += transform.a * rect.x + transform.c * rect.y;
+		transform.ty += transform.b * rect.x + transform.d * rect.y;
 	}
 
 	private _hasGraphicsContent(obj: DisplayObject): boolean {
