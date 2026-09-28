@@ -2,7 +2,7 @@
  * Slider (SliderBase / HSlider / VSlider) regression tests.
  *
  * Covers the egret-parity fixes:
- * - default `maximum` is 10 (not 100)
+ * - default `maximum` follows Range at 100
  * - `Event.CHANGE` dispatched on interaction (track tap, thumb drag)
  * - `UIEvent.CHANGE_START` / `CHANGE_END` bracket the drag lifecycle
  * - `liveDragging` defaults to true; pendingValue defers commit when false
@@ -36,15 +36,15 @@ function handlers(s: HSlider | VSlider): {
 
 describe('Slider', () => {
 	describe('defaults', () => {
-		it('HSlider defaults to maximum=10 (egret parity)', () => {
+		it('HSlider inherits Range maximum=100', () => {
 			const s = new HSlider();
-			expect(s.maximum).toBe(10);
+			expect(s.maximum).toBe(100);
 			expect(s.minimum).toBe(0);
 		});
 
-		it('VSlider defaults to maximum=10', () => {
+		it('VSlider inherits Range maximum=100', () => {
 			const s = new VSlider();
-			expect(s.maximum).toBe(10);
+			expect(s.maximum).toBe(100);
 		});
 
 		it('liveDragging defaults to true', () => {
@@ -97,7 +97,7 @@ describe('Slider', () => {
 			s.addEventListener('change', () => count++);
 
 			handlers(s).trackDown(fakeTouch(100, 0));
-			expect(s.value).toBe(10); // thumbRange=80, x=100 → clamped to max
+			expect(s.value).toBe(100); // thumbRange=80, x=100 → clamped to max
 			expect(count).toBe(1);
 
 			// Same position → no change → no extra CHANGE.
@@ -182,11 +182,11 @@ describe('Slider', () => {
 			s.track = track;
 			s.thumb = thumb;
 
-			// thumbRange = 100 - 20 = 80; range = 10 - 0 = 10
-			// x=0 → value 0; x=80 → value 10; x=40 → value 5
+			// thumbRange = 100 - 20 = 80; range = 100 - 0 = 100
+			// x=0 → value 0; x=80 → value 100; x=40 → value 50
 			expect(handlers(s).pointToValue(0, 0)).toBe(0);
-			expect(handlers(s).pointToValue(80, 0)).toBe(10);
-			expect(handlers(s).pointToValue(40, 0)).toBe(5);
+			expect(handlers(s).pointToValue(80, 0)).toBe(100);
+			expect(handlers(s).pointToValue(40, 0)).toBe(50);
 		});
 	});
 

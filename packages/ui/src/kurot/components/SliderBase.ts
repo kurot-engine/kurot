@@ -33,13 +33,6 @@ export class SliderBase extends Range {
 	 */
 	private readonly _scratchPoint = new Point();
 
-	// ── Constructor ───────────────────────────────────────────────────────
-
-	public constructor() {
-		super();
-		this.maximum = 10;
-	}
-
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
 	public get direction(): string {

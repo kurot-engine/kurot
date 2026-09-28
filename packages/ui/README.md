@@ -179,8 +179,8 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 | `ToggleButton` | Base for toggle-style buttons.                                              |
 | `ToggleSwitch` | Binary on/off switch (visual variant of `ToggleButton`).                    |
 | `ProgressBar`  | Value indicator. Inject `thumb` (a `Component`) as the fill part.           |
-| `HSlider`      | Horizontal slider. Inject `thumb` and `track` skin parts.                   |
-| `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts.                     |
+| `HSlider`      | Horizontal slider. Inject `thumb` and `track` skin parts; default range 0–100. |
+| `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts; default range 0–100.   |
 | `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`. |
 | `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`. |
 
