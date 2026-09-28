@@ -51,6 +51,42 @@ describe('KUI XML serialization', () => {
 		expect(serializeUIDocument(document)).toBe(source);
 	});
 
+	it('round-trips list data providers as nested ArrayCollection objects', () => {
+		const source = `<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.MenuSkin">
+    <List id="menu" itemRendererSkinName="skins.MenuItemSkin">
+        <layout>
+            <VerticalLayout gap="4" />
+        </layout>
+        <ArrayCollection>
+            <Array>
+                <Object label="开始" selected="true" />
+                <Object label="设置" selected="false" />
+            </Array>
+        </ArrayCollection>
+    </List>
+</Skin>
+`;
+		const document = parseUIDocument(source);
+		expect(document.root.children[0]?.properties.dataProvider).toEqual({
+			type: 'kui.ArrayCollection',
+			properties: { source: [{ label: '开始', selected: true }, { label: '设置', selected: false }] },
+		});
+		expect(serializeUIDocument(document)).toBe(source);
+	});
+
+	it('rejects malformed nested list data rather than treating it as a visual child', () => {
+		const source = `<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.MenuSkin">
+    <List id="menu">
+        <ArrayCollection><Array><Label text="wrong" /></Array></ArrayCollection>
+    </List>
+</Skin>`;
+		expect(() => parseUIDocument(source)).toThrow(/<Array> accepts only <Object \/> items/);
+		expect(() => parseUIDocument(source.replace('<Label text="wrong" />', '<Object token="@token:color:primary" />')))
+			.toThrow(/must be a scalar attribute/);
+	});
+
 	it('serializes catalog color properties as readable hexadecimal values', () => {
 		const document = createUIDocument({
 			id: 'skins.ColorSkin',

@@ -31,6 +31,20 @@ describe('KUI Skin compiler', () => {
 		expect(generated).toContain('new State("down", [new SetProperty("__kui_node_0_0", "alpha", 0.8)])');
 	});
 
+	it('constructs an ArrayCollection for a List data provider', () => {
+		const source = `<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.MenuSkin">
+	<List id="menu" itemRendererSkinName="skins.MenuItemSkin">
+		<ArrayCollection><Array><Object label="Start" /><Object label="Settings" /></Array></ArrayCollection>
+	</List>
+</Skin>`;
+		const generated = generateCode(parseKUISkin(source));
+		expect(generated).toContain('new ArrayCollection()');
+		expect(generated).toContain('source = [{"label":"Start"},{"label":"Settings"}]');
+		expect(generated).toContain('menu.dataProvider =');
+		expect(generated).toContain('menu.itemRendererSkinName = "skins.MenuItemSkin";');
+	});
+
 	it('resolves project component namespaces without EUI aliases', () => {
 		const source = `
 <Skin xmlns="https://kurot.dev/ui/1" xmlns:game="https://kurot.dev/components/game"

@@ -75,6 +75,28 @@ generic object form:
 supported. The parser converts this syntax to the internal serializable layout
 descriptor used by the editor and runtime.
 
+DataGroup, List, TabBar, and ComboBox can declare a data provider with an
+`ArrayCollection` property element. Each `Object` contains scalar attributes;
+the serialized document stores them as an ArrayCollection descriptor rather
+than child display nodes:
+
+```xml
+<List itemRendererSkinName="skins.ItemRendererSkin">
+    <ArrayCollection>
+        <Array>
+            <Object label="First" value="1" />
+            <Object label="Second" value="2" />
+        </Array>
+    </ArrayCollection>
+    <layout>
+        <VerticalLayout gap="8" />
+    </layout>
+</List>
+```
+
+The item renderer skin belongs to each generated row. The collection and
+layout are independent properties of the container.
+
 ## Parts and states
 
 Every explicitly identified node inside the Skin is available as a skin

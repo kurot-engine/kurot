@@ -6,6 +6,7 @@ import { createKurotUIFoundationRegistry } from '../../catalog/kurot-ui-foundati
 import { compareStrings } from '../../shared/strings.js';
 import type { XMLElement } from './xml-parser.js';
 import { decodeXMLValue, encodeXMLValue, escapeXML } from './xml-values.js';
+import { parseArrayCollection, serializeArrayCollection, supportsArrayCollection } from './xml-array-collection.js';
 
 const RESERVED_ATTRIBUTES = new Set(['id', 'xmlns']);
 const FOUNDATION_COMPONENTS = createKurotUIFoundationRegistry();
@@ -56,17 +57,20 @@ export function serializeNode(
 ): string[] {
 	const indent = '    '.repeat(depth);
 	const tag = componentTag(node.type);
-	const { attributes, layout } = serializeNodeMetadata(node, states, true);
+	const { attributes, layout, dataProvider } = serializeNodeMetadata(node, states, true);
 
 	const attributeSuffix = attributes.length === 0 ? '' : ` ${attributes.join(' ')}`;
 
-	if (layout === undefined && node.children.length === 0) {
+	if (layout === undefined && dataProvider === undefined && node.children.length === 0) {
 		return [`${indent}<${tag}${attributeSuffix} />`];
 	}
 
 	const lines = [`${indent}<${tag}${attributeSuffix}>`];
 	if (layout !== undefined) {
 		lines.push(...serializeLayout(layout, depth + 1));
+	}
+	if (dataProvider !== undefined) {
+		lines.push(...serializeArrayCollection(dataProvider, depth + 1));
 	}
 	for (const child of node.children) {
 		lines.push(...serializeNode(child, depth + 1, states));
@@ -144,6 +148,13 @@ export function parseNode(element: XMLElement, context: XMLNodeParseContext, pat
 				throw new Error(`<${element.name}> contains duplicate layout metadata.`);
 			}
 			properties.layout = parseLayout(child);
+		} else if (child.name === 'ArrayCollection' && supportsArrayCollection(type)) {
+			if (properties.dataProvider !== undefined) {
+				throw new Error(`<${element.name}> contains duplicate dataProvider metadata.`);
+			}
+			properties.dataProvider = parseArrayCollection(child);
+		} else if (child.name === 'ArrayCollection') {
+			throw new Error(`<${element.name}> does not support ArrayCollection dataProvider metadata.`);
 		} else if (child.name === 'properties' || child.name === 'instance') {
 			throw new Error(`<${child.name}> is not Skin XML syntax.`);
 		} else {
@@ -176,10 +187,11 @@ function serializeNodeMetadata(
 	node: UINode,
 	states: Readonly<Record<string, UIStateDefinition>>,
 	includeId: boolean,
-): { attributes: string[]; layout?: UIPropertyValue } {
+): { attributes: string[]; layout?: UIPropertyValue; dataProvider?: UIPropertyValue } {
 	const attributes = includeId && !isSyntheticNodeId(node.id) ? [`id="${escapeXML(node.id)}"`] : [];
 	const stateProperties = new Set<string>();
 	let layout: UIPropertyValue | undefined;
+	let dataProvider: UIPropertyValue | undefined;
 
 	if (node.appearance !== undefined || node.instance !== undefined) {
 		throw new Error('Skin XML nodes do not serialize semantic asset composition metadata.');
@@ -188,6 +200,10 @@ function serializeNodeMetadata(
 	for (const [name, value] of sortedEntries(node.properties)) {
 		if (name === 'layout') {
 			layout = value;
+			continue;
+		}
+		if (name === 'dataProvider' && supportsArrayCollection(node.type) && typeof value === 'object') {
+			dataProvider = value;
 			continue;
 		}
 		if (name.includes('.')) {
@@ -226,7 +242,7 @@ function serializeNodeMetadata(
 		}
 	}
 
-	return layout === undefined ? { attributes } : { attributes, layout };
+	return { attributes, ...(layout === undefined ? {} : { layout }), ...(dataProvider === undefined ? {} : { dataProvider }) };
 }
 
 function serializeLayout(value: UIPropertyValue, depth: number): string[] {

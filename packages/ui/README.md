@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.1.2.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.1.3.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -183,6 +183,9 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 | `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts; default range 0–100.   |
 | `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`. |
 | `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`. |
+
+Both sliders inherit Range's default `minimum = 0` and `maximum = 100`.
+Set either bound explicitly when a control needs a different range.
 
 ### Text Input
 

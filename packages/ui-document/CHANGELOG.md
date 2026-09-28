@@ -4,6 +4,20 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.6.5] — 2026-09-29
+
+### Added
+
+- KUI Skin XML now reads and writes data sources for DataGroup, List, TabBar,
+  and ComboBox using `<ArrayCollection><Array><Object ... /></Array></ArrayCollection>`.
+  Object attributes become scalar fields in a semantic ArrayCollection
+  descriptor, which the CLI can compile into a runtime `ArrayCollection`.
+
+### Changed
+
+- Malformed ArrayCollection property elements and non-scalar item fields are
+  rejected during XML parsing or serialization instead of being silently lost.
+
 ## [0.6.4] — 2026-09-22
 
 ### Added

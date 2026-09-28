@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.6.4`. This is a headless,
+Package identity: `@kurot/ui-document@0.6.5`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -116,6 +116,10 @@ src/
   application UI.
 - `kui.*` is canonical. Authored Skin files use `.kui.xml`; do not add EXML or
   JSON compatibility paths.
+- DataGroup, List, TabBar, and ComboBox use an `<ArrayCollection><Array>`
+  property element with scalar `<Object />` items for `dataProvider`; this is
+  semantic data, not a tree of display children. DataGroup/List/TabBar also
+  accept a separate container `<layout>` property element.
 - `Image.source` and `Button.icon` use typed image/sprite-frame references.
   Audited colors and layout measurements accept appropriate design tokens.
 - `Label.fontFamily` accepts either a CSS font-family string or a registered

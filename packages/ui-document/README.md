@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.6.4.** KUI XML is the canonical authored format. The
+> **Current release: 0.6.5.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -62,6 +62,23 @@ authored `id`. Fixed and percentage sizes use the same XML attributes:
 `width="320"` is fixed while `width="100%"` is relative to the parent. The
 semantic model retains separate `width` and `percentWidth` properties so
 editing and runtime layout do not mix unlike units in one value.
+
+Data-driven controls can author a collection as a child property element:
+
+```xml
+<List itemRendererSkinName="skins.ItemRendererSkin">
+    <ArrayCollection>
+        <Array>
+            <Object label="First" value="1" />
+            <Object label="Second" value="2" />
+        </Array>
+    </ArrayCollection>
+</List>
+```
+
+The `ArrayCollection` element maps to `dataProvider`; its `Object` attributes
+become scalar fields. DataGroup, List, TabBar, and ComboBox support this XML
+form. A Group layout remains a separate `<layout>` child property.
 
 ## Current capabilities
 

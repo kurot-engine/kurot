@@ -4,6 +4,17 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.1.3] — 2026-09-29
+
+### Fixed
+
+- HSlider and VSlider now inherit Range's default `maximum` of 100 instead of
+  overriding it to 10. Explicit slider bounds continue to take precedence.
+
+### Tests
+
+- Updated slider regressions to cover the shared 0–100 default range.
+
 ## [2.1.2] — 2026-09-26
 
 ### Fixed
