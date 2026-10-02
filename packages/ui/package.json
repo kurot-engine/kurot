@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui",
-	"version": "2.1.3",
+	"version": "2.1.4",
 	"description": "EUI-compatible UI component framework for the Kurot game engine — skin-based components, layouts, data binding, view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -16,6 +16,7 @@
 	},
 	"files": [
 		"dist/**/*",
+		"CHANGELOG.md",
 		"LICENSE"
 	],
 	"scripts": {

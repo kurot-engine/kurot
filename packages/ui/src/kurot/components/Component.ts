@@ -545,7 +545,7 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		if (!skin) return;
 
 		const bounds = new Rectangle();
-		this.getPreferredBounds(bounds);
+		this.ui.getUnscaledPreferredBounds(bounds);
 		let mw = bounds.width;
 		let mh = bounds.height;
 

@@ -470,6 +470,13 @@ export class UIState {
 		this._applyMatrix(bounds, w, h);
 	}
 
+	/**
+	 * Owner measurement uses local dimensions; its transform belongs to the parent layout.
+	 */
+	public getUnscaledPreferredBounds(bounds: Rectangle): void {
+		bounds.setTo(0, 0, this._preferredUWidth(), this._preferredUHeight());
+	}
+
 	public getPreferredBounds(bounds: Rectangle): void {
 		this._applyMatrix(bounds, this._preferredUWidth(), this._preferredUHeight());
 	}

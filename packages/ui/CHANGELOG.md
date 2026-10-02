@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [2.1.4] — 2026-10-02
+
+### Fixed
+
+- Keep auto-sized skin measurements in the host's local coordinates. Scale,
+  rotation and skew now affect layout bounds once, rather than shrinking or
+  expanding the measured dimensions before applying the transform again.
+
+### Tests
+
+- Add regressions for implicit skin sizing, negative/enlarged scales, transform
+  changes, skin limits and explicit host dimensions.
+
 ## [2.1.3] — 2026-09-29
 
 ### Fixed

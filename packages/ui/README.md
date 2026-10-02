@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.1.3.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.1.4.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -74,6 +74,11 @@ invalidateProperties / invalidateSize / invalidateDisplayList
   → validateSize        (deep → shallow,  measure)
   → validateDisplayList (shallow → deep,  updateDisplayList)
 ```
+
+Auto-sized skinnable components measure their skins in the component's local
+coordinates. Scaling, rotation, and skew affect the bounds seen by the parent
+layout once; they do not alter the component's measured width and height.
+Explicit dimensions and skin minimum/maximum dimensions also use local units.
 
 ### Skin system
 

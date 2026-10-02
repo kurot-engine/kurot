@@ -9,9 +9,9 @@
 		"clean": "kurot clean"
 	},
 	"dependencies": {
-		"@kurot/core": "^1.0.12"
+		"@kurot/core": "^1.0.28"
 	},
 	"devDependencies": {
-		"@kurot/cli": "^2.0.0"
+		"@kurot/cli": "^2.0.2"
 	}
 }

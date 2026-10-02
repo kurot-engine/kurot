@@ -6,7 +6,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@2.1.3`, EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@2.1.4`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 
@@ -82,6 +82,10 @@ skin)` signature, but `Group._commitCurrentState()` passes `this` cast
 - **Reading `.width`/`.height` can force a synchronous layout pass.**
   `getWidth()/getHeight()` call `_validateSizeNow()` before returning — this
   therefore a getter may perform layout work before returning.
+- `Component.measure()` reads `UIState.getUnscaledPreferredBounds()` so skin
+  measurement stays in component-local units. Its own scale/rotation/skew must
+  affect parent layout bounds only; using transformed preferred bounds here
+  applies the transform twice to implicitly sized skins.
 - Anchor/percent constraints (`left`/`right`/`percentWidth`, etc.) have zero
   effect until the component is added to a `Group` that has a `layout`
   assigned. Setting them on a standalone/unparented component is a no-op.
