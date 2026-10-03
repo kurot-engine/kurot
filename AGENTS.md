@@ -119,6 +119,6 @@ Kurot/
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
 ├── packages/          The 6 packages above, each with its own docs/ + docs-internal/
 ├── tools/             Private repository tooling, including the Agent evaluation harness
-├── examples/          demo and my-game (CLI-scaffolded KUI XML project)
+├── examples/          demo and game (CLI-scaffolded KUI XML project)
 └── reference/         Local read-only reference sources — not distributed via git
 ```

@@ -3,6 +3,7 @@ node_modules/
 .pnpm-store/
 
 # Generated build artifacts
+.kurot/
 dist/
 build/
 packages/core/examples/benchmark/dist/

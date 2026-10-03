@@ -1,7 +1,7 @@
 /**
  * Skin alignment regression tests.
  *
- * Verifies that the skins and component APIs from the my-game / CLI templates
+ * Verifies that the skins and component APIs from the game example / CLI templates
  * are aligned:
  * - complete skin part sets are available during Component skin lifecycle
  * - state changes apply SetProperty (ToggleSwitch knob slides)
@@ -95,7 +95,7 @@ function makePanelSkin(): Skin {
 	return skin;
 }
 
-describe('skin alignment (my-game / cli template)', () => {
+describe('skin alignment (game example / cli template)', () => {
 	it('keeps parts in the centralized skin map and runs batch lifecycle hooks in order', () => {
 		class LifecycleComponent extends Component {
 			public readonly calls: string[] = [];

@@ -219,7 +219,7 @@ are mapped through `ui.namespaces` or discovered through `ui.components` in
 ## Examples
 
 - [`examples/demo`](examples/demo/): a minimal CLI-built rendering and engine integration example.
-- [`examples/my-game`](examples/my-game/): a CLI-built game project example with KUI XML skins.
+- [`examples/game`](examples/game/): a CLI-built game project example with KUI XML skins.
 
 ## Repository layout
 

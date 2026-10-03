@@ -9,12 +9,12 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^1.0.28
-        version: 1.0.28
+        specifier: ^2.0.0
+        version: 2.0.0
     devDependencies:
       '@kurot/cli':
-        specifier: ^2.0.2
-        version: 2.0.2
+        specifier: ^3.0.0
+        version: 3.0.0
 
 packages:
 
@@ -174,15 +174,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@kurot/cli@2.0.2':
-    resolution: {integrity: sha512-194jUwnqMiq+NoUpC6LubeXX2XUg3Z9LNl3OnfLN02UkyepKAWIjvOHS9KT2H0jXAnia3YLOpmsOqZrBa7E6uw==}
+  '@kurot/cli@3.0.0':
+    resolution: {integrity: sha512-ZBvKVjJceNpRKOK6Hi5lN1UJefV69hBY76KgxLeQ5BBiSx7iwiACPOHVjJ7lRZRkV+jityRWDBPYmxXvbhPYzQ==}
     hasBin: true
 
-  '@kurot/core@1.0.28':
-    resolution: {integrity: sha512-uUqvU4nUgsd8pwYkVeLd+Wmpset3RsJ8PBWovror1/FSVB95C1dLUqB5EA8DpqPwHz9O9frpoqyRwrb09km6qw==}
+  '@kurot/core@2.0.0':
+    resolution: {integrity: sha512-uOE6KXSoEdBVYifB30r7KG0eiEr8u/kd6DDEeuCltjVbUDnUCjzI7y6ol+Z2EKoKI+wOeBXULqfsj0UN93hJrA==}
 
-  '@kurot/ui-document@0.6.5':
-    resolution: {integrity: sha512-1aJifelsccAxC0mXLQgXJkLL/rGKPzXNh5w0byBNYxG8O8sWSVtUoOEeJ8KsOKXtbDoSe9mlUx/4vLb0uumyVA==}
+  '@kurot/ui-document@0.7.0':
+    resolution: {integrity: sha512-bmHdzLehYlHsHDzTRObYEmaYNBXqmEsh6ugrzXOTr0jhIM+O1xkuiqcGwgOqrvzCoZwN2VyWafG3FrnXKkvVEA==}
 
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
@@ -273,15 +273,15 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@kurot/cli@2.0.2':
+  '@kurot/cli@3.0.0':
     dependencies:
-      '@kurot/ui-document': 0.6.5
+      '@kurot/ui-document': 0.7.0
       commander: 13.1.0
       esbuild: 0.25.12
 
-  '@kurot/core@1.0.28': {}
+  '@kurot/core@2.0.0': {}
 
-  '@kurot/ui-document@0.6.5': {}
+  '@kurot/ui-document@0.7.0': {}
 
   commander@13.1.0: {}
 

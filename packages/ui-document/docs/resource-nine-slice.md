@@ -84,8 +84,8 @@ resource/component watch builds are serialized.
 
 The CLI and ui-runtime manifests now require ui-document `^0.7.0`. UI 3.0.0,
 game 2.0.0, and ui-runtime 0.6.0 require Core `^2.0.0`. ui-runtime also
-requires UI `^3.0.0`. Engine examples still lock Core 1.0.28 and CLI 2.0.2, so refresh
-their dependencies after publication when they should demonstrate this format.
+requires UI `^3.0.0`. Engine examples use Core 2.0.0 and CLI 3.0.0;
+`examples/game` also uses UI 3.0.0 and game 2.0.0.
 The Editor currently uses local `file:` engine packages for integration
 verification; replace those pins with published versions when releasing.
 
