@@ -10,6 +10,10 @@ const REFERENCE_PATTERN = /^@token:/;
  * Encodes a scalar or reference value for an XML attribute.
  */
 export function encodeXMLValue(value: UIPropertyValue, definition?: UIPropertyDefinition): string | undefined {
+	if (definition?.valueType === 'string') {
+		return typeof value === 'string' ? value : undefined;
+	}
+
 	if (typeof value === 'number' && definition?.format === 'color') {
 		return `#${value.toString(16).padStart(6, '0').toUpperCase()}`;
 	}
@@ -35,6 +39,10 @@ export function encodeXMLValue(value: UIPropertyValue, definition?: UIPropertyDe
  * Decodes the canonical scalar and reference attribute syntax.
  */
 export function decodeXMLValue(source: string, definition?: UIPropertyDefinition): UIPropertyValue {
+	if (definition?.valueType === 'string') {
+		return source;
+	}
+
 	if (source.startsWith('\\')) return source.slice(1);
 	const color = definition?.format === 'color' ? HEX_COLOR_PATTERN.exec(source) : undefined;
 	if (color?.[1] !== undefined) return Number.parseInt(color[1], 16);

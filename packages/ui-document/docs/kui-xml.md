@@ -30,16 +30,30 @@ PascalCase tags. Project component types use an XML namespace prefix;
 
 ## Values
 
-Primitive node properties are attributes. Unescaped `true` and `false` are
-booleans and numeric literals are numbers. A string that looks like one of
-those values starts with `\`; the parser removes that escape. Resource
-properties use their keys directly; design tokens stay explicit:
+Primitive node properties are attributes. Schema-defined string properties,
+including `text`, `label` and their state overrides, contain literal strings:
+`text="100.80"` retains the decimal formatting, and `text="false"` is text.
+No backslash type escape is added or removed for these properties. XML entities
+such as `&amp;` and `&quot;` still escape XML syntax.
+
+Other property types retain scalar inference: `true` and `false` are booleans,
+and numeric literals are numbers. Schema-free ArrayCollection Object attributes
+and union-valued properties still use a leading `\` for strings that would
+otherwise be interpreted as another type. Resource properties use their keys
+directly; design tokens stay explicit:
 
 ```xml
 <Image id="logo" source="ui.logo" />
 <Rect id="background" fillColor="#121D30" />
 <Rect id="accent" fillColor="@token:color:color.accent" />
+<Label id="amount" text="100.80" size="48" />
 ```
+
+This literal-string rule is a breaking change in 0.8.0. Earlier generated
+type escapes in string properties, such as `text="\100.80"`, now represent a
+literal backslash. Remove an old synthetic prefix explicitly when adopting the
+new parser; files are not automatically migrated. Editor and CLI must use the
+same parser contract.
 
 Catalog-defined color properties use canonical `#RRGGBB` notation. The parser
 also accepts `0xRRGGBB` when source is edited by hand; serialization normalizes

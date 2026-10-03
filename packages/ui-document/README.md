@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.7.0.** KUI XML is the canonical authored format. The
+> **Current release: 0.8.0.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -53,6 +53,13 @@ the corresponding `@kurot/ui` class.
 KUI XML serializes Skin documents only. Screen and reusable-component
 documents are programmatic semantic models and do not share the authored Skin
 file pipeline.
+
+Version 0.8.0 treats schema-defined string attributes as literal text.
+For example, `<Label text="100.80" size="48" />` retains the text `100.80` and
+the numeric font size. String properties no longer need backslash type escapes;
+existing synthetic prefixes become literal backslashes. Adopt this contract in
+both Editor and CLI, and remove old prefixes explicitly. XML entities and typed
+collection fields retain their existing rules. See [KUI XML values](docs/kui-xml.md#values).
 
 The authored `<Skin>` element is the visual root container: root size and
 layout properties are written on it, and visual nodes are direct children.
@@ -290,7 +297,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.6.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.7.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition

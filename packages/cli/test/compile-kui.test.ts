@@ -18,6 +18,21 @@ afterEach(async () => {
 });
 
 describe('compile KUI', () => {
+	it('emits exact literal text with typed numbers and native state overrides', async () => {
+		const xml =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="AmountSkin" states="down"><Label id="amount" text="100.80" text.down="false" size="48" /><Button id="button" label="true" enabled="false" /></Skin>';
+		const { context, root, outputDirectory } = await createFixture([xml]);
+		await compileKUI().apply(context);
+		const script = await fs.readFile(path.join(outputDirectory, 'js/default.thm.js'), 'utf8');
+
+		expect(script).toContain('amount.text = "100.80"');
+		expect(script).toContain('amount.size = 48');
+		expect(script).toContain('new SetProperty("amount", "text", "false")');
+		expect(script).toContain('button.label = "true"');
+		expect(script).toContain('button.enabled = false');
+		expect(await fs.readFile(path.join(root, 'resource/ui/Document0.kui.xml'), 'utf8')).toBe(xml);
+	});
+
 	it('reads resource defaults on each build and retains the last good bundle on invalid manifests', async () => {
 		const xml = '<Skin xmlns="https://kurot.dev/ui/1" class="Test"><Image id="image" source="panel"/></Skin>';
 		const { context, root, outputDirectory } = await createFixture([xml]);

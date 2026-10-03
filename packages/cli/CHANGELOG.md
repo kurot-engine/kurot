@@ -3,7 +3,30 @@
 All notable changes to `@kurot/cli` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and CLI command/configuration APIs follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
+format changes are documented explicitly in each release.
+
+## 3.0.1 — 2026-10-04
+
+### XML Authoring Change
+
+- Require `@kurot/ui-document@^0.8.0`. Schema-defined string attributes,
+  including `text`, `label` and state text, now compile as literal strings.
+  `text="100.80"` preserves its decimal formatting; `text="false"` stays text.
+  Old synthetic backslash type escapes are now literal characters and must be
+  removed explicitly. No automatic source migration is performed.
+
+### Changed
+
+- Align the compiler dependency and lockfile with the published document kernel.
+  Numeric/boolean properties, references, XML entities and schema-free collection
+  scalar inference retain their existing rules. Generated Skin APIs are unchanged.
+
+### Tests
+
+- Verify literal text, state text, real backslashes and typed properties through
+  parsing, code generation and the emitted theme bundle.
 
 ## 3.0.0 — 2026-10-03
 

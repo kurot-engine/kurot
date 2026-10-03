@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 3.0.0.** Node.js 20 or later is required.
+> **Current release: 3.0.1.** Node.js 20 or later is required.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
 > Existing game projects that use EXML, including CrashMaster, should remain on
@@ -25,7 +25,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@2`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.0.1`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -133,6 +133,15 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
+Version 3.0.1 uses `@kurot/ui-document@^0.8.0` and its literal-string XML rules.
+For example, `<Label text="100.80" text.down="false" size="48" />` compiles
+the exact strings `100.80` and `false`, while the font size stays numeric.
+String properties no longer add or remove backslash type escapes. Remove old
+synthetic prefixes such as the one in `text="\100.80"` explicitly; real
+backslashes remain text. XML entities and typed collection data retain their
+existing rules. Source files are not migrated automatically. Editor and CLI
+must adopt the same [XML value contract](../ui-document/docs/kui-xml.md#values).
+
 The pipeline is:
 
 ```text
@@ -159,8 +168,9 @@ src/components/<path>/<Name>.ts
 resource/ui/components/<path>/<Name>Skin.kui.xml
 ```
 
-The TypeScript module must export `<Name>`. The paired skin must target
-`<namespace>.<Name>`. The CLI exposes the component as `<namespace>:<Name>` in
+The TypeScript module must export `<Name>`. The paired skin declares its generated
+class with `class`, for example `class="skins.ActionCardSkin"`; the source/skin
+pair supplies the host association. The CLI exposes the component as `<namespace>:<Name>` in
 KUI XML, refreshes the namespace bundle, and emits development catalog data at
 `.kurot/component-catalog.json`.
 
@@ -193,7 +203,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. This release requires `@kurot/ui-document@^0.7.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.8.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.

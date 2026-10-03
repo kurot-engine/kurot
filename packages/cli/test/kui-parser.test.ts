@@ -9,6 +9,18 @@ import { generateCode, parseKUISkin } from '../src/core/kui/index.js';
 const TEMPLATE_DIRECTORY = fileURLToPath(new URL('../templates/game/resource/ui/skins/', import.meta.url));
 
 describe('KUI Skin compiler', () => {
+	it('compiles literal component text without backslash type escapes', () => {
+		const source = String.raw`<Skin xmlns="https://kurot.dev/ui/1" class="Test" states="down"><Label id="lblWin" text="100.80" text.down="false" size="48" /><Button id="button" label="true" enabled="false" /><Label id="path" text="\folder" /></Skin>`;
+		const generated = generateCode(parseKUISkin(source));
+
+		expect(generated).toContain('lblWin.text = "100.80";');
+		expect(generated).toContain('lblWin.size = 48;');
+		expect(generated).toContain('new SetProperty("lblWin", "text", "false")');
+		expect(generated).toContain('button.label = "true";');
+		expect(generated).toContain('button.enabled = false;');
+		expect(generated).toContain(String.raw`path.text = "\\folder";`);
+	});
+
 	it('compiles inherited rectangles, local overrides and state-only grids with a core import', () => {
 		const source =
 			'<Skin xmlns="https://kurot.dev/ui/1" class="Test" states="down,ordinary"><Image id="image" source="plain" source.down="atlas.panel" source.ordinary="plain"/><Image id="local" source="panel" scale9Grid="1,1,2,2"/><Image id="off" source="panel" scale9Grid="false"/></Skin>';

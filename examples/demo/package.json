@@ -12,6 +12,6 @@
 		"@kurot/core": "^2.0.0"
 	},
 	"devDependencies": {
-		"@kurot/cli": "^3.0.0"
+		"@kurot/cli": "^3.0.1"
 	}
 }

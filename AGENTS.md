@@ -12,9 +12,9 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/core`      | 2.0.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it. | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)           |
 | `@kurot/ui`        | 3.0.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                    | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)               |
 | `@kurot/game`      | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                              | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)           |
-| `@kurot/cli`       | 3.0.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                         | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
-| `@kurot/ui-document` | 0.7.0 | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime` | 0.6.0 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
+| `@kurot/cli`       | 3.0.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                         | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)             |
+| `@kurot/ui-document` | 0.8.0 | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
+| `@kurot/ui-runtime` | 0.7.0 | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                           | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
@@ -34,8 +34,11 @@ Dependency direction is strictly one-way:
  └─ @kurot/core
 ```
 
-UI 3.0, game 2.0, and ui-runtime 0.6 require Core 2.x; ui-runtime also
-requires UI 3.x. Core 2.0 and CLI 3.0 reject comma-separated sheet `subkeys`
+UI 3.0, game 2.0, and ui-runtime 0.7 require Core 2.x; ui-runtime also
+requires UI 3.x. CLI 3.0.1 and ui-runtime 0.7 require ui-document 0.8.x.
+Schema-defined XML strings are literal: remove old synthetic backslash type
+escapes explicitly; Editor and CLI must adopt the same parser contract.
+Core 2.0 and CLI 3.0+ reject comma-separated sheet `subkeys`
 in resource manifests. Refresh legacy sheets in the Editor before upgrading KUI projects;
 see [`packages/ui-document/docs/resource-nine-slice.md`](packages/ui-document/docs/resource-nine-slice.md).
 

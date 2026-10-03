@@ -1,10 +1,10 @@
 # Resource default nine-slice grids
 
 This is a **breaking resource format change**. The
-coordinated versions are Core 2.0.0, UI 3.0.0, game 2.0.0, CLI 3.0.0,
-ui-document 0.7.0, and ui-runtime 0.6.0. All six packages are published at
+current versions are Core 2.0.0, UI 3.0.0, game 2.0.0, CLI 3.0.1,
+ui-document 0.8.0, and ui-runtime 0.7.0. All six packages are published at
 those versions.
-CLI and ui-runtime require ui-document 0.7.0. UI's Rectangle setter needs no new API.
+CLI and ui-runtime require ui-document `^0.8.0`. UI's Rectangle setter needs no new API.
 
 ## Authored configuration
 
@@ -82,12 +82,11 @@ consumes that opt-out. A failed manifest rebuild retains the last good Skin
 bundle in watch mode. Manifest edits rebuild all dependent Skin factories;
 resource/component watch builds are serialized.
 
-The CLI and ui-runtime manifests now require ui-document `^0.7.0`. UI 3.0.0,
-game 2.0.0, and ui-runtime 0.6.0 require Core `^2.0.0`. ui-runtime also
-requires UI `^3.0.0`. Engine examples use Core 2.0.0 and CLI 3.0.0;
+The CLI and ui-runtime manifests now require ui-document `^0.8.0`. UI 3.0.0,
+game 2.0.0, and ui-runtime 0.7.0 require Core `^2.0.0`. ui-runtime also
+requires UI `^3.0.0`. Engine examples use Core 2.0.0 and CLI 3.0.1;
 `examples/game` also uses UI 3.0.0 and game 2.0.0.
-The Editor currently uses local `file:` engine packages for integration
-verification; replace those pins with published versions when releasing.
+The Editor uses the published ui-document 0.8.0, ui-runtime 0.7.0, and CLI 3.0.1.
 
 All six coordinated releases are published. All downstream package lockfiles
 now resolve the coordinated dependency versions.

@@ -4,6 +4,24 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.8.0] — 2026-10-04
+
+### Breaking Changes
+
+- Schema-defined string XML properties now read and write literal text without
+  backslash type escapes. Numeric-looking text preserves its spelling, including
+  trailing zeroes; boolean and reference-looking text remains text. Previous
+  synthetic prefixes in string properties are now literal backslashes and must
+  be removed explicitly. No automatic file migration is performed.
+- Numeric, boolean, resource, token and schema-free collection data retain their
+  existing rules. XML entity escaping is unchanged. Editor and CLI consumers must
+  adopt the same parser version.
+
+### Tests
+
+- Added literal string, state text, XML entity, backslash and typed collection
+  regressions; verified downstream KUI code generation.
+
 ## [0.7.0] — 2026-10-03
 
 ### Breaking Changes

@@ -133,7 +133,7 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.6.x` consumes format version 2 and passes the shared
+`@kurot/ui-runtime@0.7.x` consumes format version 2 and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, executes bounded data bindings and semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected

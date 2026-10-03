@@ -4,6 +4,26 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.7.0] — 2026-10-04
+
+### Breaking
+
+- Require `@kurot/ui-document@^0.8.0` in peer and development dependencies.
+  Callers parsing KUI XML adopt literal string attributes: numeric-looking and
+  boolean-looking text no longer needs a backslash type escape. Previous
+  synthetic prefixes become literal characters; remove them explicitly.
+
+### Changed
+
+- Align the development lockfile with the published document kernel. Runtime
+  APIs, materialization, state restoration and disposal are unchanged; Core 2.x
+  and UI 3.x remain the required engine versions.
+
+### Tests
+
+- Verify XML-parsed literal strings materialize exactly into native Labels,
+  including native appearance state changes and restoration.
+
 ## [0.6.0] — 2026-10-03
 
 ### Added

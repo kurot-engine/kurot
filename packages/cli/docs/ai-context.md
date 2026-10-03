@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.0.0`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.0.1`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -38,6 +38,12 @@ and layout apply to the runtime Skin, and its direct visual children become
 `skin.elementsContent` without an extra Group. Overrides use local
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
+
+CLI 3.0.1 requires `@kurot/ui-document@^0.8.0`. Schema-defined strings, including
+numeric/boolean-looking text and state text, are literal attributes without
+backslash type escaping. Old synthetic prefixes become literal characters;
+do not migrate them silently. Numeric/boolean properties and schema-free
+collection fields retain their existing rules.
 
 The theme JSON at `resource/default.thm.json` is fixed generated output. It is
 derived from built-in naming conventions and configured project component

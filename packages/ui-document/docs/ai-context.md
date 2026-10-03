@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.7.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.8.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -68,6 +68,11 @@ src/
 - Properties accept strings, booleans, finite numbers, arrays, and plain
   string-keyed objects. Undefined, null, functions, platform objects, cyclic
   values, and non-finite numbers are invalid.
+- XML changes in 0.8.0 treat schema-defined string properties
+  (`text`, `label`, state text) as literal strings without backslash type escaping.
+  Old synthetic prefixes become literal characters; do not migrate them silently.
+  Numeric/boolean properties and schema-free collection fields retain their types.
+  Editor and CLI must share this parser contract; see `docs/kui-xml.md`.
 - Tagged references use explicit records: `{ kind: 'asset', assetId }`,
   `{ kind: 'resource', resourceType, key }`, or
   `{ kind: 'token', tokenType, key }`.
@@ -160,7 +165,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.6.x` consumes format version 2 and executes the current
+- `@kurot/ui-runtime@0.7.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent

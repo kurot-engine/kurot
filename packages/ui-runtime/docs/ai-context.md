@@ -1,12 +1,17 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.6.0`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.7.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.7.0`, `@kurot/ui@^3.0.0`, and
+It peer-depends on `@kurot/ui-document@^0.8.0`, `@kurot/ui@^3.0.0`, and
 `@kurot/core@^2.0.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
+
+Document 0.8 XML string attributes are literal, including state text and
+numeric/boolean-looking strings. Materialize those values unchanged. The runtime
+does not parse or migrate XML; old synthetic escape prefixes must be removed
+explicitly by the author. See [KUI XML values](../../ui-document/docs/kui-xml.md#values).
 
 Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 
