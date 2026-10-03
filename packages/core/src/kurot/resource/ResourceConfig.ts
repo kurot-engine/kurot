@@ -12,8 +12,14 @@ export interface ResourceConfigEntry {
 	name: string;
 	type: string;
 	url: string;
-	subkeys?: string;
+	subkeys?: Readonly<Record<string, ResourceSubkeyConfig>>;
+	scale9grid?: string;
 	[key: string]: unknown;
+}
+
+export interface ResourceSubkeyConfig {
+	readonly scale9grid?: string;
+	readonly [key: string]: unknown;
 }
 
 export interface ResourceGroupEntry {
@@ -39,6 +45,9 @@ export class ResourceConfig {
 
 		const resources = data.resources;
 		if (resources) {
+			for (const item of resources) {
+				this.validateSubkeys(item);
+			}
 			for (const item of resources) {
 				let url: string = item.url;
 				if (url && !url.includes('://')) {
@@ -159,17 +168,34 @@ export class ResourceConfig {
 
 	// ── Private helpers ──────────────────────────────────────────────────────
 
+	private validateSubkeys(item: ResourceConfigEntry): void {
+		if (item.subkeys === undefined) return;
+		if (!item.subkeys || typeof item.subkeys !== 'object' || Array.isArray(item.subkeys)) {
+			throw new Error('Resource subkeys must be an object. Refresh this sheet in Kurot Editor.');
+		}
+		for (const [key, config] of Object.entries(item.subkeys)) {
+			if (
+				!key ||
+				key.trim() !== key ||
+				key.includes(',') ||
+				!config ||
+				typeof config !== 'object' ||
+				Array.isArray(config)
+			) {
+				throw new Error('Invalid resource subkey configuration.');
+			}
+		}
+	}
+
 	private addItemToKeyMap(item: ResourceConfigEntry): void {
-		if (!this.keyMap.has(item.name)) {
+		this.validateSubkeys(item);
+		const existing = this.keyMap.get(item.name);
+		if (!existing || existing.name !== item.name) {
 			this.keyMap.set(item.name, item);
 		}
-		if (item.subkeys) {
-			for (const rawKey of item.subkeys.split(',')) {
-				const key = rawKey.trim();
-				if (!key) continue;
-				if (!this.keyMap.has(key)) {
-					this.keyMap.set(key, item);
-				}
+		for (const key of Object.keys(item.subkeys ?? {})) {
+			if (!this.keyMap.has(key)) {
+				this.keyMap.set(key, item);
 			}
 		}
 	}

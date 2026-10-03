@@ -2,7 +2,7 @@
 
 Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Stable (1.0.6).** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 2.0.0.** Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
 
 ## Installation
 
@@ -11,6 +11,10 @@ pnpm add @kurot/game @kurot/core
 ```
 
 `@kurot/game` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
+
+Upgrade Core to 2.x together with game 2.x. Refresh old sheet manifests with
+string-valued `subkeys` in Kurot Editor before launch. See the
+[resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 

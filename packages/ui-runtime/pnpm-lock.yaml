@@ -9,14 +9,14 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^1.0.15
-        version: 1.0.15
-      '@kurot/ui':
         specifier: ^2.0.0
-        version: 2.0.0(@kurot/core@1.0.15)
+        version: 2.0.0
+      '@kurot/ui':
+        specifier: ^3.0.0
+        version: 3.0.0(@kurot/core@2.0.0)
       '@kurot/ui-document':
-        specifier: ^0.6.4
-        version: 0.6.4
+        specifier: ^0.7.0
+        version: 0.7.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -38,16 +38,16 @@ packages:
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
-  '@kurot/core@1.0.15':
-    resolution: {integrity: sha512-X7Z0D7xoepkDre1MP5UpUWlT0bsznwbHBmCZzRvK4myaqMDYzET3hxWyqFU6CH4sU6OcPTKoMA1wJXY6HJ5N0Q==}
+  '@kurot/core@2.0.0':
+    resolution: {integrity: sha512-uOE6KXSoEdBVYifB30r7KG0eiEr8u/kd6DDEeuCltjVbUDnUCjzI7y6ol+Z2EKoKI+wOeBXULqfsj0UN93hJrA==}
 
-  '@kurot/ui-document@0.6.4':
-    resolution: {integrity: sha512-PMMoMNEcDD1Y+SoYs0T0K88HFZRO8mgAAmi0rWOM29aAEHCzzfU6ewrLWmtTWtBRK9jcHR77NgvD4FWI5Y2jjg==}
+  '@kurot/ui-document@0.7.0':
+    resolution: {integrity: sha512-bmHdzLehYlHsHDzTRObYEmaYNBXqmEsh6ugrzXOTr0jhIM+O1xkuiqcGwgOqrvzCoZwN2VyWafG3FrnXKkvVEA==}
 
-  '@kurot/ui@2.0.0':
-    resolution: {integrity: sha512-tB/39mG9BfDBl3USxn+0TJS5mHh81tGbcugZjR7HsTyinPyVFx68gEgT8zOAfr534JHFvnduwXNhZmcdn2ubxw==}
+  '@kurot/ui@3.0.0':
+    resolution: {integrity: sha512-/S8le3Ga3cnQQy/x7U5j6sK9V7t4GKVhu7eSJVXau/RC+LqwlsFUm0ctcd5/ufLOLm7KSMlRFsIQczkVGl4w7A==}
     peerDependencies:
-      '@kurot/core': ^1.0.12
+      '@kurot/core': ^2.0.0
 
   '@oxc-project/types@0.147.0':
     resolution: {integrity: sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg==}
@@ -502,13 +502,13 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
-  '@kurot/core@1.0.15': {}
+  '@kurot/core@2.0.0': {}
 
-  '@kurot/ui-document@0.6.4': {}
+  '@kurot/ui-document@0.7.0': {}
 
-  '@kurot/ui@2.0.0(@kurot/core@1.0.15)':
+  '@kurot/ui@3.0.0(@kurot/core@2.0.0)':
     dependencies:
-      '@kurot/core': 1.0.15
+      '@kurot/core': 2.0.0
 
   '@oxc-project/types@0.147.0': {}
 

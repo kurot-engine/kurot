@@ -1,3 +1,4 @@
+import { createRectangle } from './descriptors/createRectangle.js';
 import type { DisplayObject } from '@kurot/core';
 import { Component, SetProperty, Skin, State } from '@kurot/ui';
 import { isSyntheticNodeId } from '@kurot/ui-document';
@@ -158,11 +159,14 @@ function createStates(appearance: UIDocument, context: KurotUICreationContext): 
 			const definition = appearance.contract.states[name];
 			const overrides = definition.overrides.map((override, index) => {
 				const targetId = override.targetId === appearance.root.id ? '' : override.targetId;
-				const value = resolvePropertyValue(
-					override.value,
-					`${basePath}.contract.states.${name}.overrides[${index}].value`,
-					context,
-				);
+				const valuePath = `${basePath}.contract.states.${name}.overrides[${index}].value`;
+				const resolved = resolvePropertyValue(override.value, valuePath, context);
+				const value =
+					override.property === 'scale9Grid'
+						? resolved === false
+							? undefined
+							: createRectangle(resolved, valuePath)
+						: resolved;
 				if (override.transition !== undefined) {
 					return new TransitionSetProperty(targetId, override.property, value, override.transition);
 				}

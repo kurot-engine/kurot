@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.6.5`. This is a headless,
+Package identity: `@kurot/ui-document@0.7.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -160,7 +160,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.5.x` consumes format version 2 and executes the current
+- `@kurot/ui-runtime@0.6.x` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
@@ -187,3 +187,10 @@ pnpm --dir packages/ui-document install
 pnpm --dir packages/ui-document build
 pnpm --dir packages/ui-document test
 ```
+
+## Resource configuration change in 0.7.0
+
+`parseUIResourceConfigEntries()` validates object subkeys, and
+`resolveUIResourceDefaults()` injects nine-slice defaults into a copy. See
+[the resource-default contract](resource-nine-slice.md)
+for conversion and compilation boundaries.

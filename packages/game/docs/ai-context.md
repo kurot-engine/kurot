@@ -5,7 +5,7 @@ unfamiliar with Kurot does not need to re-derive the architecture from
 scratch each session. It describes the current source and public exports;
 internal plans and reviews are not required context.
 
-Package identity: `@kurot/game@1.0.6`. Peer-depends on `@kurot/core`.
+Package identity: `@kurot/game@2.0.0`. Peer-depends on `@kurot/core@^2.0.0`.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` groups exports into
 tween / display / particle / net — see §4.

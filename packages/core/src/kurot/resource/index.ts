@@ -3,7 +3,7 @@ export type { ProgressCallback, ResourceEventListener } from './Resource.js';
 
 export { ResourceItem, ResourceType } from './ResourceItem.js';
 export { ResourceConfig } from './ResourceConfig.js';
-export type { ResourceConfigData, ResourceConfigEntry } from './ResourceConfig.js';
+export type { ResourceConfigData, ResourceConfigEntry, ResourceSubkeyConfig } from './ResourceConfig.js';
 export { ResourceLoader } from './ResourceLoader.js';
 export { ResourceEventType } from './ResourceEvent.js';
 export type { ResourceEvent } from './ResourceEvent.js';

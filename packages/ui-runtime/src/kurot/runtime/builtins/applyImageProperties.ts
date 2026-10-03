@@ -12,7 +12,7 @@ export function applyImageProperty(target: Image, name: string, value: unknown, 
 			target.fillMode = requireFillMode(value, path);
 			return true;
 		case 'scale9Grid':
-			target.scale9Grid = createRectangle(value, path);
+			target.scale9Grid = value === false ? undefined : createRectangle(value, path);
 			return true;
 		case 'smoothing':
 			target.smoothing = requireBoolean(value, path);

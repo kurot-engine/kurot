@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@2.0.2`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.0.0`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -135,3 +135,10 @@ pnpm test
 
 CLI end-to-end tests bind localhost and may require permission in a restricted
 execution environment.
+
+## Resource configuration change in 3.0.0
+
+KUI builds validate object subkeys, resolve resource nine-slice defaults, and
+watch the manifest during development. See
+[the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
+for conversion and compilation boundaries.

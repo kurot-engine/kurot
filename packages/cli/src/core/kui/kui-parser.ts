@@ -4,8 +4,9 @@ import {
 	isUIResourceReference,
 	isSyntheticNodeId,
 	parseUIDocument,
+	resolveUIResourceDefaults,
 } from '@kurot/ui-document';
-import type { UIDocument, UINode, UIPropertyValue } from '@kurot/ui-document';
+import type { UIDocument, UINode, UIPropertyValue, UIResourceConfigEntry } from '@kurot/ui-document';
 import type {
 	PropertyAssignment,
 	PropertyChild,
@@ -23,10 +24,11 @@ import type { NamespaceModule } from './registry.js';
  */
 export function parseKUISkin(
 	source: string,
-	className: string | undefined,
+	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
+	resources: readonly UIResourceConfigEntry[] = [],
 ): SkinIR {
-	const document = parseUIDocument(source);
+	const document = resolveUIResourceDefaults(parseUIDocument(source), resources);
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 

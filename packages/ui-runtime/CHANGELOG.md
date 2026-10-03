@@ -4,6 +4,28 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.6.0] — 2026-10-03
+
+### Added
+
+- UI Images and native appearance states consume resource-derived nine-slice
+  grids after callers resolve defaults with `@kurot/ui-document@^0.7.0`.
+- `scale9Grid: false` clears an inherited grid during a state change; leaving
+  the state restores the previous grid. Native state rectangles become
+  `Rectangle` instances before assignment.
+
+### Breaking
+
+- Require `@kurot/core@^2.0.0`, `@kurot/ui@^3.0.0`, and
+  `@kurot/ui-document@^0.7.0` in peer and development dependencies.
+  Applications must upgrade these packages together and refresh legacy
+  sheet manifests in Kurot Editor before loading resources.
+
+### Tests
+
+- Added regressions for local overrides, opt-out, state restoration, and
+  direct runtime property updates.
+
 ## [0.5.6] — 2026-09-23
 
 ### Fixed

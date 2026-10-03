@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Stable (1.0.28).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Current release: 2.0.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
@@ -256,3 +256,14 @@ does not replace the manual checks on physical devices.
 ## License
 
 MIT
+
+## Resource manifest migration in 2.0.0
+
+Sheet `subkeys` now maps each frame name to a metadata object instead of using
+a comma-separated string. Old manifests fail validation before any resource
+is registered. Refresh every old sheet explicitly in Kurot Editor before using
+the new Core and CLI. Core indexes the frame aliases; `scale9grid` metadata is
+applied to UI Images by the compiler or document resolver, not automatically
+to arbitrary `Bitmap` objects. See the
+[resource format](docs/resource.md) and
+[nine-slice contract](../ui-document/docs/resource-nine-slice.md).

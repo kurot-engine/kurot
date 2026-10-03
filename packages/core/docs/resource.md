@@ -258,7 +258,7 @@ resource.registerAnalyzer('xml', new XmlAnalyzer());
 
 ## 配置文件格式
 
-### 标准格式（兼容 Egret）
+### 标准格式（2.0.0）
 
 ```json
 {
@@ -267,7 +267,7 @@ resource.registerAnalyzer('xml', new XmlAnalyzer());
 			"name": "资源唯一标识",
 			"type": "image|json|text|sound|sheet",
 			"url": "相对或绝对路径",
-			"subkeys": "逗号分隔的子键（仅 sheet 类型使用）"
+			"subkeys": { "frameName": { "scale9grid": "1,1,2,2" }, "ordinaryFrame": {} }
 		}
 	],
 	"groups": [
@@ -278,6 +278,10 @@ resource.registerAnalyzer('xml', new XmlAnalyzer());
 	]
 }
 ```
+
+当前源码的 `subkeys` 为对象，旧字符串需要在 Editor 中显式刷新图集后再使用。
+`scale9grid` 是 Image 编译默认值，Core 不会自动把它应用到任意 Bitmap。
+参见 [资源默认九宫格契约](../../ui-document/docs/resource-nine-slice.md)。
 
 ### URL 解析规则
 

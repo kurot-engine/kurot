@@ -4,6 +4,30 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.0.0] — 2026-10-03
+
+### Breaking Changes
+
+- `ResourceConfigEntry.subkeys` now requires a map from frame names to metadata
+  objects. Old comma-separated strings are rejected; refresh each sheet in the
+  Editor before using its resource manifest with this version.
+
+### Added
+
+- Resource entries and sheet frames can carry `scale9grid` metadata for UI
+  compilation. Core indexes the frame names but does not automatically apply
+  the grid to arbitrary `Bitmap` instances.
+
+### Fixed
+
+- Validate all subkey maps before registering resources or rewriting URLs.
+  Exact resource names take precedence over frame aliases.
+
+### Tests
+
+- Added object-subkey registration, invalid-manifest atomicity, and name
+  precedence regressions.
+
 ## [1.0.28] — 2026-09-26
 
 ### Fixed

@@ -3,17 +3,11 @@ import * as path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { DIAGNOSTIC_CODES } from '../src/core/diagnostics/index.js';
 import type { BuildResultOutput, DevEvent } from '../src/core/diagnostics/index.js';
-import {
-	availablePort,
-	createCliProject,
-	runCli,
-	startCli,
-	stopCli,
-	waitForJsonLine,
-} from './cli-process-helpers.js';
+import { availablePort, createCliProject, runCli, startCli, stopCli, waitForJsonLine } from './cli-process-helpers.js';
 
 const projects: string[] = [];
-const validSkin = '<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin"><Group id="root"><Button id="button" /></Group></Skin>';
+const validSkin =
+	'<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin"><Group id="root"><Button id="button" /></Group></Skin>';
 const unknownSkin = validSkin.replace('<Button id="button" />', '<Buton id="button" />');
 const malformedSkin = validSkin.replace('</Group>', '</Button>');
 
@@ -52,13 +46,18 @@ describe('CLI process diagnostics', () => {
 		expect(normal.exitCode).toBe(0);
 		expect(diagnostic(normal).severity).toBe('warning');
 		expect(strict.exitCode).toBe(1);
-		expect(diagnostic(strict)).toEqual(expect.objectContaining({
-			code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
-			severity: 'error',
-			suggestions: ['Did you mean "Button"?'],
-		}));
+		expect(diagnostic(strict)).toEqual(
+			expect.objectContaining({
+				code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
+				severity: 'error',
+				suggestions: ['Did you mean "Button"?'],
+			}),
+		);
 
-		await fs.writeFile(path.join(strictRoot, 'resource/skins/TestSkin.kui.xml'), unknownSkin.replace('Buton', 'Button'));
+		await fs.writeFile(
+			path.join(strictRoot, 'resource/skins/TestSkin.kui.xml'),
+			unknownSkin.replace('Buton', 'Button'),
+		);
 		const repaired = await runCli(strictRoot, ['build', '--strict', '--diagnostics', 'json']);
 		expect(repaired.exitCode).toBe(0);
 		expect((JSON.parse(repaired.stdout) as BuildResultOutput).diagnostics).toEqual([]);
@@ -72,6 +71,32 @@ describe('CLI process diagnostics', () => {
 		expect(diagnostic(result).code).toBe(DIAGNOSTIC_CODES.KUI_COMPILE_FAILED);
 	});
 
+	it('rebuilds inherited grids after manifest changes and recovers without overwriting the last good bundle', async () => {
+		const root = await project('<Skin xmlns="https://kurot.dev/ui/1" class="Test"><Image source="panel"/></Skin>');
+		const manifestPath = path.join(root, 'resource/default.res.json');
+		const manifest = {
+			resources: [{ name: 'panel', type: 'image', url: 'panel.png', scale9grid: '1,1,2,2' }],
+			groups: [],
+		};
+		await fs.writeFile(manifestPath, JSON.stringify(manifest));
+		const child = startCli(root, ['dev', '--port', String(await availablePort()), '--diagnostics', 'jsonl']);
+		try {
+			await waitForJsonLine<DevEvent>(child, event => event.type === 'server-ready');
+			const output = path.join(root, 'bin-debug/js/default.thm.js');
+			expect(await fs.readFile(output, 'utf8')).toContain('new Rectangle(1, 1, 2, 2)');
+			const failed = waitForJsonLine<DevEvent>(child, event => event.type === 'build-complete' && !event.success);
+			await fs.writeFile(manifestPath, 'invalid');
+			await failed;
+			expect(await fs.readFile(output, 'utf8')).toContain('new Rectangle(1, 1, 2, 2)');
+			manifest.resources[0]!.scale9grid = '3,4,5,6';
+			const success = waitForJsonLine<DevEvent>(child, event => event.type === 'build-complete' && event.success);
+			await fs.writeFile(manifestPath, JSON.stringify(manifest));
+			await success;
+			expect(await fs.readFile(output, 'utf8')).toContain('new Rectangle(3, 4, 5, 6)');
+		} finally {
+			await stopCli(child);
+		}
+	});
 
 	it('emits JSONL initial-build and server-ready events', async () => {
 		const root = await project(validSkin);
@@ -98,7 +123,10 @@ describe('CLI process diagnostics', () => {
 			const failed = waitForJsonLine<DevEvent>(child, event => event.type === 'build-complete' && !event.success);
 			await fs.writeFile(skinPath, malformedSkin);
 			await expect(failed).resolves.toEqual(expect.objectContaining({ success: false }));
-			const recovered = waitForJsonLine<DevEvent>(child, event => event.type === 'build-complete' && event.success);
+			const recovered = waitForJsonLine<DevEvent>(
+				child,
+				event => event.type === 'build-complete' && event.success,
+			);
 			await fs.writeFile(skinPath, validSkin.replace('/>', ' label="Recovered"/>'));
 			await expect(recovered).resolves.toEqual(expect.objectContaining({ success: true }));
 			expect(child.exitCode).toBeNull();

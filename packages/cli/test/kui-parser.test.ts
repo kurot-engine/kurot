@@ -6,11 +6,28 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { generateCode, parseKUISkin } from '../src/core/kui/index.js';
 
-const TEMPLATE_DIRECTORY = fileURLToPath(
-	new URL('../templates/game/resource/ui/skins/', import.meta.url),
-);
+const TEMPLATE_DIRECTORY = fileURLToPath(new URL('../templates/game/resource/ui/skins/', import.meta.url));
 
 describe('KUI Skin compiler', () => {
+	it('compiles inherited rectangles, local overrides and state-only grids with a core import', () => {
+		const source =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="Test" states="down,ordinary"><Image id="image" source="plain" source.down="atlas.panel" source.ordinary="plain"/><Image id="local" source="panel" scale9Grid="1,1,2,2"/><Image id="off" source="panel" scale9Grid="false"/></Skin>';
+		const resources = [
+			{
+				name: 'atlas',
+				type: 'sheet',
+				url: 'atlas.json',
+				subkeys: { panel: { scale9grid: '2,3,4,5' }, plain: {} },
+			},
+		];
+		const generated = generateCode(parseKUISkin(source, undefined, [], resources));
+		expect(generated).toContain('import { Rectangle } from "@kurot/core"');
+		expect(generated).toContain('new SetProperty("image", "scale9Grid", new Rectangle(2, 3, 4, 5))');
+		expect(generated).toContain('new SetProperty("image", "scale9Grid", undefined)');
+		expect(generated).toContain('local.scale9Grid = new Rectangle(1, 1, 2, 2)');
+		expect(generated).toContain('off.scale9Grid = undefined');
+	});
+
 	it('compiles canonical component tags, typed resources, inferred parts, and states', () => {
 		const source = `<?xml version="1.0" encoding="utf-8"?>
 <Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="down" minWidth="100">
@@ -51,11 +68,13 @@ describe('KUI Skin compiler', () => {
 	class="skins.HostSkin">
 	<game:Badge id="badge" />
 </Skin>`;
-		const ir = parseKUISkin(source, undefined, [{
-			prefix: 'game',
-			specifier: '#ns/game',
-			componentNames: new Set(['Badge']),
-		}]);
+		const ir = parseKUISkin(source, undefined, [
+			{
+				prefix: 'game',
+				specifier: '#ns/game',
+				componentNames: new Set(['Badge']),
+			},
+		]);
 
 		expect(ir.imports.get('Badge')).toBe('#ns/game');
 		expect(ir.unresolvedTags).toEqual([]);
@@ -73,9 +92,7 @@ describe('KUI Skin compiler', () => {
 	});
 
 	it('compiles every bundled template skin', async () => {
-		const files = (await fs.readdir(TEMPLATE_DIRECTORY))
-			.filter(file => file.endsWith('.kui.xml'))
-			.sort();
+		const files = (await fs.readdir(TEMPLATE_DIRECTORY)).filter(file => file.endsWith('.kui.xml')).sort();
 
 		expect(files).toHaveLength(21);
 		for (const file of files) {

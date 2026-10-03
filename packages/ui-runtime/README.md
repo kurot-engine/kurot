@@ -4,9 +4,13 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.5.6.** Requires `@kurot/ui@^2.0.0` and
-> `@kurot/ui-document@^0.6.4`, and uses UI's atomic complete-skin lifecycle for
-> materialized appearances.
+> **Current release: 0.6.0.** Requires `@kurot/core@^2.0.0`,
+> `@kurot/ui@^3.0.0`, and `@kurot/ui-document@^0.7.0`. Uses UI's atomic
+> complete-skin lifecycle for materialized appearances.
+
+Upgrade these dependencies together. Refresh legacy sheet manifests in Kurot
+Editor before loading resources; see the
+[resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 ```ts
 import { createKurotUI } from '@kurot/ui-runtime';
@@ -118,3 +122,13 @@ pnpm preview
 ```
 
 The preview is available at `http://localhost:5173/preview/` by default.
+
+## Resource nine-slice defaults in 0.6.0
+
+Resolve each authored document and registered appearance with
+`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.7.0` before passing
+it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
+`scale9Grid: false` clears an inherited grid, including during native Skin
+state changes; leaving the state restores the previous grid. The runtime does
+not read or migrate the resource manifest itself. See the
+[resource nine-slice contract](../ui-document/docs/resource-nine-slice.md).

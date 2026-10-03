@@ -5,6 +5,32 @@ All notable changes to `@kurot/cli` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.0.0 — 2026-10-03
+
+### Breaking Changes
+
+- KUI builds reject resource manifests with comma-separated sheet `subkeys`.
+  Refresh each sheet in the Editor to produce an object-valued frame map before
+  building with this CLI.
+
+### Added
+
+- Resolve resource nine-slice defaults into disposable Skin compilation copies.
+  Explicit XML grids and `false` opt-outs take precedence; source states clear
+  or replace inherited grids without changing authored XML.
+- Development mode watches `resource/default.res.json`, serializes resource
+  and component rebuilds, and retains the last good Skin bundle when manifest
+  validation fails.
+
+### Changed
+
+- Require `@kurot/ui-document@^0.7.0` for the shared resource parser and
+  default resolver.
+
+### Tests
+
+- Added parser, generated Skin, and development rebuild regressions.
+
 ## 2.0.2 — 2026-09-22
 
 ### Changed

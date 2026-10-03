@@ -90,8 +90,9 @@ export async function startDevServer(project: Project, options: DevServerOptions
 		throw error;
 	}
 
-	const componentSkinsWatched = watchComponents(project, ctx, options);
-	watchResources(project, ctx, options, componentSkinsWatched);
+	const enqueue = createResourceBuildQueue(ctx);
+	const componentSkinsWatched = watchComponents(project, ctx, options, enqueue);
+	watchResources(project, ctx, options, componentSkinsWatched, enqueue);
 	const server = startHttpServer(project, options);
 
 	process.on('SIGINT', async () => {
@@ -103,13 +104,14 @@ export async function startDevServer(project: Project, options: DevServerOptions
 }
 
 /**
- * Recompiles KUI and re-copies assets when a `.kui.xml` file changes.
+ * Recompiles KUI when authored skins or their resource default configuration change.
  */
 function watchResources(
 	project: Project,
 	ctx: BuildContext,
 	options: DevServerOptions,
 	componentSkinsWatched: boolean,
+	enqueue: (action: () => Promise<void>) => void,
 ): void {
 	if (!project.config.ui) return;
 
@@ -117,40 +119,60 @@ function watchResources(
 	let watcher: fsSync.FSWatcher;
 	try {
 		watcher = fsSync.watch(project.resourceDir, { recursive: true }, (_event, filename) => {
-			if (!filename || !filename.endsWith('.kui.xml')) return;
-			if (componentSkinsWatched && project.componentConvention) {
+			if (!filename || (!filename.endsWith('.kui.xml') && filename !== 'default.res.json')) return;
+			if (filename.endsWith('.kui.xml') && componentSkinsWatched && project.componentConvention) {
 				const changed = path.resolve(project.resourceDir, filename);
 				if (isWithin(project.componentConvention.skinDir, changed)) return;
 			}
 			clearTimeout(debounce);
-			debounce = setTimeout(async () => {
-				const startedAt = Date.now();
-				options.onEvent?.({ type: 'build-start', reason: 'kui-change' });
-				logger.info(`KUI changed: ${path.basename(filename)}, recompiling...`);
-				try {
-					await compileKUI().apply(ctx);
-					await copyAssets().apply(ctx);
-					emitDiagnostics(ctx, options);
-					options.onEvent?.({ type: 'build-complete', success: true, durationMs: Date.now() - startedAt });
-				} catch (err) {
-					emitDiagnostics(ctx, options);
-					options.onEvent?.({ type: 'build-complete', success: false, durationMs: Date.now() - startedAt });
-					logger.error(`KUI recompile failed: ${err instanceof Error ? err.message : err}`);
-				}
-			}, 100);
+			debounce = setTimeout(
+				() =>
+					enqueue(async () => {
+						const startedAt = Date.now();
+						options.onEvent?.({ type: 'build-start', reason: 'kui-change' });
+						logger.info(`KUI changed: ${path.basename(filename)}, recompiling...`);
+						try {
+							await compileKUI().apply(ctx);
+							await copyAssets().apply(ctx);
+							emitDiagnostics(ctx, options);
+							options.onEvent?.({
+								type: 'build-complete',
+								success: true,
+								durationMs: Date.now() - startedAt,
+							});
+						} catch (err) {
+							emitDiagnostics(ctx, options);
+							options.onEvent?.({
+								type: 'build-complete',
+								success: false,
+								durationMs: Date.now() - startedAt,
+							});
+							logger.error(`KUI recompile failed: ${err instanceof Error ? err.message : err}`);
+						}
+					}),
+				100,
+			);
 		});
 	} catch {
 		logger.warn('KUI watcher unavailable (recursive fs.watch unsupported on this platform).');
 		return;
 	}
-	ctx.disposers.push(() => watcher.close());
+	ctx.disposers.push(() => {
+		clearTimeout(debounce);
+		watcher.close();
+	});
 }
 
 /**
  * Refreshes the component model and dependent artifacts when a reusable
  * component source or skin changes.
  */
-function watchComponents(project: Project, ctx: BuildContext, options: DevServerOptions): boolean {
+function watchComponents(
+	project: Project,
+	ctx: BuildContext,
+	options: DevServerOptions,
+	enqueue: (action: () => Promise<void>) => void,
+): boolean {
 	const convention = project.componentConvention;
 	if (!convention) return false;
 	let debounce: ReturnType<typeof setTimeout> | undefined;
@@ -158,23 +180,35 @@ function watchComponents(project: Project, ctx: BuildContext, options: DevServer
 	let skinWatcherActive = false;
 	const schedule = (): void => {
 		clearTimeout(debounce);
-		debounce = setTimeout(async () => {
-			const startedAt = Date.now();
-			options.onEvent?.({ type: 'build-start', reason: 'source-change' });
-			try {
-				await refreshProjectComponents(project);
-				await refreshGeneratedNamespaceEntries(ctx);
-				await compileKUI().apply(ctx);
-				await writeComponentCatalog().apply(ctx);
-				await copyAssets().apply(ctx);
-				emitDiagnostics(ctx, options);
-				options.onEvent?.({ type: 'build-complete', success: true, durationMs: Date.now() - startedAt });
-			} catch (error) {
-				emitDiagnostics(ctx, options);
-				options.onEvent?.({ type: 'build-complete', success: false, durationMs: Date.now() - startedAt });
-				logger.error(`Component refresh failed: ${error instanceof Error ? error.message : error}`);
-			}
-		}, 100);
+		debounce = setTimeout(
+			() =>
+				enqueue(async () => {
+					const startedAt = Date.now();
+					options.onEvent?.({ type: 'build-start', reason: 'source-change' });
+					try {
+						await refreshProjectComponents(project);
+						await refreshGeneratedNamespaceEntries(ctx);
+						await compileKUI().apply(ctx);
+						await writeComponentCatalog().apply(ctx);
+						await copyAssets().apply(ctx);
+						emitDiagnostics(ctx, options);
+						options.onEvent?.({
+							type: 'build-complete',
+							success: true,
+							durationMs: Date.now() - startedAt,
+						});
+					} catch (error) {
+						emitDiagnostics(ctx, options);
+						options.onEvent?.({
+							type: 'build-complete',
+							success: false,
+							durationMs: Date.now() - startedAt,
+						});
+						logger.error(`Component refresh failed: ${error instanceof Error ? error.message : error}`);
+					}
+				}),
+			100,
+		);
 	};
 
 	for (const [directory, kind, accepts] of [
@@ -203,6 +237,21 @@ function watchComponents(project: Project, ctx: BuildContext, options: DevServer
 		}
 	});
 	return skinWatcherActive;
+}
+
+function createResourceBuildQueue(ctx: BuildContext): (action: () => Promise<void>) => void {
+	let pending = Promise.resolve();
+	let disposed = false;
+	ctx.disposers.push(() => {
+		disposed = true;
+	});
+	return action => {
+		pending = pending.then(async () => {
+			if (!disposed) {
+				await action();
+			}
+		});
+	};
 }
 
 function isWithin(directory: string, file: string): boolean {

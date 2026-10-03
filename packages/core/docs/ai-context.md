@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@1.0.28`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.0.0`. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -208,3 +208,10 @@ rotation during sampling. Resize geometry using scaleX/scaleY. After mutating
 vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
+
+## Resource configuration change in 2.0.0
+
+`ResourceConfigEntry.subkeys` is an object map, and Core rejects legacy strings
+before mutating the resource registry. See
+[the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
+for conversion and compilation boundaries.

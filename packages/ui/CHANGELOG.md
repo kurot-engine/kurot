@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.0.0] — 2026-10-03
+
+### Breaking
+
+- Require `@kurot/core@^2.0.0` in peer and development dependencies.
+  Applications must upgrade Core and convert string-valued sheet `subkeys`
+  to metadata maps by refreshing legacy sheets in Kurot Editor.
+  Component APIs and the skin lifecycle retain their existing contracts.
+
+### Tests
+
+- Built and ran the UI suite against the local Core 2.0.0 source.
+
 ## [2.1.4] — 2026-10-02
 
 ### Fixed

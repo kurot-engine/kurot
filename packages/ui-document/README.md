@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.6.5.** KUI XML is the canonical authored format. The
+> **Current release: 0.7.0.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Installation
@@ -290,7 +290,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.5.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.6.x` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition
@@ -304,3 +304,16 @@ pnpm install
 pnpm build
 pnpm test
 ```
+
+## Resource nine-slice defaults in 0.7.0
+
+`parseUIResourceConfigEntries()` validates object-valued sheet `subkeys` and
+image/frame `scale9grid` values. Old comma-separated subkeys are rejected;
+refresh those sheets explicitly in the Editor. Before compiling or previewing
+a document, call `resolveUIResourceDefaults(document, resources)` on each Skin
+or other appearance asset. The returned copy inherits resource grids while
+preserving authored XML and history. A local `scale9Grid="false"` disables
+inheritance, and state source changes get matching grid overrides.
+
+See the [resource nine-slice contract](docs/resource-nine-slice.md) for lookup
+priority, conversion, and release order.

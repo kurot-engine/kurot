@@ -4,6 +4,19 @@ All notable changes to `@kurot/game` are documented here.
 
 ---
 
+## [2.0.0] — 2026-10-03
+
+### Breaking
+
+- Require `@kurot/core@^2.0.0` in peer and development dependencies.
+  Applications must upgrade Core and convert string-valued sheet `subkeys`
+  to metadata maps by refreshing legacy sheets in Kurot Editor.
+  Game APIs retain their existing contracts.
+
+### Tests
+
+- Built and ran the game suite against the local Core 2.0.0 source.
+
 ## [1.0.6] — 2026-08-10
 
 ### Added

@@ -141,9 +141,9 @@ export const IMAGE_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		description: 'How the source bitmap fills the assigned image bounds.',
 	},
 	scale9Grid: {
-		valueType: 'object',
+		valueType: ['object', 'boolean'],
 		format: 'rectangle',
-		description: 'Nine-slice center rectangle with x, y, width, and height numbers.',
+		description: 'Nine-slice center rectangle; false explicitly disables resource inheritance.',
 	},
 	smoothing: booleanProperty(true, 'Whether scaled bitmap sampling uses interpolation.'),
 	source: {

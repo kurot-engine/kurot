@@ -4,6 +4,28 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.7.0] — 2026-10-03
+
+### Breaking Changes
+
+- Canonical resource manifests require object-valued `subkeys`; old
+  comma-separated strings are rejected by the new parser. Refresh each sheet
+  in the Editor before compiling against the new package set.
+
+### Added
+
+- Exported resource manifest types, validation, nine-slice lookup, and
+  `resolveUIResourceDefaults()` for compiler and preview use.
+- Image `scale9Grid` accepts `false` to disable an inherited resource default.
+  Source changes in states and variants receive paired grid overrides, so
+  exiting a state restores its original grid. Authored XML and history remain
+  unchanged.
+
+### Tests
+
+- Added resource default, opt-out, state/variant, and manifest validation
+  regressions.
+
 ## [0.6.5] — 2026-09-29
 
 ### Added

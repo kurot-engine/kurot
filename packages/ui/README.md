@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 2.1.4.** Requires `@kurot/core@^1.0.12`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 3.0.0.** Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -13,6 +13,10 @@ pnpm add @kurot/ui @kurot/core
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
+
+Upgrade Core to 2.x together with UI 3.x. Refresh old sheet manifests with
+string-valued `subkeys` in Kurot Editor before launching the application.
+See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 ## Quick Start
 

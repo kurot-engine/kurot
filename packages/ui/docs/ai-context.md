@@ -6,8 +6,8 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@2.1.4`, EUI-compatible UI framework on top of
-`@kurot/core`. Peer-depends on `@kurot/core`. Rewritten with standard class
+Package identity: `@kurot/ui@3.0.0`, EUI-compatible UI framework on top of
+`@kurot/core`. Peer-depends on `@kurot/core@^2.0.0`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of

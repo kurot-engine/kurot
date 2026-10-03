@@ -1,3 +1,5 @@
+import { parseUIResourceConfigEntries } from '@kurot/ui-document';
+import type { UIResourceConfigEntry } from '@kurot/ui-document';
 import * as esbuild from 'esbuild';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
@@ -57,7 +59,18 @@ export interface BuiltSkinsModule {
 export async function buildSkinsModule(ctx: BuildContext, skins: readonly CompiledSkin[]): Promise<BuiltSkinsModule> {
 	const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
 	try {
-		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin)));
+		const manifestPath = path.join(ctx.project.resourceDir, 'default.res.json');
+		let resources: readonly UIResourceConfigEntry[] = [];
+		try {
+			resources = parseUIResourceConfigEntries(JSON.parse(await fs.readFile(manifestPath, 'utf8')));
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+				throw new BuildError(
+					`Resource configuration failed: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
+		}
+		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin, resources)));
 		if (modules.some(module => module === undefined) || ctx.diagnostics.hasErrors()) {
 			throw new BuildError('KUI compilation failed.');
 		}
@@ -87,6 +100,7 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 async function generateSkinModule(
 	ctx: BuildContext,
 	skin: CompiledSkin,
+	resources: readonly UIResourceConfigEntry[],
 ): Promise<{ source: string; skin: SkinIR } | undefined> {
 	try {
 		const namespaces = ctx.project.customNamespaces.map(ns => ({
@@ -94,7 +108,7 @@ async function generateSkinModule(
 			specifier: ns.specifier,
 			...(ns.components ? { componentNames: new Set(ns.components.map(component => component.name)) } : {}),
 		}));
-		const ir = parseToIR(skin.file.contents, skin.className, namespaces);
+		const ir = parseToIR(skin.file.contents, skin.className, namespaces, resources);
 		const diagnostics = createUnresolvedTagDiagnostics(
 			skin.file.relPath,
 			skin.file.contents,

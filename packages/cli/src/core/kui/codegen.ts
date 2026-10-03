@@ -69,8 +69,7 @@ class CodeGenerator {
 			moduleImports.get(modulePath)!.add(className);
 		}
 
-		// KUI keeps rectangle-valued properties such as scale9Grid in the compact
-		// comma-separated form used by the runtime compiler.
+		// Resource defaults and authored rectangles share the same runtime constructor.
 		if (this.hasPropertyInTree('scale9Grid')) {
 			if (!moduleImports.has('@kurot/core')) {
 				moduleImports.set('@kurot/core', new Set());
@@ -234,6 +233,24 @@ class CodeGenerator {
 	}
 
 	private propertyValueToJS(prop: string, value: PropertyValue): string {
+		if (prop === 'scale9Grid' && value.type === 'literal' && value.value === false) {
+			return 'undefined';
+		}
+		if (
+			prop === 'scale9Grid' &&
+			value.type === 'literal' &&
+			value.value &&
+			typeof value.value === 'object' &&
+			'x' in value.value &&
+			'y' in value.value &&
+			'width' in value.value &&
+			'height' in value.value
+		) {
+			const { x, y, width, height } = value.value;
+			if ([x, y, width, height].every(part => typeof part === 'number' && Number.isFinite(part))) {
+				return `new Rectangle(${[x, y, width, height].join(', ')})`;
+			}
+		}
 		if (prop === 'scale9Grid' && value.type === 'literal' && typeof value.value === 'string') {
 			const parts = value.value.split(',').map(part => Number(part.trim()));
 			if (parts.length === 4 && parts.every(Number.isFinite)) {
@@ -259,11 +276,15 @@ class CodeGenerator {
 	}
 
 	private hasPropertyInTree(propertyName: string): boolean {
-		if (this._ir.properties.some(prop => prop.name === propertyName)) return true;
+		if (
+			this._ir.properties.some(prop => prop.name === propertyName) ||
+			this._ir.states.some(state => state.overrides.some(override => override.name === propertyName))
+		)
+			return true;
 		const visit = (nodes: readonly SkinNode[]): boolean => {
 			for (const node of nodes) {
 				if (node.properties.some(prop => prop.name === propertyName)) return true;
-				if (visit(node.children)) return true;
+				if (visit(node.children) || node.propertyChildren.some(child => visit(child.nodes))) return true;
 			}
 			return false;
 		};

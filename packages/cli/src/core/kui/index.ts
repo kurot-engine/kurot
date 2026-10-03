@@ -1,3 +1,4 @@
+import type { UIResourceConfigEntry } from '@kurot/ui-document';
 /**
  * KUI Skin parser and ESM factory generator.
  */
@@ -25,11 +26,7 @@ export type {
 	UnresolvedTag,
 } from './ast.js';
 
-export {
-	lookupComponent,
-	localName,
-	suggestComponentTag,
-} from './registry.js';
+export { lookupComponent, localName, suggestComponentTag } from './registry.js';
 export type { ComponentInfo, NamespaceModule } from './registry.js';
 
 export { parseKUISkin } from './kui-parser.js';
@@ -41,17 +38,14 @@ export interface CompileKUIOptions extends CodeGenOptions {
 	 * Project-defined KUI component namespaces.
 	 */
 	readonly customNamespaces?: readonly NamespaceModule[];
+	readonly resources?: readonly UIResourceConfigEntry[];
 }
 
 /**
  * Compiles one KUI Skin source string to an ESM factory module.
  */
-export function compileKUI(
-	source: string,
-	className?: string,
-	options?: CompileKUIOptions,
-): string {
-	const ir = parseKUISkin(source, className, options?.customNamespaces ?? []);
+export function compileKUI(source: string, className?: string, options?: CompileKUIOptions): string {
+	const ir = parseKUISkin(source, className, options?.customNamespaces ?? [], options?.resources ?? []);
 	return generateCode(ir, options);
 }
 
@@ -62,6 +56,7 @@ export function parseToIR(
 	source: string,
 	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
+	resources: readonly UIResourceConfigEntry[] = [],
 ): SkinIR {
-	return parseKUISkin(source, className, customNamespaces);
+	return parseKUISkin(source, className, customNamespaces, resources);
 }

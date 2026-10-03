@@ -3,11 +3,11 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 2.0.2.** Node.js 20 or later is required.
+> **Current release: 3.0.0.** Node.js 20 or later is required.
 
-> **Release scope:** The 2.0.x line is currently dedicated to Kurot Editor integration.
+> **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
 > Existing game projects that use EXML, including CrashMaster, should remain on
-> `@kurot/cli@1.3.x`. Version 2.0.x is not an in-place project upgrade and does
+> `@kurot/cli@1.3.x`. The KUI toolchain is not an in-place project upgrade and does
 > not require those projects to change their configuration or UI assets.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
@@ -186,3 +186,15 @@ my-game/
 │   └── Main.ts
 └── template/web/index.html
 ```
+
+## Resource defaults in 3.0.0
+
+KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
+`scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
+Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
+skins after manifest edits; a malformed manifest leaves the last good Skin
+bundle in place. This release requires `@kurot/ui-document@^0.7.0`.
+
+Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
+Editor before upgrading a KUI project; string-valued subkeys now fail the build.
+See the [resource nine-slice contract](../ui-document/docs/resource-nine-slice.md).

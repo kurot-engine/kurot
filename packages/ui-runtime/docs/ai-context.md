@@ -1,10 +1,11 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.5.6`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.6.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It depends on `@kurot/ui-document`, `@kurot/ui`, and `@kurot/core`. It does not
+It peer-depends on `@kurot/ui-document@^0.7.0`, `@kurot/ui@^3.0.0`, and
+`@kurot/core@^2.0.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
 Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
@@ -67,7 +68,7 @@ the `ui-document` appearance naming rule: identifiers that collide with
 `Skin` or inherited runtime members are invalid and should produce a clear
 diagnostic that asks the author or generator to rename them.
 
-Assigning the completed appearance `Skin` to a host uses `@kurot/ui@2`'s
+Assigning the completed appearance `Skin` to a host uses `@kurot/ui@3`'s
 atomic lifecycle: the host receives one complete part map before built-in
 component binding runs. `Skin.setPart()` remains the write-side materializer
 API and is not the removed `Component.setSkinPart()` lifecycle API.
@@ -156,3 +157,10 @@ pnpm --dir packages/ui-runtime build
 pnpm --dir packages/ui-runtime test
 pnpm --dir packages/ui-runtime preview
 ```
+
+## Resource configuration change in 0.6.0
+
+The runtime accepts resolved `scale9Grid` rectangles and clears inherited
+grids when an Image receives `false`. See
+[the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
+for conversion and compilation boundaries.

@@ -203,7 +203,7 @@ describe('Resource.loadGroup concurrency', () => {
 });
 
 describe('Resource sheet subkeys', () => {
-	it('trims subkeys and ignores empty entries when indexing a config', () => {
+	it('indexes configured frame names while preserving the parent sheet', () => {
 		const config = new ResourceConfig();
 		config.parseConfig(
 			{
@@ -212,7 +212,7 @@ describe('Resource sheet subkeys', () => {
 						name: 'eui',
 						type: 'sheet',
 						url: 'eui.json',
-						subkeys: ' button_up_png, ,button_down_png ',
+						subkeys: { button_up_png: { scale9grid: '1,1,2,2' }, button_down_png: {} },
 					},
 				],
 				groups: [],
@@ -236,7 +236,7 @@ describe('Resource sheet subkeys', () => {
 					name: 'eui',
 					type: 'mock-sheet',
 					url: 'eui.json',
-					subkeys: 'button_up_png',
+					subkeys: { button_up_png: {} },
 				},
 			],
 			groups: [{ name: 'preload', keys: 'eui' }],
