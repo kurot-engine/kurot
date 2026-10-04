@@ -1,10 +1,9 @@
 /**
- * Multilingual text tokenization for word-wrapping.
+ * Locale-aware word segmentation utility.
  *
  * Uses `Intl.Segmenter` (supported in all browsers since 2024) for locale-aware
- * word segmentation. Correctly handles Latin (space-separated), CJK (each
- * character is a segment), Thai/Khmer/Lao (dictionary-based word boundaries),
- * and mixed-script text.
+ * word segmentation, including dictionary-based boundaries. Word boundaries
+ * are distinct from Unicode line-break opportunities; TextField uses LineBreaks.
  *
  * Falls back to character-by-character splitting when `Intl.Segmenter` is
  * unavailable.
@@ -47,7 +46,7 @@ const NEWLINES = new Set([0x000a, 0x000d]);
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Split text into word / space segments suitable for line-wrapping.
+ * Split text into locale-aware word / space segments.
  *
  * Returns plain strings — each string is either a word or a space.
  * Newlines are NOT included (the caller should split by newlines first).
@@ -97,8 +96,7 @@ export function tokenize(text: string): string[] {
 
 /**
  * Split a string into grapheme clusters (user-perceived characters).
- * Used when a single token is wider than the field and must be broken
- * character-by-character.
+ * This utility is independent of TextField's UAX #14 line layout.
  */
 export function splitGraphemes(text: string): string[] {
 	if (hasSegmenter) {

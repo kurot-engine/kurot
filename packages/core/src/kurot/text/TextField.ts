@@ -4,13 +4,13 @@ import { Rectangle } from '../geom/Rectangle.js';
 import { TouchEvent } from '../events/TouchEvent.js';
 import { TextEvent } from '../events/TextEvent.js';
 import { measureText, getFontString } from './TextMeasurer.js';
-import type { ITextElement, ILineElement, IWTextElement } from './types/ITextElement.js';
+import type { ITextElement, ILineElement } from './types/ITextElement.js';
 import { HorizontalAlign } from './enums/HorizontalAlign.js';
 import { VerticalAlign } from './enums/VerticalAlign.js';
 import { TextFieldType } from './enums/TextFieldType.js';
 import { TextFieldInputType } from './enums/TextFieldInputType.js';
 import { InputController } from './InputController.js';
-import { tokenize, splitGraphemes } from './WordWrap.js';
+import { layoutTextLines } from './TextLineLayout.js';
 
 /**
  * TextField displays text content. Supports single-line, multi-line, word wrap,
@@ -808,130 +808,17 @@ export class TextField extends DisplayObject {
 	}
 
 	private calculateLines(): ILineElement[] {
-		const elements = this._textFlow ?? [{ text: this.getDisplayText() }];
-		const hasTrailingLineBreak = /(?:\r\n|\r|\n)$/.test(elements.map(element => element.text).join(''));
-		const maxWidth = !isNaN(this.$explicitWidth) ? this.$explicitWidth : NaN;
 		const isInput = this._type === TextFieldType.INPUT;
-		const canWrap = !isInput || this._multiline;
-		const lines: ILineElement[] = [];
-
-		if (!isNaN(maxWidth) && maxWidth === 0) {
-			return [{ width: 0, height: 0, charNum: 0, hasNextLine: false, elements: [] }];
-		}
-
-		let currentLine: IWTextElement[] = [];
-		let lineWidth = 0;
-		let lineHeight = this._fontSize;
-		let lineCharNum = 0;
-
-		const flushLine = (hasNext: boolean): void => {
-			lines.push({
-				width: lineWidth,
-				height: lineHeight,
-				charNum: lineCharNum + (hasNext ? 1 : 0),
-				hasNextLine: hasNext,
-				elements: currentLine,
-			});
-			currentLine = [];
-			lineWidth = 0;
-			lineHeight = this._fontSize;
-			lineCharNum = 0;
-		};
-
-		for (const element of elements) {
-			if (!element.text) continue;
-			const style = element.style ?? {};
-			const fontSize = typeof style.size === 'number' ? style.size : this._fontSize;
-			const fontFamily = style.fontFamily ?? this._fontFamily;
-			const bold = style.bold ?? this._bold;
-			const italic = style.italic ?? this._italic;
-
-			const segments = element.text.split(/\r\n|\r|\n/);
-
-			for (let si = 0; si < segments.length; si++) {
-				const seg = segments[si];
-				const isLastSeg = si === segments.length - 1;
-
-				if (seg === '') {
-					if (!isLastSeg) {
-						flushLine(true);
-					}
-					continue;
-				}
-
-				if (isNaN(maxWidth)) {
-					const w = measureText(seg, fontFamily, fontSize, bold, italic);
-					currentLine.push({ text: seg, width: w, style: element.style });
-					lineWidth += w;
-					if (!isInput) lineHeight = Math.max(lineHeight, fontSize);
-					lineCharNum += seg.length;
-					if (!isLastSeg) flushLine(true);
-				} else {
-					const totalSegWidth = measureText(seg, fontFamily, fontSize, bold, italic);
-
-					if (lineWidth + totalSegWidth <= maxWidth || !canWrap) {
-						currentLine.push({ text: seg, width: totalSegWidth, style: element.style });
-						lineWidth += totalSegWidth;
-						if (!isInput) lineHeight = Math.max(lineHeight, fontSize);
-						lineCharNum += seg.length;
-						if (!isLastSeg) flushLine(true);
-					} else {
-						const tokenTexts = this._wordWrap ? tokenize(seg) : (seg.match(/[\s\S]/gu) ?? seg.split(''));
-
-						let ww = 0;
-						let charNum = 0;
-
-						for (const token of tokenTexts) {
-							const w = measureText(token, fontFamily, fontSize, bold, italic);
-
-							if (lineWidth !== 0 && lineWidth + w > maxWidth) {
-								flushLine(false);
-							}
-
-							if (w > maxWidth) {
-								const chars = splitGraphemes(token);
-								for (const ch of chars) {
-									const cw = measureText(ch, fontFamily, fontSize, bold, italic);
-									if (lineWidth !== 0 && lineWidth + cw > maxWidth) {
-										flushLine(false);
-									}
-									currentLine.push({ text: ch, width: cw, style: element.style });
-									lineWidth += cw;
-									if (!isInput) lineHeight = Math.max(lineHeight, fontSize);
-									lineCharNum++;
-									charNum++;
-								}
-							} else {
-								currentLine.push({ text: token, width: w, style: element.style });
-								lineWidth += w;
-								if (!isInput) lineHeight = Math.max(lineHeight, fontSize);
-								lineCharNum += token.length;
-								charNum += token.length;
-								ww += w;
-							}
-						}
-
-						if (!isLastSeg) flushLine(true);
-					}
-				}
-			}
-		}
-
-		if (currentLine.length > 0) {
-			lines.push({
-				width: lineWidth,
-				height: lineHeight,
-				charNum: lineCharNum,
-				hasNextLine: false,
-				elements: currentLine,
-			});
-		}
-
-		if (lines.length === 0 || (currentLine.length === 0 && hasTrailingLineBreak)) {
-			lines.push({ width: 0, height: this._fontSize, charNum: 0, hasNextLine: false, elements: [] });
-		}
-
-		return lines;
+		return layoutTextLines(this._textFlow ?? [{ text: this.getDisplayText() }], {
+			fontFamily: this._fontFamily,
+			size: this._fontSize,
+			bold: this._bold,
+			italic: this._italic,
+			maxWidth: this.$explicitWidth,
+			wordWrap: this._wordWrap,
+			canWrap: !isInput || this._multiline,
+			isInput,
+		});
 	}
 
 	private getDisplayText(): string {

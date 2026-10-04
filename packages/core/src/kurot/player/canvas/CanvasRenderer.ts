@@ -1009,9 +1009,14 @@ export class CanvasRenderer {
 				caretTop = drawY - tf.size / 2;
 				caretLocated = true;
 			}
-			if (line.hasNextLine) {
-				characterIndex++;
+			if (!caretLocated && tf.caretIndex >= characterIndex && tf.caretIndex < lineStartIndex + line.charNum) {
+				caretX = lineX;
+				caretTop = drawY - tf.size / 2;
+				caretHeight = tf.size;
+				caretLocated = true;
 			}
+			// charNum includes unpainted wrap spaces and the complete hard separator.
+			characterIndex = lineStartIndex + line.charNum;
 
 			drawY += h / 2 + lineSpacing;
 		}

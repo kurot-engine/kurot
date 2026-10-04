@@ -14,6 +14,7 @@ Core features include:
 - Egret-style `DisplayObject`, event, geometry, graphics, resource, and media APIs.
 - A **Build → Execute** rendering flow, with WebGL multi-texture batching and RenderGroup layering.
 - A WebGL primary rendering backend with a Canvas 2D fallback backend.
+- Unicode 17.0 word wrapping, dictionary segmentation, and rich-text input offsets.
 - EUI-compatible components, layout, states, data binding, and theming system.
 - Canonical KUI XML authoring with build-time Skin compilation and no XML parsing at runtime.
 - A headless `kui.*` UI document model and explicit runtime materialization layer
@@ -48,7 +49,7 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
 | ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.0.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
+| [`@kurot/core`](packages/core/README.md)               | 2.0.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.0.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.0.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                    | `ui-document`         |

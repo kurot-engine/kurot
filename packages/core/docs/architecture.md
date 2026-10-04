@@ -1,6 +1,6 @@
 # @kurot/core 架构文档
 
-> 当前版本：2.0.0。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
+> 当前版本：2.0.1。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
 
 ---
@@ -85,7 +85,9 @@ packages/core/src/kurot/
 │   ├── HtmlTextParser.ts             # HTML 文本解析
 │   ├── InputController.ts            # 输入控制器（选择、光标、键盘处理）
 │   ├── TextMeasurer.ts               # 文本测量（measureText, getFontString）
-│   ├── WordWrap.ts                   # 自动换行（tokenize, splitGraphemes）
+│   ├── LineBreaks.ts                 # Unicode 17.0 UAX #14 断行边界与字典分词
+│   ├── TextLineLayout.ts             # 整段富文本断行、宽度拟合与 UTF-16 源偏移
+│   ├── WordWrap.ts                   # 独立分词与字素工具（tokenize, splitGraphemes）
 │   ├── enums/                        # HorizontalAlign, VerticalAlign, TextFieldType, TextFieldInputType
 │   └── types/                        # ITextElement, IWTextElement, ILineElement, IHitTextElement 等类型定义
 ├── resource/         # 资源管理
@@ -295,7 +297,7 @@ Canvas 2D 渲染器保持直接遍历模式，作为 WebGL 不可用时的降级
 - cacheAsBitmap 支持（通过 DisplayList）
 - 像素级命中测试（3x3 离屏 buffer，hitTestBuffer 函数）
 - 支持所有 DisplayObject 类型：Bitmap, Shape, Sprite, Mesh, TextField（含样式、对齐、自动换行）
-- TextField 渲染：测量 → 分行 → Canvas 2D fillText/strokeText 绘制
+- TextField 渲染：测量 → 分行 → Canvas 2D fillText/strokeText 绘制；断行规则与输入偏移契约见 [text-layout.md](./text-layout.md)
 
 ---
 

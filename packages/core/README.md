@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Current release: 2.0.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Current release: 2.0.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Features
 
@@ -157,12 +157,21 @@ text and `cacheAsTexture(true)` caches will be regenerated at the new density.
 WebGL vector graphics are also re-rasterized when their display scale increases;
 their cached sampling scale is capped at 8× to bound zoom-related memory use.
 
+## Multilingual text
+
+`TextField.wordWrap = true` uses Unicode 17.0 UAX #14, with dictionary
+segmentation for complex-context scripts and alphabetic overflow wrapping.
+Automatic wraps consume separator spaces without painting them at the start
+of the next line. Original text and UTF-16 input offsets are preserved.
+Non-breaking spaces and punctuation keep their Unicode constraints.
+See [text layout](docs/text-layout.md) for the profiles and conformance tests.
+
 ## Development
 
 ```bash
 pnpm install
 pnpm run build        # compile
-pnpm run test         # run tests (706 cases)
+pnpm run test         # run tests
 pnpm run dev          # watch mode
 ```
 

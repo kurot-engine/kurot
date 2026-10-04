@@ -4,6 +4,34 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.0.1] — 2026-10-04
+
+### Fixed
+
+- Use Unicode 17.0 UAX #14 line-break opportunities for word wrapping, including
+  CJK punctuation, non-breaking spaces and word joiners. Retain dictionary
+  segmentation for Thai, Lao and Khmer and bounded alphabetic overflow wrapping.
+- Consume automatic-wrap separator spaces on the preceding line, fixing
+  indented continuation lines and overstated Label/Skin measurements.
+- Evaluate rich-text line breaks across style boundaries, measure complete
+  runs, and preserve caret/selection source offsets through hidden spaces and
+  CRLF. Honor Unicode mandatory line separators.
+
+### Internal
+
+- Add the pinned browser-compatible `@cto.af/linebreak` runtime dependency.
+- Extract width fitting from TextField; reuse candidate measurements and avoid
+  rescanning oversized words and completed style spans.
+- Include the public docs directory in the npm package, including the text
+  layout contract and updated package context.
+
+### Tests
+
+- Check all 19,338 official Unicode 17.0 default line-break cases, with a
+  provenance-checked compressed fixture and its Unicode license.
+- Add multilingual width, punctuation, rich-text, input-rendering and long-word
+  measurement regressions. No public API or resource/XML schema change.
+
 ## [2.0.0] — 2026-10-03
 
 ### Breaking Changes

@@ -9,14 +9,22 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.0.1
+        version: 2.0.1
     devDependencies:
       '@kurot/cli':
         specifier: ^3.0.1
         version: 3.0.1
 
 packages:
+
+  '@cto.af/linebreak@4.0.3':
+    resolution: {integrity: sha512-GiyepYtGQMo4LDynuhyFr0/hBGv0SFNVKnPjHuhFMnkseCBCIMecaCkKL8V3cu9mRas1djpSWznxigw/irV5Lw==}
+    engines: {node: '>=20'}
+
+  '@cto.af/unicode-trie-runtime@3.2.9':
+    resolution: {integrity: sha512-H4FHtvIef/8NlU+NsQolcL9SKu+fYIPMZI++h6rQcM1IN7C/AwiCs9L8WRff+O4hDMamksAEuwBjet2S9uPt4w==}
+    engines: {node: '>=20'}
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -178,8 +186,8 @@ packages:
     resolution: {integrity: sha512-qJ7aFwBedaOu1JHlSMGV0OrPXtRVYjYet/xdkxQu0f/jiRdhV54/AZWiEscPGq/qg37Q3jA84GP+QNoVU3crPg==}
     hasBin: true
 
-  '@kurot/core@2.0.0':
-    resolution: {integrity: sha512-uOE6KXSoEdBVYifB30r7KG0eiEr8u/kd6DDEeuCltjVbUDnUCjzI7y6ol+Z2EKoKI+wOeBXULqfsj0UN93hJrA==}
+  '@kurot/core@2.0.1':
+    resolution: {integrity: sha512-dtC7m9RARyjZnx8NHqEh4Q8xXMjgMZA/pb9x5S+gZZh05GeLMsQFcCu/4k33uzIAmskpGULsmNZhyRnwt8O+Pw==}
 
   '@kurot/ui-document@0.8.0':
     resolution: {integrity: sha512-hXYhujyW4ffMrjelNIYnvwq4W9JJNebQqFc4egjlSGSjd3gux0F3/LUVZlG8b/qxlUBR4OZf7yoQcVJMDadb7Q==}
@@ -193,7 +201,18 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
+
 snapshots:
+
+  '@cto.af/linebreak@4.0.3':
+    dependencies:
+      '@cto.af/unicode-trie-runtime': 3.2.9
+
+  '@cto.af/unicode-trie-runtime@3.2.9':
+    dependencies:
+      fflate: 0.8.3
 
   '@esbuild/aix-ppc64@0.25.12':
     optional: true
@@ -279,7 +298,9 @@ snapshots:
       commander: 13.1.0
       esbuild: 0.25.12
 
-  '@kurot/core@2.0.0': {}
+  '@kurot/core@2.0.1':
+    dependencies:
+      '@cto.af/linebreak': 4.0.3
 
   '@kurot/ui-document@0.8.0': {}
 
@@ -313,3 +334,5 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.12
       '@esbuild/win32-ia32': 0.25.12
       '@esbuild/win32-x64': 0.25.12
+
+  fflate@0.8.3: {}

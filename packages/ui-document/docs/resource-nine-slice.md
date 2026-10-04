@@ -1,7 +1,7 @@
 # Resource default nine-slice grids
 
 This is a **breaking resource format change**. The
-current versions are Core 2.0.0, UI 3.0.0, game 2.0.0, CLI 3.0.1,
+current versions are Core 2.0.1, UI 3.0.0, game 2.0.0, CLI 3.0.1,
 ui-document 0.8.0, and ui-runtime 0.7.0. All six packages are published at
 those versions.
 CLI and ui-runtime require ui-document `^0.8.0`. UI's Rectangle setter needs no new API.
@@ -84,7 +84,7 @@ resource/component watch builds are serialized.
 
 The CLI and ui-runtime manifests now require ui-document `^0.8.0`. UI 3.0.0,
 game 2.0.0, and ui-runtime 0.7.0 require Core `^2.0.0`. ui-runtime also
-requires UI `^3.0.0`. Engine examples use Core 2.0.0 and CLI 3.0.1;
+requires UI `^3.0.0`. Engine examples use Core 2.0.1 and CLI 3.0.1;
 `examples/game` also uses UI 3.0.0 and game 2.0.0.
 The Editor uses the published ui-document 0.8.0, ui-runtime 0.7.0, and CLI 3.0.1.
 

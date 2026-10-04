@@ -10,10 +10,10 @@ importers:
     devDependencies:
       '@kurot/core':
         specifier: ^2.0.0
-        version: 2.0.0
+        version: 2.0.1
       '@kurot/ui':
         specifier: ^3.0.0
-        version: 3.0.0(@kurot/core@2.0.0)
+        version: 3.0.0(@kurot/core@2.0.1)
       '@kurot/ui-document':
         specifier: ^0.8.0
         version: 0.8.0
@@ -35,11 +35,19 @@ importers:
 
 packages:
 
+  '@cto.af/linebreak@4.0.3':
+    resolution: {integrity: sha512-GiyepYtGQMo4LDynuhyFr0/hBGv0SFNVKnPjHuhFMnkseCBCIMecaCkKL8V3cu9mRas1djpSWznxigw/irV5Lw==}
+    engines: {node: '>=20'}
+
+  '@cto.af/unicode-trie-runtime@3.2.9':
+    resolution: {integrity: sha512-H4FHtvIef/8NlU+NsQolcL9SKu+fYIPMZI++h6rQcM1IN7C/AwiCs9L8WRff+O4hDMamksAEuwBjet2S9uPt4w==}
+    engines: {node: '>=20'}
+
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
-  '@kurot/core@2.0.0':
-    resolution: {integrity: sha512-uOE6KXSoEdBVYifB30r7KG0eiEr8u/kd6DDEeuCltjVbUDnUCjzI7y6ol+Z2EKoKI+wOeBXULqfsj0UN93hJrA==}
+  '@kurot/core@2.0.1':
+    resolution: {integrity: sha512-dtC7m9RARyjZnx8NHqEh4Q8xXMjgMZA/pb9x5S+gZZh05GeLMsQFcCu/4k33uzIAmskpGULsmNZhyRnwt8O+Pw==}
 
   '@kurot/ui-document@0.8.0':
     resolution: {integrity: sha512-hXYhujyW4ffMrjelNIYnvwq4W9JJNebQqFc4egjlSGSjd3gux0F3/LUVZlG8b/qxlUBR4OZf7yoQcVJMDadb7Q==}
@@ -242,6 +250,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -500,15 +511,25 @@ packages:
 
 snapshots:
 
+  '@cto.af/linebreak@4.0.3':
+    dependencies:
+      '@cto.af/unicode-trie-runtime': 3.2.9
+
+  '@cto.af/unicode-trie-runtime@3.2.9':
+    dependencies:
+      fflate: 0.8.3
+
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
-  '@kurot/core@2.0.0': {}
+  '@kurot/core@2.0.1':
+    dependencies:
+      '@cto.af/linebreak': 4.0.3
 
   '@kurot/ui-document@0.8.0': {}
 
-  '@kurot/ui@3.0.0(@kurot/core@2.0.0)':
+  '@kurot/ui@3.0.0(@kurot/core@2.0.1)':
     dependencies:
-      '@kurot/core': 2.0.0
+      '@kurot/core': 2.0.1
 
   '@oxc-project/types@0.147.0': {}
 
@@ -646,6 +667,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
       picomatch: 4.0.7
+
+  fflate@0.8.3: {}
 
   fsevents@2.3.3:
     optional: true

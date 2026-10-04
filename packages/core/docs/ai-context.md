@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.0.0`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.0.1`. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -42,7 +42,7 @@ src/kurot/
 │                   CustomFilter, MultiPassFilter, BloomFilter. GPU execution in player/webgl/;
 │                   push/pop scene integration in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
-│                   HtmlTextParser, InputController, TextMeasurer, WordWrap.
+│                   HtmlTextParser, InputController, TextMeasurer, LineBreaks, TextLineLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
 │                   (Image/Json/Text/Sound/Sheet). Async, resource.json-driven (RES-compatible).
 ├── net/            HttpRequest, ImageLoader. Low-level; resource/analyzers build on these.
@@ -196,7 +196,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                      |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                 |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                     |
-| Change text layout/wrapping                | `text/WordWrap.ts`, `text/TextMeasurer.ts`                                                                       |
+| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                     |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`  |
 
@@ -208,6 +208,15 @@ rotation during sampling. Resize geometry using scaleX/scaleY. After mutating
 vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
+
+## Text layout in 2.0.1
+
+Word-wrapped text uses Unicode 17.0 UAX #14, dictionary tailoring for SA scripts
+and alphabetic overflow tailoring. Style runs never introduce break positions.
+Automatic-wrap spaces count in source offsets but not painted width. Core's
+Canvas renderer advances input indices by line.charNum, including hidden spaces
+and CRLF; do not derive the next line's source offset from painted text lengths.
+See [text layout](text-layout.md).
 
 ## Resource configuration change in 2.0.0
 
