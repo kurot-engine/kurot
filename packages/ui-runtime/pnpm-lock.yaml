@@ -9,11 +9,11 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.1.1
+        version: 2.1.1
       '@kurot/ui':
         specifier: ^3.1.0
-        version: 3.1.0(@kurot/core@2.1.0)
+        version: 3.1.0(@kurot/core@2.1.1)
       '@kurot/ui-document':
         specifier: ^0.9.0
         version: 0.9.0
@@ -46,8 +46,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
-  '@kurot/core@2.1.0':
-    resolution: {integrity: sha512-RInkr2cXQ8HjG2vn+yQxbkVCNV+Qej7TpVWVQu3TF++6G8c7u2288dG0+r4W1p2jFMGtr9dMqwQXBJwbM8NfmQ==}
+  '@kurot/core@2.1.1':
+    resolution: {integrity: sha512-/jQgTjvps+djsUfyW0p+VSkpoGWf728J/tUrc/K8ngijW76KhEKdeGl4kXvNp0RecSw49FquM2SqrPIB/bOcIw==}
 
   '@kurot/ui-document@0.9.0':
     resolution: {integrity: sha512-IRnXqHT8GzrnFCPnOJNPxNZ4gTbAqhp/qp4qQJJPrZHcxQTRKyAC5FmhQ61f5gFOFcqc8VxsdlXTwe/+ISWp7g==}
@@ -521,15 +521,15 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
-  '@kurot/core@2.1.0':
+  '@kurot/core@2.1.1':
     dependencies:
       '@cto.af/linebreak': 4.0.3
 
   '@kurot/ui-document@0.9.0': {}
 
-  '@kurot/ui@3.1.0(@kurot/core@2.1.0)':
+  '@kurot/ui@3.1.0(@kurot/core@2.1.1)':
     dependencies:
-      '@kurot/core': 2.1.0
+      '@kurot/core': 2.1.1
 
   '@oxc-project/types@0.147.0': {}
 

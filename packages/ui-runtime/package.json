@@ -37,7 +37,7 @@
 		"@kurot/ui-document": "^0.9.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.1.0",
+		"@kurot/core": "^2.1.1",
 		"@kurot/ui": "^3.1.0",
 		"@kurot/ui-document": "^0.9.0",
 		"@types/node": "^22.0.0",

@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.1.0`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.1.1`. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -73,6 +73,10 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   rendering**. It's a WebGL-only optimization hint that isolates a subtree
   into its own `InstructionSet` — toggling it never changes pixels, only which
   instruction set absorbs rebuilds.
+- A `scrollRect` clips a fixed viewport at local (0,0); its x/y translate the
+  content, not the clip. WebGL's nested/rotated stencil path must use the same
+  viewport origin as its axis-aligned scissor path. Rectangle masks retain
+  their own local x/y. See `player/pipes/MaskPipe.ts`.
 - `CanvasRenderer` is not purely a fallback. The WebGL backend depends on it
   internally to rasterize Graphics/Text to offscreen canvases before texture
   upload, and to snapshot `RenderTexture`. Don't reason about it as dead code

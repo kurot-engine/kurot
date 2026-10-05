@@ -2,7 +2,19 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Current release: 2.1.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Current release: 2.1.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Scroll clipping in 2.1.1
+
+WebGL keeps a `scrollRect` viewport fixed when it is nested inside another clip
+or rotated. Its `x`/`y` move the content; they do not move the viewport boundary.
+This fixes the shifted visible area in nested UI Scrollers, including Editor
+Preview. Rectangular masks keep their own local origin.
+
+This patch changes no public API, text behavior or resource/KUI format, and
+requires no project migration. The UI 3.1, game 2.0 and ui-runtime 0.8 peer ranges
+accept it; update the installed Core version and lockfile to receive the fix.
+UI Scrollers use the corrected Core path without a separate UI release.
 
 ## Text layout in 2.1.0
 

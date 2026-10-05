@@ -65,12 +65,13 @@ regressions. No resource-manifest or CLI XML-format change is involved.
 
 ## Package dependencies
 
-UI 3.0.0, game 2.0.0 and ui-runtime 0.7.0 already declare Core `^2.0.0` in their
-peer/development ranges, which include Core 2.1.0. Repository examples require
-Core `^2.0.1`, which also permits 2.1.0; installed lockfiles still need updating.
-CLI templates use `latest`. The upcoming Label font-shrinking capability calls
-`invalidateTextMetrics()` and therefore needs a Core minimum of 2.1.0 in UI and
-the matching ui-runtime release. Game does not require a release for this change.
+UI 3.1.0 and ui-runtime 0.8.0 declare Core `^2.1.0` in their peer ranges;
+game 2.0.0 declares `^2.0.0`. Their development dependencies and repository
+examples use Core `^2.1.1`, with lockfiles resolving 2.1.1 for its nested
+scroll-clipping fix. CLI templates use `latest`.
+Label font shrinking calls `invalidateTextMetrics()` and requires Core 2.1.0
+or later. Core 2.1.1 preserves that text contract and does not require another
+UI, game or ui-runtime release.
 
 References: [UAX #14 revision 55](https://www.unicode.org/reports/tr14/tr14-55.html),
 [official corpus](https://www.unicode.org/Public/17.0.0/ucd/auxiliary/LineBreakTest.txt),

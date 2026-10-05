@@ -4,6 +4,27 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.1.1] — 2026-10-05
+
+### Fixed
+
+- Keep scrollRect viewports fixed while scrolling under an outer clip or rotation.
+  The WebGL stencil path now uses the same viewport origin as the scissor path,
+  avoiding a repeated scroll offset in nested Scrollers.
+
+### Internal
+
+- Preserve rectangular-mask origins while normalizing scrollRect clip origins.
+  Public APIs, resource formats and text-layout contracts are unchanged; no
+  project migration is required for this patch.
+
+### Tests
+
+- Cover positive/negative scroll offsets under scaled outer clips and rotated
+  transforms, plus rectangular-mask origin preservation.
+- Verify fixed viewport boundaries during drag, after release and after canvas
+  zoom in the packaged Editor, including the actual Provably Fair Settings skin.
+
 ## [2.1.0] — 2026-10-05
 
 ### Added

@@ -1,11 +1,56 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Sprite } from '../src/kurot/display/Sprite.js';
+import { Matrix } from '../src/kurot/geom/Matrix.js';
+import { Rectangle } from '../src/kurot/geom/Rectangle.js';
 import type { WebGLRenderBuffer } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
 import { WebGLRenderBuffer as WGLBuf } from '../src/kurot/player/webgl/WebGLRenderBuffer.js';
 import { MaskPipe } from '../src/kurot/player/pipes/MaskPipe.js';
 
 afterEach(() => {
 	vi.restoreAllMocks();
+});
+
+describe('MaskPipe viewport clipping', () => {
+	it.each([
+		{ name: 'nested clip', nested: true, matrix: new Matrix(2, 0, 0, 2, 100, 120) },
+		{ name: 'rotated clip', nested: false, matrix: new Matrix(0, 2, -2, 0, 100, 120) },
+	])('keeps the $name fixed while its content scrolls', ({ nested, matrix }) => {
+		const viewport = new Sprite();
+		const pushMask = vi.fn();
+		const enableScissor = vi.fn();
+		const buffer = {
+			globalMatrix: matrix,
+			hasScissor: nested,
+			context: { pushMask, enableScissor },
+		} as unknown as WebGLRenderBuffer;
+		const pipe = new MaskPipe(() => {});
+
+		for (const offset of [0, 60, 120, -20]) {
+			viewport.scrollRect = new Rectangle(5, offset, 400, 730);
+			const push = MaskPipe.makePush(viewport, 0, 0);
+			expect(pipe.executeScrollRectPush(push, buffer)).toBe(false);
+			expect(pushMask).toHaveBeenLastCalledWith(0, 0, 400, 730);
+			MaskPipe.releasePush(push);
+		}
+		expect(enableScissor).not.toHaveBeenCalled();
+	});
+
+	it('preserves the local origin of a rectangular mask inside an outer clip', () => {
+		const renderable = new Sprite();
+		renderable.mask = new Rectangle(15, 25, 40, 70);
+		const pushMask = vi.fn();
+		const buffer = {
+			globalMatrix: new Matrix(),
+			hasScissor: true,
+			context: { pushMask },
+		} as unknown as WebGLRenderBuffer;
+		const pipe = new MaskPipe(() => {});
+		const push = MaskPipe.makePush(renderable, 0, 0);
+
+		expect(pipe.executeScrollRectPush(push, buffer)).toBe(false);
+		expect(pushMask).toHaveBeenCalledWith(15, 25, 40, 70);
+		MaskPipe.releasePush(push);
+	});
 });
 
 describe('MaskPipe framebuffer lifecycle', () => {

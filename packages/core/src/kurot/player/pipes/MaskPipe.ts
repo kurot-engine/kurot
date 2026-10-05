@@ -99,7 +99,10 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 
 		const m = buffer.globalMatrix;
 		if (buffer.hasScissor || m.b !== 0 || m.c !== 0) {
-			buffer.context.pushMask(rect.x, rect.y, rect.width, rect.height);
+			// Scroll clipping uses the fixed viewport transform, before content translation.
+			const x = renderable.$scrollRect ? 0 : rect.x;
+			const y = renderable.$scrollRect ? 0 : rect.y;
+			buffer.context.pushMask(x, y, rect.width, rect.height);
 			return false;
 		}
 

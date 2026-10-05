@@ -9,7 +9,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.1.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.1.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.1.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.1.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
@@ -41,6 +41,9 @@ ui-document 0.9.0 adds Label fitting metadata without changing format version 2.
 Core 2.1.0 makes explicit `multiline = false` single-line; remove the flag or
 use `true` where wrapping is intended. UI 3.1 uses `invalidateTextMetrics()`
 for Label fitting and late font readiness; Core 2.0.x is not sufficient.
+Core 2.1.1 fixes nested/rotated WebGL scrollRect clipping without API or format
+changes. Update installed/locked Core versions to receive the correction;
+existing UI/Game/ui-runtime peer ranges already accept this patch.
 Schema-defined XML strings are literal: remove old synthetic backslash type
 escapes explicitly; Editor and CLI must adopt the same parser contract.
 Core 2.0 and CLI 3.0+ reject comma-separated sheet `subkeys`
