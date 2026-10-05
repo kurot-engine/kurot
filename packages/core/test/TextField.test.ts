@@ -15,7 +15,7 @@ describe('TextField line layout', () => {
 		vi.restoreAllMocks();
 	});
 
-	it('wraps width-constrained dynamic text when multiline is false', () => {
+	it('does not wrap width-constrained dynamic text when multiline is false', () => {
 		const field = new TextField();
 		field.width = 40;
 		field.size = 20;
@@ -23,8 +23,56 @@ describe('TextField line layout', () => {
 		field.wordWrap = false;
 		field.text = 'This is wider than forty pixels';
 
-		expect(field.numLines).toBeGreaterThan(1);
-		expect(field.textHeight).toBeGreaterThan(field.size);
+		expect(field.numLines).toBe(1);
+		expect(field.textHeight).toBe(field.size);
+		expect(field.textWidth).toBeGreaterThan(field.width);
+	});
+
+	it('uses dynamic/input defaults, invalidates lines on type changes and preserves explicit intent', () => {
+		const field = new TextField();
+		const explicit = new TextField();
+		explicit.multiline = true;
+		explicit.type = TextFieldType.INPUT;
+		expect(explicit.multiline).toBe(true);
+		field.width = 40;
+		field.text = 'abcdefghij';
+		expect(field.multiline).toBe(true);
+		expect(field.numLines).toBe(3);
+		field.type = TextFieldType.INPUT;
+		expect(field.multiline).toBe(false);
+		expect(field.numLines).toBe(1);
+		field.type = TextFieldType.DYNAMIC;
+		expect(field.numLines).toBe(3);
+		field.multiline = false;
+		field.type = TextFieldType.INPUT;
+		field.type = TextFieldType.DYNAMIC;
+		expect(field.multiline).toBe(false);
+		expect(field.numLines).toBe(1);
+	});
+
+	it.each(['\n', '\r\n', '\r', '\v', '\f', '\u0085', '\u2028', '\u2029'])(
+		'single-line mode displays the first paragraph for separator %j without editing the source',
+		separator => {
+			const field = new TextField();
+			field.multiline = false;
+			field.text = `first${separator}second`;
+			expect(field.getLinesArr().map(line => line.elements.map(element => element.text).join(''))).toEqual([
+				'first',
+			]);
+			expect(field.text).toBe(`first${separator}second`);
+		},
+	);
+
+	it('height clips multiline text without changing the measured line count', () => {
+		const field = new TextField();
+		field.width = 40;
+		field.size = 20;
+		field.text = 'abcdefghij';
+		expect(field.numLines).toBe(3);
+		expect(field.textHeight).toBe(60);
+		field.height = 20;
+		expect(field.numLines).toBe(3);
+		expect(field.textHeight).toBe(60);
 	});
 
 	it('does not wrap width-constrained single-line input', () => {

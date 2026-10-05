@@ -9,6 +9,18 @@ import { generateCode, parseKUISkin } from '../src/core/kui/index.js';
 const TEMPLATE_DIRECTORY = fileURLToPath(new URL('../templates/game/resource/ui/skins/', import.meta.url));
 
 describe('KUI Skin compiler', () => {
+	it('compiles single-line fitting and state sizes without baking derived font sizes', () => {
+		const source =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="FitSkin" states="down"><Label id="amount" text="100.80" width="140" size="24" multiline="false" textFit="shrink" minFontSize="16" size.down="20" /></Skin>';
+		const generated = generateCode(parseKUISkin(source));
+		expect(generated).toContain('amount.multiline = false;');
+		expect(generated).toContain('amount.textFit = "shrink";');
+		expect(generated).toContain('amount.minFontSize = 16;');
+		expect(generated).toContain('amount.size = 24;');
+		expect(generated).toContain('new SetProperty("amount", "size", 20)');
+		expect(generated).not.toContain('renderedSize');
+	});
+
 	it('compiles literal component text without backslash type escapes', () => {
 		const source = String.raw`<Skin xmlns="https://kurot.dev/ui/1" class="Test" states="down"><Label id="lblWin" text="100.80" text.down="false" size="48" /><Button id="button" label="true" enabled="false" /><Label id="path" text="\folder" /></Skin>`;
 		const generated = generateCode(parseKUISkin(source));

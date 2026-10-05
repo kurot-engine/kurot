@@ -1,5 +1,5 @@
 import { Label } from '@kurot/ui';
-import { requireBoolean, requireNumber, requireString } from './valueGuards.js';
+import { invalidRuntimeValue, requireBoolean, requireNumber, requireString } from './valueGuards.js';
 
 /**
  * Applies one property owned by Label and inherited by its subclasses.
@@ -24,6 +24,17 @@ export function applyLabelProperty(target: Label, name: string, value: unknown, 
 		case 'maxChars':
 			target.maxChars = requireNumber(value, path);
 			return true;
+		case 'minFontSize':
+			target.minFontSize = requireNumber(value, path);
+			return true;
+		case 'textFit': {
+			const mode = requireString(value, path);
+			if (mode !== 'none' && mode !== 'shrink') {
+				throw invalidRuntimeValue('none or shrink', path);
+			}
+			target.textFit = mode;
+			return true;
+		}
 		case 'multiline':
 			target.multiline = requireBoolean(value, path);
 			return true;

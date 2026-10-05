@@ -4,6 +4,34 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.1.0] — 2026-10-05
+
+### Added
+
+- Add `TextField.invalidateTextMetrics()` for font readiness changes without
+  a family rename. Call it after a late-loaded font becomes ready.
+
+### Changed
+
+- Make explicit `TextField.multiline = false` render one unwrapped first line,
+  including dynamic text. Dynamic fields default to multiline and input fields
+  to single-line until assigned; explicit intent survives type changes.
+- Keep wordWrap as the Unicode-versus-character wrapping choice in multiline
+  mode. Fixed height clips content without changing its measured line count.
+
+### Migration
+
+- Dynamic text previously wrapped even with multiline false. Remove that explicit
+  value or use true where multiple lines are intended. Source text is unchanged.
+
+### Tests
+
+- Cover dynamic/input defaults, explicit multiline intent across type changes,
+  all hard separators, rich text, width wrapping and fixed-height clipping.
+- Verify single-line and font-readiness behavior through native UI Labels with
+  real fonts in both WebGL and Canvas. Label font shrinking itself belongs to
+  the separate UI release.
+
 ## [2.0.1] — 2026-10-04
 
 ### Fixed

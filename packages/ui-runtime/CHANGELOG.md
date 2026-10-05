@@ -4,6 +4,30 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.8.0] — 2026-10-05
+
+### Added
+
+- Apply Label textFit and minFontSize through native UI property routing so
+  editor previews share compiled-skin behavior without changing authored size.
+- Include public documentation in the npm package, including text layout,
+  materialization boundaries and package context.
+
+### Breaking
+
+- Require `@kurot/core@^2.1.0`, `@kurot/ui@^3.1.0`, and
+  `@kurot/ui-document@^0.9.0` in peer and development dependencies. Upgrade
+  these libraries together; semantic format version 2 and literal XML strings
+  remain unchanged.
+- Explicit `multiline: false` now uses Core's single-line behavior even when
+  height is automatic. Remove the flag or use `true` when wrapping is intended.
+
+### Tests
+
+- Verify shrinking without document mutation, restoration after shorter text,
+  constructor defaults, native appearance state sizes and invalid authoring
+  values against the published dependency versions.
+
 ## [0.7.0] — 2026-10-04
 
 ### Breaking

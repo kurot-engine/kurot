@@ -3,14 +3,34 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 3.0.1.** Node.js 20 or later is required.
+> **Current release: 3.1.0.** Node.js 20 or later is required.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
-> Existing game projects that use EXML, including CrashMaster, should remain on
+> Existing game projects that use EXML should remain on
 > `@kurot/cli@1.3.x`. The KUI toolchain is not an in-place project upgrade and does
 > not require those projects to change their configuration or UI assets.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+## Label text fitting in 3.1.0
+
+The shared ui-document 0.9.x catalog supports Label `textFit` and `minFontSize`
+in KUI XML:
+
+```xml
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.AmountSkin" states="down">
+    <Label id="labelDisplay" text="KZT 10 000,00" width="140" size="24"
+           multiline="false" textFit="shrink" minFontSize="16" size.down="20" />
+</Skin>
+```
+
+The compiler emits the policy, base size and state overrides unchanged. UI
+derives the drawing size after layout validation. Rendering this capability
+requires `@kurot/ui@^3.1.0` and `@kurot/core@^2.1.0` in the application.
+Explicit `multiline="false"` means one unwrapped first line; remove it or set
+it to true for text intended to wrap. Files are not migrated automatically.
+See the [compilation contract](docs/label-text-layout.md) and
+[native Label contract](../ui/docs/label-text-layout.md).
 
 ## Usage
 
@@ -25,7 +45,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.0.1`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.1.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -76,25 +96,25 @@ Create `kurot.config.ts` in the project root:
 
 ```ts
 export default {
-    target: 'html5',
-    entry: 'src/Main.ts',
-    output: { dir: 'bin-debug' },
-    html: { template: 'template/web/index.html' },
-    stage: {
-        width: 640,
-        height: 1136,
-        scaleMode: 'showAll',
-        orientation: 'auto',
-        frameRate: 60,
-    },
-    ui: {
-        sourceDir: 'resource/ui',
-        components: {
-            namespace: 'game',
-            sourceDir: 'src/components',
-            skinDir: 'resource/ui/components',
-        },
-    },
+	target: 'html5',
+	entry: 'src/Main.ts',
+	output: { dir: 'bin-debug' },
+	html: { template: 'template/web/index.html' },
+	stage: {
+		width: 640,
+		height: 1136,
+		scaleMode: 'showAll',
+		orientation: 'auto',
+		frameRate: 60,
+	},
+	ui: {
+		sourceDir: 'resource/ui',
+		components: {
+			namespace: 'game',
+			sourceDir: 'src/components',
+			skinDir: 'resource/ui/components',
+		},
+	},
 };
 ```
 
@@ -133,7 +153,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.0.1 uses `@kurot/ui-document@^0.8.0` and its literal-string XML rules.
+Version 3.1.0 uses `@kurot/ui-document@^0.9.0` and its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -203,7 +223,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.8.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.9.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.

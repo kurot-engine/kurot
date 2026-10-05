@@ -37,7 +37,7 @@ export class TextField extends DisplayObject {
 	private _resolution?: number;
 	private _lineSpacing = 0;
 	private _wordWrap = false;
-	private _multiline = false;
+	private _multiline?: boolean;
 	private _type: TextFieldType = TextFieldType.DYNAMIC;
 	private _inputType: TextFieldInputType = TextFieldInputType.TEXT;
 	private _text = '';
@@ -217,6 +217,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Chooses Unicode word boundaries when true, character boundaries when false.
+	 * Only affects width wrapping while multiline is enabled.
+	 */
 	public get wordWrap(): boolean {
 		return this._wordWrap;
 	}
@@ -228,8 +232,13 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Allows hard line breaks and automatic width wrapping.
+	 * Defaults to true for dynamic text and false for input text until assigned.
+	 * False displays only the first hard-separated line without changing text.
+	 */
 	public get multiline(): boolean {
-		return this._multiline;
+		return this._multiline ?? this._type !== TextFieldType.INPUT;
 	}
 	public set multiline(value: boolean) {
 		if (this._multiline !== value) {
@@ -266,7 +275,7 @@ export class TextField extends DisplayObject {
 			}
 			this.touchEnabled = false;
 		}
-		this.$markDirty();
+		this.invalidateText();
 	}
 
 	public get inputType(): TextFieldInputType {
@@ -318,7 +327,7 @@ export class TextField extends DisplayObject {
 		value = Math.min(Math.max(value, 1), this.maxScrollV);
 		if (this._scrollV !== value) {
 			this._scrollV = value;
-			if (this._type === TextFieldType.INPUT && this._multiline) {
+			if (this._type === TextFieldType.INPUT && this.multiline) {
 				this._inputScrollY = Math.min(this.getScrollYOffset(), this.getMaxInputScrollY());
 				this._inputController?.setScrollTop(this._inputScrollY);
 			}
@@ -434,7 +443,7 @@ export class TextField extends DisplayObject {
 	}
 	public get textHeight(): number {
 		this.ensureLines();
-		if (this._type === TextFieldType.INPUT && !this._multiline) {
+		if (this._type === TextFieldType.INPUT && !this.multiline) {
 			return this._fontSize;
 		}
 		return this._textHeight + (this._numLines - 1) * this._lineSpacing;
@@ -476,6 +485,14 @@ export class TextField extends DisplayObject {
 
 	public get $compositionEnd(): number {
 		return this._compositionEnd;
+	}
+
+	/**
+	 * Discards measured lines and cached drawing after an external font becomes ready.
+	 * Call even when the font-family name and other authored properties are unchanged.
+	 */
+	public invalidateTextMetrics(): void {
+		this.invalidateText();
 	}
 
 	getLinesArr(): ILineElement[] {
@@ -584,9 +601,7 @@ export class TextField extends DisplayObject {
 		const normalized = Number.isFinite(value) ? Math.max(0, value) : 0;
 		const scrollY = Math.min(normalized, this.getMaxInputScrollY());
 		const lineHeight = this.getLineHeight();
-		const scrollV = lineHeight > 0
-			? Math.min(Math.floor(scrollY / lineHeight) + 1, this.maxScrollV)
-			: 1;
+		const scrollV = lineHeight > 0 ? Math.min(Math.floor(scrollY / lineHeight) + 1, this.maxScrollV) : 1;
 		if (this._inputScrollY === scrollY && this._scrollV === scrollV) return;
 		this._inputScrollY = scrollY;
 		this._scrollV = scrollV;
@@ -606,7 +621,7 @@ export class TextField extends DisplayObject {
 	}
 
 	public $getInputIndexAt(localX: number, localY = 0): number {
-		if (this._multiline) {
+		if (this.multiline) {
 			return this.getMultilineInputIndexAt(localX, localY);
 		}
 
@@ -671,14 +686,14 @@ export class TextField extends DisplayObject {
 		this.$renderDirty = true;
 		this.$markDirty();
 		this.updateInputScroll();
-		if (this._type === TextFieldType.INPUT && this._multiline) {
+		if (this._type === TextFieldType.INPUT && this.multiline) {
 			this.$setInputScrollY(this._inputScrollY);
 		}
 		this._inputController?.updateProperties();
 	}
 
 	private updateInputScroll(): void {
-		if (!this._isTyping || this._multiline || isNaN(this.$explicitWidth)) {
+		if (!this._isTyping || this.multiline || isNaN(this.$explicitWidth)) {
 			this._inputScrollX = 0;
 			return;
 		}
@@ -745,13 +760,9 @@ export class TextField extends DisplayObject {
 					let previousCharacterWidth = previousWidth;
 
 					for (let index = 1; index <= element.text.length; index++) {
-						const currentWidth = previousWidth + measureText(
-							element.text.substring(0, index),
-							fontFamily,
-							fontSize,
-							bold,
-							italic,
-						);
+						const currentWidth =
+							previousWidth +
+							measureText(element.text.substring(0, index), fontFamily, fontSize, bold, italic);
 						if (x < (previousCharacterWidth + currentWidth) / 2) {
 							return elementStartIndex + index - 1;
 						}
@@ -771,7 +782,7 @@ export class TextField extends DisplayObject {
 	}
 
 	private getMaxInputScrollY(): number {
-		if (!this._multiline || isNaN(this.$explicitHeight)) return 0;
+		if (!this.multiline || isNaN(this.$explicitHeight)) return 0;
 		return Math.max(0, this.textHeight - this.$explicitHeight);
 	}
 
@@ -797,7 +808,7 @@ export class TextField extends DisplayObject {
 	}
 
 	private getScrollNum(): number {
-		if (!this._multiline) return 1;
+		if (!this.multiline) return 1;
 		if (isNaN(this.$explicitHeight)) return this._numLines;
 		const lineH = this._fontSize + this._lineSpacing;
 		if (lineH <= 0) return this._numLines;
@@ -816,7 +827,7 @@ export class TextField extends DisplayObject {
 			italic: this._italic,
 			maxWidth: this.$explicitWidth,
 			wordWrap: this._wordWrap,
-			canWrap: !isInput || this._multiline,
+			multiline: this.multiline,
 			isInput,
 		});
 	}

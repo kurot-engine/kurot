@@ -2,7 +2,22 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Current release: 2.0.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Current release: 2.1.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Text layout in 2.1.0
+
+Explicit `TextField.multiline = false` now renders only the first hard-separated
+line, without width wrapping. Dynamic text defaults to multiline and input text
+to single-line until the flag is assigned. Fixed height clips drawing without
+changing the measured line count. If an older skin set `multiline="false"` but
+expected wrapping, remove that flag or set it to `true`; files are not migrated
+automatically.
+
+Load fonts before measuring text. If a font becomes ready later, call
+`textField.invalidateTextMetrics()` to refresh cached measurements even when its
+family name is unchanged. See the [Core text contract](docs/text-layout.md).
+Automatic Label font shrinking is a separate UI capability and requires the
+matching UI release; Core does not expose `textFit` or `minFontSize`.
 
 ## Features
 
@@ -64,7 +79,7 @@ Bitmap nine-slice rendering also works in Canvas, including WebGL
 
 **vs. Egret**
 
-| Aspect      | Egret             | Kurot                 |
+| Aspect      | Egret             | Kurot                   |
 | ----------- | ----------------- | ----------------------- |
 | Code size   | 42,340 lines      | ~18,500 lines           |
 | Modules     | `namespace egret` | ES Module               |
@@ -96,15 +111,15 @@ deterministic workloads. The complete run used headless Chromium 151.0.7922.34
 on an Apple M1 Max, an 800×600 surface at DPR/resolution 1, 60 warmup frames,
 300 measured frames, five fresh browser contexts per case, and 175 total cases.
 
-| WebGL 2 workload | Objects | Frame P95 Kurot / PixiJS | Render P95 Kurot / PixiJS | Draw calls Kurot / PixiJS |
-| ---------------- | ------: | ------------------------: | -------------------------: | --------------------------: |
-| Sprite batch | 500 | 16.8 / 17.2 ms | 0.2 / 0.2 ms | 1 / 1 |
-| Mixed textures | 500 | 17.0 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
-| Dynamic transforms | 300 | 17.1 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
-| Deep container | 500 | 17.1 / 17.1 ms | 0.3 / 0.2 ms | 1 / 1 |
-| Rapid churn | 500 | 17.0 / 17.0 ms | 0.3 / 0.3 ms | 1 / 1 |
-| Texture swap | 500 | 16.8 / 16.8 ms | 0.3 / 0.2 ms | 1 / 1 |
-| Filter heavy | 50 | 25.0 / 17.9 ms | 0.7 / 0.4 ms | 200 / 150 |
+| WebGL 2 workload   | Objects | Frame P95 Kurot / PixiJS | Render P95 Kurot / PixiJS | Draw calls Kurot / PixiJS |
+| ------------------ | ------: | -----------------------: | ------------------------: | ------------------------: |
+| Sprite batch       |     500 |           16.8 / 17.2 ms |              0.2 / 0.2 ms |                     1 / 1 |
+| Mixed textures     |     500 |           17.0 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
+| Dynamic transforms |     300 |           17.1 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
+| Deep container     |     500 |           17.1 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
+| Rapid churn        |     500 |           17.0 / 17.0 ms |              0.3 / 0.3 ms |                     1 / 1 |
+| Texture swap       |     500 |           16.8 / 16.8 ms |              0.3 / 0.2 ms |                     1 / 1 |
+| Filter heavy       |      50 |           25.0 / 17.9 ms |              0.7 / 0.4 ms |                 200 / 150 |
 
 The result supports a narrow conclusion: Kurot's sprite/container batching is
 competitive in these six ordinary workloads, while PixiJS has a small
@@ -190,14 +205,14 @@ Interactive test pages in `examples/` require an HTTP dev server (ES Modules don
 pnpm benchmark
 ```
 
-| Page            | Description                                                          |
-| --------------- | -------------------------------------------------------------------- |
-| **Visual Test** | 19 cases: Shape, Graphics, Filters, Mask, RenderGroup, Animation     |
-| **Bitmap Test** | Bitmap rendering: scale, rotation, SpriteSheet, scale9Grid, batching |
-| **Mesh Test**   | Mesh deformation: Quad / Fan / Grid presets, Wave / Ripple / Twist   |
-| **Sound Test**  | Sound / SoundChannel: load, play, volume, loop, error handling       |
-| **Video Test**  | Video: load, play/pause, seek, volume, resize                        |
-| **Net Test**    | HttpRequest / ImageLoader: GET / POST, responseType, timeout, abort  |
+| Page            | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| **Visual Test** | 19 cases: Shape, Graphics, Filters, Mask, RenderGroup, Animation      |
+| **Bitmap Test** | Bitmap rendering: scale, rotation, SpriteSheet, scale9Grid, batching  |
+| **Mesh Test**   | Mesh deformation: Quad / Fan / Grid presets, Wave / Ripple / Twist    |
+| **Sound Test**  | Sound / SoundChannel: load, play, volume, loop, error handling        |
+| **Video Test**  | Video: load, play/pause, seek, volume, resize                         |
+| **Net Test**    | HttpRequest / ImageLoader: GET / POST, responseType, timeout, abort   |
 | **Benchmark**   | Shared Kurot/PixiJS/Egret comparison across 7 deterministic workloads |
 
 Kurot and PixiJS run on WebGL 1 and WebGL 2. The bundled Egret 5.4.1 baseline

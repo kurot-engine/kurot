@@ -64,7 +64,7 @@ describe('Label', () => {
 			expect(h._widthConstraint).toBe(200);
 		});
 
-		it('measure() consumes and uses _widthConstraint', () => {
+		it('measure() retains the external width constraint across text changes', () => {
 			const label = new Label('');
 			const h = label as unknown as { _widthConstraint: number };
 			const tf = textField(label);
@@ -74,8 +74,8 @@ describe('Label', () => {
 
 			label.measure();
 
-			// measure() should have consumed (reset) the constraint.
-			expect(isNaN(h._widthConstraint)).toBe(true);
+			// The parent constraint remains authoritative for subsequent measurements.
+			expect(h._widthConstraint).toBe(200);
 			// And restored the text field width.
 			expect(isNaN(tf.$explicitWidth)).toBe(true);
 		});

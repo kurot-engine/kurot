@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.0.0
-        version: 2.0.1
+        specifier: ^2.1.0
+        version: 2.1.0
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -43,8 +43,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kurot/core@2.0.1':
-    resolution: {integrity: sha512-dtC7m9RARyjZnx8NHqEh4Q8xXMjgMZA/pb9x5S+gZZh05GeLMsQFcCu/4k33uzIAmskpGULsmNZhyRnwt8O+Pw==}
+  '@kurot/core@2.1.0':
+    resolution: {integrity: sha512-RInkr2cXQ8HjG2vn+yQxbkVCNV+Qej7TpVWVQu3TF++6G8c7u2288dG0+r4W1p2jFMGtr9dMqwQXBJwbM8NfmQ==}
 
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
@@ -524,7 +524,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kurot/core@2.0.1':
+  '@kurot/core@2.1.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
 

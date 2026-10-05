@@ -1,6 +1,6 @@
 # @kurot/ui 架构文档
 
-> 当前版本：3.0.0，peerDependency `@kurot/core: ^2.0.0`。逐条变更记录见
+> 当前版本：3.1.0，peerDependency `@kurot/core: ^2.1.0`。逐条变更记录见
 > [CHANGELOG.md](../CHANGELOG.md)。
 > 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反
 > 直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机
@@ -431,7 +431,7 @@ EUI 的一处差异）存在的意义是让 `List`/`DataGroup` 面对成千上�
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `eui.Component`                                                | `Component`                                                                      | 角色相同，Kurot 用真正的类继承（`extends Sprite`）取代 Egret 的命名空间混入风格。                                                                                                                                                                                            |
 | `eui.Skin`                                                     | `Skin`                                                                           | Egret 的 Skin 通常是 EXML 生成的真实 `DisplayObjectContainer` 子类；Kurot 的 `Skin` 明确**不是**显示对象——这是相对 Egret 最大的结构性偏离（见第三节）。                                                                                                                      |
-| `eui.UIComponent` 的三阶段校验                                 | `UIState` + `Validator`                                                          | 同样按深度执行三阶段批处理（提交属性 → 测量 → 提交显示列表）。Egret 通过 `Event.RENDER` 保证绘制前校验，Kurot 通过 core ticker 的 `callLater` 队列实现同一时序契约。                                                                                                             |
+| `eui.UIComponent` 的三阶段校验                                 | `UIState` + `Validator`                                                          | 同样按深度执行三阶段批处理（提交属性 → 测量 → 提交显示列表）。Egret 通过 `Event.RENDER` 保证绘制前校验，Kurot 通过 core ticker 的 `callLater` 队列实现同一时序契约。                                                                                                         |
 | `eui.IThemeAdapter` / 框架内置的主题单例                       | `IThemeAdapter` + `Theme`/`getTheme()`/`setTheme()`                              | Egret 的主题加载策略基本是框架内置的；Kurot 把网络请求策略做成了可通过构造函数注入的接口（见下方"全新设计"）。                                                                                                                                                               |
 | 编译期 EXML 皮肤类的全局命名空间注册                           | `globalThis["skins.X"] = factory` 自注册 ESM 导入                                | 概念上是同一种"全局皮肤注册表"模式，但 Kurot 的编译产物生成的是 **factory 函数**而不是类，专门为了支持用 `.call(this)` 调用来绑定 `this` 上下文——这是类继承重写带来的新问题（原本 Egret 的命名空间混入模式不存在这个绑定问题），Kurot 特有的解法,在 Egret 里没有直接对应物。 |
 | `State`/`SetProperty`/`SetStateProperty`/`AddItems` 覆盖机制   | 同名类，同一个 `IOverride` 接口                                                  | 对 Egret/Flex 视图状态覆盖模式的相当直接的移植。                                                                                                                                                                                                                             |

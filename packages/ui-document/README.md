@@ -4,8 +4,28 @@ Headless semantic document foundation for Kurot UI tooling. It is intended to
 provide one format and one mutation model shared by the future visual UI
 builder, `@kurot/cli`, and Agent-driven UI generation.
 
-> **Current release: 0.8.0.** KUI XML is the canonical authored format. The
+> **Current release: 0.9.0.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
+
+## Label text authoring in 0.9.0
+
+The foundation catalog now declares `textFit` (`none` or `shrink`) and
+`minFontSize` for Labels. Authored `size` and state overrides remain unchanged;
+derived `renderedSize` and `textFitOverflow` are runtime observations and are
+rejected as document properties. EditableText accepts only `textFit="none"`.
+
+```xml
+<Label text="KZT 10 000,00" width="140" size="24"
+       multiline="false" textFit="shrink" minFontSize="16" />
+```
+
+Label's catalog default for `multiline` is true; EditableText's is false.
+Omitted defaults are not inserted into XML. Explicit `multiline="false"` uses
+Core 2.1.0's single-line behavior; remove the flag or set it to true for wrapping.
+The semantic format remains version 2, and files are not migrated automatically.
+See the [text authoring contract](docs/text-layout.md) for validation and
+consumer requirements. This package models these fields; rendering and compiling
+them require the matching UI, ui-runtime and CLI updates.
 
 ## Installation
 
@@ -20,26 +40,26 @@ models UI documents but does not instantiate or render runtime components.
 
 ```ts
 import {
-  createUIDocument,
-  createUISkinRoot,
-  createUINode,
-  serializeUIDocument,
-  validateUIDocument,
+	createUIDocument,
+	createUISkinRoot,
+	createUINode,
+	serializeUIDocument,
+	validateUIDocument,
 } from '@kurot/ui-document';
 
 const document = createUIDocument({
-  id: 'game.MainSkin',
-  assetKind: 'appearance',
-  root: createUISkinRoot({
-    properties: { width: 1280, height: 720 },
-    children: [
-      createUINode({
-        id: 'title',
-        type: 'kui.Label',
-        properties: { text: 'Kurot' },
-      }),
-    ],
-  }),
+	id: 'game.MainSkin',
+	assetKind: 'appearance',
+	root: createUISkinRoot({
+		properties: { width: 1280, height: 720 },
+		children: [
+			createUINode({
+				id: 'title',
+				type: 'kui.Label',
+				properties: { text: 'Kurot' },
+			}),
+		],
+	}),
 });
 
 const diagnostics = validateUIDocument(document);
@@ -130,31 +150,31 @@ tree:
 
 ```ts
 import {
-  createUIAssetReference,
-  createUIComponentInstance,
-  createUIDocument,
-  createUINode,
-  UIAssetRegistry,
-  validateUIAssetRegistry,
+	createUIAssetReference,
+	createUIComponentInstance,
+	createUIDocument,
+	createUINode,
+	UIAssetRegistry,
+	validateUIAssetRegistry,
 } from '@kurot/ui-document';
 
 const screen = createUIDocument({
-  id: 'lobby-screen',
-  assetKind: 'screen',
-  root: createUINode({
-    id: 'root',
-    type: 'kui.Group',
-    children: [
-      createUINode({
-        id: 'play-action',
-        type: 'game.ActionCard',
-        instance: createUIComponentInstance({
-          source: createUIAssetReference('action-card'),
-          parameters: { label: 'Play' },
-        }),
-      }),
-    ],
-  }),
+	id: 'lobby-screen',
+	assetKind: 'screen',
+	root: createUINode({
+		id: 'root',
+		type: 'kui.Group',
+		children: [
+			createUINode({
+				id: 'play-action',
+				type: 'game.ActionCard',
+				instance: createUIComponentInstance({
+					source: createUIAssetReference('action-card'),
+					parameters: { label: 'Play' },
+				}),
+			}),
+		],
+	}),
 });
 
 const registry = new UIAssetRegistry();
@@ -182,17 +202,17 @@ import { UIDocumentHistory } from '@kurot/ui-document';
 
 const history = new UIDocumentHistory(document);
 history.commit({
-  id: 'widen-spin-button',
-  expectedRevision: history.snapshot.revision,
-  summary: 'Make the primary action wider',
-  operations: [
-    {
-      kind: 'set-node-property',
-      nodeId: 'spin-button',
-      property: 'width',
-      value: 320,
-    },
-  ],
+	id: 'widen-spin-button',
+	expectedRevision: history.snapshot.revision,
+	summary: 'Make the primary action wider',
+	operations: [
+		{
+			kind: 'set-node-property',
+			nodeId: 'spin-button',
+			property: 'width',
+			value: 320,
+		},
+	],
 });
 
 history.undo();
@@ -216,14 +236,14 @@ import { UIComponentRegistry } from '@kurot/ui-document';
 
 const registry = new UIComponentRegistry();
 registry.register({
-  type: 'schema.UIComponent',
-  abstract: true,
-  allowUnknownProperties: true,
+	type: 'schema.UIComponent',
+	abstract: true,
+	allowUnknownProperties: true,
 });
 
 registry.register({
-  type: 'game.ProfileCard',
-  extends: 'schema.UIComponent',
+	type: 'game.ProfileCard',
+	extends: 'schema.UIComponent',
 });
 
 const resolved = registry.resolve('game.ProfileCard');

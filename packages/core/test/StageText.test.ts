@@ -18,8 +18,15 @@ describe('StageText DOM overlay', () => {
 			clientTop: { value: 3 },
 		});
 		canvas.getBoundingClientRect = () => ({
-			x: 100, y: 50, left: 100, top: 50, right: 420, bottom: 290,
-			width: 320, height: 240, toJSON: () => ({}),
+			x: 100,
+			y: 50,
+			left: 100,
+			top: 50,
+			right: 420,
+			bottom: 290,
+			width: 320,
+			height: 240,
+			toJSON: () => ({}),
 		});
 		document.body.appendChild(canvas);
 
@@ -29,6 +36,7 @@ describe('StageText DOM overlay', () => {
 		parent.scaleX = 2;
 		parent.scaleY = 1.5;
 		const field = new TextField();
+		field.multiline = false;
 		field.x = 10;
 		field.y = 8;
 		field.width = 100;
@@ -73,14 +81,22 @@ describe('StageText DOM overlay', () => {
 			clientTop: { value: 0 },
 		});
 		canvas.getBoundingClientRect = () => ({
-			x: 0, y: 0, left: 0, top: 0, right: 320, bottom: 240,
-			width: 320, height: 240, toJSON: () => ({}),
+			x: 0,
+			y: 0,
+			left: 0,
+			top: 0,
+			right: 320,
+			bottom: 240,
+			width: 320,
+			height: 240,
+			toJSON: () => ({}),
 		});
 		document.body.appendChild(canvas);
 
 		const stage = new Stage();
 		stage.resize(640, 480);
 		const field = new TextField();
+		field.multiline = false;
 		field.x = 20;
 		field.y = 10;
 		field.width = 100;
@@ -97,6 +113,7 @@ describe('StageText DOM overlay', () => {
 
 	it('publishes native text and selection while keeping the DOM editor invisible', () => {
 		const field = new TextField();
+		field.multiline = false;
 		field.width = 160;
 		field.height = 30;
 		const stageText = new StageText();
@@ -123,6 +140,7 @@ describe('StageText DOM overlay', () => {
 
 	it('publishes the native textarea pixel scroll position', () => {
 		const field = new TextField();
+		field.multiline = false;
 		field.multiline = true;
 		field.width = 160;
 		field.height = 60;

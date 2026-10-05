@@ -27,16 +27,16 @@ Kurot is a continuation of Egret 5.4.1 for the modern web platform, not a new
 API placed on top of the old renderer. It retains the productive display-object,
 event and EUI model while replacing the rendering and build foundations.
 
-| Area | Egret 5.4.1 | Kurot |
-| ---- | ----------- | ----- |
-| GPU backend | WebGL 1 | WebGL 2 preferred, WebGL 1 fallback |
-| Software fallback | Canvas 2D | Canvas 2D |
-| Batching | Primarily consecutive same-texture draws | Up to eight textures in one batch |
-| Render organization | RenderNode tree | Flat `InstructionSet` + `RenderPipe` execution |
-| Update model | RenderNode/display-tree updates | Separate `structureDirty` rebuilds and `renderDirty` patches |
-| Modules | Namespace/global-oriented runtime | Native ESM |
-| Language target | Legacy web/TypeScript environment | ES2022 with `strict: true` |
-| UI documents | EXML runtime/toolchain model | Canonical KUI XML → build-time ESM Skin compilation |
+| Area                | Egret 5.4.1                              | Kurot                                                        |
+| ------------------- | ---------------------------------------- | ------------------------------------------------------------ |
+| GPU backend         | WebGL 1                                  | WebGL 2 preferred, WebGL 1 fallback                          |
+| Software fallback   | Canvas 2D                                | Canvas 2D                                                    |
+| Batching            | Primarily consecutive same-texture draws | Up to eight textures in one batch                            |
+| Render organization | RenderNode tree                          | Flat `InstructionSet` + `RenderPipe` execution               |
+| Update model        | RenderNode/display-tree updates          | Separate `structureDirty` rebuilds and `renderDirty` patches |
+| Modules             | Namespace/global-oriented runtime        | Native ESM                                                   |
+| Language target     | Legacy web/TypeScript environment        | ES2022 with `strict: true`                                   |
+| UI documents        | EXML runtime/toolchain model             | Canonical KUI XML → build-time ESM Skin compilation          |
 
 Canvas 2D fallback is a capability shared by both engines; it is not presented
 as a Kurot invention. Kurot's measurable renderer evolution is its modern
@@ -47,34 +47,37 @@ correctness and performance validation system.
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
-| Package                                                | Version | Path                   | Responsibility                                                                                                 | Internal dependencies |
-| ------------------------------------------------------ | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.0.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media | None                  |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.0.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                         | `@kurot/core`         |
-| [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                 | `@kurot/core`         |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.0.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                    | `ui-document`         |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.8.0   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                  |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.7.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse | `core`, `ui`, `ui-document` |
+| Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
+| ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| [`@kurot/core`](packages/core/README.md)               | 2.1.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | None                        |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.1.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.9.0   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
-`@kurot/ui-document` 0.8 provides the reusable semantic model, explicit
+`@kurot/ui-document` 0.9 provides the reusable semantic model, explicit
 component capabilities, bounded dynamic contracts, and headless editing
-kernel. `@kurot/ui-runtime` 0.7 validates and renders that model, including
+kernel. `@kurot/ui-runtime` 0.8 validates and renders that model, including
 component instances, Slots, appearances, states, variants, resources, and
 design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
 category-specific resource adapters while keeping game logic outside the
 document.
 
-CLI 3.0.1 and ui-runtime 0.7 require ui-document 0.8.x and its literal-string
-XML contract. Remove old synthetic backslash text prefixes explicitly; Editor
-and CLI must share the same parser contract.
+CLI 3.1 and ui-runtime 0.8 require ui-document ^0.9.0.
+The document kernel retains the literal-string XML contract. Remove old
+synthetic backslash text prefixes explicitly; Editor and CLI must share the
+same parser contract. ui-document 0.9 adds Label fitting metadata while retaining
+format version 2. ui-runtime 0.8 materializes fitting properties through native
+Labels without changing the authored size or semantic document.
 
 Core 2.0 and CLI 3.0+ require object-valued sheet
-`subkeys` in resource manifests. UI 3.0, game 2.0, and ui-runtime 0.7 require
-Core 2.x; ui-runtime also requires UI 3.x. Refresh old sheets in Kurot Editor before
-upgrading a KUI project; see the
+`subkeys` in resource manifests. UI 3.1 and ui-runtime 0.8 require Core ^2.1.0;
+ui-runtime also requires UI ^3.1.0, while game 2.0 declares Core 2.x. Refresh
+old sheets in Kurot Editor before upgrading a KUI project; see the
 [resource migration contract](packages/ui-document/docs/resource-nine-slice.md).
 
 ```text
@@ -169,14 +172,14 @@ Against Egret 5.4.1 on WebGL 1, the same benchmark measured the following draw
 calls. These values describe the named workloads, not universal speed-up
 factors:
 
-| Workload | Kurot | Egret 5.4.1 |
-| -------- | ----: | ----------: |
-| 500 single-texture sprites | 1 | 1 |
-| 500 sprites across eight textures | 1 | 500 |
-| 300 dynamic transforms | 1 | 1 |
-| 500 objects in a deep container tree | 1 | 500 |
-| 500 objects with display-list churn | 1 | 451 |
-| 500 objects with dynamic texture swaps | 1 | 167.3 |
+| Workload                               | Kurot | Egret 5.4.1 |
+| -------------------------------------- | ----: | ----------: |
+| 500 single-texture sprites             |     1 |           1 |
+| 500 sprites across eight textures      |     1 |         500 |
+| 300 dynamic transforms                 |     1 |           1 |
+| 500 objects in a deep container tree   |     1 |         500 |
+| 500 objects with display-list churn    |     1 |         451 |
+| 500 objects with dynamic texture swaps |     1 |       167.3 |
 
 These are scoped workload results, not a claim that Kurot matches PixiJS as a
 whole or that draw-call ratios translate directly into equal FPS gains. The
@@ -188,11 +191,11 @@ benchmark method and commands are documented in the
 The initial `@kurot/ui` browser benchmark confirms that core rendering
 efficiency reaches the UI layer:
 
-| Workload | Frame P95 | Render P95 | Draw calls | Lifecycle evidence |
-| -------- | --------: | ---------: | ---------: | ------------------ |
-| 400-node static image UI | 10.20 ms | 0.20 ms | 1 | No repeated validation after stabilization |
-| 240-node transform/alpha animation | 10.00 ms | 0.30 ms | 1 | No measure or display-list validation |
-| 10,000-record virtual list | 9.90 ms | 0.50 ms | 5 | At most 19 live ItemRenderers |
+| Workload                           | Frame P95 | Render P95 | Draw calls | Lifecycle evidence                         |
+| ---------------------------------- | --------: | ---------: | ---------: | ------------------------------------------ |
+| 400-node static image UI           |  10.20 ms |    0.20 ms |          1 | No repeated validation after stabilization |
+| 240-node transform/alpha animation |  10.00 ms |    0.30 ms |          1 | No measure or display-list validation      |
+| 10,000-record virtual list         |   9.90 ms |    0.50 ms |          5 | At most 19 live ItemRenderers              |
 
 The animation workload performs one coalesced `commitProperties` call per
 moving UI component per frame because position participates in the unified

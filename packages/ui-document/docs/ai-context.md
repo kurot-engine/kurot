@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.8.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.9.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -107,8 +107,8 @@ src/
   deterministic and detects missing bases and cycles.
 - The foundation catalog contains abstract `kurot.DisplayObject`,
   `kui.UIComponent`, and `kui.Component`, plus concrete `kui.Group`,
-	`kui.Label`, `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
-	`kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput`.
+  `kui.Label`, `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
+  `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput`.
 - `kui.ToggleButton` inherits the Button contract and changes the authored
   `toggle` default to `true`. `kui.ProgressBar` directly extends
   `kui.Component`, matching the runtime class rather than pretending it
@@ -129,6 +129,14 @@ src/
   Audited colors and layout measurements accept appropriate design tokens.
 - `Label.fontFamily` accepts either a CSS font-family string or a registered
   `font` resource reference.
+- Label's catalog default for `multiline` is true; EditableText's is false.
+  Omitted default properties are not inserted into XML. Core 2.1.0 interprets
+  explicit false as one unwrapped first line.
+- Label `textFit` accepts `none` (default) or `shrink`. `minFontSize` defaults
+  to 12 and accepts finite numbers >= 1. EditableText overrides `textFit` to
+  accept only `none`; inherited minimum metadata does not enable fitting.
+- `size` and state sizes are authored inputs. `renderedSize` and
+  `textFitOverflow` are runtime results, deliberately absent from the catalog.
 - Runtime and compatibility fields are not automatically authoring APIs.
   `currentState` and `hostComponentKey` remain deliberately absent. Skinnable
   controls expose `skinName` because compiled KUI Skin modules register their
@@ -173,17 +181,17 @@ src/
 
 ## 6. Task → file map
 
-| Task | Start with |
-| --- | --- |
-| Change asset/node/reference shapes | `model/` |
-| Add constructors or tree queries | `document/` |
-| Add a structural invariant | `validation/validateUIDocument.ts` and related validators |
-| Change canonical KUI XML | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures |
-| Change property semantics | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
-| Change built-in component fields | `catalog/properties/` |
-| Change project catalogs or cross-document rules | `assets/` |
-| Change operations, transactions, diff, or history | `editing/` |
-| Change public exports | nearest folder `index.ts`, then `src/index.ts` |
+| Task                                              | Start with                                                                 |
+| ------------------------------------------------- | -------------------------------------------------------------------------- |
+| Change asset/node/reference shapes                | `model/`                                                                   |
+| Add constructors or tree queries                  | `document/`                                                                |
+| Add a structural invariant                        | `validation/validateUIDocument.ts` and related validators                  |
+| Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures          |
+| Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
+| Change built-in component fields                  | `catalog/properties/`                                                      |
+| Change project catalogs or cross-document rules   | `assets/`                                                                  |
+| Change operations, transactions, diff, or history | `editing/`                                                                 |
+| Change public exports                             | nearest folder `index.ts`, then `src/index.ts`                             |
 
 ## 7. Commands
 
@@ -199,3 +207,14 @@ pnpm --dir packages/ui-document test
 `resolveUIResourceDefaults()` injects nine-slice defaults into a copy. See
 [the resource-default contract](resource-nine-slice.md)
 for conversion and compilation boundaries.
+
+## Text authoring contract in 0.9.0
+
+The package describes and validates fitting policy; it does not measure text,
+derive font sizes or import runtime classes. The semantic format remains 2.
+Matching CLI and ui-runtime releases must raise their ui-document range to
+0.9.x before consuming the new catalog. Rendering requires Core >= 2.1.0 and
+the matching UI Label implementation.
+See [text authoring](text-layout.md) for defaults, XML preservation and
+validation boundaries, and [Label text layout](../../ui/docs/label-text-layout.md)
+for native rendering behavior.

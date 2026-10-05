@@ -12,7 +12,7 @@ const TEXT_CONTENT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 	text: {
 		valueType: 'string',
 		defaultValue: '',
-		description: 'Plain text content; newline characters create hard line breaks.',
+		description: 'Plain text content; hard separators create line breaks only in multiline mode.',
 	},
 	textColor: colorProperty(0xffffff, 'Text fill RGB color.'),
 };
@@ -85,12 +85,24 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		defaultValue: 0,
 		description: 'Additional spacing in pixels between text lines.',
 	},
-	multiline: booleanProperty(false, 'Whether the label permits multiple rendered lines.'),
+	multiline: booleanProperty(true, 'Allows hard breaks and width wrapping; false renders only the first line.'),
+	textFit: {
+		valueType: 'string',
+		enumValues: ['none', 'shrink'],
+		defaultValue: 'none',
+		description: 'Shrinks single-line Label text within constrained bounds without changing size.',
+	},
+	minFontSize: {
+		valueType: 'number',
+		minimum: 1,
+		defaultValue: 12,
+		description: 'Readable lower limit for shrinking, in logical pixels; never enlarges text.',
+	},
 	size: {
 		valueType: 'number',
 		minimum: 0,
 		defaultValue: 30,
-		description: 'Font size in pixels.',
+		description: 'Authored font size in logical pixels; shrinking derives a separate drawing size.',
 	},
 	stroke: {
 		valueType: 'number',
@@ -111,7 +123,7 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		defaultValue: 'top',
 		description: 'Vertical alignment within the label bounds.',
 	},
-	wordWrap: booleanProperty(false, 'Whether text wraps at the available width.'),
+	wordWrap: booleanProperty(false, 'Multiline wrapping: true uses Unicode boundaries, false character boundaries.'),
 };
 
 /**
@@ -119,6 +131,13 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
  */
 export const EDITABLE_TEXT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	...TEXT_ENTRY_PROPERTIES,
+	multiline: booleanProperty(false, 'Whether native text entry allows multiple lines.'),
+	textFit: {
+		valueType: 'string',
+		enumValues: ['none'],
+		defaultValue: 'none',
+		description: 'Editable text does not support automatic font shrinking.',
+	},
 	promptColor: colorProperty(0x999999, 'Placeholder text RGB color.'),
 };
 

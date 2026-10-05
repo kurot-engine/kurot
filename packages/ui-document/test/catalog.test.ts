@@ -13,7 +13,7 @@ describe('Kurot UI foundation catalog', () => {
 	it('registers the audited component subset in deterministic order', () => {
 		const registry = createKurotUIFoundationRegistry();
 
-		expect(registry.list().map((definition) => definition.type)).toEqual([
+		expect(registry.list().map(definition => definition.type)).toEqual([
 			'kui.Button',
 			'kui.Component',
 			'kui.EditableText',
@@ -51,12 +51,7 @@ describe('Kurot UI foundation catalog', () => {
 			children: 'multiple',
 		});
 		expect(editableText).toMatchObject({
-			baseTypes: [
-				'kurot.DisplayObject',
-				'kui.UIComponent',
-				'kui.Component',
-				'kui.Label',
-			],
+			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component', 'kui.Label'],
 			children: 'none',
 		});
 		expect(editableText?.properties.text?.defaultValue).toBe('');
@@ -64,12 +59,7 @@ describe('Kurot UI foundation catalog', () => {
 		expect(button?.children).toBe('none');
 		expect(button?.properties.skinName).toMatchObject({ valueType: 'string' });
 		expect(toggleButton).toMatchObject({
-			baseTypes: [
-				'kurot.DisplayObject',
-				'kui.UIComponent',
-				'kui.Component',
-				'kui.Button',
-			],
+			baseTypes: ['kurot.DisplayObject', 'kui.UIComponent', 'kui.Component', 'kui.Button'],
 			children: 'none',
 		});
 		expect(toggleButton?.properties.toggle?.defaultValue).toBe(true);
@@ -90,11 +80,7 @@ describe('Kurot UI foundation catalog', () => {
 			valueType: ['string', 'resource-reference'],
 			resourceTypes: ['font'],
 		});
-		expect(label?.properties.left?.valueType).toEqual([
-			'number',
-			'string',
-			'token-reference',
-		]);
+		expect(label?.properties.left?.valueType).toEqual(['number', 'string', 'token-reference']);
 	});
 
 	it('validates a document using the audited basic properties', () => {
@@ -204,6 +190,7 @@ describe('Kurot UI foundation catalog', () => {
 			'italic',
 			'lineSpacing',
 			'maxChars',
+			'minFontSize',
 			'multiline',
 			'size',
 			'stroke',
@@ -211,12 +198,18 @@ describe('Kurot UI foundation catalog', () => {
 			'text',
 			'textAlign',
 			'textColor',
+			'textFit',
 			'verticalAlign',
 			'wordWrap',
 		]);
-		expect(
-			Object.keys(registry.get('kui.EditableText')?.properties ?? {}).sort(),
-		).toEqual(['inputType', 'prompt', 'promptColor', 'restrict']);
+		expect(Object.keys(registry.get('kui.EditableText')?.properties ?? {}).sort()).toEqual([
+			'inputType',
+			'multiline',
+			'prompt',
+			'promptColor',
+			'restrict',
+			'textFit',
+		]);
 		expect(Object.keys(registry.get('kui.Image')?.properties ?? {}).sort()).toEqual([
 			'fillMode',
 			'scale9Grid',
@@ -238,15 +231,15 @@ describe('Kurot UI foundation catalog', () => {
 			'selected',
 			'toggle',
 		]);
-		expect(
-			Object.keys(registry.get('kui.ToggleButton')?.properties ?? {}).sort(),
-		).toEqual(['toggle']);
-		expect(
-			Object.keys(registry.get('kui.ProgressBar')?.properties ?? {}).sort(),
-		).toEqual(['direction', 'maximum', 'minimum', 'slideDuration', 'value']);
-		expect(
-			Object.keys(registry.get('kui.TextInput')?.properties ?? {}).sort(),
-		).toEqual([
+		expect(Object.keys(registry.get('kui.ToggleButton')?.properties ?? {}).sort()).toEqual(['toggle']);
+		expect(Object.keys(registry.get('kui.ProgressBar')?.properties ?? {}).sort()).toEqual([
+			'direction',
+			'maximum',
+			'minimum',
+			'slideDuration',
+			'value',
+		]);
+		expect(Object.keys(registry.get('kui.TextInput')?.properties ?? {}).sort()).toEqual([
 			'displayAsPassword',
 			'inputType',
 			'maxChars',
@@ -308,9 +301,7 @@ describe('Kurot UI foundation catalog', () => {
 			}),
 		});
 
-		expect(
-			validateUIDocumentComponents(document, registry).map(item => item.path),
-		).toEqual([
+		expect(validateUIDocumentComponents(document, registry).map(item => item.path)).toEqual([
 			'$.root.children[0].properties.textAlign',
 			'$.root.children[0].properties.alpha',
 			'$.root.children[0].properties.typo',
@@ -337,9 +328,10 @@ describe('Kurot UI foundation catalog', () => {
 			}),
 		});
 
-		expect(
-			validateUIDocumentComponents(document, registry).map(item => item.path),
-		).toEqual(['$.root.properties.inputType', '$.root.properties.promptColor']);
+		expect(validateUIDocumentComponents(document, registry).map(item => item.path)).toEqual([
+			'$.root.properties.inputType',
+			'$.root.properties.promptColor',
+		]);
 	});
 
 	it('rejects abstract catalog bases as document nodes', () => {
@@ -349,18 +341,14 @@ describe('Kurot UI foundation catalog', () => {
 			root: createUINode({ id: 'root', type: 'kui.Component' }),
 		});
 
-		expect(validateUIDocumentComponents(document, registry)[0]?.code).toBe(
-			'abstract-component-type',
-		);
+		expect(validateUIDocumentComponents(document, registry)[0]?.code).toBe('abstract-component-type');
 	});
 
 	it('checks all collisions before mutating a target registry', () => {
 		const registry = new UIComponentRegistry();
 		registry.register({ type: 'kui.Button' });
 
-		expect(() => registerKurotUIFoundation(registry)).toThrow(
-			'Component type "kui.Button" is already registered.',
-		);
+		expect(() => registerKurotUIFoundation(registry)).toThrow('Component type "kui.Button" is already registered.');
 		expect(registry.has('kurot.DisplayObject')).toBe(false);
 	});
 });

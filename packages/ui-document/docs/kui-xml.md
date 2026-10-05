@@ -111,6 +111,22 @@ than child display nodes:
 The item renderer skin belongs to each generated row. The collection and
 layout are independent properties of the container.
 
+## Label text layout
+
+The 0.9.0 foundation catalog accepts a single-line Label fitting policy:
+
+```xml
+<Label text="KZT 10 000,00" width="140" size="24"
+       multiline="false" textFit="shrink" minFontSize="16" />
+```
+
+`textFit` is `none` by default and may be `shrink` on Label. `minFontSize` must
+be finite and at least 1. EditableText accepts only `none`. Authored `size` and
+state sizes are preserved; `renderedSize` and `textFitOverflow` are runtime
+observations and cannot be authored. Omitted catalog defaults stay omitted.
+See [text authoring](text-layout.md) for the complete contract and matching
+compiler/runtime requirements.
+
 ## Parts and states
 
 Every explicitly identified node inside the Skin is available as a skin

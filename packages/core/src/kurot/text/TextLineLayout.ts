@@ -9,7 +9,7 @@ export interface TextLineLayoutOptions {
 	italic: boolean;
 	maxWidth: number;
 	wordWrap: boolean;
-	canWrap: boolean;
+	multiline: boolean;
 	isInput: boolean;
 }
 
@@ -36,12 +36,16 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 		offset += element.text.length;
 		return { start, end: offset, style: element.style };
 	});
-	const wrapping = options.canWrap && Number.isFinite(options.maxWidth);
+	const wrapping = options.multiline && Number.isFinite(options.maxWidth);
 	const lines: ILineElement[] = [];
 	let paragraphStart = 0;
 	let spanIndex = 0;
 
 	for (const separator of text.matchAll(/\r\n|[\n\r\v\f\u0085\u2028\u2029]/g)) {
+		if (!options.multiline) {
+			lines.push(createLine(0, separator.index, false));
+			return lines;
+		}
 		appendParagraph(paragraphStart, separator.index, separator[0].length);
 		paragraphStart = separator.index + separator[0].length;
 	}

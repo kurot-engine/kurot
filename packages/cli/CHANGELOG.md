@@ -7,6 +7,28 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.1.0 — 2026-10-05
+
+### Added
+
+- Compile shared-catalog Label textFit/minFontSize properties and state sizes
+  unchanged. Drawing size remains a UI runtime derivation, never generated data.
+- Include public documentation in the npm package, including the compilation
+  contract, architecture and package context.
+
+### Dependencies
+
+- Require `@kurot/ui-document@^0.9.0` for the Label authoring catalog. KUI
+  rendering with shrinking requires UI 3.1.x and Core 2.1.x or later within
+  their respective majors; native engine packages remain project dependencies.
+- Keep semantic format version 2, literal string handling and resource defaults.
+  Existing EXML projects stay on CLI 1.3.x; no files are migrated automatically.
+
+### Tests
+
+- Verify fitting policy, minimum font size, authored size and state-size
+  assignments through KUI parsing and code generation.
+
 ## 3.0.1 — 2026-10-04
 
 ### XML Authoring Change
@@ -227,13 +249,13 @@ change their project configuration.
 - `kurot dev --diagnostics jsonl`, which reserves stdout for independent
   `build-start`, `diagnostic`, `build-complete` and `server-ready` events.
 - Stable diagnostics for the following cases:
-  - `KUROT_EXML_UNKNOWN_TAG`
-  - `KUROT_EXML_COMPILE_FAILED`
-  - `KUROT_EXML_DECLARED_FILE_NOT_FOUND`
-  - `KUROT_THEME_FILE_NOT_FOUND`
-  - `KUROT_THEME_INVALID_JSON`
-  - `KUROT_THEME_SKIN_NOT_FOUND`
-  - `KUROT_WATCH_RELEASE_IGNORED`
+    - `KUROT_EXML_UNKNOWN_TAG`
+    - `KUROT_EXML_COMPILE_FAILED`
+    - `KUROT_EXML_DECLARED_FILE_NOT_FOUND`
+    - `KUROT_THEME_FILE_NOT_FOUND`
+    - `KUROT_THEME_INVALID_JSON`
+    - `KUROT_THEME_SKIN_NOT_FOUND`
+    - `KUROT_WATCH_RELEASE_IGNORED`
 
 ### Changed
 

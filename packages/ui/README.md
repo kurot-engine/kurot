@@ -2,19 +2,50 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 3.0.0.** Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Current release: 3.1.0.** Requires `@kurot/core@^2.1.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
+
+## Label text fitting in 3.1.0
+
+Single-line Labels can shrink their drawing size to fit the available region:
+
+```ts
+import { Label } from '@kurot/ui';
+
+const amount = new Label('KZT 10 000,00');
+amount.width = 140;
+amount.size = 24;
+amount.multiline = false;
+amount.textFit = 'shrink';
+amount.minFontSize = 16;
+```
+
+`size` stays authored; `renderedSize` and `textFitOverflow` are read-only results
+after layout validation. Shorter text or larger bounds restore the base size.
+Put a Button's fitting policy on its `labelDisplay` skin part, so icon spacing
+and state overrides are respected. EditableText rejects shrinking; multiline
+Labels retain their base size.
+
+Label defaults to multiline, while explicit `multiline = false` displays one
+unwrapped first line. Remove an old false flag or set it to true for text
+intended to wrap. Files are not migrated automatically. Load fonts before
+measurement; after late loading, call `label.invalidateSize()` to refresh
+metrics even if the family name is unchanged.
+
+See the [text layout and fitting contract](docs/label-text-layout.md). KUI
+authoring requires ui-document 0.9.x and matching CLI/ui-runtime releases;
+programmatic UI depends only on Core.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui @kurot/core
+pnpm add @kurot/ui@^3.1.0 @kurot/core@^2.1.0
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-Upgrade Core to 2.x together with UI 3.x. Refresh old sheet manifests with
+UI 3.1 requires Core 2.1.0 or later within Core 2.x. Refresh old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
@@ -134,18 +165,12 @@ export class ConfirmPanel extends Component {
 
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		this.skinParts.btnConfirm.addEventListener(
-			TouchEvent.TOUCH_TAP,
-			this.onConfirm,
-		);
+		this.skinParts.btnConfirm.addEventListener(TouchEvent.TOUCH_TAP, this.onConfirm);
 		this.skinParts.lblMessage.text = 'Continue?';
 	}
 
 	protected override onSkinRemoved(): void {
-		this.skinParts.btnConfirm.removeEventListener(
-			TouchEvent.TOUCH_TAP,
-			this.onConfirm,
-		);
+		this.skinParts.btnConfirm.removeEventListener(TouchEvent.TOUCH_TAP, this.onConfirm);
 		super.onSkinRemoved();
 	}
 
@@ -179,19 +204,19 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 
 ### Basic Controls
 
-| Component      | Description                                                                 |
-| -------------- | --------------------------------------------------------------------------- |
-| `Label`        | Text display. Wraps `TextField` in the UI lifecycle.                        |
-| `Button`       | Tappable button with `up`/`down`/`disabled` states and `labelDisplay` part. |
-| `CheckBox`     | Toggle button. Dispatches `Event.CHANGE` on selection change.               |
-| `RadioButton`  | Mutually exclusive toggle. Use `groupName` to link buttons.                 |
-| `ToggleButton` | Base for toggle-style buttons.                                              |
-| `ToggleSwitch` | Binary on/off switch (visual variant of `ToggleButton`).                    |
-| `ProgressBar`  | Value indicator. Inject `thumb` (a `Component`) as the fill part.           |
+| Component      | Description                                                                    |
+| -------------- | ------------------------------------------------------------------------------ |
+| `Label`        | Text display. Wraps `TextField` in the UI lifecycle.                           |
+| `Button`       | Tappable button with `up`/`down`/`disabled` states and `labelDisplay` part.    |
+| `CheckBox`     | Toggle button. Dispatches `Event.CHANGE` on selection change.                  |
+| `RadioButton`  | Mutually exclusive toggle. Use `groupName` to link buttons.                    |
+| `ToggleButton` | Base for toggle-style buttons.                                                 |
+| `ToggleSwitch` | Binary on/off switch (visual variant of `ToggleButton`).                       |
+| `ProgressBar`  | Value indicator. Inject `thumb` (a `Component`) as the fill part.              |
 | `HSlider`      | Horizontal slider. Inject `thumb` and `track` skin parts; default range 0–100. |
 | `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts; default range 0–100.   |
-| `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`. |
-| `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`. |
+| `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`.    |
+| `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`.    |
 
 Both sliders inherit Range's default `minimum = 0` and `maximum = 100`.
 Set either bound explicitly when a control needs a different range.
@@ -221,13 +246,13 @@ gesture. Set `visible="true" autoVisibility="false"` to keep a bar visible.
 
 ### Data-Driven
 
-| Component      | Description                                                                                 |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| `DataGroup`    | Renders a data collection using item renderers. Supports virtual layout for large datasets. |
-| `List`         | `DataGroup` with tap-to-select. Dispatches `ItemTapEvent.ITEM_TAP`.                         |
-| `TabBar`       | Horizontal tab strip driven by `dataProvider`. Dispatches `ItemTapEvent.ITEM_TAP`.          |
+| Component      | Description                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| `DataGroup`    | Renders a data collection using item renderers. Supports virtual layout for large datasets.     |
+| `List`         | `DataGroup` with tap-to-select. Dispatches `ItemTapEvent.ITEM_TAP`.                             |
+| `TabBar`       | Horizontal tab strip driven by `dataProvider`. Dispatches `ItemTapEvent.ITEM_TAP`.              |
 | `ComboBox`     | Drop-down selector. Tapping toggles a `list` skin part; dispatches `Event.CHANGE` on selection. |
-| `ItemRenderer` | Base class for custom item renderers. Override `dataChanged()` to update visuals.           |
+| `ItemRenderer` | Base class for custom item renderers. Override `dataChanged()` to update visuals.               |
 
 ### Scroll Bars
 
@@ -326,13 +351,13 @@ class MyButtonSkin extends Skin {
 
 ## Events
 
-| Event                               | Dispatched by                   | Description                                          |
-| ----------------------------------- | ------------------------------- | ---------------------------------------------------- |
+| Event                               | Dispatched by                                                    | Description                                                        |
+| ----------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
 | `Event.CHANGE`                      | `List`, `TabBar`, `ComboBox`, `CheckBox`, `RadioButton`, `Range` | Selection or value changed (user interaction only for List/TabBar) |
-| `ItemTapEvent.ITEM_TAP`             | `List`, `TabBar`                | Item tapped. Has `item`, `itemIndex`, `itemRenderer` |
-| `CollectionEvent.COLLECTION_CHANGE` | `ArrayCollection`               | Data added, removed, replaced, reset                 |
-| `UIEvent.CLOSING`                   | `Panel`                         | Close button tapped (cancelable)                     |
-| `UIEvent.CREATION_COMPLETE`         | Any `Component`                 | First `createChildren` completed                     |
+| `ItemTapEvent.ITEM_TAP`             | `List`, `TabBar`                                                 | Item tapped. Has `item`, `itemIndex`, `itemRenderer`               |
+| `CollectionEvent.COLLECTION_CHANGE` | `ArrayCollection`                                                | Data added, removed, replaced, reset                               |
+| `UIEvent.CLOSING`                   | `Panel`                                                          | Close button tapped (cancelable)                                   |
+| `UIEvent.CREATION_COMPLETE`         | Any `Component`                                                  | First `createChildren` completed                                   |
 
 ## UI Benchmark
 
@@ -347,11 +372,11 @@ report can distinguish a stable pool from per-frame renderer churn.
 
 The first complete Chromium run used 60 warmup frames and 300 measured frames:
 
-| Workload | Setup | Frame P95 | Render P95 | Draw calls | UI lifecycle result |
-| -------- | ----: | --------: | ---------: | ---------: | ------------------- |
-| 400-node static image UI | 8.50 ms | 10.20 ms | 0.20 ms | 1 | No repeated validation after stabilization |
-| 240-node transform/alpha animation | 3.90 ms | 10.00 ms | 0.30 ms | 1 | No measure or display-list validation |
-| 10,000-record virtual list | 6.90 ms | 9.90 ms | 0.50 ms | 5 | 19 renderers created and at most 19 live |
+| Workload                           |   Setup | Frame P95 | Render P95 | Draw calls | UI lifecycle result                        |
+| ---------------------------------- | ------: | --------: | ---------: | ---------: | ------------------------------------------ |
+| 400-node static image UI           | 8.50 ms |  10.20 ms |    0.20 ms |          1 | No repeated validation after stabilization |
+| 240-node transform/alpha animation | 3.90 ms |  10.00 ms |    0.30 ms |          1 | No measure or display-list validation      |
+| 10,000-record virtual list         | 6.90 ms |   9.90 ms |    0.50 ms |          5 | 19 renderers created and at most 19 live   |
 
 The transform workload recorded 72,000 `commitProperties` calls: 240 moving UI
 nodes × 300 measured frames. Multiple property changes on the same component
@@ -380,12 +405,12 @@ cross-framework ranking.
 
 ## Differences from Egret EUI
 
-|                | Egret EUI                   | @kurot/ui                          |
+|                | Egret EUI                   | @kurot/ui                            |
 | -------------- | --------------------------- | ------------------------------------ |
 | Namespace      | `eui.*` global              | ES Module named exports              |
 | Component base | `namespace` + `mixin`       | Standard class inheritance           |
 | Layout state   | Prototype-injected          | `UIState` delegation                 |
-| Authored skins | EXML runtime parser          | KUI XML compiled by `@kurot/cli`   |
+| Authored skins | EXML runtime parser         | KUI XML compiled by `@kurot/cli`     |
 | Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`             |
 | Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`      |
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions     |

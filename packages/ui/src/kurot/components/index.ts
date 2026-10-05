@@ -2,7 +2,7 @@ export { Component, type ComponentEvents, type SkinPartsMap, type SkinPartsOf } 
 export { Group, type GroupEvents } from './Group.js';
 export { Rect } from './Rect.js';
 export { Image } from './Image.js';
-export { Label } from './Label.js';
+export { Label, type TextFitMode } from './Label.js';
 export { Button } from './Button.js';
 export { ToggleButton } from './ToggleButton.js';
 export { CheckBox } from './CheckBox.js';

@@ -4,9 +4,24 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.7.0.** Requires `@kurot/core@^2.0.0`,
-> `@kurot/ui@^3.0.0`, and `@kurot/ui-document@^0.8.0`. Uses UI's atomic
+> **Current release: 0.8.0.** Requires `@kurot/core@^2.1.0`,
+> `@kurot/ui@^3.1.0`, and `@kurot/ui-document@^0.9.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
+
+## Label text fitting in 0.8.0
+
+Materialized Labels support `textFit: 'none' | 'shrink'` and `minFontSize`.
+Set `multiline: false` and constrain the available size to shrink a single line;
+an automatic axis does not impose a fit limit. The authored `size` stays intact,
+while the native Label derives `renderedSize` during layout. State restoration,
+data bindings and font readiness follow the same UI contract as CLI-built skins.
+See [runtime text layout](docs/label-text-layout.md) for an example and lifecycle
+guidance.
+
+Explicit `multiline: false` now remains single-line even with automatic height.
+Use `true` or omit the flag when wrapping is intended. Shrinking defaults to off
+and does not apply to EditableText. Derived size and overflow are read-only
+runtime observations; they are never written into the document.
 
 Upgrade these dependencies together. Refresh legacy sheet manifests in Kurot
 Editor before loading resources; see the
@@ -134,7 +149,7 @@ The preview is available at `http://localhost:5173/preview/` by default.
 ## Resource nine-slice defaults in 0.6.0
 
 Resolve each authored document and registered appearance with
-`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.8.0` before passing
+`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.9.0` before passing
 it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
 `scale9Grid: false` clears an inherited grid, including during native Skin
 state changes; leaving the state restores the previous grid. The runtime does

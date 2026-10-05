@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.0.1`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.1.0`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -39,7 +39,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.0.1 requires `@kurot/ui-document@^0.8.0`. Schema-defined strings, including
+CLI 3.1.0 requires `@kurot/ui-document@^0.9.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -116,19 +116,19 @@ in `namespace-external-plugin.ts`.
 
 ## Configuration lookup
 
-| Task | File |
-| --- | --- |
-| Add or validate a config field | `src/core/config.ts` |
-| Resolve an absolute project path | `src/core/project.ts` |
-| Change KUI scanning/theme output | `src/core/plugins/compile-kui.ts` |
-| Change KUI node code generation | `src/core/kui/kui-parser.ts`, `codegen.ts` |
-| Add a built-in component tag | `src/core/kui/registry.ts` |
-| Change generated part types | `src/core/kui/skin-parts-declaration.ts` |
-| Change component pairing | `src/core/components/discover-components.ts` |
-| Change watch behavior | `src/core/dev-server.ts` |
-| Change output HTML/import maps | `src/core/plugins/generate-html.ts` |
-| Change scaffolding | `src/core/template.ts`, `templates/` |
-| Add a diagnostic code | `src/core/diagnostics/codes.ts` |
+| Task                             | File                                         |
+| -------------------------------- | -------------------------------------------- |
+| Add or validate a config field   | `src/core/config.ts`                         |
+| Resolve an absolute project path | `src/core/project.ts`                        |
+| Change KUI scanning/theme output | `src/core/plugins/compile-kui.ts`            |
+| Change KUI node code generation  | `src/core/kui/kui-parser.ts`, `codegen.ts`   |
+| Add a built-in component tag     | `src/core/kui/registry.ts`                   |
+| Change generated part types      | `src/core/kui/skin-parts-declaration.ts`     |
+| Change component pairing         | `src/core/components/discover-components.ts` |
+| Change watch behavior            | `src/core/dev-server.ts`                     |
+| Change output HTML/import maps   | `src/core/plugins/generate-html.ts`          |
+| Change scaffolding               | `src/core/template.ts`, `templates/`         |
+| Add a diagnostic code            | `src/core/diagnostics/codes.ts`              |
 
 ## Verification
 
@@ -148,3 +148,13 @@ KUI builds validate object subkeys, resolve resource nine-slice defaults, and
 watch the manifest during development. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
+
+## Label text compilation in 3.1.0
+
+The compiler consumes the ui-document 0.9.x catalog and emits Label `textFit`,
+`minFontSize`, authored `size` and state-size overrides unchanged. Runtime
+observations are not authoring inputs, and fitting never becomes a build-time
+measurement. Rendering uses the application's UI >= 3.1.0 and Core >= 2.1.0
+within their respective majors. Neither engine is a CLI runtime dependency.
+See [text compilation](label-text-layout.md) and
+[native Label text layout](../../ui/docs/label-text-layout.md) for the boundary.

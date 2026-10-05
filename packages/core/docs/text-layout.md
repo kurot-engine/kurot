@@ -21,12 +21,31 @@ additional wrap opportunities.
 - The source string is unchanged. Line `charNum` counts consumed UTF-16 code
   units, including unpainted spaces and both characters of CRLF. Painting,
   input caret and hit testing use these source offsets.
-- CRLF, CR, LF, VT, FF, NEL, line separator and paragraph separator force line
-  breaks. A trailing hard separator retains a final empty line.
+- In multiline mode, CRLF, CR, LF, VT, FF, NEL, line separator and paragraph
+  separator force line breaks. A trailing hard separator retains a final empty line.
 
-`wordWrap = false` retains character-based wrapping. Single-line INPUT fields
-do not wrap to available width; multiline INPUT and dynamic text do. An
-unconstrained field measures its hard-separated lines without automatic wrapping.
+`wordWrap = false` retains character-based wrapping in multiline mode. Since
+Core 2.1.0, explicit `multiline = false` renders only the first
+hard-separated line without width wrapping. Dynamic text defaults to multiline;
+INPUT defaults to single-line until the flag is assigned. An unconstrained
+multiline field measures its hard-separated lines without automatic wrapping.
+Fixed height clips drawing rather than changing those measured lines.
+
+## Font readiness
+
+Load fonts before constructing or measuring text where possible. After a font
+becomes ready late, call `textField.invalidateTextMetrics()`; reassigning an
+unchanged family name does not invalidate cached line measurements. This method
+clears text layout and marks the text for rendering with the newly available
+font. UI Labels additionally need layout invalidation through their documented
+`invalidateSize()` contract. Core does not install a global font-loading listener.
+
+## Migration from 2.0.1
+
+Dynamic text previously wrapped even when `multiline` was explicitly false.
+Remove that flag or set it to true where multiple lines are intended. The source
+string is retained, including later hard-separated lines hidden in single-line
+mode. Existing files are not rewritten automatically.
 
 `WordWrap.tokenize()` remains a public word-segmentation utility; it is not the
 TextField line-break algorithm. `splitGraphemes()` is likewise independent.
@@ -41,15 +60,17 @@ separately in `test/TextWrapping.test.ts`.
 
 The dependency bundles its Unicode property tables and uses no network or Node
 runtime APIs. Both WebGL text rasterization and Canvas rendering share this
-layout. Core 2.0.1 is sufficient for existing UI 3.x / ui-runtime 0.7 consumers;
-no CLI XML-format change is involved.
+layout. Core 2.1.0 also adds explicit single-line and font-invalidation
+regressions. No resource-manifest or CLI XML-format change is involved.
 
 ## Package dependencies
 
 UI 3.0.0, game 2.0.0 and ui-runtime 0.7.0 already declare Core `^2.0.0` in their
-peer/development ranges, which include Core 2.0.1. Repository examples require
-Core `^2.0.1`. CLI templates use `latest`. This text-layout fix does not require
-a version bump in the dependant libraries.
+peer/development ranges, which include Core 2.1.0. Repository examples require
+Core `^2.0.1`, which also permits 2.1.0; installed lockfiles still need updating.
+CLI templates use `latest`. The upcoming Label font-shrinking capability calls
+`invalidateTextMetrics()` and therefore needs a Core minimum of 2.1.0 in UI and
+the matching ui-runtime release. Game does not require a release for this change.
 
 References: [UAX #14 revision 55](https://www.unicode.org/reports/tr14/tr14-55.html),
 [official corpus](https://www.unicode.org/Public/17.0.0/ucd/auxiliary/LineBreakTest.txt),

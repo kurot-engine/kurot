@@ -4,6 +4,50 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.1.0] — 2026-10-05
+
+### Added
+
+- Single-line Label `textFit="shrink"` and `minFontSize`, with derived
+  `renderedSize` and `textFitOverflow` observations after validation.
+- Export the `TextFitMode` type (`none` or `shrink`) from the public barrel.
+- Fit within actual label constraints, reserve outline allowance, restore the
+  authored size for shorter text, and refresh metrics after font readiness.
+- Include public documentation in the npm package, including the Label text
+  contract, architecture and package context.
+
+### Changed
+
+- Label defaults to multiline; explicit false means one unwrapped first line.
+  EditableText keeps its single-line default and rejects shrinking.
+- Preserve authored size through native state apply/remove and avoid feeding
+  automatic measured dimensions back into fitting.
+
+### Migration
+
+- Explicit `multiline="false"` now means one unwrapped first line. Remove the
+  flag or set it to true for text intended to wrap; files are not migrated.
+- Set fitting policy on a Button's `labelDisplay` skin part. Multiline Labels
+  retain their authored size, and EditableText rejects `textFit="shrink"`.
+- Load fonts before measurement where possible. After a font becomes ready
+  late, call `label.invalidateSize()` to refresh fitting and Core line metrics.
+
+### Dependencies
+
+- Require `@kurot/core@^2.1.0` in peer and development dependencies for
+  `TextField.invalidateTextMetrics()`. Core 2.0.x is no longer sufficient.
+- KUI authoring uses ui-document 0.9.x and matching CLI/ui-runtime releases;
+  native UI still depends only on Core.
+
+### Tests
+
+- Verify native Button label fitting uses the label region, preserves authored
+  sizes through disabled-state transitions, and follows active skin replacement.
+- Cover minimum overflow, fractional sizes, outlines, hard separators, password
+  display, late font readiness, automatic dimensions and parent layout changes.
+- Verify real regular/bold fonts and Chinese fallback with 16 browser checks
+  each on WebGL and Canvas, including Unicode wrapping and state restoration.
+
 ## [3.0.0] — 2026-10-03
 
 ### Breaking
@@ -337,7 +381,6 @@ protected override onSkinRemoved(): void {
 - **Button: remove dead `_autoRepeat` property** — getter/setter existed but no code consumed the value. Simplified `partAdded` to compare `partName` instead of `instance === this.labelDisplay` (eliminates non-null assertions).
 - **ListBase: clean up `adjustSelection` and `dataProviderRefreshed`** — removed identical if/else branches and premature `PropertyEvent` dispatch (silent adjustment per egret semantics, events deferred to `commitProperties`).
 
-
 ## [1.0.6] — 2026-08-05
 
 ### Fixed
@@ -354,10 +397,10 @@ protected override onSkinRemoved(): void {
 ### Fixed
 
 - **Component (`enabled` / `touchEnabled` cycle completely broken)**: Three interdependent issues in the `enabled` setter and `touchEnabled` accessor:
-  1. **`touchEnabled` getter always returned `undefined`**. Overriding only the setter on `Component.prototype` creates a JS accessor with `get: undefined`, which shadows the inherited `DisplayObject` getter. Every read of `.touchEnabled` on any Component subclass (Button, Label, TextInput, …) silently returned `undefined` instead of the real boolean.
-  2. **`enabled = false` never disabled hit-testing**. The setter delegated to `this.touchEnabled = false`, but `Component`'s own `touchEnabled` setter contains a guard (`if (this._enabled) super.touchEnabled = value`) that skips the display-level write when the component is already disabled. The result: a disabled button still captured touches and blocked elements behind it — unlike egret, where disabled components are excluded from hit-testing.
-  3. **disable → enable permanently broke touch**. The disable path clobbered `_explicitTouchEnabled` to `false`, and the re-enable path restored `$touchEnabled` from that corrupted value — leaving every Component subclass permanently non-touchable after a single disable/enable cycle.
-  The fix matches egret's `$setEnabled`: the `enabled` setter now writes `touchEnabled` / `touchChildren` directly at the display-object level via `super.touchEnabled` / `super.touchChildren`, bypassing the guarded setters. Additionally, `touchEnabled` and `touchChildren` getters are now explicitly overridden to delegate to `super`, un-shadowing the parent accessor.
+    1. **`touchEnabled` getter always returned `undefined`**. Overriding only the setter on `Component.prototype` creates a JS accessor with `get: undefined`, which shadows the inherited `DisplayObject` getter. Every read of `.touchEnabled` on any Component subclass (Button, Label, TextInput, …) silently returned `undefined` instead of the real boolean.
+    2. **`enabled = false` never disabled hit-testing**. The setter delegated to `this.touchEnabled = false`, but `Component`'s own `touchEnabled` setter contains a guard (`if (this._enabled) super.touchEnabled = value`) that skips the display-level write when the component is already disabled. The result: a disabled button still captured touches and blocked elements behind it — unlike egret, where disabled components are excluded from hit-testing.
+    3. **disable → enable permanently broke touch**. The disable path clobbered `_explicitTouchEnabled` to `false`, and the re-enable path restored `$touchEnabled` from that corrupted value — leaving every Component subclass permanently non-touchable after a single disable/enable cycle.
+       The fix matches egret's `$setEnabled`: the `enabled` setter now writes `touchEnabled` / `touchChildren` directly at the display-object level via `super.touchEnabled` / `super.touchChildren`, bypassing the guarded setters. Additionally, `touchEnabled` and `touchChildren` getters are now explicitly overridden to delegate to `super`, un-shadowing the parent accessor.
 - **Skin factory: ES class constructors crash via `.call(this)`**: 1.0.4 fixed the EXML binding `this` context by switching from `new factory()` to `factory.call(this)`, but `call()` throws `TypeError` on genuine ES class constructors (the documented `skinName: (new () => Skin)` path). Now detects class constructors via `Function.prototype.toString()` and falls back to `new`.
 - **Button: `selected` PropertyEvent never dispatched**: `selected` setter did not dispatch `PropertyEvent('selected')`, breaking data bindings (`{selected}`) on Buttons and ToggleButtons. Now dispatched after `_selected` is updated.
 - **Button: redundant `touchEnabled` override after `enabled` setter fix**: The now-fixed `Component.enabled` setter handles `touchEnabled`/`touchChildren` at the display-object level. Button's own `this.touchEnabled = value` line was overwriting that with the user's new value regardless of pre-disable intent, so it has been removed.
@@ -380,7 +423,7 @@ protected override onSkinRemoved(): void {
 - **Scroller (viewport orphaned on skin re-apply)**: Egret overrides `setSkin` to re-`addChildAt(viewport, 0)` after the skin (scroll bars) is applied so the viewport is never orphaned and sits beneath the bars. Kurot was missing this override; now added.
 - **Scroller (static-object field)**: `private static readonly _vpBounds = new Rectangle()` was converted to a module-level constant, applying the same remedy as the HSlider/VSlider class-name-corruption fix from 1.0.3.
 - **ItemRenderer (labelDisplay auto-sync)**: Added `partAdded`/`partRemoved`/`dataChanged` to auto-sync `labelDisplay.text = String(data)`, matching Egret's binding fallback. Previously the default ItemRenderer had no mechanism to push `data` into the label.
-- **Label (_widthConstraint)**: Added `_widthConstraint` mechanism (`setLayoutBoundsSize` override + `measure` update) so that when a parent layout constrains the Label's width, the measured height correctly accounts for text wrapping. Matches Egret's Label L695-710.
+- **Label (\_widthConstraint)**: Added `_widthConstraint` mechanism (`setLayoutBoundsSize` override + `measure` update) so that when a parent layout constrains the Label's width, the measured height correctly accounts for text wrapping. Matches Egret's Label L695-710.
 - **Label (text PropertyEvent)**: `text` setter now dispatches `PropertyEvent('text')` for data binding.
 - **Panel (elementsContent)**: Added missing `elementsContent` setter so that EXML-declared children of `<eui:Panel>` are added to the display list. Previously they were silently discarded because Panel (via Component) had no such setter.
 - **Panel (drag includeInLayout)**: Dragging the moveArea now sets `includeInLayout = false` to prevent the parent layout from snapping the panel back.

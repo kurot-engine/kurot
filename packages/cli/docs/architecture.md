@@ -39,6 +39,12 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
+CLI 3.1.0 consumes ui-document 0.9.x for Label text-fitting metadata. The
+compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
+native UI owns measurement and derives drawing sizes after layout validation.
+See [Label compilation](label-text-layout.md). The application supplies UI
+3.1.x and Core 2.1.x or later within their respective majors.
+
 The authored `Skin` root supplies its generated `class` and optional state
 names. State values live on their target nodes as `property.state`. The compiler
 derives the theme map from built-in naming conventions and configured project

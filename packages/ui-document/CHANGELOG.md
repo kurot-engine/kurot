@@ -4,6 +4,41 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.9.0] — 2026-10-05
+
+### Added
+
+- Author single-line Label fitting through `textFit="none|shrink"` and
+  `minFontSize` (default 12, finite and at least 1 logical pixel).
+- Include public documentation in the npm package, with the text authoring
+  contract, KUI XML rules and package context.
+
+### Changed
+
+- Align catalog defaults with native components: Label is multiline by default,
+  while EditableText defaults to single-line. Omitted defaults stay omitted in
+  XML; existing files are not rewritten.
+- Keep authored `size` and state sizes independent of runtime fitting results.
+  Reject `textFit="shrink"` on EditableText and reject derived `renderedSize`
+  and `textFitOverflow` as authored properties.
+- Clarify that wordWrap chooses Unicode or character wrapping in multiline mode.
+  The semantic document shape and format version remain unchanged.
+
+### Migration
+
+- Rendering the new fitting fields requires matching UI/runtime releases and
+  Core 2.1.0 or later. CLI and ui-runtime consumers must update their
+  ui-document dependency from 0.8.x to 0.9.x; these pre-1.0 minor ranges do not
+  include each other.
+- In Core 2.1.0, explicit `multiline="false"` means one unwrapped first line.
+  Remove that flag or set it to true on text intended to wrap.
+
+### Tests
+
+- Verify default metadata, omitted-default preservation, KUI round trips,
+  state sizes, invalid fit policies and minimums, editable restrictions and
+  rejection of derived runtime observations.
+
 ## [0.8.0] — 2026-10-04
 
 ### Breaking Changes

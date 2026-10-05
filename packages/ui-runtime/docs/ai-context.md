@@ -1,14 +1,14 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.7.0`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.8.0`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.8.0`, `@kurot/ui@^3.0.0`, and
-`@kurot/core@^2.0.0`. It does not
+It peer-depends on `@kurot/ui-document@^0.9.0`, `@kurot/ui@^3.1.0`, and
+`@kurot/core@^2.1.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
-Document 0.8 XML string attributes are literal, including state text and
+Document 0.9 XML string attributes are literal, including state text and
 numeric/boolean-looking strings. Materialize those values unchanged. The runtime
 does not parse or migrate XML; old synthetic escape prefixes must be removed
 explicitly by the author. See [KUI XML values](../../ui-document/docs/kui-xml.md#values).
@@ -142,6 +142,7 @@ does not depend on a particular animation or Spine implementation.
 - Component properties: `src/kurot/runtime/builtins/applyComponentProperties.ts`
 - Group properties: `src/kurot/runtime/builtins/applyGroupProperties.ts`
 - Label properties: `src/kurot/runtime/builtins/applyLabelProperties.ts`
+- Label fitting contract and lifecycle: `docs/label-text-layout.md`
 - EditableText properties: `src/kurot/runtime/builtins/applyEditableTextProperties.ts`
 - TextInput properties: `src/kurot/runtime/builtins/applyTextInputProperties.ts`
 - Image properties: `src/kurot/runtime/builtins/applyImageProperties.ts`
@@ -169,3 +170,13 @@ The runtime accepts resolved `scale9Grid` rectangles and clears inherited
 grids when an Image receives `false`. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
+
+## Label text layout in 0.8.0
+
+`textFit` and `minFontSize` route directly to native Label properties. Core 2.1
+keeps explicit `multiline = false` single-line, including automatic height.
+The shared 0.9 authoring catalog rejects invalid fitting modes and minimum sizes,
+and only permits `textFit = 'none'` on EditableText. The runtime does not author
+`renderedSize` or `textFitOverflow`; these are native observations after layout.
+See [runtime text layout](label-text-layout.md) for defaults, fit bounds,
+state restoration, font readiness and document-mutation boundaries.
