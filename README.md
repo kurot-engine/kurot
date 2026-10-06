@@ -52,32 +52,56 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/core`](packages/core/README.md)               | 2.1.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | None                        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.1.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.9.0   | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.2.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.10.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.1   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
-`@kurot/ui-document` 0.9 provides the reusable semantic model, explicit
-component capabilities, bounded dynamic contracts, and headless editing
-kernel. `@kurot/ui-runtime` 0.8 validates and renders that model, including
+`@kurot/ui-document` provides the reusable semantic model, explicit component
+capabilities, bounded dynamic contracts, and headless editing kernel.
+`@kurot/ui-runtime` 0.8.1 uses ui-document 0.10.x and renders
 component instances, Slots, appearances, states, variants, resources, and
 design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
 category-specific resource adapters while keeping game logic outside the
 document.
 
-CLI 3.1 and ui-runtime 0.8 require ui-document ^0.9.0.
+The current dependency ranges are:
+
+| Consumer         | Required Kurot packages                           |
+| ---------------- | ------------------------------------------------- |
+| UI 3.1.0         | Core `^2.1.0`                                     |
+| Game 2.0.0       | Core `^2.0.0`                                     |
+| CLI 3.2.0        | ui-document `^0.10.0`                             |
+| ui-runtime 0.8.1 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.10.0` |
+
+CLI 3.2.0 and ui-document 0.10.0 are published. They share the optional
+`resource/config/style.json` font/color parser and `@style:colors:<key>` XML
+references. CLI resolves color references into numeric values before generating
+Skin factories; font loading belongs to the application. XML and document
+history retain authored references. The previous `@token:color:<key>` XML prefix
+is rejected, so update those references explicitly. See
+[project styles](packages/ui-document/docs/project-styles.md).
+
+ui-runtime 0.8.1 adopts ui-document `^0.10.0`. Consumers resolve stylesheet
+colors in disposable copies or register palette entries as color design tokens;
+the runtime does not read style.json or load fonts. Runtime 0.8.1 is published;
+Editor 0.12.1 installs it with ui-document 0.10.0 and CLI 3.2.0. The KUI sample
+and engine examples also adopt the published compiler/kernel dependencies.
+CLI-built skins run directly through UI and do not require ui-runtime. No
+Core/UI release is needed for compiled style colors.
+
 The document kernel retains the literal-string XML contract. Remove old
 synthetic backslash text prefixes explicitly; Editor and CLI must share the
 same parser contract. ui-document 0.9 adds Label fitting metadata while retaining
 format version 2. ui-runtime 0.8 materializes fitting properties through native
 Labels without changing the authored size or semantic document.
 
-Core 2.0 and CLI 3.0+ require object-valued sheet
-`subkeys` in resource manifests. UI 3.1 and ui-runtime 0.8 require Core ^2.1.0;
-ui-runtime also requires UI ^3.1.0, while game 2.0 declares Core 2.x. Refresh
-old sheets in Kurot Editor before upgrading a KUI project; see the
+Install Core 2.1.1 or later within Core 2.x to receive the nested/rotated
+WebGL scroll clipping fix; the UI, Game and ui-runtime peer ranges already
+accept it. Core 2.0 and CLI 3.0+ require object-valued sheet `subkeys` in
+resource manifests. Refresh old sheets in Kurot Editor before upgrading a KUI project; see the
 [resource migration contract](packages/ui-document/docs/resource-nine-slice.md).
 
 ```text
@@ -212,7 +236,7 @@ cross-device ranking. Commands and measurement details are documented in the
 
 ### KUI XML and EUI
 
-CLI 2.0 is currently scoped to the Kurot Editor workflow. Existing EXML game
+CLI 3.x is scoped to the Kurot Editor workflow. Existing EXML game
 projects continue to use CLI 1.3.x and do not need to migrate their project
 configuration or UI assets.
 

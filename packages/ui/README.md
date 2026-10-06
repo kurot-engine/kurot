@@ -33,21 +33,42 @@ intended to wrap. Files are not migrated automatically. Load fonts before
 measurement; after late loading, call `label.invalidateSize()` to refresh
 metrics even if the family name is unchanged.
 
-See the [text layout and fitting contract](docs/label-text-layout.md). KUI
-authoring requires ui-document 0.9.x and matching CLI/ui-runtime releases;
-programmatic UI depends only on Core.
+See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
+metadata was introduced in ui-document 0.9.0 and remains supported in 0.10.0.
+Current CLI-built KUI projects use CLI 3.2.0 with ui-document `^0.10.0`;
+ui-runtime 0.8.1 also uses ui-document `^0.10.0`. Programmatic UI depends
+only on Core.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.1.0 @kurot/core@^2.1.0
+pnpm add @kurot/ui@^3.1.0 @kurot/core@^2.1.1
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.1 requires Core 2.1.0 or later within Core 2.x. Refresh old sheet manifests with
+UI 3.1 requires Core 2.1.0 or later within Core 2.x. The installation above also
+includes Core 2.1.1's nested/rotated WebGL scroll clipping fix. Refresh old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
+
+## Project style colors
+
+CLI 3.2.0 can resolve named colors from the optional
+`resource/config/style.json` into native UI properties, including state overrides:
+
+```xml
+<Label id="labelDisplay" textColor="#FF9900"
+       textColor.disabled="@style:colors:disabled-text" />
+```
+
+The Label belongs to a Skin declaring the `disabled` state. Native Skin state
+handling applies the compiled numeric color and restores the base color on
+leaving that state. The same reference syntax works for base color properties.
+UI does not read style.json or evaluate XML references itself; programmatic
+components assign numeric colors. This release does not introduce complete
+typography presets or automatic live theme switching. See the
+[project style contract](../ui-document/docs/project-styles.md).
 
 ## Quick Start
 
@@ -281,10 +302,12 @@ data.addItem('Durian');
 data.addItemAt('Elderberry', 1);
 data.removeItemAt(0);
 data.replaceItemAt('Fig', 0);
-data.sortOn('name'); // sort by field
-data.sort((a, b) => (a > b ? 1 : -1)); // custom sort
+data.sort((a, b) => String(a).localeCompare(String(b)));
 data.filterFunction(item => item !== 'Fig');
 data.refresh(); // notify view after manual source changes
+
+const records = new ArrayCollection([{ name: 'Pear' }, { name: 'Apple' }]);
+records.sortOn('name'); // sort records by field
 ```
 
 ## Virtual Layout
@@ -335,19 +358,36 @@ component.percentHeight = 100;
 ## View States
 
 ```ts
-import { State, SetProperty, AddItems } from '@kurot/ui';
+import { Label, Rect, Skin, State, SetProperty } from '@kurot/ui';
 
-class MyButtonSkin extends Skin {
-	states = [
-		new State('up'),
-		new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
-		new State('disabled', [
-			new SetProperty('bg', 'fillColor', 0x636e72),
-			new SetProperty('lbl', 'textColor', 0xb2bec3),
-		]),
-	];
+class StatefulButtonSkin extends Skin {
+	constructor() {
+		super();
+		const bg = new Rect(120, 36, 0x6c5ce7);
+		const labelDisplay = new Label();
+		labelDisplay.textColor = 0xffffff;
+		labelDisplay.horizontalCenter = 0;
+		labelDisplay.verticalCenter = 0;
+		this.setPart('bg', bg);
+		this.setPart('labelDisplay', labelDisplay);
+		this.skinParts = ['labelDisplay'];
+		this.elementsContent = [bg, labelDisplay];
+		this.states = [
+			new State('up'),
+			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
+			new State('disabled', [
+				new SetProperty('bg', 'fillColor', 0x636e72),
+				new SetProperty('labelDisplay', 'textColor', 0xb2bec3),
+			]),
+		];
+	}
 }
 ```
+
+Button selects `up`, `down` or `disabled` through its native behavior. Each
+state restores the previous property values before applying the next overrides.
+CLI-built skins generate the same `State`/`SetProperty` objects from XML
+attributes such as `textColor.disabled`.
 
 ## Events
 
@@ -405,14 +445,14 @@ cross-framework ranking.
 
 ## Differences from Egret EUI
 
-|                | Egret EUI                   | @kurot/ui                            |
-| -------------- | --------------------------- | ------------------------------------ |
-| Namespace      | `eui.*` global              | ES Module named exports              |
-| Component base | `namespace` + `mixin`       | Standard class inheritance           |
-| Layout state   | Prototype-injected          | `UIState` delegation                 |
-| Authored skins | EXML runtime parser         | KUI XML compiled by `@kurot/cli`     |
-| Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`             |
-| Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`      |
-| `thisObject`   | Required in event listeners | Not needed — use arrow functions     |
-| Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true` |
-| i18n           | Built-in                    | Not supported                        |
+|                | Egret EUI                   | @kurot/ui                                                   |
+| -------------- | --------------------------- | ----------------------------------------------------------- |
+| Namespace      | `eui.*` global              | ES Module named exports                                     |
+| Component base | `namespace` + `mixin`       | Standard class inheritance                                  |
+| Layout state   | Prototype-injected          | `UIState` delegation                                        |
+| Authored skins | EXML runtime parser         | KUI XML compiled by `@kurot/cli`                            |
+| Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`                                    |
+| Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`                             |
+| `thisObject`   | Required in event listeners | Not needed — use arrow functions                            |
+| Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true`                        |
+| i18n           | Built-in                    | Project-managed translations; Core handles Unicode wrapping |

@@ -4,9 +4,59 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.8.0.** Requires `@kurot/core@^2.1.0`,
-> `@kurot/ui@^3.1.0`, and `@kurot/ui-document@^0.9.0`. Uses UI's atomic
+> **Current release: 0.8.1.** Requires `@kurot/core@^2.1.0`,
+> `@kurot/ui@^3.1.0`, and `@kurot/ui-document@^0.10.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
+
+See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
+
+## Installation
+
+```bash
+pnpm add @kurot/ui-runtime@^0.8.1 @kurot/ui-document@^0.10.0 @kurot/ui@^3.1.0 @kurot/core@^2.1.1
+```
+
+Install all peers explicitly. Core 2.1.1 includes the nested/rotated WebGL
+scroll clipping fix while satisfying the runtime's `^2.1.0` requirement.
+Upgrade ui-document to 0.10.x together with runtime 0.8.1; the earlier runtime
+0.8.0 peer range excluded it. Runtime APIs and semantic format version 2 remain
+unchanged.
+
+CLI 3.2.0 uses ui-document 0.10.0 for build-time stylesheet colors and emits
+skins that run directly through UI. That compilation path does not require
+ui-runtime. Runtime 0.8.1 and CLI 3.2.0 now share the same document parser.
+See the [project style contract](../ui-document/docs/project-styles.md).
+
+## Project style colors in 0.8.1
+
+Read the optional `resource/config/style.json` in the application or Editor,
+then resolve color references into a disposable preview copy:
+
+```ts
+import { parseUIDocument, parseUIStyleSheet, resolveUIStyleColors } from '@kurot/ui-document';
+import { createKurotUI } from '@kurot/ui-runtime';
+
+// The caller reads styleConfiguration and skinSource; the kernel performs no I/O.
+const style = parseUIStyleSheet(styleConfiguration);
+const authored = parseUIDocument(skinSource);
+const preview = resolveUIStyleColors(authored, style.colors);
+const result = createKurotUI(preview);
+stage.addChild(result.root);
+```
+
+XML uses `@style:colors:<key>` for base and state colors, for example
+`textColor.disabled="@style:colors:disabled-text"`. Resolution includes inactive
+states and variants. Resolve every registered appearance asset as well as the
+root document before materialization. Continue editing and saving `authored`;
+never persist the expanded RGB values from `preview`. Missing colors fail
+explicitly. The previous `@token:color:<key>` XML prefix is rejected; files are
+not migrated automatically, and ordinary text remains literal.
+
+Alternatively, register each parsed palette entry as a `color` token in the
+supplied `UIAssetRegistry` and materialize the authored document directly.
+The internal token record is unchanged. Font loading, Stage ownership and
+live project theme updates remain application responsibilities; dispose the
+materialization and remove its root when it is no longer needed.
 
 ## Label text fitting in 0.8.0
 
@@ -97,7 +147,8 @@ Reusable-component state controllers apply Contract state overrides at runtime
 and restore the exact pre-state values when cleared. Controllers are isolated
 per component instance; an unknown state throws `KurotUIRuntimeError`.
 
-Design tokens resolve from the supplied `UIAssetRegistry`. Resource references
+Design tokens resolve from the supplied `UIAssetRegistry`; the runtime does not
+read `resource/config/style.json` or load project fonts itself. Resource references
 use their registered key by default. Applications may replace the adapter for
 each semantic category without adding resource-system behavior to the document
 model:
@@ -149,7 +200,7 @@ The preview is available at `http://localhost:5173/preview/` by default.
 ## Resource nine-slice defaults in 0.6.0
 
 Resolve each authored document and registered appearance with
-`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.9.0` before passing
+`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.10.0` before passing
 it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
 `scale9Grid: false` clears an inherited grid, including during native Skin
 state changes; leaving the state restores the previous grid. The runtime does

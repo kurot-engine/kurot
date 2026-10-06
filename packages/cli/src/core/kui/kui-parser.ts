@@ -5,6 +5,7 @@ import {
 	isSyntheticNodeId,
 	parseUIDocument,
 	resolveUIResourceDefaults,
+	resolveUIStyleColors,
 } from '@kurot/ui-document';
 import type { UIDocument, UINode, UIPropertyValue, UIResourceConfigEntry } from '@kurot/ui-document';
 import type {
@@ -27,8 +28,9 @@ export function parseKUISkin(
 	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
 	resources: readonly UIResourceConfigEntry[] = [],
+	colors: Readonly<Record<string, number>> = {},
 ): SkinIR {
-	const document = resolveUIResourceDefaults(parseUIDocument(source), resources);
+	const document = resolveUIStyleColors(resolveUIResourceDefaults(parseUIDocument(source), resources), colors);
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 

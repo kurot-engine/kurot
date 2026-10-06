@@ -39,11 +39,17 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.1.0 consumes ui-document 0.9.x for Label text-fitting metadata. The
+CLI 3.2.0 consumes ui-document 0.10.x, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
 3.1.x and Core 2.1.x or later within their respective majors.
+
+Each build also reads optional `resource/config/style.json` through the shared
+parser. Resource nine-slice defaults and named color references resolve into a
+disposable document before SkinIR conversion; authored Skin XML is never rewritten.
+Only the `@style:colors:<key>` section is currently compiled from style references.
+Invalid configurations and unknown colors fail before a new Skin bundle is installed.
 
 The authored `Skin` root supplies its generated `class` and optional state
 names. State values live on their target nodes as `property.state`. The compiler
@@ -70,6 +76,8 @@ convention-based reusable components. A component change can affect its source
 namespace, paired skin, generated type declaration, and editor catalog, so that
 path refreshes all four outputs as one operation. The server preserves the last
 successful output after an invalid edit.
+The resource watcher includes the fixed style.json path, rebuilding skins when
+its palette changes; font loading remains an application responsibility.
 
 ## Diagnostics
 

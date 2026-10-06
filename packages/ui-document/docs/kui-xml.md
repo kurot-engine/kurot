@@ -40,14 +40,20 @@ Other property types retain scalar inference: `true` and `false` are booleans,
 and numeric literals are numbers. Schema-free ArrayCollection Object attributes
 and union-valued properties still use a leading `\` for strings that would
 otherwise be interpreted as another type. Resource properties use their keys
-directly; design tokens stay explicit:
+directly; stylesheet colors stay explicit:
 
 ```xml
 <Image id="logo" source="ui.logo" />
 <Rect id="background" fillColor="#121D30" />
-<Rect id="accent" fillColor="@token:color:color.accent" />
+<Rect id="accent" fillColor="@style:colors:color.accent" />
 <Label id="amount" text="100.80" size="48" />
 ```
+
+`@style:colors:<key>` references the `colors` section of project `style.json`.
+Other stylesheet sections are not yet supported in XML. The previous
+`@token:color:<key>` prefix is rejected. Other semantic token categories retain
+their `@token:<type>:<key>` syntax. These prefixes never reinterpret literal
+string properties such as Label text.
 
 This literal-string rule is a breaking change in 0.8.0. Earlier generated
 type escapes in string properties, such as `text="\100.80"`, now represent a

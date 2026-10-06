@@ -1,28 +1,27 @@
 # Resource default nine-slice grids
 
-This is a **breaking resource format change**. The
-current versions are Core 2.0.1, UI 3.0.0, game 2.0.0, CLI 3.0.1,
-ui-document 0.8.0, and ui-runtime 0.7.0. All six packages are published at
-those versions.
-CLI and ui-runtime require ui-document `^0.8.0`. UI's Rectangle setter needs no new API.
+This is a **breaking resource format change**, introduced with Core 2.0,
+CLI 3.0, ui-document 0.7 and ui-runtime 0.6. Later releases retain the same
+object-valued frame map and local-override rules. CLI 3.2.0 and ui-runtime 0.8.1
+use ui-document `^0.10.0`; UI's Rectangle setter needs no additional API.
 
 ## Authored configuration
 
 ```json
 {
-  "resources": [
-    { "name": "logo", "type": "image", "url": "assets/logo.png", "scale9grid": "10,10,20,20" },
-    {
-      "name": "atlas",
-      "type": "sheet",
-      "url": "assets/atlas.json",
-      "subkeys": {
-        "panel": { "scale9grid": "85,0,10,60" },
-        "button": {}
-      }
-    }
-  ],
-  "groups": [{ "name": "main", "keys": "atlas,logo" }]
+	"resources": [
+		{ "name": "logo", "type": "image", "url": "assets/logo.png", "scale9grid": "10,10,20,20" },
+		{
+			"name": "atlas",
+			"type": "sheet",
+			"url": "assets/atlas.json",
+			"subkeys": {
+				"panel": { "scale9grid": "85,0,10,60" },
+				"button": {}
+			}
+		}
+	],
+	"groups": [{ "name": "main", "keys": "atlas,logo" }]
 }
 ```
 
@@ -82,13 +81,11 @@ consumes that opt-out. A failed manifest rebuild retains the last good Skin
 bundle in watch mode. Manifest edits rebuild all dependent Skin factories;
 resource/component watch builds are serialized.
 
-The CLI and ui-runtime manifests now require ui-document `^0.8.0`. UI 3.0.0,
-game 2.0.0, and ui-runtime 0.7.0 require Core `^2.0.0`. ui-runtime also
-requires UI `^3.0.0`. Engine examples use Core 2.0.1 and CLI 3.0.1;
-`examples/game` also uses UI 3.0.0 and game 2.0.0.
-The Editor uses the published ui-document 0.8.0, ui-runtime 0.7.0, and CLI 3.0.1.
+CLI 3.2.0 and ui-runtime 0.8.1 require ui-document `^0.10.0`. UI 3.1.0 and
+ui-runtime 0.8.1 require Core `^2.1.0`; ui-runtime also requires UI `^3.1.0`.
+Game 2.0.0 accepts Core `^2.0.0`. Core 2.1.1 adds the nested/rotated scroll
+clipping fix without changing this resource contract.
 
-All six coordinated releases are published. All downstream package lockfiles
-now resolve the coordinated dependency versions.
-Convert old sheets in the Editor before moving
-applications to the new package set. The old EXML projects can remain on CLI 1.3.x.
+ui-runtime 0.8.1 is published and installed by Editor 0.12.1. The KUI sample and
+engine examples use the published CLI 3.2.0. Convert old sheets in the Editor before
+moving applications to the new package set. Old EXML projects can remain on CLI 1.3.x.

@@ -119,7 +119,13 @@ function watchResources(
 	let watcher: fsSync.FSWatcher;
 	try {
 		watcher = fsSync.watch(project.resourceDir, { recursive: true }, (_event, filename) => {
-			if (!filename || (!filename.endsWith('.kui.xml') && filename !== 'default.res.json')) return;
+			if (
+				!filename ||
+				(!filename.endsWith('.kui.xml') &&
+					filename !== 'default.res.json' &&
+					filename.split(path.sep).join('/') !== 'config/style.json')
+			)
+				return;
 			if (filename.endsWith('.kui.xml') && componentSkinsWatched && project.componentConvention) {
 				const changed = path.resolve(project.resourceDir, filename);
 				if (isWithin(project.componentConvention.skinDir, changed)) return;

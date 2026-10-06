@@ -1,4 +1,4 @@
-import { parseUIResourceConfigEntries } from '@kurot/ui-document';
+import { parseUIResourceConfigEntries, parseUIStyleSheet } from '@kurot/ui-document';
 import type { UIResourceConfigEntry } from '@kurot/ui-document';
 import * as esbuild from 'esbuild';
 import * as fs from 'node:fs/promises';
@@ -70,7 +70,18 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 				);
 			}
 		}
-		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin, resources)));
+		let colors: Readonly<Record<string, number>> = {};
+		try {
+			const source = await fs.readFile(path.join(ctx.project.resourceDir, 'config/style.json'), 'utf8');
+			colors = parseUIStyleSheet(JSON.parse(source)).colors;
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+				throw new BuildError(
+					`resource/config/style.json: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
+		}
+		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin, resources, colors)));
 		if (modules.some(module => module === undefined) || ctx.diagnostics.hasErrors()) {
 			throw new BuildError('KUI compilation failed.');
 		}
@@ -101,6 +112,7 @@ async function generateSkinModule(
 	ctx: BuildContext,
 	skin: CompiledSkin,
 	resources: readonly UIResourceConfigEntry[],
+	colors: Readonly<Record<string, number>>,
 ): Promise<{ source: string; skin: SkinIR } | undefined> {
 	try {
 		const namespaces = ctx.project.customNamespaces.map(ns => ({
@@ -108,7 +120,7 @@ async function generateSkinModule(
 			specifier: ns.specifier,
 			...(ns.components ? { componentNames: new Set(ns.components.map(component => component.name)) } : {}),
 		}));
-		const ir = parseToIR(skin.file.contents, skin.className, namespaces, resources);
+		const ir = parseToIR(skin.file.contents, skin.className, namespaces, resources, colors);
 		const diagnostics = createUnresolvedTagDiagnostics(
 			skin.file.relPath,
 			skin.file.contents,

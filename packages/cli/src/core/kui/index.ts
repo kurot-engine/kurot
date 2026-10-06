@@ -39,13 +39,20 @@ export interface CompileKUIOptions extends CodeGenOptions {
 	 */
 	readonly customNamespaces?: readonly NamespaceModule[];
 	readonly resources?: readonly UIResourceConfigEntry[];
+	readonly colors?: Readonly<Record<string, number>>;
 }
 
 /**
  * Compiles one KUI Skin source string to an ESM factory module.
  */
 export function compileKUI(source: string, className?: string, options?: CompileKUIOptions): string {
-	const ir = parseKUISkin(source, className, options?.customNamespaces ?? [], options?.resources ?? []);
+	const ir = parseKUISkin(
+		source,
+		className,
+		options?.customNamespaces ?? [],
+		options?.resources ?? [],
+		options?.colors ?? {},
+	);
 	return generateCode(ir, options);
 }
 
@@ -57,6 +64,7 @@ export function parseToIR(
 	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
 	resources: readonly UIResourceConfigEntry[] = [],
+	colors: Readonly<Record<string, number>> = {},
 ): SkinIR {
-	return parseKUISkin(source, className, customNamespaces, resources);
+	return parseKUISkin(source, className, customNamespaces, resources, colors);
 }

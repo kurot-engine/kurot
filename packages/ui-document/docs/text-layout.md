@@ -59,9 +59,10 @@ or automatic migration occurs in this package.
 
 ## Consumers and migration
 
-CLI and ui-runtime must consume ui-document 0.9.x to recognize the new catalog;
-their existing `^0.8.0` ranges do not include 0.9.0. Native rendering requires
-Core >= 2.1.0 and the matching UI Label release. The public UI contract describes
+CLI 3.2 and ui-runtime 0.8.1 consume the fitting catalog through ui-document ^0.10.0.
+Consumers on earlier ^0.9.0 dependency/peer ranges must update before adopting styles;
+the fitting metadata and semantic format remain unchanged. Native rendering requires
+Core >= 2.1.0 and UI >= 3.1.0. The public UI contract describes
 fit bounds, state restoration and font-readiness invalidation in detail.
 
 Explicit `multiline="false"` previously did not prevent dynamic text wrapping.

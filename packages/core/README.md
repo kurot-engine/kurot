@@ -31,6 +31,16 @@ family name is unchanged. See the [Core text contract](docs/text-layout.md).
 Automatic Label font shrinking is a separate UI capability and requires the
 matching UI release; Core does not expose `textFit` or `minFontSize`.
 
+## Installation
+
+```bash
+pnpm add @kurot/core@^2.1.1
+```
+
+Core has no dependency on other Kurot packages. UI 3.1.0, Game 2.0.0 and
+ui-runtime 0.8.1 accept Core 2.1.1 through their existing peer ranges. Install
+those packages separately when the application needs their capabilities.
+
 ## Features
 
 **Rendering Engine**
@@ -303,3 +313,9 @@ applied to UI Images by the compiler or document resolver, not automatically
 to arbitrary `Bitmap` objects. See the
 [resource format](docs/resource.md) and
 [nine-slice contract](../ui-document/docs/resource-nine-slice.md).
+
+The optional `resource/config/style.json` is handled by ui-document 0.10.0 and
+CLI 3.2.0. Core does not read this file or interpret `@style:colors:<key>` XML
+references. Compiled skins receive numeric RGB values; the application loads
+fonts before measuring text. See the
+[project style contract](../ui-document/docs/project-styles.md).

@@ -1,10 +1,10 @@
 # @kurot/ui-document
 
-Headless semantic document foundation for Kurot UI tooling. It is intended to
-provide one format and one mutation model shared by the future visual UI
-builder, `@kurot/cli`, and Agent-driven UI generation.
+Headless semantic document foundation for Kurot UI tooling. It provides one
+format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
+Agent-driven UI generation.
 
-> **Current release: 0.9.0.** KUI XML is the canonical authored format. The
+> **Current release: 0.10.0.** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Label text authoring in 0.9.0
@@ -24,13 +24,15 @@ Omitted defaults are not inserted into XML. Explicit `multiline="false"` uses
 Core 2.1.0's single-line behavior; remove the flag or set it to true for wrapping.
 The semantic format remains version 2, and files are not migrated automatically.
 See the [text authoring contract](docs/text-layout.md) for validation and
-consumer requirements. This package models these fields; rendering and compiling
-them require the matching UI, ui-runtime and CLI updates.
+consumer requirements. This package models these fields; native rendering uses
+UI 3.1.0 and Core 2.1.0 or later within Core 2.x. CLI 3.2.0 consumes this kernel
+at build time. ui-runtime 0.8.1 uses the same ui-document `^0.10.0` dependency
+and native Label fitting behavior.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document
+pnpm add @kurot/ui-document@^0.10.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
@@ -119,6 +121,8 @@ form. A Group layout remains a separate `<layout>` child property.
 - compact reusable instances containing an asset reference and only their
   parameter values, variant, part overrides, and projected Slot content;
 - typed project resource and design-token references;
+- shared project font configuration, immutable named colors and explicit
+  stylesheet color references resolved in compilation/preview copies;
 - `UIAssetRegistry` and project-wide validation of asset identities,
   references, type compatibility, public contracts, and dependency cycles;
 - explicit `UIDocument`, `UINode`, and recursive `UIPropertyValue` types;
@@ -317,7 +321,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.7.x` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.8.1` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition
@@ -344,3 +348,52 @@ inheritance, and state source changes get matching grid overrides.
 
 See the [resource nine-slice contract](docs/resource-nine-slice.md) for lookup
 priority, conversion, and release order.
+
+## Project fonts and colors in 0.10.0
+
+The optional fixed `resource/config/style.json` is independent of
+`default.res.json`. `parseUIStyleSheet()` validates schemaVersion 1, font roles,
+resource-relative font URLs, fallback families and weights, plus an optional
+`colors` palette of named `#RRGGBB` values. An existing stylesheet requires its
+font section; absent colors produce an empty immutable palette.
+
+`getUIStyleFontAlias()` exposes stable `kurot-<role>` aliases,
+`getUIStyleFontFamily()` returns the alias/fallback CSS stack, and
+`getUIStyleColor()` returns a numeric RGB value, including black as zero.
+Unknown roles/colors fail explicitly. Font loading and reading configuration
+remain consumer responsibilities.
+
+```xml
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="disabled">
+    <Label id="labelDisplay" textColor="#FF9900"
+           textColor.disabled="@style:colors:disabled-text" />
+</Skin>
+```
+
+`@style:colors:<key>` selects the `colors` section of `style.json`. The internal
+reference remains `{ kind: 'token', tokenType: 'color', key }`; semantic format
+version 2 is unchanged. Only colors is currently a supported stylesheet section
+in XML. Schema-defined strings such as Label text remain literal.
+
+```ts
+import { parseUIDocument, parseUIStyleSheet, resolveUIStyleColors } from '@kurot/ui-document';
+
+// The consumer reads these inputs; the document package performs no I/O.
+const style = parseUIStyleSheet(styleConfiguration);
+const authored = parseUIDocument(skinSource);
+const preview = resolveUIStyleColors(authored, style.colors);
+```
+
+Resolve a disposable copy before compilation/materialization, including nested
+skins and inactive states/variants. Continue saving and editing `authored`;
+never replace it with `preview` or persist the expanded RGB values. Missing
+colors report the semantic path, and other token categories stay unresolved.
+
+This is an XML syntax change: the previous `@token:color:<key>` prefix is
+rejected. Update authored color references explicitly; files are not migrated
+automatically. Published CLI 3.2.0 depends on `^0.10.0` and resolves stylesheet
+colors during KUI compilation. ui-runtime 0.8.1 adopts the same range;
+consumers resolve colors in preview copies or register palette entries in the
+runtime asset registry. Editor and application dependencies must also adopt the same parser.
+No Core/UI rendering change is required. See
+[project styles](docs/project-styles.md) for the full contract.

@@ -18,6 +18,44 @@ afterEach(async () => {
 });
 
 describe('compile KUI', () => {
+	it('resolves stylesheet state colors on every build and retains the last good bundle on invalid or missing colors', async () => {
+		const xml =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="ColorSkin" states="disabled"><Label id="label" textColor="#FF9900" strokeColor="@style:colors:disabled-text" textColor.disabled="@style:colors:disabled-text" /></Skin>';
+		const { context, root, outputDirectory } = await createFixture([xml]);
+		const filename = path.join(root, 'resource/config/style.json');
+		const style = {
+			schemaVersion: 1,
+			fonts: {
+				default: 'primary',
+				families: { primary: { fallback: [], faces: [{ url: 'font.ttf', weight: 400 }] } },
+			},
+			colors: { 'disabled-text': '#999999' },
+		};
+		await fs.mkdir(path.dirname(filename), { recursive: true });
+		await fs.writeFile(filename, JSON.stringify(style));
+		await compileKUI().apply(context);
+		const output = path.join(outputDirectory, 'js/default.thm.js');
+		expect(await fs.readFile(output, 'utf8')).toContain('new SetProperty("label", "textColor", 10066329)');
+		expect(await fs.readFile(output, 'utf8')).toContain('label.strokeColor = 10066329');
+		style.colors['disabled-text'] = '#000000';
+		await fs.writeFile(filename, JSON.stringify(style));
+		await compileKUI().apply(context);
+		const lastGood = await fs.readFile(output, 'utf8');
+		expect(lastGood).toContain('new SetProperty("label", "textColor", 0)');
+		expect(lastGood).toContain('label.strokeColor = 0');
+		style.colors['disabled-text'] = '#bad';
+		await fs.writeFile(filename, JSON.stringify(style));
+		await expect(compileKUI().apply(context)).rejects.toThrow('style.colors.disabled-text');
+		expect(await fs.readFile(output, 'utf8')).toBe(lastGood);
+		await fs.rm(filename);
+		await expect(compileKUI().apply(context)).rejects.toThrow('KUI compilation failed');
+		expect(
+			context.diagnostics.all().some(item => item.message.includes('Unknown project color: disabled-text')),
+		).toBe(true);
+		expect(await fs.readFile(output, 'utf8')).toBe(lastGood);
+		expect(await fs.readFile(path.join(root, 'resource/ui/Document0.kui.xml'), 'utf8')).toBe(xml);
+	});
+
 	it('emits exact literal text with typed numbers and native state overrides', async () => {
 		const xml =
 			'<Skin xmlns="https://kurot.dev/ui/1" class="AmountSkin" states="down"><Label id="amount" text="100.80" text.down="false" size="48" /><Button id="button" label="true" enabled="false" /></Skin>';

@@ -1,8 +1,8 @@
 # Label text layout
 
-ui-runtime 0.8.0 requires Core `^2.1.0`, UI `^3.1.0` and ui-document `^0.9.0`.
+ui-runtime 0.8.1 requires Core `^2.1.0`, UI `^3.1.0` and ui-document `^0.10.0`.
 It applies authored text properties to native Labels rather than measuring text
-or fitting fonts itself. CLI 3.1.0 compiles the same properties into KUI skins.
+or fitting fonts itself. CLI 3.2.0 compiles the same properties into KUI skins.
 
 ## Materialization
 

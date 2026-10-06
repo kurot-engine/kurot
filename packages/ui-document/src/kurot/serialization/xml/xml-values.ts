@@ -4,7 +4,7 @@ import { isUIDesignTokenReference, isUIResourceReference } from '../../model/UIR
 
 const NUMBER_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 const HEX_COLOR_PATTERN = /^(?:#|0x)([0-9a-f]{6})$/i;
-const REFERENCE_PATTERN = /^@token:/;
+const REFERENCE_PATTERN = /^@(?:token|style):/;
 
 /**
  * Encodes a scalar or reference value for an XML attribute.
@@ -30,6 +30,9 @@ export function encodeXMLValue(value: UIPropertyValue, definition?: UIPropertyDe
 		return undefined;
 	}
 	if (isUIDesignTokenReference(value)) {
+		if (value.tokenType === 'color') {
+			return `@style:colors:${value.key}`;
+		}
 		return `@token:${value.tokenType}:${value.key}`;
 	}
 	return undefined;
@@ -52,8 +55,19 @@ export function decodeXMLValue(source: string, definition?: UIPropertyDefinition
 	if (source.startsWith('@asset:') || source.startsWith('@resource:')) {
 		throw new Error('Skin XML uses direct component values instead of typed asset or resource prefixes.');
 	}
+	if (source.startsWith('@style:')) {
+		const prefix = '@style:colors:';
+		const key = source.slice(prefix.length);
+		if (!source.startsWith(prefix) || key.trim().length === 0) {
+			throw new Error('Style references use @style:colors:<key> with a non-empty key.');
+		}
+		return { kind: 'token', tokenType: 'color', key };
+	}
 	if (source.startsWith('@token:')) {
 		const [tokenType, ...key] = source.slice('@token:'.length).split(':');
+		if (tokenType === 'color') {
+			throw new Error('Color references use @style:colors:<key>.');
+		}
 		return { kind: 'token', tokenType: tokenType ?? '', key: key.join(':') };
 	}
 	if (definition?.format === 'resource') {

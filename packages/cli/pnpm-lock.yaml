@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@kurot/ui-document':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.10.0
+        version: 0.10.0
       commander:
         specifier: ^13.0.0
         version: 13.1.0
@@ -348,8 +348,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kurot/ui-document@0.9.0':
-    resolution: {integrity: sha512-IRnXqHT8GzrnFCPnOJNPxNZ4gTbAqhp/qp4qQJJPrZHcxQTRKyAC5FmhQ61f5gFOFcqc8VxsdlXTwe/+ISWp7g==}
+  '@kurot/ui-document@0.10.0':
+    resolution: {integrity: sha512-rsNooegiQhpHpNyFRH5FbKMdbKyVS8tGuYhY97xmg+pELT6S0fTFOb1Ju9RVioKKjpPSq9Lh7vB5hK9jWwSGaA==}
 
   '@rollup/rollup-android-arm-eabi@4.60.2':
     resolution: {integrity: sha512-dnlp69efPPg6Uaw2dVqzWRfAWRnYVb1XJ8CyyhIbZeaq4CA5/mLeZ1IEt9QqQxmbdvagjLIm2ZL8BxXv5lH4Yw==}
@@ -906,7 +906,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kurot/ui-document@0.9.0': {}
+  '@kurot/ui-document@0.10.0': {}
 
   '@rollup/rollup-android-arm-eabi@4.60.2':
     optional: true

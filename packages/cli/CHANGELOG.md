@@ -7,6 +7,39 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.2.0 — 2026-10-06
+
+### Added
+
+- Read the optional fixed `resource/config/style.json` through the shared
+  ui-document parser and resolve named colors in base properties and state
+  overrides before SkinIR/code generation.
+- Watch `config/style.json` during development. Rebuild skins when the palette
+  changes, preserving the last successful Skin bundle on invalid configurations
+  or missing referenced colors.
+
+### Dependencies
+
+- Require published `@kurot/ui-document@^0.10.0` for shared font/color validation,
+  disposable color resolution and the `@style:colors:<key>` XML contract.
+- Keep Node.js >= 20, ES2022/ESM output, command APIs and document format version 2
+  unchanged. Core/UI remain application dependencies; no renderer upgrade is
+  required for named colors.
+
+### XML Authoring Change
+
+- Compile `@style:colors:<key>` to numeric RGB values; preserve authored Skin XML.
+  The previous `@token:color:<key>` prefix is rejected by the shared parser and
+  requires an explicit source update. Files are not migrated automatically.
+- Missing style.json is allowed until a Skin references a named color. Unsupported
+  sections, invalid font/color configuration and unknown color keys fail explicitly.
+  Schema-defined text remains literal; other semantic token syntax is unchanged.
+
+### Tests
+
+- Verify base/state color compilation, palette changes, black as zero, failures
+  retaining the previous output and authored XML remaining untouched.
+
 ## 3.1.0 — 2026-10-05
 
 ### Added

@@ -4,6 +4,32 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.8.1] — 2026-10-06
+
+### Changed
+
+- Adopt published `@kurot/ui-document@^0.10.0` in peer and development
+  dependencies, including its shared project font/color configuration and
+  `@style:colors:<key>` XML color references.
+- Keep runtime APIs, materialization, native state restoration and disposal
+  unchanged. Applications resolve stylesheet colors in disposable document
+  copies or register their numeric values as color design tokens; the runtime
+  does not read style.json or load fonts.
+
+### Migration
+
+- Upgrade the application or Editor's ui-document dependency to `^0.10.0`
+  together with this runtime. The previous `@token:color:<key>` XML syntax is
+  rejected by the new document parser; update authored references explicitly.
+  Literal text, internal color-token records and semantic format version 2
+  remain unchanged. Core `^2.1.0` and UI `^3.1.0` remain the peer requirements.
+
+### Tests
+
+- Verify stylesheet-derived base and inactive-state colors, black RGB values,
+  native state restoration, registry token resolution, literal reference-like
+  text, and preservation of authored XML through the published document kernel.
+
 ## [0.8.0] — 2026-10-05
 
 ### Added

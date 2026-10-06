@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.1.0`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.2.0`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -39,7 +39,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.1.0 requires `@kurot/ui-document@^0.9.0`. Schema-defined strings, including
+CLI 3.2.0 requires `@kurot/ui-document@^0.10.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -151,10 +151,21 @@ for conversion and compilation boundaries.
 
 ## Label text compilation in 3.1.0
 
-The compiler consumes the ui-document 0.9.x catalog and emits Label `textFit`,
+The compiler consumes the shared ui-document catalog and emits Label `textFit`,
 `minFontSize`, authored `size` and state-size overrides unchanged. Runtime
 observations are not authoring inputs, and fitting never becomes a build-time
 measurement. Rendering uses the application's UI >= 3.1.0 and Core >= 2.1.0
 within their respective majors. Neither engine is a CLI runtime dependency.
 See [text compilation](label-text-layout.md) and
 [native Label text layout](../../ui/docs/label-text-layout.md) for the boundary.
+
+## Project styles in 3.2.0
+
+Read [project styles](../../ui-document/docs/project-styles.md). buildSkinsModule
+reads the optional fixed config/style.json once per build and forwards its numeric
+colors to parseKUISkin before IR conversion. The resource watcher also observes
+config/style.json; missing referenced colors fail with the Skin path and property.
+Base and state colors use @style:colors:<key>; reject the previous color prefix
+without migrating files. Fonts are validated but not loaded; the application owns
+font loading and rendering. Build/preview copies resolve references while authored
+XML retains them. No live runtime palette switching is introduced.

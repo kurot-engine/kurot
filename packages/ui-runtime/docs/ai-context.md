@@ -1,14 +1,14 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.8.0`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.8.1`. This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.9.0`, `@kurot/ui@^3.1.0`, and
+It peer-depends on `@kurot/ui-document@^0.10.0`, `@kurot/ui@^3.1.0`, and
 `@kurot/core@^2.1.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
-Document 0.9 XML string attributes are literal, including state text and
+Document XML string attributes are literal, including state text and
 numeric/boolean-looking strings. Materialize those values unchanged. The runtime
 does not parse or migrate XML; old synthetic escape prefixes must be removed
 explicitly by the author. See [KUI XML values](../../ui-document/docs/kui-xml.md#values).
@@ -170,6 +170,17 @@ The runtime accepts resolved `scale9Grid` rectangles and clears inherited
 grids when an Image receives `false`. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
+
+## Project style adoption in 0.8.1
+
+The published ui-document 0.10.0 parser owns `@style:colors:<key>` XML syntax
+and the optional fixed `resource/config/style.json` contract. Internal color
+token records remain unchanged; no runtime property-routing change is needed.
+Consumers perform configuration I/O and font loading. They may resolve every
+document and registered appearance with `resolveUIStyleColors()` into disposable
+copies, or register palette entries as color tokens in `UIAssetRegistry` before
+materializing the original document. Never save the expanded copies or rewrite
+authored references. The previous XML color prefix is rejected without an alias.
 
 ## Label text layout in 0.8.0
 

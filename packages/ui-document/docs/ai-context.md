@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.9.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.10.0`. This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -160,7 +160,9 @@ src/
 - Catalog: `createKurotUIFoundationRegistry`,
   `registerKurotUIFoundation`.
 - Project assets: `UIAssetRegistry`, project resource/token definitions, and
-  `validateUIAssetRegistry`.
+  `validateUIAssetRegistry`. Project styles: `UIStyleSheet`, `UIStyleFontFamily`,
+  `UIStyleFontFace`, `parseUIStyleSheet`, `getUIStyleFontAlias`,
+  `getUIStyleFontFamily`, `getUIStyleColor` and `resolveUIStyleColors`.
 - Editing: `UIOperation` (including atomic `set-node-id` reference updates),
   `applyUIOperation`, `UITransaction`,
   `applyUITransaction`, revision snapshots, `diffUIDocuments`,
@@ -173,7 +175,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.7.x` consumes format version 2 and executes the current
+- `@kurot/ui-runtime@0.8.1` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
@@ -181,17 +183,18 @@ src/
 
 ## 6. Task → file map
 
-| Task                                              | Start with                                                                 |
-| ------------------------------------------------- | -------------------------------------------------------------------------- |
-| Change asset/node/reference shapes                | `model/`                                                                   |
-| Add constructors or tree queries                  | `document/`                                                                |
-| Add a structural invariant                        | `validation/validateUIDocument.ts` and related validators                  |
-| Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures          |
-| Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts` |
-| Change built-in component fields                  | `catalog/properties/`                                                      |
-| Change project catalogs or cross-document rules   | `assets/`                                                                  |
-| Change operations, transactions, diff, or history | `editing/`                                                                 |
-| Change public exports                             | nearest folder `index.ts`, then `src/index.ts`                             |
+| Task                                              | Start with                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Change asset/node/reference shapes                | `model/`                                                                             |
+| Add constructors or tree queries                  | `document/`                                                                          |
+| Add a structural invariant                        | `validation/validateUIDocument.ts` and related validators                            |
+| Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures                    |
+| Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts`           |
+| Change built-in component fields                  | `catalog/properties/`                                                                |
+| Change project catalogs or cross-document rules   | `assets/`                                                                            |
+| Change project fonts/colors or their resolution   | `assets/UIStyleSheet.ts`, `assets/resolveUIStyleColors.ts`, `docs/project-styles.md` |
+| Change operations, transactions, diff, or history | `editing/`                                                                           |
+| Change public exports                             | nearest folder `index.ts`, then `src/index.ts`                                       |
 
 ## 7. Commands
 
@@ -212,9 +215,21 @@ for conversion and compilation boundaries.
 
 The package describes and validates fitting policy; it does not measure text,
 derive font sizes or import runtime classes. The semantic format remains 2.
-Matching CLI and ui-runtime releases must raise their ui-document range to
-0.9.x before consuming the new catalog. Rendering requires Core >= 2.1.0 and
+CLI 3.2 and ui-runtime 0.8.1 consume this catalog through their ^0.10.0 ranges;
+consumers on earlier ^0.9.0 ranges must update explicitly before adopting styles.
+Rendering requires Core >= 2.1.0 and
 the matching UI Label implementation.
 See [text authoring](text-layout.md) for defaults, XML preservation and
 validation boundaries, and [Label text layout](../../ui/docs/label-text-layout.md)
 for native rendering behavior.
+
+## Project styles in 0.10.0
+
+Read [project-styles.md](project-styles.md). UIStyleSheet.ts owns the shared font
+and immutable RGB color contract; resolveUIStyleColors.ts resolves only color tokens
+in a disposable copy, including inactive state/variant values. No renderer or I/O.
+XML colors use @style:colors:<key>, corresponding to the colors section of style.json.
+The internal token record remains unchanged. Reject the previous @token:color:<key>
+prefix and unsupported style sections; never reinterpret schema-defined strings.
+Only resolve disposable copies for compilation/preview, retaining the authored
+document for XML/history. Font loading and configuration I/O belong to consumers.

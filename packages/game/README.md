@@ -7,10 +7,14 @@ Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/mai
 ## Installation
 
 ```bash
-pnpm add @kurot/game @kurot/core
+pnpm add @kurot/game@^2.0.0 @kurot/core@^2.1.1
 ```
 
 `@kurot/game` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
+
+Game 2.0.0 supports Core 2.x; the installation above includes Core 2.1.1's
+nested/rotated WebGL scroll clipping fix. Game has no dependency on UI,
+ui-document or CLI and does not interpret KUI XML or project style.json.
 
 Upgrade Core to 2.x together with game 2.x. Refresh old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launch. See the
@@ -20,7 +24,10 @@ For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md)
 
 ## Tween
 
-`Tween` owns its ticker registration automatically. Create a tween with `Tween.get(target)` and append steps; it begins on the next engine tick.
+`Tween` owns its ticker registration automatically. Create a tween with
+`Tween.get(target)` and append steps. All active tweens share one registration;
+the first tick after registration captures the timestamp, and advancement
+begins on the following tick.
 
 ### Basic animation
 

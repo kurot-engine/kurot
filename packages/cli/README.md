@@ -3,7 +3,8 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 3.1.0.** Node.js 20 or later is required.
+> **Current release: 3.2.0.** Requires `@kurot/ui-document@^0.10.0`
+> and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
 > Existing game projects that use EXML should remain on
@@ -14,7 +15,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Label text fitting in 3.1.0
 
-The shared ui-document 0.9.x catalog supports Label `textFit` and `minFontSize`
+The shared ui-document catalog supports Label `textFit` and `minFontSize`
 in KUI XML:
 
 ```xml
@@ -37,7 +38,7 @@ See the [compilation contract](docs/label-text-layout.md) and
 The CLI does not require a global install.
 
 ```bash
-npx @kurot/cli create my-game
+npx @kurot/cli@3.2.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -45,7 +46,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.1.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.2.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -153,7 +154,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.1.0 uses `@kurot/ui-document@^0.9.0` and its literal-string XML rules.
+Version 3.2.0 uses `@kurot/ui-document@^0.10.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -223,8 +224,41 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.9.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.10.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.
 See the [resource nine-slice contract](../ui-document/docs/resource-nine-slice.md).
+
+## Project style colors in 3.2.0
+
+The optional fixed `resource/config/style.json` is independent of
+`default.res.json`. Each KUI build reads it with ui-document 0.10.x, validates
+font definitions and the optional named `colors` palette, and resolves color
+references before generating Skin factories:
+
+```xml
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="disabled">
+    <Label id="labelDisplay" textColor="#FF9900"
+           textColor.disabled="@style:colors:disabled-text" />
+</Skin>
+```
+
+`@style:colors:disabled-text` selects the `disabled-text` RGB entry in the
+`colors` section. Base and inactive-state references compile to numeric values;
+the authored XML remains unchanged. The dev resource watcher observes style.json
+and rebuilds skins after changes. Invalid configuration or a missing referenced
+color fails with diagnostics and retains the last successful Skin bundle.
+
+An absent stylesheet is allowed when no Skin references its colors. An existing
+stylesheet must contain valid font definitions even if the build only consumes
+colors; see the shared [project style contract](../ui-document/docs/project-styles.md).
+The CLI does not load fonts, apply runtime CSS or introduce live game theme
+switching. CLI-built skins run directly through `@kurot/ui`; `@kurot/ui-runtime`
+is not required for this compilation path. Node.js >= 20 and semantic format
+version 2 remain unchanged.
+
+The previous `@token:color:<key>` XML prefix is rejected by ui-document 0.10.
+Update those references explicitly before adopting CLI 3.2; ordinary text stays
+literal. Existing EXML projects remain on CLI 1.3.x. No Core/UI rendering change
+is required for color expansion.

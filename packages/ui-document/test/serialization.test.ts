@@ -70,7 +70,12 @@ describe('KUI XML serialization', () => {
 		const document = parseUIDocument(source);
 		expect(document.root.children[0]?.properties.dataProvider).toEqual({
 			type: 'kui.ArrayCollection',
-			properties: { source: [{ label: '开始', selected: true }, { label: '设置', selected: false }] },
+			properties: {
+				source: [
+					{ label: '开始', selected: true },
+					{ label: '设置', selected: false },
+				],
+			},
 		});
 		expect(serializeUIDocument(document)).toBe(source);
 	});
@@ -83,8 +88,9 @@ describe('KUI XML serialization', () => {
     </List>
 </Skin>`;
 		expect(() => parseUIDocument(source)).toThrow(/<Array> accepts only <Object \/> items/);
-		expect(() => parseUIDocument(source.replace('<Label text="wrong" />', '<Object token="@token:color:primary" />')))
-			.toThrow(/must be a scalar attribute/);
+		expect(() =>
+			parseUIDocument(source.replace('<Label text="wrong" />', '<Object token="@style:colors:primary" />')),
+		).toThrow(/must be a scalar attribute/);
 	});
 
 	it('serializes catalog color properties as readable hexadecimal values', () => {
@@ -101,15 +107,17 @@ describe('KUI XML serialization', () => {
 			root: createUINode({
 				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
-				children: [createUINode({
-					id: 'background',
-					type: 'kui.Rect',
-					properties: {
-						alpha: 1,
-						fillColor: 0x121d30,
-						strokeColor: 0x73a9ff,
-					},
-				})],
+				children: [
+					createUINode({
+						id: 'background',
+						type: 'kui.Rect',
+						properties: {
+							alpha: 1,
+							fillColor: 0x121d30,
+							strokeColor: 0x73a9ff,
+						},
+					}),
+				],
 			}),
 		});
 
@@ -129,11 +137,13 @@ describe('KUI XML serialization', () => {
 			root: createUINode({
 				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
-				children: [createUINode({
-					id: 'imageDisplay',
-					type: 'kui.Image',
-					properties: { source: createUIResourceReference('image', 'roundthumb_png') },
-				})],
+				children: [
+					createUINode({
+						id: 'imageDisplay',
+						type: 'kui.Image',
+						properties: { source: createUIResourceReference('image', 'roundthumb_png') },
+					}),
+				],
 			}),
 		});
 
@@ -175,11 +185,13 @@ describe('KUI XML serialization', () => {
 			root: createUINode({
 				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
-				children: [createUINode({
-					id: 'conflict',
-					type: 'kui.Group',
-					properties: { width: 320, percentWidth: 100 },
-				})],
+				children: [
+					createUINode({
+						id: 'conflict',
+						type: 'kui.Group',
+						properties: { width: 320, percentWidth: 100 },
+					}),
+				],
 			}),
 		});
 
@@ -203,30 +215,40 @@ describe('KUI XML serialization', () => {
 		expect(() => parseUIDocument('<Skin class="x"><Group id="root" /></Skin>')).toThrow(
 			/KUI XML root must declare xmlns/,
 		);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x" target="kui.Button"><Group id="root" /></Skin>',
-		)).toThrow(/Unexpected attribute "target"/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><contract /><Group id="root" /></Skin>',
-		)).toThrow(/Unexpected <contract> inside <Skin>/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down" alpha.unknown="0.5" />',
-		)).toThrow(/undeclared state/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down.alt"><Group id="root" /></Skin>',
-		)).toThrow(/not valid in a property.state attribute/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="root" appearance="other" /></Skin>',
-		)).toThrow(/does not support appearance/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="root"><properties /></Group></Skin>',
-		)).toThrow(/not Skin XML syntax/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Image id="root" source="@resource:image:old" /></Skin>',
-		)).toThrow(/direct component values/);
-		expect(() => parseUIDocument(
-			'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="__kui_node_0" /></Skin>',
-		)).toThrow(/reserved internal prefix/);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="x" target="kui.Button"><Group id="root" /></Skin>',
+			),
+		).toThrow(/Unexpected attribute "target"/);
+		expect(() =>
+			parseUIDocument('<Skin xmlns="https://kurot.dev/ui/1" class="x"><contract /><Group id="root" /></Skin>'),
+		).toThrow(/Unexpected <contract> inside <Skin>/);
+		expect(() =>
+			parseUIDocument('<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down" alpha.unknown="0.5" />'),
+		).toThrow(/undeclared state/);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="x" states="down.alt"><Group id="root" /></Skin>',
+			),
+		).toThrow(/not valid in a property.state attribute/);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="root" appearance="other" /></Skin>',
+			),
+		).toThrow(/does not support appearance/);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="root"><properties /></Group></Skin>',
+			),
+		).toThrow(/not Skin XML syntax/);
+		expect(() =>
+			parseUIDocument(
+				'<Skin xmlns="https://kurot.dev/ui/1" class="x"><Image id="root" source="@resource:image:old" /></Skin>',
+			),
+		).toThrow(/direct component values/);
+		expect(() =>
+			parseUIDocument('<Skin xmlns="https://kurot.dev/ui/1" class="x"><Group id="__kui_node_0" /></Skin>'),
+		).toThrow(/reserved internal prefix/);
 	});
 
 	it('writes state overrides on their target nodes', () => {
@@ -292,11 +314,13 @@ describe('KUI XML serialization', () => {
 			root: createUINode({
 				id: SKIN_ROOT_ID,
 				type: 'kui.Group',
-				children: [createUINode({
-					id: 'custom',
-					type: 'game.Custom',
-					properties: { options: ['a', 'b'] },
-				})],
+				children: [
+					createUINode({
+						id: 'custom',
+						type: 'game.Custom',
+						properties: { options: ['a', 'b'] },
+					}),
+				],
 			}),
 		});
 

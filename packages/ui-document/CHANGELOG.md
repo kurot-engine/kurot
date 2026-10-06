@@ -4,6 +4,34 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.10.0] — 2026-10-06
+
+### Added
+
+- Share the `style.json` font and named RGB palette contract through
+  `parseUIStyleSheet`, `getUIStyleFontAlias`, `getUIStyleFontFamily` and
+  `getUIStyleColor`, with field-specific validation errors and immutable colors.
+- Resolve color references in a disposable compilation/preview copy through
+  `resolveUIStyleColors`, including nested property values and inactive states
+  and variants. Preserve authored documents, XML and history; missing colors
+  fail with their semantic property path.
+
+### Changed
+
+- Serialize named colors as `@style:colors:<key>` in default and state attributes,
+  matching the `colors` section of project `style.json`.
+- Keep the internal color-token model, document format version 2 and style
+  schemaVersion 1 unchanged. This package performs no I/O, font loading or rendering.
+
+### Breaking
+
+- Reject the previous `@token:color:<key>` XML prefix; explicitly update authored
+  color references before adopting 0.10.0. No automatic file migration is provided.
+- Reject unsupported stylesheet sections and empty reference keys. Literal
+  string properties and other semantic token categories retain their contracts.
+- Consumers using `^0.9.0` must update their dependency or peer range to adopt
+  this release. See [project styles](docs/project-styles.md) for integration.
+
 ## [0.9.0] — 2026-10-05
 
 ### Added

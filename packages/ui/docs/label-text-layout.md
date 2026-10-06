@@ -2,8 +2,10 @@
 
 This contract applies to UI 3.1.0 with Core >= 2.1.0 within Core 2.x. The public
 `TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
-authoring uses ui-document 0.9.x and matching CLI/ui-runtime releases; older
-consumers must update their dependency ranges before using the new fields.
+authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
+0.10.0. CLI 3.2.0 and ui-runtime 0.8.1 use ui-document `^0.10.0`.
+Older consumers must update before using the fitting fields; runtime 0.8.0's
+`^0.9.0` peer range does not include ui-document 0.10.0.
 
 ## Lines and bounds
 
