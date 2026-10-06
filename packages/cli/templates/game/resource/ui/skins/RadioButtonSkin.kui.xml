@@ -5,6 +5,6 @@
             <HorizontalLayout verticalAlign="middle" />
         </layout>
         <Image alpha="1" fillMode="scale" source="radiobutton_unselect_png" alpha.disabled="0.5" source.disabledAndSelected="radiobutton_select_disabled_png" alpha.down="0.7" source.downAndSelected="radiobutton_select_down_png" source.upAndSelected="radiobutton_select_up_png" />
-        <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
+        <Label id="labelDisplay" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
     </Group>
 </Skin>

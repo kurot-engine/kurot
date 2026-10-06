@@ -4,6 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { parseUIStyleSheet } from '@kurot/ui-document';
 import { generateCode, parseKUISkin } from '../src/core/kui/index.js';
 
 const TEMPLATE_DIRECTORY = fileURLToPath(new URL('../templates/game/resource/ui/skins/', import.meta.url));
@@ -116,12 +117,20 @@ describe('KUI Skin compiler', () => {
 	});
 
 	it('compiles every bundled template skin', async () => {
+		const stylesheet = parseUIStyleSheet(
+			JSON.parse(
+				await fs.readFile(
+					fileURLToPath(new URL('../templates/game/resource/config/style.json', import.meta.url)),
+					'utf8',
+				),
+			),
+		);
 		const files = (await fs.readdir(TEMPLATE_DIRECTORY)).filter(file => file.endsWith('.kui.xml')).sort();
 
 		expect(files).toHaveLength(21);
 		for (const file of files) {
 			const source = await fs.readFile(path.join(TEMPLATE_DIRECTORY, file), 'utf8');
-			expect(() => generateCode(parseKUISkin(source))).not.toThrow();
+			expect(() => generateCode(parseKUISkin(source, undefined, [], [], stylesheet.colors))).not.toThrow();
 		}
 	});
 });

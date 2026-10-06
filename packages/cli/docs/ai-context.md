@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.2.0`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.2.1`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -24,6 +24,11 @@ src/
 ```
 
 Project templates are under `templates/game` and `templates/empty`.
+The 3.2.1 game template includes fixed style/locale configuration,
+English properties and licensed regular/bold font files. StyleManager finishes
+font loading before Main creates Player/Preloader; LocaleManager registers
+preload texts before creating the scene. See [game-template.md](game-template.md).
+Version 3.2.1 is prepared for publication; 3.2.0 is already published.
 
 ## KUI compilation
 
@@ -39,7 +44,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.2.0 requires `@kurot/ui-document@^0.10.0`. Schema-defined strings, including
+CLI 3.2.1 requires `@kurot/ui-document@^0.10.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -116,19 +121,20 @@ in `namespace-external-plugin.ts`.
 
 ## Configuration lookup
 
-| Task                             | File                                         |
-| -------------------------------- | -------------------------------------------- |
-| Add or validate a config field   | `src/core/config.ts`                         |
-| Resolve an absolute project path | `src/core/project.ts`                        |
-| Change KUI scanning/theme output | `src/core/plugins/compile-kui.ts`            |
-| Change KUI node code generation  | `src/core/kui/kui-parser.ts`, `codegen.ts`   |
-| Add a built-in component tag     | `src/core/kui/registry.ts`                   |
-| Change generated part types      | `src/core/kui/skin-parts-declaration.ts`     |
-| Change component pairing         | `src/core/components/discover-components.ts` |
-| Change watch behavior            | `src/core/dev-server.ts`                     |
-| Change output HTML/import maps   | `src/core/plugins/generate-html.ts`          |
-| Change scaffolding               | `src/core/template.ts`, `templates/`         |
-| Add a diagnostic code            | `src/core/diagnostics/codes.ts`              |
+| Task                             | File                                                                |
+| -------------------------------- | ------------------------------------------------------------------- |
+| Add or validate a config field   | `src/core/config.ts`                                                |
+| Resolve an absolute project path | `src/core/project.ts`                                               |
+| Change KUI scanning/theme output | `src/core/plugins/compile-kui.ts`                                   |
+| Change KUI node code generation  | `src/core/kui/kui-parser.ts`, `codegen.ts`                          |
+| Add a built-in component tag     | `src/core/kui/registry.ts`                                          |
+| Change generated part types      | `src/core/kui/skin-parts-declaration.ts`                            |
+| Change component pairing         | `src/core/components/discover-components.ts`                        |
+| Change watch behavior            | `src/core/dev-server.ts`                                            |
+| Change output HTML/import maps   | `src/core/plugins/generate-html.ts`                                 |
+| Change scaffolding               | `src/core/template.ts`, `templates/`                                |
+| Change project style/locale boot | `templates/game/src/StyleManager.ts`, `LocaleManager.ts`, `Main.ts` |
+| Add a diagnostic code            | `src/core/diagnostics/codes.ts`                                     |
 
 ## Verification
 

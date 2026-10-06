@@ -12,7 +12,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/core`        | 2.1.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.1.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
-| `@kurot/cli`         | 3.2.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
+| `@kurot/cli`         | 3.2.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.10.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.8.1   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
 
@@ -151,3 +151,8 @@ installs all three from the registry. The KUI sample installs ui-document 0.10.0
 and CLI 3.2.0; CLI-built skins do not require ui-runtime. Engine examples use CLI
 3.2.0, while legacy EXML projects keep their independent dependency set.
 Package source versions alone do not confirm npm publication.
+
+CLI 3.2.1 is prepared for publication. Its game template includes style.json, locale.json, English
+properties and licensed regular/bold fonts with project-owned initialization.
+See packages/cli/docs/game-template.md for the initialization and fallback contract.
+The empty template stays Core-only, and existing projects are not modified.

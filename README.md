@@ -52,7 +52,7 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/core`](packages/core/README.md)               | 2.1.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | None                        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.2.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.2.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.10.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.1   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 
@@ -73,8 +73,12 @@ The current dependency ranges are:
 | ---------------- | ------------------------------------------------- |
 | UI 3.1.0         | Core `^2.1.0`                                     |
 | Game 2.0.0       | Core `^2.0.0`                                     |
-| CLI 3.2.0        | ui-document `^0.10.0`                             |
+| CLI 3.2.1        | ui-document `^0.10.0`                             |
 | ui-runtime 0.8.1 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.10.0` |
+
+CLI 3.2.1 is prepared for publication with project styles, bundled fonts and
+English translations in the game template; existing projects are not rewritten.
+See [game template setup](packages/cli/docs/game-template.md).
 
 CLI 3.2.0 and ui-document 0.10.0 are published. They share the optional
 `resource/config/style.json` font/color parser and `@style:colors:<key>` XML

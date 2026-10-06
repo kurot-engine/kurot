@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "eui",
+			"keys": "eui,locale_json,lang_en_US_properties",
 			"name": "preload"
 		}
 	],
@@ -10,6 +10,16 @@
 			"name": "eui",
 			"type": "sheet",
 			"url": "assets/ui/eui/eui.json"
+		},
+		{
+			"name": "locale_json",
+			"type": "json",
+			"url": "config/locale.json"
+		},
+		{
+			"name": "lang_en_US_properties",
+			"type": "text",
+			"url": "lang/lang_en_US.properties"
 		}
 	]
 }

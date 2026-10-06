@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current release: 3.2.0.** Requires `@kurot/ui-document@^0.10.0`
+> **Current version: 3.2.1 (prepared for publication).** Requires `@kurot/ui-document@^0.10.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -12,6 +12,9 @@ ESM, and compiles canonical KUI XML skins into runtime theme modules.
 > not require those projects to change their configuration or UI assets.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+Version 3.2.1 adds project styles, bundled fonts and English translations to the
+game template. Existing projects are not rewritten. See [game template setup](docs/game-template.md).
 
 ## Label text fitting in 3.1.0
 
@@ -38,7 +41,7 @@ See the [compilation contract](docs/label-text-layout.md) and
 The CLI does not require a global install.
 
 ```bash
-npx @kurot/cli@3.2.0 create my-game
+npx @kurot/cli@3.2.1 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -46,7 +49,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.2.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.2.1`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -57,9 +60,11 @@ Editor-managed KUI XML project, install the package with
 kurot create <name> [--template game|empty]
 ```
 
-The `game` template includes `@kurot/core`, `@kurot/game`, `@kurot/ui`, KUI
-skins, resource loading, and an editable HTML template. The `empty` template
-contains a minimal `Sprite` application.
+The `game` template includes `@kurot/core`, `@kurot/game`, `@kurot/ui`,
+`@kurot/ui-document`, KUI skins, project styles/fonts, English translations,
+resource loading, and an editable HTML template. Fonts load before creating UI;
+translations register after preload. The `empty` template contains a minimal
+`Sprite` application without UI/style/language dependencies.
 
 ### `kurot build`
 
@@ -154,7 +159,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.2.0 uses `@kurot/ui-document@^0.10.0` and retains its literal-string XML rules.
+Version 3.2.1 uses `@kurot/ui-document@^0.10.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -207,16 +212,32 @@ my-game/
 ├── kurot.config.ts
 ├── resource/
 │   ├── default.res.json
-│   ├── assets/
+│   ├── config/
+│   │   ├── style.json
+│   │   └── locale.json
+│   ├── lang/lang_en_US.properties
+│   ├── assets/fonts/
+│   │   ├── ChakraPetch-Regular.ttf
+│   │   ├── ChakraPetch-Bold.ttf
+│   │   └── OFL.txt
 │   └── ui/
+│       ├── app/
 │       ├── components/
 │       └── skins/*.kui.xml
 ├── src/
 │   ├── components/
-│   ├── LoadingUI.ts
+│   ├── Preloader.ts
+│   ├── StyleManager.ts
+│   ├── LocaleManager.ts
 │   └── Main.ts
 └── template/web/index.html
 ```
+
+StyleManager uses the same ui-document stylesheet parser as the compiler/Editor.
+`style.json` is read directly, independently of the manifest; locale.json and
+enabled properties files are registered in `preload`. Replace fonts by changing
+the resource-relative files/paths, and add languages through the Editor.
+See [game template setup](docs/game-template.md) for lifecycle and fallback rules.
 
 ## Resource defaults in 3.0.0
 

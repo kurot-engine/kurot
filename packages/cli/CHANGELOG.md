@@ -7,6 +7,34 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.2.1 — 2026-10-06
+
+### Game Template
+
+- Include fixed style.json and locale.json configuration, English properties,
+  Chakra Petch regular/bold fonts and their SIL Open Font License.
+- Load and publish project fonts before creating any UI, then register preload
+  translations using the URL language or configured default with English/key fallback.
+- Use shared ui-document font/color validation and named disabled text colors;
+  default skins inherit the project font instead of hardcoded Tahoma.
+- Keep the empty template minimal. Existing projects are not rewritten by scaffolding.
+- Create resource/ui/app alongside the reusable component directories so the
+  application Skin workspace is ready for the Editor.
+
+### Dependencies and Compatibility
+
+- New game projects include ui-document for the shared stylesheet parser. The
+  compiler retains its existing ui-document ^0.10.0 dependency.
+- Command/configuration APIs, KUI XML semantics and document format version 2
+  remain unchanged. Existing projects receive no automatic migration.
+
+### Tests
+
+- Validate bundled fonts/licenses, stylesheet colors, translation registration,
+  locale fallback, failed initialization and the unchanged empty template.
+- Compile all bundled default skins with the project palette and verify newly
+  generated projects through strict builds, type checking and browser rendering.
+
 ## 3.2.0 — 2026-10-06
 
 ### Added

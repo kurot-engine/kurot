@@ -50,6 +50,7 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 		await Promise.all([
 			ensureDir(path.join(destDir, 'src/components')),
 			ensureDir(path.join(destDir, 'resource/ui/components')),
+			ensureDir(path.join(destDir, 'resource/ui/app')),
 		]);
 	}
 

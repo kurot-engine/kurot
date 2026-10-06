@@ -5,15 +5,18 @@
  *
  * Lifecycle: constructor → ADDED_TO_STAGE → $onAddToStage → runGame → load → createGameScene → startAnimation
  */
-import { createPlayer, Event, resource } from '@kurot/core';
+import { createPlayer, Event, resource, TextField } from '@kurot/core';
 import { Button, Label, Rect, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
 import { Tween } from '@kurot/game';
 import { AssetAdapter } from '@/AssetAdapter';
 import { LifecycleHandler } from '@/LifecycleHandler';
 import { Preloader } from '@/Preloader';
+import { LocaleManager } from '@/LocaleManager';
+import { StyleManager } from '@/StyleManager';
 
 class Main extends UILayer {
 	private readonly _preloader = new Preloader();
+	private _description!: Label;
 
 	createChildren(): void {
 		super.createChildren();
@@ -24,25 +27,25 @@ class Main extends UILayer {
 		setAssetAdapter(new AssetAdapter());
 		LifecycleHandler.init(stage);
 
-		void this.runGame().catch(error => {
+		void this._runGame().catch(error => {
 			console.error('[Main] Unable to start game:', error);
 		});
 	}
 
-	private async runGame(): Promise<void> {
-		await this.createPreloader();
-		await this.load();
+	private async _runGame(): Promise<void> {
+		await this._createPreloader();
+		await this._load();
 		this._preloader.destroy();
-		this.createGameScene();
-		this.startAnimation();
+		this._createGameScene();
+		this._startAnimation();
 	}
 
-	private async load(): Promise<void> {
-		await this.updatePreloader('Loading resource configuration...', 1, 2);
+	private async _load(): Promise<void> {
+		await this._updatePreloader('Loading resource configuration...', 1, 2);
 		await resource.loadConfig('resource/default.res.json', 'resource/');
 
-		await this.updatePreloader('Loading theme...', 2, 2);
-		await this.loadTheme();
+		await this._updatePreloader('Loading theme...', 2, 2);
+		await this._loadTheme();
 
 		if (resource.hasGroup('preload')) {
 			this._preloader.updateText('Loading resources...');
@@ -50,39 +53,44 @@ class Main extends UILayer {
 				this._preloader.onProgress(loaded, total);
 			});
 		}
+
+		// 翻译依赖 preload 中的文本资源；加载完毕后再创建业务界面。
+		LocaleManager.init(
+			resource.get('locale_json'),
+			name => resource.get(name),
+			new URLSearchParams(window.location.search).get('lang') ?? '',
+		);
 	}
 
-	private async createPreloader(): Promise<void> {
+	private async _createPreloader(): Promise<void> {
 		await this._preloader.init();
 		this.addChild(this._preloader);
 	}
 
-	private async updatePreloader(message: string, current: number, total: number): Promise<void> {
+	private async _updatePreloader(message: string, current: number, total: number): Promise<void> {
 		this._preloader.updateText(message);
 		this._preloader.updateProgress(current, total);
-		await this.wait(0.1);
+		await this._wait(0.1);
 	}
 
-	private async loadTheme(): Promise<void> {
+	private async _loadTheme(): Promise<void> {
 		// Load the theme and its default UI skin mappings.
 		const theme = new Theme('resource/default.thm.json');
 		await new Promise<void>(resolve => theme.addEventListener(Event.COMPLETE, () => resolve()));
 	}
 
-	private wait(timeout: number): Promise<void> {
+	private _wait(timeout: number): Promise<void> {
 		return new Promise<void>(resolve => {
 			setTimeout(resolve, timeout * 1000);
 		});
 	}
-
-	private textfield!: Label;
 
 	/**
 	 * Create the game scene.
 	 *
 	 * Build a responsive view with EUI components and constraint-based layout.
 	 */
-	private createGameScene(): void {
+	private _createGameScene(): void {
 		// Responsive background
 		const sky = new Rect();
 		sky.left = 0;
@@ -111,7 +119,7 @@ class Main extends UILayer {
 		colorLabel.height = 48;
 		colorLabel.textAlign = 'center';
 		colorLabel.verticalAlign = 'middle';
-		colorLabel.text = 'Hello Kurot';
+		colorLabel.text = LocaleManager.getString('label.title');
 		colorLabel.size = 36;
 		this.addChild(colorLabel);
 
@@ -127,11 +135,11 @@ class Main extends UILayer {
 		textfield.verticalAlign = 'middle';
 		textfield.size = 24;
 		textfield.textColor = 0xffffff;
-		this.textfield = textfield;
+		this._description = textfield;
 
 		// UI button using the default theme
 		const button = new Button();
-		button.label = 'Click Me';
+		button.label = LocaleManager.getString('label.button');
 		button.horizontalCenter = 0;
 		button.top = 200;
 		button.width = 200;
@@ -141,16 +149,20 @@ class Main extends UILayer {
 	/**
 	 * Play a looping text fade animation.
 	 */
-	private startAnimation(): void {
-		const texts = ['Open-source, Free, Multi-platform', 'Push Game Forward', 'HTML5 Game Engine'];
+	private _startAnimation(): void {
+		const texts = [
+			LocaleManager.getString('label.description.open_source'),
+			LocaleManager.getString('label.description.push_forward'),
+			LocaleManager.getString('label.description.engine'),
+		];
 		let count = -1;
 		const change = () => {
 			count++;
 			if (count >= texts.length) {
 				count = 0;
 			}
-			this.textfield.text = texts[count];
-			const tw = Tween.get(this.textfield);
+			this._description.text = texts[count];
+			const tw = Tween.get(this._description);
 			tw.to({ alpha: 1 }, 200);
 			tw.wait(2000);
 			tw.to({ alpha: 0 }, 200);
@@ -161,12 +173,24 @@ class Main extends UILayer {
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────
-const app = createPlayer({
-	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
-	contentWidth: 640,
-	contentHeight: 1136,
-	scaleMode: 'showAll',
-	frameRate: 60,
-});
+async function start(): Promise<void> {
+	// 包括 Preloader 在内的所有 Label 首次测量都使用已就绪的项目字体。
+	await StyleManager.init();
+	TextField.default_fontFamily = StyleManager.fontFamily;
+	const canvas = document.getElementById('gameCanvas');
+	if (!(canvas instanceof HTMLCanvasElement)) {
+		throw new Error('Missing gameCanvas.');
+	}
+	const app = createPlayer({
+		canvas,
+		contentWidth: 640,
+		contentHeight: 1136,
+		scaleMode: 'showAll',
+		frameRate: 60,
+	});
+	app.start(new Main());
+}
 
-app.start(new Main());
+void start().catch(error => {
+	console.error('[Main] Unable to start project:', error);
+});

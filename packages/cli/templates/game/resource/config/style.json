@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"fonts": {
+		"default": "primary",
+		"families": {
+			"primary": {
+				"fallback": ["Arial", "sans-serif"],
+				"faces": [
+					{ "url": "assets/fonts/ChakraPetch-Regular.ttf", "weight": 400 },
+					{ "url": "assets/fonts/ChakraPetch-Bold.ttf", "weight": 700 }
+				]
+			}
+		}
+	},
+	"colors": { "disabled-text": "#999999" }
+}

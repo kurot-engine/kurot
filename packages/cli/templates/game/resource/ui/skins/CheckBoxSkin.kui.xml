@@ -5,6 +5,6 @@
             <HorizontalLayout verticalAlign="middle" />
         </layout>
         <Image alpha="1" fillMode="scale" source="checkbox_unselect_png" alpha.disabled="0.5" source.disabledAndSelected="checkbox_select_disabled_png" alpha.down="0.7" source.downAndSelected="checkbox_select_down_png" source.upAndSelected="checkbox_select_up_png" />
-        <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
+        <Label id="labelDisplay" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
     </Group>
 </Skin>

@@ -11,7 +11,8 @@
 	"dependencies": {
 		"@kurot/core": "latest",
 		"@kurot/game": "latest",
-		"@kurot/ui": "latest"
+		"@kurot/ui": "latest",
+		"@kurot/ui-document": "latest"
 	},
 	"devDependencies": {
 		"@kurot/cli": "latest"
