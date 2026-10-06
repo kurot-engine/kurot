@@ -199,6 +199,7 @@ describe('Kurot UI foundation catalog', () => {
 			'textAlign',
 			'textColor',
 			'textFit',
+			'textStyle',
 			'verticalAlign',
 			'wordWrap',
 		]);

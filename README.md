@@ -76,9 +76,16 @@ The current dependency ranges are:
 | CLI 3.2.1        | ui-document `^0.10.0`                             |
 | ui-runtime 0.8.1 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.10.0` |
 
-CLI 3.2.1 is prepared for publication with project styles, bundled fonts and
+CLI 3.2.1 is published with project styles, bundled fonts and
 English translations in the game template; existing projects are not rewritten.
 See [game template setup](packages/cli/docs/game-template.md).
+
+Unreleased source adds `style.json.labels` presets and Default-only
+`textStyle="@style:labels:<key>"` on Labels. Local properties and individual
+state overrides take precedence; compilation expands copies into native
+properties while XML/history retain references. These APIs are absent from
+published ui-document 0.10.0 and CLI 3.2.1. The CLI currently uses a local kernel
+override for development. See [the Label preset contract](packages/ui-document/docs/project-styles.md#label-typography-presets-unreleased).
 
 CLI 3.2.0 and ui-document 0.10.0 are published. They share the optional
 `resource/config/style.json` font/color parser and `@style:colors:<key>` XML

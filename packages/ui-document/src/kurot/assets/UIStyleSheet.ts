@@ -1,3 +1,6 @@
+import { parseUILabelStyles } from './UILabelStyle.js';
+import type { UILabelStyle } from './UILabelStyle.js';
+
 export interface UIStyleFontFace {
 	readonly url: string;
 	readonly weight: number;
@@ -15,6 +18,7 @@ export interface UIStyleFontFamily {
 export interface UIStyleSheet {
 	readonly schemaVersion: 1;
 	readonly colors: Readonly<Record<string, number>>;
+	readonly labels: Readonly<Record<string, UILabelStyle>>;
 	readonly fonts: {
 		readonly default: string;
 		readonly families: Readonly<Record<string, UIStyleFontFamily>>;
@@ -43,7 +47,7 @@ const GENERIC_FONT_FAMILIES = new Set([
  */
 export function parseUIStyleSheet(value: unknown): UIStyleSheet {
 	const root = requireRecord(value, 'style');
-	requireKeys(root, ['schemaVersion', 'fonts', 'colors'], 'style');
+	requireKeys(root, ['schemaVersion', 'fonts', 'colors', 'labels'], 'style');
 	if (root.schemaVersion !== 1) {
 		throw new Error('style.schemaVersion must be 1.');
 	}
@@ -65,7 +69,9 @@ export function parseUIStyleSheet(value: unknown): UIStyleSheet {
 
 	const colors = parseColors(root.colors);
 
-	return { schemaVersion: 1, fonts: { default: defaultKey, families }, colors };
+	const style: UIStyleSheet = { schemaVersion: 1, fonts: { default: defaultKey, families }, colors, labels: {} };
+	const labels = parseUILabelStyles(root.labels, colors, key => getUIStyleFontFamily(style, key));
+	return { ...style, labels };
 }
 
 export function getUIStyleFontAlias(key: string): string {

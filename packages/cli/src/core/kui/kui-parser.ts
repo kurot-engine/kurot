@@ -6,8 +6,9 @@ import {
 	parseUIDocument,
 	resolveUIResourceDefaults,
 	resolveUIStyleColors,
+	resolveUILabelStyles,
 } from '@kurot/ui-document';
-import type { UIDocument, UINode, UIPropertyValue, UIResourceConfigEntry } from '@kurot/ui-document';
+import type { UIDocument, UINode, UIPropertyValue, UIResourceConfigEntry, UIStyleSheet } from '@kurot/ui-document';
 import type {
 	PropertyAssignment,
 	PropertyChild,
@@ -28,9 +29,13 @@ export function parseKUISkin(
 	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
 	resources: readonly UIResourceConfigEntry[] = [],
-	colors: Readonly<Record<string, number>> = {},
+	colors?: Readonly<Record<string, number>>,
+	styleSheet?: UIStyleSheet,
 ): SkinIR {
-	const document = resolveUIStyleColors(resolveUIResourceDefaults(parseUIDocument(source), resources), colors);
+	const document = resolveUIStyleColors(
+		resolveUILabelStyles(resolveUIResourceDefaults(parseUIDocument(source), resources), styleSheet),
+		colors ?? styleSheet?.colors ?? {},
+	);
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 

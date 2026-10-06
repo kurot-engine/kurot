@@ -152,7 +152,17 @@ and CLI 3.2.0; CLI-built skins do not require ui-runtime. Engine examples use CL
 3.2.0, while legacy EXML projects keep their independent dependency set.
 Package source versions alone do not confirm npm publication.
 
-CLI 3.2.1 is prepared for publication. Its game template includes style.json, locale.json, English
+CLI 3.2.1 is published. Its game template includes style.json, locale.json, English
 properties and licensed regular/bold fonts with project-owned initialization.
 See packages/cli/docs/game-template.md for the initialization and fallback contract.
 The empty template stays Core-only, and existing projects are not modified.
+
+## Unreleased Label presets
+
+Source now supports style.json.labels and Default-only Label
+textStyle="@style:labels:<key>". Local fields and individual Skin state fields win.
+`resolveUILabelStyles` expands compilation/preview copies before color resolution;
+XML/history retain references. No Core/UI changes or migration. See packages/ui-document/docs/project-styles.md.
+These APIs are not in published ui-document 0.10.0 or CLI 3.2.1. CLI source uses a
+local pnpm override and Editor 0.13.0 uses local Bun overrides for trial packaging;
+publish the kernel first and update/remove these bindings before registry adoption.

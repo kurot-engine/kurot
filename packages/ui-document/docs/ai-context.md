@@ -162,7 +162,9 @@ src/
 - Project assets: `UIAssetRegistry`, project resource/token definitions, and
   `validateUIAssetRegistry`. Project styles: `UIStyleSheet`, `UIStyleFontFamily`,
   `UIStyleFontFace`, `parseUIStyleSheet`, `getUIStyleFontAlias`,
-  `getUIStyleFontFamily`, `getUIStyleColor` and `resolveUIStyleColors`.
+  `getUIStyleFontFamily`, `getUIStyleColor`, `resolveUIStyleColors`,
+  `UILabelStyle`, `UILabelStyleProperty`, `UI_LABEL_STYLE_PROPERTIES`,
+  `getUILabelStyle` and `resolveUILabelStyles` (preset APIs are unreleased).
 - Editing: `UIOperation` (including atomic `set-node-id` reference updates),
   `applyUIOperation`, `UITransaction`,
   `applyUITransaction`, revision snapshots, `diffUIDocuments`,
@@ -183,18 +185,18 @@ src/
 
 ## 6. Task → file map
 
-| Task                                              | Start with                                                                           |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Change asset/node/reference shapes                | `model/`                                                                             |
-| Add constructors or tree queries                  | `document/`                                                                          |
-| Add a structural invariant                        | `validation/validateUIDocument.ts` and related validators                            |
-| Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures                    |
-| Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts`           |
-| Change built-in component fields                  | `catalog/properties/`                                                                |
-| Change project catalogs or cross-document rules   | `assets/`                                                                            |
-| Change project fonts/colors or their resolution   | `assets/UIStyleSheet.ts`, `assets/resolveUIStyleColors.ts`, `docs/project-styles.md` |
-| Change operations, transactions, diff, or history | `editing/`                                                                           |
-| Change public exports                             | nearest folder `index.ts`, then `src/index.ts`                                       |
+| Task                                              | Start with                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Change asset/node/reference shapes                | `model/`                                                                                                                                         |
+| Add constructors or tree queries                  | `document/`                                                                                                                                      |
+| Add a structural invariant                        | `validation/validateUIDocument.ts` and related validators                                                                                        |
+| Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures                                                                                |
+| Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts`                                                                       |
+| Change built-in component fields                  | `catalog/properties/`                                                                                                                            |
+| Change project catalogs or cross-document rules   | `assets/`                                                                                                                                        |
+| Change project fonts/colors/Label presets         | `assets/UIStyleSheet.ts`, `assets/UILabelStyle.ts`, `assets/resolveUILabelStyles.ts`, `assets/resolveUIStyleColors.ts`, `docs/project-styles.md` |
+| Change operations, transactions, diff, or history | `editing/`                                                                                                                                       |
+| Change public exports                             | nearest folder `index.ts`, then `src/index.ts`                                                                                                   |
 
 ## 7. Commands
 
@@ -233,3 +235,12 @@ The internal token record remains unchanged. Reject the previous @token:color:<k
 prefix and unsupported style sections; never reinterpret schema-defined strings.
 Only resolve disposable copies for compilation/preview, retaining the authored
 document for XML/history. Font loading and configuration I/O belong to consumers.
+
+## Label preset extension (unreleased)
+
+Read project-styles.md before extending labels. UILabelStyle.ts validates sparse
+appearance-only presets; resolveUILabelStyles.ts expands a disposable tree before
+color resolution. Label textStyle is a Default-only authoring directive, removed
+before native rendering/code generation. Local fields and state field overrides
+win. Reject dynamic selection, non-Label use and instance overrides. No I/O or
+migration; schemaVersion 1/format 2 stay unchanged. Published 0.10.0 lacks these APIs.

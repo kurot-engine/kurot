@@ -1,6 +1,6 @@
 # Project styles and languages in the game template
 
-CLI 3.2.1 includes this template update and is prepared for publication. It adds
+CLI 3.2.1 is published with this template update. It adds
 project-owned initialization without changing Core/UI APIs or migrating existing
 projects. The empty template stays minimal.
 

@@ -1,8 +1,8 @@
-import type { UIResourceConfigEntry } from '@kurot/ui-document';
 /**
  * KUI Skin parser and ESM factory generator.
  */
 
+import type { UIResourceConfigEntry, UIStyleSheet } from '@kurot/ui-document';
 import { generateCode } from './codegen.js';
 import { parseKUISkin } from './kui-parser.js';
 import type { SkinIR } from './ast.js';
@@ -40,6 +40,7 @@ export interface CompileKUIOptions extends CodeGenOptions {
 	readonly customNamespaces?: readonly NamespaceModule[];
 	readonly resources?: readonly UIResourceConfigEntry[];
 	readonly colors?: Readonly<Record<string, number>>;
+	readonly styleSheet?: UIStyleSheet;
 }
 
 /**
@@ -51,7 +52,8 @@ export function compileKUI(source: string, className?: string, options?: Compile
 		className,
 		options?.customNamespaces ?? [],
 		options?.resources ?? [],
-		options?.colors ?? {},
+		options?.colors ?? options?.styleSheet?.colors ?? {},
+		options?.styleSheet,
 	);
 	return generateCode(ir, options);
 }
@@ -64,7 +66,8 @@ export function parseToIR(
 	className?: string,
 	customNamespaces: readonly NamespaceModule[] = [],
 	resources: readonly UIResourceConfigEntry[] = [],
-	colors: Readonly<Record<string, number>> = {},
+	colors?: Readonly<Record<string, number>>,
+	styleSheet?: UIStyleSheet,
 ): SkinIR {
-	return parseKUISkin(source, className, customNamespaces, resources, colors);
+	return parseKUISkin(source, className, customNamespaces, resources, colors, styleSheet);
 }

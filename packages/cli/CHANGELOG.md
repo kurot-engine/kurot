@@ -7,6 +7,17 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## Unreleased — 2026-10-06
+
+- Expand shared Label presets from the optional fixed style.json before SkinIR
+  generation. Emit only native Label properties; retain authored XML untouched.
+- Rebuild all consuming skins when presets change. Invalid presets retain the
+  previous successful bundle and recover after configuration correction.
+- Add the optional `styleSheet` compilation option. This source work requires the
+  unreleased ui-document preset APIs; the development override links that source.
+  Remove the override and adopt its published version before releasing the CLI.
+- Published 3.2.1 remains the template release below; it does not support Label presets.
+
 ## 3.2.1 — 2026-10-06
 
 ### Game Template

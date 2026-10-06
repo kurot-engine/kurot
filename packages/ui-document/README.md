@@ -372,8 +372,9 @@ remain consumer responsibilities.
 
 `@style:colors:<key>` selects the `colors` section of `style.json`. The internal
 reference remains `{ kind: 'token', tokenType: 'color', key }`; semantic format
-version 2 is unchanged. Only colors is currently a supported stylesheet section
-in XML. Schema-defined strings such as Label text remain literal.
+version 2 is unchanged. Published 0.10.0 supports colors in XML; see the
+unreleased Label extension below. Schema-defined strings such as Label text
+remain literal.
 
 ```ts
 import { parseUIDocument, parseUIStyleSheet, resolveUIStyleColors } from '@kurot/ui-document';
@@ -397,3 +398,16 @@ consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
 [project styles](docs/project-styles.md) for the full contract.
+
+## Label presets (unreleased source)
+
+`style.json.labels` defines reusable Label appearance: font, size, color, outline,
+emphasis, alignment and spacing. `textStyle="@style:labels:<key>"` selects one in
+Default; local fields and state field overrides take precedence. Use the new
+`resolveUILabelStyles()` before `resolveUIStyleColors()` on disposable copies,
+retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
+`UILabelStyleProperty` and `UI_LABEL_STYLE_PROPERTIES` describe this contract.
+The source `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
+supplies an empty map when the optional JSON section is absent.
+See [project styles](docs/project-styles.md) for configuration and release order.
+This extension is not included in published 0.10.0; no project migration is performed.

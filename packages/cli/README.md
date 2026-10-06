@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.2.1 (prepared for publication).** Requires `@kurot/ui-document@^0.10.0`
+> **Current version: 3.2.1 (published).** Requires `@kurot/ui-document@^0.10.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -283,3 +283,16 @@ The previous `@token:color:<key>` XML prefix is rejected by ui-document 0.10.
 Update those references explicitly before adopting CLI 3.2; ordinary text stays
 literal. Existing EXML projects remain on CLI 1.3.x. No Core/UI rendering change
 is required for color expansion.
+
+## Label presets (unreleased source)
+
+Current source expands `textStyle="@style:labels:<key>"` through the shared
+`style.json.labels` contract before generating native Label properties. Local and
+state fields win; authoring references remain in XML. Development watches the
+stylesheet and retains the last good bundle on errors. Programmatic `compileKUI`
+accepts `styleSheet: parseUIStyleSheet(config)`. No Core/UI renderer change is needed.
+
+This feature is not part of published CLI 3.2.1. The development pnpm override
+links the unreleased document kernel; publish that package and update the CLI
+range/lockfile before releasing this compiler. Existing projects are not migrated.
+See [the shared contract](../ui-document/docs/project-styles.md).

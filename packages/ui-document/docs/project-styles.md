@@ -1,4 +1,4 @@
-# Project fonts and named colors
+# Project styles
 
 The fixed resource/config/style.json is plain project configuration, independent
 of default.res.json. ui-document 0.10.0 exports parseUIStyleSheet,
@@ -38,7 +38,8 @@ Missing keys and invalid colors fail rather than silently substituting values.
 `@style:colors:<key>` selects the `colors` section of `style.json`; the key maps
 to an authored RGB value. Parsing retains the semantic color-token record and
 serialization emits this stylesheet reference in both base properties and state
-overrides. Only the colors section is currently supported by this XML syntax.
+overrides. Published 0.10.0 supports colors in XML; the unreleased Label preset
+extension below adds labels.
 The previous `@token:color:<key>` syntax is rejected; update authored references
 explicitly. Ordinary string properties remain literal, including reference-looking text.
 
@@ -50,8 +51,8 @@ never save the expanded copy. Other token categories remain unchanged.
 Browser font loading and project color publication remain application responsibilities.
 The helper performs no filesystem access, font loading or rendering. Native runtime
 consumers can alternatively register the parsed colors in UIAssetRegistry as color
-design tokens. Complete Label typography presets and state-selection policy are
-outside this slice. An enabled control restores its own normal color rather than a
+design tokens. Label preset support is specified below and remains unreleased.
+An enabled control restores its own normal color rather than a
 hardcoded universal white. Build-time expansion does not add live game theme switching.
 
 ## Adoption
@@ -64,3 +65,71 @@ colors in preview copies or register the palette as color design tokens before
 materialization. No Core/UI rendering change is required. Consumers read the
 optional configuration, load/register fonts and resolve colors before materialization;
 the kernel never creates a missing style.json or rewrites project files.
+
+## Label typography presets (unreleased)
+
+The optional `labels` section contains sparse, non-inheriting presets. Names use
+lowercase letter-led keys with digits/hyphens. Omitting the section yields an empty
+immutable map. Existing XML is never assigned presets automatically.
+The exported `UIStyleSheet` type requires this map; `parseUIStyleSheet()` supplies
+it even when the optional JSON section is omitted.
+
+```json
+"labels": {
+  "button": {
+    "fontFamily": "@style:fonts:primary",
+    "size": 24,
+    "textColor": "@style:colors:disabled-text",
+    "stroke": 2,
+    "strokeColor": "#000000",
+    "bold": true,
+    "italic": false,
+    "textAlign": "center",
+    "verticalAlign": "middle",
+    "lineSpacing": 4
+  }
+}
+```
+
+Allowed fields are exactly those shown. `fontFamily` accepts a literal CSS stack
+or `@style:fonts:<role>`, which resolves to the existing alias/fallback stack.
+Colors accept `#RRGGBB` or `@style:colors:<key>`, including black. Numeric, boolean
+and alignment values use the foundation Label schema; unknown fields, missing
+roles/colors and invalid values report their configuration paths. Presets do not
+own text, geometry, wrapping, fitting, language selection or Skin state selectors.
+
+```xml
+<Label text="Confirm" textStyle="@style:labels:button"
+       size="28" size.disabled="20" />
+```
+
+Precedence is **state field > local field > preset field > native default**.
+Bind `textStyle` only on Label in Default. Remove a local field to inherit the
+preset; remove the reference to return to local/native styling. Explicit false
+and zero still override a preset. Selecting a preset never removes existing local
+properties. Named states override individual fields; `textStyle.<state>`, variants,
+instance-part overrides and parameter/data bindings to textStyle are rejected.
+This authoring directive is not a Core/UI runtime property.
+
+```ts
+import { resolveUILabelStyles, resolveUIStyleColors } from '@kurot/ui-document';
+const expanded = resolveUILabelStyles(authored, style);
+const preview = resolveUIStyleColors(expanded, style.colors);
+```
+
+Resolve every Skin, including nested components and list item skins, before
+materialization. Keep the original document for saving and history. Missing style
+configuration or preset references fail explicitly; the resolver performs no I/O.
+Font loading remains a consumer responsibility. No live theme switching or native
+renderer change is required. SchemaVersion stays 1 and document format stays 2.
+
+These APIs are not in published ui-document 0.10.0 or CLI 3.2.1. Current CLI source
+uses a development-only pnpm override; Editor 0.13.0 bundles this local parser and
+compiler. Publish ui-document first, then update CLI's dependency and release it;
+remove local overrides before claiming registry adoption. ui-runtime consumers can
+expand copies before materialization without a Core/UI update.
+
+When publishing a new ui-document minor, ui-runtime's peer/development range
+`^0.10.0` must also adopt it and be verified/released, even though callers expand
+presets before its unchanged native materializer. Editor and application locks
+must use the same published kernel contract; do not silently upgrade legacy EXML projects.

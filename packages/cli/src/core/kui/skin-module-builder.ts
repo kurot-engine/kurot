@@ -1,5 +1,5 @@
 import { parseUIResourceConfigEntries, parseUIStyleSheet } from '@kurot/ui-document';
-import type { UIResourceConfigEntry } from '@kurot/ui-document';
+import type { UIResourceConfigEntry, UIStyleSheet } from '@kurot/ui-document';
 import * as esbuild from 'esbuild';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
@@ -70,10 +70,10 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 				);
 			}
 		}
-		let colors: Readonly<Record<string, number>> = {};
+		let styleSheet: UIStyleSheet | undefined;
 		try {
 			const source = await fs.readFile(path.join(ctx.project.resourceDir, 'config/style.json'), 'utf8');
-			colors = parseUIStyleSheet(JSON.parse(source)).colors;
+			styleSheet = parseUIStyleSheet(JSON.parse(source));
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
 				throw new BuildError(
@@ -81,7 +81,7 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 				);
 			}
 		}
-		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin, resources, colors)));
+		const modules = await Promise.all(skins.map(skin => generateSkinModule(ctx, skin, resources, styleSheet)));
 		if (modules.some(module => module === undefined) || ctx.diagnostics.hasErrors()) {
 			throw new BuildError('KUI compilation failed.');
 		}
@@ -112,7 +112,7 @@ async function generateSkinModule(
 	ctx: BuildContext,
 	skin: CompiledSkin,
 	resources: readonly UIResourceConfigEntry[],
-	colors: Readonly<Record<string, number>>,
+	styleSheet: UIStyleSheet | undefined,
 ): Promise<{ source: string; skin: SkinIR } | undefined> {
 	try {
 		const namespaces = ctx.project.customNamespaces.map(ns => ({
@@ -120,7 +120,14 @@ async function generateSkinModule(
 			specifier: ns.specifier,
 			...(ns.components ? { componentNames: new Set(ns.components.map(component => component.name)) } : {}),
 		}));
-		const ir = parseToIR(skin.file.contents, skin.className, namespaces, resources, colors);
+		const ir = parseToIR(
+			skin.file.contents,
+			skin.className,
+			namespaces,
+			resources,
+			styleSheet?.colors ?? {},
+			styleSheet,
+		);
 		const diagnostics = createUnresolvedTagDiagnostics(
 			skin.file.relPath,
 			skin.file.contents,

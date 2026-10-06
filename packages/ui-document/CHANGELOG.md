@@ -4,6 +4,21 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## Unreleased — 2026-10-06
+
+- Parse optional `style.json.labels` into immutable, validated Label presets covering
+  font family, size, colors, outline, emphasis, alignment and line spacing.
+- Resolve `@style:fonts:<role>` and `@style:colors:<key>` inside presets. Add
+  `getUILabelStyle`, `resolveUILabelStyles` and typed preset metadata.
+- Require the `labels` map in the exported `UIStyleSheet` type; the parser
+  supplies an empty map when the JSON section is absent.
+- Retain `textStyle="@style:labels:<key>"` in authored XML/history; expand only
+  compilation/preview copies. Local properties and individual state overrides win.
+- Bind presets in Default only. Reject non-Label, state/variant, instance override
+  and dynamic binding usage rather than silently emitting unsupported properties.
+- Preserve document format 2 and stylesheet schemaVersion 1. Existing projects
+  receive no automatic preset insertion or migration. This is not in published 0.10.0.
+
 ## [0.10.0] — 2026-10-06
 
 ### Added

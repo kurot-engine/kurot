@@ -72,6 +72,11 @@ export const GROUP_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
  */
 export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	...TEXT_CONTENT_PROPERTIES,
+	textStyle: {
+		valueType: 'string',
+		description:
+			'Default-state Label preset reference @style:labels:<key>; local properties and state overrides win.',
+	},
 	bold: booleanProperty(false, 'Whether the text uses a bold font weight.'),
 	fontFamily: {
 		valueType: ['string', 'resource-reference'],

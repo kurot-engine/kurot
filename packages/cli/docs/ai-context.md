@@ -28,7 +28,7 @@ The 3.2.1 game template includes fixed style/locale configuration,
 English properties and licensed regular/bold font files. StyleManager finishes
 font loading before Main creates Player/Preloader; LocaleManager registers
 preload texts before creating the scene. See [game-template.md](game-template.md).
-Version 3.2.1 is prepared for publication; 3.2.0 is already published.
+Version 3.2.1 is published. Label preset support below is unreleased source work.
 
 ## KUI compilation
 
@@ -175,3 +175,12 @@ Base and state colors use @style:colors:<key>; reject the previous color prefix
 without migrating files. Fonts are validated but not loaded; the application owns
 font loading and rendering. Build/preview copies resolve references while authored
 XML retains them. No live runtime palette switching is introduced.
+
+## Label presets (unreleased)
+
+skin-module-builder.ts reads the entire stylesheet once per build and passes it
+through parseToIR/parseKUISkin. Resolve resource defaults, then Label presets, then colors before
+native emission; retain XML references and local/state precedence. compileKUI
+accepts an optional styleSheet. style.json changes already trigger whole-Skin
+rebuilds. Invalid presets retain the last successful bundle. The temporary pnpm
+kernel override is development-only; publish/adopt its preset API before CLI release.
