@@ -4,16 +4,13 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@kurot/ui-document': link:../ui-document
-
 importers:
 
   .:
     dependencies:
       '@kurot/ui-document':
-        specifier: link:../ui-document
-        version: link:../ui-document
+        specifier: ^0.11.0
+        version: 0.11.0
       commander:
         specifier: ^13.0.0
         version: 13.1.0
@@ -350,6 +347,9 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@kurot/ui-document@0.11.0':
+    resolution: {integrity: sha512-YuumsJA87si4XDcI9QfEligHHzH2Rua0N+bYKhuxBW1uwRzpizimrk2qSvfM/WaPwtaVFI5THcLy+tLvDszf8g==}
 
   '@rollup/rollup-android-arm-eabi@4.60.2':
     resolution: {integrity: sha512-dnlp69efPPg6Uaw2dVqzWRfAWRnYVb1XJ8CyyhIbZeaq4CA5/mLeZ1IEt9QqQxmbdvagjLIm2ZL8BxXv5lH4Yw==}
@@ -905,6 +905,8 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
+
+  '@kurot/ui-document@0.11.0': {}
 
   '@rollup/rollup-android-arm-eabi@4.60.2':
     optional: true

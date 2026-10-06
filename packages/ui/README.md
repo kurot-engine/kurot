@@ -34,9 +34,9 @@ measurement; after late loading, call `label.invalidateSize()` to refresh
 metrics even if the family name is unchanged.
 
 See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
-metadata was introduced in ui-document 0.9.0 and remains supported in 0.10.0.
-Current CLI-built KUI projects use CLI 3.2.0 with ui-document `^0.10.0`;
-ui-runtime 0.8.1 also uses ui-document `^0.10.0`. Programmatic UI depends
+metadata was introduced in ui-document 0.9.0 and remains supported in 0.11.0.
+Current CLI-built KUI projects use published CLI 3.3.0 with ui-document `^0.11.0`;
+Published ui-runtime 0.8.2 uses the same kernel range. Programmatic UI depends
 only on Core.
 
 ## Installation
@@ -54,7 +54,7 @@ See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 ## Project style colors
 
-CLI 3.2.0 can resolve named colors from the optional
+CLI 3.3.0 resolves Label presets and named colors from the optional
 `resource/config/style.json` into native UI properties, including state overrides:
 
 ```xml

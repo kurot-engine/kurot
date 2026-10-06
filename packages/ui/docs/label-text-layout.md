@@ -3,9 +3,11 @@
 This contract applies to UI 3.1.0 with Core >= 2.1.0 within Core 2.x. The public
 `TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
 authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
-0.10.0. CLI 3.2.0 and ui-runtime 0.8.1 use ui-document `^0.10.0`.
-Older consumers must update before using the fitting fields; runtime 0.8.0's
-`^0.9.0` peer range does not include ui-document 0.10.0.
+0.11.0. Published CLI 3.3.0 and ui-runtime 0.8.2 use ui-document `^0.11.0`.
+Runtime 0.8.0's `^0.9.0` and runtime 0.8.1's `^0.10.0` peer ranges exclude
+the current kernel. Label presets are expanded into native properties before
+rendering; their precedence does not change fitting behavior. See the
+[project style contract](../../ui-document/docs/project-styles.md).
 
 ## Lines and bounds
 

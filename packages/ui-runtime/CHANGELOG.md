@@ -4,6 +4,31 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.8.2] — 2026-10-07
+
+### Changed
+
+- Adopt published `@kurot/ui-document@^0.11.0` in peer and development
+  dependencies so Editor and CLI 3.3.0 share the Label preset contract.
+- Keep materialization APIs, state restoration and disposal unchanged. Callers
+  expand `style.json.labels` into disposable documents before resolving colors
+  and materializing every root or registered appearance; the runtime does not
+  read style.json, load fonts or apply presets to authoring data.
+
+### Migration
+
+- Upgrade ui-document to `^0.11.0` together with this runtime. Earlier runtime
+  0.8.1's peer range excludes this kernel. Core `^2.1.0`, UI `^3.1.0`, style
+  schemaVersion 1 and document format version 2 remain unchanged.
+- Preserve authored XML and history references. Named states override individual
+  properties; selecting a Label preset remains Default-only.
+
+### Tests
+
+- Verify preset-derived native fields, local/state precedence and restoration,
+  font aliases, black colors and authored-document preservation through the
+  published kernel.
+
 ## [0.8.1] — 2026-10-06
 
 ### Changed

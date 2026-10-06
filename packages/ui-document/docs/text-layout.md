@@ -59,7 +59,7 @@ or automatic migration occurs in this package.
 
 ## Consumers and migration
 
-CLI 3.2 and ui-runtime 0.8.1 consume the fitting catalog through ui-document ^0.10.0.
+Published CLI 3.3 and ui-runtime 0.8.2 consume the fitting catalog through ui-document ^0.11.0.
 Consumers on earlier ^0.9.0 dependency/peer ranges must update before adopting styles;
 the fitting metadata and semantic format remain unchanged. Native rendering requires
 Core >= 2.1.0 and UI >= 3.1.0. The public UI contract describes

@@ -1,10 +1,10 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.8.1`. This package consumes validated
+Package identity: `@kurot/ui-runtime@0.8.2` (published). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.10.0`, `@kurot/ui@^3.1.0`, and
+It peer-depends on published `@kurot/ui-document@^0.11.0`, `@kurot/ui@^3.1.0`, and
 `@kurot/core@^2.1.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
@@ -181,6 +181,17 @@ document and registered appearance with `resolveUIStyleColors()` into disposable
 copies, or register palette entries as color tokens in `UIAssetRegistry` before
 materializing the original document. Never save the expanded copies or rewrite
 authored references. The previous XML color prefix is rejected without an alias.
+
+## Label preset adoption in 0.8.2
+
+Read the shared project-styles.md contract before materializing Label presets.
+Callers resolve resource defaults, then `resolveUILabelStyles()` with the parsed
+stylesheet, then colors into disposable copies of every root/appearance/component.
+The runtime does not read config or consume textStyle as a native property.
+Local/state fields win and native states restore the resolved baseline. Keep
+authored references for saving/history. This release adopts the published 0.11.0
+kernel without local overrides; runtime 0.8.1's ^0.10.0 range excludes it.
+Published CLI 3.3.0 uses the same preset expansion order at build time.
 
 ## Label text layout in 0.8.0
 

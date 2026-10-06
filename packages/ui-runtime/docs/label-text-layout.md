@@ -1,8 +1,12 @@
 # Label text layout
 
-ui-runtime 0.8.1 requires Core `^2.1.0`, UI `^3.1.0` and ui-document `^0.10.0`.
+ui-runtime 0.8.2 requires Core `^2.1.0`, UI `^3.1.0` and ui-document `^0.11.0`.
 It applies authored text properties to native Labels rather than measuring text
-or fitting fonts itself. CLI 3.2.0 compiles the same properties into KUI skins.
+or fitting fonts itself. CLI 3.3.0 compiles the same properties into KUI skins.
+
+Callers expand Label presets with `resolveUILabelStyles()` before color resolution
+and materialization. Presets supply appearance defaults; local and state fields
+win. Authored text, geometry, fitting policy and XML/history remain unchanged.
 
 ## Materialization
 

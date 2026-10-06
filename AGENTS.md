@@ -12,9 +12,9 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/core`        | 2.1.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.1.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
-| `@kurot/cli`         | 3.2.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
-| `@kurot/ui-document` | 0.10.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime`  | 0.8.1   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
+| `@kurot/cli`         | 3.3.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
+| `@kurot/ui-document` | 0.11.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
+| `@kurot/ui-runtime`  | 0.8.2   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
 
 Dependency direction is strictly one-way:
 
@@ -35,13 +35,14 @@ Dependency direction is strictly one-way:
 ```
 
 UI 3.1 requires Core ^2.1.0. Game 2.0 declares Core 2.x.
-ui-runtime 0.8.1 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.10.0.
-CLI 3.2 requires ui-document ^0.10.0.
+ui-runtime 0.8.2 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.11.0.
+CLI 3.3 requires ui-document ^0.11.0.
 ui-document 0.9.0 adds Label fitting metadata without changing format version 2.
 ui-document 0.10.0 adds shared style.json fonts/colors and @style:colors:<key>
 XML references without changing the internal color-token record or format version 2.
-ui-runtime 0.8.1 adopts the published document kernel; consumers resolve stylesheet
-colors in preview copies or register palette entries as color design tokens.
+ui-runtime 0.8.2 adopts the published document kernel; consumers expand Label
+presets and resolve stylesheet colors in preview copies. Colors can alternatively
+be registered as color design tokens.
 Core 2.1.0 makes explicit `multiline = false` single-line; remove the flag or
 use `true` where wrapping is intended. UI 3.1 uses `invalidateTextMetrics()`
 for Label fitting and late font readiness; Core 2.0.x is not sufficient.
@@ -146,10 +147,12 @@ resolve copies while authoring XML/history keep references. Core/UI rendering is
 unchanged. See packages/ui-document/docs/project-styles.md before extending this
 contract. The previous @token:color:<key> XML prefix is rejected; update authored
 references explicitly. Literal strings and other token categories are unchanged.
-ui-document 0.10.0, CLI 3.2.0 and ui-runtime 0.8.1 are published. Editor 0.12.1
-installs all three from the registry. The KUI sample installs ui-document 0.10.0
-and CLI 3.2.0; CLI-built skins do not require ui-runtime. Engine examples use CLI
-3.2.0, while legacy EXML projects keep their independent dependency set.
+The original color integration shipped in ui-document 0.10.0, CLI 3.2.0 and
+ui-runtime 0.8.1. Current KUI projects use published ui-document 0.11.0 and CLI
+3.3.0 for colors and Label presets; CLI-built skins do not require ui-runtime.
+Engine examples use CLI 3.3.0, while legacy EXML projects keep their independent
+dependency set. Editor 0.19.2 installs ui-document 0.11.0, CLI 3.3.0 and
+ui-runtime 0.8.2 from the registry without local overrides.
 Package source versions alone do not confirm npm publication.
 
 CLI 3.2.1 is published. Its game template includes style.json, locale.json, English
@@ -157,12 +160,17 @@ properties and licensed regular/bold fonts with project-owned initialization.
 See packages/cli/docs/game-template.md for the initialization and fallback contract.
 The empty template stays Core-only, and existing projects are not modified.
 
-## Unreleased Label presets
+## Label presets in ui-document 0.11.0
 
-Source now supports style.json.labels and Default-only Label
+ui-document 0.11.0 supports style.json.labels and Default-only Label
 textStyle="@style:labels:<key>". Local fields and individual Skin state fields win.
 `resolveUILabelStyles` expands compilation/preview copies before color resolution;
 XML/history retain references. No Core/UI changes or migration. See packages/ui-document/docs/project-styles.md.
-These APIs are not in published ui-document 0.10.0 or CLI 3.2.1. CLI source uses a
-local pnpm override and Editor 0.13.0 uses local Bun overrides for trial packaging;
-publish the kernel first and update/remove these bindings before registry adoption.
+ui-document 0.11.0 and CLI 3.3.0 are published. CLI uses
+published ui-document ^0.11.0 without a local override. UIStyleSheet requires
+labels; the parser supplies an empty map for an absent JSON section.
+These APIs are not in ui-document 0.10.0 or CLI 3.2.1. Published ui-runtime 0.8.2
+requires ^0.11.0; runtime 0.8.1 excludes the new kernel.
+The KUI sample and engine examples use published CLI 3.3.0; the sample also uses
+ui-document 0.11.0 without local overrides. Editor 0.19.2 adopts the matching
+published runtime. Package source versions alone do not confirm publication.

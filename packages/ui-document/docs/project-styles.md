@@ -3,7 +3,8 @@
 The fixed resource/config/style.json is plain project configuration, independent
 of default.res.json. ui-document 0.10.0 exports parseUIStyleSheet,
 getUIStyleFontAlias, getUIStyleFontFamily, getUIStyleColor and resolveUIStyleColors.
-The document format remains version 2; style schemaVersion remains 1.
+Version 0.11.0 adds Label presets and is published. The document
+format remains version 2; style schemaVersion remains 1.
 
 ```json
 {
@@ -38,7 +39,7 @@ Missing keys and invalid colors fail rather than silently substituting values.
 `@style:colors:<key>` selects the `colors` section of `style.json`; the key maps
 to an authored RGB value. Parsing retains the semantic color-token record and
 serialization emits this stylesheet reference in both base properties and state
-overrides. Published 0.10.0 supports colors in XML; the unreleased Label preset
+overrides. Published 0.10.0 supports colors in XML; the 0.11.0 Label preset
 extension below adds labels.
 The previous `@token:color:<key>` syntax is rejected; update authored references
 explicitly. Ordinary string properties remain literal, including reference-looking text.
@@ -51,22 +52,22 @@ never save the expanded copy. Other token categories remain unchanged.
 Browser font loading and project color publication remain application responsibilities.
 The helper performs no filesystem access, font loading or rendering. Native runtime
 consumers can alternatively register the parsed colors in UIAssetRegistry as color
-design tokens. Label preset support is specified below and remains unreleased.
+design tokens. Label preset support in 0.11.0 is specified below.
 An enabled control restores its own normal color rather than a
 hardcoded universal white. Build-time expansion does not add live game theme switching.
 
 ## Adoption
 
-CLI and Editor must use the same 0.10.x parser and stylesheet contract. Existing
-`^0.9.0` dependency and peer ranges exclude 0.10.0 and require an explicit update.
-Published CLI 3.2.0 depends on `^0.10.0` and resolves stylesheet colors during
-KUI compilation. ui-runtime 0.8.1 adopts the same range; applications resolve
-colors in preview copies or register the palette as color design tokens before
-materialization. No Core/UI rendering change is required. Consumers read the
+CLI and Editor must share the parser and stylesheet contract. Published CLI
+3.3.0 and ui-document 0.11.0 support fonts, colors and Label presets. Existing
+`^0.9.0` and `^0.10.0` dependency/peer ranges exclude 0.11.0. Published runtime 0.8.2
+requires `^0.11.0`; applications expand presets and resolve colors in
+preview copies before materialization. Color-only consumers may register the
+palette as color design tokens. No Core/UI rendering change is required. Consumers read the
 optional configuration, load/register fonts and resolve colors before materialization;
 the kernel never creates a missing style.json or rewrites project files.
 
-## Label typography presets (unreleased)
+## Label typography presets in 0.11.0
 
 The optional `labels` section contains sparse, non-inheriting presets. Names use
 lowercase letter-led keys with digits/hyphens. Omitting the section yields an empty
@@ -123,13 +124,11 @@ configuration or preset references fail explicitly; the resolver performs no I/O
 Font loading remains a consumer responsibility. No live theme switching or native
 renderer change is required. SchemaVersion stays 1 and document format stays 2.
 
-These APIs are not in published ui-document 0.10.0 or CLI 3.2.1. Current CLI source
-uses a development-only pnpm override; Editor 0.13.0 bundles this local parser and
-compiler. Publish ui-document first, then update CLI's dependency and release it;
-remove local overrides before claiming registry adoption. ui-runtime consumers can
-expand copies before materialization without a Core/UI update.
-
-When publishing a new ui-document minor, ui-runtime's peer/development range
-`^0.10.0` must also adopt it and be verified/released, even though callers expand
-presets before its unchanged native materializer. Editor and application locks
-must use the same published kernel contract; do not silently upgrade legacy EXML projects.
+Version 0.11.0 is published. These APIs are not in ui-document 0.10.0 or CLI
+3.2.1. Published CLI 3.3.0 uses the registry kernel through `^0.11.0`, without
+a local override. The KUI sample and engine examples use this compiler.
+Published ui-runtime 0.8.2 uses the same peer/development range;
+runtime 0.8.1 excludes the new kernel. Editor 0.19.2 installs all three registry packages.
+Callers expand presets before its unchanged native materializer without a
+Core/UI update. Editor and application locks must use the same published
+kernel contract; do not silently upgrade legacy EXML projects.

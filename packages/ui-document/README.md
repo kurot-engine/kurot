@@ -4,7 +4,7 @@ Headless semantic document foundation for Kurot UI tooling. It provides one
 format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
 Agent-driven UI generation.
 
-> **Current release: 0.10.0.** KUI XML is the canonical authored format. The
+> **Current version: 0.11.0 (published).** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
 
 ## Label text authoring in 0.9.0
@@ -25,14 +25,14 @@ Core 2.1.0's single-line behavior; remove the flag or set it to true for wrappin
 The semantic format remains version 2, and files are not migrated automatically.
 See the [text authoring contract](docs/text-layout.md) for validation and
 consumer requirements. This package models these fields; native rendering uses
-UI 3.1.0 and Core 2.1.0 or later within Core 2.x. CLI 3.2.0 consumes this kernel
-at build time. ui-runtime 0.8.1 uses the same ui-document `^0.10.0` dependency
-and native Label fitting behavior.
+UI 3.1.0 and Core 2.1.0 or later within Core 2.x. CLI 3.3.0 consumes this kernel
+at build time. Published ui-runtime 0.8.2 requires ui-document `^0.11.0`;
+runtime 0.8.1 excludes this kernel and must be upgraded alongside it.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.10.0
+pnpm add @kurot/ui-document@^0.11.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
@@ -321,7 +321,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.8.1` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.8.2` validates and materializes format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition
@@ -372,8 +372,8 @@ remain consumer responsibilities.
 
 `@style:colors:<key>` selects the `colors` section of `style.json`. The internal
 reference remains `{ kind: 'token', tokenType: 'color', key }`; semantic format
-version 2 is unchanged. Published 0.10.0 supports colors in XML; see the
-unreleased Label extension below. Schema-defined strings such as Label text
+version 2 is unchanged. Version 0.11.0 also supports Label presets as described
+below. Schema-defined strings such as Label text
 remain literal.
 
 ```ts
@@ -392,14 +392,15 @@ colors report the semantic path, and other token categories stay unresolved.
 
 This is an XML syntax change: the previous `@token:color:<key>` prefix is
 rejected. Update authored color references explicitly; files are not migrated
-automatically. Published CLI 3.2.0 depends on `^0.10.0` and resolves stylesheet
-colors during KUI compilation. ui-runtime 0.8.1 adopts the same range;
+automatically. Published CLI 3.3.0 depends on `^0.11.0` and resolves stylesheet
+colors and Label presets during KUI compilation. Runtime 0.8.2 adopts the same
+range and is published;
 consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
 [project styles](docs/project-styles.md) for the full contract.
 
-## Label presets (unreleased source)
+## Label presets in 0.11.0
 
 `style.json.labels` defines reusable Label appearance: font, size, color, outline,
 emphasis, alignment and spacing. `textStyle="@style:labels:<key>"` selects one in
@@ -407,7 +408,10 @@ Default; local fields and state field overrides take precedence. Use the new
 `resolveUILabelStyles()` before `resolveUIStyleColors()` on disposable copies,
 retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 `UILabelStyleProperty` and `UI_LABEL_STYLE_PROPERTIES` describe this contract.
-The source `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
+The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and release order.
-This extension is not included in published 0.10.0; no project migration is performed.
+Version 0.11.0 and CLI 3.3.0 are published. CLI compiles presets with the
+registry kernel through `^0.11.0`, without a local override. CLI 3.2.1 does not
+support presets. Published ui-runtime 0.8.2 uses the same kernel range;
+runtime 0.8.1 excludes it. Editor 0.19.2 adopts all three registry packages.

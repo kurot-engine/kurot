@@ -208,4 +208,6 @@ Core >= 2.1.0; there is no global font-readiness listener.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
 font readiness and shared-schema boundaries. Native UI still depends only on
-Core; KUI authoring uses ui-document 0.9.x and matching CLI/runtime releases.
+Core; KUI authoring uses ui-document 0.11.x, published CLI 3.3.0 and
+published ui-runtime 0.8.2. Label presets expand in consumer-owned
+copies before native rendering; UI does not read style.json or consume textStyle.

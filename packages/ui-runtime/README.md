@@ -4,8 +4,8 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current release: 0.8.1.** Requires `@kurot/core@^2.1.0`,
-> `@kurot/ui@^3.1.0`, and `@kurot/ui-document@^0.10.0`. Uses UI's atomic
+> **Current version: 0.8.2 (published).** Requires `@kurot/core@^2.1.0`,
+> `@kurot/ui@^3.1.0`, and published `@kurot/ui-document@^0.11.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
@@ -13,18 +13,18 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.8.1 @kurot/ui-document@^0.10.0 @kurot/ui@^3.1.0 @kurot/core@^2.1.1
+pnpm add @kurot/ui-runtime@^0.8.2 @kurot/ui-document@^0.11.0 @kurot/ui@^3.1.0 @kurot/core@^2.1.1
 ```
 
 Install all peers explicitly. Core 2.1.1 includes the nested/rotated WebGL
 scroll clipping fix while satisfying the runtime's `^2.1.0` requirement.
-Upgrade ui-document to 0.10.x together with runtime 0.8.1; the earlier runtime
-0.8.0 peer range excluded it. Runtime APIs and semantic format version 2 remain
+Upgrade ui-document to 0.11.x together with runtime 0.8.2; runtime
+0.8.1's peer range excludes it. Runtime APIs and semantic format version 2 remain
 unchanged.
 
-CLI 3.2.0 uses ui-document 0.10.0 for build-time stylesheet colors and emits
+Published CLI 3.3.0 uses ui-document 0.11.0 for build-time Label presets/colors and emits
 skins that run directly through UI. That compilation path does not require
-ui-runtime. Runtime 0.8.1 and CLI 3.2.0 now share the same document parser.
+ui-runtime. Runtime 0.8.2 and CLI 3.3.0 share the same document parser.
 See the [project style contract](../ui-document/docs/project-styles.md).
 
 ## Project style colors in 0.8.1
@@ -57,6 +57,30 @@ supplied `UIAssetRegistry` and materialize the authored document directly.
 The internal token record is unchanged. Font loading, Stage ownership and
 live project theme updates remain application responsibilities; dispose the
 materialization and remove its root when it is no longer needed.
+
+## Label presets in 0.8.2
+
+Expand Default-only Label `textStyle="@style:labels:<key>"` before color
+resolution. Local fields and individual Skin state fields take precedence:
+
+```ts
+import { parseUIDocument, parseUIStyleSheet, resolveUILabelStyles, resolveUIStyleColors } from '@kurot/ui-document';
+import { createKurotUI } from '@kurot/ui-runtime';
+
+const style = parseUIStyleSheet(styleConfiguration);
+const authored = parseUIDocument(skinSource);
+const expanded = resolveUILabelStyles(authored, style);
+const preview = resolveUIStyleColors(expanded, style.colors);
+const result = createKurotUI(preview);
+stage.addChild(result.root);
+```
+
+Resolve every registered appearance and nested component document as well as the
+root before materialization. Preserve `authored` for saving/history; expanded
+native fields do not replace the preset reference. Missing presets fail explicitly.
+The runtime accepts the resolved native properties and does not perform stylesheet
+I/O, font loading or live theme switching. Resource defaults, if used, resolve
+before Label presets. Core/UI need no new release for preset expansion.
 
 ## Label text fitting in 0.8.0
 
@@ -200,7 +224,7 @@ The preview is available at `http://localhost:5173/preview/` by default.
 ## Resource nine-slice defaults in 0.6.0
 
 Resolve each authored document and registered appearance with
-`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.10.0` before passing
+`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.11.0` before passing
 it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
 `scale9Grid: false` clears an inherited grid, including during native Skin
 state changes; leaving the state restores the previous grid. The runtime does

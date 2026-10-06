@@ -1,6 +1,6 @@
 # Label text compilation
 
-CLI 3.2.1 consumes ui-document 0.10.x and compiles KUI text-fitting properties
+CLI 3.3.0 consumes ui-document 0.11.x and compiles KUI text-fitting properties
 through the existing UIDocument → SkinIR → ESM factory pipeline. The semantic
 document format remains version 2.
 
@@ -26,6 +26,11 @@ The down-state size becomes a native `SetProperty('amount', 'size', 20)` overrid
 The compiler does not measure fonts or change `size` based on text length,
 currency, locale or display bounds. Source XML remains authored data; neither
 derived sizes nor fitting diagnostics are persisted by compilation.
+
+Label presets supply baseline appearance before local and state fields are
+applied. They do not own wrapping or fitting policy, and preset expansion never
+introduces build-time text measurement. See the
+[shared style contract](../../ui-document/docs/project-styles.md).
 
 ## Runtime boundary
 

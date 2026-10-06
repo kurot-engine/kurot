@@ -124,8 +124,20 @@ The foundation catalog remains curated rather than reflective. It includes
 their abstract bases. `EditableText` is cataloged for appearance composition;
 ordinary application UI should prefer the complete `TextInput` control.
 Runtime-owned and compatibility-shaped fields are not automatically authoring
-APIs. `currentState`, `skinName`, and `hostComponentKey` are absent because
-states and appearances are first-class semantics.
+APIs. `currentState` and `hostComponentKey` remain absent. Authored `skinName`
+values select generated Skin factories; semantic appearance references use
+the asset registry instead.
+
+## Project styles
+
+The 0.11.0 kernel validates project fonts, colors and Label appearance presets
+without configuration I/O or native rendering. `resolveUILabelStyles()` expands
+Default-only `textStyle` references into a disposable copy before
+`resolveUIStyleColors()`. Local properties and individual state fields take
+precedence. XML and editing history retain the original references. CLI 3.3.0
+uses this expansion order at build time; ui-runtime callers prepare every root
+and registered appearance/component before materialization. See
+[project styles](./project-styles.md).
 
 ## Runtime boundary
 
@@ -133,7 +145,8 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.8.1` consumes format version 2 and passes the shared
+`@kurot/ui-runtime@0.8.2` consumes format version 2 with ui-document `^0.11.0`
+and passes the shared
 component, screen, and appearance conformance fixtures. It expands reusable
 instances, executes bounded data bindings and semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected

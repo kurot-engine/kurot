@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.10.0`. This is a headless,
+Package identity: `@kurot/ui-document@0.11.0` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -164,7 +164,7 @@ src/
   `UIStyleFontFace`, `parseUIStyleSheet`, `getUIStyleFontAlias`,
   `getUIStyleFontFamily`, `getUIStyleColor`, `resolveUIStyleColors`,
   `UILabelStyle`, `UILabelStyleProperty`, `UI_LABEL_STYLE_PROPERTIES`,
-  `getUILabelStyle` and `resolveUILabelStyles` (preset APIs are unreleased).
+  `getUILabelStyle` and `resolveUILabelStyles` (preset APIs added in 0.11.0).
 - Editing: `UIOperation` (including atomic `set-node-id` reference updates),
   `applyUIOperation`, `UITransaction`,
   `applyUITransaction`, revision snapshots, `diffUIDocuments`,
@@ -177,7 +177,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.8.1` consumes format version 2 and executes the current
+- `@kurot/ui-runtime@0.8.2` consumes format version 2 and executes the current
   reuse, appearance, data-binding, semantic-action, transition, and typed
   resource-adapter slice. Incremental reconciliation remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
@@ -217,8 +217,9 @@ for conversion and compilation boundaries.
 
 The package describes and validates fitting policy; it does not measure text,
 derive font sizes or import runtime classes. The semantic format remains 2.
-CLI 3.2 and ui-runtime 0.8.1 consume this catalog through their ^0.10.0 ranges;
-consumers on earlier ^0.9.0 ranges must update explicitly before adopting styles.
+Published CLI 3.3.0 and ui-runtime 0.8.2 consume this catalog through
+^0.11.0 without local overrides. Runtime 0.8.1 uses ^0.10.0, which excludes this
+0.11.0 release. Editor 0.19.2 adopts the matching published packages.
 Rendering requires Core >= 2.1.0 and
 the matching UI Label implementation.
 See [text authoring](text-layout.md) for defaults, XML preservation and
@@ -236,11 +237,13 @@ prefix and unsupported style sections; never reinterpret schema-defined strings.
 Only resolve disposable copies for compilation/preview, retaining the authored
 document for XML/history. Font loading and configuration I/O belong to consumers.
 
-## Label preset extension (unreleased)
+## Label preset extension in 0.11.0
 
 Read project-styles.md before extending labels. UILabelStyle.ts validates sparse
 appearance-only presets; resolveUILabelStyles.ts expands a disposable tree before
 color resolution. Label textStyle is a Default-only authoring directive, removed
 before native rendering/code generation. Local fields and state field overrides
 win. Reject dynamic selection, non-Label use and instance overrides. No I/O or
-migration; schemaVersion 1/format 2 stay unchanged. Published 0.10.0 lacks these APIs.
+migration; schemaVersion 1/format 2 stay unchanged. UIStyleSheet now requires a
+labels map; parsing an omitted JSON section produces an empty immutable map.
+Version 0.11.0 is published; 0.10.0 lacks these APIs.

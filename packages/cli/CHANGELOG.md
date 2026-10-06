@@ -7,16 +7,31 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## Unreleased — 2026-10-06
+## 3.3.0 — 2026-10-07
+
+### Label Presets
 
 - Expand shared Label presets from the optional fixed style.json before SkinIR
   generation. Emit only native Label properties; retain authored XML untouched.
 - Rebuild all consuming skins when presets change. Invalid presets retain the
   previous successful bundle and recover after configuration correction.
-- Add the optional `styleSheet` compilation option. This source work requires the
-  unreleased ui-document preset APIs; the development override links that source.
-  Remove the override and adopt its published version before releasing the CLI.
-- Published 3.2.1 remains the template release below; it does not support Label presets.
+- Add the optional `styleSheet` compilation option for programmatic KUI compilation.
+- Preserve the precedence of state fields over local fields, preset fields and
+  native defaults. Missing references and unsupported state preset selection fail
+  explicitly rather than falling back silently.
+
+### Dependencies and Compatibility
+
+- Require published `@kurot/ui-document@^0.11.0` and remove the local pnpm override;
+  installation and compilation use the registry kernel.
+- Command/configuration APIs, style schemaVersion 1 and document format version 2
+  remain unchanged. Existing skins receive no automatic migration. Core/UI do
+  not need a new release for preset compilation; font loading belongs to the project.
+
+### Tests
+
+- Cover native property emission, local/state precedence, invalid references and
+  shared preset changes across skins, including watcher failure and recovery.
 
 ## 3.2.1 — 2026-10-06
 

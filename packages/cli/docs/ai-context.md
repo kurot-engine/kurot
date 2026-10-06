@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.2.1`, runs on
+explains the plugin pipeline. The package is `@kurot/cli@3.3.0`, runs on
 Node.js 20+, and is installed as a project dev dependency.
 
 ## Directory map
@@ -28,7 +28,8 @@ The 3.2.1 game template includes fixed style/locale configuration,
 English properties and licensed regular/bold font files. StyleManager finishes
 font loading before Main creates Player/Preloader; LocaleManager registers
 preload texts before creating the scene. See [game-template.md](game-template.md).
-Version 3.2.1 is published. Label preset support below is unreleased source work.
+Version 3.3.0 is published with Label preset compilation and
+published ui-document 0.11.0. It has no local document-kernel override.
 
 ## KUI compilation
 
@@ -44,7 +45,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.2.1 requires `@kurot/ui-document@^0.10.0`. Schema-defined strings, including
+CLI 3.3.0 requires `@kurot/ui-document@^0.11.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -176,11 +177,12 @@ without migrating files. Fonts are validated but not loaded; the application own
 font loading and rendering. Build/preview copies resolve references while authored
 XML retains them. No live runtime palette switching is introduced.
 
-## Label presets (unreleased)
+## Label presets in 3.3.0
 
 skin-module-builder.ts reads the entire stylesheet once per build and passes it
 through parseToIR/parseKUISkin. Resolve resource defaults, then Label presets, then colors before
 native emission; retain XML references and local/state precedence. compileKUI
 accepts an optional styleSheet. style.json changes already trigger whole-Skin
-rebuilds. Invalid presets retain the last successful bundle. The temporary pnpm
-kernel override is development-only; publish/adopt its preset API before CLI release.
+rebuilds. Invalid presets retain the last successful bundle. The dependency and
+lockfile use published ui-document 0.11.0 without a local override. textStyle is
+Default-only; individual named-state fields can still override preset properties.

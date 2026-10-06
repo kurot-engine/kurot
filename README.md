@@ -52,15 +52,15 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/core`](packages/core/README.md)               | 2.1.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | None                        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.2.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.10.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.1   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.3.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.11.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.2   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
 
 `@kurot/ui-document` provides the reusable semantic model, explicit component
 capabilities, bounded dynamic contracts, and headless editing kernel.
-`@kurot/ui-runtime` 0.8.1 uses ui-document 0.10.x and renders
+Published `@kurot/ui-runtime` 0.8.2 uses ui-document 0.11.x and renders
 component instances, Slots, appearances, states, variants, resources, and
 design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
@@ -73,19 +73,21 @@ The current dependency ranges are:
 | ---------------- | ------------------------------------------------- |
 | UI 3.1.0         | Core `^2.1.0`                                     |
 | Game 2.0.0       | Core `^2.0.0`                                     |
-| CLI 3.2.1        | ui-document `^0.10.0`                             |
-| ui-runtime 0.8.1 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.10.0` |
+| CLI 3.3.0        | ui-document `^0.11.0`                             |
+| ui-runtime 0.8.2 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.11.0` |
 
 CLI 3.2.1 is published with project styles, bundled fonts and
 English translations in the game template; existing projects are not rewritten.
 See [game template setup](packages/cli/docs/game-template.md).
 
-Unreleased source adds `style.json.labels` presets and Default-only
+ui-document 0.11.0 is published with `style.json.labels` presets and Default-only
 `textStyle="@style:labels:<key>"` on Labels. Local properties and individual
 state overrides take precedence; compilation expands copies into native
 properties while XML/history retain references. These APIs are absent from
-published ui-document 0.10.0 and CLI 3.2.1. The CLI currently uses a local kernel
-override for development. See [the Label preset contract](packages/ui-document/docs/project-styles.md#label-typography-presets-unreleased).
+ui-document 0.10.0 and CLI 3.2.1. Published CLI 3.3.0 uses
+the registry kernel through `^0.11.0` without a local override. ui-runtime 0.8.2
+is published with the same kernel; runtime 0.8.1 excludes it.
+See [the Label preset contract](packages/ui-document/docs/project-styles.md#label-typography-presets-in-0110).
 
 CLI 3.2.0 and ui-document 0.10.0 are published. They share the optional
 `resource/config/style.json` font/color parser and `@style:colors:<key>` XML
@@ -95,11 +97,12 @@ history retain authored references. The previous `@token:color:<key>` XML prefix
 is rejected, so update those references explicitly. See
 [project styles](packages/ui-document/docs/project-styles.md).
 
-ui-runtime 0.8.1 adopts ui-document `^0.10.0`. Consumers resolve stylesheet
-colors in disposable copies or register palette entries as color design tokens;
-the runtime does not read style.json or load fonts. Runtime 0.8.1 is published;
-Editor 0.12.1 installs it with ui-document 0.10.0 and CLI 3.2.0. The KUI sample
-and engine examples also adopt the published compiler/kernel dependencies.
+ui-runtime 0.8.2 adopts ui-document `^0.11.0`. Consumers expand Label presets
+and resolve colors in disposable copies; plain color-only consumers may register
+palette entries as design tokens. The runtime does not read style.json or load
+fonts. Editor 0.19.2 installs all three published packages without local overrides.
+The KUI sample and engine examples already use published CLI 3.3.0; the sample
+also uses ui-document 0.11.0 without local overrides.
 CLI-built skins run directly through UI and do not require ui-runtime. No
 Core/UI release is needed for compiled style colors.
 
