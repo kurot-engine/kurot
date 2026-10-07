@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/core",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "Modern rewrite of the Egret game engine — WebGL multi-texture batching, instruction-driven render pipeline, strict TypeScript, Egret-compatible API",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -44,6 +44,7 @@
 	"devDependencies": {
 		"@playwright/test": "1.62.1",
 		"@types/node": "^22.0.0",
+		"esbuild": "^0.28.2",
 		"fast-check": "^4.6.0",
 		"happy-dom": "^20.8.9",
 		"pixi.js": "8.20.0",

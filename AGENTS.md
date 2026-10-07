@@ -9,7 +9,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.2.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.2.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.2.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.3.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
@@ -54,6 +54,11 @@ instructions before editing the runtime. Version 0.1.0 is published and develops
 against published Core 2.2.0 without local overrides. No current game consumes
 this package.
 
+Core 2.2.1 is prepared for publication. It fixes minified TextField dictionary
+and emergency wrapping and protects complete graphemes in both wrapping modes.
+It retains Unicode 17.0, the pinned linebreak dependency and UTF-16 input offsets.
+Existing UI/Game/ui-runtime/DragonBones peer ranges accept this patch; installed
+and locked Core versions must be updated after publication to receive it.
 Core 2.2.0 is published with bitmap-font ^0.1.0 and no local dependency override.
 It adds font resources and native BitmapText rendering. UI 3.2.0 is published
 with BitmapLabel and Core ^2.2.0 in peer/dev dependencies, without local overrides.

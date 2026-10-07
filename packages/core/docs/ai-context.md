@@ -5,7 +5,8 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.2.0`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.2.1`. This patch is prepared for publication;
+Core 2.2.0 is published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -42,7 +43,8 @@ src/kurot/
 │                   CustomFilter, MultiPassFilter, BloomFilter. GPU execution in player/webgl/;
 │                   push/pop scene integration in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
-│                   HtmlTextParser, InputController, TextMeasurer, LineBreaks, TextLineLayout, WordWrap.
+│                   HtmlTextParser, InputController, TextMeasurer, TextSegmentation,
+│                   LineBreaks, TextLineLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
 │                   (Image/Json/Text/Sound/Sheet/Font). Async, resource.json-driven (RES-compatible).
 ├── net/            HttpRequest, ImageLoader. Low-level; resource/analyzers build on these.
@@ -203,7 +205,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                                                                                     |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                                                                                |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                                                                                    |
-| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                                                   |
+| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                        |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                                                                                    |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`                                                                   |
 
@@ -220,9 +222,13 @@ with local index remapping (player/webgl/split-mesh.ts).
 
 Word-wrapped text uses Unicode 17.0 UAX #14, dictionary tailoring for SA scripts
 and alphabetic overflow tailoring. Style runs never introduce break positions.
-Core 2.2.0 still requires preserved rule-function names when minified, and its
-wrap opportunities do not protect every composed emoji or grapheme cluster.
-See the known issues in [text layout](text-layout.md) before changing the wrapper.
+Core 2.2.1 tailors rules by imported function identity and filters optional
+breaks through grapheme boundaries. Character wrapping also uses complete
+graphemes. Never introduce a break inside a cluster; an oversized cluster
+overflows intact. The untailored default profile stays unchanged for Unicode
+conformance. `TextSegmentation.ts` shares cached word/grapheme segmenters;
+ordinary and emergency layout reuse a paragraph's UTF-16 grapheme end offsets.
+No text or segmentation results are retained globally. See [text layout](text-layout.md).
 Automatic-wrap spaces count in source offsets but not painted width. Core's
 Canvas renderer advances input indices by line.charNum, including hidden spaces
 and CRLF; do not derive the next line's source offset from painted text lengths.

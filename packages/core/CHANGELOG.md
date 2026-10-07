@@ -4,6 +4,37 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.2.1] — 2026-10-08
+
+### Fixed
+
+- Keep Thai/Lao/Khmer dictionary wrapping and alphabetic overflow wrapping
+  functional in minified bundles that rename rule functions. Customize LB28 by
+  its imported function identity instead of its name.
+- Protect grapheme clusters in normal word wrapping, emergency word wrapping
+  and `wordWrap = false`. Family emoji, flags, skin-tone modifiers, combining
+  marks and conjuncts stay intact. An oversized cluster can overflow the field
+  width rather than being split.
+
+### Internal
+
+- Share cached word/grapheme `Intl.Segmenter` instances with the public
+  segmentation utilities. Reuse each paragraph's grapheme end offsets between
+  ordinary and emergency layout; do not retain text or segment results globally.
+- Keep `@cto.af/linebreak` pinned to 4.0.3 and the default Unicode 17.0 profile
+  unchanged. No public API, runtime dependency, resource or KUI format change.
+
+### Tests
+
+- Add a minified browser-bundle regression with `keepNames: false`, using
+  esbuild as a development dependency only.
+- Cover complete-character wrapping, oversized clusters, rich-text boundaries,
+  CRLF source lengths, input hit testing and existing soft-wrap caret affinity.
+- Retain all 19,338 official Unicode 17.0 line-break conformance cases.
+- Verify a packed consumer with published UI 3.2.0 and DragonBones 0.1.0:
+  strict declaration checking and a complete minified bundle render correctly
+  through Canvas 2D, WebGL 1 and WebGL 2 with `keepNames: false`.
+
 ## [2.2.0] — 2026-10-08
 
 ### Added

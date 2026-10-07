@@ -2,7 +2,21 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.2.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.2.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Text wrapping fixes in 2.2.1
+
+TextField wrapping remains functional when a bundler renames functions.
+Dictionary wrapping and alphabetic overflow no longer depend on Unicode rule
+function names. Both word wrapping and `wordWrap = false` keep grapheme
+clusters intact, including family emoji, flags, skin-tone modifiers and combining
+marks. A cluster wider than the field can overflow intact. Source and input
+indices continue to use UTF-16 offsets.
+
+The patch adds no public API, runtime dependency or resource/KUI format change.
+The existing UI 3.2.0, Game 2.0.0, ui-runtime 0.8.2 and DragonBones 0.1.0 peer
+ranges accept it. Update the installed Core version and lockfile to receive
+the fixes; see [text layout](docs/text-layout.md).
 
 ## Scroll clipping in 2.1.1
 
@@ -34,15 +48,14 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.2.0
+pnpm add @kurot/core@^2.2.1
 ```
 
-Core 2.2.0 depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
-layout. Package installation resolves this dependency from npm. UI 3.1.0,
-Game 2.0.0 and ui-runtime 0.8.2 accept Core 2.2.0 through their existing peer
-ranges. Install those packages separately when the application needs their
-capabilities. The new UI BitmapLabel component follows in a separate UI release;
-it is absent from UI 3.1.0.
+Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
+layout. Package installation resolves this dependency from npm. Install other
+Kurot packages separately when the application needs their capabilities.
+Published UI 3.2.0 provides BitmapLabel and requires Core `^2.2.0`;
+UI 3.1.0 does not contain this component.
 
 ## Features
 

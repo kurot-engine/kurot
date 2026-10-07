@@ -1,5 +1,6 @@
 import { getWordLineBreaks } from './LineBreaks.js';
 import { measureText } from './TextMeasurer.js';
+import { getGraphemeEndPositions } from './TextSegmentation.js';
 import type { ILineElement, ITextElement, ITextStyle, IWTextElement } from './types/ITextElement.js';
 
 export interface TextLineLayoutOptions {
@@ -62,9 +63,10 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			return;
 		}
 
+		const graphemeEnds = getGraphemeEndPositions(paragraph);
 		const positions = options.wordWrap
-			? getWordLineBreaks(paragraph).map(point => start + point.position)
-			: characterPositions(paragraph).map(position => start + position);
+			? getWordLineBreaks(paragraph, false, graphemeEnds).map(point => start + point.position)
+			: graphemeEnds.map(position => start + position);
 		let emergencyPositions: number[] | undefined;
 		let emergencyIndex = 0;
 		let oversizedBoundary = -1;
@@ -96,7 +98,9 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			}
 
 			if (chosen === lineStart) {
-				emergencyPositions ??= getWordLineBreaks(paragraph, true).map(point => start + point.position);
+				emergencyPositions ??= getWordLineBreaks(paragraph, true, graphemeEnds).map(
+					point => start + point.position,
+				);
 				const firstBoundary = positions[positionIndex];
 				oversizedBoundary = firstBoundary;
 				while (emergencyPositions[emergencyIndex] <= lineStart) {
@@ -172,14 +176,4 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 		}
 		return { width, height, charNum: end - start, hasNextLine: false, elements: lineElements };
 	}
-}
-
-function characterPositions(text: string): number[] {
-	const positions: number[] = [];
-	let position = 0;
-	for (const character of text) {
-		position += character.length;
-		positions.push(position);
-	}
-	return positions;
 }

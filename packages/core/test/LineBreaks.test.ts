@@ -2,6 +2,9 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
+import { createContext, runInContext } from 'node:vm';
+import { fileURLToPath } from 'node:url';
+import { build } from 'esbuild';
 import { describe, expect, it } from 'vitest';
 import { getDefaultLineBreaks, getWordLineBreaks } from '../src/kurot/text/LineBreaks.js';
 
@@ -44,5 +47,50 @@ describe('Unicode 17.0 UAX #14', () => {
 		const text = 'สวัสดีครับ';
 		expect(getDefaultLineBreaks(text).map(point => point.position)).toEqual([text.length]);
 		expect(getWordLineBreaks(text).map(point => point.position)).toEqual([6, text.length]);
+	});
+
+	it.each(['👩‍👩‍👧‍👦', '🇨🇳', '👍🏽', 'e\u0301', 'क्ष'])(
+		'keeps the complete grapheme %j in ordinary and emergency wrapping',
+		text => {
+			expect(getWordLineBreaks(text).map(point => point.position)).toEqual([text.length]);
+			expect(getWordLineBreaks(text, true).map(point => point.position)).toEqual([text.length]);
+		},
+	);
+
+	it('retains tailoring and grapheme protection in a minified browser bundle without keepNames', async () => {
+		const result = await build({
+			entryPoints: [fileURLToPath(new URL('../src/kurot/text/LineBreaks.ts', import.meta.url))],
+			bundle: true,
+			platform: 'browser',
+			target: 'es2022',
+			format: 'iife',
+			globalName: 'LineBreakTest',
+			minify: true,
+			keepNames: false,
+			write: false,
+		});
+		const output = result.outputFiles[0];
+		const context = createContext({ atob, TextDecoder, TextEncoder, Intl });
+		runInContext(output.text, context);
+		const cases: { text: string; emergency: boolean; expected: number[] }[] = [
+			{ text: 'abcdef', emergency: true, expected: [1, 2, 3, 4, 5, 6] },
+			{ text: 'สวัสดีครับ', emergency: false, expected: [6, 10] },
+			{ text: '你好，世界！', emergency: false, expected: [1, 3, 4, 6] },
+			{ text: '👩‍👩‍👧‍👦', emergency: false, expected: [11] },
+			{ text: '👩‍👩‍👧‍👦', emergency: true, expected: [11] },
+			{ text: '🇨🇳', emergency: true, expected: [4] },
+			{ text: '👍🏽', emergency: true, expected: [4] },
+			{ text: 'e\u0301', emergency: true, expected: [2] },
+			{ text: 'a\u00a0b', emergency: true, expected: [3] },
+			{ text: 'a\u202fb', emergency: true, expected: [3] },
+			{ text: 'a\u2060b', emergency: true, expected: [3] },
+		];
+		for (const { text, emergency, expected } of cases) {
+			const actual: unknown = runInContext(
+				`JSON.stringify(LineBreakTest.getWordLineBreaks(${JSON.stringify(text)}, ${emergency}).map(point => point.position))`,
+				context,
+			);
+			expect(actual, text).toBe(JSON.stringify(expected));
+		}
 	});
 });

@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.2.0. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 2.2.1. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -14,9 +14,15 @@ resources, networking and media runtime. Public APIs follow Egret's
 `DisplayObject` and event model, while rendering uses a flat
 `InstructionSet + RenderPipe` pipeline inspired by Pixi.js 8.
 
-Version 2.2.0 uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
+Since 2.2.0, Core uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
+
+TextField uses Unicode 17.0 line-break rules with dictionary and overflow
+tailoring. Since 2.2.1, tailoring uses imported rule identities, and layout
+filters optional break positions through `Intl.Segmenter` grapheme boundaries.
+Word and grapheme segmenters are cached; paragraph results remain local to
+each layout. See [text layout](text-layout.md).
 
 | Aspect             | Description                                                |
 | ------------------ | ---------------------------------------------------------- |
@@ -96,6 +102,7 @@ packages/core/src/kurot/
 │   ├── HtmlTextParser.ts            # HTML text parsing
 │   ├── InputController.ts           # selection, caret and keyboard input
 │   ├── TextMeasurer.ts              # measureText and getFontString
+│   ├── TextSegmentation.ts          # shared cached word/grapheme segmenters and UTF-16 boundaries
 │   ├── LineBreaks.ts                # Unicode 17.0 UAX #14 boundaries and dictionary segmentation
 │   ├── TextLineLayout.ts            # rich-text wrapping, width fitting and UTF-16 source offsets
 │   ├── WordWrap.ts                  # independent token and grapheme utilities

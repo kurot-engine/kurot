@@ -9,18 +9,9 @@
  * unavailable.
  */
 
-// ── Segmenter (lazy, cached) ────────────────────────────────────────────────
-
-let _segmenter: Intl.Segmenter | undefined;
+import { getGraphemeSegments, getWordSegments } from './TextSegmentation.js';
 
 const hasSegmenter = typeof Intl !== 'undefined' && typeof (Intl as Record<string, unknown>).Segmenter === 'function';
-
-function getSegmenter(): Intl.Segmenter {
-	if (!_segmenter) {
-		_segmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
-	}
-	return _segmenter;
-}
 
 // ── Breaking space / newline tables ─────────────────────────────────────────
 
@@ -59,7 +50,7 @@ export function tokenize(text: string): string[] {
 
 	if (hasSegmenter) {
 		const result: string[] = [];
-		for (const seg of getSegmenter().segment(text)) {
+		for (const seg of getWordSegments(text)) {
 			const s = seg.segment;
 			if (!s) continue;
 			const code = s.charCodeAt(0);
@@ -100,9 +91,8 @@ export function tokenize(text: string): string[] {
  */
 export function splitGraphemes(text: string): string[] {
 	if (hasSegmenter) {
-		const seg = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 		const result: string[] = [];
-		for (const s of seg.segment(text)) {
+		for (const s of getGraphemeSegments(text)) {
 			result.push(s.segment);
 		}
 		return result;
