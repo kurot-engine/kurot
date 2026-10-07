@@ -19,17 +19,24 @@ import type { Project } from '../project.js';
 export function compileEngine(): BuildPlugin {
 	return {
 		name: 'compile engine',
+
+		/**
+		 * Bundles installed engine packages and records import-map chunk paths.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
+
 			if (project.enginePackages.length === 0) return;
 
 			const jsDir = path.join(project.outputDir, 'js');
+
 			await ensureDir(jsDir);
 
 			// Stub entry files (`export * from '<pkg>'`) keep package resolution
 			// and output naming under our control. They live inside the project's
 			// node_modules so esbuild resolves engine packages correctly.
 			const stubDir = await fs.mkdtemp(path.join(project.root, 'node_modules', '.kurot-engine-'));
+
 			try {
 				for (const pkg of project.enginePackages) {
 					const chunk = await bundlePackage(project, pkg, stubDir, jsDir, project.mode === 'release');
@@ -56,6 +63,7 @@ async function bundlePackage(
 ): Promise<string> {
 	const base = chunkBaseName(pkg);
 	const stub = path.join(stubDir, `${base}.ts`);
+
 	await fs.writeFile(stub, `export * from '${pkg}';\n`);
 
 	const result = await esbuild.build({
@@ -77,6 +85,7 @@ async function bundlePackage(
 	});
 
 	const output = Object.keys(result.metafile!.outputs).find(f => f.endsWith('.js'));
+
 	return path.basename(output ?? `${base}.js`);
 }
 

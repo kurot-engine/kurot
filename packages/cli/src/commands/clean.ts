@@ -15,5 +15,6 @@ export const cleanCommand = new Command('clean').description('Remove build outpu
 	for (const name of names) {
 		await fs.rm(path.resolve(name), { recursive: true, force: true });
 	}
+
 	logger.success(`Cleaned ${names.map(n => n + '/').join(', ')}`);
 });

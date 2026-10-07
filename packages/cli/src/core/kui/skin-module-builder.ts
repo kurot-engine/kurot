@@ -108,6 +108,9 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 	}
 }
 
+/**
+ * Parses one Skin and reports diagnostics before generating its factory.
+ */
 async function generateSkinModule(
 	ctx: BuildContext,
 	skin: CompiledSkin,
@@ -156,6 +159,9 @@ async function generateSkinModule(
 	}
 }
 
+/**
+ * Registers generated Skin factories under their complete class names.
+ */
 function createIndex(skins: readonly CompiledSkin[]): string {
 	return skins
 		.map((skin, index) => {
@@ -168,6 +174,9 @@ function createIndex(skins: readonly CompiledSkin[]): string {
 		.join('\n\n');
 }
 
+/**
+ * Bundles Skin factories while keeping engine and namespace modules external.
+ */
 async function bundleSkins(ctx: BuildContext, stubDir: string, bundleDir: string): Promise<string> {
 	const { project } = ctx;
 	const isRelease = project.mode === 'release';
@@ -186,12 +195,18 @@ async function bundleSkins(ctx: BuildContext, stubDir: string, bundleDir: string
 		external: [...engineExternal, ...project.customNamespaces.map(ns => ns.specifier)],
 	});
 	const output = Object.keys(result.metafile!.outputs).find(file => file.endsWith('.js'));
+
 	return path.basename(output ?? 'default.thm.js');
 }
 
+/**
+ * Stages and renames the completed bundle into the output directory.
+ */
 async function installBundle(bundleDir: string, outputName: string, destinationDir: string): Promise<void> {
 	await ensureDir(destinationDir);
+
 	const stagingDir = await fs.mkdtemp(path.join(destinationDir, '.kurot-skins-'));
+
 	try {
 		const stagedFile = path.join(stagingDir, outputName);
 		await fs.copyFile(path.join(bundleDir, outputName), stagedFile);
@@ -201,6 +216,9 @@ async function installBundle(bundleDir: string, outputName: string, destinationD
 	}
 }
 
+/**
+ * Derives the factory identifier used by the generated registration module.
+ */
 function factoryName(className: string): string {
 	const base = (className.split('.').pop() ?? 'Skin').replace(/[^A-Za-z0-9_$]/g, '_');
 	return `create${base}`;

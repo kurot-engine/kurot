@@ -43,14 +43,20 @@ interface NamespaceEntry {
 export function compileCustomNamespaces(): BuildPlugin {
 	return {
 		name: 'compile custom namespaces',
+
+		/**
+		 * Bundles configured namespaces and records their shared module ownership.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
 			const namespaces = project.customNamespaces.filter(
 				namespace => namespace.entry || (namespace.components?.length ?? 0) > 0 || ctx.watch,
 			);
+
 			if (namespaces.length === 0) return;
 
 			const jsDir = path.join(project.outputDir, 'js');
+
 			await ensureDir(jsDir);
 
 			for (const ns of namespaces) {
@@ -134,16 +140,27 @@ async function bundleNamespace(
 	}
 
 	const result = await esbuild.build(options);
+
 	return toBundleResult(project, result, base);
 }
 
+/**
+ * Uses an authored barrel or creates a temporary component export entry.
+ */
 async function createNamespaceEntry(namespace: CustomNamespace): Promise<NamespaceEntry> {
 	if (namespace.entry) return { entry: namespace.entry };
+
 	const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), `kurot-ns-${namespace.prefix}-`));
 	const entry = path.join(temporaryRoot, 'index.ts');
+
 	await fs.writeFile(entry, namespaceEntrySource(namespace));
+
 	return {
 		entry,
+
+		/**
+		 * Removes the temporary namespace entry directory.
+		 */
 		dispose: () => fs.rm(temporaryRoot, { recursive: true, force: true }),
 	};
 }
@@ -162,6 +179,9 @@ export async function refreshGeneratedNamespaceEntries(ctx: BuildContext): Promi
 	}
 }
 
+/**
+ * Generates the export source for convention-based components.
+ */
 function namespaceEntrySource(namespace: CustomNamespace): string {
 	const source = (namespace.components ?? [])
 		.map(component => `export { ${component.name} } from ${JSON.stringify(component.source)};`)
@@ -169,6 +189,9 @@ function namespaceEntrySource(namespace: CustomNamespace): string {
 	return source ? `${source}\n` : 'export {};\n';
 }
 
+/**
+ * Replaces the source-module ownership entries for a rebuilt namespace.
+ */
 function registerNamespaceInputs(ctx: BuildContext, namespace: CustomNamespace, inputs: readonly string[]): void {
 	for (const [module, specifier] of ctx.outputs.namespaceModules) {
 		if (specifier === namespace.specifier) {
@@ -190,6 +213,7 @@ function toBundleResult(project: Project, result: esbuild.BuildResult, base: str
 	const inputs = outputPath
 		? Object.keys(outputs[outputPath].inputs).map(input => path.resolve(project.root, input))
 		: [];
+
 	return { chunk: path.basename(outputPath ?? `${base}.js`), inputs };
 }
 

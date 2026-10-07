@@ -16,6 +16,10 @@ import type { BuildContext, BuildPlugin } from '../pipeline.js';
 export function writeManifest(): BuildPlugin {
 	return {
 		name: 'write manifest.json',
+
+		/**
+		 * Writes the runtime script manifest for release builds.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			if (ctx.project.mode !== 'release') return;
 
@@ -23,6 +27,7 @@ export function writeManifest(): BuildPlugin {
 				initial: Object.values(ctx.outputs.engine),
 				game: [ctx.outputs.skinsScript, ctx.outputs.entryScript].filter(Boolean),
 			};
+
 			await writeFile(
 				path.join(ctx.project.outputDir, 'manifest.json'),
 				JSON.stringify(manifest, null, '\t') + '\n',

@@ -14,6 +14,9 @@ import {
 } from './plugins/index.js';
 import { refreshGeneratedNamespaceEntries } from './plugins/compile-custom-namespaces.js';
 import { refreshProjectComponents } from './components/discover-components.js';
+import { createResourceAssetSync } from './resource-asset-sync.js';
+import { watchResourceDirectory } from './resource-watcher.js';
+import { KUI_THEME_OUTPUT_PATH } from './project.js';
 import { logger } from '../utils/logger.js';
 import type { DevEvent } from './diagnostics/index.js';
 import type { BuildContext } from './pipeline.js';
@@ -64,14 +67,16 @@ const MIME_TYPES: Record<string, string> = {
  * Starts a development server.
  *
  * The build pipeline runs once with watch enabled: esbuild rebuilds `main.js`
- * on every source change, and an `fs.watch` on `resource/` recompiles KUI and
- * re-copies assets. Files are served straight from the output directory.
+ * on every source change. Resource edits synchronize assets; KUI inputs also
+ * trigger compilation. Files are served straight from the output directory.
  * The browser is not auto-reloaded — refresh manually to pick up changes.
  */
 export async function startDevServer(project: Project, options: DevServerOptions): Promise<void> {
 	const ctx = createContext(project, { sourcemap: options.sourcemap, watch: true, strict: options.strict });
 	const startedAt = Date.now();
+
 	options.onEvent?.({ type: 'build-start', reason: 'initial' });
+
 	try {
 		await runPipeline(ctx, [
 			compileKUI(),
@@ -91,8 +96,11 @@ export async function startDevServer(project: Project, options: DevServerOptions
 	}
 
 	const enqueue = createResourceBuildQueue(ctx);
-	const componentSkinsWatched = watchComponents(project, ctx, options, enqueue);
-	watchResources(project, ctx, options, componentSkinsWatched, enqueue);
+	const syncAssets = await createResourceAssetSync(project);
+	const componentSkinsWatched = watchComponents(project, ctx, options, enqueue, syncAssets);
+
+	watchResources(project, ctx, options, componentSkinsWatched, enqueue, syncAssets);
+
 	const server = startHttpServer(project, options);
 
 	process.on('SIGINT', async () => {
@@ -104,7 +112,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 }
 
 /**
- * Recompiles KUI when authored skins or their resource default configuration change.
+ * Coalesces all resource edits, compiling only when a batch includes KUI inputs.
  */
 function watchResources(
 	project: Project,
@@ -112,34 +120,50 @@ function watchResources(
 	options: DevServerOptions,
 	componentSkinsWatched: boolean,
 	enqueue: (action: () => Promise<void>) => void,
+	syncAssets: () => Promise<void>,
 ): void {
-	if (!project.config.ui) return;
-
 	let debounce: ReturnType<typeof setTimeout> | undefined;
-	let watcher: fsSync.FSWatcher;
+	let needsKUI = false;
+	let retryKUI = false;
+	let closeWatcher: () => void;
+
 	try {
-		watcher = fsSync.watch(project.resourceDir, { recursive: true }, (_event, filename) => {
-			if (
-				!filename ||
-				(!filename.endsWith('.kui.xml') &&
-					filename !== 'default.res.json' &&
-					filename.split(path.sep).join('/') !== 'config/style.json')
-			)
-				return;
-			if (filename.endsWith('.kui.xml') && componentSkinsWatched && project.componentConvention) {
-				const changed = path.resolve(project.resourceDir, filename);
+		closeWatcher = watchResourceDirectory(project.resourceDir, filename => {
+			const changed = filename ? path.resolve(project.resourceDir, filename) : project.resourceDir;
+
+			if (!isWithin(project.resourceDir, changed)) return;
+
+			const relative = path.relative(project.resourceDir, changed).split(path.sep).join('/');
+
+			if (relative.endsWith('.kui.xml') && componentSkinsWatched && project.componentConvention) {
 				if (isWithin(project.componentConvention.skinDir, changed)) return;
 			}
+			if (project.config.ui && path.basename(relative) === path.basename(KUI_THEME_OUTPUT_PATH)) return;
+
+			needsKUI ||= Boolean(project.config.ui) && (!relative || relative.endsWith('.kui.xml') ||
+				relative === 'default.res.json' || relative === 'config/style.json' ||
+				isWithin(project.uiSourceDir ?? project.resourceDir, changed) ||
+				isWithin(changed, project.uiSourceDir ?? project.resourceDir) || relative === 'config');
 			clearTimeout(debounce);
 			debounce = setTimeout(
-				() =>
+				() => {
+					const requestedCompile = needsKUI;
+
+					needsKUI = false;
 					enqueue(async () => {
+						const compile = requestedCompile || retryKUI;
 						const startedAt = Date.now();
-						options.onEvent?.({ type: 'build-start', reason: 'kui-change' });
-						logger.info(`KUI changed: ${path.basename(filename)}, recompiling...`);
+
+						options.onEvent?.({ type: 'build-start', reason: compile ? 'kui-change' : 'resource-change' });
+						logger.info(compile ? 'Resources changed, recompiling KUI...' : 'Resources changed, synchronizing...');
+
 						try {
-							await compileKUI().apply(ctx);
-							await copyAssets().apply(ctx);
+							if (compile) {
+								await compileKUI().apply(ctx);
+								await writeComponentCatalog().apply(ctx);
+							}
+							await syncAssets();
+							retryKUI = false;
 							emitDiagnostics(ctx, options);
 							options.onEvent?.({
 								type: 'build-complete',
@@ -147,25 +171,28 @@ function watchResources(
 								durationMs: Date.now() - startedAt,
 							});
 						} catch (err) {
+							retryKUI ||= compile;
 							emitDiagnostics(ctx, options);
 							options.onEvent?.({
 								type: 'build-complete',
 								success: false,
 								durationMs: Date.now() - startedAt,
 							});
-							logger.error(`KUI recompile failed: ${err instanceof Error ? err.message : err}`);
+							logger.error(`Resource update failed: ${err instanceof Error ? err.message : err}`);
 						}
-					}),
+					});
+				},
 				100,
 			);
 		});
 	} catch {
-		logger.warn('KUI watcher unavailable (recursive fs.watch unsupported on this platform).');
+		logger.warn('Resource watcher unavailable (recursive fs.watch unsupported on this platform).');
 		return;
 	}
+
 	ctx.disposers.push(() => {
 		clearTimeout(debounce);
-		watcher.close();
+		closeWatcher();
 	});
 }
 
@@ -178,25 +205,34 @@ function watchComponents(
 	ctx: BuildContext,
 	options: DevServerOptions,
 	enqueue: (action: () => Promise<void>) => void,
+	syncAssets: () => Promise<void>,
 ): boolean {
 	const convention = project.componentConvention;
+
 	if (!convention) return false;
+
 	let debounce: ReturnType<typeof setTimeout> | undefined;
 	const watchers: fsSync.FSWatcher[] = [];
 	let skinWatcherActive = false;
+
+	/**
+	 * Coalesces component edits into a queued model and bundle refresh.
+	 */
 	const schedule = (): void => {
 		clearTimeout(debounce);
 		debounce = setTimeout(
 			() =>
 				enqueue(async () => {
 					const startedAt = Date.now();
+
 					options.onEvent?.({ type: 'build-start', reason: 'source-change' });
+
 					try {
 						await refreshProjectComponents(project);
 						await refreshGeneratedNamespaceEntries(ctx);
 						await compileKUI().apply(ctx);
 						await writeComponentCatalog().apply(ctx);
-						await copyAssets().apply(ctx);
+						await syncAssets();
 						emitDiagnostics(ctx, options);
 						options.onEvent?.({
 							type: 'build-complete',
@@ -242,15 +278,21 @@ function watchComponents(
 			watcher.close();
 		}
 	});
+
 	return skinWatcherActive;
 }
 
+/**
+ * Serializes resource work and skips queued actions after disposal.
+ */
 function createResourceBuildQueue(ctx: BuildContext): (action: () => Promise<void>) => void {
 	let pending = Promise.resolve();
 	let disposed = false;
+
 	ctx.disposers.push(() => {
 		disposed = true;
 	});
+
 	return action => {
 		pending = pending.then(async () => {
 			if (!disposed) {
@@ -260,6 +302,9 @@ function createResourceBuildQueue(ctx: BuildContext): (action: () => Promise<voi
 	};
 }
 
+/**
+ * Checks whether a file or directory belongs to the given subtree.
+ */
 function isWithin(directory: string, file: string): boolean {
 	const relative = path.relative(directory, file);
 	return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
@@ -272,9 +317,10 @@ function startHttpServer(project: Project, options: DevServerOptions): http.Serv
 	const server = http.createServer(async (req, res) => {
 		const url = (req.url ?? '/').split('?')[0];
 		const filePath = path.join(project.outputDir, url === '/' ? 'index.html' : url);
+
 		try {
 			const data = await fs.readFile(filePath);
-			res.writeHead(200, { 'Content-Type': mimeType(filePath) });
+			res.writeHead(200, { 'Content-Type': mimeType(filePath), 'Cache-Control': 'no-store' });
 			res.end(data);
 		} catch {
 			res.writeHead(404);
@@ -284,19 +330,27 @@ function startHttpServer(project: Project, options: DevServerOptions): http.Serv
 
 	server.listen(options.port, () => {
 		const url = `http://localhost:${options.port}`;
+
 		logger.success(`Dev server running at ${url}`);
 		logger.info('Watching for changes (refresh the browser to reload)...');
 		options.onEvent?.({ type: 'server-ready', url });
 	});
+
 	return server;
 }
 
+/**
+ * Forwards collected diagnostics to the dev event consumer.
+ */
 function emitDiagnostics(ctx: BuildContext, options: DevServerOptions): void {
 	for (const diagnostic of ctx.diagnostics.all()) {
 		options.onEvent?.({ type: 'diagnostic', diagnostic });
 	}
 }
 
+/**
+ * Selects the response content type from the file extension.
+ */
 function mimeType(filePath: string): string {
 	return MIME_TYPES[path.extname(filePath).toLowerCase()] ?? 'application/octet-stream';
 }

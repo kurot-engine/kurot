@@ -17,6 +17,7 @@ export const createCommand = new Command('create')
 		}
 
 		logger.info(`Creating project "${name}" from template "${options.template}"...`);
+
 		try {
 			await scaffoldProject(name, options.template as TemplateName);
 		} catch (err) {

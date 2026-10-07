@@ -24,8 +24,11 @@ export const devCommand = new Command('dev')
 	.action(async (options: DevOptions) => {
 		const format = parseDevDiagnosticsFormat(options.diagnostics);
 		const machine = format === 'jsonl';
+
 		setLoggerEnabled(!machine);
+
 		const port = Number.parseInt(options.port, 10);
+
 		if (!Number.isInteger(port) || port < 1 || port > 65535) {
 			setLoggerEnabled(true);
 			throw new ConfigError(`Invalid port: ${options.port}`);

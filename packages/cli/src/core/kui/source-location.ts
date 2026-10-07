@@ -18,14 +18,20 @@ export class SourceLocator {
 
 	// ── Constructor ───────────────────────────────────────────────────
 
+	/**
+	 * Indexes line starts for repeated source-position lookup.
+	 */
 	public constructor(source: string) {
 		this._sourceLength = source.length;
+
 		const lineStarts = [0];
+
 		for (let i = 0; i < source.length; i++) {
 			if (source.charCodeAt(i) === 10) {
 				lineStarts.push(i + 1);
 			}
 		}
+
 		this._lineStarts = lineStarts;
 	}
 
@@ -41,6 +47,7 @@ export class SourceLocator {
 
 		let low = 0;
 		let high = this._lineStarts.length - 1;
+
 		while (low <= high) {
 			const middle = Math.floor((low + high) / 2);
 			if (this._lineStarts[middle] <= offset) {
@@ -51,6 +58,7 @@ export class SourceLocator {
 		}
 
 		const lineIndex = Math.max(0, high);
+
 		return {
 			line: lineIndex + 1,
 			column: offset - this._lineStarts[lineIndex] + 1,

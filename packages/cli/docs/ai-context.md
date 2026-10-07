@@ -1,8 +1,8 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is `@kurot/cli@3.3.0`, runs on
-Node.js 20+, and is installed as a project dev dependency.
+explains the plugin pipeline. The package is published as `@kurot/cli@3.3.1`, runs on Node.js 20+,
+and is installed as a project dev dependency.
 
 ## Directory map
 
@@ -16,6 +16,8 @@ src/
 │   ├── project.ts                 resolved paths, dependencies, namespaces
 │   ├── pipeline.ts                BuildContext and ordered plugin runner
 │   ├── dev-server.ts              static server and watchers
+│   ├── resource-watcher.ts        recursive resource + shallow parent watch/reconnect
+│   ├── resource-asset-sync.ts     content comparison, staged writes and deletion reconciliation
 │   ├── diagnostics/               stable codes and JSON/JSONL output
 │   ├── components/                reusable component discovery
 │   ├── kui/                       UIDocument → SkinIR → ESM compiler
@@ -30,6 +32,9 @@ font loading before Main creates Player/Preloader; LocaleManager registers
 preload texts before creating the scene. See [game-template.md](game-template.md).
 Version 3.3.0 is published with Label preset compilation and
 published ui-document 0.11.0. It has no local document-kernel override.
+Published version 3.3.1 adds whole-resource dev synchronization, deletion/reconnect
+handling and no-store responses. Installed CLI 3.3.0 lacks these fixes; consumers
+must update their installed/locked version to receive them.
 
 ## KUI compilation
 
@@ -45,7 +50,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.3.0 requires `@kurot/ui-document@^0.11.0`. Schema-defined strings, including
+CLI 3.3.1 requires `@kurot/ui-document@^0.11.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -88,6 +93,11 @@ manual prefix cannot conflict with `ui.components.namespace`.
   `--strict` or release policy.
 - Machine diagnostic modes own stdout: build emits one JSON result; dev emits
   JSONL lifecycle events.
+- Since 3.3.1, dev watches all resource assets even without UI, emits
+  resource-change for copy-only batches, retains KUI requirements across mixed
+  batches, and reconciles deletions. Browser refresh remains manual; HTTP is
+  no-store. Per-file staging/rename is not an atomic atlas pair transaction.
+  Read [dev resource watching](dev-resource-watching.md) for the exact boundaries.
 - `compileCustomNamespaces` must precede `compileSource`. Application-relative
   imports and generated `#ns/<prefix>` imports must resolve to one bundled class
   identity.

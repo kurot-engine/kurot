@@ -39,7 +39,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.3.0 consumes ui-document 0.11.x, retaining Label text-fitting metadata. The
+CLI 3.3.1 consumes ui-document 0.11.x, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
@@ -78,8 +78,14 @@ convention-based reusable components. A component change can affect its source
 namespace, paired skin, generated type declaration, and editor catalog, so that
 path refreshes all four outputs as one operation. The server preserves the last
 successful output after an invalid edit.
-The resource watcher includes the fixed style.json path, rebuilding skins when
-its palette or Label presets change; font loading remains an application responsibility.
+Since 3.3.1, the resource watcher synchronizes all runtime assets even without UI,
+and reconciles additions, deletions and directory replacement. Runtime-only
+changes do not recompile skins. The fixed style.json and default.res.json paths
+still trigger KUI compilation; font loading remains an application responsibility.
+Changes are debounced and queued, with changed bytes staged before publication.
+Browser refresh remains manual and HTTP responses use no-store. Individual
+renames do not form an atomic multi-file transaction. See
+[resource watching](dev-resource-watching.md).
 
 ## Diagnostics
 

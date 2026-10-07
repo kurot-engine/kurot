@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/cli",
-	"version": "3.3.0",
+	"version": "3.3.1",
 	"description": "Kurot CLI - build tool for Kurot Editor KUI XML workflows",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

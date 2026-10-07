@@ -3,6 +3,10 @@
  * top level to print a friendly error instead of a raw stack trace.
  */
 export class BuildError extends Error {
+
+	/**
+	 * Creates the named CLI error with its message.
+	 */
 	public constructor(
 		message: string,
 		public readonly cause?: Error,
@@ -17,6 +21,10 @@ export class BuildError extends Error {
  * invalid `stage.scaleMode`).
  */
 export class ConfigError extends Error {
+
+	/**
+	 * Creates the named CLI error with its message.
+	 */
 	public constructor(message: string) {
 		super(message);
 		this.name = 'ConfigError';

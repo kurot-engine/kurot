@@ -12,9 +12,10 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/core`        | 2.1.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.1.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
-| `@kurot/cli`         | 3.3.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
+| `@kurot/cli`         | 3.3.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.11.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.8.2   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
+| `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Initial local implementation, not published.                                               | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)               |
 
 Dependency direction is strictly one-way:
 
@@ -32,11 +33,23 @@ Dependency direction is strictly one-way:
  ├─ @kurot/ui-document
  ├─ @kurot/ui
  └─ @kurot/core
+
+@kurot/atlas  (independent build-time tool; no Kurot package dependencies)
 ```
+
+Atlas has a portable pixel-only root entry and a separate Node PNG subpath using
+pngjs. No current package consumes it. Core loads prebuilt sheets without atlas;
+Editor, Reskin or CLI adoption is a separate change.
 
 UI 3.1 requires Core ^2.1.0. Game 2.0 declares Core 2.x.
 ui-runtime 0.8.2 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.11.0.
 CLI 3.3 requires ui-document ^0.11.0.
+CLI 3.3.1 is published with whole-resource dev synchronization,
+including Core-only projects, without adding an atlas dependency. Installed CLI
+3.3.0 does not include these watcher fixes. Source versions do not confirm npm
+publication. Engine examples, the KUI sample and the Editor working tree now
+install CLI 3.3.1 from npm; legacy EXML projects remain on CLI 1.3.x. See
+packages/cli/docs/dev-resource-watching.md for manual refresh and batch boundaries.
 ui-document 0.9.0 adds Label fitting metadata without changing format version 2.
 ui-document 0.10.0 adds shared style.json fonts/colors and @style:colors:<key>
 XML references without changing the internal color-token record or format version 2.
@@ -105,7 +118,7 @@ There is no root-level install/build/test command — the repo root has no
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
-pnpm --dir packages/<package> test   # core, cli, ui, game, ui-document, ui-runtime
+pnpm --dir packages/<package> test   # core, cli, ui, game, ui-document, ui-runtime, atlas
 pnpm --dir packages/<package> dev    # TS compile watch
 ```
 
@@ -133,7 +146,7 @@ Kurot/
 ├── README.md          Human-facing overview (English)
 ├── docs/              Contribution rules (docs/code-rules.md) — committed
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
-├── packages/          The 6 packages above, each with its own docs/ + docs-internal/
+├── packages/          The 7 packages above; public docs/ and optional local docs-internal/
 ├── tools/             Private repository tooling, including the Agent evaluation harness
 ├── examples/          demo and game (CLI-scaffolded KUI XML project)
 └── reference/         Local read-only reference sources — not distributed via git
@@ -150,9 +163,11 @@ references explicitly. Literal strings and other token categories are unchanged.
 The original color integration shipped in ui-document 0.10.0, CLI 3.2.0 and
 ui-runtime 0.8.1. Current KUI projects use published ui-document 0.11.0 and CLI
 3.3.0 for colors and Label presets; CLI-built skins do not require ui-runtime.
-Engine examples use CLI 3.3.0, while legacy EXML projects keep their independent
+Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 installs ui-document 0.11.0, CLI 3.3.0 and
-ui-runtime 0.8.2 from the registry without local overrides.
+ui-runtime 0.8.2 from the registry without local overrides. The current Editor
+0.19.3 working tree pins published CLI 3.3.1; existing signed installers are not
+rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.
 
 CLI 3.2.1 is published. Its game template includes style.json, locale.json, English
@@ -171,6 +186,6 @@ published ui-document ^0.11.0 without a local override. UIStyleSheet requires
 labels; the parser supplies an empty map for an absent JSON section.
 These APIs are not in ui-document 0.10.0 or CLI 3.2.1. Published ui-runtime 0.8.2
 requires ^0.11.0; runtime 0.8.1 excludes the new kernel.
-The KUI sample and engine examples use published CLI 3.3.0; the sample also uses
+The KUI sample and engine examples use published CLI 3.3.1; the sample also uses
 ui-document 0.11.0 without local overrides. Editor 0.19.2 adopts the matching
 published runtime. Package source versions alone do not confirm publication.

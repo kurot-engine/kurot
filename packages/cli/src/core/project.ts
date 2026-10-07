@@ -196,6 +196,7 @@ export async function loadProject(mode: BuildMode): Promise<Project> {
 	const componentConvention = resolveComponentConvention(root, config);
 	const components = await discoverComponents(root, componentConvention);
 	const customNamespaces = resolveCustomNamespaces(root, config.ui?.namespaces);
+
 	if (componentConvention) {
 		if (customNamespaces.some(namespace => namespace.prefix === componentConvention.prefix)) {
 			throw new ConfigError(
@@ -250,15 +251,19 @@ function resolveCustomNamespaces(root: string, namespaces: Record<string, string
  */
 function resolveComponentConvention(root: string, config: ProjectConfig): ComponentConvention | undefined {
 	const components = config.ui?.components;
+
 	if (!components) return undefined;
+
 	const sourceDir = path.resolve(root, components.sourceDir);
 	const skinDir = path.resolve(root, components.skinDir);
+
 	if (!isWithin(path.resolve(root, 'src'), sourceDir)) {
 		throw new ConfigError('Invalid config: ui.components.sourceDir must be inside the project src directory');
 	}
 	if (!isWithin(path.resolve(root, 'resource'), skinDir)) {
 		throw new ConfigError('Invalid config: ui.components.skinDir must be inside the project resource directory');
 	}
+
 	return {
 		prefix: components.namespace,
 		specifier: `${NAMESPACE_SPECIFIER_PREFIX}${components.namespace}`,
@@ -267,6 +272,9 @@ function resolveComponentConvention(root: string, config: ProjectConfig): Compon
 	};
 }
 
+/**
+ * Checks that a configured path remains within its allowed root.
+ */
 function isWithin(directory: string, target: string): boolean {
 	const relative = path.relative(directory, target);
 	return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
@@ -293,7 +301,12 @@ function detectEnginePackages(root: string): string[] {
  */
 function timestamp(): string {
 	const d = new Date();
+
+	/**
+	 * Formats a timestamp field as two digits.
+	 */
 	const p = (n: number) => String(n).padStart(2, '0');
+
 	return (
 		String(d.getFullYear() % 100) +
 		p(d.getMonth() + 1) +

@@ -1,0 +1,41 @@
+{
+	"name": "@kurot/atlas",
+	"version": "0.1.0",
+	"description": "Independent RGBA atlas packing and PNG tooling with Kurot-compatible sheet output",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+		"./png": { "types": "./dist/png/index.d.ts", "import": "./dist/png/index.js" }
+	},
+	"files": ["dist/**/*", "docs/**/*", "CHANGELOG.md", "LICENSE"],
+	"scripts": {
+		"build": "tsc --build",
+		"dev": "tsc --watch",
+		"clean": "rm -rf dist",
+		"test": "tsc --project tsconfig.test.json && vitest run",
+		"test:watch": "vitest",
+		"verify:reference": "tsc --project tsconfig.verify.json && node .verify/scripts/verify-reference.js",
+		"prepublishOnly": "pnpm run clean && pnpm run build"
+	},
+	"dependencies": { "pngjs": "^7.0.0" },
+	"devDependencies": {
+		"@types/node": "^22.0.0",
+		"@types/pngjs": "^6.0.5",
+		"typescript": "^5.6.0",
+		"vitest": "^4.1.4"
+	},
+	"engines": { "node": ">=20" },
+	"keywords": ["kurot", "atlas", "sprite-sheet", "maxrects", "typescript"],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/atlas"
+	},
+	"packageManager": "pnpm@10.33.0",
+	"publishConfig": { "access": "public" }
+}

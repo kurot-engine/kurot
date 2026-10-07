@@ -174,6 +174,7 @@ export async function loadConfig(): Promise<ProjectConfig> {
 	}
 
 	const entryPath = path.resolve(config.entry);
+
 	if (!(await exists(entryPath))) {
 		throw new ConfigError(`Invalid config: entry file '${config.entry}' does not exist`);
 	}
@@ -190,14 +191,21 @@ export async function loadConfig(): Promise<ProjectConfig> {
 	return config;
 }
 
+/**
+ * Validates UI source and optional component configuration.
+ */
 function validateUIConfig(ui: KUIConfig | undefined): void {
 	if (!ui) return;
 	if (!ui.sourceDir.trim()) {
 		throw new ConfigError('Invalid config: ui.sourceDir must not be empty');
 	}
+
 	validateComponentsConfig(ui.components);
 }
 
+/**
+ * Validates the component namespace and paired source/skin directories.
+ */
 function validateComponentsConfig(components: ComponentsConfig | undefined): void {
 	if (!components) return;
 	if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(components.namespace)) {

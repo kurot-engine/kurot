@@ -41,11 +41,13 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 	for (const module of modules) {
 		lines.push(`import type * as ${aliases.get(module)} from ${JSON.stringify(module)};`);
 	}
+
 	if (modules.length > 0) {
 		lines.push('');
 	}
 
 	lines.push('declare module "@kurot/ui" {', '\tinterface SkinPartsMap {');
+
 	for (const entry of entries) {
 		lines.push(`\t\t${JSON.stringify(entry.className)}: {`);
 		for (const part of entry.parts) {
@@ -53,6 +55,7 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 		}
 		lines.push('\t\t};');
 	}
+
 	lines.push('\t}', '}', '');
 
 	for (const host of hosts) {
@@ -67,6 +70,7 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 	}
 
 	lines.push('export {};', '');
+
 	return lines.join('\n');
 }
 
@@ -133,15 +137,25 @@ async function collectSkinHosts(
 	return [...hosts.values()].sort((a, b) => a.module.localeCompare(b.module));
 }
 
+/**
+ * Extracts the final segment of a qualified Skin name.
+ */
 function getSkinShortName(skinName: string): string {
 	return skinName.slice(skinName.lastIndexOf('.') + 1);
 }
 
+/**
+ * Collects project TypeScript files while excluding declaration files.
+ */
 async function collectTypeScriptFiles(directory: string): Promise<string[]> {
 	const files: string[] = [];
 
+	/**
+	 * Traverses source directories while tolerating missing directories.
+	 */
 	async function walk(current: string): Promise<void> {
 		let entries: Dirent[];
+
 		try {
 			entries = await fs.readdir(current, { withFileTypes: true });
 		} catch (error) {
@@ -162,33 +176,50 @@ async function collectTypeScriptFiles(directory: string): Promise<string[]> {
 	}
 
 	await walk(directory);
+
 	return files.sort();
 }
 
+/**
+ * Removes comments before inspecting class and Skin declarations.
+ */
 function stripComments(source: string): string {
 	return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 }
 
+/**
+ * Checks whether the source exports the expected host class.
+ */
 function hasNamedClassExport(source: string, className: string): boolean {
 	const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 	if (new RegExp(`\\bexport\\s+(?:default\\s+)?class\\s+${escaped}\\b`).test(source)) {
 		return true;
 	}
 
 	const declared = new RegExp(`\\bclass\\s+${escaped}\\b`).test(source);
 	const exported = new RegExp(`\\bexport\\s*\\{[^}]*\\b${escaped}\\b[^}]*\\}`, 's').test(source);
+
 	return declared && exported;
 }
 
+/**
+ * Formats a relative ESM module specifier with normalized separators.
+ */
 function toModuleSpecifier(value: string): string {
 	const normalized = value.split(path.sep).join('/');
 	return normalized.startsWith('.') ? normalized : `./${normalized}`;
 }
 
+/**
+ * Resolves each declared Skin part to its component type and module.
+ */
 function collectSkinParts(project: Project, declarationFile: string, skin: SkinIR): SkinPartType[] {
 	const nodes = new Map<string, SkinNode>();
+
 	collectNodes(skin.children, nodes);
 	collectNodes(skin.declarations, nodes);
+
 	for (const property of skin.propertyChildren) {
 		collectNodes(
 			property.nodes.filter((node): node is SkinNode => typeof node !== 'string'),
@@ -198,9 +229,11 @@ function collectSkinParts(project: Project, declarationFile: string, skin: SkinI
 
 	return skin.skinParts.map(name => {
 		const node = nodes.get(name);
+
 		if (!node) {
 			throw new Error(`Skin part "${name}" in ${skin.className} has no matching KUI node.`);
 		}
+
 		return {
 			name,
 			className: node.className,
@@ -209,6 +242,9 @@ function collectSkinParts(project: Project, declarationFile: string, skin: SkinI
 	});
 }
 
+/**
+ * Indexes identified nodes including visual and property children.
+ */
 function collectNodes(source: readonly SkinNode[], target: Map<string, SkinNode>): void {
 	for (const node of source) {
 		if (node.id) {
@@ -224,19 +260,25 @@ function collectNodes(source: readonly SkinNode[], target: Map<string, SkinNode>
 	}
 }
 
+/**
+ * Resolves namespace component types to project source modules when available.
+ */
 function resolveTypeModule(project: Project, declarationFile: string, node: SkinNode): string {
 	const namespace = project.customNamespaces.find(candidate => candidate.specifier === node.module);
+
 	if (!namespace) {
 		return node.module;
 	}
 
 	const component = namespace.components?.find(candidate => candidate.name === node.className);
 	const source = component?.source ?? namespace.entry;
+
 	if (!source) {
 		return node.module;
 	}
 
 	const relative = path.relative(path.dirname(declarationFile), source).replace(/\.tsx?$/, '.js');
 	const specifier = relative.split(path.sep).join('/');
+
 	return specifier.startsWith('.') ? specifier : `./${specifier}`;
 }

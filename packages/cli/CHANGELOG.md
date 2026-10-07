@@ -7,6 +7,39 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.3.1 — 2026-10-07
+
+### Development Resource Updates
+
+- Synchronize all runtime assets during dev, including locale configuration,
+  atlas PNG/JSON, fonts and language properties, including Core-only projects.
+- Reconcile deleted/renamed assets and reconnect after resource-root creation or
+  replacement. Stage changed bytes before publication and preserve generated files.
+- Coalesce and serialize resource updates; retain KUI rebuild requirements across
+  mixed batches and retry failed compilation before publishing later resource edits.
+- Emit resource-change build events and serve development files with no-store;
+  browser refresh remains manual. No atlas parser or atomic group commit is added.
+
+### Internal
+
+- Add brief function and method comments and separate logical steps with blank
+  lines throughout CLI source, without changing behavior in the cleanup.
+
+### Dependencies and Compatibility
+
+- Retain published `@kurot/ui-document@^0.11.0` and existing dependency ranges.
+  Command/configuration APIs, KUI XML, stylesheet and document formats are unchanged.
+- JSONL consumers must accept the additional `resource-change` build-start reason.
+  Existing projects require no asset migration or special atlas directory.
+- Updating installed CLI versions is required to receive the watcher fixes;
+  a source-version bump alone does not confirm npm publication.
+
+### Tests
+
+- Exercise live dev processes and HTTP responses for binary/JSON assets, locale,
+  translations, fonts, cache headers, rename/deletion, Core-only root creation,
+  mixed style/resource batches and recovery after invalid styles.
+
 ## 3.3.0 — 2026-10-07
 
 ### Label Presets

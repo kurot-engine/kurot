@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.3.0 (published).** Requires published `@kurot/ui-document@^0.11.0`
+> **Current version: 3.3.1 (published).** Requires published `@kurot/ui-document@^0.11.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -12,6 +12,11 @@ ESM, and compiles canonical KUI XML skins into runtime theme modules.
 > not require those projects to change their configuration or UI assets.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+Version 3.3.1 fixes development synchronization for all runtime resources,
+including locale JSON, atlas PNG/JSON, fonts and translations. No project
+configuration changes are required; refresh the preview after synchronization.
+See [development resource watching](docs/dev-resource-watching.md).
 
 Version 3.2.1 adds project styles, bundled fonts and English translations to the
 game template. Existing projects are not rewritten. See [game template setup](docs/game-template.md).
@@ -44,7 +49,7 @@ See the [compilation contract](docs/label-text-layout.md) and
 The CLI does not require a global install.
 
 ```bash
-npx @kurot/cli@3.3.0 create my-game
+npx @kurot/cli@3.3.1 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -52,7 +57,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.3.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.3.1`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -94,6 +99,13 @@ kurot dev [--port 3000] [--sourcemap] [--strict]
 The development server rebuilds TypeScript, KUI XML, custom namespaces, and
 the component catalog as their sources change. Browser refresh is currently
 manual. JSONL mode reserves stdout for incremental build and server events.
+
+Since 3.3.1, dev also synchronizes the complete `resource/` tree,
+including locale JSON, atlas PNG/JSON, fonts and translation files, with deletion
+and rename handling. Runtime-only edits do not recompile skins; style and resource
+default changes still do. Refresh after synchronization succeeds. No atlas
+directory configuration is needed. See [resource watching](docs/dev-resource-watching.md)
+for batching, cache headers and the limits of multi-file updates.
 
 ### `kurot clean`
 
@@ -162,7 +174,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.3.0 uses `@kurot/ui-document@^0.11.0` and retains its literal-string XML rules.
+Version 3.3.1 uses `@kurot/ui-document@^0.11.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -300,6 +312,6 @@ than selecting a different preset. Missing presets, unsupported selection or
 invalid configuration fail explicitly. Expansion runs after resource defaults
 and before color resolution. It does not load fonts or measure text.
 
-Version 3.3.0 uses published ui-document 0.11.0 without local overrides. CLI
+Version 3.3.1 uses published ui-document 0.11.0 without local overrides. CLI
 3.2.1 does not include this feature. Existing projects are not migrated.
 See [the shared contract](../ui-document/docs/project-styles.md).

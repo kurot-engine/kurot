@@ -16,7 +16,9 @@ export async function ensureDir(dir: string): Promise<void> {
  */
 export async function copyDir(src: string, dest: string, filter?: (name: string) => boolean): Promise<void> {
 	await ensureDir(dest);
+
 	const entries = await fs.readdir(src, { withFileTypes: true });
+
 	for (const entry of entries) {
 		const srcPath = path.join(src, entry.name);
 		const destPath = path.join(dest, entry.name);

@@ -54,9 +54,12 @@ export const buildCommand = new Command('build')
 		const start = Date.now();
 		const format = parseBuildDiagnosticsFormat(options.diagnostics);
 		const machine = format === 'json';
+
 		setLoggerEnabled(!machine);
+
 		let ctx: BuildContext | undefined;
 		let mode: BuildMode = options.release ? 'release' : 'development';
+
 		try {
 			if (options.watch && options.release) {
 				logger.warn('--watch is a development workflow; ignoring --release.');

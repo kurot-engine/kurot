@@ -88,6 +88,7 @@ export async function discoverComponents(
 	if (errors.length > 0) {
 		throw new ConfigError(`Invalid reusable components:\n${errors.map(error => `- ${error}`).join('\n')}`);
 	}
+
 	return components.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -104,16 +105,25 @@ export async function refreshProjectComponents(project: {
 	project.components.splice(0, project.components.length, ...discovered);
 }
 
+/**
+ * Collects matching component files in stable path order.
+ */
 async function collectFiles(directory: string, include: (fileName: string) => boolean): Promise<string[]> {
 	const results: string[] = [];
+
+	/**
+	 * Collects files recursively, allowing an absent component directory.
+	 */
 	async function walk(current: string): Promise<void> {
 		let entries: Dirent[];
+
 		try {
 			entries = await fs.readdir(current, { withFileTypes: true });
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
 			throw error;
 		}
+
 		for (const entry of entries) {
 			const absolute = path.join(current, entry.name);
 			if (entry.isDirectory()) {
@@ -124,35 +134,56 @@ async function collectFiles(directory: string, include: (fileName: string) => bo
 		}
 	}
 	await walk(directory);
+
 	return results.sort();
 }
 
+/**
+ * Derives the extensionless relative key used to match a component source.
+ */
 function sourcePairKey(sourceDir: string, file: string): string {
 	return toPosix(path.relative(sourceDir, file).slice(0, -'.ts'.length));
 }
 
+/**
+ * Derives the relative key shared by a component source and its Skin.
+ */
 function skinPairKey(skinDir: string, file: string): string {
 	return toPosix(path.relative(skinDir, file).slice(0, -'Skin.kui.xml'.length));
 }
 
+/**
+ * Checks direct and export-list declarations for the required component class.
+ */
 function hasNamedClassExport(source: string, name: string): boolean {
 	source = stripComments(source);
+
 	const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	const direct = new RegExp(`\\bexport\\s+class\\s+${escaped}\\b`);
+
 	if (direct.test(source)) return true;
+
 	const declared = new RegExp(`\\bclass\\s+${escaped}\\b`).test(source);
 	const exportList = new RegExp(`\\bexport\\s*\\{[^}]*\\b${escaped}\\b[^}]*\\}`, 's').test(source);
+
 	return declared && exportList;
 }
 
+/**
+ * Detects abstract classes that cannot serve as reusable components.
+ */
 function hasAbstractClassExport(source: string, name: string): boolean {
 	const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	return new RegExp(`\\b(?:export\\s+)?abstract\\s+class\\s+${escaped}\\b`).test(stripComments(source));
 }
 
+/**
+ * Removes comments while preserving quoted source text.
+ */
 function stripComments(source: string): string {
 	let result = '';
 	let quote = '';
+
 	for (let index = 0; index < source.length; index++) {
 		const current = source[index];
 		const next = source[index + 1];
@@ -189,13 +220,20 @@ function stripComments(source: string): string {
 		}
 		result += current;
 	}
+
 	return result;
 }
 
+/**
+ * Formats a project-relative path for diagnostics.
+ */
 function relative(root: string, absolute: string): string {
 	return toPosix(path.relative(root, absolute));
 }
 
+/**
+ * Normalizes path separators for stable resource keys.
+ */
 function toPosix(value: string): string {
 	return value.split(path.sep).join('/');
 }

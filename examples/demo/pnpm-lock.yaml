@@ -13,8 +13,8 @@ importers:
         version: 2.1.1
     devDependencies:
       '@kurot/cli':
-        specifier: ^3.3.0
-        version: 3.3.0
+        specifier: ^3.3.1
+        version: 3.3.1
 
 packages:
 
@@ -182,8 +182,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@kurot/cli@3.3.0':
-    resolution: {integrity: sha512-dIZ+CxxgdApurdL1C6AIZiRK3FkAXKEPeFTTvWc07BEStaZQz929RSOjmCz0hbZ2Mpl112Q5YXXltOko1dm2OA==}
+  '@kurot/cli@3.3.1':
+    resolution: {integrity: sha512-j1RX+o91SaJHyfGEgotQdJnTdwFirrtU6vuX5j6WucLl3myqc7BeP7AMSM8vmel+mxwOv/hk2ywkhx+8loOP2g==}
     hasBin: true
 
   '@kurot/core@2.1.1':
@@ -292,7 +292,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@kurot/cli@3.3.0':
+  '@kurot/cli@3.3.1':
     dependencies:
       '@kurot/ui-document': 0.11.0
       commander: 13.1.0

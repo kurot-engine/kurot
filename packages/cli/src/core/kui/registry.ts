@@ -136,6 +136,7 @@ export function lookupComponent(
 	customNamespaces: readonly NamespaceModule[] = [],
 ): ComponentInfo | undefined {
 	const prefix = tagName.includes(':') ? tagName.split(':')[0] : '';
+
 	if (prefix) {
 		const custom = customNamespaces.find(ns => ns.prefix === prefix);
 		if (custom) {
@@ -151,6 +152,7 @@ export function lookupComponent(
 
 	const local = localName(tagName);
 	const info = COMPONENTS[local];
+
 	return info?.module === '@kurot/ui' ? info : undefined;
 }
 
@@ -189,6 +191,7 @@ export function resolveModule(tagName: string, customNamespaces: readonly Namesp
 	}
 
 	const info = lookupComponent(tagName, customNamespaces);
+
 	return info?.module;
 }
 
@@ -216,37 +219,54 @@ export function suggestComponentTag(
 	const separator = tagName.indexOf(':');
 	const prefix = separator >= 0 ? tagName.slice(0, separator) : '';
 	const custom = customNamespaces.find(namespace => namespace.prefix === prefix);
+
 	if (custom?.componentNames) {
 		return suggestName(tagName, prefix, [...custom.componentNames]);
 	}
+
 	const expectedModule = prefix ? NAMESPACE_MODULES[prefix] : undefined;
+
 	if (prefix && !expectedModule) return undefined;
 
 	const requestedName = localName(tagName);
 	const names = Object.entries(COMPONENTS)
 		.filter(([, info]) => !expectedModule || info.module === expectedModule)
 		.map(([name]) => name);
+
 	return suggestName(requestedName, prefix, names);
 }
 
+/**
+ * Suggests the closest known component within the accepted edit distance.
+ */
 function suggestName(tagName: string, prefix: string, names: readonly string[]): string | undefined {
 	const requestedName = localName(tagName);
 	const candidates = names
 		.map(name => ({ name, distance: editDistance(requestedName, name) }))
 		.sort((a, b) => a.distance - b.distance || a.name.localeCompare(b.name));
 	const candidate = candidates[0];
+
 	if (!candidate || candidate.distance > suggestionThreshold(requestedName.length)) return undefined;
+
 	return prefix ? `${prefix}:${candidate.name}` : candidate.name;
 }
 
+/**
+ * Limits suggestions according to the requested name length.
+ */
 function suggestionThreshold(length: number): number {
 	if (length <= 3) return 1;
 	if (length <= 7) return 2;
+
 	return 3;
 }
 
+/**
+ * Calculates the Levenshtein distance between component names.
+ */
 function editDistance(a: string, b: string): number {
 	const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+
 	for (let i = 1; i <= a.length; i++) {
 		const current = [i];
 		for (let j = 1; j <= b.length; j++) {
@@ -255,5 +275,6 @@ function editDistance(a: string, b: string): number {
 		}
 		previous.splice(0, previous.length, ...current);
 	}
+
 	return previous[b.length];
 }

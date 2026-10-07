@@ -30,8 +30,13 @@ const COMMON: esbuild.BuildOptions = {
 export function compileSource(): BuildPlugin {
 	return {
 		name: 'compile source',
+
+		/**
+		 * Prepares output and selects development or release source compilation.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
+
 			await ensureDir(project.outputDir);
 
 			return project.mode === 'release' ? buildRelease(ctx) : buildDevelopment(ctx);
@@ -73,6 +78,7 @@ async function buildDevelopment(ctx: BuildContext): Promise<void> {
 		ctx.disposers.push(() => context.dispose());
 		return;
 	}
+
 	await esbuild.build(options);
 }
 
@@ -97,6 +103,7 @@ async function buildRelease(ctx: BuildContext): Promise<void> {
 	});
 
 	const output = Object.keys(result.metafile!.outputs).find(f => f.endsWith('.js'));
+
 	ctx.outputs.entryScript = output ? `js/${path.basename(output)}` : 'js/main.min.js';
 
 	if (ctx.analyze) {
@@ -127,13 +134,18 @@ function toOutputPath(project: Project, sourceFile: string): string {
 async function collectSources(srcDir: string): Promise<string[]> {
 	const results: string[] = [];
 
+	/**
+	 * Collects TypeScript sources recursively while excluding declaration files.
+	 */
 	async function walk(dir: string): Promise<void> {
 		let entries: Dirent[];
+
 		try {
 			entries = await fs.readdir(dir, { withFileTypes: true });
 		} catch {
 			return;
 		}
+
 		for (const entry of entries) {
 			const full = path.join(dir, entry.name);
 			if (entry.isDirectory()) {
@@ -145,5 +157,6 @@ async function collectSources(srcDir: string): Promise<string[]> {
 	}
 
 	await walk(srcDir);
+
 	return results.sort();
 }

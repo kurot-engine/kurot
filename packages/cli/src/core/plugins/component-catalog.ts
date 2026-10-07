@@ -10,9 +10,15 @@ const CATALOG_PATH = '.kurot/component-catalog.json';
 export function writeComponentCatalog(): BuildPlugin {
 	return {
 		name: 'write component catalog',
+
+		/**
+		 * Writes the development catalog for discovered reusable components.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
+
 			if (project.mode !== 'development' || !project.componentConvention) return;
+
 			const catalog = {
 				schemaVersion: 1,
 				namespace: project.componentConvention.prefix,
@@ -24,6 +30,7 @@ export function writeComponentCatalog(): BuildPlugin {
 					skinClass: component.skinClass,
 				})),
 			};
+
 			await writeFile(path.join(project.outputDir, CATALOG_PATH), `${JSON.stringify(catalog, null, '\t')}\n`);
 			ctx.outputs.componentCatalog = CATALOG_PATH;
 		},

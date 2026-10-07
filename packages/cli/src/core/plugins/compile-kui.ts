@@ -47,8 +47,13 @@ interface GeneratedTheme {
 export function compileKUI(): BuildPlugin {
 	return {
 		name: 'compile KUI',
+
+		/**
+		 * Compiles authored KUI and writes the generated theme and part declarations.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
+
 			if (!project.config.ui || !project.uiSourceDir) return;
 
 			ctx.diagnostics.removeByCodes([
@@ -59,7 +64,9 @@ export function compileKUI(): BuildPlugin {
 
 			const files = await collectKUIFiles(project.uiSourceDir, project.resourceDir);
 			const parsed = parseSkins(ctx, files);
+
 			throwIfInputInvalid(ctx);
+
 			if (parsed.length === 0) {
 				await fs.rm(path.join(project.root, SKIN_PARTS_DECLARATION_PATH), { force: true });
 				delete ctx.outputs.skinPartsDeclaration;
@@ -68,8 +75,11 @@ export function compileKUI(): BuildPlugin {
 			}
 
 			const mappings = createDefaultMappings(ctx, parsed, project.components);
+
 			throwIfInputInvalid(ctx);
+
 			const built = await buildSkinsModule(ctx, parsed.map(item => item.skin));
+
 			ctx.outputs.skinsScript = `js/${built.filename}`;
 			ctx.outputs.skinPartsDeclaration = SKIN_PARTS_DECLARATION_PATH;
 			await writeFile(
@@ -82,6 +92,7 @@ export function compileKUI(): BuildPlugin {
 				`js/${built.filename}`,
 			));
 			const theme: GeneratedTheme = { skins: mappings, skinsJs: relativeScript };
+
 			await writeFile(
 				path.join(project.outputDir, KUI_THEME_OUTPUT_PATH),
 				JSON.stringify(theme, undefined, '\t'),
@@ -91,8 +102,12 @@ export function compileKUI(): BuildPlugin {
 	};
 }
 
+/**
+ * Reads Skin identities and reports invalid or duplicate declarations.
+ */
 function parseSkins(ctx: BuildContext, files: readonly KUIFile[]): ParsedSkin[] {
 	const parsed: ParsedSkin[] = [];
+
 	for (const file of files) {
 		try {
 			const document = parseUIDocument(file.contents);
@@ -108,9 +123,13 @@ function parseSkins(ctx: BuildContext, files: readonly KUIFile[]): ParsedSkin[] 
 			});
 		}
 	}
+
 	return parsed;
 }
 
+/**
+ * Builds conventional component-to-Skin mappings and reports conflicts.
+ */
 function createDefaultMappings(
 	ctx: BuildContext,
 	skins: readonly ParsedSkin[],
@@ -118,6 +137,7 @@ function createDefaultMappings(
 ): Record<string, string> {
 	const result: Record<string, string> = {};
 	const sources = new Map<string, string>();
+
 	for (const item of skins) {
 		const key = defaultComponentName(item.skin.className, components);
 		if (!key) {
@@ -136,35 +156,53 @@ function createDefaultMappings(
 		sources.set(key, item.skin.file.relPath);
 		result[key] = item.skin.className;
 	}
+
 	return result;
 }
 
+/**
+ * Resolves a Skin name to a reusable or built-in component.
+ */
 function defaultComponentName(
 	skinClass: string,
 	components: readonly ProjectComponent[],
 ): string | undefined {
 	const projectComponent = components.find(component => component.skinClass === skinClass);
+
 	if (projectComponent) {
 		return projectComponent.name;
 	}
+
 	const shortName = skinClass.split('.').pop();
+
 	if (!shortName?.endsWith('Skin')) {
 		return undefined;
 	}
+
 	const componentName = shortName.slice(0, -'Skin'.length);
+
 	return DEFAULT_BUILTIN_COMPONENTS.has(componentName) ? componentName : undefined;
 }
 
+/**
+ * Collects authored KUI files in stable resource-path order.
+ */
 async function collectKUIFiles(sourceDir: string, resourceDir: string): Promise<KUIFile[]> {
 	const results: KUIFile[] = [];
+
+	/**
+	 * Traverses KUI source directories while allowing missing roots.
+	 */
 	async function walk(directory: string): Promise<void> {
 		let entries: Dirent[];
+
 		try {
 			entries = await fs.readdir(directory, { withFileTypes: true });
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
 			throw error;
 		}
+
 		for (const entry of entries) {
 			const absolute = path.join(directory, entry.name);
 			if (entry.isDirectory()) {
@@ -179,12 +217,18 @@ async function collectKUIFiles(sourceDir: string, resourceDir: string): Promise<
 		}
 	}
 	await walk(sourceDir);
+
 	return results.sort((left, right) => left.relPath.localeCompare(right.relPath));
 }
 
+/**
+ * Collects a KUI diagnostic and logs it at the corresponding severity.
+ */
 function reportDiagnostic(ctx: BuildContext, diagnostic: Diagnostic): void {
 	ctx.diagnostics.report(diagnostic);
+
 	const location = diagnostic.location ? `${diagnostic.location.file}: ` : '';
+
 	if (diagnostic.severity === 'error') {
 		logger.error(`${location}${diagnostic.message}`);
 	} else {
@@ -192,11 +236,17 @@ function reportDiagnostic(ctx: BuildContext, diagnostic: Diagnostic): void {
 	}
 }
 
+/**
+ * Stops compilation when collected input diagnostics contain errors.
+ */
 function throwIfInputInvalid(ctx: BuildContext): void {
 	if (!ctx.diagnostics.hasErrors()) return;
 	throw new BuildError('KUI input validation failed.');
 }
 
+/**
+ * Normalizes resource paths for portable diagnostics and output.
+ */
 function toPosix(value: string): string {
 	return value.split(path.sep).join('/');
 }

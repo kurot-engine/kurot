@@ -46,6 +46,7 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 	}
 
 	await copyDir(templateDir, destDir);
+
 	if (template === 'game') {
 		await Promise.all([
 			ensureDir(path.join(destDir, 'src/components')),
@@ -55,6 +56,7 @@ export async function scaffoldProject(name: string, template: TemplateName): Pro
 	}
 
 	const pkgPath = path.join(destDir, 'package.json');
+
 	if (await exists(pkgPath)) {
 		const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8')) as PackageJson;
 		pkg.name = path.basename(destDir);

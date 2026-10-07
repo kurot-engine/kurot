@@ -66,10 +66,15 @@ const DEFAULT_TEMPLATE = `<!DOCTYPE html>
 export function generateHtml(): BuildPlugin {
 	return {
 		name: 'generate index.html',
+
+		/**
+		 * Writes the entry page with generated scripts and import-map entries.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const entryScript = ctx.outputs.entryScript ?? 'main.js';
 			const template = await loadTemplate(ctx.project);
 			const html = renderHtml(template, ctx.project, entryScript, ctx.outputs.engine);
+
 			await writeFile(path.join(ctx.project.outputDir, 'index.html'), html);
 			await copyTemplateAssets(ctx.project);
 		},
@@ -117,6 +122,7 @@ export function renderHtml(
 	engine: Record<string, string>,
 ): string {
 	const missing = Object.values(PLACEHOLDERS).filter(placeholder => !template.includes(placeholder));
+
 	if (missing.length > 0) {
 		const source = project.htmlTemplate ?? 'the built-in HTML template';
 		throw new BuildError(`HTML template '${source}' is missing required placeholders: ${missing.join(', ')}`);
@@ -134,9 +140,11 @@ export function renderHtml(
 	]);
 
 	let html = template;
+
 	for (const [placeholder, value] of replacements) {
 		html = html.replaceAll(placeholder, value);
 	}
+
 	return html;
 }
 

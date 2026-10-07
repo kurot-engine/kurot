@@ -7,6 +7,10 @@ import type { BuildPlugin } from '../pipeline.js';
 export function cleanOutput(): BuildPlugin {
 	return {
 		name: 'clean output',
+
+		/**
+		 * Removes the active build output directory.
+		 */
 		async apply(ctx): Promise<void> {
 			await fs.rm(ctx.project.outputDir, { recursive: true, force: true });
 		},

@@ -55,8 +55,14 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.3.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.11.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.2   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
+| [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Independent RGBA atlas packing and Node PNG tooling; initial local implementation, not published                  | None                        |
 
 Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
+
+`@kurot/atlas` is independent build-time tooling, with a portable RGBA entry point
+and a separate Node PNG adapter. It has no Core/CLI dependencies and is not yet
+connected to Editor, Reskin or CLI. Games consume its PNG/JSON output without
+loading the packing library. See [atlas contracts and examples](packages/atlas/README.md).
 
 `@kurot/ui-document` provides the reusable semantic model, explicit component
 capabilities, bounded dynamic contracts, and headless editing kernel.
@@ -73,12 +79,19 @@ The current dependency ranges are:
 | ---------------- | ------------------------------------------------- |
 | UI 3.1.0         | Core `^2.1.0`                                     |
 | Game 2.0.0       | Core `^2.0.0`                                     |
-| CLI 3.3.0        | ui-document `^0.11.0`                             |
+| CLI 3.3.1        | ui-document `^0.11.0`                             |
 | ui-runtime 0.8.2 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.11.0` |
 
 CLI 3.2.1 is published with project styles, bundled fonts and
 English translations in the game template; existing projects are not rewritten.
 See [game template setup](packages/cli/docs/game-template.md).
+
+CLI 3.3.1 is published with development synchronization of all
+runtime resources, including atlas PNG/JSON, locale configuration, fonts and
+translations. Browser refresh remains manual. Engine examples, the KUI sample
+and the Editor working tree install CLI 3.3.1 from npm. Legacy EXML projects keep
+CLI 1.3.x. Source versions alone do not confirm publication or installed versions.
+See [resource watching](packages/cli/docs/dev-resource-watching.md).
 
 ui-document 0.11.0 is published with `style.json.labels` presets and Default-only
 `textStyle="@style:labels:<key>"` on Labels. Local properties and individual
@@ -101,7 +114,7 @@ ui-runtime 0.8.2 adopts ui-document `^0.11.0`. Consumers expand Label presets
 and resolve colors in disposable copies; plain color-only consumers may register
 palette entries as design tokens. The runtime does not read style.json or load
 fonts. Editor 0.19.2 installs all three published packages without local overrides.
-The KUI sample and engine examples already use published CLI 3.3.0; the sample
+The KUI sample and engine examples already use published CLI 3.3.1; the sample
 also uses ui-document 0.11.0 without local overrides.
 CLI-built skins run directly through UI and do not require ui-runtime. No
 Core/UI release is needed for compiled style colors.

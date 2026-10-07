@@ -18,6 +18,7 @@ export function createUnresolvedTagDiagnostics(
 	return tags.map(tag => {
 		const position = locator.locate(tag.range.start);
 		const suggestion = suggestComponentTag(tag.name, customNamespaces);
+
 		return {
 			code: DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 			severity: 'warning',

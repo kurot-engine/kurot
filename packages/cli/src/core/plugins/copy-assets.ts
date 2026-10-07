@@ -14,17 +14,24 @@ import type { BuildContext, BuildPlugin } from '../pipeline.js';
 export function copyAssets(): BuildPlugin {
 	return {
 		name: 'copy assets',
+
+		/**
+		 * Copies runtime resources while preserving generated KUI outputs.
+		 */
 		async apply(ctx: BuildContext): Promise<void> {
 			const { project } = ctx;
+
 			if (!(await exists(project.resourceDir))) return;
 
 			const ui = project.config.ui;
 			const themeName = ui ? path.basename(KUI_THEME_OUTPUT_PATH) : undefined;
 
 			const dest = path.join(project.outputDir, 'resource');
+
 			await copyDir(project.resourceDir, dest, name => {
 				if (name === themeName) return false;
 				if (ui && name.endsWith('.kui.xml')) return false;
+
 				return true;
 			});
 		},

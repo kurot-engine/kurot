@@ -50,6 +50,10 @@ export function normalizeModuleKey(absolutePath: string): string {
 export function namespaceModuleExternalPlugin(namespaceModules: ReadonlyMap<string, string>): esbuild.Plugin {
 	return {
 		name: 'kurot-namespace-external',
+
+		/**
+		 * Registers relative-import rewrites to the owning namespace specifier.
+		 */
 		setup(build): void {
 			if (namespaceModules.size === 0) return;
 
@@ -59,6 +63,7 @@ export function namespaceModuleExternalPlugin(namespaceModules: ReadonlyMap<stri
 
 				const resolved = path.resolve(args.resolveDir, args.path);
 				const specifier = namespaceModules.get(normalizeModuleKey(resolved));
+
 				if (!specifier) return undefined;
 
 				return { path: specifier, external: true };
