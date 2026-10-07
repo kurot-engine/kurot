@@ -15,7 +15,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | `@kurot/cli`         | 3.3.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.11.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.8.2   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
-| `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Initial local implementation, not published.                                               | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)               |
+| `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Published.                                               | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)               |
 | `@kurot/dragonbones` | 0.1.0   | Published DragonBones 5.7 runtime and native Kurot display, atlas, mesh, event and clock adapter. Core ^2.1.1 peer. | [`packages/dragonbones/docs/ai-context.md`](packages/dragonbones/docs/ai-context.md) |
 | `@kurot/bitmap-font` | 0.1.0 | Headless bitmap-font parsing, validation, serialization and layout. Published, no runtime dependencies; consumed by Core 2.2.0. | [`packages/bitmap-font/docs/ai-context.md`](packages/bitmap-font/docs/ai-context.md) |
 
@@ -41,6 +41,26 @@ Dependency direction is strictly one-way:
 @kurot/atlas  (independent build-time tool; no Kurot package dependencies)
 ```
 
+## Dependency and release policy
+
+Read [`docs/dependency-policy.md`](docs/dependency-policy.md) before changing
+dependency ranges or planning releases. Package versions are independent.
+Core→bitmap-font and CLI→ui-document are ordinary dependencies; UI, Game,
+DragonBones and ui-runtime use peers for their host contracts. Development
+dependencies and lockfiles describe the tested checkout, not consumer minima.
+
+- A compatible dependency patch does not trigger dependent SDK version bumps.
+  An older installed/locked version inside an accepted range is optional
+  adoption, not an incompatible dependency declaration.
+- Keep peers at the real minimum required API/contract; raise them only when
+  adopting a new requirement or correcting compatibility metadata.
+- SDK development-only declaration/lockfile updates need no version bump or
+  npm release unless generated/bundled shipped output changes.
+- Apps update their own locks and rebuild when adopting fixes, following their
+  own version rules. Do not upgrade templates or other apps incidentally.
+- Report required migrations, optional adoption and unaffected consumers
+  separately. Never prescribe a blanket package bump or `--latest` update.
+
 Atlas has a portable pixel-only root entry and a separate Node PNG subpath using
 pngjs. No current package consumes it. Core loads prebuilt sheets without atlas;
 Editor, Reskin or CLI adoption is a separate change.
@@ -54,17 +74,26 @@ instructions before editing the runtime. Version 0.1.0 is published and develops
 against published Core 2.2.0 without local overrides. No current game consumes
 this package.
 
-Core 2.2.1 is prepared for publication. It fixes minified TextField dictionary
+Core 2.2.1 is published. It fixes minified TextField dictionary
 and emergency wrapping and protects complete graphemes in both wrapping modes.
 It retains Unicode 17.0, the pinned linebreak dependency and UTF-16 input offsets.
 Existing UI/Game/ui-runtime/DragonBones peer ranges accept this patch; installed
-and locked Core versions must be updated after publication to receive it.
+and locked Core versions must be updated to receive it.
 Core 2.2.0 is published with bitmap-font ^0.1.0 and no local dependency override.
 It adds font resources and native BitmapText rendering. UI 3.2.0 is published
 with BitmapLabel and Core ^2.2.0 in peer/dev dependencies, without local overrides.
 Published UI 3.1.0 requires Core
 ^2.1.0 and does not contain BitmapLabel. KUI/Editor adoption is separate.
 Game 2.0 declares Core 2.x.
+The separate Kurot-Spine repository publishes Spine 4.0–4.2 adapter 0.2.1 and
+Spine 4.3 adapter 0.3.1 with peer ^1.0.16 || ^2.0.0 and development ^2.2.1.
+Publication was verified on npm on 2026-10-08. Packed adapters pass
+type/behavior/browser checks on Core 1.0.16, 2.0.0 and 2.2.1. Earlier
+0.2.0 / 0.3.0 declare only ^1.0.16, which excludes Core 2.x. Reskin and
+the copied Tentax project accept the Spine 4.0 patch through ^0.2.0. Update their
+installations/locks and rebuild when adopting it; no unrelated SDK bump is needed.
+Templates/tentax now declares Core ^2.2.1, UI ^3.2.0 and Spine 4.0 ^0.2.1;
+its lockfile and installation resolve those published versions with one shared Core.
 ui-runtime 0.8.2 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.11.0.
 CLI 3.3 requires ui-document ^0.11.0.
 CLI 3.3.1 is published with whole-resource dev synchronization,
@@ -127,9 +156,11 @@ of the following unless the user explicitly narrows the scope:
    notes, and compatibility requirements; do not leave stale documentation.
 5. Re-check this root `AGENTS.md`. Update the package version table and any
    dependency or architectural guidance affected by the release.
-6. Find direct package dependants and report stale peer, development, template,
-   example, and application dependency ranges. Do not silently bump unrelated
-   packages unless the user requested that broader change.
+6. Find direct package dependants and classify required compatibility migrations,
+   optional installed/development lockfile adoption, and unaffected consumers.
+   Report peer, development, template, example and application requirements.
+   Compatible older locks are not a reason to bump dependent SDK versions.
+   Follow `docs/dependency-policy.md`; do not silently bump unrelated packages.
 7. Run the target package's build and tests, then run `git diff --check`. Report
    the exact verification result before declaring the release ready.
 

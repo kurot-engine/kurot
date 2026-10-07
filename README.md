@@ -56,7 +56,7 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.3.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.11.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.2   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
-| [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Independent RGBA atlas packing and Node PNG tooling; initial local implementation, not published                  | None                        |
+| [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                  | None                        |
 | [`@kurot/dragonbones`](packages/dragonbones/README.md) | 0.1.0 | `packages/dragonbones` | Published DragonBones 5.7 runtime, native displays, atlas regions, deformable meshes, events and clock | `@kurot/core` |
 | [`@kurot/bitmap-font`](packages/bitmap-font/README.md) | 0.1.0 | `packages/bitmap-font` | Published headless font data, parsing, validation, serialization and layout | None |
 
@@ -83,11 +83,25 @@ actions, numeric appearance transitions, component states, and
 category-specific resource adapters while keeping game logic outside the
 document.
 
-Core 2.2.1 is prepared for publication; Core 2.2.0 is published. The patch
+Core 2.2.1 is published. The patch
 fixes minified dictionary/emergency wrapping and keeps grapheme clusters intact
 in TextField word and character wrapping. Existing consumer peer ranges accept
-it, but installed packages and lockfiles need updating after publication. See
+it. To adopt the fix, update the installed Core and lockfile; unchanged SDKs need
+no new release. See
 [text layout](packages/core/docs/text-layout.md).
+
+The separate Spine repository publishes 4.0–4.2 adapter 0.2.1 and 4.3 adapter
+0.3.1 with peer `^1.0.16 || ^2.0.0`, validated against Core 1.0.16, 2.0.0 and
+2.2.1. Publication was verified on npm on 2026-10-08. Earlier 0.2.0 / 0.3.0
+declare only `^1.0.16`. Existing application caret ranges accept
+these adapter patches without a manifest version increase.
+
+Packages release independently. A compatible Core patch does not require new
+UI/Game/DragonBones/ui-runtime releases. Peers express the minimum required
+host contract; development dependencies and lockfiles record the tested checkout.
+Applications adopt fixes through their own dependency updates and rebuilds.
+See the [dependency graph and release policy](docs/dependency-policy.md) for
+ordinary versus peer dependencies, release scope and targeted updates.
 
 The current dependency ranges are:
 

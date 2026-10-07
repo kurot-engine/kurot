@@ -1,8 +1,10 @@
 # @kurot/dragonbones
 
 Version **0.1.0**. A standalone ESM DragonBones **5.7.000** runtime and native
-Kurot adapter. The only runtime peer is `@kurot/core ^2.1.1`; development uses
-published Core 2.2.0 without local overrides. UI and Game are not required.
+Kurot adapter. The only runtime peer is `@kurot/core ^2.1.1`; development declares
+Core `^2.2.0`, currently locked to published 2.2.0 without local overrides.
+UI and Game are not required. Compatible Core updates do not require a new
+adapter release when its shipped output and compatibility stay unchanged.
 
 Supports JSON / DBDT skeletons, texture atlases, rotated and trimmed regions,
 weighted and unweighted mesh deformation, nested armatures, animation events,

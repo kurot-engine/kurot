@@ -40,7 +40,7 @@
 		"@kurot/core": "^2.1.1"
 	},
 	"devDependencies": {
-		"@kurot/core": "2.2.0",
+		"@kurot/core": "^2.2.0",
 		"@types/node": "^22.0.0",
 		"typescript": "~5.9.3",
 		"tsx": "^4.20.6",

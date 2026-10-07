@@ -103,18 +103,40 @@ these existing peer ranges. Bitmap-font rendering is separate from TextField;
 see [bitmap fonts](bitmap-fonts.md). The new UI BitmapLabel requires Core 2.2.0
 and published UI 3.2.0; published UI 3.1.0 does not contain it.
 
-Current consumers still need an installed-version update after 2.2.1 is published:
+Core 2.2.1 is published. The 2026-10-08 dependency audit checked declarations,
+lockfiles and installed package versions. Older versions inside an accepted
+range are optional adoption for projects/development, not SDK release blockers.
+See the [independent release policy](../../../docs/dependency-policy.md).
 
-| Consumer | Current Core declaration | Locked or pinned Core | Required update |
+| Consumer | Current Core declaration | Locked or pinned Core | Adoption or migration |
 | --- | --- | --- | --- |
-| UI development | `^2.2.0` | 2.2.0 | Refresh the lockfile. |
-| DragonBones development | `2.2.0`; peer `^2.1.1` | 2.2.0 | Update the development pin and lockfile. The peer already accepts 2.2.1. |
-| Game / ui-runtime development | `^2.1.1` | 2.1.1 | Refresh the lockfiles. Their peers already accept 2.2.1. |
-| Engine examples / tentax / copied Reskin project | `^2.1.1` | 2.1.1 | Refresh application lockfiles. |
-| Editor | `2.1.1` | Exact pin 2.1.1 | Update the dependency and rebuild to deliver the fix. |
-| Reskin application / milf-master template | `^2.1.1` | No pnpm lockfile | Update the installation; the declared range accepts 2.2.1. |
+| UI development | `^2.2.0` | 2.2.0 | Optionally refresh the development lockfile. |
+| DragonBones development | `^2.2.0`; peer `^2.1.1` | 2.2.0 | Optionally refresh the development lockfile. The peer already accepts 2.2.1. |
+| Game / ui-runtime development | `^2.1.1` | 2.1.1 | Optionally refresh the development lockfiles. Their peers already accept 2.2.1. |
+| Engine examples / copied Reskin project | `^2.1.1` | 2.1.1 | Refresh application lockfiles when adopting the fix. |
+| Templates/tentax | `^2.2.1` | 2.2.1 | Adopted with UI 3.2.0 and Spine 4.0 adapter 0.2.1; strict development/release builds and all 170 application tests passed. |
+| Editor | `2.1.1` | 2.1.1 in bun.lock and the installation | Update the exact dependency, lockfile and installation; rebuild to deliver the fix. |
+| Reskin application | `^2.1.1` | 2.1.1 in bun.lock and the installation | Refresh the Bun lockfile and installation when adopting the fix; validate the Spine 4.0 adapter. |
+| milf-master template | `^2.1.1` | No lockfile or installed Core | New installs accept 2.2.1; use `^2.2.1` to require the corrected baseline. |
+| Separate Spine 4.0–4.3 adapters | Published 0.2.1 / 0.3.1 peers `^1.0.16 || ^2.0.0`; development `^2.2.1` | Development 2.2.1; earlier 0.2.0 / 0.3.0 have Core 1.x peers | Refresh consumer installations/locks to adopt the published adapter patches. |
 
-These consumer packages and applications are not changed by the Core patch.
+UI, Game, ui-runtime and DragonBones need no new release solely to receive this
+Core patch: their published peers already accept 2.2.1. Development installs
+may be refreshed independently. Raising their development baseline to 2.2.1 is separate
+from raising the minimum supported peer version.
+
+Earlier Spine 4.0–4.2 adapter 0.2.0 and 4.3 adapter 0.3.0 peers exclude Core
+2.x. Published 0.2.1 / 0.3.1 have peers `^1.0.16 || ^2.0.0`, validated using
+packed adapters on Core 1.0.16, 2.0.0 and 2.2.1. Publication was verified on
+npm on 2026-10-08. Reskin and the copied Tentax project accept the Spine 4.0
+patch through their existing `^0.2.0` range; refresh their installed adapter and
+rebuild. Templates/tentax has adopted published adapter 0.2.1 and Core 2.2.1,
+with UI/Game/Spine resolving the same Core instance. The Core patch itself does
+not update these consumers.
+
+CLI's empty/game templates use `latest`, which currently resolves to Core 2.2.1.
+CLI itself, bitmap-font, atlas and ui-document have no Core dependency to update.
+The Kurot-Dev website is static and does not install the engine runtime.
 
 ## Updating from Core 2.2.0 to 2.2.1
 
@@ -133,8 +155,7 @@ through grapheme boundaries and uses those boundaries for character wrapping.
 The untailored default Unicode profile remains unchanged. This affects
 TextField layout without changing DragonBones playback or the separate
 bitmap-font layout contract. No asset or project migration is required; update
-the installed package and lockfile after publication. Source 2.2.1 is prepared
-for publication; Core 2.2.0 is the published release.
+the installed package and lockfile. Core 2.2.1 is published to npm.
 
 References: [UAX #14 revision 55](https://www.unicode.org/reports/tr14/tr14-55.html),
 [official corpus](https://www.unicode.org/Public/17.0.0/ucd/auxiliary/LineBreakTest.txt),

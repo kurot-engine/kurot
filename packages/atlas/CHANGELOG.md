@@ -2,7 +2,7 @@
 
 ## 0.1.0 — 2026-10-07
 
-Initial local implementation; not published.
+Initial release, published to npm.
 
 - Add independent portable RGBA atlas packing with deterministic nonrotated
   MaxRects placement and single-sheet power-of-two size selection.

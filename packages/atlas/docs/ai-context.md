@@ -1,6 +1,6 @@
 # @kurot/atlas — AI context map
 
-Version 0.1.0, initial local implementation, not published. Independent build-time
+Version 0.1.0, published to npm. Independent build-time
 atlas library; no Kurot package dependencies and no integration into consumers yet.
 Read README.md for input limits and the pixel/output contract.
 
