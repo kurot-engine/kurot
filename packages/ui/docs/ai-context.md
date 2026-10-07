@@ -6,9 +6,11 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.1.0`, EUI-compatible UI framework on top of
-`@kurot/core`. Peer-depends on `@kurot/core@^2.1.0`. Rewritten with standard class
+Package identity: `@kurot/ui@3.2.0`, EUI-compatible UI framework on top of
+`@kurot/core`. Peer-depends on `@kurot/core@^2.2.0`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
+Version 3.2.0 is published with BitmapLabel against published Core 2.2.0,
+without local dependency overrides. Published UI 3.1.0 does not contain BitmapLabel.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of
 7 barrels — `core`, `layouts`, `components`, `events`, `states`, `collections`,
@@ -24,7 +26,7 @@ src/kurot/
 │                   Validator/validator (render-preparation validation scheduler),
 │                   Theme/getTheme()/setTheme(), IViewport, IAssetAdapter/IThemeAdapter.
 ├── components/     Group, Component (delegation core — see §2), Skin, and
-│                   concrete widgets: Button, Label, CheckBox, RadioButton,
+│                   concrete widgets: Button, Label, BitmapLabel, CheckBox, RadioButton,
 │                   ToggleButton/ToggleSwitch, ProgressBar, HSlider/VSlider,
 │                   Rect, Image, EditableText, TextInput, Panel, ViewStack,
 │                   Scroller, UILayer, DataGroup, List, TabBar, ComboBox,
@@ -141,7 +143,7 @@ Flat re-export of 7 barrels, in this order: `core`, `layouts`, `components`,
 
 - **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
 - **layouts**: `ILayoutTarget`, `LayoutBase`, `BasicLayout`, `LinearLayoutBase`, `VerticalLayout`, `HorizontalLayout`, `TileLayout`, `ColumnAlign`, `RowAlign`, `JustifyAlign`, `TileOrientation`.
-- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
+- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
 - **events**: `UIEvent`, `ItemTapEvent`, `CollectionEvent`/`CollectionEventKind`, `PropertyEvent`, `ScrollerThrowEvent`.
 - **states**: `State`, `IOverride`, `SetProperty`, `SetStateProperty`, `AddItems`.
 - **collections**: `ICollection`, `ArrayCollection`.
@@ -204,10 +206,19 @@ automatic bounds are not fed back as fit constraints.
 
 `label.invalidateSize()` also invalidates Core line metrics. Call it after
 late font loading, even if the family name did not change. This requires
-Core >= 2.1.0; there is no global font-readiness listener.
+Core >= 2.1.0 for that API; UI 3.2.0's package requirement is Core ^2.2.0.
+There is no global font-readiness listener.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
 font readiness and shared-schema boundaries. Native UI still depends only on
 Core; KUI authoring uses ui-document 0.11.x, published CLI 3.3.0 and
 published ui-runtime 0.8.2. Label presets expand in consumer-owned
 copies before native rendering; UI does not read style.json or consume textStyle.
+
+## Bitmap labels in 3.2.0
+
+[bitmap-label.md](bitmap-label.md) documents the new exported BitmapLabel,
+using one BitmapText child and the configured Core resource singleton for string
+font names. Stale async results are guarded by request generation. Core ^2.2.0
+is required; local Core overrides have been removed. Published UI 3.1.0 does
+not contain it. KUI catalog, installed compilers and Editor adoption are separate.

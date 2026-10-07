@@ -1,228 +1,253 @@
-# @kurot/core 架构文档
+# @kurot/core architecture
 
-> 当前版本：2.1.1。逐条变更记录见 [CHANGELOG.md](../CHANGELOG.md)。
-> 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机与内部机制，两份文档不重复内容，互相引用。
-
----
-
-## 一、项目概述
-
-`@kurot/core` 是 Kurot 引擎的核心运行时，提供显示对象、渲染、事件、几何、文本、资源、网络与媒体能力。对外 API 沿用 Egret 的 `DisplayObject`/事件模型，渲染内核则重写为 Pixi.js 8 风格的扁平 "InstructionSet + RenderPipe" 管线。
-
-| 维度     | 说明                                            |
-| -------- | ----------------------------------------------- |
-| 模块系统 | ES Module（`@kurot/core` npm 包）              |
-| 类型系统 | `strict: true`，全量类型安全，零 `any`         |
-| 编译目标 | ES2022，仅支持现代浏览器                        |
-| 渲染架构 | InstructionSet 指令驱动（借鉴 Pixi.js 8）       |
-| 批处理   | 多纹理批处理（8 张/批）                         |
-| 包管理   | `@kurot/core` workspace 包，pnpm               |
-| 资源管理 | Resource 完整资源生命周期                       |
-| WebGL    | WebGL 1 + WebGL 2 双后端，运行时自动选择        |
-
-与 Egret 的差异、Breaking Changes 及迁移方式见根目录 [egret-migration.md](../../../docs/egret-migration.md)。
+> Package version: 2.2.0. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
+> terminology and task-to-file references. This document explains design choices
+> and internal mechanisms for contributors; the two documents complement each other.
 
 ---
 
-## 二、模块结构
+## 1. Overview
+
+`@kurot/core` provides Kurot's display objects, rendering, events, geometry, text,
+resources, networking and media runtime. Public APIs follow Egret's
+`DisplayObject` and event model, while rendering uses a flat
+`InstructionSet + RenderPipe` pipeline inspired by Pixi.js 8.
+
+Version 2.2.0 uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
+and layout kernel. Core manages font resources, image-page ownership and glyph
+drawing in both backends. UI components belong to the UI package.
+
+| Aspect             | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
+| Modules            | ES modules (`@kurot/core` npm package)                     |
+| Types              | Strict TypeScript (`strict: true`)                         |
+| Target             | ES2022 and modern browsers                                 |
+| Rendering          | InstructionSet pipeline inspired by Pixi.js 8              |
+| Batching           | Multiple textures, up to 8 per batch                       |
+| Package management | Independent pnpm package                                   |
+| Resources          | Loading, caching and lifecycle management through Resource |
+| WebGL              | WebGL 1 and WebGL 2, selected at runtime                   |
+
+See [Egret migration](../../../docs/egret-migration.md) for differences,
+breaking changes and migration guidance.
+
+---
+
+## 2. Module structure
 
 ```
 packages/core/src/kurot/
-├── display/          # 显示对象层（场景图）
-│   ├── DisplayObject.ts              # 基类，含 renderDirty/cacheDirty/renderMode/RenderObjectType/bounds 缓存
-│   ├── DisplayObjectContainer.ts     # 容器，含 isRenderGroup/sortableChildren/zIndex 排序
-│   ├── Bitmap.ts                     # 位图显示（含 scale9Grid 九宫格）
-│   ├── Sprite.ts                     # 精灵（容器 + Graphics）
-│   ├── Shape.ts                      # 矢量图形
-│   ├── Mesh.ts                       # 网格（vertices/indices/uvs）
-│   ├── Stage.ts                      # 舞台根节点
-│   ├── Graphics.ts                   # 矢量绘图命令
-│   ├── GraphicsPath.ts               # 命令类型定义（PathCommandType, GraphicsCommand）
-│   ├── enums/                        # BlendMode, BitmapFillMode, CapsStyle, GradientType, JointStyle, OrientationMode, StageScaleMode
-│   └── texture/                      # BitmapData, Texture, SpriteSheet, RenderTexture
-├── player/           # 渲染管线 + 游戏循环
-│   ├── Player.ts                     # 播放器（Stage + Renderer 绑定，含 perf 性能指标）
-│   ├── SystemTicker.ts               # 帧循环（RAF + ENTER_FRAME，含 callLater 延迟调用队列）
-│   ├── RenderPipe.ts                 # RenderPipe 接口定义
-│   ├── TouchHandler.ts               # 触摸/鼠标输入
-│   ├── ScreenAdapter.ts              # 屏幕适配（7种缩放模式）
-│   ├── createPlayer.ts               # 统一创建入口（含 Capabilities 初始化、RenderTexture 渲染器注入）
-│   ├── KurotOptions.ts             # 配置接口
-│   ├── canvas/                       # Canvas 2D 渲染后端（降级方案）
-│   │   ├── CanvasRenderer.ts         # 直接遍历渲染器（支持全部 DisplayObject 类型 + 滤镜降级）
-│   │   ├── DisplayList.ts            # cacheAsBitmap 离屏缓存
-│   │   └── CanvasBuffer.ts          # Canvas 2D 缓冲区（含 hitTestBuffer 像素级命中测试）
-│   └── webgl/                        # WebGL 渲染后端（主渲染器）
-│       ├── WebGLRenderer.ts          # 两阶段渲染器（build + execute，含 RenderGroup/DisplayListCache 支持）
-│       ├── WebGLRenderContext.ts      # WebGL 状态管理 + draw 调度（WebGL1/2 自动选择，配合 WebGLFilterSystem 管理效果）
-│       ├── WebGLRenderBuffer.ts      # WebGL 缓冲区（含对象池，支持 offscreen/stencil/scissor）
-│       ├── WebGLRenderTarget.ts      # FBO 管理
-│       ├── WebGLVertexArrayObject.ts  # VAO 顶点管理（单纹理 20B + 多纹理 24B 双布局）
-│       ├── WebGLDrawCmdManager.ts    # 绘制命令队列（12 种命令类型，含 MULTI_TEXTURE）
-│       ├── WebGLProgram.ts           # 着色器程序缓存
-│       ├── WebGLUtils.ts             # WebGL 工具（compileShader, createProgram, premultiplyTint, deleteWebGLTexture）
-│       ├── InstructionSet.ts         # 指令集（renderableIndex O(1) 查找，dirtyRenderables 增量更新）
-│       ├── MultiTextureBatcher.ts    # 多纹理批处理（8张/批，slotMap 纹理槽位分配）
-│       ├── pipes/                    # RenderPipe 实现
-│       │   ├── BitmapPipe.ts         # 位图渲染指令
-│       │   ├── GraphicsPipe.ts       # 矢量图形指令（Canvas光栅化 → 纹理上传）
-│       │   ├── MeshPipe.ts           # 网格渲染指令
-│       │   ├── FilterPipe.ts         # 滤镜 push/pop 指令（含对象池）
-│       │   ├── MaskPipe.ts           # 遮罩 push/pop 指令（含对象池）
-│       │   ├── TextPipe.ts           # 文本 WebGL 渲染（offscreen canvas → 纹理上传）
-│       │   └── ParticlePipe.ts       # 粒子系统渲染
-│       └── shaders/                  # GLSL 着色器
-│           ├── ShaderLib.ts          # GLSL ES 1.00 着色器库（WebGL1）
-│           └── ShaderLib2.ts         # GLSL ES 3.00 着色器库（WebGL2）
-├── events/           # 事件系统（11 个事件类 + EventPhase + IEventDispatcher 接口）
-├── geom/             # 几何工具（Matrix, Point, Rectangle）
-├── filters/          # 滤镜（Blur, Glow, DropShadow, ColorMatrix, CustomFilter, MultiPassFilter, BloomFilter）
-├── text/             # 文本渲染
-│   ├── TextField.ts                  # 核心文本字段（含 textFlow 富文本、输入模式、密码模式）
-│   ├── BitmapText.ts                 # 位图文本
-│   ├── BitmapFont.ts                 # 位图字体
-│   ├── StageText.ts                  # INPUT 模式 DOM 输入框
-│   ├── HtmlTextParser.ts             # HTML 文本解析
-│   ├── InputController.ts            # 输入控制器（选择、光标、键盘处理）
-│   ├── TextMeasurer.ts               # 文本测量（measureText, getFontString）
-│   ├── LineBreaks.ts                 # Unicode 17.0 UAX #14 断行边界与字典分词
-│   ├── TextLineLayout.ts             # 整段富文本断行、宽度拟合与 UTF-16 源偏移
-│   ├── WordWrap.ts                   # 独立分词与字素工具（tokenize, splitGraphemes）
-│   ├── enums/                        # HorizontalAlign, VerticalAlign, TextFieldType, TextFieldInputType
-│   └── types/                        # ITextElement, IWTextElement, ILineElement, IHitTextElement 等类型定义
-├── resource/         # 资源管理
-│   ├── Resource.ts                   # 资源核心（单例模式，async/await API，加载/缓存/生命周期）
-│   ├── ResourceConfig.ts             # 资源配置
-│   ├── ResourceEvent.ts              # 资源事件
-│   ├── ResourceItem.ts               # 资源项
-│   ├── ResourceLoader.ts             # 资源加载器
-│   └── analyzers/                    # 资源分析器（AnalyzerBase, ImageAnalyzer, JsonAnalyzer, SheetAnalyzer, SoundAnalyzer, TextAnalyzer）
-├── system/           # 系统能力
-│   └── Capabilities.ts               # 运行时 WebGL 扩展/平台能力检测（UA + Client Hints）
-├── net/              # 网络加载（HttpRequest, ImageLoader, HttpMethod, HttpResponseType）
-├── media/            # 媒体（Sound, SoundChannel, Video）
-├── utils/            # 工具类（ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils, toColorString）
-│                     # 注：不提供 HashObject，对象身份比较用 === 或 WeakMap 键控查找
-├── localStorage/     # 本地存储
-└── external/         # 外部接口（ExternalInterface）
+├── display/                         # scene graph
+│   ├── DisplayObject.ts             # base class, dirty flags, render mode/type and cached bounds
+│   ├── DisplayObjectContainer.ts    # containers, render groups and zIndex sorting
+│   ├── Bitmap.ts                    # bitmap display with scale9Grid
+│   ├── Sprite.ts                    # container with Graphics
+│   ├── Shape.ts                     # vector shapes
+│   ├── Mesh.ts                      # vertices, indices and UVs
+│   ├── Stage.ts                     # scene root
+│   ├── Graphics.ts                  # vector drawing commands
+│   ├── GraphicsPath.ts              # PathCommandType and GraphicsCommand
+│   ├── enums/                       # BlendMode, BitmapFillMode, CapsStyle, GradientType, JointStyle, OrientationMode, StageScaleMode
+│   └── texture/                     # BitmapData, Texture, SpriteSheet, RenderTexture
+├── player/                          # rendering pipeline and game loop
+│   ├── Player.ts                    # Stage/renderer integration and performance metrics
+│   ├── SystemTicker.ts              # RAF loop, ENTER_FRAME and callLater queue
+│   ├── RenderPipe.ts                # RenderPipe interface
+│   ├── InstructionSet.ts            # instruction list, renderableIndex and incremental dirty updates
+│   ├── TouchHandler.ts              # touch and mouse input
+│   ├── ScreenAdapter.ts             # screen adaptation with 7 scale modes
+│   ├── createPlayer.ts              # initialization and RenderTexture renderer setup
+│   ├── KurotOptions.ts              # player options
+│   ├── pipes/                       # RenderPipe implementations
+│   │   ├── BitmapPipe.ts            # bitmap instructions
+│   │   ├── BitmapTextPipe.ts        # native bitmap-font glyph instructions
+│   │   ├── GraphicsPipe.ts          # Canvas rasterization and texture upload
+│   │   ├── MeshPipe.ts              # mesh instructions
+│   │   ├── FilterPipe.ts            # pooled filter push/pop instructions
+│   │   ├── MaskPipe.ts              # pooled mask push/pop instructions
+│   │   ├── TextPipe.ts              # offscreen text rasterization and texture upload
+│   │   └── ParticlePipe.ts          # particle rendering
+│   ├── canvas/                      # Canvas 2D backend and offscreen capture
+│   │   ├── CanvasRenderer.ts        # direct traversal with built-in filter approximations
+│   │   ├── DisplayList.ts           # offscreen cache for cacheAsBitmap
+│   │   └── CanvasBuffer.ts          # Canvas buffers and pixel hit testing
+│   └── webgl/                       # primary WebGL backend
+│       ├── WebGLRenderer.ts         # build/execute phases and render groups
+│       ├── WebGLRenderContext.ts    # WebGL state, draw scheduling and filter execution
+│       ├── WebGLRenderBuffer.ts     # pooled offscreen, stencil and scissor buffers
+│       ├── WebGLRenderTarget.ts     # framebuffer management
+│       ├── WebGLVertexArrayObject.ts # single-texture 20B and multi-texture 24B vertex layouts
+│       ├── WebGLDrawCmdManager.ts   # 12 draw command types, including MULTI_TEXTURE
+│       ├── WebGLProgram.ts          # shader program cache
+│       ├── WebGLUtils.ts            # shader compilation, program creation, tint and texture helpers
+│       ├── MultiTextureBatcher.ts   # 8-texture batches and slotMap assignments
+│       └── shaders/                 # GLSL sources
+│           ├── ShaderLib.ts         # GLSL ES 1.00 for WebGL 1
+│           └── ShaderLib2.ts        # GLSL ES 3.00 for WebGL 2
+├── events/                          # event classes, EventPhase and IEventDispatcher
+├── geom/                            # Matrix, Point, Rectangle
+├── filters/                         # Blur, Glow, DropShadow, ColorMatrix, CustomFilter, MultiPassFilter, BloomFilter
+├── text/                            # text data and layout
+│   ├── TextField.ts                 # rich text, input mode and password display
+│   ├── BitmapText.ts                # bitmap text
+│   ├── BitmapFont.ts                # bitmap font and texture ownership
+│   ├── StageText.ts                 # DOM input for INPUT mode
+│   ├── HtmlTextParser.ts            # HTML text parsing
+│   ├── InputController.ts           # selection, caret and keyboard input
+│   ├── TextMeasurer.ts              # measureText and getFontString
+│   ├── LineBreaks.ts                # Unicode 17.0 UAX #14 boundaries and dictionary segmentation
+│   ├── TextLineLayout.ts            # rich-text wrapping, width fitting and UTF-16 source offsets
+│   ├── WordWrap.ts                  # independent token and grapheme utilities
+│   ├── enums/                      # HorizontalAlign, VerticalAlign, TextFieldType, TextFieldInputType
+│   └── types/                      # ITextElement, IWTextElement, ILineElement, IHitTextElement
+├── resource/                        # resource management
+│   ├── Resource.ts                  # resource manager, shared instance and async/await API
+│   ├── ResourceConfig.ts            # resource configuration
+│   ├── ResourceEvent.ts             # resource events
+│   ├── ResourceItem.ts              # resource items
+│   ├── ResourceLoader.ts            # resource loading queue
+│   └── analyzers/                   # AnalyzerBase, Image, Json, Sheet, Sound, Text and Font analyzers
+├── system/                          # environment capabilities
+│   └── Capabilities.ts              # runtime capabilities using UA and Client Hints
+├── net/                             # HttpRequest, ImageLoader, HttpMethod, HttpResponseType
+├── media/                           # Sound, SoundChannel, Video
+├── utils/                           # ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils, toColorString
+│                                    # object identity uses === or WeakMap; no HashObject
+├── localStorage/                    # local storage functions
+└── external/                        # ExternalInterface
 ```
 
 ---
 
-## 三、渲染管线架构
+## 3. Rendering pipeline
 
-### 3.1 两阶段渲染（借鉴 Pixi.js 8）
+### 3.1 Build and execute phases
 
 ```
-Phase A — Build（仅 structureDirty 时）:
-  遍历 DisplayObject 树 → 生成 Instruction（含 transform 快照）→ InstructionSet
+Phase A — Build (structureDirty):
+  Traverse the display tree → create Instructions with transform snapshots → InstructionSet
 
-Phase A' — Update（仅 renderDirty 时）:
-  遍历 dirtyRenderables → 刷新 transform 快照（O(1) lookup via renderableIndex Map）
+Phase A' — Update (renderDirty):
+  Visit dirtyRenderables → refresh transform snapshots using renderableIndex lookups
 
-Phase B — Execute（每帧）:
-  按指令顺序分发到 Pipe → 无场景图遍历
+Phase B — Execute (every frame):
+  Dispatch instructions to pipes without traversing the scene graph
 ```
 
-### 3.2 RenderPipe 体系
+### 3.2 RenderPipe
 
 ```
 RenderPipe<T extends DisplayObject>
-├── addToInstructionSet(renderable, set)  — 结构变化时调用
-├── updateRenderable(renderable)          — 数据变化时调用
-└── destroyRenderable(renderable)         — 对象销毁时调用（可选，见下方 GPU 纹理回收说明）
+├── addToInstructionSet(renderable, set) — build instructions after structure changes
+├── updateRenderable(renderable)        — update visual data
+└── destroyRenderable(renderable)       — optional immediate cleanup; see texture GC below
 
-实现：
-├── BitmapPipe    → BitmapInstruction    → drawImage()（含 scale9Grid 九宫格）
-├── GraphicsPipe  → GraphicsInstruction  → Canvas光栅化 → 纹理上传 → drawTexture()
-├── MeshPipe      → MeshInstruction      → drawMesh()
-├── TextPipe      → TextInstruction      → offscreen canvas → 纹理上传 → drawImage()
-├── ParticlePipe  → ParticleInstruction  → 粒子批处理渲染
-├── FilterPipe    → FilterPush/Pop       → 离屏FBO → 着色器滤镜
-└── MaskPipe      → MaskPush/Pop         → stencil/scissor/离屏合成
+Implementations:
+├── BitmapPipe     → BitmapInstruction     → drawImage(), including scale9Grid
+├── BitmapTextPipe → BitmapTextInstruction → shared layout → batched glyph drawImage()
+├── GraphicsPipe   → GraphicsInstruction   → Canvas rasterization → texture upload → drawTexture()
+├── MeshPipe       → MeshInstruction       → drawMesh()
+├── TextPipe       → TextInstruction       → offscreen Canvas → texture upload → drawImage()
+├── ParticlePipe   → ParticleInstruction   → particle batches
+├── FilterPipe     → FilterPush/Pop        → offscreen FBO → shader effects
+└── MaskPipe       → MaskPush/Pop          → stencil, scissor or offscreen compositing
 ```
 
-**GPU 纹理回收**：`destroyRenderable()` 目前不会被 `WebGLRenderer` 自动调用（`DisplayObject` 没有"永久销毁"信号——`$onRemoveFromStage` 会在临时移出舞台又重新加入时反复触发，接上调用链会让虚拟列表等场景反复重新栅格化/上传纹理）。因此 `GraphicsPipe`、`TextPipe` 各自缓存纹理的清理不依赖调用方显式调用，而是用 `FinalizationRegistry` 在对应的 `Graphics` / `TextField` 被 JS 引擎 GC 时自动 `gl.deleteTexture()`。`destroyRenderable()` 仍保留为可选的立即释放路径（调用时会 `unregister` 对应的 GC 回调，避免重复删除），供未来需要显式销毁时机的场景使用。`BitmapPipe` / `MeshPipe` 的 `destroyRenderable` 是 no-op，因为它们绘制用的纹理归属于 `BitmapData` 的生命周期，不由 Pipe 自身管理。
+**GPU texture cleanup.** `WebGLRenderer` does not automatically call
+`destroyRenderable()`. Display objects have no permanent-destruction signal:
+`$onRemoveFromStage` also fires when an object is temporarily removed and later
+reused. Releasing textures at that point would force repeated rasterization and
+uploads, for example when virtual lists reuse renderers.
 
-### 3.3 RenderGroup 分层
+GraphicsPipe and TextPipe use `FinalizationRegistry` to call `gl.deleteTexture()`
+when their Graphics/TextField owners are garbage-collected. Explicit
+`destroyRenderable()` remains an optional immediate-release path; it unregisters
+the GC callback to avoid duplicate deletion. BitmapPipe and MeshPipe have no
+pipe-owned texture cleanup because their textures belong to BitmapData.
+
+### 3.3 Render groups
 
 ```typescript
 backgroundLayer.isRenderGroup = true;
 ```
 
-- 每个 RenderGroup 拥有独立的 InstructionSet
-- 父 set 只包含一条 `renderGroup` 指令，指向子树 set
-- 子树结构变化只触发自身 set 重建，不影响父 set
-- 静态子树的 JS 遍历开销降为零
-- 实现通过 `WeakMap<DisplayObjectContainer, InstructionSet>` 管理 group sets
-- 使用 `WeakRef` 跟踪 group 生命周期，便于 GC
+- Each render group owns an InstructionSet.
+- Its parent set contains one `renderGroup` instruction referencing that subtree.
+- Structure changes inside the group rebuild its own set, not its parent's set.
+- Static subtrees do not need to be traversed on every WebGL frame.
+- A `WeakMap<DisplayObjectContainer, InstructionSet>` stores group sets.
+- WeakRef tracks group lifetimes without preventing garbage collection.
 
-### 3.4 多纹理批处理
+### 3.4 Multi-texture batching
 
-- `MultiTextureBatcher` 管理最多 8 个纹理槽位（WebGL1 最小保证纹理单元数）
-- 顶点格式扩展：增加 `aTextureId` float 属性（stride 从 20B 增至 24B）
-- Fragment shader 使用 if/else 链采样（WebGL1 兼容）
-- mesh、filter、blend 变化自动 flush 回退到单纹理路径
-- `WebGLVertexArrayObject` 维护双缓冲区（单纹理 + 多纹理），按需切换 GPU buffer 大小
+- MultiTextureBatcher manages up to 8 texture slots, the WebGL 1 minimum guarantee.
+- The multi-texture vertex layout adds `aTextureId`, increasing the stride from
+  20 to 24 bytes.
+- The fragment shader selects textures with an if/else chain for WebGL 1 support.
+- Mesh, filter and blend changes flush the current batch when needed.
+- WebGLVertexArrayObject maintains single-texture and multi-texture buffers and
+  grows GPU buffers as needed.
 
-### 3.5 脏标记系统
+### 3.5 Dirty flags
 
 ```
-DisplayObject 脏标记：
-├── cacheDirty    — cacheAsBitmap 缓存失效，向上传播
-├── renderDirty   — 视觉数据变化（位置/纹理/alpha/tint），向上传播
-└── renderMode    — 渲染模式（NONE/FILTER/CLIP/SCROLLRECT）
+DisplayObject flags:
+├── cacheDirty  — invalidates cacheAsBitmap and propagates upward
+├── renderDirty — visual changes (position, texture, alpha, tint), propagated upward
+└── renderMode  — NONE, FILTER, CLIP or SCROLLRECT
 
-通知机制（单 Player 静态钩子，由 Player 构造函数赋值）：
-├── $onStructureChange?: () => void                          — 结构变化回调
-├── $onRenderableDirty?: (obj: DisplayObject) => void         — 渲染脏回调
-├── DisplayObjectContainer.$onContainerStructureChange?: (owner) => void — 容器结构变化回调
+Notifications (single-Player static hooks installed by Player):
+├── $onStructureChange?: () => void                    — structure changes
+├── $onRenderableDirty?: (obj: DisplayObject) => void  — visual changes
+├── DisplayObjectContainer.$onContainerStructureChange?: (owner) => void
 ├── $markDirty()
-│   ├── 更新 worldAlpha / worldTint 缓存（O(1) 读取）
-│   ├── 调用 $onRenderableDirty?.(this) → WebGLRenderer.markRenderableDirty()
-│   └── 向上传播 cacheDirty + renderDirty
+│   ├── refresh worldAlpha/worldTint caches for constant-time reads
+│   ├── $onRenderableDirty?.(this) → WebGLRenderer.markRenderableDirty()
+│   └── propagate cacheDirty and renderDirty upward
 ├── $updateRenderMode()
-│   └── 调用 $onStructureChange?.() → WebGLRenderer.markStructureDirty()
+│   └── $onStructureChange?.() → WebGLRenderer.markStructureDirty()
 └── DisplayObjectContainer.markDirtyInternal()
-    └── 调用 $onContainerStructureChange?.(this) → markStructureDirty(owner)
+    └── $onContainerStructureChange?.(this) → markStructureDirty(owner)
 ```
 
-引擎设计上始终是单 Player：`Player` 的构造函数直接把上述三个静态字段赋值
-为具体的闭包函数（见 `player/Player.ts`），并在 `destroy()` 里清空它们。
+The engine supports one Player per page. Its constructor assigns these static
+hooks to instance closures, and `destroy()` clears them. See `player/Player.ts`.
 
-### 3.6 RenderObjectType 快速路由
+### 3.6 RenderObjectType dispatch
 
-为避免热路径中的 `instanceof` 检查，DisplayObject 使用 `renderObjectType` 枚举：
+DisplayObject uses the `renderObjectType` enum to avoid `instanceof` checks on
+hot rendering paths:
 
-| 枚举值     | 值  | 对应类型  | 路由 Pipe    |
-| ---------- | --- | --------- | ------------ |
-| `NONE`     | 0   | 无渲染    | —            |
-| `BITMAP`   | 1   | Bitmap    | BitmapPipe   |
-| `MESH`     | 2   | Mesh      | MeshPipe     |
-| `SHAPE`    | 3   | Shape     | GraphicsPipe |
-| `SPRITE`   | 4   | Sprite    | GraphicsPipe |
-| `TEXT`     | 5   | TextField | TextPipe     |
-| `PARTICLE` | 6   | Particle  | ParticlePipe |
+| Enum          | Value | Display type | Pipe           |
+| ------------- | ----- | ------------ | -------------- |
+| `NONE`        | 0     | No rendering | —              |
+| `BITMAP`      | 1     | Bitmap       | BitmapPipe     |
+| `MESH`        | 2     | Mesh         | MeshPipe       |
+| `SHAPE`       | 3     | Shape        | GraphicsPipe   |
+| `SPRITE`      | 4     | Sprite       | GraphicsPipe   |
+| `TEXT`        | 5     | TextField    | TextPipe       |
+| `PARTICLE`    | 6     | Particle     | ParticlePipe   |
+| `BITMAP_TEXT` | 7     | BitmapText   | BitmapTextPipe |
 
 ---
 
-## 四、WebGL 渲染后端
+## 4. WebGL backend
 
-### 4.1 WebGL 版本选择
+### 4.1 WebGL selection
 
-`WebGLRenderContext` 在初始化时自动检测并选择最佳后端：
+WebGLRenderContext selects a backend during initialization:
 
-- **WebGL 2 优先**：使用 `canvas.getContext('webgl2')`，加载 `ShaderLib2`（GLSL ES 3.00）
-- **WebGL 1 降级**：回退到 `canvas.getContext('webgl')`，加载 `ShaderLib`（GLSL ES 1.00）。
-  不使用 `experimental-webgl` 前缀——该别名只有 IE11/早期 Safari/旧版
-  Android Chrome 才需要，现代浏览器的标准 `'webgl'` 已经足够。
-- **无独立探测 canvas**：`Player` 直接在应用方传入的 canvas 上依次尝试
-  `webgl2` → `webgl`，两者都失败才降级到 Canvas 2D，不额外创建临时 canvas
-  探测能力。`checkWebGLSupport()` 函数仍导出，供需要独立探测的调用方使用，
-  但 `Player` 自身不调用它。
-- 着色器库通过实例属性动态绑定：`ctx.shaders`、`ctx.blurTierFn`、`ctx.makeBlurH`、`ctx.makeBlurV`
+- **WebGL 2 first:** `canvas.getContext('webgl2')` uses ShaderLib2 (GLSL ES 3.00).
+- **WebGL 1 fallback:** `canvas.getContext('webgl')` uses ShaderLib (GLSL ES 1.00).
+  No `experimental-webgl` alias is used; the target browsers support `webgl`.
+- **No separate probe canvas:** Player tries WebGL 2 and WebGL 1 directly on the
+  application's canvas, then falls back to Canvas 2D if both fail.
+  `checkWebGLSupport()` remains available to callers but is not used by Player.
+- Shader helpers are selected through context properties: `ctx.shaders`,
+  `ctx.blurTierFn`, `ctx.makeBlurH` and `ctx.makeBlurV`.
 
-### 4.2 渲染流程
+### 4.2 Rendering flow
 
 ```
 Player.render()
@@ -231,77 +256,97 @@ Player.render()
     → Phase B: _executeInstructions()
       → Pipe.execute() → WebGLRenderContext.drawImage/drawMesh/drawTexture()
     → WebGLRenderContext.flush() → _flush()
-      → 上传顶点（bufferSubData）→ 遍历 DrawCmdManager → 分发 draw batch
+      → upload vertices with bufferSubData → visit DrawCmdManager → dispatch draw batches
 ```
 
-### 4.3 着色器体系
+### 4.3 Shaders
 
-| 着色器                                   | 用途                               | 来源      |
-| ---------------------------------------- | ---------------------------------- | --------- |
-| default_vert + texture_frag              | 标准纹理绘制                       | ShaderLib |
-| multi_vert + multi_frag                  | 多纹理批处理（8单元）              | ShaderLib |
-| default_vert + colorTransform_frag       | ColorMatrixFilter                  | ShaderLib |
-| default_vert + glow_frag                 | Glow/DropShadow                    | ShaderLib |
-| fullscreen_vert + makeBlurH/ VFrag | 水平/垂直模糊（ping-pong 双 pass） | ShaderLib |
-| default_vert + primitive_frag            | 纯色矩形（stencil mask）           | ShaderLib |
-| fullscreen_vert                          | 全屏 quad blit（滤镜 pass）        | ShaderLib |
+| Shader                             | Purpose                                 | Source    |
+| ---------------------------------- | --------------------------------------- | --------- |
+| default_vert + texture_frag        | Standard texture drawing                | ShaderLib |
+| multi_vert + multi_frag            | Multi-texture batches, up to 8 textures | ShaderLib |
+| default_vert + colorTransform_frag | ColorMatrixFilter                       | ShaderLib |
+| default_vert + glow_frag           | Glow/DropShadow                         | ShaderLib |
+| fullscreen_vert + makeBlurH/VFrag  | Horizontal/vertical blur in two passes  | ShaderLib |
+| default_vert + primitive_frag      | Solid rectangles for stencil masks      | ShaderLib |
+| fullscreen_vert                    | Fullscreen quad blits for filter passes | ShaderLib |
 
-WebGL2（ShaderLib2）提供等价的 GLSL ES 3.00 版本着色器，使用 `in`/`out` 语法替代 `attribute`/`varying`，
-`texture()` 替代 `texture2D()`，blur 着色器按 4/8/16/32 档生成固定上限循环，仍使用三角权重核。
+ShaderLib2 supplies equivalent GLSL ES 3.00 shaders for WebGL 2, using `in`/`out`
+instead of `attribute`/`varying`, and `texture()` instead of `texture2D()`.
+Blur shaders use fixed loop limits of 4, 8, 16 or 32 samples with triangular weights.
 
-### 4.4 滤镜渲染
+### 4.4 Filters
 
-滤镜通过 FilterPipe 的 push/pop 指令对实现：
+FilterPipe emits paired push/pop instructions:
 
-- **push 阶段**：分配离屏 FBO（含 filter padding 扩展），将后续 draw 重定向到离屏 buffer
-- **pop 阶段**：调用 `compositeFilterResult()` 将离屏结果合成回父 buffer
+- **Push:** allocate an offscreen FBO with filter padding and redirect drawing.
+- **Pop:** call `compositeFilterResult()` to composite the result into the parent.
 
-合成流程（`compositeFilterResult`）：
+The compositing sequence is:
 
-1. `flush()` 确保离屏输入完整。
-2. `WebGLFilterSystem` 按数组顺序执行；中间 pass 关闭 blend/stencil/scissor，使用独立输出。
-3. 显式恢复父 FBO、viewport 与裁剪状态。
-4. 使用 `drawFramebufferTexture()` 合成最终结果，不重复应用已经写入子树的 alpha/tint。
-5. 立即 flush 后归还中间纹理；失败时清理 pass 资源与待执行命令，下一帧可以恢复。
+1. Flush pending drawing to complete the captured input.
+2. WebGLFilterSystem executes filters in array order. Intermediate passes disable
+   blending, stencil and scissor and write to separate targets.
+3. Restore the parent FBO, viewport and clip state explicitly.
+4. Composite with `drawFramebufferTexture()` without applying inherited alpha/tint
+   a second time.
+5. Flush and return intermediate textures to the pool. Failures release resources
+   and queued commands so a later frame can recover.
 
-- **ColorMatrixFilter**：无 mask 的叶子、单滤镜、继承分辨率时保留 inline 快速路径；组与组合走离屏。
-- **BlurFilter**：横纵分离，quality 控制 pass 对数；大半径先降采样，使 shader 半径不超过 32 物理像素。
-- **Glow / DropShadow**：保留原有 `glow_frag`；knockout 绑定与“是否保留原图”的 shader 语义对应。
-- **CustomFilter**：显式 GLSL 100/300 源码、按链接类型校验 numeric uniforms、独立采样的辅助 BitmapData 上传。
-- **MultiPassFilter / BloomFilter**：有序无环 pass 图，可读取原图或较早输出，支持各 pass 缩放。
+- **ColorMatrixFilter:** an unmasked leaf with one filter and inherited resolution
+  can use the inline path; groups and combinations use offscreen targets.
+- **BlurFilter:** horizontal/vertical separation, with quality controlling pass
+  pairs. Large radii downsample to stay within the 32-physical-pixel shader tier.
+- **Glow/DropShadow:** retain glow_frag; knockout controls whether the source image
+  remains in the output.
+- **CustomFilter:** explicit GLSL 100/300 sources, reflected numeric uniforms and
+  auxiliary BitmapData uploads with independent sampling.
+- **MultiPassFilter/BloomFilter:** ordered acyclic pass graphs, with original or
+  earlier inputs and per-pass scaling.
 
-`WebGLFilterTargetPool` 缓存中间 GPU 目标，空闲上限 16 个 / 64 MiB；子树捕获缓冲与辅助图片不计入这个限制。
-`WebGLFilterTextures` 管理辅助图像上传和恢复。着色器编译缓存按 GL context 与实际源码隔离。
+WebGLFilterTargetPool caches up to 16 idle targets or 64 MiB. Subtree captures and
+auxiliary images are outside this limit. WebGLFilterTextures manages auxiliary
+image uploads and restoration. Shader programs are cached by GL context and source.
 
-Filter padding 按链累加，并包含子级效果的渲染范围，不修改布局 bounds。
-离屏 pass 统一使用 framebuffer UV（左下为 0,0），每一步保持图像方向。
-DropShadow 传入正常角度弧度；辅助 DOM 图片的自动 UV 矩阵负责纵向转换。
+Filter-chain padding accumulates and includes child effects without changing
+layout bounds. Offscreen passes use framebuffer UVs, with (0,0) at the lower left,
+and preserve orientation. DropShadow angles reach shaders in radians. Auxiliary
+DOM image bindings use UV transforms to account for vertical orientation.
 
-具体 API、示例、Canvas 与缓存限制见 [GPU filters](filters.md)。
+See [GPU filters](filters.md) for APIs, examples, Canvas support and cache limits.
 
-### 4.5 遮罩渲染
+### 4.5 Masks
 
-- scrollRect/maskRect 无旋转且没有外层 scissor：scissor 裁剪（GPU 硬件加速）
-- scrollRect/maskRect 有旋转或嵌套在外层 scissor 内：stencil 裁剪；WebGL 主画布与能力探测共用 2D 上下文配置（不申请 depth，申请 stencil）
-- DisplayObject mask：离屏 buffer + destination-in 合成
-
----
-
-## 五、Canvas 2D 渲染后端
-
-Canvas 2D 渲染器保持直接遍历模式，作为 WebGL 不可用时的降级方案。
-
-- Graphics 离屏 Canvas 缓存（`canvasCacheDirty` 脏标记）
-- CSS filter 快速路径（Blur → `blur()`，DropShadow → `drop-shadow()`）
-- ColorMatrixFilter CPU 像素操作降级
-- cacheAsBitmap 支持（通过 DisplayList）
-- 像素级命中测试（3x3 离屏 buffer，hitTestBuffer 函数）
-- 支持所有 DisplayObject 类型：Bitmap, Shape, Sprite, Mesh, TextField（含样式、对齐、自动换行）
-- TextField 渲染：测量 → 分行 → Canvas 2D fillText/strokeText 绘制；断行规则与输入偏移契约见 [text-layout.md](./text-layout.md)
+- Axis-aligned scrollRect/maskRect without an outer scissor uses scissor clipping.
+- Rotated rectangles or rectangles inside an outer scissor use stencil clipping.
+  Both the WebGL canvas and capability checks request stencil without depth.
+- DisplayObject masks use offscreen compositing with destination-in.
 
 ---
 
-## 六、快速启动 API
+## 5. Canvas 2D backend
+
+CanvasRenderer traverses the scene graph directly and supplies the fallback when
+WebGL is unavailable. It also rasterizes offscreen caches and RenderTexture captures.
+
+- Offscreen Graphics caching through `canvasCacheDirty`.
+- CSS blur/drop-shadow approximations for Blur, DropShadow and Glow.
+- CPU pixel processing for ColorMatrixFilter.
+- DisplayList support for cacheAsBitmap.
+- Pixel hit testing through a 3×3 offscreen buffer.
+- Bitmap, Shape, Sprite, Mesh, TextField and BitmapText rendering.
+- BitmapText draws atlas regions from shared layout, including trim offsets, tint
+  and ordinary clipping. See [bitmap fonts](bitmap-fonts.md) for ownership.
+- TextField measurement, line layout and fillText/strokeText drawing. See
+  [text layout](./text-layout.md) for wrapping and source-offset contracts.
+
+CustomFilter, MultiPassFilter and BloomFilter are GPU effects and are skipped.
+Built-in Canvas approximations are not pixel-equivalent to WebGL. The same
+boundary applies to cacheAsTexture and RenderTexture capture.
+
+---
+
+## 6. Application startup
 
 ### `createPlayer(options)`
 
@@ -319,55 +364,56 @@ const app = createPlayer({
 app.start(root);
 ```
 
-`createPlayer` 自动完成：
+`createPlayer` initializes:
 
-1. 调用 `Capabilities._init()` 检测运行环境（OS、isMobile、language）
-2. 首次调用时注入 `RenderTexture.renderer`（Canvas 2D 离屏渲染器）
-3. 创建 Stage、Player（WebGL 优先，Canvas 2D 降级）、TouchHandler、ScreenAdapter
-4. 调用 `setupLifecycle(stage)` 绑定 ENTER_FRAME / RENDER 广播
+1. Capabilities._init() for OS, isMobile and language detection.
+2. RenderTexture.renderer on first use, providing offscreen Canvas 2D rendering.
+3. Stage, Player, TouchHandler and ScreenAdapter, preferring WebGL with Canvas fallback.
+4. setupLifecycle(stage) for ENTER_FRAME and RENDER broadcasts.
 
 ### KurotOptions
 
-| 属性            | 类型                | 默认值          | 说明         |
-| --------------- | ------------------- | --------------- | ------------ |
-| `canvas`        | `HTMLCanvasElement` | （必填）        | 渲染画布     |
-| `frameRate`     | `number`            | `60`            | 目标帧率     |
-| `scaleMode`     | `StageScaleMode`    | `'showAll'`     | 屏幕适配模式 |
-| `contentWidth`  | `number`            | `canvas.width`  | 逻辑内容宽度 |
-| `contentHeight` | `number`            | `canvas.height` | 逻辑内容高度 |
-| `resolution`    | `number`            | `min(DPR, 2)`   | 后备缓冲像素密度 |
-| `orientation`   | `OrientationMode`   | `'auto'`        | 屏幕方向     |
-| `maxTouches`    | `number`            | `99`            | 最大触点数   |
-| `background`    | `string`            | —               | CSS 背景色   |
+| Property        | Type                | Default                   | Description                 |
+| --------------- | ------------------- | ------------------------- | --------------------------- |
+| `canvas`        | `HTMLCanvasElement` | Required                  | Rendering canvas            |
+| `frameRate`     | `number`            | `60`                      | Target frame rate           |
+| `scaleMode`     | `StageScaleMode`    | `'showAll'`               | Screen scale mode           |
+| `contentWidth`  | `number`            | `canvas.width` or `640`   | Logical content width       |
+| `contentHeight` | `number`            | `canvas.height` or `1136` | Logical content height      |
+| `resolution`    | `number`            | `min(DPR, 2)`             | Backing-store pixel density |
+| `orientation`   | `OrientationMode`   | `'auto'`                  | Screen orientation          |
+| `maxTouches`    | `number`            | `99`                      | Maximum touch points        |
+| `background`    | `string`            | —                         | CSS background color        |
 
-### KurotApp 返回值
+### KurotApp
 
-| 属性            | 类型            | 说明          |
-| --------------- | --------------- | ------------- |
-| `player`        | `Player`        | 渲染播放器    |
-| `stage`         | `Stage`         | 舞台根节点    |
-| `touchHandler`  | `TouchHandler`  | 触摸/鼠标处理 |
-| `screenAdapter` | `ScreenAdapter` | 屏幕适配器    |
-| `start(root?)`  | `() => void`    | 启动游戏循环  |
-| `stop()`        | `() => void`    | 停止游戏循环  |
+| Property        | Type                             | Description                                            |
+| --------------- | -------------------------------- | ------------------------------------------------------ |
+| `player`        | `Player`                         | Renderer and game loop                                 |
+| `stage`         | `Stage`                          | Scene root                                             |
+| `touchHandler`  | `TouchHandler`                   | Touch and mouse input                                  |
+| `screenAdapter` | `ScreenAdapter`                  | Screen adaptation                                      |
+| `start(root?)`  | `(root?: DisplayObject) => void` | Start or resume the game loop                          |
+| `stop()`        | `() => void`                     | Stop the loop; it can be resumed                       |
+| `destroy()`     | `() => void`                     | Release the player, input, adapter and lifecycle hooks |
 
 ---
 
-## 七、测试覆盖
+## 7. Test coverage
 
-`test/` 下按模块组织测试文件，运行 `pnpm --dir packages/core test` 查看当前
-文件数与用例数。
+Tests are organized by module in `test/`. Run `pnpm --dir packages/core test` for
+current file and test counts.
 
-| 模块       | 主要覆盖内容                                                                                                                                                                                             |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| events/    | Event, EventDispatcher, EventPropagation, EventMap, TouchEvent, HTTPStatusEvent, ProgressEvent                                                                                                           |
-| geom/      | Matrix, Point, Rectangle                                                                                                                                                                                 |
-| utils/     | ByteArray, Base64Util, Logger, DebugLog, NumberUtils, toColorString                                                                                                                                      |
-| display/   | DisplayObject, DisplayObjectContainer, DisplayObjectIntegration, Bitmap, BitmapData, Sprite, Shape, Mesh, Stage, StageText, Graphics, Texture, SpriteSheet, BlendMode, DisplayList                       |
-| filters/   | Filter (全部滤镜), CustomFilter, filters（滤镜集成）, EffectTransform（离屏效果变换正确性）                                                                                                              |
-| media/     | Sound, SoundChannel, Video                                                                                                                                                                               |
-| player/    | InstructionSet, InstructionPool, RenderGroup, TextPipe, MaskPipe, WebGLRendererDirty, WebGLRendererLeaf, WebGLVertexArrayObject, WebGLRenderBuffer, WebGLBlurFramebufferPool, CreatePlayer, TouchHandler |
-| net/       | HttpRequest, ImageLoader                                                                                                                                                                                 |
-| resource/  | Resource（并发 loadGroup 队列化）, ResourceLoader（并发/重试/无 analyzer 场景）                                                                                                                          |
-| examples/benchmark/tests/ | 性能基准运行时与跨引擎对比测试                                                                                                                                                              |
-| text/      | 通过 display 集成测试覆盖                                                                                                                                                                                |
+| Module                    | Main coverage                                                                                                                                                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| events/                   | Event, EventDispatcher, EventPropagation, EventMap, TouchEvent, HTTPStatusEvent, ProgressEvent                                                                                                           |
+| geom/                     | Matrix, Point, Rectangle                                                                                                                                                                                 |
+| utils/                    | ByteArray, Base64Util, Logger, DebugLog, NumberUtils, toColorString                                                                                                                                      |
+| display/                  | DisplayObject, DisplayObjectContainer, DisplayObjectIntegration, Bitmap, BitmapData, Sprite, Shape, Mesh, Stage, StageText, Graphics, Texture, SpriteSheet, BlendMode, DisplayList                       |
+| filters/                  | Filter classes, CustomFilter, filter integration and offscreen effect transforms                                                                                                                         |
+| media/                    | Sound, SoundChannel, Video                                                                                                                                                                               |
+| player/                   | InstructionSet, InstructionPool, RenderGroup, TextPipe, MaskPipe, WebGLRendererDirty, WebGLRendererLeaf, WebGLVertexArrayObject, WebGLRenderBuffer, WebGLBlurFramebufferPool, CreatePlayer, TouchHandler |
+| net/                      | HttpRequest, ImageLoader                                                                                                                                                                                 |
+| resource/                 | Resource group serialization; ResourceLoader concurrency, retries and missing analyzers; FontAnalyzer loading and ownership                                                                              |
+| examples/benchmark/tests/ | Benchmark runtime and cross-engine comparisons                                                                                                                                                           |
+| text/                     | Display integration, BitmapText layout and native glyph geometry                                                                                                                                         |

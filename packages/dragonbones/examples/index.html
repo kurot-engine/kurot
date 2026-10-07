@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Kurot DragonBones</title>
+	<style>
+		body {
+			margin: 24px;
+			font: 15px system-ui;
+			color: #eef2f8;
+			background: #151b26;
+		}
+		h1 {
+			font-size: 22px;
+		}
+		h2 {
+			font-size: 16px;
+		}
+		canvas {
+			width: 640px;
+			height: 360px;
+			background: #252e3e;
+			border: 1px solid #41506a;
+		}
+		.views {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 24px;
+		}
+		.labels {
+			display: flex;
+			width: 600px;
+			justify-content: space-around;
+			font-size: 12px;
+			margin: 8px 0;
+		}
+	</style>
+	<h1>Kurot DragonBones 0.1.0</h1>
+	<p id="status">Loading…</p>
+	<div class="views">
+		<section>
+			<h2>Player / WebGL</h2>
+			<div class="labels">
+				<span>Image</span>
+				<span>Rotated</span>
+				<span>Trimmed</span>
+				<span>Deform</span>
+				<span>Weighted</span>
+				<span>Nested</span>
+			</div>
+			<canvas id="webgl" width="640" height="360"></canvas>
+		</section>
+		<section>
+			<h2>Canvas 2D</h2>
+			<div class="labels">
+				<span>Image</span>
+				<span>Rotated</span>
+				<span>Trimmed</span>
+				<span>Deform</span>
+				<span>Weighted</span>
+				<span>Nested</span>
+			</div>
+			<div id="fallback"></div>
+		</section>
+	</div>
+	<script type="module" src="/bundle.js"></script>
+</html>

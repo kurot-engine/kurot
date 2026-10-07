@@ -14,3 +14,4 @@ export { JsonAnalyzer } from './analyzers/JsonAnalyzer.js';
 export { TextAnalyzer } from './analyzers/TextAnalyzer.js';
 export { SoundAnalyzer } from './analyzers/SoundAnalyzer.js';
 export { SheetAnalyzer } from './analyzers/SheetAnalyzer.js';
+export { FontAnalyzer } from './analyzers/FontAnalyzer.js';

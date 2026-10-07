@@ -15,6 +15,9 @@ import { FilterPipe, type FilterPushInstruction, type FilterPopInstruction } fro
 import { MaskPipe, type MaskPushInstruction, type MaskPopInstruction } from '../pipes/MaskPipe.js';
 import { TextPipe, type TextInstruction } from '../pipes/TextPipe.js';
 import { ParticlePipe, type ParticleInstruction } from '../pipes/ParticlePipe.js';
+import { BitmapTextPipe } from '../pipes/BitmapTextPipe.js';
+import type { BitmapTextInstruction } from '../pipes/BitmapTextPipe.js';
+import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 
@@ -44,7 +47,7 @@ const MASK_BUILD_OPTIONS: InstructionBuildOptions = { inlineRenderGroups: true }
 // ── Augmented instruction types ───────────────────────────────────────────────
 
 type BaseLeafInstruction =
-	BitmapInstruction | GraphicsInstruction | MeshInstruction | TextInstruction | ParticleInstruction;
+	BitmapInstruction | GraphicsInstruction | MeshInstruction | TextInstruction | ParticleInstruction | BitmapTextInstruction;
 
 type LeafInstruction = BaseLeafInstruction & {
 	transform: TransformState;
@@ -92,6 +95,7 @@ export class WebGLRenderer {
 	private readonly _filterPipe = new FilterPipe();
 	private readonly _maskPipe: MaskPipe;
 	private readonly _particlePipe = new ParticlePipe();
+	private readonly _bitmapTextPipe = new BitmapTextPipe();
 
 	// ── Instruction set ───────────────────────────────────────────────────────
 	private readonly _instructionSet = new InstructionSet();
@@ -308,6 +312,8 @@ export class WebGLRenderer {
 					offsetX,
 					offsetY,
 				};
+			case RenderObjectType.BITMAP_TEXT:
+				return { renderPipeId: 'bitmapText', renderable: obj as BitmapText, offsetX, offsetY };
 			case RenderObjectType.TEXT:
 				return {
 					renderPipeId: 'text',
@@ -628,6 +634,7 @@ export class WebGLRenderer {
 					case 'mesh':
 					case 'graphics':
 					case 'text':
+					case 'bitmapText':
 					case 'particle': {
 						const leaf = inst as LeafInstruction;
 						this._applyTransform(activeBuffer, leaf.transform);
@@ -744,6 +751,9 @@ export class WebGLRenderer {
 				break;
 			case 'graphics':
 				this._graphicsPipe.execute(instruction, buffer);
+				break;
+			case 'bitmapText':
+				this._bitmapTextPipe.execute(instruction, buffer);
 				break;
 			case 'text':
 				this._textPipe.execute(instruction, buffer);

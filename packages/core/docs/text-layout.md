@@ -65,13 +65,34 @@ regressions. No resource-manifest or CLI XML-format change is involved.
 
 ## Package dependencies
 
-UI 3.1.0 and ui-runtime 0.8.0 declare Core `^2.1.0` in their peer ranges;
-game 2.0.0 declares `^2.0.0`. Their development dependencies and repository
-examples use Core `^2.1.1`, with lockfiles resolving 2.1.1 for its nested
-scroll-clipping fix. CLI templates use `latest`.
+Published UI 3.2.0 requires Core `^2.2.0` for BitmapLabel. Older UI 3.1.0 and
+ui-runtime 0.8.2 declare Core `^2.1.0`; game 2.0.0 declares `^2.0.0`.
+Existing example lockfiles still resolve Core 2.1.1 and UI 3.1.0; accepting a
+version in a dependency range does not update an installed package.
+DragonBones 0.1.0 declares Core `^2.1.1` and develops against published Core
+2.2.0. Its animation adapter does not depend on TextField wrapping changes.
+CLI templates use `latest`.
 Label font shrinking calls `invalidateTextMetrics()` and requires Core 2.1.0
-or later. Core 2.1.1 preserves that text contract and does not require another
-UI, game or ui-runtime release.
+or later. Core 2.2.0 preserves that TextField contract and remains accepted by
+these existing peer ranges. Bitmap-font rendering is separate from TextField;
+see [bitmap fonts](bitmap-fonts.md). The new UI BitmapLabel requires Core 2.2.0
+and published UI 3.2.0; published UI 3.1.0 does not contain it.
+
+## Known issues in Core 2.2.0
+
+The current wrapper customizes rules by function name. Minifiers that rename
+functions can silently disable alphabetic overflow tailoring and cause SA-script
+dictionary wrapping to throw `Rule not found: "LB28"`. Preserve function names
+when bundling this release, for example with esbuild's `keepNames: true`.
+Kurot CLI 3.3.1 already enables this setting for release bundles.
+
+Passing the official default corpus does not cover every real-text sequence.
+The current dependency exposes internal break opportunities for some composed
+emoji, including the family ZWJ sequence, and the wrapper does not filter them
+against grapheme boundaries. Character wrapping also works by code point rather
+than grapheme cluster. A narrow field can therefore split a composed character.
+These are TextField issues; they do not change DragonBones animation playback
+or the separate bitmap-font layout contract.
 
 References: [UAX #14 revision 55](https://www.unicode.org/reports/tr14/tr14-55.html),
 [official corpus](https://www.unicode.org/Public/17.0.0/ucd/auxiliary/LineBreakTest.txt),

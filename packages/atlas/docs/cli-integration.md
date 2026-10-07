@@ -1,113 +1,153 @@
-# 图集与 CLI 的接入及优化建议
+# Atlas integration with CLI and optimization recommendations
 
-状态：2026-10-07 的源码分析与样例验证。本文是后续方案；本次没有改动 CLI、Core、
-Editor 或 Reskin，也没有添加消费者依赖。
+Status: source analysis and sample validation from 2026-10-07. This document
+proposes follow-up work. That validation did not modify CLI, Core, Editor or
+Reskin, or add dependencies to consumers.
 
-## 当前链路
+## Current pipeline
 
 ```text
-原图 → @kurot/atlas → PNG + 图集 JSON
-                       ↓ 调用方保存
-resource/default.res.json → CLI 读取资源默认值 → 编译 KUI
-resource/ 下的 PNG/JSON   → CLI copyAssets      → 构建输出
-构建输出的图集 JSON/PNG   → Core SheetAnalyzer → SpriteSheet / Texture
+Source images → @kurot/atlas → PNG + atlas JSON
+                                  ↓ saved by the caller
+resource/default.res.json → CLI reads resource defaults → KUI compilation
+PNG/JSON under resource/  → CLI copyAssets              → build output
+Atlas JSON/PNG in output  → Core SheetAnalyzer           → SpriteSheet / Texture
 ```
 
-CLI 没有在编译 KUI 时解析图集的帧坐标或 PNG。
-`src/core/kui/skin-module-builder.ts` 读取 `default.res.json`，通过 ui-document 的
-`parseUIResourceConfigEntries` 获得资源和九宫格默认值；`kui-parser.ts` 在副本上依次
-应用资源默认值、Label presets 和颜色。`plugins/copy-assets.ts` 复制 resource，
-排除 authored KUI 和生成的主题文件。
+CLI does not parse atlas frame coordinates or PNG data when compiling KUI.
+`src/core/kui/skin-module-builder.ts` reads `default.res.json` and uses
+ui-document's `parseUIResourceConfigEntries` to obtain resources and nine-slice
+defaults. `kui-parser.ts` applies resource defaults, Label presets and colors to
+copies, in that order. `plugins/copy-assets.ts` copies resource files, excluding
+authored KUI and generated theme files.
 
-Core 的 `packages/core/src/kurot/resource/analyzers/SheetAnalyzer.ts` 在运行时读取
-`file/frames`，将裁剪坐标、偏移和原始尺寸交给 `SpriteSheet.createTexture`。
-因此本次格式兼容已经足够，无需为了接入库改造 CLI 的 KUI parser 或 Core。
+Core's `packages/core/src/kurot/resource/analyzers/SheetAnalyzer.ts` reads
+`file/frames` at runtime and passes crop coordinates, offsets and original sizes
+to `SpriteSheet.createTexture`. The verified output format is sufficient for
+this pipeline; adopting the library does not require changes to CLI's KUI parser
+or Core.
 
-atlas 保持独立；Reskin/Editor 的资源服务可以调用库。以后若 CLI 提供打包功能，
-CLI 可依赖 atlas，但 atlas 不依赖 CLI/Core。单纯复制、消费已打包图集无需新增依赖。
+Atlas remains independent. Reskin/Editor resource services can call it. If CLI
+later offers packing, CLI may depend on atlas; atlas must not depend on CLI/Core.
+Copying or consuming prebuilt atlases requires no new dependency.
 
-## 第一优先级：资源更新能够到达预览
+## First priority: resource updates reach the preview
 
-后续进展：CLI 工作树已补充全 resource 监听、成批同步、删除处理和 no-store；
-CLI 3.3.1 已发布；已安装的 CLI 3.3.0 没有这些能力，需要更新项目依赖与锁文件。
-以下缺口记录的是分析时的旧实现；当前实现和成组更新限制见
-[CLI 资源监听](../../cli/docs/dev-resource-watching.md)。严格 PNG/JSON 事务仍是后续工作。
+Subsequent progress: the CLI working tree added whole-resource watching, batched
+synchronization, deletion handling and no-store responses. CLI 3.3.1 is published;
+installed CLI 3.3.0 lacks these capabilities and needs a dependency and lockfile
+update. The gaps below describe the older implementation examined during the
+analysis. See [CLI resource watching](../../cli/docs/dev-resource-watching.md)
+for the current implementation and batch limits. Strict PNG/JSON transactions
+remain future work.
 
-CLI `src/core/dev-server.ts` 的 `watchResources` 目前仅响应 `.kui.xml`、
-`default.res.json` 和 `config/style.json`，并且要求项目配置 `ui`。
-PNG 与普通图集 JSON 的修改不会触发此监听器。完整 build 能复制新产物，
-但运行中的 dev 服务可能继续提供旧资源。这是源码确认的缺口，尚未做运行中 watcher 验收。
+At the time of analysis, `watchResources` in CLI's `src/core/dev-server.ts`
+responded only to `.kui.xml`, `default.res.json` and `config/style.json`, and
+required a project `ui` configuration. PNG and ordinary atlas JSON edits did not
+trigger that watcher. A full build could copy new outputs, while the running dev
+server could continue serving old resources. Source inspection confirmed this
+gap; live watcher acceptance testing had not been performed at that point.
 
-建议增加资源变化分支：
+The recommended resource-change branches were:
 
-| 变化 | 建议动作 |
-| --- | --- |
-| 图集 PNG / 帧 JSON，资源名称和九宫格不变 | 校验成对产物、复制资源、通知预览重新加载 |
-| default.res.json 中资源默认九宫格变化 | 校验清单、重新编译受影响 KUI、复制资源 |
-| style.json 中颜色 / 字体 / Label presets 变化 | 继续使用既有样式副本解析链和 KUI 重编译 |
-| KUI 变化 | 保持既有编译流程；Reskin 不提供这个编辑入口 |
+| Change                                                                        | Recommended action                                                                  |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Atlas PNG / frame JSON, with unchanged resource names and nine-slice defaults | Validate the output pair, copy resources and notify the preview to reload           |
+| Resource nine-slice defaults change in default.res.json                       | Validate the manifest, recompile affected KUI and copy resources                    |
+| Colors / fonts / Label presets change in style.json                           | Use the existing style-resolution pipeline on copies and recompile KUI              |
+| KUI changes                                                                   | Keep the existing compilation flow; Reskin does not expose this editing entry point |
 
-第一版可复用现有 copyAssets，先保证正确性；后续再只复制变化文件。
-资源监听不应绑定 ui 存在，Core-only 项目也需要复制变化的资源。
-无需通过修改或 touch KUI/default.res.json 伪造更新事件。
+An initial implementation can reuse copyAssets to establish correctness before
+copying only changed files. Resource watching should also work without a `ui`
+configuration, since Core-only projects need resource updates. Changes should
+not require artificial edits or touches to KUI/default.res.json.
 
-PNG 和 JSON 各自 rename 并不构成双文件原子事务。调用方应先生成并验证临时产物，
-再提交一整组；同进程用提交完成事件串行触发复制。外部文件监听可采用去抖与有界重试，
-但它们不能严格保证同尺寸 PNG/JSON 是同一代。需要跨进程严格一致时，考虑版本目录
-加一次性指针切换，或显式 commit 标记/代次协议；该方案应独立评审。
-只有成组验证和复制完成后才发布成功事件。预览刷新还要处理 Core 资源缓存和浏览器缓存；
-第一阶段整页重载比只清除一个子纹理可靠，不应向产物 JSON 塞入未定义缓存字段。
+Renaming PNG and JSON separately does not create an atomic two-file transaction.
+The caller should generate and validate temporary outputs, then commit the whole
+pair. In one process, a commit-complete event can serialize copying. External
+file watchers may use debouncing and bounded retries, but these cannot guarantee
+that same-sized PNG/JSON files belong to the same generation. Strict consistency
+across processes may require versioned directories with a single pointer switch,
+or an explicit commit marker / generation protocol. Review that design separately.
+Publish success only after grouped validation and copying finish. Preview refresh
+must also account for Core resource caches and browser caches. A full-page reload
+is more reliable for the first stage than clearing one subtexture. Do not add
+undefined cache fields to output JSON.
 
-## 第二优先级：构建前资源完整性校验
+## Second priority: resource integrity checks before building
 
-增加独立校验步骤，位于编译/复制前，不改变 authored KUI：
+Add a separate validation step before compilation/copying, without changing
+authored KUI:
 
-- 清单中的 sheet URL 指向存在的 JSON；JSON 的 file 指向合法、存在的相对 PNG。
-- PNG 尺寸、frame 整数与边界、裁剪偏移及逻辑尺寸一致，拒绝不支持的旋转格式。
-- `subkeys` 继续使用对象格式；对照实际 frame 集合报告缺失/多余条目，
-  严格模式下对引用不到的帧失败，错误包含 sheet 名、资源路径和 frame 名。
-- 资源默认 `scale9grid` 按未裁剪的 sourceW/sourceH 校验，不能按图集 x/y 或裁剪 w/h 重算。
-- 沿用现有名称/别名优先级，区分重复裸帧名和可使用的 `sheet.frame` 引用。
+- A manifest sheet URL points to an existing JSON file, whose `file` points to a
+  valid, existing relative PNG.
+- PNG dimensions, integer frame fields, bounds, crop offsets and logical sizes
+  agree. Reject unsupported rotation formats.
+- Keep `subkeys` in object form. Compare them with actual frames and report missing
+  or extra entries. In strict mode, fail on unresolved frame references, including
+  the sheet name, resource path and frame name in the error.
+- Validate resource-default `scale9grid` against untrimmed sourceW/sourceH. Do not
+  recalculate it from atlas x/y or cropped w/h.
+- Preserve existing name/alias precedence and distinguish duplicate bare frame
+  names from usable `sheet.frame` references.
 
-相关契约见 `packages/ui-document/docs/resource-nine-slice.md`。
-现有清单解析器不读取 PNG/帧文件，因此不能把它通过解析视为完整的图集校验。
-新增纯格式检查可放在独立工具模块；不要仅为读取已有图集强迫 Core 或 ui-document 依赖 atlas。
-若将来共享读取校验器，可提供不含 PNG 编码器的独立入口，再评估 CLI 是否需要依赖。
+See `packages/ui-document/docs/resource-nine-slice.md` for the contract. The
+existing manifest parser does not read PNG/frame files, so successful parsing
+is not complete atlas validation. Pure format checks can live in a separate
+tool module. Do not force Core or ui-document to depend on atlas just to read
+prebuilt sheets. If a shared validator is introduced, consider a separate entry
+without PNG encoding before deciding whether CLI needs the dependency.
 
-Reskin 默认保持资源键集合，按已有键替换素材。重打包不需要重新生成整份清单。
-保留 frame 的既有九宫格和未知元数据、groups、URL 与资源顺序；出现键集合变化时先报告，
-不能静默删除或重写已有引用。不得自动调整皮肤、布局或把局部字段迁移成 presets。
+Reskin preserves resource keys by default and replaces assets under existing
+keys. Repacking does not require regenerating the whole manifest. Preserve frame
+nine-slice values, unknown metadata, groups, URLs and resource order. Report key
+set changes before applying them; do not silently remove or rewrite references.
+Do not automatically adjust skins or layouts, or migrate local fields to presets.
 
-## 第三优先级：增量处理和可选打包入口
+## Third priority: incremental processing and optional packing
 
-先按源图内容指纹、规范化 options、库版本缓存产物，命中后跳过解码/打包/编码。
-不同原图路径顺序不影响输出，已有确定性校验覆盖这一点。
-CLI 可以在一次构建中只读取一次清单和每个相关 sheet，建立资源索引，避免多皮肤重复 I/O。
-坐标变化不影响 KUI 编译；默认九宫格或样式变化才影响生成代码。
-按资源/样式到皮肤的依赖关系减少编译，需要先完善引用追踪和删除事件测试。
+Cache outputs by source image content fingerprint, normalized options and library
+version. A cache hit skips decoding, packing and encoding. Input path order does
+not affect output; the existing determinism checks cover this.
+CLI can read the manifest and each relevant sheet once per build to create a
+resource index, avoiding repeated I/O for multiple skins. Coordinate changes do
+not affect KUI compilation; default nine-slice or style changes affect generated
+code. Reducing compilation through resource/style-to-skin dependencies first
+requires complete reference tracking and deletion-event tests.
 
-若 CLI 增加 opt-in pack 插件，顺序建议为：
-`配置校验 → 打包 → 成组校验/提交 → KUI 编译 → copyAssets`。
-输入配置需要显式 source/output、稳定资源名、打包选项，禁止依靠扫描结果猜测既有资源键。
-通用 CLI 项目不因已有 PNG/JSON 就自动重打包；其余消费者仍直接调用同一 atlas API。
-工具拥有路径、文件提交、队列/worker 与进度；库继续只返回内存结果。
+For an opt-in CLI packing plugin, the recommended order is:
+`configuration validation → packing → grouped validation/commit → KUI compilation → copyAssets`.
+Configuration must explicitly specify source/output paths, stable resource names
+and packing options. Do not infer existing resource keys from directory scans.
+A generic CLI project should not automatically repack existing PNG/JSON files.
+Other consumers can continue calling the same atlas API directly.
+Tools own paths, file commits, queues/workers and progress. The library continues
+to return only in-memory results.
 
-## 图集本身的优化空间
+## Atlas optimization opportunities
 
-两组新图集与 TexturePacker 面积相同，优先优化更新链路与诊断。
-可以试验 PNG filter/deflate 设置、替代无损编码器与不同 MaxRects 排序组合，
-同时记录耗时、PNG 字节、图集面积和内存峰值。以多组资源基准选择策略，
-每种策略必须重新通过 RGBA 与裁剪/扩边校验；减少 PNG 字节不等于减少 GPU 内存。
+Both new atlases match TexturePacker's area, so prioritize the update pipeline
+and diagnostics. Experiments can compare PNG filter/deflate settings, alternative
+lossless encoders and MaxRects sorting combinations, recording time, PNG bytes,
+atlas area and peak memory. Choose strategies using several resource benchmarks.
+Every strategy must pass RGBA, crop and extrusion checks again. Fewer PNG bytes
+do not imply lower GPU memory use.
 
-重复像素别名在当前两组里无收益；旋转和 multipack 会扩大 Core/清单/工具契约，
-不作为当前格式一致目标的优化。不可用有损量化、丢弃低 alpha 或减少 margin/extrusion
-换取大小优势并继续声称与当前像素契约一致。
+Pixel aliases provide no benefit for the two current samples. Rotation and
+multipack would expand Core, manifest and tooling contracts, so they are outside
+the current format-compatibility optimization scope. Lossy quantization,
+discarding low-alpha pixels or reducing margin/extrusion cannot claim compliance
+with the current pixel contract just because they reduce output size.
 
-## 建议验收顺序
+## Recommended acceptance order
 
-1. 保留 `verify:reference` 基线，先完成 Reskin/Editor 的成组替换与整页预览刷新。
-2. CLI 验收 dev 下仅替换 PNG/JSON、删除资源、外部提交中途失败和 Core-only 项目资源更新。
-3. 验收九宫格逻辑尺寸、裁剪图标、manifest 不变、KUI 未修改、现有 preset 引用不变。
-4. 再引入输入缓存、增量复制或 opt-in CLI 打包，分别测量改善和测试失败回滚。
+1. Keep the `verify:reference` baseline and first complete grouped replacement and
+   full-page preview refresh in Reskin/Editor.
+2. Verify CLI dev updates for PNG/JSON-only replacement, resource deletion,
+   interrupted external commits and Core-only projects.
+3. Verify nine-slice logical dimensions, cropped icons, unchanged manifests,
+   unmodified KUI and preserved preset references.
+4. Introduce input caching, incremental copying or opt-in CLI packing afterward;
+   measure each improvement and test rollback on failure.
 
-本次兼容性证据见 [reference-validation.md](./reference-validation.md)。
+Compatibility evidence is recorded in [reference-validation.md](./reference-validation.md).

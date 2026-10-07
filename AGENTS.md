@@ -9,20 +9,24 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.1.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. The foundation — everything else depends on it.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
-| `@kurot/ui`          | 3.1.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
+| `@kurot/core`        | 2.2.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/ui`          | 3.2.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.3.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.11.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.8.2   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
 | `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Initial local implementation, not published.                                               | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)               |
+| `@kurot/dragonbones` | 0.1.0   | Published DragonBones 5.7 runtime and native Kurot display, atlas, mesh, event and clock adapter. Core ^2.1.1 peer. | [`packages/dragonbones/docs/ai-context.md`](packages/dragonbones/docs/ai-context.md) |
+| `@kurot/bitmap-font` | 0.1.0 | Headless bitmap-font parsing, validation, serialization and layout. Published, no runtime dependencies; consumed by Core 2.2.0. | [`packages/bitmap-font/docs/ai-context.md`](packages/bitmap-font/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
 ```
-@kurot/core
- ├─ @kurot/ui
- └─ @kurot/game
+@kurot/bitmap-font (headless shared dependency)
+ └─ @kurot/core
+     ├─ @kurot/ui
+     ├─ @kurot/game
+     └─ @kurot/dragonbones
 
 @kurot/cli  (build-time only)
  └─ @kurot/ui-document
@@ -41,7 +45,21 @@ Atlas has a portable pixel-only root entry and a separate Node PNG subpath using
 pngjs. No current package consumes it. Core loads prebuilt sheets without atlas;
 Editor, Reskin or CLI adoption is a separate change.
 
-UI 3.1 requires Core ^2.1.0. Game 2.0 declares Core 2.x.
+DragonBones is maintained in `packages/dragonbones`, with a Core ^2.1.1 peer
+and no UI/Game dependency. `src/runtime` contains the official TypeScript
+sources adapted to ESM and compiled with the adapter directly to `dist`.
+Imported types and object-pool contracts are retained; original commit and
+hashes are recorded in `upstream.json` for provenance. See the package
+instructions before editing the runtime. Version 0.1.0 is published and develops
+against published Core 2.2.0 without local overrides. No current game consumes
+this package.
+
+Core 2.2.0 is published with bitmap-font ^0.1.0 and no local dependency override.
+It adds font resources and native BitmapText rendering. UI 3.2.0 is published
+with BitmapLabel and Core ^2.2.0 in peer/dev dependencies, without local overrides.
+Published UI 3.1.0 requires Core
+^2.1.0 and does not contain BitmapLabel. KUI/Editor adoption is separate.
+Game 2.0 declares Core 2.x.
 ui-runtime 0.8.2 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.11.0.
 CLI 3.3 requires ui-document ^0.11.0.
 CLI 3.3.1 is published with whole-resource dev synchronization,
@@ -118,7 +136,7 @@ There is no root-level install/build/test command — the repo root has no
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
-pnpm --dir packages/<package> test   # core, cli, ui, game, ui-document, ui-runtime, atlas
+pnpm --dir packages/<package> test   # core, cli, ui, game, ui-document, ui-runtime, atlas, dragonbones, bitmap-font
 pnpm --dir packages/<package> dev    # TS compile watch
 ```
 
@@ -146,7 +164,7 @@ Kurot/
 ├── README.md          Human-facing overview (English)
 ├── docs/              Contribution rules (docs/code-rules.md) — committed
 ├── docs-internal/     Design drafts / research notes — local-only, gitignored
-├── packages/          The 7 packages above; public docs/ and optional local docs-internal/
+├── packages/          The 9 packages above; public docs/ and optional local docs-internal/
 ├── tools/             Private repository tooling, including the Agent evaluation harness
 ├── examples/          demo and game (CLI-scaffolded KUI XML project)
 └── reference/         Local read-only reference sources — not distributed via git

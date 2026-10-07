@@ -5,3 +5,5 @@ export { MaskPipe, type MaskPushInstruction, type MaskPopInstruction } from './M
 export { MeshPipe, type MeshInstruction } from './MeshPipe.js';
 export { TextPipe, type TextInstruction } from './TextPipe.js';
 export { ParticlePipe, type ParticleInstruction } from './ParticlePipe.js';
+export { BitmapTextPipe } from './BitmapTextPipe.js';
+export type { BitmapTextInstruction } from './BitmapTextPipe.js';

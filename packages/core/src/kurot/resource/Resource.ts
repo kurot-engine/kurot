@@ -7,6 +7,7 @@ import { ImageAnalyzer } from './analyzers/ImageAnalyzer.js';
 import { JsonAnalyzer } from './analyzers/JsonAnalyzer.js';
 import { TextAnalyzer } from './analyzers/TextAnalyzer.js';
 import { SoundAnalyzer } from './analyzers/SoundAnalyzer.js';
+import { FontAnalyzer } from './analyzers/FontAnalyzer.js';
 import { SheetAnalyzer } from './analyzers/SheetAnalyzer.js';
 import { HttpRequest } from '../net/HttpRequest.js';
 import { HttpResponseType } from '../net/HttpResponseType.js';
@@ -268,18 +269,21 @@ export class Resource {
 		const textAnalyzer = new TextAnalyzer();
 		const soundAnalyzer = new SoundAnalyzer();
 		const sheetAnalyzer = new SheetAnalyzer();
+		const fontAnalyzer = new FontAnalyzer();
 
 		this.analyzerMap.set(ResourceType.Image, imageAnalyzer);
 		this.analyzerMap.set(ResourceType.Json, jsonAnalyzer);
 		this.analyzerMap.set(ResourceType.Text, textAnalyzer);
 		this.analyzerMap.set(ResourceType.Sound, soundAnalyzer);
 		this.analyzerMap.set(ResourceType.Sheet, sheetAnalyzer);
+		this.analyzerMap.set(ResourceType.Font, fontAnalyzer);
 
 		this.loader.registerAnalyzer(ResourceType.Image, imageAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Json, jsonAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Text, textAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Sound, soundAnalyzer);
 		this.loader.registerAnalyzer(ResourceType.Sheet, sheetAnalyzer);
+		this.loader.registerAnalyzer(ResourceType.Font, fontAnalyzer);
 	}
 
 	private async fetchConfig(url: string): Promise<ResourceConfigData> {

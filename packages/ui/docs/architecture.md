@@ -1,478 +1,467 @@
-# @kurot/ui 架构文档
+# @kurot/ui architecture
 
-> 当前版本：3.1.0，peerDependency `@kurot/core: ^2.1.0`。逐条变更记录见
-> [CHANGELOG.md](../CHANGELOG.md)。
-> 面向 AI 智能体的速查文档见 [ai-context.md](./ai-context.md)（目录地图、反
-> 直觉行为清单、术语表、任务→文件速查表）。本文档面向人类读者，讲设计动机
-> 与内部机制，两份文档不重复内容，互相引用。
-
----
-
-## 一、概述
-
-`@kurot/ui` 是从零重写的 EUI 兼容 UI 框架，建在 [`@kurot/core`](../../core/docs/architecture.md)
-之上。对 core 是 `peerDependency`，不打包进产物——依赖方项目需要显式安装
-`@kurot/core`，这样多个使用 UI 库的包才能共享同一份 core 实例，避免出现
-两套独立的显示树/全局状态。
-
-整个包最核心的架构决策是**委托模式取代原型混入**：Egret EUI 用
-`implementUIComponent()` 做 prototype 拷贝来模拟"一个类同时是 DisplayObject
-又是 UIComponent"的多继承效果，这种做法在 TypeScript 严格模式下没法表达
-（拷贝出来的属性没有类型），也违反团队约定的"继承链不超过 2 层"规则。
-`@kurot/ui` 换成了纯组合：`Group`/`Component` 都只 `extends Sprite`（继承链
-1 层），把全部布局状态和验证逻辑单独放进 `UIState` 类，`Group`/`Component`
-各持有一个 `UIState` 实例（`this.ui`），把 `IUIComponent` 接口的每个方法都
-写成一行委托。`UIState` 反过来只通过一个很窄的 `IUIOwner` 回调接口跟宿主
-通信，完全不知道宿主具体是 `Sprite` 还是别的什么——这个解耦是"皮肤系统"
-和"验证系统"能够分别独立演化、不互相牵连的前提。
+> Package version: 3.2.0, with peerDependency `@kurot/core: ^2.2.0`.
+> UI 3.2.0 and Core 2.2.0 are published, without local dependency overrides.
+> See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
+> The [AI context map](./ai-context.md) provides directory, behavior, terminology
+> and task-to-file references. This document explains design decisions and internal
+> mechanisms for human readers; the two documents complement each other.
+> Version 3.2.0 exports BitmapLabel for native code and programmatic skins.
+> See [bitmap-label.md](./bitmap-label.md) for its resource and ownership contract.
 
 ---
 
-## 二、验证循环（失效/校验机制）
+## 1. Overview
 
-### 2.1 三阶段 + 三个独立队列
+`@kurot/ui` is an EUI-compatible UI framework rewritten on top of
+[`@kurot/core`](../../core/docs/architecture.md). Core is a `peerDependency`,
+excluded from the output bundle. Consumers explicitly install it so packages
+using UI share one Core instance, display tree infrastructure and global state.
 
-UI 组件的布局更新是延迟批处理的：属性修改不会立刻触发重排，而是把组件
-"排队"，等到 core ticker 下一次渲染前的 `callLater` 阶段统一处理，避免
-同一帧内多次修改属性导致重复计算，也保证未布局状态不会被渲染出来。
-
-`Validator`（单例 `validator`）内部维护三个独立的 `DepthQueue`：
-`_propsQueue`、`_sizeQueue`、`_displayQueue`。每个队列按 `$nestLevel`
-（core 的 `DisplayObject` 字段，不是 UI 概念）分桶，`Map<number, DepthBin>`，
-每个 `DepthBin` 内部是数组 + `Set` 的组合——`Set` 提供 O(1) 的"是否已在
-队列里"去重检查，数组提供有序的弹出。
-
-三阶段按固定顺序执行，但**遍历方向不同**：
-
-```
-validateProperties()  浅→深   commitProperties()
-validateSize()         深→浅   measure()
-validateDisplayList()  浅→深   updateDisplayList()
-```
-
-方向不是随意选的，反映的是数据依赖方向：
-
-- **属性提交浅→深**：父组件的属性变化经常需要先"下推"给子组件（比如
-  `List` 先把 `data` 设到某个 renderer 上，这个 renderer 才能据此测量自己
-  的文本尺寸）。父先处理，它在提交属性过程中新增/移除的子节点才能在同一轮
-  里被正确地轮到。
-- **测量深→浅**：容器的测量尺寸通常是子节点尺寸的函数（`VerticalLayout`
-  求和、`BasicLayout` 求 union），必须先测完所有子节点才能正确测量父节点。
-- **显示列表提交浅→深**：容器决定每个子节点该放在哪（调用
-  `child.setLayoutBoundsSize`/`setLayoutBoundsPosition`），子节点需要先拿到
-  这个位置信息才能定稿自己的显示状态,所以还是父先处理。
-
-`DepthQueue.shift()`（浅→深）用一个只会前进不会回退的 `_min` 游标；
-`pop()`（深→浅）对称地用 `_max` 游标——这让连续多次 `shift()`/`pop()`
-调用摊销下来是 O(1)，不需要每次都从头扫描所有深度桶。
-
-### 2.2 三阶段之间的"打断重来"问题
-
-三阶段分离本身有一个经典难题：`validateProperties()` 在处理对象 A 时，
-可能会调用某个已经跑过属性验证的对象 B 的 `invalidateSize()`，或者给某个
-兄弟节点新增属性失效。如果三个阶段各自傻乎乎地跑一遍就完事，这类"迟到"
-的失效请求会被漏掉，逻辑上它们其实属于*同一轮*校验，应该被处理。
-
-`validateClient(target)` 是这个问题的正确解法，用于强制同步校验（比如把
-一个之前移除的组件重新加回舞台，或者显式调用 `component.validateNow()`）：
-
-1. 把 `_targetLevel` 设成 `target.$nestLevel`（如果已经在另一个
-   `validateClient` 调用内部，则不覆盖——`_targetLevel === Infinity` 的
-   检查保证了重入安全）。
-2. 跑一个 `while (!done)` 外层循环：
-    - 先浅→深清空 `_propsQueue` 里深度不超过 target 的部分，逐个跑
-      `validateProperties()`（跑之前检查 `obj.stage` 还在，跳过中途被移出
-      舞台的对象）。
-    - 再深→浅清空 `_sizeQueue`。**关键点**：如果在测量过程中，`target` 子树
-      内某个对象又触发了属性失效（`_clientPropsFlag` 被置位），就把一个
-      元素塞回 `_propsQueue`，标记 `done = false` 并 `break`——强制外层循环
-      从第一阶段重新开始。这就是"迟到的属性失效"能在显示列表阶段跑之前
-      被重新处理的机制。
-    - 显示列表阶段同理，同时监视 `_clientPropsFlag` 和 `_clientSizeFlag`。
-3. `finally` 块无条件恢复 `_targetLevel` 并重新同步各阶段的标志位——这是
-   为了保证哪怕某个 client 的 `validateProperties()` 抛出异常，`Validator`
-   内部记账状态在下一次校验时仍然一致（`Validator.test.ts` 专门测试了
-   这个异常路径）。
-4. `_clientPropsFlag`/`_clientSizeFlag` 只有在 `_targetLevel` 不是
-   `Infinity`（即当前正处在某次 `validateClient` 调用内）且失效对象的深度
-   落在 target 子树内时才会被置位——普通的延迟调度路径完全不会触发这个
-   检查，不产生额外开销。
-
-普通的延迟调度路径（`_schedule()` → `_flush()`）简单得多：没有打断重来的
-逻辑，也不追踪重入。三个阶段依次跑一遍，各自用普通的 `shift()`/`pop()`
-清空整棵树的队列（不像 `validateClient` 只处理某个子树）。跑完之后如果
-任何一个标志位仍是 true（说明校验过程中又产生了新的失效），就再排一次
-core ticker 的下一次 `callLater`，不会在同一个调用栈里同步循环——这意味着普通路径
-下，一次级联的失效可能跨越好几帧才收敛，而 `validateClient` 保证一次调用
-内同步收敛。这是两条路径在"一致性 vs 延迟"上刻意做出的不同取舍。
-
-### 2.3 与渲染循环的顺序保证
-
-`_schedule()` 通过 core 的 `ticker.callLater()` 安排 `_flush()`。Core 在
-`Player.render()` 之前先执行 `flushCallLaters()`，因此动态挂载的组件会先完成
-属性提交、测量和布局，再产生首帧画面。这个顺序等价于 Egret Validator 通过
-`Event.RENDER` 建立的渲染前校验契约，同时避免 UI 和渲染器各自维护独立 RAF
-所产生的先后竞争。
+The central architectural choice is delegation in place of prototype mixins.
+Egret EUI uses `implementUIComponent()` to copy prototype members and combine
+DisplayObject and UIComponent behavior. Such copied members are difficult to
+represent in strict TypeScript. Kurot uses composition instead: Group and
+Component both directly extend Sprite and hold a UIState instance as `this.ui`.
+Their IUIComponent methods delegate layout state and validation to UIState.
+UIState communicates with its host through the narrow IUIOwner callback interface,
+without depending on the host's concrete DisplayObject subclass. This separation
+allows skin and validation systems to evolve independently and follows the
+repository preference for composition over deeper application inheritance.
 
 ---
 
-## 三、皮肤系统
+## 2. Validation cycle
 
-### 3.1 Skin 不是显示对象——这是相对 Egret EUI 最大的结构性差异
+### 2.1 Three phases and three queues
 
-`Skin`（`components/Skin.ts:25`）是 `class Skin extends EventDispatcher<SkinEvents>`
-——一个普通数据持有者,不在显示树里出现。这跟 Egret EUI 里 Skin 本身就是
-一个真实的 `DisplayObjectContainer` 子类完全不同。`Skin` 唯一的职责是
-声明 `skinParts`（字符串数组）、`states`（State 列表）、`elementsContent`
-（要挂载的显示对象数组），实际挂载动作由宿主 `Component` 的
-`_setSkin()` 完成——`elementsContent` 里的每个显示对象被直接
-`addChildAt` 到*宿主组件*上，不是挂到 `Skin` 对象上。
+Layout updates are deferred and batched. Property changes enqueue components
+for Core's render-preparation `callLater` queue instead of immediately repeating
+layout work for each change within a frame.
 
-这个设计选择的动机是让 `Skin` 保持纯粹的"声明式配置对象"角色，跟视觉
-渲染完全脱钩,`Component` 才是唯一的显示树节点。
+The Validator singleton (`validator`) maintains three DepthQueues:
+`_propsQueue`, `_sizeQueue` and `_displayQueue`. Each groups clients by
+`$nestLevel`, a Core DisplayObject field, using `Map<number, DepthBin>`.
+Each DepthBin combines an array for ordered removal with a Set for constant-time
+duplicate checks.
 
-### 3.2 主题加载的完整链路
+The phases execute in a fixed order with different traversal directions:
 
-```
-Theme(url) 构造
-  → setTheme(this)                  立即同步把自己注册为全局主题（还没加载完）
-  → _load(url)                      用 adapter.getTheme(url, onSuccess, onError)
-      → _onConfigLoaded(raw)        解析 JSON，把 skins/styles 合并进内部表
-          → 若有 skinsJs 字段
-              → _loadSkinsModule()  动态 import 编译产物
-          → _onLoaded()             _initialized = true，处理 _delayList，派发 Event.COMPLETE
-      → 失败路径 → _onLoadFailed()  同样 _initialized = true + 处理 _delayList，
-                                     但派发 IOErrorEvent.IO_ERROR
+```text
+validateProperties()   shallow → deep   commitProperties()
+validateSize()         deep → shallow   measure()
+validateDisplayList()  shallow → deep   updateDisplayList()
 ```
 
-一个容易踩的坑：`Theme.ts` 里实际生效的默认适配器，是文件底部一个内联的
-`_defaultThemeAdapter` 对象（用 `XMLHttpRequest`），**不是**公开导出的
-`DefaultThemeAdapter` 类（`core/DefaultThemeAdapter.ts`，用 `fetch()`）。
-`_load()` 只在构造 `Theme` 时显式传入自定义 adapter 才会绕开内联的那个。
-`DefaultThemeAdapter` 目前是导出了但没有任何内部代码路径会用到它，只有
-调用方自己 `new DefaultThemeAdapter()` 传进去才会被激活——这是一处可以
-清理的重复实现，两个 adapter 分别用 XHR 和 fetch，逻辑没有共享，将来
-修 bug 容易只改一边漏另一边。
+These directions follow the data dependencies:
 
-### 3.3 编译期产物如何在运行时被找到——globalThis 是事实上的皮肤注册表
+- Properties commit from parent to child. For example, List assigns data to a
+  renderer before the renderer measures its text. Children added or removed
+  during a parent commit can participate in the same queue processing.
+- Size measurement runs from child to parent. Container measurements depend
+  on child dimensions, whether VerticalLayout sums them or BasicLayout unions bounds.
+- Display-list updates run from parent to child. A parent first assigns child
+  layout bounds through setLayoutBoundsSize/setLayoutBoundsPosition; the child
+  can then finalize its display using the allocated bounds.
 
-`@kurot/cli` 编译 KUI XML Skin 时，为每个主题生成一个索引模块，做的事情等价于：
+DepthQueue.shift() tracks the shallowest bucket with `_min`; pop() tracks the
+deepest with `_max`. Removing clients advances these cursors rather than scanning
+from the beginning on each call. New insertions can adjust the bounds again.
+
+### 2.2 Restarting after a later invalidation
+
+Separate phases create a dependency problem: processing one client can invalidate
+another client whose earlier phase has already run. A single pass may leave such
+an invalidation pending even though it belongs to the same logical update.
+
+`validateClient(target)` handles this for forced synchronous validation, such as
+re-adding a removed component to the stage or calling component.validateNow():
+
+1. Set `_targetLevel` to target.$nestLevel when it is currently Infinity. Nested
+   calls retain the existing level and restore it afterward.
+2. Run an outer `while (!done)` loop:
+    - Remove clients from the target subtree's properties queue from shallow to
+      deep and call validateProperties. Check obj.stage before each call to skip
+      objects removed from the stage during validation.
+    - Process the subtree's size queue from deep to shallow. If measurement sets
+      `_clientPropsFlag` and a pending property client exists in the subtree,
+      reinsert that client, set done=false and break. The outer loop restarts at
+      properties before proceeding to display-list updates.
+    - Apply the same restart logic in the display-list phase for both
+      `_clientPropsFlag` and `_clientSizeFlag`.
+3. In finally, restore `_targetLevel`, synchronize empty-queue flags and clear
+   client flags. Validator.test.ts covers consistency after a client throws.
+4. Client flags are raised when an invalidated client's depth is at least
+   `_targetLevel`. Queue removal then checks actual ancestry to select clients
+   in the target subtree. Outside validateClient, `_targetLevel` is Infinity,
+   so ordinary clients do not raise these flags.
+
+The deferred path, `_schedule()` → `_flush()`, is simpler: it runs properties,
+size and display-list queues once each across the tree, using shift/pop, without
+the synchronous restart loop. If flags remain afterward, it schedules another
+callLater. Cascading invalidations can therefore require later deferred flushes;
+validateClient instead converges synchronously for its target subtree.
+
+### 2.3 Ordering before rendering
+
+`_schedule()` uses Core's ticker.callLater() to schedule `_flush()`. Core executes
+flushCallLaters() before Player.render(), so initial property commits, measurement
+and layout run before newly mounted components are drawn. This provides the
+render-preparation ordering that Egret's Validator establishes through
+Event.RENDER, without independent UI and renderer RAF loops competing for order.
+
+---
+
+## 3. Skin system
+
+### 3.1 Skin is a data object
+
+`components/Skin.ts` defines Skin as an EventDispatcher<SkinEvents>, rather than
+a display object. Egret EUI's Skin also extends EventDispatcher; its nonvisual
+role is shared with Kurot.
+
+Skin declares skinParts (names), states (State entries) and elementsContent
+(display objects to attach). Component._setSkin() performs the attachment:
+elementsContent children are added directly to the host Component, and Skin
+itself never appears in the display tree. This keeps the skin's configuration
+and state role separate from the Component's visual-host role.
+
+### 3.2 Theme loading
+
+```text
+new Theme(url)
+  → setTheme(this)                  synchronously register before loading completes
+  → _load(url)                      adapter.getTheme(url, onSuccess, onError)
+      → _onConfigLoaded(raw)        parse JSON and merge skins/styles
+          → if skinsJs is present
+              → _loadSkinsModule()  dynamically import compiled skins
+          → _onLoaded()             mark initialized, handle _delayList, emit COMPLETE
+      → failure → _onLoadFailed()   mark initialized and handle _delayList,
+                                    then emit IOErrorEvent.IO_ERROR
+```
+
+Theme.ts uses an inline `_defaultThemeAdapter` backed by XMLHttpRequest unless
+a custom adapter is passed to the constructor. The separately exported
+DefaultThemeAdapter in `core/DefaultThemeAdapter.ts` uses fetch and is activated
+only when the caller creates and supplies it. These two implementations do not
+share loading logic, so changes to default-adapter behavior must account for
+both paths.
+
+### 3.3 Compiled skin factories and global registration
+
+When CLI compiles KUI XML skins, its theme index module performs registrations
+equivalent to:
 
 ```js
 import { createButtonSkin as s0 } from './skin0.js';
 globalThis['skins.ButtonSkin'] = s0;
 ```
 
-`Theme._loadSkinsModule()` 相对主题配置文件自身的 URL 解析出
-`skinsJs` 路径，动态 `import()` 这个模块。因为 ESM 模块求值是自顶向下
-同步执行的，`import()` 的 Promise resolve 的那一刻，这个 bundle 里的每个
-皮肤 factory 已经把自己挂到 `globalThis` 上了。
+Theme._loadSkinsModule() resolves skinsJs relative to the theme configuration URL
+and dynamically imports it. By the time that import promise resolves, the module
+has registered its skin factories on globalThis.
 
-真正的读取发生在后面，`Component._parseSkinName()` 处理字符串形式的
-`skinName` 时做 `(globalThis as Record<string, unknown>)[skinName]`。
-所以完整链路是：
+Component._parseSkinName() resolves a string skinName through
+`(globalThis as Record<string, unknown>)[skinName]`. The complete flow is:
 
-```
-CLI 编译期            globalThis["skins.X"] = factory   （import 副作用）
-Theme 配置文件          hostComponentKey → "skins.X"      （字符串映射）
-Component 赋皮肤时      globalThis["skins.X"]              （读取拿到 factory）
+```text
+CLI-generated module   globalThis["skins.X"] = factory   import side effect
+Theme configuration    hostComponentKey → "skins.X"      string mapping
+Component skin setup   globalThis["skins.X"]              factory lookup
 ```
 
-没有独立的注册表对象——`globalThis` 本身就是皮肤 factory 的注册表。这是
-刻意换来简单性的设计，代价是**皮肤类名是一个事实上的全局命名空间**：两个
-主题如果凑巧用了同名的皮肤类（比如都叫 `"skins.ButtonSkin"`），后加载的
-会直接覆盖前一个在 `globalThis` 上的槏位。
+There is no separate registry object. Skin names occupy a global namespace:
+if two themes use the same name, such as skins.ButtonSkin, the later-loaded
+factory overwrites the earlier registration.
 
-### 3.4 组件创建早于主题加载完成——`_delayList` 机制
+### 3.4 Components created before the theme is ready
 
-游戏代码经常需要在网络请求（拉取主题配置）完成之前就先把 UI 树搭好。
-`Component.createChildren()` 如果没有显式设置 `skinName`，会去问全局
-`Theme` 要一个默认皮肤名：
+Game code can construct the UI tree before the theme request finishes.
+If Component.createChildren() has no explicit skinName, it asks the global
+Theme for a default:
 
-- 如果主题还没初始化完（`!theme._initialized`），`Theme.getSkinName()`
-  把这个组件塞进 `_delayList`（去重），当下返回空字符串——**组件先以
-  完全没有皮肤的状态创建出来**。
-- 主题加载完成（成功或失败都算）后，`_handleDelayList()` 遍历这个队列：
-  对每个还没被用户手动设置过 `skinName` 的组件，重新解析出真正的皮肤名，
-  调用 `component._applySkinName()` 补上皮肤，触发一次重新验证。
+- While the theme is uninitialized, getSkinName() puts the component into the
+  deduplicated `_delayList` and returns an empty string. The component starts
+  without a skin.
+- On loading completion or failure, `_handleDelayList()` revisits components
+  whose skinName has not been set explicitly. It resolves available skin names
+  and calls component._applySkinName(), causing validation of the applied skin.
 
-净效果：早创建的组件会有一到几帧渲染成"裸组件"，主题加载完（含 skinsJs
-模块的动态 import）之后被追加皮肤——这是让引擎能够异步解耦主题加载和
-UI 树构建的机制，跟 Egret 的异步主题加载惯例是一致的。
+An early-created component can render without its skin until theme loading,
+including the skinsJs import, finishes. This follows EUI's asynchronous-theme
+pattern and decouples UI-tree construction from theme loading.
 
-### 3.5 `_setSkin` 的拆装流程
+### 3.5 Replacing a skin
 
-`_parseSkinName()` 根据 `skinName` 的类型分派：函数 → 直接当 factory 调；
-字符串 → 先查 `globalThis` 再当 factory 调；对象 → 直接当 `Skin` 实例用。
+_parseSkinName() dispatches by skinName type: a function is invoked as a factory
+or constructor; a string is resolved through globalThis; an object is used as
+a Skin instance.
 
-`_invokeSkinFactory()` 用正则 `/^class\s/.test(Function.prototype.toString.call(fn))`
-区分真正的 ES class 构造器（用 `new` 调）和 KUI XML 编译产生的 factory 函数（用 `fn.call(this)` 调，让 factory 获得宿主组件上下文）。
+_invokeSkinFactory() tests `/^class\s/.test(Function.prototype.toString.call(fn))`
+to distinguish ES class constructors, invoked with new, from compiled KUI
+factories, invoked with fn.call(this) to supply the host context.
 
-`_setSkin(skin)` 做的事：
+_setSkin(skin) follows this lifecycle:
 
-1. **拆旧**：调用 `onSkinRemoved()`，此时旧的完整 `skinParts` 仍可读取
-   → 标记 Skin 未就绪并清空内部 part 映射
-   → `oldSkin.hostComponent = undefined` 退出旧状态
-   → `oldSkin.unwatchAll()` 清空皮肤激活期间注册的 `Watcher`
-   → 把 `elementsContent` 从宿主上摘掉。
-2. **装新**：遍历 `skin.skinParts`，通过 `skin.getPart(name)` 一次性构建
-   新的内部 part 映射 → 按声明顺序把 `elementsContent` `addChildAt` 到宿主
-   → 设置 `skin.hostComponent = this` 初始化状态机 → 标记 Skin 就绪并调用
-   `onSkinReady()`。组件实例上不会动态生成同名属性。
-3. 收尾 `invalidateSize()` + `invalidateDisplayList()` + 在*组件*（不是
-   皮肤）上派发 `Event.COMPLETE`。
+1. Detach the old skin: call onSkinRemoved() while its complete skinParts map
+   remains available, mark it unready and clear the map, set
+   oldSkin.hostComponent=undefined to exit its state, call oldSkin.unwatchAll()
+   to remove Watchers, and detach elementsContent from the host.
+2. Attach the new skin: collect declared parts through skin.getPart(name) into
+   the internal map, add elementsContent to the host in declaration order,
+   set currentState and hostComponent, mark the skin ready and call onSkinReady().
+   The Component instance does not acquire dynamic properties for those part names.
+3. Invalidate size and display list, then dispatch Event.COMPLETE on the Component.
 
 ---
 
-## 四、视图状态（State/Override 系统）
+## 4. View states and overrides
 
-### 4.1 状态切换的实际算法——没有真正的"diff"
+### 4.1 State transitions remove and reapply overrides
 
-`IOverride` 只有两个方法：`apply(host, skin)`、`remove(host, skin)`。
-`Skin._applyState(fromState, toState)` 的实现是：
+IOverride defines apply(host, skin) and remove(host, skin).
+Skin._applyState(fromState, toState) follows this algorithm:
 
-```
+```text
 oldState = states.find(s => s.name === fromState)
-若存在：对 oldState.overrides 逐个调用 override.remove(host, this)
+if present: call override.remove(host, this) for every oldState override
 
 newState = states.find(s => s.name === toState)
-若存在：对 newState.overrides 逐个调用 override.apply(host, this)
+if present: call override.apply(host, this) for every newState override
 ```
 
-**这就是全部逻辑**——无条件撤销旧状态的每个 override，无条件应用新状态
-的每个 override，**没有对比新旧两个状态的 override 列表、找出实际变化
-的部分**。如果同一个 `IOverride` 实例（或者逻辑等价的两个实例）同时出现
-在新旧两个状态里，它会被撤销然后立刻重新应用——对 `SetProperty`/
-`SetStateProperty` 而言这只是白做一次无意义的往返（先恢复旧值再设成
-同一个新值），但对 `AddItems` 而言会造成一次多余的
-"从容器移除→重新添加"，可能带来 z-order 重置（如果没有重新指定完全
-一致的 `position`）。这是一个真实的性能/正确性细节，跟熟悉 Flex 那种
-"只应用差集"的智能 diff 的开发者的直觉不符。
+It does not compute the difference between override lists. Even a shared override
+instance is removed and reapplied. SetProperty/SetStateProperty may restore a
+value and immediately set it again. AddItems can remove and reinsert an object,
+with possible z-order changes unless its placement is fully specified.
+Developers expecting only changed overrides to execute must account for this.
 
-### 4.2 三种 override 的具体行为
+### 4.2 Override behavior
 
-- **`SetProperty`**：目标是某个皮肤部件（或皮肤对象本身，`target` 为空时）
-  ，`apply()` 时先缓存旧值到 `_oldValue`，再赋新值；`remove()` 恢复
-  `_oldValue`，但只在 `_applied` 为真时才恢复（防御性检查，避免没有
-  `apply()` 过就调 `remove()`）。
-- **`SetStateProperty`**：同样的模式,但目标是**宿主组件本身**
-  （`host[name] = value`），不是皮肤部件——用于状态驱动的、影响组件自己
-  公开 API 的变化（比如 `enabled`），不是内部视觉细节。
-- **`AddItems`**：`apply()` 时把某个显示对象移到目标容器里（默认是宿主）
-  的指定位置；`remove()` 时把它移出，但只在
-  `item.parent === dest` 时才动手——防御性检查，避免这个对象在中途被
-  别的逻辑挪去了别处。
+- SetProperty targets a skin part, or Skin itself for an empty target. apply()
+  saves `_oldValue` and assigns the new value. remove() restores it only when
+  `_applied` is true.
+- SetStateProperty uses the same save/restore pattern on the host Component,
+  through host[name]=value. It changes public host behavior, such as enabled,
+  rather than a named skin part.
+- AddItems moves a display object into a destination container, defaulting to the
+  host, at the specified position. remove() detaches it only if item.parent===dest,
+  preserving an object that other logic has since moved elsewhere.
 
-### 4.3 `Skin` 与 `Group` 各自维护一套几乎相同的状态机——已知的重复
+### 4.3 Separate Skin and Group state machines
 
-`Group` 没有附着的 `Skin`（容器本身不换肤），所以它自己复刻了一份跟
-`Skin._applyState` 结构上完全相同的 apply/remove 逻辑（`Group.ts` 的
-`_commitCurrentState()`），直接持有 `_states`/`_statesMap`/`_currentState`
-字段。调用 override 时传的是 `override.apply(this as unknown as Component,
-this as unknown as Skin)`——因为 `IOverride.apply/remove(host, skin)`
-这个签名假设的是一对独立的 `Component` + `Skin`，但 `Group` 只有自己
-一个对象，只能同时假扮两个角色（这能工作是因为 `Group` 状态实际用到的
-override 通常是 `SetStateProperty`，从不真正调用 `skin.getPart()`）。
+Group has no attached Skin, so `_commitCurrentState()` implements similar
+apply/remove logic using `_states`, `_statesMap` and `_currentState`.
+It passes Group as both roles using
+`override.apply(this as unknown as Component, this as unknown as Skin)`.
+The signature assumes separate Component and Skin objects, while Group has only
+itself. Host-property overrides can use this arrangement; code that requires
+real Skin APIs such as getPart() must not assume that Group provides them.
 
-这是一处已知的架构重复——两套结构相同的状态机分别长在 `Skin` 和 `Group`
-上，如果抽出一个共享的 `applyStateTransition(states, from, to, host, skin)`
-辅助函数，能去掉大约 30 行重复代码和那处不安全的双重类型转换。目前
-未做这个抽取，属于已知但尚未处理的技术债，不是刻意的设计。
+The duplicated transition logic and casts are a known coupling point. A shared
+transition helper could reduce the duplication, but no such extraction is
+currently implemented.
 
 ---
 
-## 五、布局系统
+## 5. Layout system
 
-### 5.1 measure/updateDisplayList 契约
+### 5.1 Measurement and display-list contracts
 
-`LayoutBase`（抽象基类）声明两个抽象方法，每个具体布局都要实现：
+LayoutBase defines the two operations implemented by concrete layouts:
 
-- **`measure()`**——深→浅阶段调用。任务是根据每个子节点的
-  `getPreferredBounds()`，算出容器自己的期望尺寸，调用
-  `target.setMeasuredSize(w, h)` 恰好一次。
-- **`updateDisplayList(width, height)`**——浅→深阶段调用，传入的是*实际*
-  分配到的宽高（可能跟测量尺寸不同，如果父节点做了约束）。任务是给每个
-  纳入布局的子节点调用 `setLayoutBoundsSize()` + `setLayoutBoundsPosition()`
-  ，最后调用一次 `target.setContentSize(w, h)` 报告实际占用尺寸（用于
-  滚动/视口计算，跟测量尺寸是两个不同的概念）。
+- measure() runs from deep to shallow. It uses each child's getPreferredBounds()
+  to determine the container's preferred dimensions and reports them through
+  target.setMeasuredSize(w, h).
+- updateDisplayList(width, height) runs from shallow to deep, receiving allocated
+  dimensions that can differ from measured dimensions because of parent
+  constraints. It assigns participating children through setLayoutBoundsSize()
+  and setLayoutBoundsPosition(), then reports occupied dimensions with
+  target.setContentSize(w, h) for scrolling/viewport calculations.
 
-`ILayoutTarget` 是布局算法需要从容器那里拿到的最小接口
-（`numChildren`/`getChildAt`/`scrollH`/`setMeasuredSize`/... ）。`Group`
-和 `Component` 都实现了这个接口，所以同一批布局类（`BasicLayout`、
-`VerticalLayout` 等）既能当 `Group.layout` 用，也能被 `Component` 内部
-用作默认布局（`Component` 的度量/显示列表更新其实是委托给一个共享的
-`BasicLayout` 单例实例，通过临时设置 `.target` 复用）。
+ILayoutTarget is the minimal container interface used by layout algorithms:
+numChildren, getChildAt, scrollH, setMeasuredSize and related operations.
+Group and Component both implement it. Layouts such as BasicLayout and
+VerticalLayout can be assigned to Group.layout; Component internally reuses a
+shared BasicLayout for measurement and display-list updates by temporarily
+setting its target. Component's skin measurement uses unscaled preferred bounds,
+so the host's transform is applied by its parent rather than counted twice.
 
-`includeInLayout` 过滤：每个布局遍历子节点时会跳过没有实现
-`getPreferredBounds()`（鸭子类型检查）或者 `includeInLayout === false`
-的对象——这就是 EUI 风格的 `includeIn`/`excludeFrom` 状态覆盖能"从布局里
-隐藏一个元素但不把它移出显示树"的底层机制。
+Layouts skip children that do not implement the UI layout contract or have
+includeInLayout=false. This excludes an element from layout without requiring
+its removal from the display tree. State membership that changes display-tree
+attachment is handled separately by AddItems.
 
-### 5.2 百分比尺寸
+### 5.2 Percentage dimensions
 
-`BasicLayout`（约束布局）解析 `left`/`right`/`top`/`bottom`/
-`horizontalCenter`/`verticalCenter` 加 `percentWidth`/`percentHeight`。
-只有当对应方向的两个位置约束**没有同时设置**（`left` + `right` 同时给出
-意味着宽度已经被算死了，`unscaledWidth - right - left`，这时优先于
-`percentWidth`）百分比才会生效。字符串形式的约束值（KUI XML 中写
-`left="10%"`）由 `fmt()` 辅助函数统一解析：以 `%` 结尾的当百分比处理，
-否则强转数字——没有单独的"百分比 vs 像素"类型标签。
+BasicLayout resolves left/right/top/bottom, horizontalCenter/verticalCenter and
+percentWidth/percentHeight. When both edge constraints on an axis are set, they
+fix that dimension: width becomes unscaledWidth-right-left, taking precedence
+over percentWidth. Percentage sizing applies when the two edge constraints do
+not both determine the dimension.
 
-`LinearLayoutBase.flexChildrenProportionally()`（`VerticalLayout`/
-`HorizontalLayout` 共用）实现的是带 min/max 夹紧的迭代式百分比分配：用
-`do...while(!done)` 循环反复找出"按比例分配会超出自己 min/max 限制"的
-子节点，把它夹到边界值，从剩余待分配池里移除（原地分区交换，不做数组
-拼接），把它的 `percent` 从总百分比里减掉，再对剩下的子节点重新分配——
-这不是一次除法就能算完的，因为一个子节点被夹住之后,其他子节点的"有效
-百分比份额"要跟着变。这是 Flex 盒模型百分比分配算法的移植。
+The fmt() helper parses string constraints such as `left="10%"` in KUI XML.
+A trailing percent sign selects percentage calculation; otherwise the value is
+converted to a number. There is no separate runtime type tag for percentages
+versus pixels.
 
-### 5.3 间距与内边距
+LinearLayoutBase.flexChildrenProportionally(), shared by VerticalLayout and
+HorizontalLayout, iteratively allocates percentages with min/max constraints.
+A do...while loop identifies children whose proportional allocation exceeds a
+bound, clamps them and removes them from the remaining allocation pool using
+in-place partition swaps. It subtracts their percentage shares and redistributes
+the remainder. One division is insufficient because clamping a child changes
+the effective shares of the others. This follows the Flex-style percentage
+allocation algorithm.
 
-`LinearLayoutBase` 持有 `_gap`/`_paddingLeft/Right/Top/Bottom`（setter
-统一调用 `_invalidateTargetLayout()`）。`VerticalLayout`/`HorizontalLayout`
-在分配空间之前先减掉 `(numElements - 1) * gap`，第二遍定位时每两个元素
-之间加上 `gap`。`TileLayout` 单独维护 `_horizontalGap`/`_verticalGap`
-和自己的 padding 字段——它直接 `extends LayoutBase`，不经过
-`LinearLayoutBase`，所以 padding 的 getter/setter 是重复实现的一份，不是
-共享的。
+### 5.3 Gaps and padding
 
-### 5.4 虚拟布局
+LinearLayoutBase owns gap and paddingLeft/Right/Top/Bottom; setters invalidate
+the target layout. VerticalLayout/HorizontalLayout subtract
+(numElements-1)*gap before allocation, then add gaps during positioning.
+TileLayout maintains separate horizontalGap/verticalGap and padding fields.
+It extends LayoutBase directly, so these accessors are implemented independently
+of LinearLayoutBase.
 
-虚拟布局（`layout.useVirtualLayout = true`，默认关闭，这是相对 Egret
-EUI 的一处差异）存在的意义是让 `List`/`DataGroup` 面对成千上万条数据时
-只实例化当前可见范围内的 renderer：
+### 5.4 Virtual layout
 
-- **`elementSizeTable: number[]`**（`LinearLayoutBase` 的受保护字段）
-  按数据下标（不是显示子节点下标，因为屏幕外的元素根本没被实例化）缓存
-  每个元素沿布局轴的最近一次已知尺寸。`NaN` 表示"还不知道，用
-  `typicalWidth`/`typicalHeight` 估算"（默认 71×22）。
-- **`elementAdded(index)`/`elementRemoved(index)`** 让尺寸表跟随
-  `ICollection` 的增删同步,不需要整体重新测量。
-- **`getStartPosition(index)`**：累加 `elementSizeTable` 得到某下标的
-  起始偏移；配合 `findIndexAt`（递归二分查找）可以反过来从滚动位置推算出
-  当前可见的下标范围。
-- `updateDisplayListVirtual()` 只遍历 `startIndex..endIndex`，先调用
-  `target.setVirtualElementIndicesInView(startIndex, endIndex)`——这是
-  `DataGroup` 用来回收/实例化对应下标范围的 renderer 的钩子。
-- `measureVirtual()` 靠 `getElementTotalSize()`（缓存尺寸求和，未知条目
-  用估算尺寸补）加上一次只针对当前可见范围的修正测量，来估算总可滚动
-  尺寸——不需要为了拿到一个近似总长度就把所有屏幕外条目都实例化一遍。
-- `TileLayout` 的虚拟模式不用 `elementSizeTable`，而是直接用
-  `scrollH`/`scrollV` 除以固定的 `列宽+间距`/`行高+间距` 算出可见下标
-  范围（`_getIndexInView()`）——因为瓦片布局的格子本身就是等宽等高的，
-  比线性布局的可变尺寸虚拟化简单得多。
+Virtual layout is disabled by default. Enable it explicitly through
+layout.useVirtualLayout or the corresponding DataGroup/List property.
+It lets List/DataGroup instantiate renderers only for the visible range when
+handling thousands of records:
 
-**给未来扩展布局系统的人的提示**：`LayoutBase.getElementIndicesInView()`
-这个公开方法默认返回空数组，而 `VerticalLayout`/`HorizontalLayout`/
-`TileLayout` 各自实现的其实是名字不同的**受保护**方法
-（`getIndexInView()`/`_getIndexInView()`），**没有一个真正重写了基类的
-这个公开方法**。也就是说 `LayoutBase.getElementIndicesInView()` 目前是一处
-没有被实际接上任何逻辑的、看起来像扩展点但并不是的公开 API——新写一个
-布局类不要假设覆写它就能拿到虚拟可见范围。
+- LinearLayoutBase's protected elementSizeTable stores the last known axis size
+  by data index, rather than display-child index. NaN means unknown, estimated
+  using typicalWidth/typicalHeight, initially 71 × 22.
+- elementAdded(index)/elementRemoved(index) keep the size table synchronized with
+  ICollection changes without requiring full remeasurement.
+- getStartPosition(index) accumulates preceding sizes to obtain an offset.
+  findIndexAt uses recursive binary search to map scroll positions to visible indices.
+- updateDisplayListVirtual() visits only startIndex..endIndex. It calls
+  target.setVirtualElementIndicesInView(startIndex, endIndex), which lets
+  DataGroup recycle and instantiate renderers for that range.
+- measureVirtual() estimates total scrollable size from getElementTotalSize()
+  and a correction based on visible elements, without instantiating every
+  off-screen record.
+- TileLayout uses scrollH/scrollV and fixed column/row strides, including gaps,
+  to determine the visible range through _getIndexInView(). Uniform cells make
+  this simpler than variable-size linear virtualization.
 
----
-
-## 六、组件类层级（完整组件目录）
-
-### 继承 `Component`（可换肤，单一视觉宿主，`skin`/`currentState` 委托给 `Skin`）
-
-| 类                                    | 一句话说明                                                                                 |
-| ------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `Component`                           | 所有可换肤组件的抽象基类——皮肤生命周期、视图状态委托、约束布局属性、校验委托给 `UIState`。 |
-| `Rect`                                | 矩形图形基元，带填充/描边。                                                                |
-| `Image`                               | 展示通过 `IAssetAdapter` 解析出的位图数据。                                                |
-| `Label`                               | 文本展示，包装一个 `TextField`。                                                           |
-| `EditableText`（继承 `Label`）        | 支持占位提示的可编辑文本框。                                                               |
-| `Button`                              | 带 up/down/disabled 状态的可点击按钮；`toggle` 标志让子类实现自动切换 `selected`。         |
-| `ToggleButton`（继承 `Button`）       | 默认 `toggle = true`，每次点击自动翻转选中状态。                                           |
-| `CheckBox`（继承 `ToggleButton`）     | 功能与 `ToggleButton` 相同，视觉区别完全由皮肤决定。                                       |
-| `RadioButton`（继承 `ToggleButton`）  | 通过独立的 `RadioButtonGroup` 实现互斥选择。                                               |
-| `ToggleSwitch`（继承 `ToggleButton`） | 皮肤变体，渲染成滑动开关样式。                                                             |
-| `Range`                               | 数值限制在 `[minimum, maximum]`，可选 `snapInterval`，是滑块的基类。                       |
-| `SliderBase`（继承 `Range`）          | 拖动 thumb/track 皮肤部件来改变数值的抽象滑块行为。                                        |
-| `HSlider`（继承 `SliderBase`）        | 水平方向，从左到右。                                                                       |
-| `VSlider`（继承 `SliderBase`）        | 垂直方向，从下到上。                                                                       |
-| `ScrollBarBase`                       | 滚动条基类——拖动 thumb 跟视口滚动位置绑定。                                                |
-| `HScrollBar`（继承 `ScrollBarBase`）  | 水平滚动（`scrollH`）。                                                                    |
-| `VScrollBar`（继承 `ScrollBarBase`）  | 垂直滚动（`scrollV`）。                                                                    |
-| `ProgressBar`                         | 通过裁剪的 thumb（`scrollRect`）展示任务进度，支持标签格式化。                             |
-| `TextInput`                           | 文本输入框，支持占位提示和密码遮罩。                                                       |
-| `Panel`                               | 带可选标题栏/关闭按钮/拖拽区域的可换肤容器。                                               |
-| `Scroller`                            | 包装一个 `IViewport`（通常是 `Group`），提供触摸滚动和滚动条管理。                         |
-| `ComboBox`                            | 下拉选择组件——触发按钮 + 悬浮下拉列表。                                                    |
-| `ItemRenderer`                        | `DataGroup`/`List`/`TabBar` 使用的数据驱动列表项渲染器基类。                               |
-
-### 继承 `Group`（纯容器，不换肤，自带一套轻量状态机，持有可插拔的 `LayoutBase`）
-
-| 类                             | 一句话说明                                                                                                        |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `Group`                        | 容器基类：参与校验循环，把子节点定位委托给 `LayoutBase`，自带一套状态机（跟 `Skin` 的状态机结构重复,见 4.3 节）。 |
-| `DataGroup`（继承 `Group`）    | 把 `ICollection` 数据源转换成 item renderer 实例，维护一个可复用的 renderer 空闲池支持虚拟布局回收。              |
-| `ListBase`（继承 `DataGroup`） | 增加 `selectedIndex`/`selectedItem` 选中状态和 `requireSelection` 语义。                                          |
-| `List`（继承 `ListBase`）      | 增加点击 renderer 选中的触摸交互。                                                                                |
-| `TabBar`（继承 `ListBase`）    | 一排可选中标签，默认 `requireSelection = true`。                                                                  |
-| `ViewStack`                    | 堆叠子节点的导航容器，任意时刻只显示一个；实现 `ICollection`。                                                    |
-| `UILayer`                      | 顶层容器，监听 `RESIZE` 自动跟随舞台尺寸。                                                                        |
-
-### 不属于 `Component`/`Group` 层级的支持类
-
-| 类                 | 一句话说明                                                                                                       |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `Skin`             | 数据持有者（继承 `EventDispatcher`）——声明 `skinParts`/`states`/`elementsContent`,自己不在显示树里（见第三节）。 |
-| `RadioButtonGroup` | 继承 `EventDispatcher`——追踪同一 `groupName` 下多个 `RadioButton` 的互斥关系，派发 `PropertyEvent`。             |
-| `TouchScroll`      | 触摸滚动的惯性物理模拟，被 `Scroller` 使用。                                                                     |
-| `Animation`        | 简单数值缓动工具,被 `TouchScroll` 使用，靠 core 的 `ticker` 驱动。                                               |
+LayoutBase.getElementIndicesInView() returns an empty array by default.
+TileLayout overrides it to expose the currently calculated range.
+VerticalLayout/HorizontalLayout use protected getIndexInView() methods for their
+internal calculations and do not override that public query. New layouts must
+explicitly connect range calculation, viewport invalidation and renderer
+materialization; overriding the public query alone does not drive virtual layout.
 
 ---
 
-## 七、与 Egret EUI 的对应关系
+## 6. Component hierarchy
 
-| Egret EUI 概念                                                 | Kurot UI 对应                                                                    | 说明                                                                                                                                                                                                                                                                         |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `eui.Component`                                                | `Component`                                                                      | 角色相同，Kurot 用真正的类继承（`extends Sprite`）取代 Egret 的命名空间混入风格。                                                                                                                                                                                            |
-| `eui.Skin`                                                     | `Skin`                                                                           | Egret 的 Skin 通常是 EXML 生成的真实 `DisplayObjectContainer` 子类；Kurot 的 `Skin` 明确**不是**显示对象——这是相对 Egret 最大的结构性偏离（见第三节）。                                                                                                                      |
-| `eui.UIComponent` 的三阶段校验                                 | `UIState` + `Validator`                                                          | 同样按深度执行三阶段批处理（提交属性 → 测量 → 提交显示列表）。Egret 通过 `Event.RENDER` 保证绘制前校验，Kurot 通过 core ticker 的 `callLater` 队列实现同一时序契约。                                                                                                         |
-| `eui.IThemeAdapter` / 框架内置的主题单例                       | `IThemeAdapter` + `Theme`/`getTheme()`/`setTheme()`                              | Egret 的主题加载策略基本是框架内置的；Kurot 把网络请求策略做成了可通过构造函数注入的接口（见下方"全新设计"）。                                                                                                                                                               |
-| 编译期 EXML 皮肤类的全局命名空间注册                           | `globalThis["skins.X"] = factory` 自注册 ESM 导入                                | 概念上是同一种"全局皮肤注册表"模式，但 Kurot 的编译产物生成的是 **factory 函数**而不是类，专门为了支持用 `.call(this)` 调用来绑定 `this` 上下文——这是类继承重写带来的新问题（原本 Egret 的命名空间混入模式不存在这个绑定问题），Kurot 特有的解法,在 Egret 里没有直接对应物。 |
-| `State`/`SetProperty`/`SetStateProperty`/`AddItems` 覆盖机制   | 同名类，同一个 `IOverride` 接口                                                  | 对 Egret/Flex 视图状态覆盖模式的相当直接的移植。                                                                                                                                                                                                                             |
-| `BasicLayout`/`VerticalLayout`/`HorizontalLayout`/`TileLayout` | 同名类，算法结构基本一致（百分比分配、间距/内边距、`elementSizeTable` 虚拟布局） | 相当接近的算法移植，包括 `flexChildrenProportionally` 的迭代夹紧法。                                                                                                                                                                                                         |
-| 命名空间混入/原型拷贝的继承模型                                | 标准 TypeScript 类继承 + 显式委托（`UIState`、`ILayoutTarget`）                  | 这是整个包最大的架构决策，不是某个具体功能点的差异——第一节已经详述。                                                                                                                                                                                                         |
+### Component subclasses
 
-**Egret EUI 里没有直接对应物、属于全新设计的部分：**
+Component is the visual host for skinnable controls, delegating skin states to
+Skin and layout/validation state to UIState. The table lists its descendants,
+including intermediate base classes.
 
-- `IThemeAdapter` 作为可在 `Theme` 构造函数注入的接口（Egret 把网络加载
-  策略焊死在框架里）。
-- 委托模式本身：`IUIOwner`/`UIState` 作为一个可以独立于任何具体
-  DisplayObject 子类存在的状态机对象，被 `Group`/`Component` 各自持有一份
-  （`this.ui`），而不是把校验状态直接塞进一个公共基类——这正是
-  `Group`/`Component` 能在只有 1 层继承的情况下都实现 `ILayoutTarget`
-  的原因。
-- `Skin` 作为非视觉数据持有者的设计（前面已详述）——这是相对 Egret
-  "皮肤即容器"模型的刻意偏离。
+| Class                               | Responsibility                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `Component`                         | Base for skinnable components: skin lifecycle, view states, constraints and validation delegation |
+| `Rect`                              | Rectangle graphics with fill and stroke                                                           |
+| `Image`                             | Displays bitmap data resolved through IAssetAdapter                                               |
+| `Label`                             | Text display wrapping one TextField                                                               |
+| `BitmapLabel`                       | Bitmap-font label wrapping one BitmapText; requires Core 2.2.0 or later                           |
+| `EditableText extends Label`        | Editable text with prompt support                                                                 |
+| `Button`                            | Clickable up/down/disabled states; toggle enables automatic selected changes                      |
+| `ToggleButton extends Button`       | Defaults toggle to true and toggles selection on click                                            |
+| `CheckBox extends ToggleButton`     | Toggle behavior whose appearance is defined by its skin                                           |
+| `RadioButton extends ToggleButton`  | Mutually exclusive selection through RadioButtonGroup                                             |
+| `ToggleSwitch extends ToggleButton` | Skin variant presenting a sliding switch                                                          |
+| `Range`                             | Bounds values to minimum/maximum with optional snapInterval; base for sliders                     |
+| `SliderBase extends Range`          | Abstract dragging behavior for thumb/track skin parts                                             |
+| `HSlider extends SliderBase`        | Horizontal slider, increasing left to right                                                       |
+| `VSlider extends SliderBase`        | Vertical slider, increasing bottom to top                                                         |
+| `ScrollBarBase`                     | Binds thumb movement to a viewport's scroll position                                              |
+| `HScrollBar extends ScrollBarBase`  | Horizontal scrolling through scrollH                                                              |
+| `VScrollBar extends ScrollBarBase`  | Vertical scrolling through scrollV                                                                |
+| `ProgressBar`                       | Displays progress through a clipped thumb using scrollRect, with label formatting                 |
+| `TextInput`                         | Text input with prompts and password masking                                                      |
+| `Panel`                             | Skinnable container with optional title bar, close button and drag area                           |
+| `Scroller`                          | Wraps an IViewport, usually Group, and manages touch scrolling and scrollbars                     |
+| `ComboBox`                          | Dropdown selection with a trigger button and popup list                                           |
+| `ItemRenderer`                      | Data-driven item renderer base for DataGroup/List/TabBar                                          |
+
+### Group subclasses
+
+Group is a container without a skin. It owns a lightweight state machine and a
+pluggable LayoutBase.
+
+| Class                        | Responsibility                                                                                                                         |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `Group`                      | Participates in validation and delegates child positioning to LayoutBase; maintains its own state machine, as described in section 4.3 |
+| `DataGroup extends Group`    | Converts ICollection records into renderers and maintains a reusable pool for virtual layout                                           |
+| `ListBase extends DataGroup` | Adds selectedIndex/selectedItem and requireSelection semantics                                                                         |
+| `List extends ListBase`      | Adds touch selection by clicking renderers                                                                                             |
+| `TabBar extends ListBase`    | Selectable tabs with requireSelection=true by default                                                                                  |
+| `ViewStack`                  | Stacked navigation container showing one child at a time; implements ICollection                                                       |
+| `UILayer`                    | Top-level container following stage dimensions through RESIZE events                                                                   |
+
+### Supporting classes
+
+| Class              | Responsibility                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| `Skin`             | Nonvisual EventDispatcher declaring skinParts/states/elementsContent; see section 3                   |
+| `RadioButtonGroup` | EventDispatcher tracking mutually exclusive RadioButtons under a groupName and emitting PropertyEvent |
+| `TouchScroll`      | Inertial touch-scroll physics used by Scroller                                                        |
+| `Animation`        | Numeric easing used by TouchScroll, driven by Core's ticker                                           |
 
 ---
 
-## 八、测试覆盖
+## 7. Relationship to Egret EUI
 
-`test/` 下 26 个文件，共 223 个测试用例。按覆盖领域分组：
+| Egret EUI concept                                      | Kurot UI counterpart                                      | Notes                                                                                                                                                                          |
+| ------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `eui.Component`                                        | `Component`                                               | Same role; UI behavior uses standard Sprite inheritance and explicit delegation rather than prototype mixins                                                                   |
+| `eui.Skin`                                             | `Skin`                                                    | Both are nonvisual EventDispatcher objects; their content is attached to the host component                                                                                    |
+| Three-phase UIComponent validation                     | `UIState` + `Validator`                                   | Depth-ordered properties, measurement and display-list phases; Kurot uses Core's callLater queue before rendering where Egret uses Event.RENDER                                |
+| Theme adapters and theme registration                  | `IThemeAdapter` + `Theme`/`getTheme()`/`setTheme()`       | Both support theme adapters; Kurot injects the adapter through the Theme constructor, while the Egret reference resolves eui.IThemeAdapter through its implementation registry |
+| Global registration of compiled EXML skins             | `globalThis["skins.X"] = factory` from ESM imports        | Both use global skin names; Kurot's compiled output registers factories invoked with .call(this) to provide host context                                                       |
+| State/SetProperty/SetStateProperty/AddItems            | Same class names and IOverride interface                  | Direct adaptation of declarative state overrides                                                                                                                               |
+| BasicLayout/VerticalLayout/HorizontalLayout/TileLayout | Same class names                                          | Similar percentage allocation, gaps, padding and virtual-layout algorithms, including iterative min/max clamping                                                               |
+| Prototype-copy UIComponent implementation              | TypeScript inheritance + UIState/ILayoutTarget delegation | The central architectural change described in section 1                                                                                                                        |
 
-| 领域               | 覆盖的文件                                                                                                                       |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 校验/主题基础设施  | `sanity`、`Theme`、`Validator`                                                                                                   |
-| 皮肤与状态         | `Skin`、`SkinAlignment`（针对真实 CLI 模板皮肤的集成测试）、`AddItems`                                                           |
-| 数据绑定           | `Binding`、`Watcher`                                                                                                             |
-| 集合与数据驱动组件 | `ArrayCollection`、`DataGroup`、`ListBase`、`ItemRenderer`、`ComboBox`、`TabBar`、`ViewStack`                                    |
-| 具体组件           | `RadioButton`、`Range`、`Slider`、`ProgressBar`、`Scroller`、`Label`、`TextInput`                                                |
-| 跨组件行为         | `Enabled`（enabled/touchEnabled/touchChildren 的 egret 对齐回归测试）、`EventMapOverride`、`GestureLifecycle`、`TransformLayout` |
+Kurot-specific choices include the IUIOwner/UIState composition boundary,
+constructor-based Theme adapter injection and ESM skin factories with explicit
+host context. UIState can exist independently of a specific DisplayObject
+subclass; Group and Component each hold an instance rather than requiring a
+shared visual base class for all validation state.
 
-**已知覆盖缺口**：没有独立的 `Group.test.ts`（`Group` 的状态机只是通过
-`DataGroup`/`ListBase`/`ViewStack` 的测试间接被覆盖）；没有针对布局算法
-本身的独立测试文件（没有 `VerticalLayout.test.ts`/`TileLayout.test.ts`），
-布局正确性目前只通过 `TransformLayout.test.ts`、`Scroller.test.ts`、
-`SkinAlignment.test.ts` 这类组件级测试间接验证。如果要专门补测试，这两块
-是优先级最高的空白。
+---
 
-`examples/benchmark/` 另外提供真实 Chromium 中的 UI 性能验证，覆盖 400
-节点静态界面、240 节点 transform/alpha 动画和 10,000 条数据的虚拟列表。
-它分别记录 frame/render time、draw calls、校验阶段调用和 ItemRenderer
-创建/复用；该 benchmark 是自身回归基线，不承担跨 UI 框架排名。
+## 8. Test coverage
+
+Tests are grouped under `test/`. Run `pnpm --dir packages/ui test` for current
+file and case counts.
+
+| Area                                   | Test files                                                                                                                                     |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Validation / theme infrastructure      | sanity, Theme, Validator                                                                                                                       |
+| Skins and states                       | Skin, SkinAlignment (real CLI template skins), SkinMeasurement, AddItems                                                                       |
+| Data binding                           | Binding, Watcher                                                                                                                               |
+| Collections and data-driven components | ArrayCollection, DataGroup, ListBase, ItemRenderer, ComboBox, TabBar, ViewStack                                                                |
+| Individual components                  | RadioButton, Range, Slider, ProgressBar, Scroller, Label, BitmapLabel, TextInput                                                               |
+| Text fitting                           | ButtonLabelTextFit, LabelTextFit, LabelTextFitBounds                                                                                           |
+| Cross-component behavior               | Enabled (EUI-aligned enabled/touchEnabled/touchChildren behavior), EventMapOverride, GestureLifecycle, TransformLayout, ScrollAndVirtualLayout |
+
+There is no dedicated Group.test.ts; Group state behavior is covered indirectly
+by container/component tests. There are also no separate VerticalLayout.test.ts
+or TileLayout.test.ts files. Layout behavior is exercised by component and
+integration tests such as TransformLayout, Scroller, SkinAlignment,
+SkinMeasurement and ScrollAndVirtualLayout. Dedicated state-machine and layout
+algorithm tests remain useful areas for additional coverage.
+
+`examples/benchmark/` provides real Chromium performance checks for a 400-node
+static UI, 240-node transform/alpha animation and a virtual list with 10,000 records.
+It records frame/render time, draw calls, validation-phase calls and ItemRenderer
+creation/reuse. It is a regression baseline for this UI implementation, rather
+than a ranking across UI frameworks.

@@ -4,6 +4,47 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.2.0] — 2026-10-08
+
+### Added
+
+- Add built-in `ResourceType.Font` and `FontAnalyzer` for native JSON, Egret JSON
+  `.fnt` and single-page, unpacked BMFont text. Load pages relative to their
+  descriptors, deduplicate concurrent font loads and clean up owned page data.
+- Draw `BitmapText` through native WebGL texture batching and Canvas, including
+  trimmed glyphs, kerning, alignment, tint and ordinary clipping.
+- Expose immutable `BitmapFont.data`, explicit page ownership through
+  `BitmapFontOptions`, and independent `BitmapText.measureText()`.
+
+### Fixed
+
+- Restore readable `BitmapText.width`/`height` accessors and invalidate cached
+  layout/rendering after text, font or metric changes.
+- Keep a separately loaded PNG alive when its font resource is destroyed.
+
+### Internal
+
+- Use published `@kurot/bitmap-font ^0.1.0` for validation, parsing, serialization
+  contracts and shared layout. Remove the local source dependency override.
+- Add `BitmapTextPipe` and route bitmap text directly through both renderers.
+
+### Migration
+
+- Bitmap text now uses explicit per-font advances, fixed line-height boxes and
+  complete-line height clipping. `multiline = false` keeps the first hard line
+  unwrapped; width/height constrain layout rather than scaling glyphs.
+- `BitmapText.EMPTY_FACTOR` remains deprecated; `font.data.spaceAdvance` controls
+  fallback spaces. Font pages require a full unrotated texture at scale factor 1.
+- The UI `BitmapLabel` wrapper requires a separate UI release. CLI/KUI and Editor
+  adoption are not included. See [bitmap-font contracts](docs/bitmap-fonts.md).
+
+### Tests
+
+- Cover native glyph geometry, WebGL dispatch, layout invalidation, independent
+  measurement, ownership, descriptor-relative loading, concurrency and retries.
+- Validate the original number font in WebGL 2, WebGL 1 and Canvas, including
+  clearing/changing text, clipping, zero advances and RenderTexture capture.
+
 ## [2.1.1] — 2026-10-05
 
 ### Fixed

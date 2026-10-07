@@ -2,7 +2,7 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Current release: 2.1.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.2.0.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Scroll clipping in 2.1.1
 
@@ -34,12 +34,15 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.1.1
+pnpm add @kurot/core@^2.2.0
 ```
 
-Core has no dependency on other Kurot packages. UI 3.1.0, Game 2.0.0 and
-ui-runtime 0.8.2 accept Core 2.1.1 through their existing peer ranges. Install
-those packages separately when the application needs their capabilities.
+Core 2.2.0 depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
+layout. Package installation resolves this dependency from npm. UI 3.1.0,
+Game 2.0.0 and ui-runtime 0.8.2 accept Core 2.2.0 through their existing peer
+ranges. Install those packages separately when the application needs their
+capabilities. The new UI BitmapLabel component follows in a separate UI release;
+it is absent from UI 3.1.0.
 
 ## Features
 
@@ -71,7 +74,7 @@ those packages separately when the application needs their capabilities.
 **Other**
 
 - 7 screen scale modes (showAll / noScale / exactFit / noBorder, etc.)
-- Resource manager — async/await loading, group-based batching, 5 built-in parsers (Image / Json / Text / Sound / Sheet)
+- Resource manager — async/await loading, group-based batching, 6 built-in parsers (Image / Json / Text / Sound / Sheet / Font)
 - HttpRequest / ImageLoader networking
 - Sound (Web Audio + HTML Audio fallback) / Video playback
 - ByteArray / Timer / Logger / FontManager / LocalStorage
@@ -217,6 +220,7 @@ pnpm run dev          # watch mode
 - [CHANGELOG.md](./CHANGELOG.md) — versioned release notes, including the full list of 1.0.0 breaking changes
 - [Architecture](./docs/architecture.md) — engine structure and rendering pipeline
 - [Resource system](./docs/resource.md) — resource configuration, loading, and lifecycle
+- [Bitmap fonts](./docs/bitmap-fonts.md) — supported descriptors, native rendering, metrics and ownership
 - [Live demo](https://irwinmc.github.io/kurot-demo/) — interactive rendering examples
 
 ## Test Pages
@@ -319,3 +323,18 @@ CLI 3.3.0, including named colors and Label presets. Core does not read this fil
 references. Compiled skins receive numeric RGB values; the application loads
 fonts before measuring text. See the
 [project style contract](../ui-document/docs/project-styles.md).
+
+## Bitmap fonts in 2.2.0
+
+[Core bitmap fonts](docs/bitmap-fonts.md) use the headless @kurot/bitmap-font
+package for data and layout. Built-in `font` resources load the descriptor and
+its image page; `BitmapText` draws cropped glyphs through WebGL batching or
+Canvas using the same layout. Descriptor data is immutable, text borrows its
+font, and direct construction owns the page unless `ownsTexture: false` is set.
+
+Widths/heights are layout constraints; use scaleX/scaleY to resize the artwork.
+Height admits complete lines, and explicit `multiline = false` keeps the first
+hard-separated line unwrapped. `BitmapText.EMPTY_FACTOR` is deprecated in favor
+of `font.data.spaceAdvance`. See the linked contracts before migrating custom
+bitmap-text measurements. KUI tags and Editor materialization need separate
+consumer releases.

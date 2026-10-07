@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.1.1`. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.2.0`. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -28,7 +28,7 @@ src/kurot/
 ├── player/         Game loop + both render backends. Player, createPlayer(), SystemTicker/
 │                   ticker singleton, ScreenAdapter, TouchHandler. Backend-neutral abstractions
 │                   live here: RenderPipe / RenderContext / RenderBuffer interfaces (the latter
-│                   two are internal), InstructionSet, and pipes/ (Bitmap/Graphics/Mesh/Text/
+│                   two are internal), InstructionSet, and pipes/ (Bitmap/BitmapText/Graphics/Mesh/Text/
 │                   Filter/Mask/Particle). The WebGL instruction renderer consumes the pipes.
 │   ├── webgl/      WebGLRenderer, WebGLRenderContext, WebGLRenderBuffer/Target,
 │   │               WebGLVertexArrayObject, WebGLDrawCmdManager, MultiTextureBatcher,
@@ -44,7 +44,7 @@ src/kurot/
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
 │                   HtmlTextParser, InputController, TextMeasurer, LineBreaks, TextLineLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
-│                   (Image/Json/Text/Sound/Sheet). Async, resource.json-driven (RES-compatible).
+│                   (Image/Json/Text/Sound/Sheet/Font). Async, resource.json-driven (RES-compatible).
 ├── net/            HttpRequest, ImageLoader. Low-level; resource/analyzers build on these.
 ├── media/          Sound (+SoundChannel), Video. Web Audio + HTMLAudioElement fallback.
 ├── system/         Capabilities (static). Must be _init()'d — createPlayer() does this for you.
@@ -116,8 +116,11 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
 - `BlurFilter.quality` controls pass pairs (1–16); large radii downsample to
   stay within the existing 32-physical-pixel shader tier. Glow/DropShadow keep
   their existing fixed-sample shader and do not use their quality metadata.
-- GPU filters are skipped by Canvas 2D, including the Canvas capture used by
-  cacheAsTexture and RenderTexture. Do not cache GPU effects through those APIs.
+- Canvas 2D skips CustomFilter, MultiPassFilter and BloomFilter, including the
+  Canvas capture used by cacheAsTexture and RenderTexture. Built-in Blur, Glow
+  and DropShadow use CSS approximations; ColorMatrix uses CPU pixels. These
+  fallbacks are not pixel-equivalent to WebGL. Do not cache GPU shader effects
+  through those capture APIs. See docs/filters.md.
 - Filter setters invalidate weakly attached users. Direct uniform/binding edits
   need `filter.invalidate()`. Auxiliary canvas/video edits additionally need
   `BitmapData.invalidate(source)` for upload refresh.
@@ -162,11 +165,11 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **Media**: `Sound`/`SoundType`/`SoundEvents`, `SoundChannel`, `Video`.
 - **Player**: `Player`, `createPlayer`/`KurotApp`/`KurotOptions`; ticker: `SystemTicker`, `ticker`, `getTimer`, `setupLifecycle`, `START_TIME`, `invalidateRenderFlag`/`setInvalidateRenderFlag`, `requestRenderingFlag`/`setRequestRenderingFlag`, `Renderable`; rendering: `InstructionSet`/`Instruction`, `RenderPipe` (type), `CanvasBuffer`, `hitTestBuffer`, `CanvasRenderer`, `DisplayList`; input/layout: `TouchHandler`, `ScreenAdapter`/`StageDisplaySize`; WebGL: `WebGLRenderer`, `WebGLRenderContext`, `WebGLRenderBuffer`, `WebGLRenderTarget`, `WebGLVertexArrayObject`, `WebGLDrawCmdManager`, `WebGLProgram`, `ShaderLib`, `checkWebGLSupport`, `MultiTextureBatcher`.
     - `RenderContext` / `RenderBuffer` (`player/RenderContext.ts`, `player/RenderBuffer.ts`) are internal backend-neutral contracts and are not re-exported.
-- **Text**: `HorizontalAlign`, `VerticalAlign`, `TextFieldType`, `TextFieldInputType`; types `ITextStyle`, `ITextElement`, `IWTextElement`, `ILineElement`, `IHitTextElement`; `HtmlTextParser`, `BitmapFont`, `BitmapText`, `measureText`/`getFontString`, `TextField`, `StageText`, `InputController`, `tokenize`/`splitGraphemes`.
+- **Text**: `HorizontalAlign`, `VerticalAlign`, `TextFieldType`, `TextFieldInputType`; types `ITextStyle`, `ITextElement`, `IWTextElement`, `ILineElement`, `IHitTextElement`, `BitmapFontOptions`; `HtmlTextParser`, `BitmapFont`, `BitmapText`, `measureText`/`getFontString`, `TextField`, `StageText`, `InputController`, `tokenize`/`splitGraphemes`.
 - **System**: `Capabilities`.
 - **localStorage**: namespace object — `import { localStorage } from '@kurot/core'`, then `localStorage.getItem(...)`.
 - **External**: `ExternalInterface` (named, not namespaced).
-- **Resource**: `Resource`/`resource` (shared instance), `ProgressCallback`, `ResourceEventListener`, `ResourceItem`, `ResourceType`, `ResourceConfig`/`ResourceConfigData`/`ResourceConfigEntry`, `ResourceLoader`, `ResourceEventType`/`ResourceEvent`, `AnalyzerBase`, `ImageAnalyzer`, `JsonAnalyzer`, `TextAnalyzer`, `SoundAnalyzer`, `SheetAnalyzer`.
+- **Resource**: `Resource`/`resource` (shared instance), `ProgressCallback`, `ResourceEventListener`, `ResourceItem`, `ResourceType`, `ResourceConfig`/`ResourceConfigData`/`ResourceConfigEntry`, `ResourceLoader`, `ResourceEventType`/`ResourceEvent`, `AnalyzerBase`, `ImageAnalyzer`, `JsonAnalyzer`, `TextAnalyzer`, `SoundAnalyzer`, `SheetAnalyzer`, `FontAnalyzer`.
 
 `examples/benchmark/` is dev-only tooling and is **not** exported from `index.ts`.
 
@@ -217,6 +220,9 @@ with local index remapping (player/webgl/split-mesh.ts).
 
 Word-wrapped text uses Unicode 17.0 UAX #14, dictionary tailoring for SA scripts
 and alphabetic overflow tailoring. Style runs never introduce break positions.
+Core 2.2.0 still requires preserved rule-function names when minified, and its
+wrap opportunities do not protect every composed emoji or grapheme cluster.
+See the known issues in [text layout](text-layout.md) before changing the wrapper.
 Automatic-wrap spaces count in source offsets but not painted width. Core's
 Canvas renderer advances input indices by line.charNum, including hidden spaces
 and CRLF; do not derive the next line's source offset from painted text lengths.
@@ -240,3 +246,15 @@ separate UI capability requiring Core 2.1.0 or later.
 See [text layout](text-layout.md) for the Core contract and
 [Label text layout](../../ui/docs/label-text-layout.md) for fit bounds, state
 restoration and shared-schema boundaries.
+
+## Bitmap fonts in 2.2.0
+
+[bitmap-fonts.md](bitmap-fonts.md) documents the headless bitmap-font dependency,
+FontAnalyzer and BitmapTextPipe. ResourceType.Font is built in; BitmapText
+now draws via WebGL/Canvas. BitmapFontOptions controls page ownership. Native
+font data comes from @kurot/bitmap-font; do not reimplement parsing/layout here.
+The dependency is published @kurot/bitmap-font ^0.1.0, with no local override.
+BitmapText.measureText() leaves rendered constraints and layout caches unchanged;
+text borrows the font and the resource/caller retains ownership. Font pages are
+full, unrotated textures at scale factor 1. Core 2.1.1 does not include these
+changes. Core 2.2.0 is published with its registry bitmap-font dependency.

@@ -1,56 +1,66 @@
+import { layoutBitmapText } from '@kurot/bitmap-font';
+import type { BitmapTextLayout, PositionedBitmapGlyph } from '@kurot/bitmap-font';
 import { DisplayObject, RenderObjectType } from '../display/DisplayObject.js';
-import { Rectangle } from '../geom/Rectangle.js';
-import { HorizontalAlign } from './enums/HorizontalAlign.js';
-import { VerticalAlign } from './enums/VerticalAlign.js';
+import type { Rectangle } from '../geom/Rectangle.js';
 import type { BitmapFont } from './BitmapFont.js';
 
 /**
- * Renders text using a BitmapFont (texture atlas), avoiding system font rendering differences.
+ * Draws atlas glyphs directly through WebGL batching or Canvas 2D.
+ * Width wraps by code point; use multiline=false for one unwrapped line.
+ * Fonts are borrowed. Missing glyphs are skipped; U+0020 has a fallback advance.
  */
 export class BitmapText extends DisplayObject {
+	// ── Static fields ─────────────────────────────────────────────────────────
+	/**
+	 * @deprecated Font layout uses its explicit spaceAdvance metric.
+	 * Set that metric in font data before constructing a font.
+	 */
 	public static EMPTY_FACTOR = 0.33;
 
+	// ── Instance fields ──────────────────────────────────────────────────────
 	private _text = '';
 	private _font?: BitmapFont;
 	private _lineSpacing = 0;
 	private _letterSpacing = 0;
-	private _textAlign: HorizontalAlign = HorizontalAlign.LEFT;
-	private _verticalAlign: VerticalAlign = VerticalAlign.TOP;
-
-	public override set width(value: number) {
-		const v = isNaN(value) ? NaN : value;
-		if (this.$explicitWidth === v) return;
-		this.$explicitWidth = v;
-		this._invalidate();
-	}
-
-	public override set height(value: number) {
-		const v = isNaN(value) ? NaN : value;
-		if (this.$explicitHeight === v) return;
-		this.$explicitHeight = v;
-		this._invalidate();
-	}
+	private _textAlign: 'left' | 'center' | 'right' = 'left';
+	private _verticalAlign: 'top' | 'middle' | 'bottom' = 'top';
 	private _smoothing = true;
+	private _multiline = true;
+	private _layout?: BitmapTextLayout;
 
-	private _textLinesChanged = false;
-	private _textLines: string[] = [];
-	private _textLinesWidth: number[] = [];
-	private _lineHeights: number[] = [];
-	private _textWidth = 0;
-	private _textHeight = 0;
-	private _textStartX = 0;
-	private _textStartY = 0;
+	// ── Constructor ──────────────────────────────────────────────────────────
+	public constructor() {
+		super();
+		this.$renderObjectType = RenderObjectType.BITMAP_TEXT;
+	}
 
+	// ── Getters / Setters ─────────────────────────────────────────────────────
+	public override get width(): number {
+		return super.width;
+	}
+	public override set width(value: number) {
+		if (Object.is(this.$explicitWidth, value)) return;
+		if (!Number.isNaN(value) && (!Number.isFinite(value) || value < 0)) throw new RangeError('BitmapText.width must be nonnegative or NaN.');
+		this.$explicitWidth = value;
+		this._invalidate();
+	}
+	public override get height(): number {
+		return super.height;
+	}
+	public override set height(value: number) {
+		if (Object.is(this.$explicitHeight, value)) return;
+		if (!Number.isNaN(value) && (!Number.isFinite(value) || value < 0)) throw new RangeError('BitmapText.height must be nonnegative or NaN.');
+		this.$explicitHeight = value;
+		this._invalidate();
+	}
 	public get text(): string {
 		return this._text;
 	}
 	public set text(value: string) {
-		const v = value ?? '';
-		if (this._text === v) return;
-		this._text = v;
+		if (this._text === value) return;
+		this._text = value;
 		this._invalidate();
 	}
-
 	public get font(): BitmapFont | undefined {
 		return this._font;
 	}
@@ -59,43 +69,42 @@ export class BitmapText extends DisplayObject {
 		this._font = value;
 		this._invalidate();
 	}
-
 	public get lineSpacing(): number {
 		return this._lineSpacing;
 	}
 	public set lineSpacing(value: number) {
 		if (this._lineSpacing === value) return;
+		if (!Number.isFinite(value) || value < 0) throw new RangeError('BitmapText.lineSpacing must be finite and nonnegative.');
 		this._lineSpacing = value;
 		this._invalidate();
 	}
-
 	public get letterSpacing(): number {
 		return this._letterSpacing;
 	}
 	public set letterSpacing(value: number) {
 		if (this._letterSpacing === value) return;
+		if (!Number.isFinite(value)) throw new RangeError('BitmapText.letterSpacing must be finite.');
 		this._letterSpacing = value;
 		this._invalidate();
 	}
-
-	public get textAlign(): HorizontalAlign {
+	public get textAlign(): 'left' | 'center' | 'right' {
 		return this._textAlign;
 	}
-	public set textAlign(value: HorizontalAlign) {
+	public set textAlign(value: 'left' | 'center' | 'right') {
 		if (this._textAlign === value) return;
+		if (!['left', 'center', 'right'].includes(value)) throw new RangeError('Invalid bitmap text alignment.');
 		this._textAlign = value;
 		this._invalidate();
 	}
-
-	public get verticalAlign(): VerticalAlign {
+	public get verticalAlign(): 'top' | 'middle' | 'bottom' {
 		return this._verticalAlign;
 	}
-	public set verticalAlign(value: VerticalAlign) {
+	public set verticalAlign(value: 'top' | 'middle' | 'bottom') {
 		if (this._verticalAlign === value) return;
+		if (!['top', 'middle', 'bottom'].includes(value)) throw new RangeError('Invalid bitmap text vertical alignment.');
 		this._verticalAlign = value;
 		this._invalidate();
 	}
-
 	public get smoothing(): boolean {
 		return this._smoothing;
 	}
@@ -104,146 +113,72 @@ export class BitmapText extends DisplayObject {
 		this._smoothing = value;
 		this.$markDirty();
 	}
-
+	public get multiline(): boolean {
+		return this._multiline;
+	}
+	public set multiline(value: boolean) {
+		if (this._multiline === value) return;
+		this._multiline = value;
+		this._invalidate();
+	}
 	public get textWidth(): number {
-		this._ensureLines();
-		return this._textWidth;
+		return this.getLayout().width;
 	}
 	public get textHeight(): number {
-		this._ensureLines();
-		return this._textHeight;
+		return this.getLayout().height;
 	}
 
-	override $measureContentBounds(bounds: Rectangle): void {
-		this._ensureLines();
-		if (this._textLines.length === 0) {
-			bounds.setEmpty();
-		} else {
-			bounds.setTo(this._textStartX, this._textStartY, this._textWidth, this._textHeight);
-		}
+	// ── Public methods ───────────────────────────────────────────────────────
+	public getLayout(): BitmapTextLayout {
+		this._layout ??= this.measureText(this.$explicitWidth, this.$explicitHeight);
+		return this._layout;
+	}
+	/**
+	 * Measures with independent constraints without changing the rendered field.
+	 * NaN means unconstrained; font, spacing, alignment and multiline are retained.
+	 */
+	public measureText(width: number = NaN, height: number = NaN): BitmapTextLayout {
+		return this._font
+			? layoutBitmapText(this._font.data, this._text, {
+					width: Number.isNaN(width) ? undefined : width,
+					height: Number.isNaN(height) ? undefined : height,
+					lineSpacing: this._lineSpacing,
+					letterSpacing: this._letterSpacing,
+					textAlign: this._textAlign,
+					verticalAlign: this._verticalAlign,
+					multiline: this._multiline,
+				})
+			: { glyphs: [], lines: [], width: 0, height: 0, startX: 0, startY: 0, bounds: { x: 0, y: 0, width: 0, height: 0 } };
+	}
+	public getGlyphs(): readonly PositionedBitmapGlyph[] {
+		return this.getLayout().glyphs;
+	}
+	public getTextLines(): string[] {
+		return this.getLayout().lines.map(line => line.text);
+	}
+	public getTextLinesWidth(): number[] {
+		return this.getLayout().lines.map(line => line.width);
+	}
+	public getLineHeights(): number[] {
+		return this.getLayout().lines.map(line => line.height);
+	}
+	public getTextStartX(): number {
+		return this.getLayout().startX;
+	}
+	public getTextStartY(): number {
+		return this.getLayout().startY;
 	}
 
-	getTextLines(): string[] {
-		return this._ensureLines();
-	}
-	getTextLinesWidth(): number[] {
-		this._ensureLines();
-		return this._textLinesWidth;
-	}
-	getLineHeights(): number[] {
-		this._ensureLines();
-		return this._lineHeights;
-	}
-	getTextStartX(): number {
-		this._ensureLines();
-		return this._textStartX;
-	}
-	getTextStartY(): number {
-		this._ensureLines();
-		return this._textStartY;
+	// ── Override methods ─────────────────────────────────────────────────────
+	public override $measureContentBounds(bounds: Rectangle): void {
+		const measured = this.getLayout().bounds;
+		bounds.setTo(measured.x, measured.y, measured.width, measured.height);
 	}
 
+	// ── Private methods ──────────────────────────────────────────────────────
 	private _invalidate(): void {
-		this._textLinesChanged = true;
+		this._layout = undefined;
 		this.$renderDirty = true;
 		this.$markDirty();
-	}
-
-	private _ensureLines(): string[] {
-		if (!this._textLinesChanged) return this._textLines;
-		this._textLinesChanged = false;
-		this._textLines = [];
-		this._textLinesWidth = [];
-		this._lineHeights = [];
-		this._textWidth = 0;
-		this._textHeight = 0;
-
-		const font = this._font;
-		if (!this._text || !font) return this._textLines;
-
-		const hasWidthSet = !isNaN(this.$explicitWidth);
-		const fieldWidth = this.$explicitWidth;
-		const fieldHeight = this.$explicitHeight;
-		const emptyHeight = font.getFirstCharHeight();
-		const emptyWidth = Math.ceil(emptyHeight * BitmapText.EMPTY_FACTOR);
-		const textArr = this._text.split(/(?:\r\n|\r|\n)/);
-
-		let totalWidth = 0;
-		let totalHeight = 0;
-
-		const pushLine = (str: string, lh: number, lw: number): boolean => {
-			if (!isNaN(fieldHeight) && this._textLines.length > 0 && totalHeight > fieldHeight) return false;
-			totalHeight += lh + this._lineSpacing;
-			this._textLines.push(str);
-			this._lineHeights.push(lh);
-			this._textLinesWidth.push(lw);
-			totalWidth = Math.max(lw, totalWidth);
-			return true;
-		};
-
-		for (let i = 0; i < textArr.length; i++) {
-			let line = textArr[i];
-			let len = line.length;
-			let lineHeight = 0;
-			let xPos = 0;
-			let isFirstChar = true;
-
-			for (let j = 0; j < len; j++) {
-				if (!isFirstChar) xPos += this._letterSpacing;
-				const ch = line.charAt(j);
-				const texture = font.getTexture(ch);
-				let texW: number;
-				let texH: number;
-
-				if (!texture) {
-					if (ch === ' ') {
-						texW = emptyWidth;
-						texH = emptyHeight;
-					} else {
-						if (isFirstChar) isFirstChar = false;
-						continue;
-					}
-				} else {
-					texW = texture.textureWidth;
-					texH = texture.textureHeight;
-				}
-
-				if (isFirstChar) isFirstChar = false;
-
-				if (hasWidthSet && j > 0 && xPos + texW > fieldWidth) {
-					if (!pushLine(line.substring(0, j), lineHeight, xPos)) break;
-					line = line.substring(j);
-					len = line.length;
-					j = 0;
-					xPos = len === 1 ? texW : font.getConfig(ch, 'xadvance') || texW;
-					lineHeight = texH;
-					continue;
-				}
-
-				xPos += j === len - 1 ? texW : font.getConfig(ch, 'xadvance') || texW;
-				lineHeight = Math.max(texH, lineHeight);
-			}
-
-			if (!isNaN(fieldHeight) && i > 0 && totalHeight > fieldHeight) break;
-			pushLine(line, lineHeight, xPos);
-		}
-
-		this._textWidth = totalWidth;
-		this._textHeight = Math.max(0, totalHeight - this._lineSpacing);
-
-		this._textStartX = 0;
-		this._textStartY = 0;
-		if (hasWidthSet && fieldWidth > totalWidth) {
-			if (this._textAlign === HorizontalAlign.RIGHT) this._textStartX = fieldWidth - totalWidth;
-			else if (this._textAlign === HorizontalAlign.CENTER)
-				this._textStartX = Math.floor((fieldWidth - totalWidth) / 2);
-		}
-		if (!isNaN(fieldHeight) && fieldHeight > this._textHeight) {
-			if (this._verticalAlign === VerticalAlign.BOTTOM) this._textStartY = fieldHeight - this._textHeight;
-			else if (this._verticalAlign === VerticalAlign.MIDDLE)
-				this._textStartY = Math.floor((fieldHeight - this._textHeight) / 2);
-		}
-
-		return this._textLines;
 	}
 }

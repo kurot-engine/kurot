@@ -7,6 +7,7 @@ export const ResourceType = {
 	Text: 'text',
 	Sound: 'sound',
 	Sheet: 'sheet',
+	Font: 'font',
 } as const;
 
 export type ResourceType = (typeof ResourceType)[keyof typeof ResourceType];

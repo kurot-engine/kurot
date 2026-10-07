@@ -4,6 +4,7 @@ export { TextFieldType } from './enums/TextFieldType.js';
 export { TextFieldInputType } from './enums/TextFieldInputType.js';
 export type { ITextStyle, ITextElement, IWTextElement, ILineElement, IHitTextElement } from './types/ITextElement.js';
 export { HtmlTextParser } from './HtmlTextParser.js';
+export type { BitmapFontOptions } from './BitmapFont.js';
 export { BitmapFont } from './BitmapFont.js';
 export { BitmapText } from './BitmapText.js';
 export { measureText, getFontString } from './TextMeasurer.js';

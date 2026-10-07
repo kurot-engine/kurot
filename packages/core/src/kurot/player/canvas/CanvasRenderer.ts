@@ -12,6 +12,7 @@ import { BlurFilter } from '../../filters/BlurFilter.js';
 import { ColorMatrixFilter } from '../../filters/ColorMatrixFilter.js';
 import { GlowFilter } from '../../filters/GlowFilter.js';
 import { DropShadowFilter } from '../../filters/DropShadowFilter.js';
+import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { HorizontalAlign } from '../../text/enums/HorizontalAlign.js';
 import { VerticalAlign } from '../../text/enums/VerticalAlign.js';
@@ -49,6 +50,7 @@ export class CanvasRenderer {
 	private readonly _bitmapTintCache = new WeakMap<Bitmap, TintedCanvasCache>();
 	private readonly _graphicsTintCache = new WeakMap<Graphics, TintedCanvasCache>();
 	private _globalTint = 0xffffff;
+	private readonly _fontGlyphBitmaps = new WeakMap<Texture, Bitmap>();
 	private _resolution = 1;
 
 	// ── Public methods ────────────────────────────────────────────────────────
@@ -459,6 +461,8 @@ export class CanvasRenderer {
 				return this.renderGraphics((displayObject as Shape).graphics, ctx, offsetX, offsetY);
 			case RenderObjectType.SPRITE:
 				return this.renderGraphics((displayObject as Sprite).graphics, ctx, offsetX, offsetY);
+			case RenderObjectType.BITMAP_TEXT:
+				return this.renderBitmapText(displayObject as BitmapText, ctx, offsetX, offsetY);
 			case RenderObjectType.TEXT:
 				return this.renderTextField(displayObject as TextField, ctx, offsetX, offsetY);
 			case RenderObjectType.PARTICLE:
@@ -466,6 +470,36 @@ export class CanvasRenderer {
 			default:
 				return 0;
 		}
+	}
+
+	private renderBitmapText(text: BitmapText, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): number {
+		const font = text.font;
+		if (!font) return 0;
+		let count = 0;
+		for (const glyph of text.getGlyphs()) {
+			const texture = font.getTexture(glyph.character);
+			if (!texture || texture.bitmapWidth === 0 || texture.bitmapHeight === 0) continue;
+			let bitmap = this._fontGlyphBitmaps.get(texture);
+			if (!bitmap) {
+				bitmap = new Bitmap(texture);
+				this._fontGlyphBitmaps.set(texture, bitmap);
+			}
+			bitmap.smoothing = text.smoothing;
+			const data = texture.bitmapData;
+			if (!data?.source) continue;
+			ctx.imageSmoothingEnabled = text.smoothing;
+			const x = offsetX + glyph.x + texture.offsetX;
+			const y = offsetY + glyph.y + texture.offsetY;
+			const width = texture.bitmapWidth * textureScaleFactor;
+			const height = texture.bitmapHeight * textureScaleFactor;
+			if (this._globalTint === 0xffffff) {
+				ctx.drawImage(data.source as CanvasImageSource, texture.bitmapX, texture.bitmapY, texture.bitmapWidth, texture.bitmapHeight, x, y, width, height);
+			} else {
+				ctx.drawImage(this.getTintedBitmapSource(bitmap, this._globalTint), x, y, width, height);
+			}
+			count++;
+		}
+		return count;
 	}
 
 	private renderMesh(mesh: Mesh, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): number {

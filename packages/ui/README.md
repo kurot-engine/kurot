@@ -2,7 +2,7 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Current release: 3.1.0.** Requires `@kurot/core@^2.1.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.2.0.** Requires `@kurot/core@^2.2.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -42,13 +42,14 @@ only on Core.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.1.0 @kurot/core@^2.1.1
+pnpm add @kurot/ui@^3.2.0 @kurot/core@^2.2.0
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.1 requires Core 2.1.0 or later within Core 2.x. The installation above also
-includes Core 2.1.1's nested/rotated WebGL scroll clipping fix. Refresh old sheet manifests with
+UI 3.2 requires Core 2.2.0 or later within Core 2.x for BitmapText rendering and
+font resources. Core installs its published bitmap-font dependency automatically.
+Refresh older Core/UI lockfiles and old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
@@ -150,11 +151,7 @@ class MyButtonSkin extends Skin {
 		this.bg = new Rect(120, 36, 0x6c5ce7);
 		this.skinParts = ['bg'];
 		this.elementsContent = [this.bg];
-		this.states = [
-			new State('up'),
-			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
-			new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72)]),
-		];
+		this.states = [new State('up'), new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]), new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72)])];
 	}
 }
 
@@ -225,19 +222,20 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 
 ### Basic Controls
 
-| Component      | Description                                                                    |
-| -------------- | ------------------------------------------------------------------------------ |
-| `Label`        | Text display. Wraps `TextField` in the UI lifecycle.                           |
-| `Button`       | Tappable button with `up`/`down`/`disabled` states and `labelDisplay` part.    |
-| `CheckBox`     | Toggle button. Dispatches `Event.CHANGE` on selection change.                  |
-| `RadioButton`  | Mutually exclusive toggle. Use `groupName` to link buttons.                    |
-| `ToggleButton` | Base for toggle-style buttons.                                                 |
-| `ToggleSwitch` | Binary on/off switch (visual variant of `ToggleButton`).                       |
-| `ProgressBar`  | Value indicator. Inject `thumb` (a `Component`) as the fill part.              |
-| `HSlider`      | Horizontal slider. Inject `thumb` and `track` skin parts; default range 0–100. |
-| `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts; default range 0–100.   |
-| `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`.    |
-| `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`.    |
+| Component      | Description                                                                     |
+| -------------- | ------------------------------------------------------------------------------- |
+| `Label`        | Text display. Wraps `TextField` in the UI lifecycle.                            |
+| `BitmapLabel`  | Bitmap-font display. Wraps BitmapText with font resources, layout and bindings. |
+| `Button`       | Tappable button with `up`/`down`/`disabled` states and `labelDisplay` part.     |
+| `CheckBox`     | Toggle button. Dispatches `Event.CHANGE` on selection change.                   |
+| `RadioButton`  | Mutually exclusive toggle. Use `groupName` to link buttons.                     |
+| `ToggleButton` | Base for toggle-style buttons.                                                  |
+| `ToggleSwitch` | Binary on/off switch (visual variant of `ToggleButton`).                        |
+| `ProgressBar`  | Value indicator. Inject `thumb` (a `Component`) as the fill part.               |
+| `HSlider`      | Horizontal slider. Inject `thumb` and `track` skin parts; default range 0–100.  |
+| `VSlider`      | Vertical slider. Inject `thumb` and `track` skin parts; default range 0–100.    |
+| `Rect`         | Filled/stroked rectangle. Supports `fillColor`, `strokeColor`, `fillAlpha`.     |
+| `Image`        | Bitmap display. Supports URL string or `Texture`, `scale9Grid`, `fillMode`.     |
 
 Both sliders inherit Range's default `minimum = 0` and `maximum = 100`.
 Set either bound explicitly when a control needs a different range.
@@ -375,10 +373,7 @@ class StatefulButtonSkin extends Skin {
 		this.states = [
 			new State('up'),
 			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
-			new State('disabled', [
-				new SetProperty('bg', 'fillColor', 0x636e72),
-				new SetProperty('labelDisplay', 'textColor', 0xb2bec3),
-			]),
+			new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72), new SetProperty('labelDisplay', 'textColor', 0xb2bec3)]),
 		];
 	}
 }
@@ -456,3 +451,28 @@ cross-framework ranking.
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions                            |
 | Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true`                        |
 | i18n           | Built-in                    | Project-managed translations; Core handles Unicode wrapping |
+
+## Bitmap labels in 3.2.0
+
+[BitmapLabel](docs/bitmap-label.md) wraps Core BitmapText with native UI layout,
+spacing, alignment and configured font-resource names:
+
+```ts
+import { BitmapLabel } from '@kurot/ui';
+
+const amount = new BitmapLabel('1,234.56');
+amount.font = 'number_font_fnt';
+amount.multiline = false;
+amount.height = 100;
+group.addChild(amount);
+```
+
+Register the font descriptor in Core's resource configuration before assigning
+its name, or assign a BitmapFont directly. The label borrows its font; the
+resource cache or caller retains ownership. Superseded async requests cannot
+replace a newer assignment. Successful named loads dispatch Event.COMPLETE;
+failed or incorrectly typed resources dispatch IOErrorEvent.IO_ERROR.
+
+The component supports native code and programmatic skins. Installed KUI
+compilers, the ui-document catalog, Editor and ui-runtime materializers do not
+yet adopt the BitmapLabel tag. Published UI 3.1.0 does not include the component.

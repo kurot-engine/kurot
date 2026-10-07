@@ -4,6 +4,35 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.2.0] — 2026-10-08
+
+### Added
+
+- Export BitmapLabel, a native UI component wrapping Core BitmapText with normal
+  measurement, parent layout constraints, alignment, spacing and text bindings.
+- Accept a caller-owned BitmapFont or a configured font-resource name. Resolve
+  preloaded fonts synchronously and load missing fonts through Core's resource
+  singleton, reporting completion and loading/type errors through events.
+- Ignore superseded asynchronous font results, including A-to-B-to-A changes.
+  Font ownership remains with the resource cache or caller.
+
+### Dependencies and migration
+
+- Require `@kurot/core ^2.2.0` in peer and development dependencies for rendered
+  BitmapText, FontAnalyzer and pure text measurement. Upgrade older Core installs
+  and lockfiles before adopting UI 3.2.0.
+- Remove the local Core dependency override and build against published Core.
+  UI continues to depend only on Core; bitmap-font is Core's dependency.
+- BitmapLabel supports native code and programmatic skins. The ui-document
+  catalog, CLI KUI tags, Editor and ui-runtime materializers do not yet adopt it.
+
+### Tests and documentation
+
+- Cover layout and measurement, alignment, binding notifications, cached and
+  asynchronous font resolution, stale requests, invalid resources and errors.
+- Translate architecture documentation to English and correct outdated Skin,
+  theme-adapter, validation and virtual-layout descriptions against source.
+
 ## [3.1.0] — 2026-10-05
 
 ### Added

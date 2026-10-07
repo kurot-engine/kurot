@@ -1,0 +1,62 @@
+{
+	"name": "@kurot/dragonbones",
+	"version": "0.1.0",
+	"description": "DragonBones 5.7 runtime adapter for Kurot Core 2.x",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./runtime": {
+			"types": "./dist/runtime/dragonbones.d.ts",
+			"import": "./dist/runtime/dragonbones.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"CHANGELOG.md",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.md",
+		"upstream.json",
+		"docs"
+	],
+	"scripts": {
+		"build": "tsx tools/build.ts",
+		"typecheck": "tsc --noEmit && tsc --project tsconfig.tools.json",
+		"test": "vitest run",
+		"format": "prettier --write src/kurot src/index.ts tools test examples",
+		"example": "tsx tools/serve-example.ts",
+		"verify:project": "tsx tools/verify-project.ts",
+		"prepack": "pnpm build"
+	},
+	"peerDependencies": {
+		"@kurot/core": "^2.1.1"
+	},
+	"devDependencies": {
+		"@kurot/core": "2.2.0",
+		"@types/node": "^22.0.0",
+		"typescript": "~5.9.3",
+		"tsx": "^4.20.6",
+		"vitest": "^3.2.4",
+		"prettier": "^3.6.2",
+		"esbuild": "^0.25.12"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kurot-engine/kurot.git",
+		"directory": "packages/dragonbones"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

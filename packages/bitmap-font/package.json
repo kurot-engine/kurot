@@ -1,0 +1,23 @@
+{
+	"name": "@kurot/bitmap-font",
+	"version": "0.1.0",
+	"description": "Headless bitmap font data, parsing, validation, serialization and layout for games and editors",
+	"author": "Kelvin <kyia.x52@gmail.com>",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+	"files": ["dist", "docs", "README.md", "CHANGELOG.md", "LICENSE"],
+	"scripts": {
+		"build": "tsc --build",
+		"typecheck": "tsc -p tsconfig.test.json",
+		"test": "pnpm typecheck && vitest run",
+		"format": "prettier --write src test",
+		"prepack": "pnpm build"
+	},
+	"devDependencies": { "@types/node": "^22.0.0", "typescript": "~5.9.3", "vitest": "^4.1.4", "prettier": "^3.6.2" },
+	"engines": { "node": ">=20" },
+	"repository": { "type": "git", "url": "git+https://github.com/kurot-engine/kurot.git", "directory": "packages/bitmap-font" },
+	"publishConfig": { "access": "public" }
+}

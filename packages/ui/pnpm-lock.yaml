@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.2.0
+        version: 2.2.0
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -43,8 +43,12 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kurot/core@2.1.1':
-    resolution: {integrity: sha512-/jQgTjvps+djsUfyW0p+VSkpoGWf728J/tUrc/K8ngijW76KhEKdeGl4kXvNp0RecSw49FquM2SqrPIB/bOcIw==}
+  '@kurot/bitmap-font@0.1.0':
+    resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
+    engines: {node: '>=20'}
+
+  '@kurot/core@2.2.0':
+    resolution: {integrity: sha512-iUaBXJ4jeJVWo2gsCdSQXlnxUR5ssLSRICRy5+yrwMtkNNYBigy8u08uRJXF5QygNFSG06Ht3o9JPjgXUQdDMg==}
 
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
@@ -524,9 +528,12 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kurot/core@2.1.1':
+  '@kurot/bitmap-font@0.1.0': {}
+
+  '@kurot/core@2.2.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
+      '@kurot/bitmap-font': 0.1.0
 
   '@oxc-project/types@0.143.0': {}
 

@@ -20,6 +20,7 @@ Core features include:
 - A headless `kui.*` UI document model and explicit runtime materialization layer
   for future editors and Agent workflows.
 - Tween, MovieClip, ScrollView, and URLLoader game extensions.
+- DragonBones 5.7 skeletal animation with native display, mesh, event and clock integration.
 
 ## From Egret to Kurot
 
@@ -49,15 +50,24 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.1.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | None                        |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.1.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/core`](packages/core/README.md)               | 2.2.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`                        |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.2.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.3.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.11.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.8.2   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Independent RGBA atlas packing and Node PNG tooling; initial local implementation, not published                  | None                        |
+| [`@kurot/dragonbones`](packages/dragonbones/README.md) | 0.1.0 | `packages/dragonbones` | Published DragonBones 5.7 runtime, native displays, atlas regions, deformable meshes, events and clock | `@kurot/core` |
+| [`@kurot/bitmap-font`](packages/bitmap-font/README.md) | 0.1.0 | `packages/bitmap-font` | Published headless font data, parsing, validation, serialization and layout | None |
 
-Dependencies flow in one direction: `core` is the foundation package; `ui` and `game` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
+Dependencies flow in one direction: `core` is the foundation package; `ui`, `game` and `dragonbones` depend only on `core` and not on each other. `ui-document` stays headless, while `ui-runtime` is the explicit browser boundary that connects its semantic data to `ui` and `core`. `cli` remains build-time only. Versioned Spine adapters are maintained separately in the `Kurot-Spine` repository.
+
+`@kurot/dragonbones` is maintained in this repository at `packages/dragonbones`.
+It requires Core `^2.1.1` and includes official DragonBones TypeScript sources
+adapted to ESM under `src/runtime`. Sources compile directly to `dist` with
+the adapter. Version 0.1.0 is published and develops against Core 2.2.0 from
+npm without local overrides. See its
+[usage and lifecycle contracts](packages/dragonbones/README.md).
 
 `@kurot/atlas` is independent build-time tooling, with a portable RGBA entry point
 and a separate Node PNG adapter. It has no Core/CLI dependencies and is not yet
@@ -77,10 +87,12 @@ The current dependency ranges are:
 
 | Consumer         | Required Kurot packages                           |
 | ---------------- | ------------------------------------------------- |
-| UI 3.1.0         | Core `^2.1.0`                                     |
+| Core 2.2.0       | bitmap-font `^0.1.0`                              |
+| UI 3.2.0         | Core `^2.2.0`                                     |
 | Game 2.0.0       | Core `^2.0.0`                                     |
 | CLI 3.3.1        | ui-document `^0.11.0`                             |
 | ui-runtime 0.8.2 | Core `^2.1.0`, UI `^3.1.0`, ui-document `^0.11.0` |
+| dragonbones 0.1.0 | Core `^2.1.1` |
 
 CLI 3.2.1 is published with project styles, bundled fonts and
 English translations in the game template; existing projects are not rewritten.
@@ -132,9 +144,11 @@ resource manifests. Refresh old sheets in Kurot Editor before upgrading a KUI pr
 [resource migration contract](packages/ui-document/docs/resource-nine-slice.md).
 
 ```text
-@kurot/core
- ├─ @kurot/ui
- └─ @kurot/game
+@kurot/bitmap-font (headless shared dependency)
+ └─ @kurot/core
+     ├─ @kurot/ui
+     ├─ @kurot/game
+     └─ @kurot/dragonbones
 
 @kurot/cli  (build-time only)
  └─ @kurot/ui-document
@@ -165,14 +179,14 @@ pnpm --dir packages/core build
 pnpm --dir packages/core test
 ```
 
-Replace `core` with `cli`, `ui`, `game`, `ui-document`, or `ui-runtime` to install and build the corresponding package:
+Replace `core` with `cli`, `ui`, `game`, `ui-document`, `ui-runtime`, `atlas`, `dragonbones`, or `bitmap-font` to install and build the corresponding package:
 
 ```sh
 pnpm --dir packages/<package> install
 pnpm --dir packages/<package> build
 ```
 
-All six packages provide a one-shot test command:
+All nine packages provide a one-shot test command:
 
 ```sh
 pnpm --dir packages/<package> test
@@ -310,3 +324,13 @@ rather than assuming `docs-internal/` is present.
 Please read the code rules before submitting changes. The project requires TypeScript, strict type checking, ESM, and ES2022; the application layer uses `undefined` to represent missing values, exported functions must declare return types, and named exports are used consistently.
 
 Run the build and test commands from within the package you changed. Do not assume a unified install, build, or test command exists at the repository root.
+
+### Bitmap fonts
+
+`packages/bitmap-font` provides dependency-free font data and shared layout for
+games and future editors. Version 0.1.0 and Core 2.2.0 are published; Core uses
+its registry dependency for FontAnalyzer and BitmapText rendering. Published
+UI 3.2.0 adds BitmapLabel, requires Core ^2.2.0 and has no local override.
+Published UI 3.1.0 lacks BitmapLabel. See [font format](packages/bitmap-font/docs/format.md) and
+[Core integration](packages/core/docs/bitmap-fonts.md). KUI/Editor adoption is
+separate from these native runtime components.

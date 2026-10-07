@@ -78,6 +78,7 @@ export const enum RenderObjectType {
 	SPRITE = 4,
 	TEXT = 5,
 	PARTICLE = 6,
+	BITMAP_TEXT = 7,
 }
 
 export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
