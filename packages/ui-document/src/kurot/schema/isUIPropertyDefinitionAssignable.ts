@@ -6,6 +6,7 @@ import { matchesUIPropertyDefinition } from './matchesUIPropertyDefinition.js';
  * Reports whether every value accepted by a source schema is safe for a target schema.
  */
 export function isUIPropertyDefinitionAssignable(source: UIPropertyDefinition, target: UIPropertyDefinition): boolean {
+	if (target.format === 'text-flow' && source.format !== 'text-flow') return false;
 	const targetTypes = new Set(toValueTypes(target.valueType));
 	if (!toValueTypes(source.valueType).every(type => targetTypes.has(type) || targetTypes.has('value'))) {
 		return false;

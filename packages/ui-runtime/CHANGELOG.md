@@ -4,6 +4,38 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## [0.9.0] — 2026-10-08
+
+### Added
+
+- Materialize native BitmapLabel and RichLabel through explicit factories and
+  property handlers. Both retain native automatic size and text layout;
+  RichLabel uses literal textFlow runs without Label's plain-text/preset API.
+- Resolve typed bitmap-font references through the existing font adapter. The
+  default returns the Core resource key; an override may return a BitmapFont.
+  The runtime does not take ownership of fonts or their page textures.
+- Support whole-flow state overrides, explicit empty flows and transactional
+  data bindings. Restoration uses native owned copies, including absent base
+  content and initially undefined bitmap fonts.
+
+### Dependencies and Migration
+
+- Require published Core `^2.3.0`, UI `^3.3.0` and ui-document `^0.12.0` together.
+  Development tests use registry Core 2.3.1; its patch fixes unstyled blank
+  rich-text line metrics without raising the required Core API minimum.
+- Public materialization/controller APIs and document format version 2 remain
+  unchanged. Existing runtime 0.8.2 apps can retain their current controls and
+  locks; adopting the new text types requires this runtime and matching peers.
+- No auto-migration, font I/O, project stylesheet expansion or Stage ownership
+  is added. Label presets apply only to Label and its actual subclasses.
+
+### Tests
+
+- Verify independent native classes, literal content, automatic dimensions,
+  font adapters and ownership, invalid values, native/reusable states, clearing,
+  rollback after adapter failure and typed flow data bindings.
+- Verify packed output on the minimum supported Core and the current patch.
+
 ## [0.8.2] — 2026-10-07
 
 ### Changed

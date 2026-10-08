@@ -49,9 +49,6 @@ export function decodeXMLValue(source: string, definition?: UIPropertyDefinition
 	if (source.startsWith('\\')) return source.slice(1);
 	const color = definition?.format === 'color' ? HEX_COLOR_PATTERN.exec(source) : undefined;
 	if (color?.[1] !== undefined) return Number.parseInt(color[1], 16);
-	if (source === 'true') return true;
-	if (source === 'false') return false;
-	if (NUMBER_PATTERN.test(source)) return Number(source);
 	if (source.startsWith('@asset:') || source.startsWith('@resource:')) {
 		throw new Error('Skin XML uses direct component values instead of typed asset or resource prefixes.');
 	}
@@ -77,6 +74,9 @@ export function decodeXMLValue(source: string, definition?: UIPropertyDefinition
 			key: source,
 		};
 	}
+	if (source === 'true') return true;
+	if (source === 'false') return false;
+	if (NUMBER_PATTERN.test(source)) return Number(source);
 	return source;
 }
 

@@ -18,6 +18,28 @@ afterEach(async () => {
 });
 
 describe('compile KUI', () => {
+	it('builds text components and typed parts, keeping the last good bundle after invalid rich text', async () => {
+		const xml =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="TextSkin" states="disabled"><BitmapLabel id="score" text="100%" font="score_font" /><RichLabel id="notice"><textFlow><Span text="Balance: " /><Span text="100.80" bold="true" /></textFlow><textFlow.disabled /></RichLabel></Skin>';
+		const { context, root, outputDirectory } = await createFixture([xml]);
+		await compileKUI().apply(context);
+		const output = path.join(outputDirectory, 'js/default.thm.js');
+		const lastGood = await fs.readFile(output, 'utf8');
+		const declaration = await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf8');
+		expect(lastGood).toContain('new BitmapLabel()');
+		expect(lastGood).toContain('new RichLabel()');
+		expect(lastGood).toContain('score.text = "100%"');
+		expect(lastGood).toContain('new SetProperty("notice", "textFlow", [])');
+		expect(declaration).toContain('SkinPartModule0.BitmapLabel');
+		expect(declaration).toContain('SkinPartModule0.RichLabel');
+		expect(declaration).not.toContain('Span');
+		const filename = path.join(root, 'resource/ui/Document0.kui.xml');
+		await fs.writeFile(filename, xml.replace('bold="true"', 'size="-1"'));
+		await expect(compileKUI().apply(context)).rejects.toThrow();
+		expect(await fs.readFile(output, 'utf8')).toBe(lastGood);
+		expect(await fs.readFile(path.join(root, '.kurot/skin-parts.d.ts'), 'utf8')).toBe(declaration);
+	});
+
 	it('resolves stylesheet state colors on every build and retains the last good bundle on invalid or missing colors', async () => {
 		const xml =
 			'<Skin xmlns="https://kurot.dev/ui/1" class="ColorSkin" states="disabled"><Label id="label" textColor="#FF9900" strokeColor="@style:colors:disabled-text" textColor.disabled="@style:colors:disabled-text" /></Skin>';

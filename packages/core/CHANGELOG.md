@@ -4,6 +4,93 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.3.3] — 2026-10-09
+
+### Fixed
+
+- Honor Bitmap/Image `fillMode="repeat"` in WebGL and Canvas, including nested
+  bitmap caches. Tile the original texture size instead of stretching it.
+- Preserve transparent atlas trim margins and crop incomplete edge tiles without
+  sampling adjacent frames. Support rotated atlas regions and tinted images.
+- Honor `fillMode="clip"` at natural size. Nine-slice applies only to `scale`,
+  matching the existing documented fill-mode contract.
+
+### Compatibility
+
+- Compatible rendering fix with no API, resource, KUI or dependency changes.
+  Existing UI/Game/DragonBones/Spine/ui-runtime peers accept it; no dependent
+  SDK bump is required. Applications must adopt the installed Core and rebuild.
+- Core 2.3.3 is published. Editor 0.23.2 adopts the exact registry package
+  and Bun lock, replacing 0.23.1's explicit local trial binding.
+
+### Verification
+
+- Core build and all 836 unit tests pass. Twelve minified pixel regressions
+  pass across Canvas 2D, WebGL 1 and WebGL 2 at 1x/2x, covering fill modes,
+  rotation, trim, tint, cached updates, scale and text-outline preservation.
+- Packaged Editor regression uses TutorialPanelSkin's actual 17px atlas frame
+  and authored Image under two cached ancestors in Design and Preview. The
+  published 2.3.2 baseline fails; the locally built patch passes. A second
+  packaged regression preserves native Label/RichLabel outlines.
+
+## [2.3.2] — 2026-10-08
+
+### Fixed
+
+- Preserve dynamic TextField outlines at the edges of Canvas drawing and WebGL
+  text textures, including strokes supplied by individual rich-text runs.
+- Include descendant text ink in display-list caches, filter captures and
+  object-mask buffers while retaining layout bounds, alignment and hit areas.
+- Skip fully hidden lines at viewport edges so their outlines do not leak into
+  the visible stroke margin. Input fields and external clips remain exact.
+
+### Compatibility and verification
+
+- Compatible patch with no public API, dependency or resource-format change.
+  Existing consumer peer ranges accept it without dependent SDK version bumps;
+  applications must update their installed Core and rebuild to receive the fix.
+- Core build and all 813 unit tests pass. Six minified browser cases cover
+  Canvas 2D, WebGL 1 and WebGL 2 at 1x/2x resolution; 40 existing filter and
+  nested-clipping browser regressions also pass.
+
+## [2.3.1] — 2026-10-08
+
+### Fixed
+
+- An unstyled blank rich-text run uses the TextField base font size instead of
+  falling back to a later styled run. Styled blank and trailing lines retain
+  their existing run-size behavior.
+
+### Compatibility and verification
+
+- Compatible patch with no API, dependency or format changes. Existing Core 2.x
+  peer ranges accept it; UI 3.3.0 retains Core ^2.3.0 as its API minimum.
+- Add a regression for a blank unstyled run between differently sized runs;
+  Core build and all 806 tests passed before publication.
+
+## [2.3.0] — 2026-10-08
+
+### Added
+
+- Add `TextField.measureText(width = NaN)` for content measurement independent
+  of rendered bounds. It preserves rendered line caches, clipping, scrolling and
+  dirty flags, and honors rich-text run styles, wrapping and line spacing.
+
+### Fixed
+
+- Measure rich-text line heights from their actual run sizes instead of imposing
+  the base TextField font size. Blank and trailing hard-separated lines retain
+  the applicable run size; input fields retain their existing size contract.
+- Assigning plain text clears rich-text styles even when the string is unchanged.
+
+### Compatibility and verification
+
+- No new runtime dependency or resource/KUI format change. Existing Core 2.x
+  peers accept this release; adopting UI 3.3.0 requires Core 2.3.0 or later.
+- Cover independent measurement, mixed and blank run heights, single-line/input
+  behavior, invalid widths and switching from rich to plain text. UI's browser
+  suite checks minified Canvas 2D, WebGL 1 and WebGL 2 text rendering.
+
 ## [2.2.1] — 2026-10-08
 
 ### Fixed

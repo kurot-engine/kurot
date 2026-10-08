@@ -1,5 +1,6 @@
 import type { UIComponentDefinition } from '../schema/UIComponentDefinition.js';
 import { UIComponentRegistry } from '../schema/UIComponentRegistry.js';
+import { BITMAP_LABEL_PROPERTIES, RICH_LABEL_PROPERTIES } from './properties/text-component-properties.js';
 import {
 	COMPONENT_PROPERTIES,
 	DISPLAY_OBJECT_PROPERTIES,
@@ -70,6 +71,20 @@ const DEFINITIONS: readonly UIComponentDefinition[] = [
 		children: 'none',
 		events: ['change'],
 		properties: EDITABLE_TEXT_PROPERTIES,
+	},
+	{
+		type: 'kui.BitmapLabel',
+		extends: 'kui.Component',
+		displayName: 'Bitmap Label',
+		children: 'none',
+		properties: BITMAP_LABEL_PROPERTIES,
+	},
+	{
+		type: 'kui.RichLabel',
+		extends: 'kui.Component',
+		displayName: 'Rich Label',
+		children: 'none',
+		properties: RICH_LABEL_PROPERTIES,
 	},
 	{
 		type: 'kui.Image',

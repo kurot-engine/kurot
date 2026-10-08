@@ -149,7 +149,7 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 
 		const lineElements: IWTextElement[] = [];
 		let width = 0;
-		let height = options.size;
+		let height = 0;
 		while (spanIndex < spans.length && spans[spanIndex].end <= start) {
 			spanIndex++;
 		}
@@ -173,6 +173,12 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			if (!options.isInput) {
 				height = Math.max(height, size);
 			}
+		}
+		if (options.isInput) {
+			height = options.size;
+		} else if (lineElements.length === 0) {
+			const blankSpan = spans[spanIndex] ?? spans[spans.length - 1];
+			height = blankSpan?.style?.size ?? options.size;
 		}
 		return { width, height, charNum: end - start, hasNextLine: false, elements: lineElements };
 	}

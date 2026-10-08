@@ -4,6 +4,35 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.12.0] — 2026-10-08
+
+### Added
+
+- Add independent BitmapLabel and RichLabel foundation definitions, matching
+  published UI 3.3.0 without importing engine packages into the headless kernel.
+- Type BitmapLabel.font as a font resource; retain literal text and native
+  alignment, spacing, multiline and smoothing contracts.
+- Add UITextFlow, UITextRun, UITextRunStyle and isUITextFlow with strict per-run
+  font, size, emphasis, RGB colors and outline validation.
+- Serialize rich-text data as textFlow/Span property elements, including
+  whole-flow Skin state overrides and explicit empty content. Retain run order,
+  hard line breaks, tabs, spaces, XML entities and literal backslashes.
+- Add the text-flow property format and reject unconstrained array bindings to it.
+
+### Fixed
+
+- Keep typed resource keys that look like boolean or numeric scalars as resource
+  identities, rather than interpreting their names as primitive values.
+
+### Compatibility
+
+- Keep document format 2 and existing Label presets unchanged. No project migration
+  or native Core/UI release is required for this headless addition.
+- Consumers on ^0.11.0 must explicitly adopt ^0.12.0. CLI and ui-runtime need
+  built-in code generation/materialization support before Editor integration.
+- UIPropertyFormat includes text-flow; exhaustive consumers need a matching branch.
+  Remove duplicate private BitmapLabel definitions when adopting the foundation catalog.
+
 ## [0.11.0] — 2026-10-07
 
 ### Added

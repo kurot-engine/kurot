@@ -9,15 +9,15 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.2.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.          | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
-| `@kurot/ui`          | 3.2.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
+| `@kurot/core`        | 2.3.3   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/ui`          | 3.3.1   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
-| `@kurot/cli`         | 3.3.1   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
-| `@kurot/ui-document` | 0.11.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime`  | 0.8.2   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
-| `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Published.                                               | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)               |
-| `@kurot/dragonbones` | 0.1.0   | Published DragonBones 5.7 runtime and native Kurot display, atlas, mesh, event and clock adapter. Core ^2.1.1 peer. | [`packages/dragonbones/docs/ai-context.md`](packages/dragonbones/docs/ai-context.md) |
-| `@kurot/bitmap-font` | 0.1.0 | Headless bitmap-font parsing, validation, serialization and layout. Published, no runtime dependencies; consumed by Core 2.2.0. | [`packages/bitmap-font/docs/ai-context.md`](packages/bitmap-font/docs/ai-context.md) |
+| `@kurot/cli`         | 3.4.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
+| `@kurot/ui-document` | 0.12.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
+| `@kurot/ui-runtime`  | 0.9.0   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
+| `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Published.                                                                                | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)             |
+| `@kurot/dragonbones` | 0.1.0   | Published DragonBones 5.7 runtime and native Kurot display, atlas, mesh, event and clock adapter. Core ^2.1.1 peer.                                                                      | [`packages/dragonbones/docs/ai-context.md`](packages/dragonbones/docs/ai-context.md) |
+| `@kurot/bitmap-font` | 0.1.0   | Headless bitmap-font parsing, validation, serialization and layout. Published, no runtime dependencies; consumed by Core 2.2.0.                                                          | [`packages/bitmap-font/docs/ai-context.md`](packages/bitmap-font/docs/ai-context.md) |
 
 Dependency direction is strictly one-way:
 
@@ -73,6 +73,66 @@ hashes are recorded in `upstream.json` for provenance. See the package
 instructions before editing the runtime. Version 0.1.0 is published and develops
 against published Core 2.2.0 without local overrides. No current game consumes
 this package.
+
+Core 2.3.3 is published, verified on npm on 2026-10-09. It fixes Bitmap/Image
+repeat and clip in WebGL, Canvas and nested bitmap caches. Repeat retains original
+texture periods, trim margins, rotated atlas regions and clipped edge tiles;
+nine-slice applies only to scale. See packages/core/docs/bitmap-fill.md.
+No API/resource/KUI/dependency migration or dependent SDK bump is required.
+UI/Game/DragonBones/Spine/ui-runtime peers already accept it. Editor 0.23.2
+installs exact registry Core 2.3.3 with a matching Bun lock, replacing 0.23.1's
+explicit local trial binding. Ordinary builds need no local engine checkout.
+Templates, examples and Reskin are unchanged; their compatible installations
+may adopt the patch separately. Source versions never confirm publication.
+
+Core 2.3.1 and UI 3.3.0 are published.
+UI 3.3.1 is prepared in source, not published. It contains the transformed-layout correction in
+`packages/ui/src/kurot/core/fit-transformed-bounds.ts` and UIState. It applies
+parent allocations to flipped/scaled/rotated/skewed components and tracks the
+affected local axes. Published UI 3.3.0 still falls back to preferred dimensions
+for non-identity transforms. Only the UI patch version changes for this repair. Peer ranges and application
+locks are unchanged; adoption requires publishing/installing UI 3.3.1 and rebuilding.
+Separate centered flipX/flipY properties are a proposed design, not implemented
+or exported APIs. Negative scale continues to use the existing anchor transform.
+Core 2.3.2 is published. It fixes TextField outline clipping using render-only
+stroke margins in Canvas/WebGL, caches and effect captures, without changing
+layout or input/external clip boundaries; see packages/core/docs/text-layout.md.
+It is not included in published Core 2.3.1. No API migration, dependency-range
+change or dependent SDK bump is required. UI/Game/DragonBones/ui-runtime/Spine
+peers accept 2.3.2; their development locks may adopt it separately.
+Editor 0.22.1's local trial pins published Core 2.3.2 with an updated Bun lockfile.
+Reskin, templates and examples receive the correction only after an explicit
+installation/lock update and rebuild;
+legacy Core 1.x projects remain unaffected.
+Core 2.3.1 fixes an unstyled blank run borrowing a later rich run's size.
+It introduces no API requirement; UI retains Core ^2.3.0. Core adds pure
+TextField.measureText and fixes rich-run line heights and clearing rich styling
+with an identical plain string. UI adds independent RichLabel (textFlow only)
+and fixes BitmapLabel automatic maxWidth measurement; its peer minimum is
+Core ^2.3.0 and development baseline is ^2.3.1. UI installs Core 2.3.1 from npm with a matching
+registry lockfile without local overrides. Existing UI 3.2.0, Game, DragonBones,
+Spine and ui-runtime Core peers accept 2.3.0 without SDK bumps. KUI/document,
+ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
+matching authoring, compilation and materialization contracts. Editor adoption
+is explicit; templates and other projects are unchanged.
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.3.3
+and UI 3.3.0; source versions do not establish npm publication.
+
+ui-document 0.12.0 is published. It adds independent
+BitmapLabel/RichLabel catalog entries, typed bitmap-font references and literal
+textFlow Span property elements, including named states, without changing format 2.
+Read packages/ui-document/docs/text-components.md. Published CLI 3.3.1 and
+ui-runtime 0.8.2 still use ^0.11.0 and do not support these built-in types.
+CLI 3.4.0 and ui-runtime 0.9.0 are published with native
+BitmapLabel/RichLabel compilation and materialization. CLI depends on published
+ui-document ^0.12.0; runtime requires Core ^2.3.0, UI ^3.3.0 and document ^0.12.0.
+Editor 0.22.1's local trial adopts this published chain and replaces its private
+BitmapLabel catalog/adapter with the native font contract. It adds BitmapLabel
+and RichLabel authoring, scoped bitmap-font refresh and native rich-text editing.
+These local trial changes do not publish a desktop release or upgrade external projects.
+Other SDKs, templates and examples are unchanged. Older CLI/runtime locks remain
+valid for their existing features; adopting these new text types requires explicit
+upgrades. Core 2.3.1 is an optional patch over the runtime minimum 2.3.0.
 
 Core 2.2.1 is published. It fixes minified TextField dictionary
 and emergency wrapping and protects complete graphemes in both wrapping modes.

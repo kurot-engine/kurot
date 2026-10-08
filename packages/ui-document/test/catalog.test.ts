@@ -14,6 +14,7 @@ describe('Kurot UI foundation catalog', () => {
 		const registry = createKurotUIFoundationRegistry();
 
 		expect(registry.list().map(definition => definition.type)).toEqual([
+			'kui.BitmapLabel',
 			'kui.Button',
 			'kui.Component',
 			'kui.EditableText',
@@ -22,6 +23,7 @@ describe('Kurot UI foundation catalog', () => {
 			'kui.Label',
 			'kui.ProgressBar',
 			'kui.Rect',
+			'kui.RichLabel',
 			'kui.TextInput',
 			'kui.ToggleButton',
 			'kui.UIComponent',

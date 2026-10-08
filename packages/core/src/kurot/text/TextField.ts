@@ -535,6 +535,32 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Measures complete content independently of the rendered width and height.
+	 * NaN means unconstrained. Height clipping, scrolling, line caches and dirty
+	 * flags are unchanged; line spacing and rich-text styles remain effective.
+	 */
+	public measureText(width: number = NaN): { width: number; height: number } {
+		if (!Number.isNaN(width) && (!Number.isFinite(width) || width < 0)) {
+			throw new RangeError('TextField measurement width must be nonnegative or NaN.');
+		}
+
+		const lines = this.calculateLines(width);
+		let measuredWidth = 0;
+		let measuredHeight = 0;
+
+		for (const line of lines) {
+			measuredWidth = Math.max(measuredWidth, line.width);
+			measuredHeight += line.height;
+		}
+
+		const height =
+			this._type === TextFieldType.INPUT && !this.multiline
+				? this._fontSize
+				: measuredHeight + Math.max(0, lines.length - 1) * this._lineSpacing;
+		return { width: measuredWidth, height };
+	}
+
 	public setFocus(): void {
 		if (this._type === TextFieldType.INPUT && this.stage && this._inputController) {
 			this._inputController.focus(true);
@@ -568,7 +594,7 @@ export class TextField extends DisplayObject {
 	// ── Internal methods ──────────────────────────────────────────────────────
 
 	public $setTextFromInput(value: string): boolean {
-		if (this._text === value) return false;
+		if (this._text === value && this._textFlow === undefined) return false;
 
 		this._text = value;
 		this._textFlow = undefined;
@@ -818,14 +844,14 @@ export class TextField extends DisplayObject {
 		return Math.max(1, scrollNum);
 	}
 
-	private calculateLines(): ILineElement[] {
+	private calculateLines(width: number = this.$explicitWidth): ILineElement[] {
 		const isInput = this._type === TextFieldType.INPUT;
 		return layoutTextLines(this._textFlow ?? [{ text: this.getDisplayText() }], {
 			fontFamily: this._fontFamily,
 			size: this._fontSize,
 			bold: this._bold,
 			italic: this._italic,
-			maxWidth: this.$explicitWidth,
+			maxWidth: width,
 			wordWrap: this._wordWrap,
 			multiline: this.multiline,
 			isInput,

@@ -32,3 +32,4 @@ export { EditableText } from './EditableText.js';
 export { TextInput } from './TextInput.js';
 export { ComboBox } from './ComboBox.js';
 export { BitmapLabel } from './BitmapLabel.js';
+export { RichLabel } from './RichLabel.js';

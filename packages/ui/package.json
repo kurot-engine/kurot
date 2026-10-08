@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/ui",
-	"version": "3.2.0",
-	"description": "EUI-compatible UI component framework for the Kurot game engine \u2014 skin-based components, layouts, data binding, view states",
+	"version": "3.3.1",
+	"description": "EUI-compatible UI component framework for the Kurot game engine — skin-based components, layouts, data binding, view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -30,15 +30,17 @@
 		"benchmark:compare": "playwright test --config examples/benchmark/playwright.config.ts",
 		"benchmark:smoke": "UI_BENCHMARK_PROFILE=smoke playwright test --config examples/benchmark/playwright.config.ts",
 		"build:benchmark": "vite --config vite.config.ts build",
-		"prepublishOnly": "npm run clean && npm run build"
+		"prepublishOnly": "npm run clean && npm run build",
+		"test:text-labels": "playwright test test/browser --workers=1"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^2.2.0"
+		"@kurot/core": "^2.3.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.2.0",
+		"@kurot/core": "^2.3.1",
 		"@playwright/test": "1.62.1",
 		"@types/node": "^22.0.0",
+		"esbuild": "^0.28.2",
 		"happy-dom": "^20.8.9",
 		"typescript": "^5.6.0",
 		"vite": "^8.0.8",

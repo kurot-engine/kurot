@@ -2,9 +2,34 @@
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.2.0.** Requires `@kurot/core@^2.2.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.3.1.** Requires `@kurot/core@^2.3.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
+
+## RichLabel in 3.3.0
+
+```ts
+import { RichLabel } from '@kurot/ui';
+
+const message = new RichLabel([
+	{ text: 'Important: ', style: { size: 20, bold: true, textColor: 0xff9900 } },
+	{ text: 'all runs wrap together.', style: { size: 20, italic: true } },
+]);
+message.maxWidth = 240;
+group.addChild(message);
+```
+
+RichLabel extends Component independently. Its content interface is `textFlow`,
+with no whole-component Label text, color, font, fitting or preset properties.
+It supports multiline layout, automatic bounds, parent constraints and alignment.
+Assigned/read runs and styles are copied; reassign an edited snapshot to update.
+See [RichLabel](docs/rich-label.md) for defaults, measurement and font readiness.
+BitmapLabel now also honors maxWidth during automatic measurement. Both text
+components remeasure automatic height when an authored width changes.
+
+UI 3.3.1 builds and tests against published Core 2.3.1 without local overrides.
+These native APIs do
+not add KUI tags or an Editor rich-text authoring interface by themselves.
 
 ## Label text fitting in 3.1.0
 
@@ -35,20 +60,20 @@ metrics even if the family name is unchanged.
 
 See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
 metadata was introduced in ui-document 0.9.0 and remains supported in 0.11.0.
-Current CLI-built KUI projects use published CLI 3.3.0 with ui-document `^0.11.0`;
-Published ui-runtime 0.8.2 uses the same kernel range. Programmatic UI depends
+Native text KUI projects use published CLI 3.4.0 with ui-document `^0.12.0`;
+published ui-runtime 0.9.0 uses the same kernel range. Programmatic UI depends
 only on Core.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.2.0 @kurot/core@^2.2.0
+pnpm add @kurot/ui@^3.3.1 @kurot/core@^2.3.0
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.2 requires Core 2.2.0 or later within Core 2.x for BitmapText rendering and
-font resources. Core installs its published bitmap-font dependency automatically.
+UI 3.3 requires Core 2.3.0 or later within Core 2.x for independent rich-text
+measurement as well as BitmapText rendering and font resources. Core installs its published bitmap-font dependency automatically.
 Refresh older Core/UI lockfiles and old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
@@ -137,6 +162,14 @@ coordinates. Scaling, rotation, and skew affect the bounds seen by the parent
 layout once; they do not alter the component's measured width and height.
 Explicit dimensions and skin minimum/maximum dimensions also use local units.
 
+The 3.3.1 transformed-layout correction applies parent allocations to the
+transformed rectangle, including negative scale on either axis. A flipped Image
+with 100% width/height fills its parent allocation, rather than reverting to the
+texture dimensions. This behavior is shared by Group and Component subclasses.
+Local minima/maxima still apply; infeasible transformed aspect ratios fit within
+the allocation when the local minimum dimensions permit it. No new flip property
+is introduced by this correction.
+
 ### Skin system
 
 ```ts
@@ -151,7 +184,11 @@ class MyButtonSkin extends Skin {
 		this.bg = new Rect(120, 36, 0x6c5ce7);
 		this.skinParts = ['bg'];
 		this.elementsContent = [this.bg];
-		this.states = [new State('up'), new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]), new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72)])];
+		this.states = [
+			new State('up'),
+			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
+			new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72)]),
+		];
 	}
 }
 
@@ -225,6 +262,7 @@ dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
 | Component      | Description                                                                     |
 | -------------- | ------------------------------------------------------------------------------- |
 | `Label`        | Text display. Wraps `TextField` in the UI lifecycle.                            |
+| `RichLabel`    | Styled runs in one continuous TextField layout; independent textFlow content.   |
 | `BitmapLabel`  | Bitmap-font display. Wraps BitmapText with font resources, layout and bindings. |
 | `Button`       | Tappable button with `up`/`down`/`disabled` states and `labelDisplay` part.     |
 | `CheckBox`     | Toggle button. Dispatches `Event.CHANGE` on selection change.                   |
@@ -373,7 +411,10 @@ class StatefulButtonSkin extends Skin {
 		this.states = [
 			new State('up'),
 			new State('down', [new SetProperty('bg', 'fillColor', 0x5a4bd1)]),
-			new State('disabled', [new SetProperty('bg', 'fillColor', 0x636e72), new SetProperty('labelDisplay', 'textColor', 0xb2bec3)]),
+			new State('disabled', [
+				new SetProperty('bg', 'fillColor', 0x636e72),
+				new SetProperty('labelDisplay', 'textColor', 0xb2bec3),
+			]),
 		];
 	}
 }

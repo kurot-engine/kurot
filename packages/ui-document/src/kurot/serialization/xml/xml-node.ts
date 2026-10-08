@@ -7,6 +7,7 @@ import { compareStrings } from '../../shared/strings.js';
 import type { XMLElement } from './xml-parser.js';
 import { decodeXMLValue, encodeXMLValue, escapeXML } from './xml-values.js';
 import { parseArrayCollection, serializeArrayCollection, supportsArrayCollection } from './xml-array-collection.js';
+import { parseTextFlow, serializeTextFlow } from './xml-text-flow.js';
 
 const RESERVED_ATTRIBUTES = new Set(['id', 'xmlns']);
 const FOUNDATION_COMPONENTS = createKurotUIFoundationRegistry();
@@ -57,11 +58,11 @@ export function serializeNode(
 ): string[] {
 	const indent = '    '.repeat(depth);
 	const tag = componentTag(node.type);
-	const { attributes, layout, dataProvider } = serializeNodeMetadata(node, states, true);
+	const { attributes, layout, dataProvider, textFlows } = serializeNodeMetadata(node, states, true);
 
 	const attributeSuffix = attributes.length === 0 ? '' : ` ${attributes.join(' ')}`;
 
-	if (layout === undefined && dataProvider === undefined && node.children.length === 0) {
+	if (layout === undefined && dataProvider === undefined && textFlows.length === 0 && node.children.length === 0) {
 		return [`${indent}<${tag}${attributeSuffix} />`];
 	}
 
@@ -71,6 +72,9 @@ export function serializeNode(
 	}
 	if (dataProvider !== undefined) {
 		lines.push(...serializeArrayCollection(dataProvider, depth + 1));
+	}
+	for (const [name, value] of textFlows) {
+		lines.push(...serializeTextFlow(value, depth + 1, name));
 	}
 	for (const child of node.children) {
 		lines.push(...serializeNode(child, depth + 1, states));
@@ -115,6 +119,9 @@ export function parseNode(element: XMLElement, context: XMLNodeParseContext, pat
 
 	for (const [name, value] of Object.entries(element.attributes)) {
 		if (RESERVED_ATTRIBUTES.has(name) || name.startsWith('xmlns:')) continue;
+		if (name.split('.')[0] === 'textFlow') {
+			throw new Error('Rich text uses a <textFlow> property element, not an attribute.');
+		}
 		if (name === 'appearance' || name === 'appearanceVariant') {
 			throw new Error(`Skin component <${element.name}> does not support ${name}.`);
 		}
@@ -142,8 +149,26 @@ export function parseNode(element: XMLElement, context: XMLNodeParseContext, pat
 	}
 
 	let childIndex = 0;
+	const textFlowNames = new Set<string>();
 	for (const child of element.children) {
-		if (child.name === 'layout') {
+		if (child.name === 'textFlow' || child.name.startsWith('textFlow.')) {
+			assertTextFlowTarget(type);
+			if (textFlowNames.has(child.name)) {
+				throw new Error(`<${element.name}> contains duplicate ${child.name} metadata.`);
+			}
+			textFlowNames.add(child.name);
+			const value = parseTextFlow(child);
+			if (child.name === 'textFlow') {
+				properties.textFlow = value;
+			} else {
+				const stateName = child.name.slice('textFlow.'.length);
+				const overrides = context.stateOverrides.get(stateName);
+				if (!context.states.has(stateName) || !overrides) {
+					throw new Error(`State property "${child.name}" references an undeclared state.`);
+				}
+				overrides.push({ targetId: id, property: 'textFlow', value });
+			}
+		} else if (child.name === 'layout') {
 			if (properties.layout !== undefined) {
 				throw new Error(`<${element.name}> contains duplicate layout metadata.`);
 			}
@@ -187,17 +212,28 @@ function serializeNodeMetadata(
 	node: UINode,
 	states: Readonly<Record<string, UIStateDefinition>>,
 	includeId: boolean,
-): { attributes: string[]; layout?: UIPropertyValue; dataProvider?: UIPropertyValue } {
+): {
+	attributes: string[];
+	layout?: UIPropertyValue;
+	dataProvider?: UIPropertyValue;
+	textFlows: [string, UIPropertyValue][];
+} {
 	const attributes = includeId && !isSyntheticNodeId(node.id) ? [`id="${escapeXML(node.id)}"`] : [];
 	const stateProperties = new Set<string>();
 	let layout: UIPropertyValue | undefined;
 	let dataProvider: UIPropertyValue | undefined;
+	const textFlows: [string, UIPropertyValue][] = [];
 
 	if (node.appearance !== undefined || node.instance !== undefined) {
 		throw new Error('Skin XML nodes do not serialize semantic asset composition metadata.');
 	}
 
 	for (const [name, value] of sortedEntries(node.properties)) {
+		if (name === 'textFlow') {
+			assertTextFlowTarget(node.type);
+			textFlows.push([name, value]);
+			continue;
+		}
 		if (name === 'layout') {
 			layout = value;
 			continue;
@@ -235,6 +271,11 @@ function serializeNodeMetadata(
 			if (override.transition !== undefined) {
 				throw new Error(`Skin XML does not serialize transitions for state "${stateName}".`);
 			}
+			if (override.property === 'textFlow') {
+				assertTextFlowTarget(node.type);
+				textFlows.push([stateProperty, override.value]);
+				continue;
+			}
 			if (property.value === undefined) {
 				throw new Error(`State property "${override.property}.${stateName}" must be a scalar value.`);
 			}
@@ -242,7 +283,20 @@ function serializeNodeMetadata(
 		}
 	}
 
-	return { attributes, ...(layout === undefined ? {} : { layout }), ...(dataProvider === undefined ? {} : { dataProvider }) };
+	return {
+		attributes,
+		textFlows,
+		...(layout === undefined ? {} : { layout }),
+		...(dataProvider === undefined ? {} : { dataProvider }),
+	};
+}
+
+function assertTextFlowTarget(type: string): void {
+	const definition = FOUNDATION_COMPONENTS.resolve(type);
+	// Project subclasses are validated later against their project component registry.
+	if (definition && definition.properties.textFlow?.format !== 'text-flow') {
+		throw new Error(`Component "${type}" does not support textFlow.`);
+	}
 }
 
 function serializeLayout(value: UIPropertyValue, depth: number): string[] {
@@ -326,11 +380,7 @@ function propertyDefinition(type: string, property: string) {
 	return FOUNDATION_COMPONENTS.resolve(type)?.properties[property];
 }
 
-function decodeSizeProperty(
-	type: string,
-	name: string,
-	source: string,
-): { name: string; value: UIPropertyValue } {
+function decodeSizeProperty(type: string, name: string, source: string): { name: string; value: UIPropertyValue } {
 	if (name === 'percentWidth' || name === 'percentHeight') {
 		throw new Error(`Skin XML uses ${PERCENT_SIZE_PROPERTIES[name]}="...%" instead of ${name}.`);
 	}

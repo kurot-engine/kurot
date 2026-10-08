@@ -2,6 +2,7 @@ import { BitmapData } from '../../display/texture/BitmapData.js';
 import type { CacheAsTextureOptions, DisplayObject } from '../../display/DisplayObject.js';
 import { deleteWebGLTexture, SYM_GL_CONTEXT, type GL } from '../webgl/WebGLUtils.js';
 import { CanvasBuffer } from './CanvasBuffer.js';
+import { getRenderContentBounds } from '../render-bounds.js';
 
 /**
  * Caches a display-object subtree in an offscreen bitmap.
@@ -81,7 +82,7 @@ export class DisplayList {
 	 * Returns false if the object has zero size.
 	 */
 	public updateSurfaceSize(maxTextureSize: number = Number.POSITIVE_INFINITY, inheritedResolution = 1): boolean {
-		const bounds = this.root.$getOriginalBounds();
+		const bounds = getRenderContentBounds(this.root);
 		if (bounds.width <= 0 || bounds.height <= 0) return false;
 		const requestedResolution = this._autoResolution ? inheritedResolution : this.resolution;
 		const maxResolution = Math.min(maxTextureSize / bounds.width, maxTextureSize / bounds.height);

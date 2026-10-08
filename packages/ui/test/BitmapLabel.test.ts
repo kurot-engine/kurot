@@ -9,7 +9,11 @@ function makeFont(): BitmapFont {
 	canvas.height = 32;
 	const texture = new Texture();
 	texture.setBitmapData(new BitmapData(canvas));
-	return new BitmapFont(texture, { frames: { A: { x: 0, y: 0, w: 8, h: 10, sourceW: 10, sourceH: 12 } } }, { ownsTexture: false });
+	return new BitmapFont(
+		texture,
+		{ frames: { A: { x: 0, y: 0, w: 8, h: 10, sourceW: 10, sourceH: 12 } } },
+		{ ownsTexture: false },
+	);
 }
 afterEach(() => vi.restoreAllMocks());
 
@@ -43,6 +47,18 @@ describe('BitmapLabel', () => {
 		expect(label.textHeight).toBe(12);
 		expect(label.textWidth).toBe(20);
 	});
+	it('uses maximum width for automatic sizing and remeasures after bounds change', () => {
+		const label = new BitmapLabel('AAAA');
+		label.font = makeFont();
+		label.maxWidth = 20;
+		label.validateNow();
+
+		expect([label.textWidth, label.textHeight]).toEqual([20, 24]);
+		expect([label.width, label.height]).toEqual([20, 24]);
+		label.maxWidth = 40;
+		label.validateNow();
+		expect([label.width, label.height]).toEqual([40, 12]);
+	});
 	it('applies actual bounds and alignment without scaling glyphs', () => {
 		const label = new BitmapLabel('A');
 		label.font = makeFont();
@@ -52,6 +68,16 @@ describe('BitmapLabel', () => {
 		label.updateDisplayList(30, 24);
 		const text = label.getChildAt(0) as BitmapText;
 		expect(text.getGlyphs()[0]).toMatchObject({ x: 20, y: 12 });
+	});
+	it('remeasures automatic height when authored width changes after validation', () => {
+		const label = new BitmapLabel('AAAA');
+		label.font = makeFont();
+		label.width = 20;
+		label.validateNow();
+		expect(label.height).toBe(24);
+		label.width = 40;
+		label.validateNow();
+		expect([label.width, label.height]).toEqual([40, 12]);
 	});
 	it('dispatches text changes for binding only when the value changes', () => {
 		const label = new BitmapLabel();

@@ -2,6 +2,7 @@ import { DisplayObject, DisplayObjectContainer, Rectangle, Matrix, Event } from 
 import type { IUIComponent } from './IUIComponent.js';
 import { validator } from './Validator.js';
 import { UIEvent } from '../events/UIEvent.js';
+import { fitTransformedBounds, TRANSFORM_EPSILON } from './fit-transformed-bounds.js';
 
 // ── Internal state keys ───────────────────────────────────────────────────────
 
@@ -421,7 +422,7 @@ export class UIState {
 			this._setActualSize(w, h);
 			return;
 		}
-		const fit = fitBounds(
+		const fit = fitTransformedBounds(
 			layoutWidth,
 			layoutHeight,
 			m,
@@ -434,6 +435,13 @@ export class UIState {
 			maxW,
 			maxH,
 		);
+		// A parent-space constraint may allocate either or both local axes after transformation.
+		v[K.layoutWidthExplicitlySet] =
+			(!isNaN(layoutWidth) && Math.abs(m.a) >= TRANSFORM_EPSILON) ||
+			(!isNaN(layoutHeight) && Math.abs(m.b) >= TRANSFORM_EPSILON);
+		v[K.layoutHeightExplicitlySet] =
+			(!isNaN(layoutWidth) && Math.abs(m.c) >= TRANSFORM_EPSILON) ||
+			(!isNaN(layoutHeight) && Math.abs(m.d) >= TRANSFORM_EPSILON);
 		this._setActualSize(fit.w, fit.h);
 	}
 
@@ -608,24 +616,4 @@ export class UIState {
  */
 export function isUIComponent(obj: unknown): obj is IUIComponent {
 	return obj != null && typeof obj === 'object' && 'ui' in obj;
-}
-
-// ── fitBounds helper ──────────────────────────────────────────────────────────
-
-function fitBounds(
-	_layoutW: number,
-	_layoutH: number,
-	_matrix: Matrix,
-	explicitW: number,
-	explicitH: number,
-	preferredW: number,
-	preferredH: number,
-	minW: number,
-	minH: number,
-	maxW: number,
-	maxH: number,
-): { w: number; h: number } {
-	const w = isNaN(explicitW) ? Math.max(minW, Math.min(maxW, preferredW)) : Math.max(minW, Math.min(maxW, explicitW));
-	const h = isNaN(explicitH) ? Math.max(minH, Math.min(maxH, preferredH)) : Math.max(minH, Math.min(maxH, explicitH));
-	return { w, h };
 }

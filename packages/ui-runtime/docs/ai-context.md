@@ -1,11 +1,11 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.8.2` (published). This package consumes validated
+Package identity: `@kurot/ui-runtime@0.9.0` (published). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on published `@kurot/ui-document@^0.11.0`, `@kurot/ui@^3.1.0`, and
-`@kurot/core@^2.1.0`. It does not
+It peer-depends on published `@kurot/ui-document@^0.12.0`, `@kurot/ui@^3.3.0`, and
+`@kurot/core@^2.3.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
 Document XML string attributes are literal, including state text and
@@ -33,9 +33,22 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 - `KurotUIRuntimeError` exposes a stable `code`, exact semantic `path`, and any
   document validation `diagnostics`.
 
+## Text integration in 0.9.0
+
+BitmapLabel/RichLabel are independent Component subclasses. Explicit handlers
+under `builtins/` share only text layout; Label typography is not inherited.
+RichLabel flows use `isUITextFlow` and native owned copies. BitmapLabel font
+adapters return either a configured resource key or a real BitmapFont.
+Native measurement, resource loading/cache ownership and content copy rules
+remain in Core/UI. Whole-flow states and typed data bindings use existing
+native/transactional restoration, including undefined base fonts. See
+[text-components.md](text-components.md). The development lock uses registry
+Core 2.3.1; the required native API minimum is 2.3.0.
+
 ## Built-in boundary
 
-The audited built-in types are `kui.Group`, `kui.Label`, `kui.EditableText`,
+The audited built-in types are `kui.Group`, `kui.Label`, `kui.BitmapLabel`,
+`kui.RichLabel`, `kui.EditableText`,
 `kui.Image`, `kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`,
 and `kui.TextInput`. Layout descriptors accept `kui.BasicLayout`,
 `kui.HorizontalLayout`,

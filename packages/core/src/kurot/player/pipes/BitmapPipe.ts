@@ -1,5 +1,7 @@
 import type { Bitmap } from '../../display/Bitmap.js';
 import { textureScaleFactor } from '../../display/texture/Texture.js';
+import { BitmapFillMode } from '../../display/enums/BitmapFillMode.js';
+import { drawUnscaledBitmapFill } from '../bitmap-fill.js';
 import type { RenderBuffer } from '../RenderBuffer.js';
 import type { Instruction } from '../InstructionSet.js';
 import type { InstructionSet } from '../InstructionSet.js';
@@ -51,7 +53,25 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 		buffer.offsetY = 0;
 
 		const grid = bitmap.scale9Grid;
-		if (grid) {
+		if (bitmap.fillMode !== BitmapFillMode.SCALE) {
+			drawUnscaledBitmapFill(bitmap, destW, destH, (sx, sy, sw, sh, dx, dy, dw, dh) => {
+				buffer.context.drawImage(
+					bd,
+					sx,
+					sy,
+					sw,
+					sh,
+					dx,
+					dy,
+					dw,
+					dh,
+					bitmap.sourceWidth,
+					bitmap.sourceHeight,
+					bitmap.texture?.rotated ?? false,
+					bitmap.smoothing,
+				);
+			});
+		} else if (grid) {
 			this._drawScale9(bitmap, bd, grid, destW, destH, buffer);
 		} else {
 			// Destination size describes the untrimmed canvas, not the cropped atlas region.

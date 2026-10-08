@@ -135,6 +135,13 @@ compiler/runtime requirements.
 
 ## Parts and states
 
+BitmapLabel and RichLabel are independent text components in 0.12.0. BitmapLabel
+uses a configured font resource key. RichLabel stores ordered text/style runs in
+`<textFlow><Span text="..." bold="true" /></textFlow>`, with
+`<textFlow.stateName>` for whole-flow overrides and `<textFlow />` to clear.
+Spans never become display children or skin parts. See
+[text components](text-components.md) for literal whitespace and supported fields.
+
 Every explicitly identified node inside the Skin is available as a skin
 part. The node `id` is the part name, so internal visual nodes can omit `id`
 instead of maintaining names that have no runtime meaning.

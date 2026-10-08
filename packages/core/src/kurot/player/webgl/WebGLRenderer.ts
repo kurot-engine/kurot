@@ -20,6 +20,7 @@ import type { BitmapTextInstruction } from '../pipes/BitmapTextPipe.js';
 import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
+import { getRenderContentBounds } from '../render-bounds.js';
 
 // ── Transform context ─────────────────────────────────────────────────────────
 
@@ -703,7 +704,7 @@ export class WebGLRenderer {
 							if (displayBuffer) {
 								this._configureOffscreenTransform(
 									displayBuffer,
-									push.renderable.$getOriginalBounds(),
+									getRenderContentBounds(push.renderable),
 									pushT,
 								);
 								activeBuffer = displayBuffer;

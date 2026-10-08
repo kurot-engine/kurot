@@ -6,6 +6,7 @@ import type { InstructionSet } from '../InstructionSet.js';
 import type { RenderPipe } from '../RenderPipe.js';
 import { WebGLRenderBuffer as WGLBuf } from '../webgl/WebGLRenderBuffer.js';
 import { fitTextureResolution } from '../webgl/WebGLUtils.js';
+import { getRenderContentBounds } from '../render-bounds.js';
 
 const INSTRUCTION_POOL_LIMIT = 256;
 
@@ -153,7 +154,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			return undefined;
 		}
 
-		const bounds = renderable.$getOriginalBounds();
+		const bounds = getRenderContentBounds(renderable);
 		if (bounds.width <= 0 || bounds.height <= 0) {
 			return undefined;
 		}
@@ -196,7 +197,7 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 			return;
 		}
 
-		const bounds = renderable.$getOriginalBounds();
+		const bounds = getRenderContentBounds(renderable);
 		const bx = bounds.x;
 		const by = bounds.y;
 		const bw = bounds.width;

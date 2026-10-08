@@ -20,6 +20,7 @@ import type {
 } from './ast.js';
 import { localName, lookupComponent } from './registry.js';
 import type { NamespaceModule } from './registry.js';
+import { validateTextComponents } from './validate-text-components.js';
 
 /**
  * Parses a KUI Skin document into the existing skin code-generation IR.
@@ -36,6 +37,7 @@ export function parseKUISkin(
 		resolveUILabelStyles(resolveUIResourceDefaults(parseUIDocument(source), resources), styleSheet),
 		colors ?? styleSheet?.colors ?? {},
 	);
+	validateTextComponents(document);
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 
@@ -137,7 +139,7 @@ class KUIParseContext {
 			if (semanticChild) {
 				propertyChildren.push(semanticChild);
 			} else {
-				properties.push({ name, value: propertyValue(value) });
+				properties.push({ name, value: propertyValue(value, name) });
 			}
 		}
 
@@ -178,7 +180,7 @@ class KUIParseContext {
 					type: 'SetProperty' as const,
 					targetId: override.targetId === this._document.root.id ? '' : override.targetId,
 					name: override.property,
-					value: propertyValue(override.value),
+					value: propertyValue(override.value, override.property),
 				};
 			}),
 		}));
@@ -188,8 +190,8 @@ class KUIParseContext {
 /**
  * Converts percentages and semantic references into compiler property values.
  */
-function propertyValue(value: UIPropertyValue): PropertyValue {
-	if (typeof value === 'string' && value.endsWith('%')) {
+function propertyValue(value: UIPropertyValue, name: string): PropertyValue {
+	if ((name === 'width' || name === 'height') && typeof value === 'string' && value.endsWith('%')) {
 		const percentage = Number.parseFloat(value);
 		if (!Number.isNaN(percentage)) return { type: 'percent', value: percentage };
 	}

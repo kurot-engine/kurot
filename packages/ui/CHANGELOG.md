@@ -4,6 +4,58 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.3.1] — 2026-10-09
+
+### Fixed
+
+- Honor parent-space layout allocations for flipped, scaled, rotated and skewed
+  components through the shared UIState. Percentage-sized flipped images now
+  fill their allocated area instead of reverting to the texture's natural size.
+- Preserve allocations mapped onto different local axes by a transform, respect
+  local size limits and handle collapsed or degenerate transforms without NaN
+  dimensions. Unconstrained local measurement and anchor offsets remain intact.
+
+### Verification
+
+- Build and all 316 UI tests pass, including flipped Group, Component, Image,
+  Label, RichLabel, BitmapLabel, Button and Rect allocations. Browser trials of
+  the unmodified Drama skin match Egret's 640×62 top-bar image dimensions and
+  positions in WebGL and Canvas without changing the game's installed packages.
+
+## [3.3.0] — 2026-10-08
+
+### Added
+
+- Export RichLabel as an independent Component wrapping one native TextField.
+  Its only content interface is textFlow; ordinary Label text, appearance fields,
+  fitting and style presets are not exposed. Per-run styling stays in the flow.
+- Support continuous Unicode wrapping across runs, hard breaks, automatic bounds,
+  parent width constraints, maximum width, line spacing and alignment.
+- Copy assigned/read runs and styles, notify textFlow bindings, clear with [],
+  cache unchanged measurements and invalidate metrics after late font readiness.
+
+### Fixed
+
+- Apply BitmapLabel.maxWidth when measuring automatic bounds without an explicit
+  or parent-supplied width, keeping wrapped height consistent with rendering.
+- Remeasure BitmapLabel and RichLabel automatic height after an authored width
+  changes, including after the component has already completed layout.
+
+### Dependencies and migration
+
+- Require Core ^2.3.0 for independent rich-text measurement. UI development
+  dependencies and the lockfile resolve published Core 2.3.1 without local
+  overrides; the compatible patch does not raise the peer minimum.
+- Native code and programmatic skins can use both text components. KUI catalogs,
+  CLI compilation, ui-runtime materialization and Editor authoring are separate
+  follow-up work; this release does not migrate projects or edit those packages.
+
+### Verification
+
+- Cover content ownership, binding, measurement, layout, late font readiness and
+  per-run Canvas styling. Add minified Canvas 2D, WebGL 1 and WebGL 2 browser tests
+  for rich text and bitmap labels, including width changes and clearing content.
+
 ## [3.2.0] — 2026-10-08
 
 ### Added

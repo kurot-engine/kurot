@@ -7,6 +7,39 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.4.0 — 2026-10-08
+
+### Added
+
+- Compile native BitmapLabel and independent RichLabel with published
+  ui-document 0.12.0. Rich content uses literal `textFlow` / `Span` elements;
+  named Skin states replace the whole flow, and an empty element clears it.
+- Generate correctly typed BitmapLabel/RichLabel Skin parts. Text runs remain
+  property data and never become display children or Skin parts.
+- Validate new text-component properties and state values against their shared
+  native contract before emitting a bundle; preserve the last good bundle and
+  declarations when input is invalid.
+
+### Fixed
+
+- Keep percentage-looking text, labels and other string properties literal.
+  Percentage conversion applies only to width and height.
+
+### Dependencies and Compatibility
+
+- Require published `@kurot/ui-document@^0.12.0`. The CLI has no Core/UI runtime
+  dependencies. Applications using the new tags need UI `^3.3.0` and Core
+  `^2.3.0`; Core 2.3.1 is recommended for corrected blank rich-text line metrics.
+- Command/config APIs and document format version 2 remain unchanged. No forced
+  asset migration or template/application upgrade. Legacy EXML projects stay
+  on CLI 1.3.x. Native font sizes/presets belong to Label, not these new types.
+
+### Tests
+
+- Verify flow/state literals, bitmap fonts, unsupported fields, exact string
+  content, generated part declarations, last-good output retention and existing
+  templates. Verify packed generated factories against registry Core/UI.
+
 ## 3.3.1 — 2026-10-07
 
 ### Development Resource Updates

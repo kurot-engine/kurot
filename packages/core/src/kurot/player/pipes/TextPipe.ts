@@ -6,6 +6,7 @@ import type { RenderContext, TextureHandle } from '../RenderContext.js';
 import type { RenderBuffer } from '../RenderBuffer.js';
 import type { CanvasRenderer } from '../canvas/index.js';
 import { CanvasBuffer } from '../canvas/index.js';
+import { getTextRenderPadding } from '../../text/TextRenderBounds.js';
 
 export interface TextInstruction extends Instruction {
 	readonly renderPipeId: 'text';
@@ -79,11 +80,14 @@ export class TextPipe implements RenderPipe<TextField> {
 
 		if (!this._context) this._context = buffer.context;
 
-		const logicalW = Math.ceil(!isNaN(tf.$explicitWidth) ? tf.$explicitWidth : tf.textWidth);
-		const logicalH = Math.ceil(!isNaN(tf.$explicitHeight) ? tf.$explicitHeight : tf.textHeight);
-		if (logicalW <= 0 || logicalH <= 0) {
+		const width = !isNaN(tf.$explicitWidth) ? tf.$explicitWidth : tf.textWidth;
+		const height = !isNaN(tf.$explicitHeight) ? tf.$explicitHeight : tf.textHeight;
+		if (width <= 0 || height <= 0) {
 			return;
 		}
+		const padding = getTextRenderPadding(tf);
+		const logicalW = Math.ceil(width + padding * 2);
+		const logicalH = Math.ceil(height + padding * 2);
 
 		buffer.offsetX = 0;
 		buffer.offsetY = 0;
@@ -148,7 +152,7 @@ export class TextPipe implements RenderPipe<TextField> {
 				ctx.setTransform(canvasScaleX, 0, 0, canvasScaleY, 0, 0);
 			}
 
-			this._canvasRenderer.renderTextFieldToContext(tf, ctx, 0, 0);
+			this._canvasRenderer.renderTextFieldToContext(tf, ctx, padding, padding);
 
 			const surface = cache.canvasBuffer.surface;
 			if (!cache.texture) {
@@ -176,8 +180,8 @@ export class TextPipe implements RenderPipe<TextField> {
 			0,
 			cache.textureWidth,
 			cache.textureHeight,
-			0,
-			0,
+			0 - padding,
+			0 - padding,
 			cache.textureWidth / canvasScaleX,
 			cache.textureHeight / canvasScaleY,
 			cache.textureWidth,

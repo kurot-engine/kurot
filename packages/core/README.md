@@ -2,7 +2,55 @@
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.2.1.** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.3.3 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Bitmap fill correction in 2.3.3
+
+`Bitmap.fillMode` / UI `Image.fillMode` now honor `repeat` and `clip` in both
+backends and bitmap caches. Repeat uses the original texture dimensions, including
+transparent trim margins; partial edge tiles are cropped rather than stretched.
+Nine-slice remains active only for `scale`. No XML or resource migration is needed.
+Core 2.3.3 is published; Core 2.3.2 does not include this fix. Existing
+Core 2.x peers accept the patch without another SDK release. Applications adopt
+its installation/lock and rebuild; templates are not rewritten.
+See [bitmap fill modes](docs/bitmap-fill.md).
+
+## Text outline fix in 2.3.2
+
+Version 2.3.2 preserves dynamic TextField outlines beyond the layout box in
+Canvas drawing, WebGL text textures, display-list caches, filter captures and
+object-mask buffers. Rich-text run strokes are included. Layout measurements,
+wrapping and alignment retain their existing dimensions; input viewports and
+external clips remain exact. This fix is not included in published 2.3.1.
+No API or resource-format migration is required. Existing UI, Game, DragonBones,
+Spine and ui-runtime Core peers accept this patch without another SDK release.
+Update the application's installation and lockfile, then rebuild; existing
+bundled Editor Apps retain their old Core until rebuilt.
+See [text layout](docs/text-layout.md#text-outlines-core-232).
+
+## Blank rich-text lines in 2.3.1
+
+An unstyled blank run between styled runs now uses the TextField base font size,
+matching other unstyled content, rather than borrowing a later run's size.
+Core 2.3.1 is published as a compatible patch. Existing Core 2.x
+peers accept it without dependent SDK version bumps.
+
+## Independent text measurement in 2.3.0
+
+```ts
+const metrics = textField.measureText(240);
+const naturalSize = textField.measureText(); // NaN: no width constraint
+```
+
+Measurements honor rich-text runs, wrapping and line spacing without changing
+rendered bounds, line caches or scrolling. Height is the complete content height
+before clipping. Rich-text lines use their actual run sizes, including blank
+lines. Assigning `text` clears a previous `textFlow`, even for an identical string.
+See [text layout](docs/text-layout.md) for font-readiness and width contracts.
+
+Core 2.3.1 is published.
+UI 3.3.0 adds RichLabel using this API; other existing Core 2.x consumers do not
+need package version bumps merely to accept Core 2.3.0.
 
 ## Text wrapping fixes in 2.2.1
 
@@ -48,7 +96,7 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.2.1
+pnpm add @kurot/core@^2.3.3
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

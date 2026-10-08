@@ -1,5 +1,6 @@
 import type { DisplayObject } from '@kurot/core';
 import {
+	BitmapLabel,
 	Button,
 	Component,
 	EditableText,
@@ -8,9 +9,11 @@ import {
 	Label,
 	ProgressBar,
 	Rect,
+	RichLabel,
 	TextInput,
 	isUIComponent,
 } from '@kurot/ui';
+import { applyBitmapLabelProperty } from './applyBitmapLabelProperties.js';
 import { applyButtonProperty } from './applyButtonProperties.js';
 import { applyComponentProperty } from './applyComponentProperties.js';
 import { applyEditableTextProperty } from './applyEditableTextProperties.js';
@@ -20,6 +23,7 @@ import { applyImageProperty } from './applyImageProperties.js';
 import { applyLabelProperty } from './applyLabelProperties.js';
 import { applyProgressBarProperty } from './applyProgressBarProperties.js';
 import { applyRectProperty } from './applyRectProperties.js';
+import { applyRichLabelProperty } from './applyRichLabelProperties.js';
 import { applyTextInputProperty } from './applyTextInputProperties.js';
 import { applyUIComponentProperty } from './applyUIComponentProperties.js';
 
@@ -39,6 +43,16 @@ export function applyBuiltInProperty(target: DisplayObject, name: string, value:
 	}
 	if (target instanceof Label) {
 		if (applyLabelProperty(target, name, value, path)) return true;
+	}
+	if (target instanceof BitmapLabel) {
+		if (applyBitmapLabelProperty(target, name, value, path)) {
+			return true;
+		}
+	}
+	if (target instanceof RichLabel) {
+		if (applyRichLabelProperty(target, name, value, path)) {
+			return true;
+		}
 	}
 	if (target instanceof EditableText) {
 		if (applyEditableTextProperty(target, name, value, path)) return true;

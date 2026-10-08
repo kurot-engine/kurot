@@ -1,7 +1,20 @@
 import type { DisplayObject } from '@kurot/core';
-import { Button, EditableText, Group, Image, Label, ProgressBar, Rect, TextInput, ToggleButton } from '@kurot/ui';
+import {
+	BitmapLabel,
+	Button,
+	EditableText,
+	Group,
+	Image,
+	Label,
+	ProgressBar,
+	Rect,
+	RichLabel,
+	TextInput,
+	ToggleButton,
+} from '@kurot/ui';
 
 const BUILT_IN_FACTORIES: Readonly<Record<string, () => DisplayObject>> = {
+	'kui.BitmapLabel': () => new BitmapLabel(),
 	'kui.Button': () => new Button(),
 	'kui.EditableText': () => new EditableText(),
 	'kui.Group': () => new Group(),
@@ -9,6 +22,7 @@ const BUILT_IN_FACTORIES: Readonly<Record<string, () => DisplayObject>> = {
 	'kui.Label': () => new Label(),
 	'kui.ProgressBar': () => new ProgressBar(),
 	'kui.Rect': () => new Rect(),
+	'kui.RichLabel': () => new RichLabel(),
 	'kui.TextInput': () => new TextInput(),
 	'kui.ToggleButton': () => new ToggleButton(),
 };

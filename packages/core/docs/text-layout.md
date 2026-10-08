@@ -40,6 +40,51 @@ Dictionary and grapheme segmentation follow the browser's `Intl` data. The
 pinned Unicode 17.0 tables govern the line-break profile; they do not replace
 the browser's grapheme implementation.
 
+## Independent measurement (Core 2.3.0)
+
+`textField.measureText(width = NaN)` measures complete content under a separate
+width constraint. NaN means unconstrained; zero returns no lines in multiline
+mode; negative or infinite values throw RangeError. Single-line mode ignores
+width wrapping as it does during rendering.
+
+The result excludes height clipping and scrolling. Measurement does not replace
+rendered line caches or change width, height, content or dirty flags. It uses the
+same run styles and line spacing as rendering. For dynamic rich text, line height
+is the largest run size on that line; blank and trailing hard-separated lines
+retain the relevant run size. Input fields keep the base size contract. Core 2.3.1 corrects unstyled blank
+runs between styled runs: they use the base size rather than the later run's size.
+
+Assigning `text`, including the same string represented by a previous `textFlow`,
+returns the field to plain-text styling. `measureText` does not load fonts or
+cache a separate measurement; UI components may cache results until invalidated.
+
+## Text outlines (Core 2.3.2)
+
+Dynamic TextFields have a render-only margin for their effective stroke widths,
+including run-level overrides. Canvas clipping, WebGL text rasterization,
+display-list caches, filter captures and object-mask buffers retain this ink.
+The margin covers stroke antialiasing and glyph overhang; it is not part of
+`width`, `height`, `textWidth`, `textHeight`, `measureText()` or hit-test bounds.
+Wrapping and horizontal/vertical alignment use the original layout dimensions.
+
+Explicit dimensions still constrain layout and select visible lines. Partially
+visible lines clip against the expanded ink area; fully hidden lines are not
+painted, including lines immediately before or after a scrolled viewport.
+Input fields keep their exact viewport for text, selection and caret drawing.
+External `scrollRect` and masks retain their authored boundaries and can clip
+outlines intentionally. Zero-size fields remain empty.
+
+`test/TextStroke.test.ts` covers render margins, run overrides, measurements,
+scrolling, input viewports, zero dimensions and resolution-limited GPU caches.
+The minified browser suite in
+`examples/visual-regression/tests/text-stroke.spec.ts` compares actual text pixels
+with an unclipped Canvas reference in Canvas 2D, WebGL 1 and WebGL 2 at 1x/2x
+resolution. Canvas CPU filter and object-mask captures retain their existing
+1x rasterization; their pixel comparison runs at 1x. This fix is published in
+Core 2.3.2 and is not included in Core 2.3.1. No layout/API migration or dependent
+SDK bump is required. Update
+the installed Core and rebuild the application to adopt the correction.
+
 ## Font readiness
 
 Load fonts before constructing or measuring text where possible. After a font
@@ -88,7 +133,11 @@ runtime APIs. Both WebGL text rasterization and Canvas rendering share this
 layout. Core 2.1.0 also adds explicit single-line and font-invalidation
 regressions. No resource-manifest or CLI XML-format change is involved.
 
-## Package dependencies
+## Core 2.2.1 adoption snapshot
+
+This section records the dependency audit for 2.2.1, before the later native
+RichLabel releases and Editor 0.22.0. For current peer requirements and 2.3.2
+adoption, see the [independent release policy](../../../docs/dependency-policy.md).
 
 Published UI 3.2.0 requires Core `^2.2.0` for BitmapLabel. Older UI 3.1.0 and
 ui-runtime 0.8.2 declare Core `^2.1.0`; game 2.0.0 declares `^2.0.0`.
@@ -108,17 +157,17 @@ lockfiles and installed package versions. Older versions inside an accepted
 range are optional adoption for projects/development, not SDK release blockers.
 See the [independent release policy](../../../docs/dependency-policy.md).
 
-| Consumer | Current Core declaration | Locked or pinned Core | Adoption or migration |
-| --- | --- | --- | --- |
-| UI development | `^2.2.0` | 2.2.0 | Optionally refresh the development lockfile. |
-| DragonBones development | `^2.2.0`; peer `^2.1.1` | 2.2.0 | Optionally refresh the development lockfile. The peer already accepts 2.2.1. |
-| Game / ui-runtime development | `^2.1.1` | 2.1.1 | Optionally refresh the development lockfiles. Their peers already accept 2.2.1. |
-| Engine examples / copied Reskin project | `^2.1.1` | 2.1.1 | Refresh application lockfiles when adopting the fix. |
-| Templates/tentax | `^2.2.1` | 2.2.1 | Adopted with UI 3.2.0 and Spine 4.0 adapter 0.2.1; strict development/release builds and all 170 application tests passed. |
-| Editor | `2.1.1` | 2.1.1 in bun.lock and the installation | Update the exact dependency, lockfile and installation; rebuild to deliver the fix. |
-| Reskin application | `^2.1.1` | 2.1.1 in bun.lock and the installation | Refresh the Bun lockfile and installation when adopting the fix; validate the Spine 4.0 adapter. |
-| milf-master template | `^2.1.1` | No lockfile or installed Core | New installs accept 2.2.1; use `^2.2.1` to require the corrected baseline. |
-| Separate Spine 4.0–4.3 adapters | Published 0.2.1 / 0.3.1 peers `^1.0.16 || ^2.0.0`; development `^2.2.1` | Development 2.2.1; earlier 0.2.0 / 0.3.0 have Core 1.x peers | Refresh consumer installations/locks to adopt the published adapter patches. |
+| Consumer                                | Audited Core declaration                                                  | Locked or pinned Core at audit                               | Adoption or migration                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| UI development                          | `^2.2.0`                                                                  | 2.2.0                                                        | Optionally refresh the development lockfile.                                                                               |
+| DragonBones development                 | `^2.2.0`; peer `^2.1.1`                                                   | 2.2.0                                                        | Optionally refresh the development lockfile. The peer already accepts 2.2.1.                                               |
+| Game / ui-runtime development           | `^2.1.1`                                                                  | 2.1.1                                                        | Optionally refresh the development lockfiles. Their peers already accept 2.2.1.                                            |
+| Engine examples / copied Reskin project | `^2.1.1`                                                                  | 2.1.1                                                        | Refresh application lockfiles when adopting the fix.                                                                       |
+| Templates/tentax                        | `^2.2.1`                                                                  | 2.2.1                                                        | Adopted with UI 3.2.0 and Spine 4.0 adapter 0.2.1; strict development/release builds and all 170 application tests passed. |
+| Editor                                  | `2.1.1`                                                                   | 2.1.1 in bun.lock and the installation                       | Update the exact dependency, lockfile and installation; rebuild to deliver the fix.                                        |
+| Reskin application                      | `^2.1.1`                                                                  | 2.1.1 in bun.lock and the installation                       | Refresh the Bun lockfile and installation when adopting the fix; validate the Spine 4.0 adapter.                           |
+| milf-master template                    | `^2.1.1`                                                                  | No lockfile or installed Core                                | New installs accept 2.2.1; use `^2.2.1` to require the corrected baseline.                                                 |
+| Separate Spine 4.0–4.3 adapters         | Published 0.2.1 / 0.3.1 peers `^1.0.16 \|\| ^2.0.0`; development `^2.2.1` | Development 2.2.1; earlier 0.2.0 / 0.3.0 have Core 1.x peers | Refresh consumer installations/locks to adopt the published adapter patches.                                               |
 
 UI, Game, ui-runtime and DragonBones need no new release solely to receive this
 Core patch: their published peers already accept 2.2.1. Development installs
@@ -134,7 +183,7 @@ rebuild. Templates/tentax has adopted published adapter 0.2.1 and Core 2.2.1,
 with UI/Game/Spine resolving the same Core instance. The Core patch itself does
 not update these consumers.
 
-CLI's empty/game templates use `latest`, which currently resolves to Core 2.2.1.
+CLI's empty/game templates use `latest`, which resolved to Core 2.2.1 at this audit.
 CLI itself, bitmap-font, atlas and ui-document have no Core dependency to update.
 The Kurot-Dev website is static and does not install the engine runtime.
 

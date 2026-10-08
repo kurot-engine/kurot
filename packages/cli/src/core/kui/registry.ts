@@ -67,6 +67,8 @@ const COMPONENTS: Record<string, ComponentInfo> = {
 	// Basic controls
 	Button: { module: '@kurot/ui' },
 	Label: { module: '@kurot/ui' },
+	BitmapLabel: { module: '@kurot/ui' },
+	RichLabel: { module: '@kurot/ui' },
 	Image: { module: '@kurot/ui' },
 	Rect: { module: '@kurot/ui' },
 	CheckBox: { module: '@kurot/ui' },

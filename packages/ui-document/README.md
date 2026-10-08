@@ -4,8 +4,34 @@ Headless semantic document foundation for Kurot UI tooling. It provides one
 format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
 Agent-driven UI generation.
 
-> **Current version: 0.11.0 (published).** KUI XML is the canonical authored format. The
+> **Package version: 0.12.0 (published).** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
+
+## BitmapLabel and RichLabel in 0.12.0
+
+The foundation catalog now models both native components independently of Label.
+BitmapLabel uses literal `text` plus a typed bitmap-font resource. RichLabel uses
+only `textFlow`, with literal font, size, emphasis, colors and outline per run:
+
+```xml
+<BitmapLabel text="100.80" font="score_font" />
+<RichLabel width="240">
+    <textFlow>
+        <Span text="Balance: " size="20" />
+        <Span text="100.80" bold="true" size="20" textColor="#FFCC00" />
+    </textFlow>
+</RichLabel>
+```
+
+RichLabel supports continuous wrapping and automatic geometry, with whole-flow
+Skin state overrides. Exported `UITextFlow`, `UITextRun`, `UITextRunStyle` and
+`isUITextFlow` share the strict data contract without any engine dependency.
+Label presets and automatic shrinking stay on Label. Format version 2 is unchanged.
+See [the text component contract](docs/text-components.md) for fields, literal
+whitespace, clearing, states and consumer requirements. Native rendering uses
+published UI 3.3.0 and Core ^2.3.0 (tested Core 2.3.1). Published CLI 3.3.1 and
+ui-runtime 0.8.2 still use ^0.11.0. Published CLI 3.4.0 and ui-runtime 0.9.0
+adopt this contract; applications must upgrade explicitly to author the new types.
 
 ## Label text authoring in 0.9.0
 
@@ -32,7 +58,7 @@ runtime 0.8.1 excludes this kernel and must be upgraded alongside it.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.11.0
+pnpm add @kurot/ui-document@^0.12.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It

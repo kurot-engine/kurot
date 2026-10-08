@@ -6,10 +6,12 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.2.0`, EUI-compatible UI framework on top of
-`@kurot/core`. Peer-depends on `@kurot/core@^2.2.0`. Rewritten with standard class
+Package identity: `@kurot/ui@3.3.1`, EUI-compatible UI framework on top of
+`@kurot/core`. Peer-depends on `@kurot/core@^2.3.0`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
-Version 3.2.0 is published with BitmapLabel against published Core 2.2.0,
+Version 3.3.1 is prepared in source and fixes transformed parent allocations. It
+has not been published. Version 3.3.0 adds RichLabel and tests against published Core 2.3.1 through its
+development installation and lockfile, without overrides. Version 3.2.0 is published with BitmapLabel against published Core 2.2.0,
 without local dependency overrides. Published UI 3.1.0 does not contain BitmapLabel.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of
@@ -26,7 +28,7 @@ src/kurot/
 │                   Validator/validator (render-preparation validation scheduler),
 │                   Theme/getTheme()/setTheme(), IViewport, IAssetAdapter/IThemeAdapter.
 ├── components/     Group, Component (delegation core — see §2), Skin, and
-│                   concrete widgets: Button, Label, BitmapLabel, CheckBox, RadioButton,
+│                   concrete widgets: Button, Label, BitmapLabel, RichLabel, CheckBox, RadioButton,
 │                   ToggleButton/ToggleSwitch, ProgressBar, HSlider/VSlider,
 │                   Rect, Image, EditableText, TextInput, Panel, ViewStack,
 │                   Scroller, UILayer, DataGroup, List, TabBar, ComboBox,
@@ -93,6 +95,13 @@ skin)` signature, but `Group._commitCurrentState()` passes `this` cast
 - Anchor/percent constraints (`left`/`right`/`percentWidth`, etc.) have zero
   effect until the component is added to a `Group` that has a `layout`
   assigned. Setting them on a standalone/unparented component is a no-op.
+- **Since 3.3.1: transformed allocations use parent-space dimensions.**
+  `core/fit-transformed-bounds.ts` converts them to local sizes for negative scale,
+  rotation and skew. UIState tracks the allocated local axes so width/height
+  reads do not discard a rotated one-axis allocation. Anchor/translation affect
+  positioning, not size. Incompatible aspect ratios fit the largest contained
+  local rectangle; local minima win when containment is impossible. The published
+  UI 3.3.0 still falls back to preferred dimensions for non-identity transforms.
 - `isUIComponent()` is duck-typed (`'ui' in obj`) — any object with a `.ui`
   property passes, not necessarily a real `Group`/`Component`.
 - **Virtual layout defaults to OFF.**
@@ -143,7 +152,7 @@ Flat re-export of 7 barrels, in this order: `core`, `layouts`, `components`,
 
 - **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
 - **layouts**: `ILayoutTarget`, `LayoutBase`, `BasicLayout`, `LinearLayoutBase`, `VerticalLayout`, `HorizontalLayout`, `TileLayout`, `ColumnAlign`, `RowAlign`, `JustifyAlign`, `TileOrientation`.
-- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
+- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `RichLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
 - **events**: `UIEvent`, `ItemTapEvent`, `CollectionEvent`/`CollectionEventKind`, `PropertyEvent`, `ScrollerThrowEvent`.
 - **states**: `State`, `IOverride`, `SetProperty`, `SetStateProperty`, `AddItems`.
 - **collections**: `ICollection`, `ArrayCollection`.
@@ -206,7 +215,7 @@ automatic bounds are not fed back as fit constraints.
 
 `label.invalidateSize()` also invalidates Core line metrics. Call it after
 late font loading, even if the family name did not change. This requires
-Core >= 2.1.0 for that API; UI 3.2.0's package requirement is Core ^2.2.0.
+Core >= 2.1.0 for that API; UI 3.3.0's package requirement is Core ^2.3.0.
 There is no global font-readiness listener.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
@@ -222,3 +231,18 @@ using one BitmapText child and the configured Core resource singleton for string
 font names. Stale async results are guarded by request generation. Core ^2.2.0
 is required; local Core overrides have been removed. Published UI 3.1.0 does
 not contain it. KUI catalog, installed compilers and Editor adoption are separate.
+
+## Rich labels in 3.3.0
+
+[rich-label.md](rich-label.md) defines RichLabel, an independent Component using
+one native TextField. Only textFlow supplies content; no Label text/appearance
+properties, textFit or textStyle. Reads and assignments copy runs and styles;
+[] clears content. Wrapping is continuous across styles. Measurement uses Core
+2.3.0's pure measureText with parent width, explicit width or maxWidth; cached
+metrics clear on invalidateSize, including after fonts load. Geometry, multiline,
+wordWrap, lineSpacing, textAlign and verticalAlign remain component-level.
+
+Task → `components/RichLabel.ts`, `test/RichLabel.test.ts`,
+`test/browser/text-labels.spec.ts`. Run `pnpm test:text-labels` after building
+Core and UI. BitmapLabel automatic measurement now uses maxWidth too. The KUI
+catalog, CLI and Editor must adopt these native components in a later phase.

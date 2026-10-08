@@ -1,12 +1,13 @@
 # @kurot/ui architecture
 
-> Package version: 3.2.0, with peerDependency `@kurot/core: ^2.2.0`.
-> UI 3.2.0 and Core 2.2.0 are published, without local dependency overrides.
+> Package version: 3.3.1, with peerDependency `@kurot/core: ^2.3.0`.
+> Core 2.3.1 is published and installed from npm without local overrides.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal
 > mechanisms for human readers; the two documents complement each other.
-> Version 3.2.0 exports BitmapLabel for native code and programmatic skins.
+> Version 3.3.0 also exports independent [RichLabel](./rich-label.md).
+> Version 3.2.0 introduced BitmapLabel for native code and programmatic skins.
 > See [bitmap-label.md](./bitmap-label.md) for its resource and ownership contract.
 
 ---
@@ -305,6 +306,23 @@ A trailing percent sign selects percentage calculation; otherwise the value is
 converted to a number. There is no separate runtime type tag for percentages
 versus pixels.
 
+The 3.3.1 transform-allocation correction uses
+`core/fit-transformed-bounds.ts` from UIState. Allocated dimensions describe the
+parent-space rectangle, while explicit, preferred and minimum/maximum sizes stay
+local. The solver uses the absolute linear matrix coefficients to obtain that
+rectangle's width and height. Anchors and translation affect only its position.
+It fills both requested axes when possible, otherwise chooses the largest local
+rectangle contained by the allocation. Local minimum sizes take precedence if
+no contained rectangle can satisfy them. With one allocated axis, an authored
+single local dimension is retained when possible; the unconstrained parent extent
+is minimized otherwise. Unallocated transforms preserve local measurement.
+
+UIState also maps the allocation flags to the affected local axes. A quarter-turn
+width allocation controls local height, so reading height must retain the fitted
+value rather than restoring the authored height. A zero scale column keeps its
+natural local dimension without division by zero. Group and Component share
+this behavior, including Image, text, buttons and other component subclasses.
+
 LinearLayoutBase.flexChildrenProportionally(), shared by VerticalLayout and
 HorizontalLayout, iteratively allocates percentages with min/max constraints.
 A do...while loop identifies children whose proportional allocation exceeds a
@@ -371,6 +389,7 @@ including intermediate base classes.
 | `Image`                             | Displays bitmap data resolved through IAssetAdapter                                               |
 | `Label`                             | Text display wrapping one TextField                                                               |
 | `BitmapLabel`                       | Bitmap-font label wrapping one BitmapText; requires Core 2.2.0 or later                           |
+| `RichLabel`                         | Independent Component with textFlow content and pure, cached TextField measurement                |
 | `EditableText extends Label`        | Editable text with prompt support                                                                 |
 | `Button`                            | Clickable up/down/disabled states; toggle enables automatic selected changes                      |
 | `ToggleButton extends Button`       | Defaults toggle to true and toggles selection on click                                            |
@@ -449,7 +468,7 @@ file and case counts.
 | Skins and states                       | Skin, SkinAlignment (real CLI template skins), SkinMeasurement, AddItems                                                                       |
 | Data binding                           | Binding, Watcher                                                                                                                               |
 | Collections and data-driven components | ArrayCollection, DataGroup, ListBase, ItemRenderer, ComboBox, TabBar, ViewStack                                                                |
-| Individual components                  | RadioButton, Range, Slider, ProgressBar, Scroller, Label, BitmapLabel, TextInput                                                               |
+| Individual components                  | RadioButton, Range, Slider, ProgressBar, Scroller, Label, BitmapLabel, RichLabel, TextInput                                                    |
 | Text fitting                           | ButtonLabelTextFit, LabelTextFit, LabelTextFitBounds                                                                                           |
 | Cross-component behavior               | Enabled (EUI-aligned enabled/touchEnabled/touchChildren behavior), EventMapOverride, GestureLifecycle, TransformLayout, ScrollAndVirtualLayout |
 
@@ -465,3 +484,10 @@ static UI, 240-node transform/alpha animation and a virtual list with 10,000 rec
 It records frame/render time, draw calls, validation-phase calls and ItemRenderer
 creation/reuse. It is a regression baseline for this UI implementation, rather
 than a ranking across UI frameworks.
+
+### Text component browser validation
+
+Build Core and UI, then run `pnpm test:text-labels` from this package. The fixture
+bundles built ESM with minification and keepNames=false, verifies actual pixels
+through Canvas 2D, WebGL 1 and WebGL 2, and checks automatic bounds, edits and
+empty content. Browser screenshots go to ignored test-results, not the package.

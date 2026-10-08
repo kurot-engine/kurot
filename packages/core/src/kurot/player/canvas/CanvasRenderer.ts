@@ -1,5 +1,6 @@
 import { DisplayObject, RenderMode, RenderObjectType } from '../../display/DisplayObject.js';
 import { Bitmap, setBitmapPixelHitTest } from '../../display/Bitmap.js';
+import { BitmapFillMode } from '../../display/enums/BitmapFillMode.js';
 import { Shape } from '../../display/Shape.js';
 import { Sprite } from '../../display/Sprite.js';
 import { Mesh } from '../../display/Mesh.js';
@@ -18,7 +19,10 @@ import { HorizontalAlign } from '../../text/enums/HorizontalAlign.js';
 import { VerticalAlign } from '../../text/enums/VerticalAlign.js';
 import { TextFieldType } from '../../text/enums/TextFieldType.js';
 import { getFontString } from '../../text/TextMeasurer.js';
+import { getTextRenderPadding } from '../../text/TextRenderBounds.js';
 import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
+import { getRenderContentBounds } from '../render-bounds.js';
+import { drawUnscaledBitmapFill } from '../bitmap-fill.js';
 
 const CAPS_MAP: Record<string, CanvasLineCap> = { none: 'butt', square: 'square', round: 'round' };
 const CANVAS_BLUR_RADIUS_SCALE = 0.25;
@@ -265,7 +269,7 @@ export class CanvasRenderer {
 		const filters = displayObject.$filters;
 		if (!filters.length) return this.drawDisplayObject(displayObject, ctx, offsetX, offsetY);
 
-		const bounds = displayObject.$getOriginalBounds();
+		const bounds = getRenderContentBounds(displayObject);
 		if (bounds.width <= 0 || bounds.height <= 0) return 0;
 
 		const cssFilters: string[] = [];
@@ -381,7 +385,7 @@ export class CanvasRenderer {
 		}
 
 		if (mask) {
-			const bounds = displayObject.$getOriginalBounds();
+			const bounds = getRenderContentBounds(displayObject);
 			if (bounds.width <= 0 || bounds.height <= 0) {
 				if (scrollRect) ctx.restore();
 				if (hasBlendMode) ctx.globalCompositeOperation = 'source-over';
@@ -559,6 +563,10 @@ export class CanvasRenderer {
 		if (destW <= 0 || destH <= 0 || bitmap.textureWidth <= 0 || bitmap.textureHeight <= 0) return 0;
 
 		ctx.imageSmoothingEnabled = bitmap.smoothing;
+		if (bitmap.fillMode !== BitmapFillMode.SCALE) {
+			this._drawUnscaledBitmap(bitmap, ctx, offsetX, offsetY, destW, destH);
+			return 1;
+		}
 		const grid = bitmap.scale9Grid;
 		if (grid) {
 			const tinted = this._globalTint !== 0xffffff;
@@ -596,6 +604,34 @@ export class CanvasRenderer {
 			ctx.drawImage(this.getTintedBitmapSource(bitmap, this._globalTint), drawX, drawY, drawW, drawH);
 		}
 		return 1;
+	}
+
+	private _drawUnscaledBitmap(
+		bitmap: Bitmap,
+		ctx: CanvasRenderingContext2D,
+		offsetX: number,
+		offsetY: number,
+		width: number,
+		height: number,
+	): void {
+		const rotated = bitmap.texture?.rotated ?? false;
+		const tinted = this._globalTint !== 0xffffff;
+		const source = tinted
+			? this.getTintedBitmapSource(bitmap, this._globalTint, rotated)
+			: bitmap.bitmapData!.source as CanvasImageSource;
+		drawUnscaledBitmapFill(bitmap, width, height, (sx, sy, sw, sh, dx, dy, dw, dh) => {
+			const sourceX = sx - (tinted ? bitmap.bitmapX : 0);
+			const sourceY = sy - (tinted ? bitmap.bitmapY : 0);
+			if (rotated) {
+				ctx.save();
+				ctx.translate(offsetX + dx, offsetY + dy + dh);
+				ctx.rotate(-Math.PI / 2);
+				ctx.drawImage(source, sourceX, sourceY, sh, sw, 0, 0, dh, dw);
+				ctx.restore();
+			} else {
+				ctx.drawImage(source, sourceX, sourceY, sw, sh, offsetX + dx, offsetY + dy, dw, dh);
+			}
+		});
 	}
 
 	private drawScale9Bitmap(
@@ -913,9 +949,10 @@ export class CanvasRenderer {
 			ctx.strokeRect(0, 0, width, height);
 		}
 
-		// ── Clip to visible area (for scrollV support) ────────────────────────
+		// Dynamic text retains edge strokes; input keeps its exact viewport.
+		const padding = getTextRenderPadding(tf);
 		ctx.beginPath();
-		ctx.rect(0, 0, width, height);
+		ctx.rect(0 - padding, 0 - padding, width + padding * 2, height + padding * 2);
 		ctx.clip();
 
 		// ── Compute vertical offset ───────────────────────────────────────────
@@ -959,7 +996,7 @@ export class CanvasRenderer {
 			const h = line.height;
 			drawY += h / 2;
 
-			if (drawY + h / 2 < 0 || drawY - h / 2 > height) {
+			if (drawY + h / 2 <= 0 || drawY - h / 2 >= height) {
 				characterIndex += line.charNum;
 				drawY += h / 2 + lineSpacing;
 				continue;

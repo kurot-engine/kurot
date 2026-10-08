@@ -25,17 +25,37 @@ flowchart LR
 
 The manifests are authoritative. Current Kurot package requirements are:
 
-| Package | Ordinary Kurot dependency | Kurot peers | Purpose |
-| --- | --- | --- | --- |
-| core | bitmap-font `^0.1.0` | None | Headless font parsing and layout used by native rendering. |
-| ui | None | core `^2.2.0` | Components use the application's Core objects. |
-| game | None | core `^2.0.0` | Game helpers use the application's Core objects and ticker. |
-| dragonbones | None | core `^2.1.1` | Animation displays and meshes use the application's Core. |
-| ui-runtime | None | core `^2.1.0`, ui `^3.1.0`, ui-document `^0.11.0` | Materializes a document into the application's Core/UI objects. |
-| cli | ui-document `^0.11.0` | None | Compiles KUI at build time. |
-| ui-document | None | None | Headless authoring, validation and serialization. |
-| bitmap-font | None | None | Headless font data, validation and layout. |
-| atlas | None | None | Independent pixel packing with a Node PNG subpath. |
+| Package     | Ordinary Kurot dependency | Kurot peers                                       | Purpose                                                         |
+| ----------- | ------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
+| core        | bitmap-font `^0.1.0`      | None                                              | Headless font parsing and layout used by native rendering.      |
+| ui          | None                      | core `^2.3.0`                                     | Components use the application's Core objects.                  |
+| game        | None                      | core `^2.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
+| dragonbones | None                      | core `^2.1.1`                                     | Animation displays and meshes use the application's Core.       |
+| ui-runtime  | None                      | core `^2.3.0`, ui `^3.3.0`, ui-document `^0.12.0` | Materializes a document into the application's Core/UI objects. |
+| cli         | ui-document `^0.12.0`     | None                                              | Compiles KUI at build time.                                     |
+| ui-document | None                      | None                                              | Headless authoring, validation and serialization.               |
+| bitmap-font | None                      | None                                              | Headless font data, validation and layout.                      |
+| atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
+
+Core 2.3.2 is published with render-only text-outline margins. This correction adds no API
+or resource-format requirement. All current UI/Game/DragonBones/ui-runtime/Spine
+Core peers accept 2.3.2 without another SDK release or raised minimum.
+Development lock adoption is optional. Editor 0.22.1's local trial pins published
+Core 2.3.2 with an updated Bun lockfile and rebuild. Reskin,
+examples and Core 2.x templates can adopt it through their accepted ranges and
+updated locks; existing installations stay unchanged. CLI/ui-document/atlas/
+bitmap-font do not depend on Core, and legacy Core 1.x projects are unaffected.
+
+Core 2.3.1 and UI 3.3.0 are published. The Core patch
+fixes unstyled blank rich-run heights without new API requirements. UI raises its real Core
+minimum because RichLabel uses the new TextField.measureText API. UI development
+dependencies and its lockfile now resolve Core 2.3.1 from npm without overrides.
+Existing published UI 3.2.0 keeps Core ^2.2.0; Game, DragonBones, Spine and
+ui-runtime already accept Core 2.3.0. They need no release merely to accept it.
+Applications/templates adopt installed versions separately. The current KUI
+CLI 3.4.0 and ui-runtime 0.9.0 are published with the new registrations;
+older catalog/materializer implementations do not acquire RichLabel support
+through a compatible Core/UI lock update.
 
 Third-party tools are separate from this graph. Core's linebreak package is a
 runtime dependency; Atlas's PNG adapter uses pngjs. TypeScript, Vitest, esbuild
@@ -53,13 +73,13 @@ alone does not prove that its installed dependency tree has no duplicate engine.
 
 ## Three different version concerns
 
-| Field or file | Meaning | When to change it |
-| --- | --- | --- |
-| `dependencies` | Code or data contract consumed by the package. | When adopting an API or behavior that requires a newer minimum, or migrating to an incompatible line. |
-| `peerDependencies` | Supported host versions, starting at the real minimum requirement. | When the consumer starts requiring a new API/contract, changes supported host lines, or corrects invalid metadata. |
-| `devDependencies` | Versions allowed for building and testing this checkout. | When deliberately changing the development/test baseline. |
-| `pnpm-lock.yaml` / `bun.lock` | Exact versions installed for this checkout/application. | When deliberately adopting an update; keep frozen installs for reproduction. |
-| Package `version` | Identity of a published artifact. | When publishing changed shipped behavior, API, types, compatibility or other requested release content. |
+| Field or file                 | Meaning                                                            | When to change it                                                                                                  |
+| ----------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `dependencies`                | Code or data contract consumed by the package.                     | When adopting an API or behavior that requires a newer minimum, or migrating to an incompatible line.              |
+| `peerDependencies`            | Supported host versions, starting at the real minimum requirement. | When the consumer starts requiring a new API/contract, changes supported host lines, or corrects invalid metadata. |
+| `devDependencies`             | Versions allowed for building and testing this checkout.           | When deliberately changing the development/test baseline.                                                          |
+| `pnpm-lock.yaml` / `bun.lock` | Exact versions installed for this checkout/application.            | When deliberately adopting an update; keep frozen installs for reproduction.                                       |
+| Package `version`             | Identity of a published artifact.                                  | When publishing changed shipped behavior, API, types, compatibility or other requested release content.            |
 
 Use compatible ranges for SDK dependencies and peers, with a lower bound based
 on what the package actually needs. Never copy the latest Core version into
@@ -80,14 +100,14 @@ require publishing new versions of unchanged SDK packages.
 
 ## Release impact rules
 
-| Change | Release scope | Consumer adoption |
-| --- | --- | --- |
-| Compatible fix to an externally resolved dependency | Release the package containing the fix. | Consumers whose ranges accept it may update their installations/lockfiles. Unchanged SDKs keep their versions and peer minima. |
-| New optional API or feature | Release the package adding it. | Release only consumers that implement/adopt it, with accurate minimum requirements. Other consumers stay on their existing contracts. |
-| Removed/changed API or incompatible data contract | Release the breaking package on the appropriate incompatible version line. | Migrate and release affected consumers; expand support only after validating each claimed line. |
-| Incorrect peer metadata | Release the package with corrected metadata. | Verify compatibility rather than masking the conflict with a permanent override. |
-| Development/test baseline refresh | No SDK release when shipped output and compatibility remain unchanged. | Update the chosen package's development installation and run its checks. |
-| Compatible dependency update embedded in a published bundle | Rebuild the package or application that embeds it; version it if publishing changed output. | Treat each changed artifact separately; externally resolved consumers still need no blanket version bump. |
+| Change                                                      | Release scope                                                                               | Consumer adoption                                                                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Compatible fix to an externally resolved dependency         | Release the package containing the fix.                                                     | Consumers whose ranges accept it may update their installations/lockfiles. Unchanged SDKs keep their versions and peer minima.        |
+| New optional API or feature                                 | Release the package adding it.                                                              | Release only consumers that implement/adopt it, with accurate minimum requirements. Other consumers stay on their existing contracts. |
+| Removed/changed API or incompatible data contract           | Release the breaking package on the appropriate incompatible version line.                  | Migrate and release affected consumers; expand support only after validating each claimed line.                                       |
+| Incorrect peer metadata                                     | Release the package with corrected metadata.                                                | Verify compatibility rather than masking the conflict with a permanent override.                                                      |
+| Development/test baseline refresh                           | No SDK release when shipped output and compatibility remain unchanged.                      | Update the chosen package's development installation and run its checks.                                                              |
+| Compatible dependency update embedded in a published bundle | Rebuild the package or application that embeds it; version it if publishing changed output. | Treat each changed artifact separately; externally resolved consumers still need no blanket version bump.                             |
 
 For a dependency change, classify each direct consumer as one of:
 
@@ -103,6 +123,11 @@ shipped behavior or compatibility changes. Do not turn the dependency graph into
 an automatic sequence of package version bumps.
 
 ## Current release examples
+
+- Core 2.3.0 adds pure TextField measurement. UI 3.3.0 adopts it and raises
+  its Core minimum to ^2.3.0; its published 3.2.0 predecessor keeps ^2.2.0.
+  Core 2.3.1 fixes unstyled blank rich-run heights without introducing another
+  API requirement. Adopt its installation/lock separately; no peer cascade.
 
 - Core 2.2.1 fixes TextField wrapping. UI 3.2.0, Game 2.0.0, ui-runtime 0.8.2
   and DragonBones 0.1.0 already accept it. Those SDKs need no new publication.

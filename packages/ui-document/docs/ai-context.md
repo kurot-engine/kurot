@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.11.0` (published). This is a headless,
+Package identity: `@kurot/ui-document@0.12.0` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -107,7 +107,7 @@ src/
   deterministic and detects missing bases and cycles.
 - The foundation catalog contains abstract `kurot.DisplayObject`,
   `kui.UIComponent`, and `kui.Component`, plus concrete `kui.Group`,
-  `kui.Label`, `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
+  `kui.Label`, `kui.BitmapLabel`, `kui.RichLabel`, `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
   `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput`.
 - `kui.ToggleButton` inherits the Button contract and changes the authored
   `toggle` default to `true`. `kui.ProgressBar` directly extends
@@ -132,6 +132,15 @@ src/
 - Label's catalog default for `multiline` is true; EditableText's is false.
   Omitted default properties are not inserted into XML. Core 2.1.0 interprets
   explicit false as one unwrapped first line.
+- BitmapLabel and RichLabel extend Component directly, not Label. BitmapLabel
+  uses literal text and a typed font resource. RichLabel uses only validated
+  textFlow arrays with literal per-run appearance; neither accepts Label presets
+  or fitting. RichLabel wordWrap defaults to true, lineSpacing is nonnegative.
+  Read docs/text-components.md before changing these contracts.
+- RichLabel XML uses textFlow/Span property elements and textFlow.stateName for
+  whole-flow state overrides. Spans are data, not child nodes or skin parts.
+  Literal whitespace and backslashes survive; [] explicitly clears, omission
+  inherits. Unknown project subclasses are checked by their project registry.
 - Label `textFit` accepts `none` (default) or `shrink`. `minFontSize` defaults
   to 12 and accepts finite numbers >= 1. EditableText overrides `textFit` to
   accept only `none`; inherited minimum metadata does not enable fitting.
@@ -147,6 +156,8 @@ src/
 - Model: `UIDocument`, `UIAssetKind`, `UIAssetContract`, `UINode`,
   `UIComponentInstance`, reference types, property-value types,
   `UI_DOCUMENT_KIND`, `UI_DOCUMENT_FORMAT_VERSION`.
+- Rich text: `UITextFlow`, `UITextRun`, `UITextRunStyle`, `isUITextFlow`; the
+  `text-flow` property format constrains arrays and directional bindings.
 - Creation/query: `createUIDocument`, `createUISkinRoot`, `createUINode`,
   `createUIAssetContract`, `createUIComponentInstance`, reference constructors,
   `findUINode`, `visitUINodes`.
@@ -193,6 +204,7 @@ src/
 | Change canonical KUI XML                          | `serialization/xml.ts`, `serialization/xml/`, and golden fixtures                                                                                |
 | Change property semantics                         | `schema/UIComponentDefinition.ts`, `schema/matchesUIPropertyDefinition.ts`                                                                       |
 | Change built-in component fields                  | `catalog/properties/`                                                                                                                            |
+| Change BitmapLabel/RichLabel authoring            | `catalog/properties/text-component-properties.ts`, `model/UITextFlow.ts`, `serialization/xml/xml-text-flow.ts`, `docs/text-components.md`        |
 | Change project catalogs or cross-document rules   | `assets/`                                                                                                                                        |
 | Change project fonts/colors/Label presets         | `assets/UIStyleSheet.ts`, `assets/UILabelStyle.ts`, `assets/resolveUILabelStyles.ts`, `assets/resolveUIStyleColors.ts`, `docs/project-styles.md` |
 | Change operations, transactions, diff, or history | `editing/`                                                                                                                                       |

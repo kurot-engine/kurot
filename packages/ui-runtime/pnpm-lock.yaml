@@ -9,14 +9,14 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.3.1
+        version: 2.3.1
       '@kurot/ui':
-        specifier: ^3.1.0
-        version: 3.1.0(@kurot/core@2.1.1)
+        specifier: ^3.3.0
+        version: 3.3.0(@kurot/core@2.3.1)
       '@kurot/ui-document':
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.12.0
+        version: 0.12.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -46,16 +46,20 @@ packages:
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
-  '@kurot/core@2.1.1':
-    resolution: {integrity: sha512-/jQgTjvps+djsUfyW0p+VSkpoGWf728J/tUrc/K8ngijW76KhEKdeGl4kXvNp0RecSw49FquM2SqrPIB/bOcIw==}
+  '@kurot/bitmap-font@0.1.0':
+    resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
+    engines: {node: '>=20'}
 
-  '@kurot/ui-document@0.11.0':
-    resolution: {integrity: sha512-YuumsJA87si4XDcI9QfEligHHzH2Rua0N+bYKhuxBW1uwRzpizimrk2qSvfM/WaPwtaVFI5THcLy+tLvDszf8g==}
+  '@kurot/core@2.3.1':
+    resolution: {integrity: sha512-a1+h8iUTRKFgSvlzTH0l84MgmAKLA/c5ZakTgggCoHzRsDqZShTfMJaPre/8FqS47tlE9z2XvESVYQZPydyXpw==}
 
-  '@kurot/ui@3.1.0':
-    resolution: {integrity: sha512-/xg4IIdHanHBAQ5rEcAdmGXodVu315yj41m77hsKat5mlYl0eSVZnsd5qJvIwB14XECn79ZPd15Y0rrLETtRAA==}
+  '@kurot/ui-document@0.12.0':
+    resolution: {integrity: sha512-xTu0v75DI8/ecJTPHjUHoh5eVZmQmlygyeQbbvtpU1iw0ajNIHg14yrVITP84G7PmNsWbuYE8IUQws/C1VqUDg==}
+
+  '@kurot/ui@3.3.0':
+    resolution: {integrity: sha512-D8J7j7WIlnN+a61za9GMrQDvq/sGKjr77VhT4Qs7tkQuqUYh3791WYsfv5e7hhF+P8KGbtrFHmxwIUhiFG1Gkg==}
     peerDependencies:
-      '@kurot/core': ^2.1.0
+      '@kurot/core': ^2.3.0
 
   '@oxc-project/types@0.147.0':
     resolution: {integrity: sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg==}
@@ -521,15 +525,18 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
-  '@kurot/core@2.1.1':
+  '@kurot/bitmap-font@0.1.0': {}
+
+  '@kurot/core@2.3.1':
     dependencies:
       '@cto.af/linebreak': 4.0.3
+      '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/ui-document@0.11.0': {}
+  '@kurot/ui-document@0.12.0': {}
 
-  '@kurot/ui@3.1.0(@kurot/core@2.1.1)':
+  '@kurot/ui@3.3.0(@kurot/core@2.3.1)':
     dependencies:
-      '@kurot/core': 2.1.1
+      '@kurot/core': 2.3.1
 
   '@oxc-project/types@0.147.0': {}
 

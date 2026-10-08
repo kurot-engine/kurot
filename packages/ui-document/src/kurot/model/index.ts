@@ -35,3 +35,5 @@ export type { UIDocument } from './UIDocument.js';
 export type { UINode } from './UINode.js';
 export { isSyntheticNodeId } from './synthetic-node-id.js';
 export type { UIPropertyObject, UIPropertyPrimitive, UIPropertyValue } from './UIPropertyValue.js';
+export type { UITextFlow, UITextRun, UITextRunStyle } from './UITextFlow.js';
+export { isUITextFlow } from './UITextFlow.js';

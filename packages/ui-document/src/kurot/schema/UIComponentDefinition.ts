@@ -18,7 +18,7 @@ export type UIPropertyValueType =
 /**
  * Semantic presentation used by editors for otherwise generic values.
  */
-export type UIPropertyFormat = 'color' | 'layout' | 'rectangle' | 'resource' | 'token';
+export type UIPropertyFormat = 'color' | 'layout' | 'rectangle' | 'resource' | 'text-flow' | 'token';
 
 /**
  * Structural child policy for a component type.

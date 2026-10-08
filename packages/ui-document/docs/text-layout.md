@@ -1,5 +1,9 @@
 # Label text authoring
 
+This document describes ordinary Label/EditableText. BitmapLabel and RichLabel
+have independent [text authoring contracts](text-components.md); Label presets
+and automatic shrinking do not apply to them.
+
 ui-document 0.9.0 adds text-fitting metadata to the foundation component catalog.
 It remains headless: this package validates authored values and preserves them
 in KUI XML; it does not measure fonts or render text. The semantic document

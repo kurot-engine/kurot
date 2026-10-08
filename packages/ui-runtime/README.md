@@ -4,8 +4,8 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current version: 0.8.2 (published).** Requires `@kurot/core@^2.1.0`,
-> `@kurot/ui@^3.1.0`, and published `@kurot/ui-document@^0.11.0`. Uses UI's atomic
+> **Current version: 0.9.0 (published).** Requires `@kurot/core@^2.3.0`,
+> `@kurot/ui@^3.3.0`, and published `@kurot/ui-document@^0.12.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
@@ -13,19 +13,32 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.8.2 @kurot/ui-document@^0.11.0 @kurot/ui@^3.1.0 @kurot/core@^2.1.1
+pnpm add @kurot/ui-runtime@^0.9.0 @kurot/ui-document@^0.12.0 @kurot/ui@^3.3.0 @kurot/core@^2.3.1
 ```
 
-Install all peers explicitly. Core 2.1.1 includes the nested/rotated WebGL
-scroll clipping fix while satisfying the runtime's `^2.1.0` requirement.
-Upgrade ui-document to 0.11.x together with runtime 0.8.2; runtime
-0.8.1's peer range excludes it. Runtime APIs and semantic format version 2 remain
-unchanged.
+Install all peers explicitly. Core 2.3.0 is the required native text API minimum;
+Core 2.3.1 also fixes unstyled blank rich-text line metrics. Upgrade UI and
+document together with runtime 0.9.0; runtime 0.8.2's document peer excludes
+0.12.x. Public creation/controller APIs and semantic format version 2 remain
+unchanged. Existing apps may retain runtime 0.8.2 for their existing controls.
 
 Published CLI 3.3.0 uses ui-document 0.11.0 for build-time Label presets/colors and emits
 skins that run directly through UI. That compilation path does not require
 ui-runtime. Runtime 0.8.2 and CLI 3.3.0 share the same document parser.
 See the [project style contract](../ui-document/docs/project-styles.md).
+
+## BitmapLabel and RichLabel in 0.9.0
+
+Native BitmapLabel uses typed font resources and glyph metrics. RichLabel uses
+literal textFlow runs, continuous wrapping and automatic sizing. Neither
+inherits Label or accepts Label typography/presets/fitting. Explicit handlers
+validate resolved values; font adapters may return a Core resource key or a
+ready BitmapFont without transferring ownership.
+
+Whole-flow states and typed data bindings use existing native and atomic
+restoration paths. Empty arrays clear content; state removal and failed writes
+restore prior runs/fonts. See [text materialization](docs/text-components.md)
+for resource setup, example XML and lifecycle boundaries.
 
 ## Project style colors in 0.8.1
 
@@ -116,7 +129,8 @@ const result = createKurotUI(document, { assets });
 stage.addChild(result.root);
 ```
 
-The runtime supports `kui.Group`, `kui.Label`, `kui.EditableText`, `kui.Image`,
+The runtime supports `kui.Group`, `kui.Label`, `kui.BitmapLabel`, `kui.RichLabel`,
+`kui.EditableText`, `kui.Image`,
 `kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`, and
 `kui.TextInput`, including their audited inherited properties, children, layout
 descriptors, and nine-slice rectangles. ProgressBar appearances bind live thumb
@@ -224,7 +238,7 @@ The preview is available at `http://localhost:5173/preview/` by default.
 ## Resource nine-slice defaults in 0.6.0
 
 Resolve each authored document and registered appearance with
-`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.11.0` before passing
+`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.12.0` before passing
 it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
 `scale9Grid: false` clears an inherited grid, including during native Skin
 state changes; leaving the state restores the previous grid. The runtime does

@@ -2,11 +2,13 @@ import type { UIPropertyObject, UIPropertyValue } from '../model/UIPropertyValue
 import { isUIAssetReference, isUIDesignTokenReference, isUIResourceReference } from '../model/UIReference.js';
 import type { UIPropertyDefinition, UIPropertyValueType } from './UIComponentDefinition.js';
 import { toValueTypes } from './UIComponentDefinition.js';
+import { isUITextFlow } from '../model/UITextFlow.js';
 
 /**
  * Reports whether a serializable value satisfies one semantic property definition.
  */
 export function matchesUIPropertyDefinition(value: UIPropertyValue, property: UIPropertyDefinition): boolean {
+	if (property.format === 'text-flow' && !isUITextFlow(value)) return false;
 	if (property.format === 'rectangle' && typeof value === 'boolean' && value !== false) return false;
 	const valueTypes = toValueTypes(property.valueType);
 	if (!valueTypes.some(valueType => matchesValueType(value, valueType))) return false;

@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. The package is published as `@kurot/cli@3.3.1`, runs on Node.js 20+,
+explains the plugin pipeline. Version `@kurot/cli@3.4.0` is published, runs on Node.js 20+,
 and is installed as a project dev dependency.
 
 ## Directory map
@@ -36,6 +36,16 @@ Published version 3.3.1 adds whole-resource dev synchronization, deletion/reconn
 handling and no-store responses. Installed CLI 3.3.0 lacks these fixes; consumers
 must update their installed/locked version to receive them.
 
+## Native text adoption in 3.4.0
+
+Version 3.4.0 registers BitmapLabel and RichLabel from published UI
+3.3.0 and consumes document 0.12.0. `kui/validate-text-components.ts` applies
+strict shared property/state validation only to these new built-ins, preserving
+existing CLI-only and custom class contracts. Text flows remain literal arrays;
+Span data does not create nodes/parts. Only width/height use percent conversion.
+See [text-components.md](text-components.md). Apps need Core ^2.3.0/UI ^3.3.0
+when using the new tags; other controls need no incidental engine upgrade.
+
 ## KUI compilation
 
 `.kui.xml` is the only authored UI format. `compile-kui.ts` recursively scans
@@ -50,7 +60,7 @@ and layout apply to the runtime Skin, and its direct visual children become
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.3.1 requires `@kurot/ui-document@^0.11.0`. Schema-defined strings, including
+CLI 3.4.0 requires published `@kurot/ui-document@^0.12.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free

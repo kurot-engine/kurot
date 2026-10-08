@@ -5,7 +5,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.2.1`, published to npm. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.3.3`, published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -82,6 +82,11 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   internally to rasterize Graphics/Text to offscreen canvases before texture
   upload, and to snapshot `RenderTexture`. Don't reason about it as dead code
   when WebGL is active.
+- The 2.3.2 TextField outline fix uses render-only margins, including rich
+  run strokes. `text/TextRenderBounds.ts` supplies padding; `player/render-bounds.ts`
+  includes descendant ink in caches and effect captures. Layout measurements and
+  hit areas remain unchanged. Input viewports and external clips remain exact;
+  fully hidden lines are skipped. See `docs/text-layout.md` for validation.
 - The engine is **single-Player by design**. `Player`'s constructor wires
   static hook fields directly onto `DisplayObject`/`DisplayObjectContainer`
   (`$onStructureChange`, etc.) — there is no listener registry. A second
@@ -204,7 +209,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                                                                                     |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                                                                                |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                                                                                    |
-| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                        |
+| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                                                                                    |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`                                                                   |
 
@@ -251,6 +256,27 @@ separate UI capability requiring Core 2.1.0 or later.
 See [text layout](text-layout.md) for the Core contract and
 [Label text layout](../../ui/docs/label-text-layout.md) for fit bounds, state
 restoration and shared-schema boundaries.
+
+## Independent text measurement in 2.3.0
+
+`TextField.measureText(width = NaN)` returns complete content width/height without
+changing rendered constraints, line caches, scrolling or dirty flags. NaN is
+unconstrained; finite nonnegative widths are accepted; other widths throw.
+Rich-text line height follows the largest run on that line rather than the
+base size; blank lines retain their applicable style. Assigning plain `text`
+always clears a previous rich flow, including identical string assignments.
+In 2.3.1, an unstyled blank run uses the base size rather than borrowing a
+later styled run's size. See `test/TextMeasurement.test.ts` and `docs/text-layout.md`.
+
+## Bitmap fill modes in 2.3.3
+
+Both BitmapPipe and CanvasRenderer honor repeat/clip through internal
+`player/bitmap-fill.ts`. Repeat periods use original logical texture dimensions,
+including trim margins; edge regions crop source pixels. Rotated atlas coordinates
+and tinting remain supported. Nine-slice applies only to scale. CanvasRenderer is
+also the nested bitmap-cache rasterizer, so both render paths must stay aligned.
+See docs/bitmap-fill.md. This compatible patch requires application installation
+and rebuild, not another UI/CLI/ui-runtime version bump.
 
 ## Bitmap fonts in 2.2.0
 

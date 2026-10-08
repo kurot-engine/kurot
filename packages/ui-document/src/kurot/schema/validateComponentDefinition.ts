@@ -25,7 +25,7 @@ const PROPERTY_VALUE_TYPES = new Set<UIPropertyValueType>([
 	'token-reference',
 	'value',
 ]);
-const PROPERTY_FORMATS = new Set<UIPropertyFormat>(['color', 'layout', 'rectangle', 'resource', 'token']);
+const PROPERTY_FORMATS = new Set<UIPropertyFormat>(['color', 'layout', 'rectangle', 'resource', 'text-flow', 'token']);
 const RESOURCE_TYPES = new Set<UIResourceType>(UI_RESOURCE_TYPES);
 const TOKEN_TYPES = new Set<UIDesignTokenType>(UI_DESIGN_TOKEN_TYPES);
 
@@ -140,6 +140,9 @@ function validatePropertyDefinition(name: string, definition: UIPropertyDefiniti
 	}
 	if (definition.format !== undefined && !PROPERTY_FORMATS.has(definition.format)) {
 		throw new Error(`Unsupported format "${String(definition.format)}" for property "${name}".`);
+	}
+	if (definition.format === 'text-flow' && (valueTypes.length !== 1 || valueTypes[0] !== 'array')) {
+		throw new Error(`Property "${name}" text-flow format requires only the array value type.`);
 	}
 	validateReferenceTypes(
 		name,

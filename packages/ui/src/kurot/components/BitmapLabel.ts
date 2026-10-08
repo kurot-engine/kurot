@@ -24,6 +24,16 @@ export class BitmapLabel extends Component implements IDisplayText {
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
+	public override get width(): number {
+		return super.width;
+	}
+	public override set width(value: number) {
+		if (Object.is(this.$explicitWidth, value)) return;
+		super.width = value;
+		// Component width changes alone do not invalidate automatic text height.
+		this._invalidateText();
+	}
+
 	public get text(): string {
 		return this._bitmapText.text;
 	}
@@ -137,7 +147,13 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this.invalidateDisplayList();
 	}
 	private _measureText(): { width: number; height: number } {
-		const width = Number.isFinite(this._widthConstraint) ? this._widthConstraint : this.$explicitWidth;
+		const width = Number.isFinite(this._widthConstraint)
+			? this._widthConstraint
+			: Number.isFinite(this.$explicitWidth)
+				? this.$explicitWidth
+				: this.maxWidth !== 100000
+					? this.maxWidth
+					: NaN;
 		const layout = this._bitmapText.measureText(width);
 		return { width: layout.width, height: layout.height };
 	}

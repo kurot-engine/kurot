@@ -5,6 +5,12 @@ Available in UI 3.2.0 with `@kurot/core ^2.2.0`. Core resolves its published
 published UI 3.1.0 does not contain this component. Core 2.1.1 does not contain
 its required BitmapText rendering.
 
+UI 3.3.0 retains this API and raises the package's Core minimum to ^2.3.0 for
+RichLabel. During automatic sizing it also uses maxWidth when neither a parent
+width nor an explicit width is present, so wrapped height matches rendering.
+Changing an authored width also invalidates automatic height after layout.
+UI 3.3.0 builds and tests against published Core 2.3.1 without local overrides.
+
 ```ts
 import { BitmapLabel } from '@kurot/ui';
 
@@ -35,7 +41,7 @@ DisplayObject tint. Alignments position glyphs without scaling them. Set scaleX
 and scaleY for decorative number sizing. Default multiline=true; explicit false
 keeps the first hard-separated line unwrapped.
 
-This initial change exposes a native UI component and supports programmatic
-skins. The ui-document built-in catalog, CLI KUI tag registry, Editor and
-ui-runtime materializers do not yet adopt BitmapLabel. Those require coordinated
-consumer releases; do not assume an installed compiler accepts the XML tag.
+Published ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 support BitmapLabel
+authoring, KUI compilation and materialization. Earlier compilers do not accept
+this built-in XML tag; update applications explicitly when adopting it. Editor
+controls are owned by the separate application.

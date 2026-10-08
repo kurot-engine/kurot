@@ -3,7 +3,7 @@
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.3.1 (published).** Requires published `@kurot/ui-document@^0.11.0`
+> **Current version: 3.4.0 (published).** Requires published `@kurot/ui-document@^0.12.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -23,6 +23,19 @@ game template. Existing projects are not rewritten. See [game template setup](do
 
 Version 3.3.0 compiles shared Label presets from `style.json.labels` into native
 properties, with local and Skin state fields taking priority. See [Label presets](#label-presets-in-330).
+
+## BitmapLabel and RichLabel in 3.4.0
+
+Compile BitmapLabel with a configured `font` resource, and RichLabel with
+literal `textFlow` / `Span` elements. Named Skin states replace complete run
+arrays; an empty flow clears content. Span elements never become display
+children or Skin parts. New native text fields are validated before output,
+and percentage-looking text such as `100%` remains literal.
+
+Rendering these new tags requires UI `^3.3.0` and Core `^2.3.0` in the app;
+Core 2.3.1 is recommended for blank rich-text line metrics. Existing controls
+and templates do not require automatic upgrades or migrations. See
+[text component compilation](docs/text-components.md).
 
 ## Label text fitting in 3.1.0
 
@@ -49,7 +62,7 @@ See the [compilation contract](docs/label-text-layout.md) and
 The CLI does not require a global install.
 
 ```bash
-npx @kurot/cli@3.3.1 create my-game
+npx @kurot/cli@3.4.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -57,7 +70,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.3.1`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.4.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -174,7 +187,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.3.1 uses `@kurot/ui-document@^0.11.0` and retains its literal-string XML rules.
+Version 3.4.0 uses published `@kurot/ui-document@^0.12.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -260,7 +273,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.11.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.12.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.
@@ -312,6 +325,6 @@ than selecting a different preset. Missing presets, unsupported selection or
 invalid configuration fail explicitly. Expansion runs after resource defaults
 and before color resolution. It does not load fonts or measure text.
 
-Version 3.3.1 uses published ui-document 0.11.0 without local overrides. CLI
+Version 3.4.0 uses published ui-document 0.12.0 without local overrides. CLI
 3.2.1 does not include this feature. Existing projects are not migrated.
 See [the shared contract](../ui-document/docs/project-styles.md).
