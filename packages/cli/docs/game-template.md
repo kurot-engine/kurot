@@ -28,19 +28,20 @@ This ordering includes loading-screen Labels in the project font. The loading
 screen's startup messages stay in English because translations are not loaded yet.
 Templates do not implement live font/theme/language replacement.
 
-## HTML loading screen
+## HTML brand splash
 
-The game template's `web/index.html` displays `web/logo.png` with a rounded blue
-indeterminate loading bar while the entry module loads. The mascot stays fully
-visible, with a gentle bob and a moving bar segment. Both animations stop when
-the browser requests reduced motion. The logo size follows both viewport width
-and height to fit small screens and landscape layouts.
+The game template's `web/index.html` presents `web/logo.png` beneath a small
+"Made with" caption. The mascot makes a gentle entrance with two brief sparkles
+and a soft blue glow, then floats while the entry module loads. The splash has
+no loading text or progress indicator; the application's Preloader owns resource
+progress. Animations stop when the browser requests reduced motion. The logo
+size follows both viewport width and height for small screens and landscape.
 
-The HTML overlay fades out after the entry module evaluates. It does not report
-resource progress; the application's Preloader handles that stage. Customize
-the logo, loading colors and text directly in the project's HTML. This template
-update applies to newly scaffolded game projects; existing project HTML is
-project-owned.
+The HTML overlay fades out after the entry module evaluates, without a minimum
+display time or a wait for the entrance animation to finish. It does not wait
+for project font or resource loading. Customize the branding directly in the
+project's HTML. This template update applies to newly scaffolded game projects;
+existing project HTML is project-owned.
 
 ## Change fonts and colors
 

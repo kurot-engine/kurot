@@ -11,10 +11,12 @@ format changes are documented explicitly in each release.
 
 ### Changed
 
-- Refresh the game template's mascot logo and match its rounded blue styling
-  with an indeterminate loading bar, softer loading text and gentle animation.
-  Keep the mascot fully visible, fit both portrait and landscape viewports, and
-  stop the animations under reduced motion. Existing project HTML is unchanged.
+- Refresh the game template's mascot logo and introduce a "Made with Kurot"
+  brand splash with a playful entrance, brief sparkles and a soft blue glow.
+  Resource progress belongs to the game's Preloader; the HTML splash has no
+  loading text or progress indicator and adds no minimum wait. Fit portrait and
+  landscape viewports and stop animations under reduced motion. Existing project
+  HTML is unchanged.
 
 ## 3.5.0 — 2026-10-09
 
