@@ -28,6 +28,20 @@ This ordering includes loading-screen Labels in the project font. The loading
 screen's startup messages stay in English because translations are not loaded yet.
 Templates do not implement live font/theme/language replacement.
 
+## HTML loading screen
+
+The game template's `web/index.html` displays `web/logo.png` with a rounded blue
+indeterminate loading bar while the entry module loads. The mascot stays fully
+visible, with a gentle bob and a moving bar segment. Both animations stop when
+the browser requests reduced motion. The logo size follows both viewport width
+and height to fit small screens and landscape layouts.
+
+The HTML overlay fades out after the entry module evaluates. It does not report
+resource progress; the application's Preloader handles that stage. Customize
+the logo, loading colors and text directly in the project's HTML. This template
+update applies to newly scaffolded game projects; existing project HTML is
+project-owned.
+
 ## Change fonts and colors
 
 Font keys such as primary produce stable aliases such as kurot-primary. Replace

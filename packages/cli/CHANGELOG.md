@@ -7,6 +7,15 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## Unreleased
+
+### Changed
+
+- Refresh the game template's mascot logo and match its rounded blue styling
+  with an indeterminate loading bar, softer loading text and gentle animation.
+  Keep the mascot fully visible, fit both portrait and landscape viewports, and
+  stop the animations under reduced motion. Existing project HTML is unchanged.
+
 ## 3.5.0 — 2026-10-09
 
 Published; verified on npm on 2026-10-09.

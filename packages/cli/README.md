@@ -104,6 +104,10 @@ resource loading, and an editable HTML template. Fonts load before creating UI;
 translations register after preload. The `empty` template contains a minimal
 `Sprite` application without UI/style/language dependencies.
 
+The unreleased game-template refresh pairs a rounded mascot logo with a blue
+indeterminate HTML loading bar. It supports reduced motion and applies to newly
+created projects; see [HTML loading screen](docs/game-template.md#html-loading-screen).
+
 ### `kurot build`
 
 ```bash
