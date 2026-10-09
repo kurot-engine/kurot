@@ -19,6 +19,13 @@ format changes are documented explicitly in each release.
   landscape viewports and stop animations under reduced motion. Existing project
   HTML is unchanged.
 
+### Fixed
+
+- Omit empty runtime asset directory trees after filtering compiled KUI sources,
+  rather than emitting an empty `resource/ui` hierarchy. Runtime files inside UI
+  directories, generated theme JSON and template scaffold directories are preserved.
+  No engine API, configuration, dependency or authored project migration is required.
+
 ## 3.5.0 — 2026-10-09
 
 Published; verified on npm on 2026-10-09.

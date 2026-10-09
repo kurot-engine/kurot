@@ -71,6 +71,12 @@ Development builds preserve application source module structure under
 `manifest.json`. Static resources retain stable paths because application code
 addresses them by key or URL.
 
+Asset copying creates directories only when an accepted runtime file needs them.
+KUI source files and source theme JSON are excluded when UI compilation is enabled,
+so a skin-only `resource/ui` tree is absent from output. Mixed directories retain
+their runtime images/JSON and generated theme output is preserved. Template
+scaffolding keeps its separate empty-directory behavior.
+
 ## Development watchers
 
 The dev server has separate rebuild paths for application source, KUI XML, and

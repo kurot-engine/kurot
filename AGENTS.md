@@ -85,6 +85,13 @@ Editor 0.24.0 explicitly adopts all five registry SDKs. Game/DragonBones/Spine
 need no release; other applications and templates retain their own dependencies.
 Read docs/centered-flips.md for the published contracts and consumer adoption order.
 
+CLI has an unreleased asset-copy correction that omits empty runtime directory
+trees after filtering KUI sources, including skin-only resource/ui. Generated
+theme JSON and compiled Skin modules remain required; mixed directories retain
+runtime files, and template copies preserve empty directories. Registry CLI 3.5.0
+does not include the correction. Adoption needs the next CLI installation and a
+project rebuild, without engine changes or dependency/format migration.
+
 Core 2.3.3 is published, verified on npm on 2026-10-09. It fixes Bitmap/Image
 repeat and clip in WebGL, Canvas and nested bitmap caches. Repeat retains original
 texture periods, trim margins, rotated atlas regions and clipped edge tiles;

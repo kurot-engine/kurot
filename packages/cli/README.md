@@ -122,6 +122,13 @@ Development output is written to `bin-debug/`. Release output is written to
 project namespace, theme, and application code are separate ESM chunks joined
 by the generated HTML import map.
 
+The unreleased asset-copy correction omits empty runtime directory trees;
+registry CLI 3.5.0 does not include it. With KUI enabled, authored
+`.kui.xml` files are compiled into the theme chunk and excluded from `resource/`;
+skin-only directories such as `resource/ui` therefore do not appear in output.
+Images, JSON and other runtime files inside those directories are still copied.
+The generated `resource/default.thm.json` remains available to theme loading.
+
 `--diagnostics json` reserves stdout for one machine-readable build result.
 Release builds apply strict diagnostic policy by default.
 

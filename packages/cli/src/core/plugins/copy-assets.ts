@@ -10,6 +10,8 @@ import type { BuildContext, BuildPlugin } from '../pipeline.js';
  *   payload, so copying the source version would overwrite it.
  * - `.kui.xml` source files are skipped when KUI is enabled, since skins are
  *   compiled to a JS module and the runtime never reads raw `.kui.xml`.
+ * - Empty directory trees are omitted, including directories containing only
+ *   excluded KUI sources. Runtime files remain eligible regardless of directory.
  */
 export function copyAssets(): BuildPlugin {
 	return {
@@ -28,12 +30,17 @@ export function copyAssets(): BuildPlugin {
 
 			const dest = path.join(project.outputDir, 'resource');
 
-			await copyDir(project.resourceDir, dest, name => {
-				if (name === themeName) return false;
-				if (ui && name.endsWith('.kui.xml')) return false;
+			await copyDir(
+				project.resourceDir,
+				dest,
+				name => {
+					if (name === themeName) return false;
+					if (ui && name.endsWith('.kui.xml')) return false;
 
-				return true;
-			});
+					return true;
+				},
+				{ preserveEmptyDirectories: false },
+			);
 		},
 	};
 }

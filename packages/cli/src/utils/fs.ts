@@ -1,6 +1,13 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
+export interface CopyDirectoryOptions {
+	/**
+	 * Defaults to true for template scaffolding; runtime asset copies may omit empty trees.
+	 */
+	readonly preserveEmptyDirectories?: boolean;
+}
+
 /**
  * Creates a directory and any missing parent directories.
  */
@@ -14,8 +21,16 @@ export async function ensureDir(dir: string): Promise<void> {
  * The optional filter receives each file's base name; directories are always
  * traversed so matching descendants remain discoverable.
  */
-export async function copyDir(src: string, dest: string, filter?: (name: string) => boolean): Promise<void> {
-	await ensureDir(dest);
+export async function copyDir(
+	src: string,
+	dest: string,
+	filter?: (name: string) => boolean,
+	options: CopyDirectoryOptions = {},
+): Promise<void> {
+	let created = options.preserveEmptyDirectories ?? true;
+	if (created) {
+		await ensureDir(dest);
+	}
 
 	const entries = await fs.readdir(src, { withFileTypes: true });
 
@@ -23,8 +38,12 @@ export async function copyDir(src: string, dest: string, filter?: (name: string)
 		const srcPath = path.join(src, entry.name);
 		const destPath = path.join(dest, entry.name);
 		if (entry.isDirectory()) {
-			await copyDir(srcPath, destPath, filter);
+			await copyDir(srcPath, destPath, filter, options);
 		} else if (!filter || filter(entry.name)) {
+			if (!created) {
+				await ensureDir(dest);
+				created = true;
+			}
 			await fs.copyFile(srcPath, destPath);
 		}
 	}

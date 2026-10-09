@@ -134,6 +134,11 @@ manual prefix cannot conflict with `ui.components.namespace`.
 - `create` queries the npm registry for current Kurot package versions and falls
   back to `latest` if the request fails.
 - Release output is timestamped and `manifest.json` exists only in release.
+- The unreleased asset-copy correction omits empty runtime directory trees,
+  including skin-only `resource/ui`. Runtime files under UI directories remain
+  eligible; generated theme JSON and the compiled Skin module remain required.
+  Template copies still preserve empty directories. Registry CLI 3.5.0 does not
+  include this correction.
 
 ## Plugin order
 
