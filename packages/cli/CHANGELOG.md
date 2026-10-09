@@ -7,6 +7,25 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.5.0 — 2026-10-09
+
+Published; verified on npm on 2026-10-09.
+
+### Added
+
+Center flip attributes and state overrides now compile with strict boolean validation, including CLI-only controls. Nonvisual Skin roots reject flags. Requires ui-document ^0.13.0; games using flips require Core 2.4/UI 3.4.
+
+See [centered flips](../../docs/centered-flips.md) for semantics and adoption.
+Dependency installation and pnpm lock now resolve published ui-document 0.13.0
+without local overrides; frozen installation reproduces the published dependency baseline.
+
+### Verification
+
+Frozen registry installation, build and all 102 unit tests pass against
+published ui-document 0.13.0, including flags, states, percentages, malformed
+booleans and nonvisual Skin-root rejection. The initial source trial had one
+resource-watch timeout; its reruns and this full registry run pass.
+
 ## 3.4.0 — 2026-10-08
 
 ### Added

@@ -145,10 +145,10 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-`@kurot/ui-runtime@0.8.2` consumes format version 2 with ui-document `^0.11.0`
-and passes the shared
-component, screen, and appearance conformance fixtures. It expands reusable
-instances, executes bounded data bindings and semantic actions, dispatches
+Published `@kurot/ui-runtime@0.10.0` consumes format version 2 with ui-document
+`^0.13.0` and passes the shared component, screen, and appearance conformance
+fixtures. It expands reusable instances, executes bounded data bindings and
+semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected
 variants and numeric transitions. Incremental reconciliation remains runtime
 work.

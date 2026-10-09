@@ -1,16 +1,21 @@
 # @kurot/ui — AI context map
 
+UI 3.4.0 is published, verified on npm on 2026-10-09, and installs published
+Core 2.4.0 with a matching registry lockfile, without local overrides. Read
+[centered flips](../../../docs/centered-flips.md) before changing transforms,
+reflection frames, authored flags or dependency adoption.
+
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from scratch
 each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.3.1`, EUI-compatible UI framework on top of
-`@kurot/core`. Peer-depends on `@kurot/core@^2.3.0`. Rewritten with standard class
+Package identity: `@kurot/ui@3.4.0`, EUI-compatible UI framework on top of
+`@kurot/core`. Peer-depends on `@kurot/core@^2.4.0`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
-Version 3.3.1 is prepared in source and fixes transformed parent allocations. It
-has not been published. Version 3.3.0 adds RichLabel and tests against published Core 2.3.1 through its
+Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent
+allocations. It has not been published; UI 3.4.0 includes the same correction. Version 3.3.0 adds RichLabel and tests against published Core 2.3.1 through its
 development installation and lockfile, without overrides. Version 3.2.0 is published with BitmapLabel against published Core 2.2.0,
 without local dependency overrides. Published UI 3.1.0 does not contain BitmapLabel.
 
@@ -49,6 +54,12 @@ src/kurot/
 ```
 
 ## 2. Non-obvious current behavior
+
+- `flipX`/`flipY` are native Core booleans inherited by every UI display
+  component. Group and Component provide their validated, unscaled actual frame
+  through `$getFlipBounds()`. `UIState.getActualBounds()` reads this frame without
+  validating recursively. Layout uses the authored matrix, independent of flips;
+  negative scale remains anchor-based. Resizing moves the reflection center.
 
 - **`Skin` is NOT a `Group`/DisplayObject subclass.** `components/Skin.ts`
   defines `class Skin extends EventDispatcher<SkinEvents>` — a plain data
@@ -245,4 +256,5 @@ wordWrap, lineSpacing, textAlign and verticalAlign remain component-level.
 Task → `components/RichLabel.ts`, `test/RichLabel.test.ts`,
 `test/browser/text-labels.spec.ts`. Run `pnpm test:text-labels` after building
 Core and UI. BitmapLabel automatic measurement now uses maxWidth too. The KUI
-catalog, CLI and Editor must adopt these native components in a later phase.
+catalog is available in published ui-document 0.12.0+, CLI 3.4.0+ and
+ui-runtime 0.9.0+. Editor adoption remains an explicit application update.

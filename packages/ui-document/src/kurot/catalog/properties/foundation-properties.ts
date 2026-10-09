@@ -51,6 +51,16 @@ export const DISPLAY_OBJECT_PROPERTIES: Readonly<Record<string, UIPropertyDefini
 		defaultValue: false,
 		description: 'Whether to cache this display subtree as a reusable texture.',
 	},
+	flipX: {
+		valueType: 'boolean',
+		defaultValue: false,
+		description: 'Mirror horizontally around the local frame center, preserving scale and position.',
+	},
+	flipY: {
+		valueType: 'boolean',
+		defaultValue: false,
+		description: 'Mirror vertically around the local frame center, preserving scale and position.',
+	},
 	height: {
 		valueType: 'number',
 		minimum: 0,

@@ -315,8 +315,10 @@ export class ComboBox extends Component implements IDisplayText {
 
 		this._dropDownParent = parent;
 		this._dropDownParentIndex = parent.getChildIndex(dropDown);
-		this._dropDownLocalMatrix = dropDown.$getMatrix().clone();
-		const stageMatrix = dropDown.$getConcatenatedMatrix().clone();
+		this._dropDownLocalMatrix = dropDown.matrix;
+		const stageMatrix = new Matrix();
+		stage.$getInvertedConcatenatedMatrix().preMultiplyInto(parent.$getConcatenatedMatrix(), stageMatrix);
+		stageMatrix.preMultiplyInto(dropDown.matrix, stageMatrix);
 		parent.removeChild(dropDown);
 		stage.addChild(dropDown);
 		dropDown.$setMatrix(stageMatrix);

@@ -1,8 +1,11 @@
 # @kurot/core
 
+**2.4.0 is published**, verified on npm on 2026-10-09. See
+[centered flips](docs/centered-flips.md) for the new APIs and consumer requirements.
+
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.3.3 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.4.0 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Bitmap fill correction in 2.3.3
 
@@ -96,7 +99,7 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.3.3
+pnpm add @kurot/core@^2.4.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -122,6 +125,8 @@ UI 3.1.0 does not contain this component.
 **Display Objects**
 
 - Full scene graph: DisplayObject → Container → Sprite → Stage
+- Independent centered `flipX`/`flipY`, preserving authored position, scale and
+  anchors; shared rendering/input transforms and subclass reflection-frame hook.
 - Bitmap (with scale9Grid), Shape, Mesh, TextField, BitmapText, Video
 - Graphics vector drawing (rect, circle, ellipse, arc, bezier, gradients, dashed lines)
 - cacheAsBitmap / cacheAsTexture, tint, skew, zIndex sorting

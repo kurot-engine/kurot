@@ -201,8 +201,8 @@ export class CanvasRenderer {
 
 			if (child.$useTranslate) {
 				const m = child.$getMatrix();
-				childOffsetX = offsetX + child.$x;
-				childOffsetY = offsetY + child.$y;
+				childOffsetX = offsetX + m.tx;
+				childOffsetY = offsetY + m.ty;
 				ctx.save();
 				ctx.transform(m.a, m.b, m.c, m.d, childOffsetX, childOffsetY);
 				childOffsetX = -child.$anchorOffsetX;

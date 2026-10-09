@@ -4,6 +4,26 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## 0.10.0 — 2026-10-09
+
+Published; verified on npm on 2026-10-09.
+
+### Added
+
+Native center flip flags support materialization, typed bindings and state restoration. Requires Core ^2.4.0, UI ^3.4.0 and ui-document ^0.13.0 for their implemented contracts.
+
+See [centered flips](../../docs/centered-flips.md) for semantics and adoption.
+Development installation and pnpm lock now resolve published Core 2.4.0,
+UI 3.4.0 and ui-document 0.13.0 without local overrides. UI and runtime share
+one Core instance, including its native display classes.
+
+### Verification
+
+Frozen registry installation, build and all 76 unit tests pass against published
+Core 2.4.0/UI 3.4.0/document 0.13.0, including native materialization, state
+restoration and atomic rejection of invalid typed bindings. Dependency inspection
+confirms UI and runtime resolve one shared Core.
+
 ## [0.9.0] — 2026-10-08
 
 ### Added

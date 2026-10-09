@@ -21,6 +21,12 @@ export function applyDisplayObjectProperty(target: DisplayObject, name: string, 
 		case 'cacheAsBitmap':
 			target.cacheAsBitmap = requireBoolean(value, path);
 			return true;
+		case 'flipX':
+			target.flipX = requireBoolean(value, path);
+			return true;
+		case 'flipY':
+			target.flipY = requireBoolean(value, path);
+			return true;
 		case 'height':
 			target.height = requireNumber(value, path);
 			return true;

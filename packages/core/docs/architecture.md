@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.2.1. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 2.4.0 (published). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -17,6 +17,13 @@ resources, networking and media runtime. Public APIs follow Egret's
 Since 2.2.0, Core uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
+
+Since 2.4.0, `DisplayObject.flipX`/`flipY` reflect around a local frame center
+independently of authored scale and anchors. `matrix` exposes the authored
+transform; `$getMatrix()` supplies the effective reflection transform to
+rendering and coordinate conversion. UI provides its validated layout frame
+through `$getFlipBounds()`. See [centered flips](centered-flips.md) for frame,
+scrolling, caching and consumer requirements.
 
 TextField uses Unicode 17.0 line-break rules with dictionary and overflow
 tailoring. Since 2.2.1, tailoring uses imported rule identities, and layout

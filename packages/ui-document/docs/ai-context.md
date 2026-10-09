@@ -1,9 +1,13 @@
 # @kurot/ui-document — AI context map
 
+ui-document 0.13.0 is published, verified on npm on 2026-10-09. Read
+[centered flips](../../../docs/centered-flips.md) before changing transforms,
+reflection frames, authored flags or dependency adoption.
+
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.12.0` (published). This is a headless,
+Package identity: `@kurot/ui-document@0.13.0` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.
@@ -94,6 +98,10 @@ src/
 
 - Component definitions remain runtime-independent metadata. Never import
   actual `@kurot/ui` classes into this package.
+- `flipX`/`flipY` are inherited boolean DisplayObject properties with false
+  defaults. XML, states and history retain literal flags without rewriting
+  negative scale. The synthetic Skin root maps to a nonvisual native Skin;
+  author flags on visual children. CLI rejects flags on the Skin root.
 - Property value categories include primitive/structured values plus explicit
   `asset-reference`, `resource-reference`, and `token-reference` categories.
 - `resourceTypes` and `tokenTypes` further constrain which reference categories
@@ -188,9 +196,10 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.8.2` consumes format version 2 and executes the current
-  reuse, appearance, data-binding, semantic-action, transition, and typed
-  resource-adapter slice. Incremental reconciliation remains pending.
+- `@kurot/ui-runtime@0.10.0` consumes format version 2 with ui-document ^0.13.0
+  and executes the current reuse, appearance, data-binding, semantic-action,
+  transition, and typed resource-adapter slice. Incremental reconciliation
+  remains pending.
 - The foundation component catalog is intentionally incomplete; do not invent
   unsupported properties from Egret, PixiJS, LayaAir, or FairyGUI conventions.
 

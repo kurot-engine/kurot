@@ -1,11 +1,15 @@
 # @kurot/core — AI context map
 
+Core 2.4.0 is published, verified on npm on 2026-10-09. Read
+[centered flips](../../../docs/centered-flips.md) before changing transforms,
+reflection frames, authored flags or dependency adoption.
+
 Read this before exploring `src/`. It is a compressed map of the package so an
 agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.3.3`, published. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.4.0`, published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -60,8 +64,12 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
 
 ## 2. Non-obvious current behavior
 
-- `DisplayObject.matrix` getter returns a **clone**, not a live reference.
-  Mutating the returned matrix does nothing — assign it back or use `$setMatrix`.
+- `DisplayObject.matrix` getter returns a **clone of the authored transform**,
+  excluding centered flips and anchor/scroll offsets. Assigning it preserves
+  flipX/flipY. `$getMatrix()` is the effective rendering transform.
+- `flipX`/`flipY` preserve x/y, scale and anchors. Ordinary display objects use
+  content bounds; UI overrides `$getFlipBounds()` with its actual local frame.
+  Resizing and descendant geometry changes update the reflection center.
 - `getChildAt`/`removeChildAt` return `undefined` on out-of-bounds instead of
   throwing. `removeChildren()` returns `void`, not the removed array.
 - `blendMode` string values are Canvas 2D composite-operation names;

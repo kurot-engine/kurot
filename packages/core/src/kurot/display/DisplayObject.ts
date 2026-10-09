@@ -145,6 +145,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	private _invertedConcatenatedMatrix?: Matrix;
 	private _scaleX = 1;
 	private _scaleY = 1;
+	private _flipX = false;
+	private _flipY = false;
+	private _flipMatrix?: Matrix;
+	private _flipBounds?: Rectangle;
 	private _rotation = 0;
 	private _skewX = 0;
 	private _skewXdeg = 0;
@@ -183,8 +187,12 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return this.$stage;
 	}
 
+	/**
+	 * Authored transform, excluding centered flips and anchor/scroll offsets.
+	 * Assigning it preserves flipX/flipY. The getter returns a copy.
+	 */
 	public get matrix(): Matrix {
-		return this.$getMatrix().clone();
+		return this._getBaseMatrix().clone();
 	}
 	public set matrix(value: Matrix) {
 		this.$setMatrix(value);
@@ -216,6 +224,36 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	}
 	public set scaleY(value: number) {
 		this.$setScaleY(value);
+	}
+
+	/**
+	 * Mirrors content horizontally around its local bounds center without
+	 * changing position, scale or anchor. UI components use their layout frame.
+	 */
+	public get flipX(): boolean {
+		return this._flipX;
+	}
+	public set flipX(value: boolean) {
+		value = !!value;
+		if (this._flipX === value) return;
+		this._flipX = value;
+		this.$updateUseTransform();
+		this.$markTransformDirty();
+	}
+
+	/**
+	 * Mirrors content vertically around its local bounds center without
+	 * changing position, scale or anchor. UI components use their layout frame.
+	 */
+	public get flipY(): boolean {
+		return this._flipY;
+	}
+	public set flipY(value: boolean) {
+		value = !!value;
+		if (this._flipY === value) return;
+		this._flipY = value;
+		this.$updateUseTransform();
+		this.$markTransformDirty();
 	}
 
 	public get rotation(): number {
@@ -544,13 +582,36 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	}
 
 	$getMatrix(): Matrix {
-		if (this._matrixDirty) {
-			this._matrixDirty = false;
-			this._matrix.updateScaleAndRotation(this._scaleX, this._scaleY, this._skewX, this._skewY);
+		const base = this._getBaseMatrix();
+		if (!this._flipX && !this._flipY) return base;
+		const matrix = (this._flipMatrix ??= new Matrix());
+		const bounds = (this._flipBounds ??= new Rectangle());
+		if (this.$scrollRect) {
+			bounds.setTo(0, 0, this.$scrollRect.width, this.$scrollRect.height);
+		} else {
+			this.$getFlipBounds(bounds);
 		}
-		this._matrix.tx = this.$x;
-		this._matrix.ty = this.$y;
-		return this._matrix;
+		// Anchor subtraction follows this matrix in both renderers. Conjugate
+		// the reflection so it changes content, never the existing outer frame.
+		const dx = this._flipX ? 2 * bounds.x + bounds.width - 2 * this.$anchorOffsetX : 0;
+		const dy = this._flipY ? 2 * bounds.y + bounds.height - 2 * this.$anchorOffsetY : 0;
+		matrix.setTo(
+			this._flipX ? -base.a : base.a,
+			this._flipX ? -base.b : base.b,
+			this._flipY ? -base.c : base.c,
+			this._flipY ? -base.d : base.d,
+			base.tx + base.a * dx + base.c * dy,
+			base.ty + base.b * dx + base.d * dy,
+		);
+		return matrix;
+	}
+
+	/**
+	 * Local reflection frame. Layout owners override this with their actual
+	 * unscaled frame; ordinary display objects use their content bounds.
+	 */
+	public $getFlipBounds(bounds: Rectangle): void {
+		bounds.copyFrom(this.$getOriginalBounds());
 	}
 
 	$setMatrix(matrix: Matrix, needUpdateProperties = true): void {
@@ -562,7 +623,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$x = matrix.tx;
 		this.$y = matrix.ty;
 		this._matrixDirty = false;
-		this.$useTranslate = !(m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1);
+		this.$useTranslate = this._flipX || this._flipY || !(m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1);
 		if (needUpdateProperties) {
 			this._scaleX = m.getScaleX();
 			this._scaleY = m.getScaleY();
@@ -767,7 +828,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	}
 
 	$updateUseTransform(): void {
-		this.$useTranslate = !(this._scaleX === 1 && this._scaleY === 1 && this._skewX === 0 && this._skewY === 0);
+		this.$useTranslate =
+			this._flipX ||
+			this._flipY ||
+			!(this._scaleX === 1 && this._scaleY === 1 && this._skewX === 0 && this._skewY === 0);
 	}
 
 	$updateRenderMode(): void {
@@ -956,6 +1020,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		let tint = this.$tintRGB;
 		let p = this.$parent;
 		while (p) {
+			if (p._flipX || p._flipY) {
+				p._boundsDirty = true;
+				DisplayObject.$onRenderableDirty?.(p);
+			}
 			alpha *= p.$alpha;
 			if (tint === 0xffffff && p.$tintRGB !== 0xffffff) {
 				tint = p.$tintRGB;
@@ -981,5 +1049,17 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 			masked.$cacheDirty = true;
 			masked.$cacheDirtyUp();
 		}
+	}
+
+	// ── Private methods ──────────────────────────────────────────────────────
+
+	private _getBaseMatrix(): Matrix {
+		if (this._matrixDirty) {
+			this._matrixDirty = false;
+			this._matrix.updateScaleAndRotation(this._scaleX, this._scaleY, this._skewX, this._skewY);
+		}
+		this._matrix.tx = this.$x;
+		this._matrix.ty = this.$y;
+		return this._matrix;
 	}
 }

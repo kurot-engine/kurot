@@ -222,6 +222,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.percentHeight = v;
 	}
 
+	public override $getFlipBounds(bounds: Rectangle): void {
+		this.ui.getActualBounds(bounds);
+	}
+
 	public override $updateUseTransform(): void {
 		super.$updateUseTransform();
 		this.ui.$invalidateParentLayout();

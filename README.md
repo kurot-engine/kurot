@@ -50,12 +50,12 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.3.3   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.3.1   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/core`](packages/core/README.md)               | 2.4.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.4.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.4.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.12.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.9.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.5.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.10.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
 | [`@kurot/dragonbones`](packages/dragonbones/README.md) | 0.1.0   | `packages/dragonbones` | Published DragonBones 5.7 runtime, native displays, atlas regions, deformable meshes, events and clock           | `@kurot/core`               |
 | [`@kurot/bitmap-font`](packages/bitmap-font/README.md) | 0.1.0   | `packages/bitmap-font` | Published headless font data, parsing, validation, serialization and layout                                      | None                        |
@@ -76,17 +76,24 @@ loading the packing library. See [atlas contracts and examples](packages/atlas/R
 
 `@kurot/ui-document` provides the reusable semantic model, explicit component
 capabilities, bounded dynamic contracts, and headless editing kernel.
-Published `@kurot/ui-runtime` 0.8.2 uses ui-document 0.11.x and renders
+Published `@kurot/ui-runtime` 0.10.0 uses ui-document 0.13.x and renders
 component instances, Slots, appearances, states, variants, resources, and
 design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
 category-specific resource adapters while keeping game logic outside the
 document.
 
-UI 3.3.1 is prepared in source, not published. It corrects transformed
+Core 2.4.0, UI 3.4.0 and ui-document 0.13.0 are published, verified on npm
+on 2026-10-09, with centered display/UI flips and shared authoring metadata.
+UI/CLI/runtime development installations and registry locks adopt the relevant
+upstream releases. CLI 3.5.0 and ui-runtime 0.10.0 are also published, verified
+on npm on the same date. Editor 0.24.0 adopts the complete registry SDK chain.
+Read [the feature and adoption contract](docs/centered-flips.md) for targeted lockfile adoption.
+
+UI 3.3.1 is preserved in commit 60e6404, not published. It corrects transformed
 percentage/edge allocations for all UI components, including negative scale,
-rotation and skew. Core peers and other SDK versions are unchanged. Consumers
-receive the correction after publishing/installing the patch and rebuilding.
+rotation and skew. The correction is included in published UI 3.4.0; consumers
+adopt UI 3.4.0 with Core ^2.4.0 and rebuild. Other SDKs need no version bump.
 
 Core 2.3.3 is published. It restores Bitmap/Image repeat
 and clip in both backends and bitmap caches; see [fill modes](packages/core/docs/bitmap-fill.md).
@@ -104,10 +111,10 @@ Core 2.3.1 and UI 3.3.0 are published. The Core
 patch corrects unstyled blank rich-text line heights without new API requirements. Core adds independent
 TextField measurement; UI adds [RichLabel](packages/ui/docs/rich-label.md),
 whose only content interface is textFlow, and fixes automatic BitmapLabel
-measurement under maxWidth. UI builds against published Core 2.3.1 without
+measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.3.3 and UI 3.3.0.
+Core 2.4.0 and UI 3.4.0.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with
@@ -137,15 +144,15 @@ Applications adopt fixes through their own dependency updates and rebuilds.
 See the [dependency graph and release policy](docs/dependency-policy.md) for
 ordinary versus peer dependencies, release scope and targeted updates.
 
-The current dependency ranges are:
+The published package dependency ranges are:
 
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
-| Core 2.3.3        | bitmap-font `^0.1.0`                              |
-| UI 3.3.1          | Core `^2.3.0`                                     |
+| Core 2.4.0        | bitmap-font `^0.1.0`                              |
+| UI 3.4.0          | Core `^2.4.0`                                     |
 | Game 2.0.0        | Core `^2.0.0`                                     |
-| CLI 3.4.0         | ui-document `^0.12.0`                             |
-| ui-runtime 0.9.0  | Core `^2.3.0`, UI `^3.3.0`, ui-document `^0.12.0` |
+| CLI 3.5.0         | ui-document `^0.13.0`                             |
+| ui-runtime 0.10.0 | Core `^2.4.0`, UI `^3.4.0`, ui-document `^0.13.0` |
 | dragonbones 0.1.0 | Core `^2.1.1`                                     |
 
 CLI 3.2.1 is published with project styles, bundled fonts and

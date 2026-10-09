@@ -124,6 +124,42 @@ describe('ComboBox', () => {
 		});
 	});
 
+	it('preserves centered flips and anchor coordinates when lifting a popup to Stage', () => {
+		const stage = new Stage();
+		const cb = makeComboBox();
+		cb.width = 120;
+		cb.height = 80;
+		cb.x = 40;
+		cb.y = 30;
+		stage.addChild(cb);
+		const skin = new Group();
+		skin.width = 120;
+		skin.height = 80;
+		skin.flipX = true;
+		const dropDown = new Scroller();
+		dropDown.width = 60;
+		dropDown.height = 30;
+		dropDown.x = 20;
+		dropDown.y = 10;
+		dropDown.anchorOffsetX = 9;
+		dropDown.flipY = true;
+		skin.addChild(dropDown);
+		cb.addChild(skin);
+		attachSkin(cb, { dropDown }, [skin]);
+		skin.validateNow();
+		dropDown.validateNow();
+		const original = dropDown.matrix;
+		const point = dropDown.localToGlobal(10, 10);
+		cb.open();
+		expect(dropDown.parent).toBe(stage);
+		expect(dropDown.localToGlobal(10, 10)).toEqual(point);
+		expect(dropDown.flipY).toBe(true);
+		cb.close();
+		expect(dropDown.parent).toBe(skin);
+		expect(dropDown.matrix).toEqual(original);
+		expect(dropDown.localToGlobal(10, 10)).toEqual(point);
+	});
+
 	describe('selection', () => {
 		it('selectedIndex updates selectedItem and dispatches CHANGE', () => {
 			const cb = makeComboBox(['a', 'b', 'c']);

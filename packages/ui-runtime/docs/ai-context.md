@@ -1,11 +1,16 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.9.0` (published). This package consumes validated
+Runtime 0.10.0 is published, verified on npm on 2026-10-09. Development
+installs published Core 2.4.0, UI 3.4.0 and
+ui-document 0.13.0 with a matching registry lock and one shared Core. Read
+[centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
+
+Package identity: `@kurot/ui-runtime@0.10.0` (published). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on published `@kurot/ui-document@^0.12.0`, `@kurot/ui@^3.3.0`, and
-`@kurot/core@^2.3.0`. It does not
+It peer-depends on `@kurot/ui-document@^0.13.0`, `@kurot/ui@^3.4.0`, and
+`@kurot/core@^2.4.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
 Document XML string attributes are literal, including state text and
@@ -42,8 +47,9 @@ adapters return either a configured resource key or a real BitmapFont.
 Native measurement, resource loading/cache ownership and content copy rules
 remain in Core/UI. Whole-flow states and typed data bindings use existing
 native/transactional restoration, including undefined base fonts. See
-[text-components.md](text-components.md). The development lock uses registry
-Core 2.3.1; the required native API minimum is 2.3.0.
+[text-components.md](text-components.md). The 0.9.0 development lock used registry
+Core 2.3.1 and required native text API 2.3.0. Current 0.10.0 development uses
+registry Core 2.4.0/UI 3.4.0/document 0.13.0 for the centered-flip contract.
 
 ## Built-in boundary
 
@@ -59,6 +65,10 @@ Property names are applied in sorted order and children retain document order.
 Unknown or malformed runtime values fail instead of being assigned dynamically.
 The runtime does not fill in component Schema defaults; Kurot constructors own
 their runtime defaults.
+
+`flipX`/`flipY` route through native DisplayObject boolean properties, including
+state restoration and transactional data bindings. The runtime does not convert
+flags into scale changes or perform reflection geometry; Core/UI own the frame.
 
 `kui.ToggleButton` uses its real constructor default of `toggle = true`.
 `kui.ProgressBar` accepts `minimum`, `maximum`, `value`, `direction`, and

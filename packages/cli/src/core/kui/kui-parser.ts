@@ -20,6 +20,7 @@ import type {
 } from './ast.js';
 import { localName, lookupComponent } from './registry.js';
 import type { NamespaceModule } from './registry.js';
+import { validateFlipProperties } from './validate-flip-properties.js';
 import { validateTextComponents } from './validate-text-components.js';
 
 /**
@@ -38,6 +39,7 @@ export function parseKUISkin(
 		colors ?? styleSheet?.colors ?? {},
 	);
 	validateTextComponents(document);
+	validateFlipProperties(document);
 	return new KUIParseContext(source, document, className ?? document.id, customNamespaces).parse();
 }
 

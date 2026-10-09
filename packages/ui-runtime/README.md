@@ -1,11 +1,15 @@
 # @kurot/ui-runtime
 
+**0.10.0 is published**, verified on npm on 2026-10-09. Development installs published
+Core 2.4.0, UI 3.4.0 and ui-document 0.13.0 with a matching registry lock and
+no local overrides. See [centered flips](../../docs/centered-flips.md) for adoption.
+
 Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current version: 0.9.0 (published).** Requires `@kurot/core@^2.3.0`,
-> `@kurot/ui@^3.3.0`, and published `@kurot/ui-document@^0.12.0`. Uses UI's atomic
+> **Current version: 0.10.0 (published).** Requires `@kurot/core@^2.4.0`,
+> `@kurot/ui@^3.4.0`, and `@kurot/ui-document@^0.13.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
@@ -13,19 +17,31 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.9.0 @kurot/ui-document@^0.12.0 @kurot/ui@^3.3.0 @kurot/core@^2.3.1
+pnpm add @kurot/ui-runtime@^0.10.0 @kurot/ui-document@^0.13.0 @kurot/ui@^3.4.0 @kurot/core@^2.4.0
 ```
 
-Install all peers explicitly. Core 2.3.0 is the required native text API minimum;
-Core 2.3.1 also fixes unstyled blank rich-text line metrics. Upgrade UI and
-document together with runtime 0.9.0; runtime 0.8.2's document peer excludes
-0.12.x. Public creation/controller APIs and semantic format version 2 remain
-unchanged. Existing apps may retain runtime 0.8.2 for their existing controls.
+Install all peers explicitly. Runtime 0.10.0 requires the
+centered flip API and layout frame in Core 2.4.0/UI 3.4.0, plus document 0.13.0
+authoring metadata. Older runtime 0.9.0 remains valid for native text on its
+published Core/UI/document chain. Public creation/controller APIs and semantic
+format version 2 remain unchanged; existing apps do not require an upgrade.
 
 Published CLI 3.3.0 uses ui-document 0.11.0 for build-time Label presets/colors and emits
 skins that run directly through UI. That compilation path does not require
 ui-runtime. Runtime 0.8.2 and CLI 3.3.0 share the same document parser.
 See the [project style contract](../ui-document/docs/project-styles.md).
+
+## Centered flips in 0.10.0
+
+Display property handlers apply typed boolean `flipX`/`flipY` to native objects.
+Group and Component subclasses reflect around their validated local layout
+frame while retaining authored scale and position. State removal restores prior
+flags; failed data-binding updates roll back without losing the applied flag.
+Reflection geometry and input coordinates remain Core/UI responsibilities.
+
+Development installs published Core 2.4.0, UI 3.4.0 and document 0.13.0 with one
+shared Core. Runtime 0.10.0 is published. Consumers install
+all matching peers explicitly and rebuild when adopting it.
 
 ## BitmapLabel and RichLabel in 0.9.0
 

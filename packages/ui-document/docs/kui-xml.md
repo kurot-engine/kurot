@@ -21,11 +21,12 @@ Storage IDs, format versions, runtime targets, and default-skin flags are not
 part of the file. Storage owns its record identity, while the CLI derives skin
 associations from built-in and project component conventions.
 
-The Skin is the visual root container. Its layout and size properties belong on
+The Skin is the nonvisual authored root. Its layout and size properties belong on
 `<Skin>`, and its visual children are written directly inside it; an extra root
 `<Group>` has no meaning. A nested Group remains valid when the design actually
-needs a separate layout container. Built-in `kui.*` types use unprefixed
-PascalCase tags. Project component types use an XML namespace prefix;
+needs a separate layout container. Display transforms, including `flipX` and
+`flipY`, belong on visual children rather than the Skin root. Built-in `kui.*`
+types use unprefixed PascalCase tags. Project component types use an XML namespace prefix;
 `game:ActionCard` maps to the semantic type `game.ActionCard`.
 
 ## Values

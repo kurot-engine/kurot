@@ -1,10 +1,34 @@
 # @kurot/ui
 
+**3.4.0 is published**, verified on npm on 2026-10-09. Its development
+installation and lock resolve published Core 2.4.0 without local overrides. See
+[centered flips](../../docs/centered-flips.md) for APIs and consumer adoption order.
+
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.3.1.** Requires `@kurot/core@^2.3.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.4.0 (published).** Requires `@kurot/core@^2.4.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
+
+## Centered flips in 3.4.0
+
+All UI display components inherit independent boolean `flipX` and `flipY`,
+defaulting to false. They reflect content around the center of the validated
+local layout rectangle, including empty space, while preserving position, size,
+anchors and scale values. Percent resizing updates the center. Negative scale
+keeps its existing anchor-based meaning and composes with a centered flip.
+
+```ts
+image.flipY = true;
+image.percentWidth = 100;
+image.percentHeight = 100;
+```
+
+Core 2.4.0 supplies the effective transform for rendering and input. The authored
+`matrix` stays independent of the flags. Layout remains deferred; validate first
+when reading coordinates or rendering manually. KUI authoring requires document
+0.13.0 and CLI 3.5.0; materialized previews require runtime 0.10.0. Core 2.4.0,
+UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0 are published. No existing skin is converted automatically.
 
 ## RichLabel in 3.3.0
 
@@ -67,7 +91,7 @@ only on Core.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.3.1 @kurot/core@^2.3.0
+pnpm add @kurot/ui@^3.4.0 @kurot/core@^2.4.0
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
@@ -167,8 +191,8 @@ transformed rectangle, including negative scale on either axis. A flipped Image
 with 100% width/height fills its parent allocation, rather than reverting to the
 texture dimensions. This behavior is shared by Group and Component subclasses.
 Local minima/maxima still apply; infeasible transformed aspect ratios fit within
-the allocation when the local minimum dimensions permit it. No new flip property
-is introduced by this correction.
+the allocation when the local minimum dimensions permit it. Published UI 3.4.0
+includes this repair alongside the independent centered-flip properties.
 
 ### Skin system
 

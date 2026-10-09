@@ -228,6 +228,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.percentHeight = v;
 	}
 
+	public override $getFlipBounds(bounds: Rectangle): void {
+		this.ui.getActualBounds(bounds);
+	}
+
 	public override $updateUseTransform(): void {
 		super.$updateUseTransform();
 		this.ui.$invalidateParentLayout();

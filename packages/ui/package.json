@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui",
-	"version": "3.3.1",
+	"version": "3.4.0",
 	"description": "EUI-compatible UI component framework for the Kurot game engine — skin-based components, layouts, data binding, view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -34,10 +34,10 @@
 		"test:text-labels": "playwright test test/browser --workers=1"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^2.3.0"
+		"@kurot/core": "^2.4.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.3.1",
+		"@kurot/core": "^2.4.0",
 		"@playwright/test": "1.62.1",
 		"@types/node": "^22.0.0",
 		"esbuild": "^0.28.2",

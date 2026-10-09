@@ -4,6 +4,26 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.4.0] — 2026-10-09
+
+Published; verified on npm on 2026-10-09. Existing Core 2.x peer ranges
+accept this optional API addition. UI 3.4.0 adopts the reflection-frame hook
+and requires Core ^2.4.0.
+
+### Added
+
+Added independent false-default flipX/flipY on DisplayObject, reflecting around the local content or scroll viewport center while preserving authored scale, position and anchors. Both backends and coordinate/hit-test paths share the effective transform; reflected ancestor bounds changes refresh descendant transforms.
+
+See [centered flips](../../docs/centered-flips.md) for semantics, adoption and
+consumer verification. UI development now installs published Core 2.4.0 with
+a matching registry lockfile; no local Core override is needed.
+
+### Verification
+
+Core build and all 842 unit tests pass. Three minified pixel regressions
+pass through the UI consumer in Canvas 2D, WebGL 1 and WebGL 2, covering
+centered transforms, scrolling clips, caches, percent resizing and render groups.
+
 ## [2.3.3] — 2026-10-09
 
 ### Fixed

@@ -1,9 +1,13 @@
 # @kurot/cli
 
+**3.5.0 is published**, verified on npm on 2026-10-09. Its dependency
+installation and lock resolve published ui-document 0.13.0 without local overrides.
+See [centered flips](../../docs/centered-flips.md) for APIs and adoption requirements.
+
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.4.0 (published).** Requires published `@kurot/ui-document@^0.12.0`
+> **Current version: 3.5.0 (published).** Requires `@kurot/ui-document@^0.13.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -23,6 +27,17 @@ game template. Existing projects are not rewritten. See [game template setup](do
 
 Version 3.3.0 compiles shared Label presets from `style.json.labels` into native
 properties, with local and Skin state fields taking priority. See [Label presets](#label-presets-in-330).
+
+## Centered flips in 3.5.0
+
+Compile independent `flipX`/`flipY` booleans on display nodes and named Skin
+states, for example `flipY="true" flipY.down="false"`. The compiler rejects
+malformed booleans and flags on the nonvisual Skin root. Percent dimensions and
+negative scale retain their existing contracts; no authored XML is converted.
+
+The dependency/lock uses published ui-document 0.13.0. Apps rendering these
+flags need published Core 2.4.0/UI 3.4.0; CLI-built skins run directly through
+UI. CLI 3.5.0 is published.
 
 ## BitmapLabel and RichLabel in 3.4.0
 
@@ -59,10 +74,12 @@ See the [compilation contract](docs/label-text-layout.md) and
 
 ## Usage
 
-The CLI does not require a global install.
+The CLI does not require a global install. Use the published version below.
+Existing templates keep their declared SDK
+baseline; adopt Core/UI centered-flip versions explicitly when using the flags.
 
 ```bash
-npx @kurot/cli@3.4.0 create my-game
+npx @kurot/cli@3.5.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -70,7 +87,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.4.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.5.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -273,7 +290,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.12.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.13.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.

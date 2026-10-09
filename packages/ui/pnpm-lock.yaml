@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.3.1
-        version: 2.3.1
+        specifier: ^2.4.0
+        version: 2.4.0
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -206,8 +206,8 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/core@2.3.1':
-    resolution: {integrity: sha512-a1+h8iUTRKFgSvlzTH0l84MgmAKLA/c5ZakTgggCoHzRsDqZShTfMJaPre/8FqS47tlE9z2XvESVYQZPydyXpw==}
+  '@kurot/core@2.4.0':
+    resolution: {integrity: sha512-b3B5i1+cCdmRItlpO+h7EkG4QHAdmVivjjgDmidBbARly8rdgQStdxiXNVjt4XaYOBmI2t3SeggJnDeI+ygUKA==}
 
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
@@ -772,7 +772,7 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/core@2.3.1':
+  '@kurot/core@2.4.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0

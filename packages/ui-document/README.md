@@ -1,11 +1,30 @@
 # @kurot/ui-document
 
+**0.13.0 is published**, verified on npm on 2026-10-09. See
+[centered flips](../../docs/centered-flips.md) for APIs and consumer requirements.
+
 Headless semantic document foundation for Kurot UI tooling. It provides one
 format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
 Agent-driven UI generation.
 
-> **Package version: 0.12.0 (published).** KUI XML is the canonical authored format. The
+> **Package version: 0.13.0 (published).** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
+
+## Centered flip metadata in 0.13.0
+
+Display nodes inherit boolean `flipX` and `flipY`, defaulting to false. XML,
+state overrides and transactional history preserve the flags without changing
+negative scale or semantic format version 2. The headless kernel has no runtime
+dependency on Core/UI and does not calculate reflection geometry.
+
+```xml
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.Reflected" states="down">
+    <Image id="art" flipX="true" flipX.down="false" />
+</Skin>
+```
+
+Rendering requires published Core 2.4.0/UI 3.4.0. Compilation uses CLI 3.5.0;
+materialization uses ui-runtime 0.10.0. Both consumer releases are published. Consumers on ^0.12.0 explicitly adopt ^0.13.0 and rebuild.
 
 ## BitmapLabel and RichLabel in 0.12.0
 
@@ -58,7 +77,7 @@ runtime 0.8.1 excludes this kernel and must be upgraded alongside it.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.12.0
+pnpm add @kurot/ui-document@^0.13.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
@@ -109,8 +128,9 @@ existing synthetic prefixes become literal backslashes. Adopt this contract in
 both Editor and CLI, and remove old prefixes explicitly. XML entities and typed
 collection fields retain their existing rules. See [KUI XML values](docs/kui-xml.md#values).
 
-The authored `<Skin>` element is the visual root container: root size and
-layout properties are written on it, and visual nodes are direct children.
+The authored `<Skin>` element is a nonvisual root: root size and layout
+properties are written on it, and visual nodes are direct children. Display
+transforms, including `flipX`/`flipY`, belong on the visual children.
 Use `createUISkinRoot()` for the corresponding internal Group when constructing
 a Skin document in TypeScript. Only child nodes exposed as skin parts need an
 authored `id`. Fixed and percentage sizes use the same XML attributes:

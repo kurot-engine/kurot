@@ -463,6 +463,13 @@ export class UIState {
 		}
 	}
 
+	/**
+	 * Returns the already validated local layout frame without starting validation.
+	 */
+	public getActualBounds(bounds: Rectangle): void {
+		bounds.setTo(0, 0, this._v[K.width] as number, this._v[K.height] as number);
+	}
+
 	public getLayoutBounds(bounds: Rectangle): void {
 		const v = this._v;
 		const w = (v[K.layoutWidthExplicitlySet] as boolean)

@@ -4,6 +4,24 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.13.0] — 2026-10-09
+
+Published; verified on npm on 2026-10-09. Consumers on ^0.12.0 must
+explicitly adopt ^0.13.0 to use the new authoring metadata.
+
+### Added
+
+Added inherited boolean flipX/flipY metadata with false defaults for every display node. XML/state serialization and history retain literal flags without converting negative scale. Format version 2 and headless dependencies are unchanged.
+
+See [centered flips](../../docs/centered-flips.md) for semantics, adoption and
+consumer verification. CLI 3.5.0 and ui-runtime 0.10.0 development now install
+the published kernel with matching registry locks and no local override.
+
+### Verification
+
+Build and all 223 unit tests pass, including shared defaults, XML and state
+round trips, boolean validation and transactional undo/redo.
+
 ## [0.12.0] — 2026-10-08
 
 ### Added

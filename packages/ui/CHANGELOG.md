@@ -4,7 +4,31 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.4.0] — 2026-10-09
+
+Published; verified on npm on 2026-10-09. Requires published Core ^2.4.0.
+Applications adopt the new UI and Core installation/lock explicitly and rebuild.
+
+### Added
+
+Added centered flips inherited by every UI component, using its validated unscaled layout frame. Percent resizing and sparse content retain the same outer frame. Popup lifting/restoration preserves authored transforms and flips. Requires Core ^2.4.0 for the reflection-frame hook.
+
+See [centered flips](../../docs/centered-flips.md) for semantics, adoption and
+consumer verification. Development now installs published Core 2.4.0 with a
+matching pnpm lockfile, without a local Core override.
+
+### Verification
+
+Frozen registry installation, UI build and all 327 unit tests pass against
+published Core 2.4.0, including percent layout across common components and
+popup reparenting. Three minified browser pixel tests pass on Canvas 2D, WebGL 1
+and WebGL 2 with that same registry Core. The earlier source-chain trial passed
+Editor type checks, 66 focused unit tests and one Electron Inspector/save/undo/redo test.
+
 ## [3.3.1] — 2026-10-09
+
+Not published separately. Preserved in commit 60e6404; its layout correction is
+included in published UI 3.4.0.
 
 ### Fixed
 

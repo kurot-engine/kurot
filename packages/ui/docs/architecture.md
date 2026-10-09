@@ -1,7 +1,8 @@
 # @kurot/ui architecture
 
-> Package version: 3.3.1, with peerDependency `@kurot/core: ^2.3.0`.
-> Core 2.3.1 is published and installed from npm without local overrides.
+> Package version: 3.4.0 (published), with peerDependency `@kurot/core: ^2.4.0`.
+> Development installs published Core 2.4.0 with a matching registry lockfile.
+> No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal

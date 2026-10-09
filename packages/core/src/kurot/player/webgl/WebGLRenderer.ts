@@ -227,8 +227,8 @@ export class WebGLRenderer {
 
 			if (child.$useTranslate) {
 				const m = child.$getMatrix();
-				ox = offsetX + child.$x;
-				oy = offsetY + child.$y;
+				ox = offsetX + m.tx;
+				oy = offsetY + m.ty;
 				savedMatrix = Matrix.create();
 				savedMatrix.copyFrom(buffer.globalMatrix);
 				buffer.transform(m.a, m.b, m.c, m.d, ox, oy);

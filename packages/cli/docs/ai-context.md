@@ -1,7 +1,12 @@
 # @kurot/cli — AI context map
 
+CLI 3.5.0 is published, verified on npm on 2026-10-09. Development installs
+published ui-document 0.13.0 with a matching
+registry lockfile, without local overrides. Read
+[centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
+
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. Version `@kurot/cli@3.4.0` is published, runs on Node.js 20+,
+explains the plugin pipeline. Version `@kurot/cli@3.5.0` is published, runs on Node.js 20+,
 and is installed as a project dev dependency.
 
 ## Directory map
@@ -54,13 +59,18 @@ assets are adapted by `kui/kui-parser.ts` to the compiler-private `SkinIR`,
 then `skin-module-builder.ts` bundles generated factories.
 
 A Skin document root declares `class`, the generated skin registration name,
-and may declare `states`. The Skin is the visual root container: its properties
-and layout apply to the runtime Skin, and its direct visual children become
-`skin.elementsContent` without an extra Group. Overrides use local
+and may declare `states`. The native Skin is nonvisual: root dimensions
+configure its size metadata, and its direct visual children become
+`skin.elementsContent` on the host Component without an extra Group. Display
+transforms such as `flipX`/`flipY` belong on those children. Overrides use local
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.4.0 requires published `@kurot/ui-document@^0.12.0`. Schema-defined strings, including
+CLI 3.5.0 validates centered-flip booleans on display nodes and named-state
+overrides, including CLI-only controls. Malformed values and flags on the
+nonvisual Skin root fail compilation. Negative scales are preserved.
+
+CLI 3.5.0 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -203,6 +213,7 @@ skin-module-builder.ts reads the entire stylesheet once per build and passes it
 through parseToIR/parseKUISkin. Resolve resource defaults, then Label presets, then colors before
 native emission; retain XML references and local/state precedence. compileKUI
 accepts an optional styleSheet. style.json changes already trigger whole-Skin
-rebuilds. Invalid presets retain the last successful bundle. The dependency and
-lockfile use published ui-document 0.11.0 without a local override. textStyle is
+rebuilds. Invalid presets retain the last successful bundle. The 3.3.0 dependency and
+lockfile used published ui-document 0.11.0 without a local override. Current
+CLI 3.5.0 development uses published ui-document 0.13.0. textStyle is
 Default-only; individual named-state fields can still override preset properties.

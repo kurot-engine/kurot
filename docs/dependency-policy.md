@@ -23,22 +23,22 @@ flowchart LR
     atlas["@kurot/atlas: independent build tool"]
 ```
 
-The manifests are authoritative. Current Kurot package requirements are:
+The manifests are authoritative. Published-baseline Kurot package requirements are:
 
 | Package     | Ordinary Kurot dependency | Kurot peers                                       | Purpose                                                         |
 | ----------- | ------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
 | core        | bitmap-font `^0.1.0`      | None                                              | Headless font parsing and layout used by native rendering.      |
-| ui          | None                      | core `^2.3.0`                                     | Components use the application's Core objects.                  |
+| ui          | None                      | core `^2.4.0`                                     | Components use the application's Core objects.                  |
 | game        | None                      | core `^2.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
 | dragonbones | None                      | core `^2.1.1`                                     | Animation displays and meshes use the application's Core.       |
-| ui-runtime  | None                      | core `^2.3.0`, ui `^3.3.0`, ui-document `^0.12.0` | Materializes a document into the application's Core/UI objects. |
-| cli         | ui-document `^0.12.0`     | None                                              | Compiles KUI at build time.                                     |
+| ui-runtime  | None                      | core `^2.4.0`, ui `^3.4.0`, ui-document `^0.13.0` | Materializes a document into the application's Core/UI objects. |
+| cli         | ui-document `^0.13.0`     | None                                              | Compiles KUI at build time.                                     |
 | ui-document | None                      | None                                              | Headless authoring, validation and serialization.               |
 | bitmap-font | None                      | None                                              | Headless font data, validation and layout.                      |
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
 
 Core 2.3.2 is published with render-only text-outline margins. This correction adds no API
-or resource-format requirement. All current UI/Game/DragonBones/ui-runtime/Spine
+or resource-format requirement. Published UI/Game/DragonBones/ui-runtime/Spine
 Core peers accept 2.3.2 without another SDK release or raised minimum.
 Development lock adoption is optional. Editor 0.22.1's local trial pins published
 Core 2.3.2 with an updated Bun lockfile and rebuild. Reskin,
@@ -48,8 +48,8 @@ bitmap-font do not depend on Core, and legacy Core 1.x projects are unaffected.
 
 Core 2.3.1 and UI 3.3.0 are published. The Core patch
 fixes unstyled blank rich-run heights without new API requirements. UI raises its real Core
-minimum because RichLabel uses the new TextField.measureText API. UI development
-dependencies and its lockfile now resolve Core 2.3.1 from npm without overrides.
+minimum because RichLabel uses the new TextField.measureText API. UI 3.3.0 release development
+dependencies and its lockfile resolve Core 2.3.1 from npm without overrides.
 Existing published UI 3.2.0 keeps Core ^2.2.0; Game, DragonBones, Spine and
 ui-runtime already accept Core 2.3.0. They need no release merely to accept it.
 Applications/templates adopt installed versions separately. The current KUI
@@ -186,3 +186,13 @@ is involved. Record the tested versions without raising unrelated peer minima.
 References: [npm dependency fields](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/),
 [npm caret ranges](https://github.com/npm/node-semver#caret-ranges-123-025-004),
 [targeted pnpm updates](https://pnpm.io/cli/update).
+
+## Centered flip releases
+
+Core 2.4.0, UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0
+are published, verified on npm on 2026-10-09. UI/CLI/runtime development
+installations and locks resolve their required upstream registry packages without
+local overrides. Editor 0.24.0 explicitly adopts this chain. Each release changes shipped behavior or an adopted API,
+so this feature requires those specific releases. Game, DragonBones, Spine,
+bitmap-font and atlas are unchanged. Read [centered flips](centered-flips.md)
+for new minimums, temporary local verification and registry lock refresh order.
