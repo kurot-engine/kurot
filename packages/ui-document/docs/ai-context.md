@@ -238,11 +238,10 @@ for conversion and compilation boundaries.
 
 The package describes and validates fitting policy; it does not measure text,
 derive font sizes or import runtime classes. The semantic format remains 2.
-Published CLI 3.3.0 and ui-runtime 0.8.2 consume this catalog through
-^0.11.0 without local overrides. Runtime 0.8.1 uses ^0.10.0, which excludes this
-0.11.0 release. Editor 0.19.2 adopts the matching published packages.
-Rendering requires Core >= 2.1.0 and
-the matching UI Label implementation.
+Current CLI 3.5.0 and runtime 0.10.0 consume this catalog through document
+^0.13.0 without local overrides. Fitting's native API minimum remains Core
+2.1.0/UI 3.1.0; current runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for its
+centered-flip contract.
 See [text authoring](text-layout.md) for defaults, XML preservation and
 validation boundaries, and [Label text layout](../../ui/docs/label-text-layout.md)
 for native rendering behavior.

@@ -2,8 +2,8 @@
 
 This is a **breaking resource format change**, introduced with Core 2.0,
 CLI 3.0, ui-document 0.7 and ui-runtime 0.6. Later releases retain the same
-object-valued frame map and local-override rules. Published CLI 3.3.0 and ui-runtime 0.8.2
-use ui-document `^0.11.0`; UI's Rectangle setter needs no additional API.
+object-valued frame map and local-override rules. Current CLI 3.5.0 and runtime
+0.10.0 require document `^0.13.0`; UI's Rectangle setter needs no additional API.
 
 ## Authored configuration
 
@@ -81,11 +81,11 @@ consumes that opt-out. A failed manifest rebuild retains the last good Skin
 bundle in watch mode. Manifest edits rebuild all dependent Skin factories;
 resource/component watch builds are serialized.
 
-CLI 3.3.0 and ui-runtime 0.8.2 require ui-document `^0.11.0`. UI 3.1.0 and
-ui-runtime 0.8.2 require Core `^2.1.0`; ui-runtime also requires UI `^3.1.0`.
+Current CLI 3.5.0 and runtime 0.10.0 require document `^0.13.0`. UI 3.4.0 and
+runtime 0.10.0 require Core `^2.4.0`; runtime also requires UI `^3.4.0`.
 Game 2.0.0 accepts Core `^2.0.0`. Core 2.1.1 adds the nested/rotated scroll
 clipping fix without changing this resource contract.
 
-Published ui-runtime 0.8.2 is installed by Editor 0.19.2. The KUI sample and
-engine examples use the published CLI 3.3.0. Convert old sheets in the Editor before
+The Editor working tree uses CLI 3.5.0/runtime 0.10.0. The KUI sample and
+engine examples retain published CLI 3.3.1. Convert old sheets in the Editor before
 moving applications to the new package set. Old EXML projects can remain on CLI 1.3.x.

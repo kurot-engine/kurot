@@ -58,10 +58,10 @@ hardcoded universal white. Build-time expansion does not add live game theme swi
 
 ## Adoption
 
-CLI and Editor must share the parser and stylesheet contract. Published CLI
-3.3.0 and ui-document 0.11.0 support fonts, colors and Label presets. Existing
-`^0.9.0` and `^0.10.0` dependency/peer ranges exclude 0.11.0. Published runtime 0.8.2
-requires `^0.11.0`; applications expand presets and resolve colors in
+CLI and Editor must share the parser and stylesheet contract. Current CLI
+3.5.0 and runtime 0.10.0 require document `^0.13.0`, retaining fonts, colors and
+Label presets. Older 0.x dependency/peer ranges do not automatically accept
+0.13.0. Applications expand presets and resolve colors in
 preview copies before materialization. Color-only consumers may register the
 palette as color design tokens. No Core/UI rendering change is required. Consumers read the
 optional configuration, load/register fonts and resolve colors before materialization;
@@ -124,11 +124,10 @@ configuration or preset references fail explicitly; the resolver performs no I/O
 Font loading remains a consumer responsibility. No live theme switching or native
 renderer change is required. SchemaVersion stays 1 and document format stays 2.
 
-Version 0.11.0 is published. These APIs are not in ui-document 0.10.0 or CLI
-3.2.1. Published CLI 3.3.0 uses the registry kernel through `^0.11.0`, without
-a local override. The KUI sample and engine examples use this compiler.
-Published ui-runtime 0.8.2 uses the same peer/development range;
-runtime 0.8.1 excludes the new kernel. Editor 0.19.2 installs all three registry packages.
-Callers expand presets before its unchanged native materializer without a
-Core/UI update. Editor and application locks must use the same published
+Presets were introduced in document 0.11.0, CLI 3.3.0 and runtime 0.8.2.
+Document 0.10.0/CLI 3.2.1 lack these APIs. Current CLI 3.5.0 and runtime 0.10.0
+use registry document `^0.13.0` without overrides; the KUI sample and engine
+examples retain CLI 3.3.1. Preset expansion itself needs no new Core/UI API,
+but installing runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for centered flips.
+Editor and application locks must use the same published
 kernel contract; do not silently upgrade legacy EXML projects.

@@ -1,6 +1,6 @@
 # Label text compilation
 
-CLI 3.4.0 consumes ui-document 0.12.x and compiles KUI text-fitting properties
+CLI 3.5.0 consumes ui-document ^0.13.0 and compiles KUI text-fitting properties
 through the existing UIDocument → SkinIR → ESM factory pipeline. The semantic
 document format remains version 2.
 
@@ -35,6 +35,8 @@ introduces build-time text measurement. See the
 ## Runtime boundary
 
 - The application must install UI `^3.1.0` and Core `^2.1.0` for shrinking.
+  These are the feature's original API minimums. Installing current UI 3.4.0
+  requires Core `^2.4.0` for that package's centered-flip contract.
   They remain application dependencies; CLI depends on the headless document
   package rather than importing the engine into the build process.
 - `textFit` is `none` by default or `shrink` for ordinary single-line Labels.

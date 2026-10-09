@@ -5,6 +5,10 @@ keeps semantic format version 2. The native components are published in UI
 3.3.0, with Core ^2.3.0 required by UI; Core 2.3.1 contains the blank-rich-run
 measurement correction. No opened project is migrated or given new fields.
 
+Current document 0.13.0 retains these types. CLI 3.5.0/runtime 0.10.0 require
+document ^0.13.0; current UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for
+centered flips. The text types were originally integrated by CLI 3.4.0/runtime 0.9.0.
+
 ## Choose the component
 
 | Component     | Content                                | Appearance                                                          | Layout                                             |
@@ -114,12 +118,12 @@ Parsing rejects malformed flow syntax and run styles immediately.
 
 ## Adoption boundary
 
-This kernel release alone does not make old compilers or materializers instantiate
-the new components. Published CLI 3.3.1 and ui-runtime 0.8.2 depend on ^0.11.0,
-which excludes 0.12.0, and lack the new built-in registrations. Adopting the new types requires explicit upgrades to published CLI 3.4.0
-and ui-runtime 0.9.0, which include these integrations.
-CLI requires document ^0.12.0; runtime requires document ^0.12.0, UI ^3.3.0 and
-Core ^2.3.0. UI 3.3.0
+The original document 0.12.0 release did not make old compilers or materializers
+instantiate the new components. CLI 3.3.1 and runtime 0.8.2 depend on ^0.11.0,
+which excludes 0.12.0, and lack the new built-in registrations. The first matching
+integrations were CLI 3.4.0 and runtime 0.9.0.
+Those initial CLI 3.4.0/runtime 0.9.0 releases require document ^0.12.0;
+runtime 0.9.0 also requires UI ^3.3.0 and Core ^2.3.0. UI 3.3.0
 already supplies the native classes; Core/UI need no further version bump for
 this headless addition. Other SDKs, templates and existing projects remain on
 their current contracts until they deliberately adopt the authoring feature.

@@ -63,10 +63,11 @@ or automatic migration occurs in this package.
 
 ## Consumers and migration
 
-Published CLI 3.3 and ui-runtime 0.8.2 consume the fitting catalog through ui-document ^0.11.0.
-Consumers on earlier ^0.9.0 dependency/peer ranges must update before adopting styles;
-the fitting metadata and semantic format remain unchanged. Native rendering requires
-Core >= 2.1.0 and UI >= 3.1.0. The public UI contract describes
+Current CLI 3.5.0 and runtime 0.10.0 consume the fitting catalog through document
+^0.13.0. Older 0.x dependency/peer ranges do not automatically accept it;
+the fitting metadata and semantic format remain unchanged. Fitting's original
+native API minimum is Core 2.1.0/UI 3.1.0. Current runtime 0.10.0 requires Core
+^2.4.0/UI ^3.4.0 for centered flips. The public UI contract describes
 fit bounds, state restoration and font-readiness invalidation in detail.
 
 Explicit `multiline="false"` previously did not prevent dynamic text wrapping.

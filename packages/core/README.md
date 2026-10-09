@@ -13,8 +13,9 @@ A modern rewrite of the Egret game engine. Maintains Egret-compatible display ob
 backends and bitmap caches. Repeat uses the original texture dimensions, including
 transparent trim margins; partial edge tiles are cropped rather than stretched.
 Nine-slice remains active only for `scale`. No XML or resource migration is needed.
-Core 2.3.3 is published; Core 2.3.2 does not include this fix. Existing
-Core 2.x peers accept the patch without another SDK release. Applications adopt
+Core 2.3.3 is published; Core 2.3.2 does not include this fix. UI 3.3.0/runtime
+0.9.0 and Game/DragonBones/Spine peers accept it without SDK bumps. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes it. Applications adopt
 its installation/lock and rebuild; templates are not rewritten.
 See [bitmap fill modes](docs/bitmap-fill.md).
 
@@ -25,8 +26,9 @@ Canvas drawing, WebGL text textures, display-list caches, filter captures and
 object-mask buffers. Rich-text run strokes are included. Layout measurements,
 wrapping and alignment retain their existing dimensions; input viewports and
 external clips remain exact. This fix is not included in published 2.3.1.
-No API or resource-format migration is required. Existing UI, Game, DragonBones,
-Spine and ui-runtime Core peers accept this patch without another SDK release.
+No API or resource-format migration is required. UI 3.3.0/runtime 0.9.0 and
+Game/DragonBones/Spine peers accept the patch without SDK bumps. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes it.
 Update the application's installation and lockfile, then rebuild; existing
 bundled Editor Apps retain their old Core until rebuilt.
 See [text layout](docs/text-layout.md#text-outlines-core-232).
@@ -35,8 +37,9 @@ See [text layout](docs/text-layout.md#text-outlines-core-232).
 
 An unstyled blank run between styled runs now uses the TextField base font size,
 matching other unstyled content, rather than borrowing a later run's size.
-Core 2.3.1 is published as a compatible patch. Existing Core 2.x
-peers accept it without dependent SDK version bumps.
+Core 2.3.1 is published as a compatible patch. Consumers whose Core peer range
+accepts it need no SDK bump. Current UI 3.4.0/runtime 0.10.0 require Core ^2.4.0,
+which includes the correction.
 
 ## Independent text measurement in 2.3.0
 
@@ -384,8 +387,8 @@ to arbitrary `Bitmap` objects. See the
 [resource format](docs/resource.md) and
 [nine-slice contract](../ui-document/docs/resource-nine-slice.md).
 
-The optional `resource/config/style.json` is handled by published ui-document 0.11.0 and
-CLI 3.3.0, including named colors and Label presets. Core does not read this file or interpret `@style:colors:<key>` XML
+The optional `resource/config/style.json` is handled by current document 0.13.0 and
+CLI 3.5.0, including named colors and Label presets. Core does not read this file or interpret `@style:colors:<key>` XML
 references. Compiled skins receive numeric RGB values; the application loads
 fonts before measuring text. See the
 [project style contract](../ui-document/docs/project-styles.md).
@@ -402,5 +405,6 @@ Widths/heights are layout constraints; use scaleX/scaleY to resize the artwork.
 Height admits complete lines, and explicit `multiline = false` keeps the first
 hard-separated line unwrapped. `BitmapText.EMPTY_FACTOR` is deprecated in favor
 of `font.data.spaceAdvance`. See the linked contracts before migrating custom
-bitmap-text measurements. KUI tags and Editor materialization need separate
-consumer releases.
+bitmap-text measurements. Native UI BitmapLabel was introduced in UI 3.2.0;
+current UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0 include its native,
+authoring, compilation and materialization contracts. Editor adoption is separate.

@@ -1,9 +1,10 @@
 # Kurot UI Authoring Architecture
 
-This document defines the intended UI authoring architecture for Kurot. It is
-the source of truth for how editable UI assets, the future visual editor,
-Agent-assisted authoring, runtime preview, reusable components, skins, and
-production compilation fit together.
+This document records UI authoring ownership and the longer-term collaboration
+design. The implementation snapshot in section 3 was audited on 2026-10-10;
+later workflow and roadmap sections describe the broader target where it is
+not yet implemented. Package `docs/ai-context.md` files and manifests define
+current APIs and version requirements.
 
 The objective is not to replace one markup syntax with another. The objective
 is a durable collaboration loop in which a person can describe a large change
@@ -63,13 +64,14 @@ an exact node and property path.
 
 The future model must not inherit EXML namespaces, reflection rules, global
 component exports, stringly typed attributes, or EUI-specific skin lookup merely
-for compatibility. Existing EXML support remains an independent current
-workflow until the new workflow is ready; it does not constrain the new model.
+for compatibility. Legacy EXML projects remain on the independent CLI 1.3.x
+line. Current CLI 3.5.0 compiles KUI XML.
 
 ### 1.5 Serialization syntax is not the semantic model
 
-`UIDocument` is the normalized in-memory meaning of an asset. XML, JSON, or a
-future `.kui` syntax may serialize that meaning. The editor, runtime, Agent
+`UIDocument` is the normalized in-memory meaning of an asset. Canonical
+`.kui.xml` serializes Skin appearance assets; screens and semantic reusable
+components remain programmatic. The editor, runtime, Agent
 tools, and compiler must depend on the semantic model rather than a particular
 text syntax.
 
@@ -81,8 +83,8 @@ editor-only interpretation that differs from production is unacceptable.
 
 ## 2. Terminology
 
-The exact public type names remain subject to design, but the concepts are
-distinct.
+Public type names are defined by `@kurot/ui-document`; the concepts below
+describe their ownership boundaries.
 
 | Term | Meaning |
 | --- | --- |
@@ -103,20 +105,24 @@ pressed, selected, and disabled visuals are an appearance or skin.
 
 ## 3. Current position
 
-Kurot has completed the lower semantic-to-runtime proof and the version 2
-reusable authoring-asset model, not the full editor or production pipeline.
+Published Core 2.4.0, UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0
+provide the current SDK chain. Document format remains 2. CLI compiles Skin
+appearances from KUI XML, and the separate Kurot Editor edits those same files.
+Semantic screen/component assets and incremental preview reconciliation retain
+their narrower programmatic/runtime boundary.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.5.0` currently provides:
+`@kurot/ui-document@0.13.0` provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
-- deterministic traversal, lookup, JSON parsing, and JSON serialization;
+- deterministic traversal, lookup, canonical Skin KUI XML parsing/serialization;
 - structural validation with stable diagnostics and exact paths;
 - component definitions, property definitions, inheritance, and deterministic
   registry resolution;
-- an audited foundation catalog for `kui.Group`, `kui.Label`,
+- an audited foundation catalog for `kui.Group`, `kui.Label`, `kui.BitmapLabel`,
+  `kui.RichLabel`,
   `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
   `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput`;
 - screen, reusable-component, and appearance asset kinds;
@@ -139,11 +145,13 @@ reusable authoring-asset model, not the full editor or production pipeline.
   states, and typed or required appearance parts;
 - directional binding validation across types, ranges, enums, resource
   categories, and token categories.
+- resource nine-slice defaults, project fonts/colors and Label appearance presets;
+- literal rich-text Span properties and inherited centered-flip metadata.
 
-`@kurot/ui-runtime@0.5.6` currently provides:
+`@kurot/ui-runtime@0.10.0` provides:
 
 - validation before materialization;
-- deterministic construction of the nine audited foundation components,
+- deterministic construction of the eleven audited foundation components,
   including the application-facing `TextInput` and its low-level
   `EditableText` appearance part;
 - application of audited display, layout, text, image, rectangle, and button
@@ -171,20 +179,28 @@ reusable authoring-asset model, not the full editor or production pipeline.
 - structured runtime errors;
 - a real browser preview proving that a semantic document becomes a rendered
   Kurot display tree.
+- native BitmapLabel/RichLabel materialization and typed text-flow bindings;
+- centered-flip property assignment, state restoration and transactional rollback.
 
 The existing `@kurot/ui` package already owns the real UI behavior: measurement,
 layout, validation, skins, states, bindings, collections, themes, and controls.
-The existing CLI still compiles EXML for current projects.
+CLI 3.5.0 parses canonical KUI XML through document ^0.13.0 and emits ESM Skin
+factories, theme output and typed skin-part declarations. It also handles project
+namespace components and development resource synchronization. The separate
+Editor 0.27.1 working tree declares this published SDK chain and implements
+Skin open/save, hierarchy/property editing, preview, resources and undo/redo;
+its desktop publication status belongs to that repository.
 
 ### 3.2 Not implemented
 
 The following are still design or implementation work:
 
 - incremental runtime reconciliation after an edit;
-- a visual editor shell;
-- Agent tools and context assembly;
-- static `UIDocument`-to-TypeScript/JavaScript compilation;
-- a final persisted `.kui` syntax and migrations.
+- the full Agent collaboration workflow and context assembly, which belong to
+  the Editor/Agent integrations rather than these SDK packages;
+- static compilation of semantic screen/reusable-component assets beyond
+  current Skin compilation;
+- authored file syntax for those programmatic asset kinds.
 
 ### 3.3 Honest interpretation
 
@@ -195,22 +211,22 @@ graph as real Kurot components. Its completed boundary is:
 UIAssetRegistry + root UIDocument → validated reusable component tree
 ```
 
-This now proves the document-to-runtime seam for the bounded Phase 3 slice, but
-it is still full-tree materialization rather than live reconciliation. Editor
-interaction and production compilation remain future work. It does not replace
-EXML in existing projects today.
+Runtime execution remains full-tree materialization rather than incremental
+reconciliation. Skin editing and KUI-to-ESM production compilation are already
+implemented. They do not imply compilation of every semantic asset kind, and
+legacy EXML applications retain their independent CLI 1.3.x workflow.
 
 | Capability | Status | Evidence / missing boundary |
 | --- | --- | --- |
-| Basic semantic tree | Implemented | Versioned documents, stable node IDs, validation, traversal, deterministic JSON. |
-| Foundation component schema | Partial | Nine components are audited; the full authoring catalog and structured schemas are incomplete. |
+| Basic semantic tree | Implemented | Format 2, stable node IDs, validation, traversal and canonical Skin KUI XML. |
+| Foundation component schema | Partial | Eleven components are audited; the full authoring catalog and structured schemas are incomplete. |
 | Semantic-to-runtime materialization | Implemented for the first slice | Real components, reusable instances, properties, layouts, Slots, adapters, errors, tests, and browser preview. |
 | Editable asset kinds and reuse | Implemented for creation and states | Screens, components, compact instances, parameter bindings, parts, Slots, component variants/states, cross-document validation, runtime expansion, and golden fixtures. |
 | Appearance, states, bindings, resources | Implemented for the first slice | Native appearance states and selected variants, data bindings, semantic actions, numeric transitions, design tokens, and category-specific resource adapters execute at runtime. Project Spine and animation components remain application adapters. |
 | Editing operations and history | Implemented | Typed semantic operations, atomic transactions, expected revisions, inverse operations, deterministic diffs, and monotonic undo/redo history. |
-| Visual editor | Not started | The current preview is a developer smoke page, not an editor. |
-| Agent collaboration | Not started | Schemas exist, but there is no editing tool protocol or context coordinator. |
-| Static UI compiler | Not started | The CLI still compiles EXML; it does not compile the new semantic assets. |
+| Visual editor | Implemented for KUI Skins in a separate repository | Kurot Editor provides file editing, hierarchy, Inspector, preview, resources and history; broader semantic asset workflows remain separate. |
+| Agent collaboration | Separate integration work | SDK schemas and transactions exist; the full Agent workflow is outside this engine audit. |
+| Static UI compiler | Implemented for KUI Skins | CLI 3.5.0 emits ESM Skin factories and typed parts; semantic screen/reuse compilation remains pending. |
 
 ## 4. Target collaboration workflow
 
@@ -605,10 +621,10 @@ it must not introduce semantics different from full materialization.
 
 ## 11. Serialization and file syntax
 
-The persisted authoring syntax remains an open implementation decision. A
-hierarchical XML-like `.kui` format may be concise for humans and Agents; JSON
-is convenient for structured tools and transport. Either can be supported by a
-format adapter.
+Canonical `.kui.xml` is the authored syntax for Skin appearance assets. The
+headless kernel owns parsing and serialization; CLI adapts the parsed document
+to SkinIR and emits ESM factories. Screen and semantic reusable-component
+documents remain programmatic; their persisted authoring syntax is not promised.
 
 The required guarantees are independent of syntax:
 
@@ -621,8 +637,9 @@ The required guarantees are independent of syntax:
 - editor metadata clearly separated from runtime semantics;
 - generated factories never used as the editable source.
 
-The current deterministic JSON API remains useful for testing, transport, and
-early tooling. It does not settle the final human-facing `.kui` syntax.
+Normalized document objects support programmatic creation and transport. They
+do not add a second authored JSON syntax or restore the earlier JSON parser
+contract. See [KUI XML](packages/ui-document/docs/kui-xml.md).
 
 ## 12. Production compilation
 
@@ -699,6 +716,10 @@ authoring packages. The editor must never become a production engine
 dependency.
 
 ## 14. Delivery roadmap
+
+These phases record the original broader delivery plan, not a current release
+sequence. Skin editing and static Skin compilation were delivered independently
+of full semantic screen/reuse authoring. Section 3 records current scope.
 
 The roadmap is ordered by dependency rather than visual appeal. Building an
 editor shell before the mutation and reuse contracts are stable would create a

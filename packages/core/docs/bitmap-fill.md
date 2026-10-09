@@ -35,9 +35,10 @@ invalid periods, fractional dimensions and nine-slice precedence. The minified
 native Canvas patterns on Canvas/WebGL 1/WebGL 2 at 1x/2x, including rotation,
 tint, cache updates and the existing scale path.
 
-There are no new APIs or dependencies. Existing UI, Game, DragonBones, Spine and
-ui-runtime Core peers accept this patch. Their SDK versions and minimum ranges
-do not change; optional development lock adoption is separate. Editor's local
+There are no new APIs or dependencies. UI 3.3.0/runtime 0.9.0 and
+Game/DragonBones/Spine peers accept this patch without SDK bumps. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for centered flips; that release
+includes the fill correction. Optional development lock adoption is separate. Editor's local
 0.23.1 trial bound one built Core through `KUROT_CORE_PATH` while retaining its
 published 2.3.2 dependency lock. Editor 0.23.2 adopts registry Core 2.3.3 and
 updates its Bun lock; ordinary builds no longer require a local engine checkout.

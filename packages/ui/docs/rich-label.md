@@ -3,6 +3,9 @@
 Native API introduced in UI 3.3.0, requiring Core ^2.3.0. Core 2.3.1 is
 published and installed from npm for this release's build and verification.
 
+Current UI 3.4.0 retains RichLabel and requires Core ^2.4.0 for centered flips.
+Its development installation and lock use published Core 2.4.0.
+
 ```ts
 import { RichLabel } from '@kurot/ui';
 
@@ -67,7 +70,8 @@ call `label.invalidateSize()` to clear both component and native text metrics,
 then allow normal layout validation. RichLabel does not load font files or
 install global font-loading listeners.
 
-Published ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 provide RichLabel
+Authoring support was introduced in document 0.12.0, CLI 3.4.0 and runtime 0.9.0.
+Current document 0.13.0, CLI 3.5.0 and runtime 0.10.0 retain RichLabel
 authoring, KUI compilation and materialization. Earlier versions lack these
 built-in registrations. Editor controls are owned by the separate application;
 all consumers retain textFlow ownership and separation from Label presets.

@@ -51,7 +51,8 @@ See [RichLabel](docs/rich-label.md) for defaults, measurement and font readiness
 BitmapLabel now also honors maxWidth during automatic measurement. Both text
 components remeasure automatic height when an authored width changes.
 
-UI 3.3.1 builds and tests against published Core 2.3.1 without local overrides.
+The unpublished UI 3.3.1 snapshot built and tested against registry Core 2.3.1.
+Current UI 3.4.0 builds and tests against registry Core 2.4.0 without overrides.
 These native APIs do
 not add KUI tags or an Editor rich-text authoring interface by themselves.
 
@@ -83,9 +84,9 @@ measurement; after late loading, call `label.invalidateSize()` to refresh
 metrics even if the family name is unchanged.
 
 See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
-metadata was introduced in ui-document 0.9.0 and remains supported in 0.11.0.
-Native text KUI projects use published CLI 3.4.0 with ui-document `^0.12.0`;
-published ui-runtime 0.9.0 uses the same kernel range. Programmatic UI depends
+metadata was introduced in document 0.9.0 and remains supported in 0.13.0.
+Current CLI 3.5.0 and runtime 0.10.0 use document `^0.13.0`.
+Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`. Programmatic UI depends
 only on Core.
 
 ## Installation
@@ -96,15 +97,16 @@ pnpm add @kurot/ui@^3.4.0 @kurot/core@^2.4.0
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.3 requires Core 2.3.0 or later within Core 2.x for independent rich-text
-measurement as well as BitmapText rendering and font resources. Core installs its published bitmap-font dependency automatically.
+UI 3.4.0 requires Core ^2.4.0 for the centered-flip frame hook, in addition to
+the native text APIs introduced in Core 2.2/2.3. Core installs its published
+bitmap-font dependency automatically.
 Refresh older Core/UI lockfiles and old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 ## Project style colors
 
-CLI 3.3.0 resolves Label presets and named colors from the optional
+CLI 3.5.0 resolves Label presets and named colors from the optional
 `resource/config/style.json` into native UI properties, including state overrides:
 
 ```xml

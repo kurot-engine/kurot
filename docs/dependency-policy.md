@@ -38,8 +38,10 @@ The manifests are authoritative. Published-baseline Kurot package requirements a
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
 
 Core 2.3.2 is published with render-only text-outline margins. This correction adds no API
-or resource-format requirement. Published UI/Game/DragonBones/ui-runtime/Spine
-Core peers accept 2.3.2 without another SDK release or raised minimum.
+or resource-format requirement. UI 3.3.0/runtime 0.9.0 and Game/DragonBones/Spine
+peers accept 2.3.2 without another SDK release or raised minimum. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for centered flips; that release
+includes this text-outline correction.
 Development lock adoption is optional. Editor 0.22.1's local trial pins published
 Core 2.3.2 with an updated Bun lockfile and rebuild. Reskin,
 examples and Core 2.x templates can adopt it through their accepted ranges and
@@ -50,10 +52,10 @@ Core 2.3.1 and UI 3.3.0 are published. The Core patch
 fixes unstyled blank rich-run heights without new API requirements. UI raises its real Core
 minimum because RichLabel uses the new TextField.measureText API. UI 3.3.0 release development
 dependencies and its lockfile resolve Core 2.3.1 from npm without overrides.
-Existing published UI 3.2.0 keeps Core ^2.2.0; Game, DragonBones, Spine and
-ui-runtime already accept Core 2.3.0. They need no release merely to accept it.
-Applications/templates adopt installed versions separately. The current KUI
-CLI 3.4.0 and ui-runtime 0.9.0 are published with the new registrations;
+Published UI 3.2.0 keeps Core ^2.2.0; Game, DragonBones, Spine and runtime 0.8.2
+accept Core 2.3.0. They need no release merely to accept it.
+Applications/templates adopt installed versions separately. The initial KUI
+CLI 3.4.0 and ui-runtime 0.9.0 integrations are published with the new registrations;
 older catalog/materializer implementations do not acquire RichLabel support
 through a compatible Core/UI lock update.
 

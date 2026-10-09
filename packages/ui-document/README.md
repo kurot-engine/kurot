@@ -69,10 +69,10 @@ Omitted defaults are not inserted into XML. Explicit `multiline="false"` uses
 Core 2.1.0's single-line behavior; remove the flag or set it to true for wrapping.
 The semantic format remains version 2, and files are not migrated automatically.
 See the [text authoring contract](docs/text-layout.md) for validation and
-consumer requirements. This package models these fields; native rendering uses
-UI 3.1.0 and Core 2.1.0 or later within Core 2.x. CLI 3.3.0 consumes this kernel
-at build time. Published ui-runtime 0.8.2 requires ui-document `^0.11.0`;
-runtime 0.8.1 excludes this kernel and must be upgraded alongside it.
+consumer requirements. This package models these fields; the original native
+API minimum is UI 3.1.0/Core 2.1.0. Current CLI 3.5.0 and runtime 0.10.0 use
+document `^0.13.0`; runtime also requires UI `^3.4.0` and Core `^2.4.0`.
+Earlier 0.x kernel ranges do not automatically accept this release.
 
 ## Installation
 
@@ -367,7 +367,8 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.8.2` validates and materializes format-version-2 assets,
+`@kurot/ui-runtime@0.10.0` uses document `^0.13.0` and validates/materializes
+format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition
@@ -438,9 +439,9 @@ colors report the semantic path, and other token categories stay unresolved.
 
 This is an XML syntax change: the previous `@token:color:<key>` prefix is
 rejected. Update authored color references explicitly; files are not migrated
-automatically. Published CLI 3.3.0 depends on `^0.11.0` and resolves stylesheet
-colors and Label presets during KUI compilation. Runtime 0.8.2 adopts the same
-range and is published;
+automatically. Current CLI 3.5.0 depends on document `^0.13.0` and resolves
+stylesheet colors and Label presets during KUI compilation. Runtime 0.10.0
+requires the same document range;
 consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
@@ -457,7 +458,7 @@ retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and release order.
-Version 0.11.0 and CLI 3.3.0 are published. CLI compiles presets with the
-registry kernel through `^0.11.0`, without a local override. CLI 3.2.1 does not
-support presets. Published ui-runtime 0.8.2 uses the same kernel range;
-runtime 0.8.1 excludes it. Editor 0.19.2 adopts all three registry packages.
+Presets were introduced in document 0.11.0 and CLI 3.3.0; CLI 3.2.1 lacks them.
+Current CLI 3.5.0 and runtime 0.10.0 use document `^0.13.0` without overrides.
+Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`; preset expansion
+itself does not introduce a new native rendering requirement.

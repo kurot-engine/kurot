@@ -31,6 +31,8 @@ src/
 ```
 
 Project templates are under `templates/game` and `templates/empty`.
+The game template's looping mascot brand splash is unreleased; registry
+CLI 3.5.0 does not contain that HTML/logo refresh. See game-template.md.
 The 3.2.1 game template includes fixed style/locale configuration,
 English properties and licensed regular/bold font files. StyleManager finishes
 font loading before Main creates Player/Preloader; LocaleManager registers

@@ -46,6 +46,12 @@ correctness and performance validation system.
 
 ## Packages and dependencies
 
+Version audit: 2026-10-10. All nine package versions below match their manifests
+and npm `latest`; dependencies and peer ranges match the published metadata.
+Feature introductions and benchmark results retain their recorded release
+versions. CLI's new brand splash is unreleased; a source version does not prove
+that later checkout changes are included in the registry artifact.
+
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
@@ -97,13 +103,16 @@ adopt UI 3.4.0 with Core ^2.4.0 and rebuild. Other SDKs need no version bump.
 
 Core 2.3.3 is published. It restores Bitmap/Image repeat
 and clip in both backends and bitmap caches; see [fill modes](packages/core/docs/bitmap-fill.md).
-Existing Core peers accept it without dependent SDK releases. Editor 0.23.2
+UI 3.3.0/runtime 0.9.0 and Game/DragonBones peers accept it without dependent
+SDK releases. UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes the
+correction. Editor 0.23.2
 installs exact registry Core 2.3.3 with a matching Bun lock and uses ordinary builds.
 
 Core 2.3.2 is published with a compatible text-outline fix for
 Canvas/WebGL drawing, display-list caches and effect captures. Text measurements,
-wrapping, hit areas and external clip boundaries remain unchanged. Existing
-consumer peers accept it; applications update their installation/lock and rebuild
+wrapping, hit areas and external clip boundaries remain unchanged.
+UI 3.3.0/runtime 0.9.0 and Game/DragonBones peers accept it; UI 3.4.0/runtime
+0.10.0 require Core ^2.4.0, which includes it. Applications update their lock and rebuild
 to adopt it. Editor 0.22.1's local trial bundles published Core 2.3.2; templates,
 examples and other apps are unchanged. See [text outlines](packages/core/docs/text-layout.md#text-outlines-core-232).
 
@@ -126,8 +135,9 @@ Editor adoption is explicit; old apps and templates are unchanged.
 
 Core 2.2.1 is published. The patch
 fixes minified dictionary/emergency wrapping and keeps grapheme clusters intact
-in TextField word and character wrapping. Existing consumer peer ranges accept
-it. To adopt the fix, update the installed Core and lockfile; unchanged SDKs need
+in TextField word and character wrapping. UI 3.2.0/runtime 0.8.2 and
+Game/DragonBones peers accept it. Current UI 3.4.0/runtime 0.10.0 require Core
+^2.4.0, which includes it. To adopt the fix, update the Core installation/lock; unchanged SDKs need
 no new release. See
 [text layout](packages/core/docs/text-layout.md).
 
@@ -161,8 +171,9 @@ See [game template setup](packages/cli/docs/game-template.md).
 
 CLI 3.3.1 is published with development synchronization of all
 runtime resources, including atlas PNG/JSON, locale configuration, fonts and
-translations. Browser refresh remains manual. Engine examples, the KUI sample
-and the Editor working tree install CLI 3.3.1 from npm. Legacy EXML projects keep
+translations. Browser refresh remains manual. Engine examples and the KUI sample
+install CLI 3.3.1 from npm. The Editor working tree uses CLI 3.5.0 with document
+0.13.0 and runtime 0.10.0. Legacy EXML projects keep
 CLI 1.3.x. Source versions alone do not confirm publication or installed versions.
 See [resource watching](packages/cli/docs/dev-resource-watching.md).
 
@@ -186,7 +197,7 @@ is rejected, so update those references explicitly. See
 ui-runtime 0.8.2 adopts ui-document `^0.11.0`. Consumers expand Label presets
 and resolve colors in disposable copies; plain color-only consumers may register
 palette entries as design tokens. The runtime does not read style.json or load
-fonts. Editor 0.19.2 installs all three published packages without local overrides.
+fonts. Editor 0.19.2 adopted that historical package set without local overrides.
 The KUI sample and engine examples already use published CLI 3.3.1; the sample
 also uses ui-document 0.11.0 without local overrides.
 CLI-built skins run directly through UI and do not require ui-runtime. No

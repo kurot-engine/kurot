@@ -80,6 +80,8 @@ now controls fallback spaces. Line-height, trailing-advance and complete-line
 clipping follow the shared
 format contract rather than the old unrendered class's approximate measurements.
 
-The matching UI release provides BitmapLabel for native/programmatic skins;
-published UI 3.1.0 does not include it. KUI catalog/CLI adoption is separate;
-existing installed compilers do not gain a new tag automatically.
+UI 3.2.0 introduced native BitmapLabel; UI 3.1.0 does not include it. Current
+UI 3.4.0 retains it and requires Core ^2.4.0. Published document 0.13.0, CLI
+3.5.0 and runtime 0.10.0 support font authoring, compilation and materialization;
+existing installed compilers do not gain a new tag automatically. See
+[BitmapLabel](../../ui/docs/bitmap-label.md) for the feature's introduction versions.

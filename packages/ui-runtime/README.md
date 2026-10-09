@@ -26,9 +26,9 @@ authoring metadata. Older runtime 0.9.0 remains valid for native text on its
 published Core/UI/document chain. Public creation/controller APIs and semantic
 format version 2 remain unchanged; existing apps do not require an upgrade.
 
-Published CLI 3.3.0 uses ui-document 0.11.0 for build-time Label presets/colors and emits
+Current CLI 3.5.0 uses document ^0.13.0 for build-time Label presets/colors and emits
 skins that run directly through UI. That compilation path does not require
-ui-runtime. Runtime 0.8.2 and CLI 3.3.0 share the same document parser.
+ui-runtime. Runtime 0.10.0 and CLI 3.5.0 use the same document 0.13.x contract.
 See the [project style contract](../ui-document/docs/project-styles.md).
 
 ## Centered flips in 0.10.0

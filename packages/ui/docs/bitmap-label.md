@@ -11,6 +11,9 @@ width nor an explicit width is present, so wrapped height matches rendering.
 Changing an authored width also invalidates automatic height after layout.
 UI 3.3.0 builds and tests against published Core 2.3.1 without local overrides.
 
+Current UI 3.4.0 retains BitmapLabel and requires Core ^2.4.0 for centered flips.
+Its development installation and lock use published Core 2.4.0.
+
 ```ts
 import { BitmapLabel } from '@kurot/ui';
 
@@ -41,7 +44,8 @@ DisplayObject tint. Alignments position glyphs without scaling them. Set scaleX
 and scaleY for decorative number sizing. Default multiline=true; explicit false
 keeps the first hard-separated line unwrapped.
 
-Published ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 support BitmapLabel
+Authoring support was introduced in document 0.12.0, CLI 3.4.0 and runtime 0.9.0.
+Current document 0.13.0, CLI 3.5.0 and runtime 0.10.0 retain BitmapLabel
 authoring, KUI compilation and materialization. Earlier compilers do not accept
 this built-in XML tag; update applications explicitly when adopting it. Editor
 controls are owned by the separate application.

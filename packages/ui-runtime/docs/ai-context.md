@@ -212,9 +212,10 @@ Callers resolve resource defaults, then `resolveUILabelStyles()` with the parsed
 stylesheet, then colors into disposable copies of every root/appearance/component.
 The runtime does not read config or consume textStyle as a native property.
 Local/state fields win and native states restore the resolved baseline. Keep
-authored references for saving/history. This release adopts the published 0.11.0
-kernel without local overrides; runtime 0.8.1's ^0.10.0 range excludes it.
-Published CLI 3.3.0 uses the same preset expansion order at build time.
+authored references for saving/history. Runtime 0.8.2 originally adopted document
+0.11.0; runtime 0.8.1's ^0.10.0 range excludes that kernel. Current runtime
+0.10.0 uses published document ^0.13.0 without overrides, and CLI 3.5.0 uses
+the same preset expansion order at build time.
 
 ## Label text layout in 0.8.0
 

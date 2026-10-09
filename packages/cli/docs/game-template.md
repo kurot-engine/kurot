@@ -1,8 +1,8 @@
 # Project styles and languages in the game template
 
-CLI 3.2.1 is published with this template update. It adds
-project-owned initialization without changing Core/UI APIs or migrating existing
-projects. The empty template stays minimal.
+Project-owned style/font/language initialization was introduced in CLI 3.2.1
+and remains in published CLI 3.5.0. Existing projects keep their own startup
+code and HTML; the empty template stays minimal.
 
 ## Files
 
@@ -29,6 +29,8 @@ screen's startup messages stay in English because translations are not loaded ye
 Templates do not implement live font/theme/language replacement.
 
 ## HTML brand splash
+
+This splash is unreleased template work; npm CLI 3.5.0 does not include it.
 
 The game template's `web/index.html` presents `web/logo.png` beneath a small
 "Made with" caption. The mascot makes a gentle entrance, then repeats a playful

@@ -226,13 +226,14 @@ automatic bounds are not fed back as fit constraints.
 
 `label.invalidateSize()` also invalidates Core line metrics. Call it after
 late font loading, even if the family name did not change. This requires
-Core >= 2.1.0 for that API; UI 3.3.0's package requirement is Core ^2.3.0.
+Core >= 2.1.0 for that API; current UI 3.4.0 requires Core ^2.4.0 for its
+centered-flip frame hook.
 There is no global font-readiness listener.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
 font readiness and shared-schema boundaries. Native UI still depends only on
-Core; KUI authoring uses ui-document 0.11.x, published CLI 3.3.0 and
-published ui-runtime 0.8.2. Label presets expand in consumer-owned
+Core; current KUI authoring uses document 0.13.x, CLI 3.5.0 and runtime 0.10.0.
+Label presets expand in consumer-owned
 copies before native rendering; UI does not read style.json or consume textStyle.
 
 ## Bitmap labels in 3.2.0

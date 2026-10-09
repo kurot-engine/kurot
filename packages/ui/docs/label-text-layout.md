@@ -1,12 +1,12 @@
 # Label text layout and fitting
 
-Introduced in UI 3.1.0 with Core >= 2.1.0, this contract is unchanged in UI 3.2.0,
-which requires Core ^2.2.0. The public
+Introduced in UI 3.1.0 with Core >= 2.1.0, this fitting contract remains in
+UI 3.4.0, whose package requires Core ^2.4.0 for centered flips. The public
 `TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
 authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
-0.11.0. Published CLI 3.3.0 and ui-runtime 0.8.2 use ui-document `^0.11.0`.
-Runtime 0.8.0's `^0.9.0` and runtime 0.8.1's `^0.10.0` peer ranges exclude
-the current kernel. Label presets are expanded into native properties before
+0.13.0. Current CLI 3.5.0 and runtime 0.10.0 use document `^0.13.0`; runtime
+also requires UI `^3.4.0` and Core `^2.4.0`. Older 0.x kernel ranges do not
+automatically accept 0.13.0. Label presets expand into native properties before
 rendering; their precedence does not change fitting behavior. See the
 [project style contract](../../ui-document/docs/project-styles.md).
 

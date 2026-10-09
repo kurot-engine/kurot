@@ -90,7 +90,8 @@ repeat and clip in WebGL, Canvas and nested bitmap caches. Repeat retains origin
 texture periods, trim margins, rotated atlas regions and clipped edge tiles;
 nine-slice applies only to scale. See packages/core/docs/bitmap-fill.md.
 No API/resource/KUI/dependency migration or dependent SDK bump is required.
-UI/Game/DragonBones/Spine/ui-runtime peers already accept it. Editor 0.23.2
+UI 3.3.0/runtime 0.9.0 and Game/DragonBones/Spine peers accept it. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes the correction. Editor 0.23.2
 installs exact registry Core 2.3.3 with a matching Bun lock, replacing 0.23.1's
 explicit local trial binding. Ordinary builds need no local engine checkout.
 Templates, examples and Reskin are unchanged; their compatible installations
@@ -113,8 +114,10 @@ Core 2.3.2 is published. It fixes TextField outline clipping using render-only
 stroke margins in Canvas/WebGL, caches and effect captures, without changing
 layout or input/external clip boundaries; see packages/core/docs/text-layout.md.
 It is not included in published Core 2.3.1. No API migration, dependency-range
-change or dependent SDK bump is required. UI/Game/DragonBones/ui-runtime/Spine
-peers accept 2.3.2; their development locks may adopt it separately.
+change or dependent SDK bump is required. UI 3.3.0/runtime 0.9.0 and
+Game/DragonBones/Spine peers accept 2.3.2; current UI 3.4.0/runtime 0.10.0
+require Core ^2.4.0, which includes the fix. Development locks may adopt accepted
+versions separately.
 Editor 0.22.1's local trial pins published Core 2.3.2 with an updated Bun lockfile.
 Reskin, templates and examples receive the correction only after an explicit
 installation/lock update and rebuild;
@@ -126,8 +129,8 @@ with an identical plain string. UI adds independent RichLabel (textFlow only)
 and fixes BitmapLabel automatic maxWidth measurement; its peer minimum is
 Core ^2.3.0 and development baseline is ^2.3.1. The UI 3.3.0 registry baseline
 installs Core 2.3.1 from npm with a matching
-registry lockfile without local overrides. Existing UI 3.2.0, Game, DragonBones,
-Spine and ui-runtime Core peers accept 2.3.0 without SDK bumps. KUI/document,
+registry lockfile without local overrides. UI 3.2.0/runtime 0.8.2 and
+Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
 ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
@@ -153,8 +156,9 @@ upgrades. Core 2.3.1 is an optional patch over the runtime minimum 2.3.0.
 Core 2.2.1 is published. It fixes minified TextField dictionary
 and emergency wrapping and protects complete graphemes in both wrapping modes.
 It retains Unicode 17.0, the pinned linebreak dependency and UTF-16 input offsets.
-Existing UI/Game/ui-runtime/DragonBones peer ranges accept this patch; installed
-and locked Core versions must be updated to receive it.
+UI 3.2.0/runtime 0.8.2 and Game/DragonBones peers accept this patch; installed
+and locked Core versions must be updated to receive it. Current UI 3.4.0/runtime
+0.10.0 require Core ^2.4.0, which includes the correction.
 Core 2.2.0 is published with bitmap-font ^0.1.0 and no local dependency override.
 It adds font resources and native BitmapText rendering. UI 3.2.0 is published
 with BitmapLabel and Core ^2.2.0 in peer/dev dependencies, without local overrides.
@@ -175,8 +179,8 @@ CLI 3.3 requires ui-document ^0.11.0.
 CLI 3.3.1 is published with whole-resource dev synchronization,
 including Core-only projects, without adding an atlas dependency. Installed CLI
 3.3.0 does not include these watcher fixes. Source versions do not confirm npm
-publication. Engine examples, the KUI sample and the Editor working tree now
-install CLI 3.3.1 from npm; legacy EXML projects remain on CLI 1.3.x. See
+publication. Engine examples and the KUI sample install CLI 3.3.1 from npm;
+the Editor working tree uses CLI 3.5.0. Legacy EXML projects remain on CLI 1.3.x. See
 packages/cli/docs/dev-resource-watching.md for manual refresh and batch boundaries.
 ui-document 0.9.0 adds Label fitting metadata without changing format version 2.
 ui-document 0.10.0 adds shared style.json fonts/colors and @style:colors:<key>
@@ -189,7 +193,8 @@ use `true` where wrapping is intended. UI 3.1 uses `invalidateTextMetrics()`
 for Label fitting and late font readiness; Core 2.0.x is not sufficient.
 Core 2.1.1 fixes nested/rotated WebGL scrollRect clipping without API or format
 changes. Update installed/locked Core versions to receive the correction;
-existing UI/Game/ui-runtime peer ranges already accept this patch.
+UI 3.1.0/runtime 0.8.2 and Game peers accept this patch. Current UI 3.4.0/runtime
+0.10.0 require Core ^2.4.0, which includes the correction.
 Schema-defined XML strings are literal: remove old synthetic backslash type
 escapes explicitly; Editor and CLI must adopt the same parser contract.
 Core 2.0 and CLI 3.0+ reject comma-separated sheet `subkeys`
@@ -291,12 +296,14 @@ unchanged. See packages/ui-document/docs/project-styles.md before extending this
 contract. The previous @token:color:<key> XML prefix is rejected; update authored
 references explicitly. Literal strings and other token categories are unchanged.
 The original color integration shipped in ui-document 0.10.0, CLI 3.2.0 and
-ui-runtime 0.8.1. Current KUI projects use published ui-document 0.11.0 and CLI
-3.3.0 for colors and Label presets; CLI-built skins do not require ui-runtime.
+ui-runtime 0.8.1. The Label preset integration originally used document 0.11.0
+and CLI 3.3.0. Current CLI 3.5.0/runtime 0.10.0 require document ^0.13.0;
+CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
-dependency set. Editor 0.19.2 installs ui-document 0.11.0, CLI 3.3.0 and
-ui-runtime 0.8.2 from the registry without local overrides. The current Editor
-0.19.3 working tree pins published CLI 3.3.1; existing signed installers are not
+dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
+runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
+tree uses Core 2.4.0/UI 3.4.0/document 0.13.0/CLI 3.5.0/runtime 0.10.0.
+Existing signed installers are not
 rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.
 

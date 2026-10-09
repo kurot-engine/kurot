@@ -48,7 +48,8 @@ children or Skin parts. New native text fields are validated before output,
 and percentage-looking text such as `100%` remains literal.
 
 Rendering these new tags requires UI `^3.3.0` and Core `^2.3.0` in the app;
-Core 2.3.1 is recommended for blank rich-text line metrics. Existing controls
+these are the original native API minimums. Current UI 3.4.0 requires Core
+`^2.4.0`, which includes the Core 2.3.1 blank rich-text line correction. Existing controls
 and templates do not require automatic upgrades or migrations. See
 [text component compilation](docs/text-components.md).
 
@@ -67,6 +68,7 @@ in KUI XML:
 The compiler emits the policy, base size and state overrides unchanged. UI
 derives the drawing size after layout validation. Rendering this capability
 requires `@kurot/ui@^3.1.0` and `@kurot/core@^2.1.0` in the application.
+These are the original fitting API minimums; current UI 3.4.0 requires Core ^2.4.0.
 Explicit `multiline="false"` means one unwrapped first line; remove it or set
 it to true for text intended to wrap. Files are not migrated automatically.
 See the [compilation contract](docs/label-text-layout.md) and
@@ -208,7 +210,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Version 3.4.0 uses published `@kurot/ui-document@^0.12.0` and retains its literal-string XML rules.
+Current CLI 3.5.0 uses published `@kurot/ui-document@^0.13.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -346,6 +348,6 @@ than selecting a different preset. Missing presets, unsupported selection or
 invalid configuration fail explicitly. Expansion runs after resource defaults
 and before color resolution. It does not load fonts or measure text.
 
-Version 3.4.0 uses published ui-document 0.12.0 without local overrides. CLI
+Current CLI 3.5.0 uses published ui-document 0.13.0 without local overrides. CLI
 3.2.1 does not include this feature. Existing projects are not migrated.
 See [the shared contract](../ui-document/docs/project-styles.md).
