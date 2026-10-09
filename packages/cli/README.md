@@ -105,8 +105,8 @@ translations register after preload. The `empty` template contains a minimal
 `Sprite` application without UI/style/language dependencies.
 
 The unreleased game-template refresh introduces a "Made with Kurot" brand splash
-with a playful mascot entrance and brief sparkles. It supports reduced motion
-and applies to newly created projects; see [HTML brand splash](docs/game-template.md#html-brand-splash).
+with a playful mascot entrance, looping hops and sparkles. It supports reduced
+motion and applies to newly created projects; see [HTML brand splash](docs/game-template.md#html-brand-splash).
 
 ### `kurot build`
 

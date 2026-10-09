@@ -31,11 +31,12 @@ Templates do not implement live font/theme/language replacement.
 ## HTML brand splash
 
 The game template's `web/index.html` presents `web/logo.png` beneath a small
-"Made with" caption. The mascot makes a gentle entrance with two brief sparkles
-and a soft blue glow, then floats while the entry module loads. The splash has
-no loading text or progress indicator; the application's Preloader owns resource
-progress. Animations stop when the browser requests reduced motion. The logo
-size follows both viewport width and height for small screens and landscape.
+"Made with" caption. The mascot makes a gentle entrance, then repeats a playful
+hop and sway every 3.2 seconds while the entry module loads. Sparkles and a soft
+blue glow follow the loop. The splash has no loading text or progress indicator;
+the application's Preloader owns resource progress. Animations stop when the
+browser requests reduced motion. The logo size follows both viewport width and
+height for small screens and landscape.
 
 The HTML overlay fades out after the entry module evaluates, without a minimum
 display time or a wait for the entrance animation to finish. It does not wait

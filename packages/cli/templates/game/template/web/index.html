@@ -44,7 +44,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			gap: 16px;
+			gap: 28px;
 		}
 
 		.web-splash__caption {
@@ -65,6 +65,7 @@
 			inset: -18%;
 			z-index: -1;
 			background: radial-gradient(circle, rgba(30, 145, 255, 0.14), transparent 68%);
+			animation: web-splash-glow 3.2s ease-in-out 1200ms infinite;
 		}
 
 		.web-splash__logo {
@@ -73,7 +74,7 @@
 			height: auto;
 			transform-origin: 50% 80%;
 			animation: web-splash-arrive 720ms ease-out both,
-				web-splash-float 3.6s ease-in-out 720ms infinite;
+				web-splash-play 3.2s ease-in-out 1200ms infinite;
 		}
 
 		.web-splash__spark {
@@ -81,7 +82,8 @@
 			width: 14px;
 			height: 14px;
 			opacity: 0;
-			animation: web-splash-spark 900ms ease-out 260ms both;
+			animation: web-splash-spark 900ms ease-out 260ms both,
+				web-splash-twinkle 3.2s ease-in-out 1200ms infinite;
 		}
 
 		.web-splash__spark::before,
@@ -114,7 +116,7 @@
 			top: 52%;
 			width: 10px;
 			height: 10px;
-			animation-delay: 460ms;
+			animation-delay: 460ms, 1400ms;
 		}
 
 		@keyframes web-splash-arrive {
@@ -123,9 +125,13 @@
 			100% { transform: translateY(0) scale(1) rotate(0); }
 		}
 
-		@keyframes web-splash-float {
-			0%, 100% { transform: translateY(0) rotate(0); }
-			50% { transform: translateY(-5px) rotate(1deg); }
+		@keyframes web-splash-play {
+			0%, 90%, 100% { transform: translateY(0) scale(1) rotate(0); }
+			12% { transform: translateY(3px) scale(1.04, 0.96) rotate(-2deg); }
+			28% { transform: translateY(-16px) scale(1.025) rotate(-5deg); }
+			46% { transform: translateY(2px) scale(1.035, 0.97) rotate(2deg); }
+			62% { transform: translateY(-9px) scale(1) rotate(4deg); }
+			80% { transform: translateY(0) scale(1) rotate(-1deg); }
 		}
 
 		@keyframes web-splash-spark {
@@ -134,7 +140,20 @@
 			100% { opacity: 0; transform: scale(0.6) rotate(30deg); }
 		}
 
+		@keyframes web-splash-twinkle {
+			0%, 12% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+			28% { opacity: 0.9; transform: scale(1.15) rotate(10deg); }
+			48%, 100% { opacity: 0; transform: scale(0.6) rotate(35deg); }
+		}
+
+		@keyframes web-splash-glow {
+			0%, 100% { opacity: 0.75; transform: scale(0.96); }
+			28% { opacity: 1; transform: scale(1.08); }
+			62% { opacity: 0.9; transform: scale(1.02); }
+		}
+
 		@media (prefers-reduced-motion: reduce) {
+			.web-splash__mascot::before,
 			.web-splash__logo,
 			.web-splash__spark {
 				animation: none;

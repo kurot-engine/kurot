@@ -12,7 +12,8 @@ format changes are documented explicitly in each release.
 ### Changed
 
 - Refresh the game template's mascot logo and introduce a "Made with Kurot"
-  brand splash with a playful entrance, brief sparkles and a soft blue glow.
+  brand splash with a playful entrance, looping hops and sways, repeating sparkles
+  and a soft blue glow.
   Resource progress belongs to the game's Preloader; the HTML splash has no
   loading text or progress indicator and adds no minimum wait. Fit portrait and
   landscape viewports and stop animations under reduced motion. Existing project
