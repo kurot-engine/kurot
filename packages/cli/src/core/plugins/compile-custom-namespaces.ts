@@ -114,7 +114,7 @@ async function bundleNamespace(
 		target: 'es2022',
 		minify,
 		// Convention-based Theme mappings use the exported component class name.
-		keepNames: minify,
+		keepNames: true,
 		metafile: true,
 		logLevel: 'warning',
 		external: externalFor(project, ns),

@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.4.0 (published). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 2.5.0 (published; registry version metadata verified on 2026-10-10). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.

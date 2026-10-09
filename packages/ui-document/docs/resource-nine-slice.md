@@ -32,6 +32,12 @@ sheet frame's `sourceW`/`sourceH`; atlas x/y and trimming offsets are not grid
 coordinates. Coordinates are nonnegative finite numbers, width/height positive.
 Editor writes additionally validate the grid against current texture dimensions.
 
+For the Core 2.5.0 [texture density extension](../../core/docs/texture-density.md),
+sheet JSON frame geometry is physical and the grid stays logical: compare it
+against `sourceW / resolution` and `sourceH / resolution`. Published Core 2.4.0
+and current Editor resource tools do not interpret that metadata. The headless
+manifest parser/resolver and XML format need no new fields or API changes.
+
 ## Resolution and authoring
 
 `parseUIResourceConfigEntries()` validates the new format. It rejects old string

@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TextField, TextFieldType } from '../src/index.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 describe('TextField independent measurement', () => {
 	beforeEach(() => {
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
 			font: '',
-			measureText: (text: string) => ({ width: text.length * 10 }),
+			measureText: (text: string) => createTextMetrics(text.length * 10),
 		} as unknown as CanvasRenderingContext2D);
 	});
 

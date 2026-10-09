@@ -106,6 +106,11 @@ See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 ## Project style colors
 
+Default artwork and XML skins belong to CLI game templates and the application,
+not the UI runtime package. The CLI 3.6.0 [rounded KUI skin kit](../cli/docs/default-ui-skins.md)
+replaces the template's EUI atlas without changing the component APIs or requiring
+a UI package release. The kit needs published Core ^2.5.0; CLI 3.6.0 is also published. Existing applications keep their own theme resources.
+
 CLI 3.5.0 resolves Label presets and named colors from the optional
 `resource/config/style.json` into native UI properties, including state overrides:
 

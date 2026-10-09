@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Stage, TextField, TextFieldType, TouchEvent } from '../src/index.js';
 import { CanvasRenderer } from '../src/kurot/player/canvas/CanvasRenderer.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 describe('TextField line layout', () => {
 	beforeEach(() => {
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
 			font: '',
-			measureText: (text: string) => ({ width: text.length * 10 }),
+			measureText: (text: string) => createTextMetrics(text.length * 10),
 		} as unknown as CanvasRenderingContext2D);
 	});
 
@@ -244,7 +245,7 @@ describe('TextField line layout', () => {
 			fillRect: vi.fn(),
 			fillText: vi.fn(),
 			strokeText: vi.fn(),
-			measureText: vi.fn((text: string) => ({ width: text.length * 10 })),
+			measureText: vi.fn((text: string) => createTextMetrics(text.length * 10)),
 			font: '',
 			textBaseline: 'alphabetic',
 			textAlign: 'start',
@@ -315,7 +316,7 @@ describe('TextField line layout', () => {
 			fillRect: vi.fn(),
 			fillText: vi.fn(),
 			strokeText: vi.fn(),
-			measureText: vi.fn((text: string) => ({ width: text.length * 10 })),
+			measureText: vi.fn((text: string) => createTextMetrics(text.length * 10)),
 			font: '',
 			textBaseline: 'alphabetic',
 			textAlign: 'start',
@@ -342,6 +343,6 @@ describe('TextField line layout', () => {
 		field.setSelection(4, 4);
 		field.$setCompositionRange(1, 4);
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
-		expect(context.fillRect).toHaveBeenCalledWith(10, 20, 30, 1);
+		expect(context.fillRect).toHaveBeenCalledWith(10, 11, 30, 1);
 	});
 });

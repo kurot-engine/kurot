@@ -35,6 +35,11 @@ invalid periods, fractional dimensions and nine-slice precedence. The minified
 native Canvas patterns on Canvas/WebGL 1/WebGL 2 at 1x/2x, including rotation,
 tint, cache updates and the existing scale path.
 
+The Core 2.5.0 [texture density extension](texture-density.md) additionally
+tests source densities 1×/2×/3× at both output resolutions. Physical atlas sampling
+and logical repeat periods remain separate, including tinted cached images and
+nine-slice texture swaps. Published 2.4.0 does not interpret sheet density metadata.
+
 There are no new APIs or dependencies. UI 3.3.0/runtime 0.9.0 and
 Game/DragonBones/Spine peers accept this patch without SDK bumps. Current
 UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for centered flips; that release

@@ -117,7 +117,13 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 		const maxX = Math.max(tx, a * xMax + tx);
 		const minY = Math.min(ty, d * yMax + ty);
 		const maxY = Math.max(ty, d * yMax + ty);
-		buffer.context.enableScissor(minX, -maxY + buffer.height, maxX - minX, maxY - minY);
+		// Scissor coordinates are physical integer pixels. Enclose both edges before
+		// subtracting to retain partially covered boundary pixels at fractional scales.
+		const left = Math.floor(minX);
+		const right = Math.ceil(maxX);
+		const top = Math.floor(minY);
+		const bottom = Math.ceil(maxY);
+		buffer.context.enableScissor(left, buffer.height - bottom, right - left, bottom - top);
 		return true;
 	}
 

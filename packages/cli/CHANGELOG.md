@@ -7,10 +7,30 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## Unreleased
+## 3.6.0 — 2026-10-10
+
+Published; verified on npm on 2026-10-10, including latest, package download
+and registry integrity. Core 2.5.0 is also published; actual registry CLI
+scaffolding resolves Core ^2.5.0.
 
 ### Changed
 
+- Use symmetric neutral padding for default Button captions/icons and enable
+  Panel title middle alignment. Keep the 2-pixel pressed offset. The supporting
+  Core 2.5.0 centers single-line visible ink and retains stable input and
+  multiline baselines; the source preview includes both changes.
+
+- Replace the game template's EUI atlas with Kurot-owned rounded, blue KUI
+  textures and XML skins, including selected/pressed/disabled states, shared
+  text colors, resource-default nine-slice grids and a dedicated panel close
+  button. Keep scroll bars hidden while retaining scrolling. Remove six unused
+  container/text/image Skin placeholders; compose those nodes directly in XML.
+  Existing projects retain their own resources. Add a native XML gallery to
+  examples/game and reproducible private SVG-to-atlas tooling.
+- Generate the KUI atlas at 2× (512×512, sheet `resolution: 2`) while preserving
+  XML sizes and logical nine-slice grids. This template needs Core ^2.5.0;
+  Core 2.5.0 was published before this CLI refresh.
+  Provide an isolated source preview without modifying application registry locks.
 - Refresh the game template's mascot logo and introduce a "Made with Kurot"
   brand splash with a playful entrance, looping hops and sways, repeating sparkles
   and a soft blue glow.
@@ -21,10 +41,37 @@ format changes are documented explicitly in each release.
 
 ### Fixed
 
+- Preserve engine and reusable component constructor names in development
+  bundles as well as release bundles. Self-referencing classes such as Scroller
+  otherwise become `_Scroller`, preventing conventional default Theme lookup.
 - Omit empty runtime asset directory trees after filtering compiled KUI sources,
   rather than emitting an empty `resource/ui` hierarchy. Runtime files inside UI
   directories, generated theme JSON and template scaffold directories are preserved.
   No engine API, configuration, dependency or authored project migration is required.
+
+### Compatibility
+
+- CLI command/configuration APIs and KUI format remain unchanged. The ordinary
+  dependency remains published ui-document ^0.13.0; CLI gains no Core/UI/Atlas
+  dependency. Existing projects keep their own skins, resource keys and HTML.
+- New game scaffolds require Core ^2.5.0 for the 2× skin kit. `create` resolves
+  registry SDK versions; the template placeholders stay `latest`. Core was published
+  before CLI. Install/rebuild projects that explicitly adopt the new skins.
+- UI/Game/document/runtime/Atlas need no release. Adopting only the CLI build
+  fixes requires updating the project's CLI installation/lock and rebuilding.
+
+### Verification — 2026-10-10
+
+- CLI build and all 112 unit tests pass against published document 0.13.0;
+  Core 2.5.0 build and all 890 unit tests also pass.
+- Package dry-run verifies the 3.6.0 manifest, default XML skins, 2× atlas,
+  mascot logo, public documentation and release notes; the old EUI atlas is absent.
+- The native isolated preview passed strict development/release builds with
+  checkout Core and registry UI/Game/document. Original app locks remain unchanged.
+- Published CLI 3.6.0 downloads through npm pack with matching registry integrity.
+  Its archive contains all 16 XML skins, the 2× atlas, mascot logo and build fixes.
+  Scaffolding with the published CLI generates Core ^2.5.0, UI ^3.4.0 and
+  CLI ^3.6.0. Published Core 2.5.0 also downloads with matching integrity.
 
 ## 3.5.0 — 2026-10-09
 

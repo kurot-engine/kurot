@@ -4,6 +4,64 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.5.0] — 2026-10-10
+
+Published; registry version metadata and latest verified on 2026-10-10.
+CLI 3.6.0 is also published; its game template requires this Core release.
+The published archive downloads through npm pack with matching registry integrity;
+its density API, text baseline module and fractional scissor correction are present.
+
+### Added
+
+- Independent immutable `Texture.resolution`, inherited by SpriteSheet views,
+  and optional sheet JSON `resolution`. Sampling/UV coordinates remain physical
+  while original dimensions, trim offsets, repeat periods and nine-slice borders
+  remain logical. Bitmap/Image scale, clip, repeat, tint and Canvas-backed caches
+  support mixed source densities in Canvas and WebGL. Existing sheets default
+  to 1×; malformed densities fail loading. See [texture density](docs/texture-density.md).
+
+### Fixed
+
+- Preserve ItemRenderer and other bitmap edges at fractional WebGL viewport
+  scales/translations. Axis-aligned clips enclose transformed physical bounds
+  before calculating scissor dimensions, retaining partially covered edge pixels.
+  Integer boundaries and nested/rotated stencil clips keep their existing behavior.
+- Center single-line dynamic middle-aligned text by measured ink bounds across
+  languages. Share alphabetic baselines between rich runs; retain stable font
+  frames for paragraphs, empty lines and inputs. Keep layout/measurement sizes
+  nominal, preserve glyph overhang in dynamic captures, and align link hits,
+  selection, caret and composition decoration with the same row geometry.
+- Restore the root WebGL render target after the first scratch-buffer allocation
+  by cycling a real 1×1 target, preventing the second frame from retaining old
+  pixels while drawing into the scratch framebuffer.
+
+### Compatibility
+
+- Compatible API addition; existing 1× resources and public text flags retain
+  their contracts. No new runtime dependencies or resource-manifest/KUI fields.
+- UI, Game, DragonBones, Spine and ui-runtime Core peers already accept 2.5.0.
+  Their package versions, peer minima and development locks need no incidental
+  change. Applications adopt this Core installation/lock and rebuild explicitly.
+- Projects using the CLI 3.6.0 default 2× skin kit require Core >=2.5.0 within
+  the 2.x line. Editor/Reskin adoption additionally needs logical frame dimensions
+  derived from source density; their current installations remain unchanged.
+
+### Verification — 2026-10-10
+
+- Core build and 890 unit tests; CLI build and 112 unit tests pass.
+- Package dry-run verifies the 2.5.0 manifest, implementation/declarations,
+  density/text documentation and release notes.
+- 12 minified text alignment/outline browser checks pass in Canvas, WebGL 1/2
+  at 1×/2×. Six golden/context-restoration/high-density checks and 30 filter
+  checks pass. Reviewed golden changes include the shared text baseline and
+  the correctly rendered blurred surface after root-target restoration.
+- Four fractional-viewport pixel regressions pass in WebGL 1/2 at 1×/2×,
+  including reflection and scrolling. All 24 related nested-clip, outline and
+  filter-chain checks pass after scissor quantization.
+- Isolated native KUI example passes strict development and release builds;
+  the local 2× preview retains stable English/Thai/Chinese input baselines and
+  the intended 2-pixel pressed caption offset. Windows is not tested.
+
 ## [2.4.0] — 2026-10-09
 
 Published; verified on npm on 2026-10-09. Existing Core 2.x peer ranges

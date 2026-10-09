@@ -30,9 +30,25 @@ export function measureText(
 	bold: boolean,
 	italic: boolean,
 ): number {
+	return measureTextMetrics(text, fontFamily, fontSize, bold, italic).width;
+}
+
+/**
+ * Measures logical-pixel ink and font bounds relative to the alphabetic baseline.
+ * The caller owns caching and invalidation when fonts become ready.
+ */
+export function measureTextMetrics(
+	text: string,
+	fontFamily: string,
+	fontSize: number,
+	bold: boolean,
+	italic: boolean,
+): TextMetrics {
 	const ctx = getContext();
 	ctx.font = buildFontString(fontSize, fontFamily, bold, italic);
-	return ctx.measureText(text).width;
+	ctx.textBaseline = 'alphabetic';
+	ctx.textAlign = 'left';
+	return ctx.measureText(text);
 }
 
 /**

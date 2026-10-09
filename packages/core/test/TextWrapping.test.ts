@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TextField, TextFieldType } from '../src/index.js';
 import { CanvasRenderer } from '../src/kurot/player/canvas/CanvasRenderer.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 function paintedLines(field: TextField): string[] {
 	return field.getLinesArr().map(line => line.elements.map(element => element.text).join(''));
@@ -15,12 +16,12 @@ function wrapped(text: string, width: number): TextField {
 	return field;
 }
 
-const measure = vi.fn((text: string) => ({ width: Array.from(text.replace(/[\u200b\u2060]/g, '')).length * 10 }));
+const measure = vi.fn((text: string) => createTextMetrics(Array.from(text.replace(/[\u200b\u2060]/g, '')).length * 10));
 
 describe('Unicode width-constrained text layout', () => {
 	beforeEach(() => {
 		measure.mockClear();
-		measure.mockImplementation(text => ({ width: Array.from(text.replace(/[\u200b\u2060]/g, '')).length * 10 }));
+		measure.mockImplementation(text => createTextMetrics(Array.from(text.replace(/[\u200b\u2060]/g, '')).length * 10));
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
 			font: '',
 			measureText: measure,
@@ -108,7 +109,7 @@ describe('Unicode width-constrained text layout', () => {
 	});
 
 	it('measures complete runs rather than adding independently measured words', () => {
-		measure.mockImplementation(text => ({ width: text.length * 10 - (text.includes('a b') ? 5 : 0) }));
+		measure.mockImplementation(text => createTextMetrics(text.length * 10 - (text.includes('a b') ? 5 : 0)));
 		expect(paintedLines(wrapped('a b c', 25))).toEqual(['a b', 'c']);
 	});
 

@@ -1,15 +1,21 @@
 # @kurot/core — AI context map
 
-Core 2.4.0 is published, verified on npm on 2026-10-09. Read
+Core 2.5.0 is published; registry version metadata and latest verified on
+2026-10-10. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
+
+Core 2.5.0 adds independent Texture/SpriteSheet source density. Read [texture density](texture-density.md) before changing texture
+dimensions or sheet loading. `resolution` defaults to 1 and is immutable;
+sampling and page coordinates are physical, frame bounds/trim/grid are logical.
+The default KUI kit uses 2× assets and requires this new Core implementation.
 
 Read this before exploring `src/`. It is a compressed map of the package so an
 agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.4.0`, published. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.5.0`, published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -86,6 +92,10 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   content, not the clip. WebGL's nested/rotated stencil path must use the same
   viewport origin as its axis-aligned scissor path. Rectangle masks retain
   their own local x/y. See `player/pipes/MaskPipe.ts`.
+- The Core 2.5.0 axis-aligned WebGL scissor correction encloses fractional
+  physical bounds with floor(left/top) and ceil(right/bottom), then subtracts
+  those integer edges. Do not truncate position and size independently: this
+  cuts boundary pixels from scaled ItemRenderer skins. Stencil clips are unchanged.
 - `CanvasRenderer` is not purely a fallback. The WebGL backend depends on it
   internally to rasterize Graphics/Text to offscreen canvases before texture
   upload, and to snapshot `RenderTexture`. Don't reason about it as dead code
@@ -229,6 +239,18 @@ rotation during sampling. Resize geometry using scaleX/scaleY. After mutating
 vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
+
+## Text alignment in 2.5.0
+
+`TextLineLayout.ts` caches alphabetic `baseline` and visible `inkAscent` /
+`inkDescent` per line. `TextVerticalLayout.ts` centers ink only for dynamic,
+single-line middle alignment. Multiline/INPUT/top/bottom retain nominal rows
+with content-independent font frames, including blank lines. Canvas, WebGL
+rasterization and link hit testing share the offset. Render bounds add glyph
+margin without changing measurement, input or external clip boundaries. See
+[text layout](text-layout.md#visual-centering-and-stable-baselines-core-250).
+Core 2.4.0 on npm does not include this correction; existing consumer peer ranges
+accept 2.5.0 without SDK bumps. Adoption updates the Core installation/lock.
 
 ## Text layout in 2.0.1
 

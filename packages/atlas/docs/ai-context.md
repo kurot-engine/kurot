@@ -1,7 +1,9 @@
 # @kurot/atlas — AI context map
 
 Version 0.1.0, published to npm. Independent build-time
-atlas library; no Kurot package dependencies and no integration into consumers yet.
+atlas library; no Kurot package dependencies. Private tools/default-ui-assets
+consumes registry 0.1.0 to generate the committed KUI default atlas. No published
+SDK or browser runtime gains an atlas dependency.
 Read README.md for input limits and the pixel/output contract.
 
 ## Directory map

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ItemRendererSkin" states="disabled,down,up" minHeight="50" minWidth="100">
-    <Image height="100%" scale9Grid="1,3,8,8" source="button_up_png" width="100%" alpha.disabled="0.5" source.down="button_down_png" />
-    <Label id="labelDisplay" bottom="8" left="8" right="8" size="20" textAlign="center" textColor="#FFFFFF" top="8" verticalAlign="middle" />
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ItemRendererSkin" states="disabled,down,up,downAndSelected,upAndSelected" minHeight="48" minWidth="96">
+    <Image height="100%" width="100%" source="kui.surface_up" source.down="kui.surface_down" source.disabled="kui.button_disabled" source.downAndSelected="kui.surface_selected_down" source.upAndSelected="kui.surface_selected" touchEnabled="false" />
+    <Label id="labelDisplay" bottom="10" left="14" right="14" top="10" size="18" multiline="false" textFit="shrink" minFontSize="14" textAlign="left" textColor="@style:colors:text" textColor.disabled="@style:colors:disabled-text" verticalAlign="middle" />
 </Skin>

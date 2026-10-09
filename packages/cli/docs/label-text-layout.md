@@ -1,6 +1,6 @@
 # Label text compilation
 
-CLI 3.5.0 consumes ui-document ^0.13.0 and compiles KUI text-fitting properties
+CLI 3.6.0 consumes ui-document ^0.13.0 and compiles KUI text-fitting properties
 through the existing UIDocument → SkinIR → ESM factory pipeline. The semantic
 document format remains version 2.
 

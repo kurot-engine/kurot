@@ -54,13 +54,13 @@ describe('automatic component namespace compilation', () => {
 		expect(ctx.outputs.namespaceModules.get(normalizeModuleKey(source))).toBe('#ns/game');
 	});
 
-	it('preserves component constructor names in a minified release namespace', async () => {
+	it.each(['development', 'release'] as const)('preserves self-referencing component names in a %s namespace', async mode => {
 		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-release-component-namespace-'));
 		temporaryDirs.push(root);
 		const source = path.join(root, 'src/components/BetButton.ts');
 		await fs.mkdir(path.dirname(source), { recursive: true });
-		await fs.writeFile(source, 'export class BetButton {}\n');
-		const project = createProject(root, path.join(root, 'bin-release'), createComponent(root, source), 'release');
+		await fs.writeFile(source, 'export class BetButton { static create() { return new BetButton(); } }\n');
+		const project = createProject(root, path.join(root, 'bin-output'), createComponent(root, source), mode);
 		const ctx = createContext(project);
 
 		await compileCustomNamespaces().apply(ctx);

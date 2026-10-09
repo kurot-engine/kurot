@@ -191,7 +191,8 @@ export class WebGLRenderer {
 			buffer.setTransform(1, 0, 0, 1, 0, 0);
 			this._nestLevel--;
 			if (this._nestLevel === 0) {
-				WebGLRenderBuffer.release(WebGLRenderBuffer.create(buffer.context, 0, 0));
+				// Nonzero dimensions also queue root reactivation on the first allocation.
+				WebGLRenderBuffer.release(WebGLRenderBuffer.create(buffer.context, 1, 1));
 			}
 		}
 	}

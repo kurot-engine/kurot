@@ -1,10 +1,17 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Sprite, Stage, TextField } from '../src/index.js';
 import { StageText } from '../src/kurot/text/StageText.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 describe('StageText DOM overlay', () => {
+	beforeEach(() => {
+		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+			measureText: () => createTextMetrics(0),
+		} as unknown as CanvasRenderingContext2D);
+	});
 	afterEach(() => {
 		document.body.replaceChildren();
+		vi.restoreAllMocks();
 	});
 
 	it('copies the TextField geometry, transform, and typography to the native input', () => {

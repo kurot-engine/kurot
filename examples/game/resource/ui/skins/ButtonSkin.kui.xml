@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="disabled,down,up">
-    <Group id="root" minHeight="50" minWidth="100">
-        <Image height="100%" scale9Grid="1,3,8,8" source="button_up_png" width="100%" alpha.disabled="0.5" source.down="button_down_png" />
-        <Label id="labelDisplay" bottom="8" left="8" right="8" size="20" textAlign="center" textColor="#FFFFFF" top="8" verticalAlign="middle" />
-        <Image id="iconDisplay" horizontalCenter="0" verticalCenter="0" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ButtonSkin" states="disabled,down,up" minHeight="48" minWidth="96">
+    <Image height="100%" width="100%" source="kui.button_up" source.down="kui.button_down" source.disabled="kui.button_disabled" touchEnabled="false" />
+    <Label id="labelDisplay" left="16" right="16" top="10" bottom="10" size="18" bold="true" multiline="false" textFit="shrink" minFontSize="14" textAlign="center" verticalAlign="middle" textColor="@style:colors:on-brand" textColor.disabled="@style:colors:disabled-text" top.down="12" bottom.down="8" />
+    <Image id="iconDisplay" horizontalCenter="0" verticalCenter="0" verticalCenter.down="2" />
 </Skin>

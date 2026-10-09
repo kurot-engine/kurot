@@ -12,8 +12,8 @@ export class SpriteSheet {
 
 	public constructor(texture: Texture) {
 		this._texture = texture;
-		this._bitmapX = texture.bitmapX - texture.offsetX;
-		this._bitmapY = texture.bitmapY - texture.offsetY;
+		this._bitmapX = texture.bitmapX - texture.offsetX / texture.pixelScale;
+		this._bitmapY = texture.bitmapY - texture.offsetY / texture.pixelScale;
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────────
@@ -22,6 +22,10 @@ export class SpriteSheet {
 		return this._textureMap.get(name);
 	}
 
+	/**
+	 * Creates a view using source-pixel coordinates, trim offsets and original
+	 * frame dimensions. Logical dimensions inherit the page's resolution.
+	 */
 	public createTexture(
 		name: string,
 		bitmapX: number,
@@ -35,7 +39,7 @@ export class SpriteSheet {
 	): Texture {
 		const tw = textureWidth ?? offsetX + bitmapWidth;
 		const th = textureHeight ?? offsetY + bitmapHeight;
-		const texture = new Texture();
+		const texture = new Texture(this._texture.resolution);
 		texture.disposeBitmapData = false;
 		texture.bitmapData = this._texture.bitmapData;
 		texture.initData(

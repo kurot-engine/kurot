@@ -1,11 +1,23 @@
 # @kurot/core
 
-**2.4.0 is published**, verified on npm on 2026-10-09. See
-[centered flips](docs/centered-flips.md) for the new APIs and consumer requirements.
+**2.5.0 is published**, with registry version metadata and latest verified on
+2026-10-10. This release adds independent source texture density and fixes
+text alignment, fractional viewport edges and root WebGL target restoration.
+See [texture density](docs/texture-density.md) and [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.4.0 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.0 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Text alignment correction in 2.5.0
+
+Single-line dynamic middle alignment centers measured glyph ink, including
+fallback fonts and accents. Multiline text and input keep stable font baselines;
+rich runs share an alphabetic baseline. Layout sizes and wrapping stay nominal.
+The existing font-readiness invalidation refreshes these cached metrics.
+See [text alignment](docs/text-layout.md#visual-centering-and-stable-baselines-core-250).
+Install Core 2.5.0 and rebuild to adopt it; published 2.4.0
+does not include the correction. Existing SDK peer ranges require no change.
 
 ## Bitmap fill correction in 2.3.3
 
@@ -72,6 +84,15 @@ The existing UI 3.2.0, Game 2.0.0, ui-runtime 0.8.2 and DragonBones 0.1.0 peer
 ranges accept it. Update the installed Core version and lockfile to receive
 the fixes; see [text layout](docs/text-layout.md).
 
+## Fractional viewport clipping in 2.5.0
+
+Axis-aligned WebGL clips now floor their left/top physical edges and ceil their
+right/bottom edges before calculating scissor dimensions. This preserves boundary
+pixels when a scaled UI list or another viewport lands between pixels, avoiding
+cut-off nine-slice outlines. Scissor precision remains one physical pixel; nested
+or rotated clips retain the stencil path. No skin padding or layout change is
+required. Published Core 2.4.0 does not include this correction.
+
 ## Scroll clipping in 2.1.1
 
 WebGL keeps a `scrollRect` viewport fixed when it is nested inside another clip
@@ -102,7 +123,7 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.4.0
+pnpm add @kurot/core@^2.5.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -265,6 +286,11 @@ the application is running through `app.screenAdapter.resolution`; automatic
 text and `cacheAsTexture(true)` caches will be regenerated at the new density.
 WebGL vector graphics are also re-rasterized when their display scale increases;
 their cached sampling scale is capped at 8× to bound zoom-related memory use.
+
+The Core 2.5.0 [texture density API](docs/texture-density.md) adds independent
+source density through `new Texture(2)` and sheet JSON `resolution: 2`.
+High-density images retain logical dimensions and nine-slice corners while
+sampling physical atlas pixels. Published Core 2.4.0 does not contain this API.
 
 ## Multilingual text
 

@@ -32,14 +32,14 @@ describe('game template components', () => {
 		expect((await fs.stat(path.join(project, 'resource/ui/components'))).isDirectory()).toBe(true);
 		expect((await fs.stat(path.join(project, 'resource/ui/app'))).isDirectory()).toBe(true);
 		expect((await fs.stat(path.join(project, 'resource/ui/skins/ButtonSkin.kui.xml'))).isFile()).toBe(true);
-		expect((await fs.stat(path.join(project, 'resource/assets/ui/eui/eui.json'))).isFile()).toBe(true);
-		expect((await fs.stat(path.join(project, 'resource/assets/ui/eui/eui.png'))).isFile()).toBe(true);
+		expect((await fs.stat(path.join(project, 'resource/assets/ui/kui/kui.json'))).isFile()).toBe(true);
+		expect((await fs.stat(path.join(project, 'resource/assets/ui/kui/kui.png'))).isFile()).toBe(true);
 		await expect(fs.access(path.join(project, 'resource/assets/eui.json'))).rejects.toThrow();
 		await expect(fs.access(path.join(project, 'resource/assets/eui.png'))).rejects.toThrow();
 		await expect(fs.access(path.join(project, 'resource/ui/ButtonSkin.kui.xml'))).rejects.toThrow();
 		await expect(fs.access(path.join(project, 'src/game-components.ts'))).rejects.toThrow();
 		const resources = await fs.readFile(path.join(project, 'resource/default.res.json'), 'utf-8');
-		expect(resources).toContain('"url": "assets/ui/eui/eui.json"');
+		expect(resources).toContain('"url": "assets/ui/kui/kui.json"');
 		const config = await fs.readFile(path.join(project, 'kurot.config.ts'), 'utf-8');
 		expect(config).toContain("sourceDir: 'src/components'");
 		expect(config).toContain("sourceDir: 'resource/ui'");
@@ -64,7 +64,7 @@ describe('game template components', () => {
 		const stylesheet = parseUIStyleSheet(
 			JSON.parse(await fs.readFile(path.join(resourceDir, 'config/style.json'), 'utf8')),
 		);
-		expect(stylesheet.colors['disabled-text']).toBe(0x999999);
+		expect(stylesheet.colors['disabled-text']).toBe(0x7c8799);
 		for (const family of Object.values(stylesheet.fonts.families)) {
 			for (const face of family.faces) {
 				const file = await fs.readFile(path.join(resourceDir, face.url));
@@ -98,7 +98,7 @@ describe('game template components', () => {
 			expect(() => compileKUI(source, undefined, { colors: stylesheet.colors })).not.toThrow();
 		}
 		const button = await fs.readFile(path.join(skinsDirectory, 'ButtonSkin.kui.xml'), 'utf8');
-		expect(compileKUI(button, undefined, { colors: stylesheet.colors })).toContain('"textColor", 10066329');
+		expect(compileKUI(button, undefined, { colors: stylesheet.colors })).toContain('"textColor", 8161177');
 		const pkg = JSON.parse(await fs.readFile(path.join(project, 'package.json'), 'utf8'));
 		expect(pkg.dependencies['@kurot/ui-document']).toBe('latest');
 	});

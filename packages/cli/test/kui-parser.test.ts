@@ -127,7 +127,7 @@ describe('KUI Skin compiler', () => {
 		);
 		const files = (await fs.readdir(TEMPLATE_DIRECTORY)).filter(file => file.endsWith('.kui.xml')).sort();
 
-		expect(files).toHaveLength(21);
+		expect(files).toHaveLength(16);
 		for (const file of files) {
 			const source = await fs.readFile(path.join(TEMPLATE_DIRECTORY, file), 'utf8');
 			expect(() => generateCode(parseKUISkin(source, undefined, [], [], stylesheet.colors))).not.toThrow();

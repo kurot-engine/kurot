@@ -46,7 +46,8 @@ describe('TextPipe', () => {
 		const context2d = {
 			setTransform: vi.fn(),
 			clearRect: vi.fn(),
-			measureText: vi.fn(() => ({ width: 20 })),
+			measureText: vi.fn(() => ({ width: 20, fontBoundingBoxAscent: 0, fontBoundingBoxDescent: 0,
+				actualBoundingBoxAscent: 0, actualBoundingBoxDescent: 0 })),
 		} as unknown as CanvasRenderingContext2D;
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context2d);
 

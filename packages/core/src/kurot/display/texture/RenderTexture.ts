@@ -21,6 +21,12 @@ export class RenderTexture extends Texture {
 	private _canvas?: HTMLCanvasElement;
 	private _ctx?: CanvasRenderingContext2D;
 
+	// ── Constructor ───────────────────────────────────────────────────────────
+
+	public constructor() {
+		super();
+	}
+
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	public drawToTexture(displayObject: DisplayObject, clipBounds?: Rectangle, scale = 1): boolean {

@@ -85,8 +85,8 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 				bitmap.bitmapHeight,
 				bitmap.bitmapOffsetX * scaleX,
 				bitmap.bitmapOffsetY * scaleY,
-				bitmap.bitmapWidth * textureScaleFactor * scaleX,
-				bitmap.bitmapHeight * textureScaleFactor * scaleY,
+				bitmap.bitmapWidth * (bitmap.texture?.pixelScale ?? textureScaleFactor) * scaleX,
+				bitmap.bitmapHeight * (bitmap.texture?.pixelScale ?? textureScaleFactor) * scaleY,
 				bitmap.sourceWidth,
 				bitmap.sourceHeight,
 				bitmap.texture?.rotated ?? false,
@@ -131,7 +131,7 @@ export class BitmapPipe implements RenderPipe<Bitmap> {
 		const sh = bitmap.sourceHeight;
 		const rotated = bitmap.texture?.rotated ?? false;
 		const smoothing = bitmap.smoothing;
-		const scale = textureScaleFactor;
+		const scale = bitmap.texture?.pixelScale ?? textureScaleFactor;
 
 		// Nine-slice keeps transparent margins and borders fixed, stretching only the inner area.
 		destW -= bitmap.textureWidth - bw * scale;

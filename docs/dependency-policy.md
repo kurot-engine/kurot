@@ -198,3 +198,31 @@ local overrides. Editor 0.24.0 explicitly adopts this chain. Each release change
 so this feature requires those specific releases. Game, DragonBones, Spine,
 bitmap-font and atlas are unchanged. Read [centered flips](centered-flips.md)
 for new minimums, temporary local verification and registry lock refresh order.
+
+## Texture density and default skin releases
+
+Core 2.5.0 and CLI 3.6.0 are published, verified on npm on 2026-10-10 with
+matching registry integrity and successful package downloads. Core adds the source-density API and rendering fixes. CLI ships the
+2× default skin assets and build corrections; its ordinary document dependency
+remains ^0.13.0, with no Core/UI/Atlas dependency.
+
+- Required adoption: the new CLI game skin kit needs Core ^2.5.0. Core was
+  published before CLI; the published `create` command resolves Core ^2.5.0. Editor/Reskin adoption
+  also needs logical frame sizes derived from sheet density.
+- Optional adoption: UI, Game, DragonBones, Spine and ui-runtime Core peer ranges
+  already accept 2.5.0. Update selected installations/locks and rebuild when
+  adopting fixes; do not raise peers or bump unchanged SDKs. Existing CLI projects
+  can install 3.6.0 for build fixes while keeping their own skins and HTML.
+- Unaffected: ui-document, Atlas and bitmap-font contracts are unchanged.
+  Documentation-only updates and private atlas-generation tooling require no
+  package release. Other applications and their registry locks remain unchanged.
+
+Checked application declarations: examples/demo and examples/game already accept
+Core 2.5.0 and CLI 3.6.0 through their 2.x/3.x caret ranges; their current locks
+remain older. The refreshed game resources need a Core installation/lock update
+before ordinary builds can use the 2× kit. Templates retain
+`latest` placeholders, resolved by `create` to concrete registry caret ranges.
+Editor pins Core 2.4.0 and CLI 3.5.0 exactly, so adopting these releases requires
+explicit manifest/lock updates. Reskin's Core ^2.1.1 accepts 2.5.0; the rendering
+update is optional, while authoring 2× sheets also needs density-aware geometry.
+SDK development-only locks can adopt Core separately, without a new SDK release.

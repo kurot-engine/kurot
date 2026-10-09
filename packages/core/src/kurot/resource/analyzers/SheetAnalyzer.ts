@@ -13,6 +13,7 @@ import { IOErrorEvent } from '../../events/IOErrorEvent.js';
  */
 interface SheetConfig {
 	file: string;
+	resolution?: number;
 	frames: Record<
 		string,
 		{
@@ -123,6 +124,9 @@ export class SheetAnalyzer extends AnalyzerBase {
 				}
 				try {
 					const config = JSON.parse(response) as SheetConfig;
+					if (config.resolution !== undefined && (!Number.isFinite(config.resolution) || config.resolution <= 0)) {
+						throw new RangeError('Sheet resolution must be a finite positive number.');
+					}
 					const imageUrl = this.getRelativePath(item.url, config.file);
 					resolve({ config, imageUrl });
 				} catch {
@@ -154,7 +158,7 @@ export class SheetAnalyzer extends AnalyzerBase {
 			const onComplete = (): void => {
 				cleanup();
 				if (loader.data) {
-					const texture = new Texture();
+					const texture = new Texture(config.resolution);
 					texture.setBitmapData(loader.data);
 					this.analyzeBitmap(item, texture, config);
 					item.loaded = true;

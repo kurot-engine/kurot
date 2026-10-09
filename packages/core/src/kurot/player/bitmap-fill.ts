@@ -21,7 +21,7 @@ type BitmapRegionDrawer = (
 export function drawUnscaledBitmapFill(bitmap: Bitmap, width: number, height: number, draw: BitmapRegionDrawer): void {
 	const tileWidth = bitmap.textureWidth;
 	const tileHeight = bitmap.textureHeight;
-	const scale = textureScaleFactor;
+	const scale = bitmap.texture?.pixelScale ?? textureScaleFactor;
 	if (![width, height, tileWidth, tileHeight, scale].every(value => Number.isFinite(value) && value > 0)) {
 		return;
 	}

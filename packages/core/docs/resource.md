@@ -221,6 +221,11 @@ Load a sprite sheet in TexturePacker JSON format in two steps:
 1. Load the JSON descriptor to obtain frame data and the image path.
 2. Load the image and create subtextures.
 
+The Core 2.5.0 [texture density extension](texture-density.md) accepts optional
+sheet JSON `resolution` (default 1). Frame coordinates and original dimensions
+in JSON remain physical pixels; loaded Texture dimensions and trim offsets are
+logical. Published Core 2.4.0 does not interpret this field.
+
 Resources can be retrieved in three ways:
 
 ```typescript

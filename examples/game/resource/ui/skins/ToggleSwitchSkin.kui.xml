@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.ToggleSwitchSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected">
-    <Group id="root">
-        <Image source="on_png" source.disabled="off_png" source.down="off_png" source.up="off_png" />
-        <Image horizontalCenter="-18" source="handle_png" verticalCenter="0" horizontalCenter.disabledAndSelected="18" horizontalCenter.downAndSelected="18" horizontalCenter.upAndSelected="18" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.ToggleSwitchSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected" width="56" height="44" minWidth="56" minHeight="44">
+    <Image width="56" height="32" horizontalCenter="0" verticalCenter="0" source="kui.switch_off" source.disabled="kui.switch_disabled_off" source.disabledAndSelected="kui.switch_disabled_on" source.downAndSelected="kui.switch_on" source.upAndSelected="kui.switch_on" />
+    <Image width="24" height="24" horizontalCenter="-12" verticalCenter="0" source="kui.switch_handle" source.disabled="kui.switch_handle_disabled" source.disabledAndSelected="kui.switch_handle_disabled" horizontalCenter.disabledAndSelected="12" horizontalCenter.downAndSelected="12" horizontalCenter.upAndSelected="12" />
 </Skin>

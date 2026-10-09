@@ -9,10 +9,10 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.4.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.5.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.4.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
-| `@kurot/cli`         | 3.5.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
+| `@kurot/cli`         | 3.6.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.13.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.10.0   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
 | `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Published.                                                                                | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)             |
@@ -64,6 +64,42 @@ dependencies and lockfiles describe the tested checkout, not consumer minima.
 Atlas has a portable pixel-only root entry and a separate Node PNG subpath using
 pngjs. No current package consumes it. Core loads prebuilt sheets without atlas;
 Editor, Reskin or CLI adoption is a separate change.
+Core 2.5.0 and CLI 3.6.0 are published, verified on npm on 2026-10-10, including
+latest tags, package downloads and registry integrity. Published Core includes
+the density/text/scissor fixes. Published CLI includes 16 XML skins, the 2× atlas,
+mascot logo and build corrections. Its actual create command generates Core
+^2.5.0, UI ^3.4.0 and CLI ^3.6.0. Source versions alone do not confirm publication.
+
+Core 2.5.0 adds independent immutable Texture/SpriteSheet source density, with
+physical sampling and logical frame dimensions/trim/grids. Existing 1× resources
+retain their behavior. It fixes shared alphabetic/ink text alignment, preserving
+stable multiline/input font frames and nominal layout sizes; restores the root
+WebGL target after the first scratch allocation; and encloses fractional physical
+scissor bounds to retain ItemRenderer edge pixels. Nested/rotated stencil clips
+are unchanged. Read packages/core/docs/texture-density.md and text-layout.md.
+
+CLI 3.6.0 ships 16 native XML skins, a Kurot-owned rounded 2× atlas (512×512,
+sheet resolution: 2), palette colors and a looping mascot brand splash. XML sizes
+and nine-slice grids stay logical. Default Button padding is symmetric and Panel
+titles use middle alignment. It also preserves development constructor names
+for Theme lookup and omits empty runtime asset directory trees after KUI filtering.
+Read packages/cli/docs/default-ui-skins.md. The new game skin kit requires
+Core ^2.5.0. `create` resolves registry SDK versions; template placeholders remain
+latest and existing projects retain their own resources and locks.
+
+Private tools/default-ui-assets uses registry Atlas 0.1.0 and pinned resvg;
+CLI and runtime SDKs gain no atlas dependency. It generates the game template
+and examples/game assets. An isolated native gallery links built checkout Core
+and installed registry UI/Game/document without editing application installations.
+The game example has an explicit document dependency for project font/style setup.
+
+UI, Game, DragonBones, Spine and ui-runtime peers already accept Core 2.5.0;
+no dependent SDK bump, raised peer minimum or development-lock update is required.
+CLI retains published document ^0.13.0. Apps adopt Core installation/lock and
+rebuild explicitly. Projects adopting the new 2× skin kit require Core ^2.5.0;
+Editor/Reskin authoring adoption also needs logical frame measurements derived
+from sheet density. Their installations are unchanged. UI/document APIs,
+resource-manifest/KUI formats and all seven other package versions are unchanged.
 
 DragonBones is maintained in `packages/dragonbones`, with a Core ^2.1.1 peer
 and no UI/Game dependency. `src/runtime` contains the official TypeScript
@@ -85,11 +121,11 @@ Editor 0.24.0 explicitly adopts all five registry SDKs. Game/DragonBones/Spine
 need no release; other applications and templates retain their own dependencies.
 Read docs/centered-flips.md for the published contracts and consumer adoption order.
 
-CLI has an unreleased asset-copy correction that omits empty runtime directory
+Published CLI 3.6.0 has an asset-copy correction that omits empty runtime directory
 trees after filtering KUI sources, including skin-only resource/ui. Generated
 theme JSON and compiled Skin modules remain required; mixed directories retain
 runtime files, and template copies preserve empty directories. Registry CLI 3.5.0
-does not include the correction. Adoption needs the next CLI installation and a
+does not include the correction. Adoption needs a CLI 3.6.0 installation and a
 project rebuild, without engine changes or dependency/format migration.
 
 Core 2.3.3 is published, verified on npm on 2026-10-09. It fixes Bitmap/Image
@@ -141,7 +177,7 @@ Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
 ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
-See packages/ui/docs/rich-label.md. Latest published versions are Core 2.4.0
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.0
 and UI 3.4.0; source versions do not establish npm publication.
 
 ui-document 0.12.0 is published. It adds independent
@@ -304,7 +340,7 @@ contract. The previous @token:color:<key> XML prefix is rejected; update authore
 references explicitly. Literal strings and other token categories are unchanged.
 The original color integration shipped in ui-document 0.10.0, CLI 3.2.0 and
 ui-runtime 0.8.1. The Label preset integration originally used document 0.11.0
-and CLI 3.3.0. Current CLI 3.5.0/runtime 0.10.0 require document ^0.13.0;
+and CLI 3.3.0. Current CLI 3.6.0/runtime 0.10.0 require document ^0.13.0;
 CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and

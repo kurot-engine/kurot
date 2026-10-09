@@ -1,14 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TextField, TextFieldType, splitGraphemes } from '../src/index.js';
 import { CanvasRenderer } from '../src/kurot/player/canvas/CanvasRenderer.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 const characters = ['👩‍👩‍👧‍👦', '🇨🇳', '👍🏽', 'e\u0301', 'क्ष'];
 
-function measureText(text: string): { width: number } {
+function measureText(text: string): TextMetrics {
 	for (const character of characters) {
 		text = text.replaceAll(character, 'x');
 	}
-	return { width: text.length * 10 };
+	return createTextMetrics(text.length * 10);
 }
 
 function paintedLines(field: TextField): string[] {

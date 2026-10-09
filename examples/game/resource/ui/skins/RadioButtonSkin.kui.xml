@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.RadioButtonSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected">
-    <Group id="root">
-        <Group height="100%" width="100%">
-            <layout>
-                <HorizontalLayout verticalAlign="middle" />
-            </layout>
-            <Image alpha="1" fillMode="scale" source="radiobutton_unselect_png" alpha.disabled="0.5" source.disabledAndSelected="radiobutton_select_disabled_png" alpha.down="0.7" source.downAndSelected="radiobutton_select_down_png" source.upAndSelected="radiobutton_select_up_png" />
-            <Label id="labelDisplay" fontFamily="Tahoma" size="20" textAlign="center" textColor="#707070" verticalAlign="middle" />
-        </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.RadioButtonSkin" states="disabled,disabledAndSelected,down,downAndSelected,up,upAndSelected" minHeight="44">
+    <Group height="100%" width="100%">
+        <layout>
+            <HorizontalLayout gap="10" paddingTop="8" paddingBottom="8" verticalAlign="middle" />
+        </layout>
+        <Image width="28" height="28" source="kui.radio_up" source.down="kui.radio_down" source.disabled="kui.radio_disabled" source.disabledAndSelected="kui.radio_selected_disabled" source.downAndSelected="kui.radio_selected_down" source.upAndSelected="kui.radio_selected" />
+        <Label id="labelDisplay" size="18" multiline="false" textColor="@style:colors:text" textColor.disabled="@style:colors:disabled-text" textColor.disabledAndSelected="@style:colors:disabled-text" verticalAlign="middle" />
     </Group>
 </Skin>

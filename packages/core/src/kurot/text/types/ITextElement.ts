@@ -23,6 +23,18 @@ export interface IWTextElement extends ITextElement {
 export interface ILineElement {
 	width: number;
 	height: number;
+	/**
+	 * Shared alphabetic baseline measured from the nominal line top, in logical pixels.
+	 */
+	baseline: number;
+	/**
+	 * Largest visible run extent above the shared baseline, excluding outlines.
+	 */
+	inkAscent: number;
+	/**
+	 * Largest visible run extent below the shared baseline, excluding outlines.
+	 */
+	inkDescent: number;
 	charNum: number;
 	hasNextLine: boolean;
 	elements: IWTextElement[];

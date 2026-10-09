@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.LabelSkin">
-    <Label id="labelDisplay" height="100%" size="14" textColor="#DFE6E9" width="100%" />
-</Skin>

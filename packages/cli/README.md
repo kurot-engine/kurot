@@ -1,13 +1,14 @@
 # @kurot/cli
 
-**3.5.0 is published**, verified on npm on 2026-10-09. Its dependency
-installation and lock resolve published ui-document 0.13.0 without local overrides.
-See [centered flips](../../docs/centered-flips.md) for APIs and adoption requirements.
+**3.6.0 is published**, verified on npm on 2026-10-10 with matching registry
+integrity and successful package download. It adds the rounded 2× KUI game skin kit and mascot brand splash,
+and fixes development Theme lookup and empty runtime asset directories.
+Core 2.5.0 is also published and verified; new game scaffolds resolve Core ^2.5.0. The dependency/lock remains published ui-document 0.13.0.
 
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.5.0 (published).** Requires `@kurot/ui-document@^0.13.0`
+> **Current version: 3.6.0 (published).** Requires `@kurot/ui-document@^0.13.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -76,12 +77,11 @@ See the [compilation contract](docs/label-text-layout.md) and
 
 ## Usage
 
-The CLI does not require a global install. Use the published version below.
-Existing templates keep their declared SDK
-baseline; adopt Core/UI centered-flip versions explicitly when using the flags.
+The CLI does not require a global install. Use published CLI 3.6.0 below. New game scaffolds need Core ^2.5.0 for the
+2× skin kit; existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@3.5.0 create my-game
+npx @kurot/cli@3.6.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -89,7 +89,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.5.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.6.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -106,7 +106,16 @@ resource loading, and an editable HTML template. Fonts load before creating UI;
 translations register after preload. The `empty` template contains a minimal
 `Sprite` application without UI/style/language dependencies.
 
-The unreleased game-template refresh introduces a "Made with Kurot" brand splash
+CLI 3.6.0 supplies rounded Kurot-owned textures,
+native `.kui.xml` component states and resource-default nine-slice grids under
+`resource/assets/ui/kui`. See [default KUI skins](docs/default-ui-skins.md).
+Registry CLI 3.5.0 still contains the previous atlas.
+The default Button uses symmetric padding and Panel titles use middle alignment.
+The source preview also uses Core 2.5.0's multilingual ink centering;
+inputs and multiline text retain stable baselines.
+The new 2× atlas requires published Core ^2.5.0; CLI 3.6.0 is also published.
+
+The CLI 3.6.0 game-template refresh introduces a "Made with Kurot" brand splash
 with a playful mascot entrance, looping hops and sparkles. It supports reduced
 motion and applies to newly created projects; see [HTML brand splash](docs/game-template.md#html-brand-splash).
 
@@ -122,7 +131,7 @@ Development output is written to `bin-debug/`. Release output is written to
 project namespace, theme, and application code are separate ESM chunks joined
 by the generated HTML import map.
 
-The unreleased asset-copy correction omits empty runtime directory trees;
+The CLI 3.6.0 asset-copy correction omits empty runtime directory trees;
 registry CLI 3.5.0 does not include it. With KUI enabled, authored
 `.kui.xml` files are compiled into the theme chunk and excluded from `resource/`;
 skin-only directories such as `resource/ui` therefore do not appear in output.
@@ -217,7 +226,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Current CLI 3.5.0 uses published `@kurot/ui-document@^0.13.0` and retains its literal-string XML rules.
+Current CLI 3.6.0 uses published `@kurot/ui-document@^0.13.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -355,6 +364,6 @@ than selecting a different preset. Missing presets, unsupported selection or
 invalid configuration fail explicitly. Expansion runs after resource defaults
 and before color resolution. It does not load fonts or measure text.
 
-Current CLI 3.5.0 uses published ui-document 0.13.0 without local overrides. CLI
+Current CLI 3.6.0 uses published ui-document 0.13.0 without local overrides. CLI
 3.2.1 does not include this feature. Existing projects are not migrated.
 See [the shared contract](../ui-document/docs/project-styles.md).

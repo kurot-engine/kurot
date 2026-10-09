@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.CloseButtonSkin" states="disabled,down,up" minWidth="44" minHeight="44">
+    <Image width="32" height="32" horizontalCenter="0" verticalCenter="0" source="kui.close_up" source.down="kui.close_down" source.disabled="kui.close_disabled" />
+</Skin>

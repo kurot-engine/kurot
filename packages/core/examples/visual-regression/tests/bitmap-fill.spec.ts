@@ -44,25 +44,27 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 			const result = await page.evaluate(() => {
 				const { bitmap, root, configure, compare, kurot, player } = window.bitmapFill;
 				const mismatches: Record<string, number> = {};
-				for (const trimmed of [false, true]) {
-					for (const rotated of [false, true]) {
-						configure(trimmed, rotated);
-						for (const mode of ['repeat', 'clip'] as const) {
-							bitmap.tint = 0xffffff;
-							bitmap.fillMode = mode;
-							bitmap.scale9Grid = new kurot.Rectangle(2, 1, 2, 2);
-							const name = `${mode}-${trimmed}-${rotated}`;
-							mismatches[name] = compare();
-							root.cacheAsBitmap = true;
-							mismatches[`${name}-cache`] = compare();
-							bitmap.fillMode = mode === 'repeat' ? 'clip' : 'repeat';
-							mismatches[`${name}-changed-cache`] = compare();
-							root.cacheAsBitmap = false;
-							bitmap.tint = 0x80ff40;
-							mismatches[`${name}-tint`] = compare();
-							root.cacheAsBitmap = true;
-							mismatches[`${name}-tinted-cache`] = compare();
-							root.cacheAsBitmap = false;
+				for (const density of [1, 2, 3]) {
+					for (const trimmed of [false, true]) {
+						for (const rotated of [false, true]) {
+							configure(trimmed, rotated, density);
+							for (const mode of ['repeat', 'clip'] as const) {
+								bitmap.tint = 0xffffff;
+								bitmap.fillMode = mode;
+								bitmap.scale9Grid = new kurot.Rectangle(2, 1, 2, 2);
+								const name = `${density}-${mode}-${trimmed}-${rotated}`;
+								mismatches[name] = compare();
+								root.cacheAsBitmap = true;
+								mismatches[`${name}-cache`] = compare();
+								bitmap.fillMode = mode === 'repeat' ? 'clip' : 'repeat';
+								mismatches[`${name}-changed-cache`] = compare();
+								root.cacheAsBitmap = false;
+								bitmap.tint = 0x80ff40;
+								mismatches[`${name}-tint`] = compare();
+								root.cacheAsBitmap = true;
+								mismatches[`${name}-tinted-cache`] = compare();
+								root.cacheAsBitmap = false;
+							}
 						}
 					}
 				}
@@ -73,6 +75,35 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				bitmap.scale9Grid = undefined;
 				bitmap.fillMode = 'scale';
 				mismatches.scale = compare();
+				const capture = (): Uint8ClampedArray => {
+					player.render(false, 0);
+					const source = document.querySelector('canvas')!;
+					const copy = document.createElement('canvas');
+					copy.width = source.width;
+					copy.height = source.height;
+					const context = copy.getContext('2d')!;
+					context.drawImage(source, 0, 0);
+					return context.getImageData(0, 0, copy.width, copy.height).data;
+				};
+				bitmap.width = 37;
+				bitmap.height = 29;
+				bitmap.scale9Grid = new kurot.Rectangle(3, 2, 2, 1);
+				for (const trimmed of [false, true]) {
+					for (const tint of [0xffffff, 0x80ff40]) {
+						for (const cached of [false, true]) {
+							root.cacheAsBitmap = cached;
+							bitmap.tint = tint;
+							configure(trimmed, false, 1);
+							const reference = capture();
+							for (const density of [2, 3]) {
+								configure(trimmed, false, density);
+								const actual = capture();
+								const count = actual.reduce((sum, value, i) => sum + (value !== reference[i] ? 1 : 0), 0);
+								mismatches[`nine-slice-${density}-${trimmed}-${tint}-${cached}`] = count;
+							}
+						}
+					}
+				}
 				return { mismatches, webgl: player.isWebGL };
 			});
 			expect(result.webgl).toBe(backend !== 'canvas');

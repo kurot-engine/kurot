@@ -3,6 +3,7 @@ import { createPlayer } from '../src/kurot/player/createPlayer.js';
 import { Player } from '../src/kurot/player/Player.js';
 import { ScreenAdapter } from '../src/kurot/player/ScreenAdapter.js';
 import { TouchHandler } from '../src/kurot/player/TouchHandler.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 describe('createPlayer lifecycle', () => {
 	beforeEach(() => {
@@ -11,7 +12,7 @@ describe('createPlayer lifecycle', () => {
 			return {
 				setTransform: vi.fn(),
 				clearRect: vi.fn(),
-				measureText: () => ({ width: 0 }),
+				measureText: () => createTextMetrics(0),
 			} as unknown as CanvasRenderingContext2D;
 		});
 	});

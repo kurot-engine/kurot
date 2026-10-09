@@ -1,12 +1,12 @@
 # Project styles and languages in the game template
 
 Project-owned style/font/language initialization was introduced in CLI 3.2.1
-and remains in published CLI 3.5.0. Existing projects keep their own startup
+and remains in published CLI 3.6.0. Existing projects keep their own startup
 code and HTML; the empty template stays minimal.
 
 ## Files
 
-- resource/config/style.json declares the primary font role and disabled-text color.
+- resource/config/style.json declares the primary font role and skin text colors.
 - resource/assets/fonts contains unmodified Chakra Petch regular (400) and bold (700)
   files, with OFL.txt. Source: [Google Fonts](https://github.com/google/fonts/tree/main/ofl/chakrapetch).
 - resource/config/locale.json enables English and selects en_US by default.
@@ -30,7 +30,7 @@ Templates do not implement live font/theme/language replacement.
 
 ## HTML brand splash
 
-This splash is unreleased template work; npm CLI 3.5.0 does not include it.
+This splash is included in published CLI 3.6.0; npm CLI 3.5.0 lacks it.
 
 The game template's `web/index.html` presents `web/logo.png` beneath a small
 "Made with" caption. The mascot makes a gentle entrance, then repeats a playful
@@ -47,6 +47,12 @@ project's HTML. This template update applies to newly scaffolded game projects;
 existing project HTML is project-owned.
 
 ## Change fonts and colors
+
+The CLI 3.6.0 [default KUI skins](default-ui-skins.md) use Kurot-owned textures
+under resource/assets/ui/kui and a matching color palette. Registry CLI 3.5.0
+does not include this skin refresh. Skin state text colors compile from the
+project stylesheet; texture colors are baked into the PNG, without live palette
+switching. Templates inherit project fonts and retain the existing licensed files.
 
 Font keys such as primary produce stable aliases such as kurot-primary. Replace
 files and update style.json resource-relative paths, retaining weight 400 and

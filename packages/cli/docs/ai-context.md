@@ -1,12 +1,13 @@
 # @kurot/cli — AI context map
 
-CLI 3.5.0 is published, verified on npm on 2026-10-09. Development installs
+CLI 3.6.0 is published, verified on npm on 2026-10-10, including latest,
+package download and matching registry integrity. Development installs
 published ui-document 0.13.0 with a matching
 registry lockfile, without local overrides. Read
 [centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. Version `@kurot/cli@3.5.0` is published, runs on Node.js 20+,
+explains the plugin pipeline. Version `@kurot/cli@3.6.0` is published, runs on Node.js 20+,
 and is installed as a project dev dependency.
 
 ## Directory map
@@ -31,7 +32,16 @@ src/
 ```
 
 Project templates are under `templates/game` and `templates/empty`.
-The game template's looping mascot brand splash is unreleased; registry
+The CLI 3.6.0 game template's default KUI skin refresh includes 16 native Skin files,
+a Kurot-owned 2× atlas with logical resource-default nine-slice grids, and project palette
+colors. These replace the old EUI assets. Group/List/TabBar and text/image nodes use
+native XML composition rather than unused default Skin placeholders. See
+[default KUI skins](default-ui-skins.md). Private tools/default-ui-assets generates
+the committed assets with registry Atlas; CLI gains no atlas runtime dependency.
+The 2× sheet requires Core ^2.5.0; published Core 2.4.0
+does not interpret it. Private preview tooling binds checkout Core in an isolated
+trial. Core 2.5.0 was published before CLI 3.6.0; both are verified on npm.
+The CLI 3.6.0 game template includes the looping mascot brand splash; registry
 CLI 3.5.0 does not contain that HTML/logo refresh. See game-template.md.
 The 3.2.1 game template includes fixed style/locale configuration,
 English properties and licensed regular/bold font files. StyleManager finishes
@@ -72,7 +82,7 @@ CLI 3.5.0 validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
 nonvisual Skin root fail compilation. Negative scales are preserved.
 
-CLI 3.5.0 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
+CLI 3.6.0 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -125,8 +135,10 @@ manual prefix cannot conflict with `ui.components.namespace`.
   identity.
 - Engine and custom namespace chunks share `ctx.outputs.engine` because the
   import-map writer treats both as external specifier mappings.
-- Release bundles preserve class names. UI theme fallback uses constructor
-  names, so normal identifier minification would break skin lookup.
+- Engine and reusable namespace bundles preserve class names in both modes.
+  The CLI 3.6.0 development fix also protects self-referencing classes, which
+  esbuild can rename without minification. Registry CLI 3.5.0 protects release
+  names only. Theme fallback uses constructor names.
 - The Skin module builder stages output in a temporary directory and installs a
   bundle only after every Skin succeeds.
 - `cleanOutput` wipes the active output directory at the start of each build.
@@ -134,7 +146,7 @@ manual prefix cannot conflict with `ui.components.namespace`.
 - `create` queries the npm registry for current Kurot package versions and falls
   back to `latest` if the request fails.
 - Release output is timestamped and `manifest.json` exists only in release.
-- The unreleased asset-copy correction omits empty runtime directory trees,
+- The CLI 3.6.0 asset-copy correction omits empty runtime directory trees,
   including skin-only `resource/ui`. Runtime files under UI directories remain
   eligible; generated theme JSON and the compiled Skin module remain required.
   Template copies still preserve empty directories. Registry CLI 3.5.0 does not

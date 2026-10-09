@@ -7,7 +7,7 @@ declare global {
 			root: kurot.Sprite;
 			player: kurot.Player;
 			kurot: typeof kurot;
-			configure(trimmed: boolean, rotated: boolean): void;
+			configure(trimmed: boolean, rotated: boolean, density?: number): void;
 			compare(): number;
 		};
 	}
@@ -39,7 +39,7 @@ tile.height = 6;
 const atlas = document.createElement('canvas');
 atlas.width = atlas.height = 32;
 
-function configure(trimmed: boolean, rotated: boolean): void {
+function configure(trimmed: boolean, rotated: boolean, density = 1): void {
 	const tileContext = tile.getContext('2d')!;
 	tileContext.clearRect(0, 0, 8, 6);
 	const left = trimmed ? 2 : 0;
@@ -52,7 +52,10 @@ function configure(trimmed: boolean, rotated: boolean): void {
 			tileContext.fillRect(left + x, top + y, 1, 1);
 		}
 	}
+	atlas.width = atlas.height = 32 * density;
 	const context = atlas.getContext('2d')!;
+	context.imageSmoothingEnabled = false;
+	context.scale(density, density);
 	context.fillStyle = '#ff00ff';
 	context.fillRect(0, 0, 32, 32);
 	context.save();
@@ -64,9 +67,10 @@ function configure(trimmed: boolean, rotated: boolean): void {
 	}
 	context.drawImage(tile, left, top, width, height, 0, 0, width, height);
 	context.restore();
-	const texture = new kurot.Texture();
+	const texture = new kurot.Texture(density);
 	texture.bitmapData = new kurot.BitmapData(atlas);
-	texture.initData(10, 12, width, height, left, top, 8, 6, 32, 32, rotated);
+	texture.initData(10 * density, 12 * density, width * density, height * density,
+		left * density, top * density, 8 * density, 6 * density, 32 * density, 32 * density, rotated);
 	bitmap.texture = texture;
 }
 

@@ -11,7 +11,8 @@
 	"dependencies": {
 		"@kurot/core": "^2.1.1",
 		"@kurot/game": "^2.0.0",
-		"@kurot/ui": "^3.1.0"
+		"@kurot/ui": "^3.1.0",
+		"@kurot/ui-document": "^0.13.0"
 	},
 	"devDependencies": {
 		"@kurot/cli": "^3.3.1"

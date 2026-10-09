@@ -9,6 +9,7 @@ import type { RenderBuffer } from '../src/kurot/player/RenderBuffer.js';
 import { TextField } from '../src/kurot/text/TextField.js';
 import { getTextRenderPadding } from '../src/kurot/text/TextRenderBounds.js';
 import { TextFieldType } from '../src/kurot/text/enums/TextFieldType.js';
+import { createTextMetrics } from './helpers/text-metrics.js';
 
 function createContext(): CanvasRenderingContext2D {
 	return {
@@ -16,7 +17,7 @@ function createContext(): CanvasRenderingContext2D {
 		save: vi.fn(), restore: vi.fn(), translate: vi.fn(),
 		beginPath: vi.fn(), rect: vi.fn(), clip: vi.fn(),
 		fillText: vi.fn(), strokeText: vi.fn(),
-		measureText: vi.fn((text: string) => ({ width: text.length * 10 })),
+		measureText: vi.fn((text: string) => createTextMetrics(text.length * 10)),
 	} as unknown as CanvasRenderingContext2D;
 }
 

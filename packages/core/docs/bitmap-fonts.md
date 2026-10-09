@@ -66,6 +66,8 @@ art. NaN removes a dimension constraint. Height admits complete line boxes;
 multiline=false draws the first hard-separated line without width wrapping.
 Explicit zero height draws nothing. Default textureScaleFactor=1 is required for
 font assets in this initial implementation.
+The Core 2.5.0 texture-density extension keeps literal font metrics separate:
+BitmapFont page textures require resolution=1. See [texture density](texture-density.md).
 
 WebGL's BitmapTextPipe submits cropped glyph quads to ordinary texture batching,
 with current transforms, alpha, tint, blend, clipping and filters. Canvas uses the

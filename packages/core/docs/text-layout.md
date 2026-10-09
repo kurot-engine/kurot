@@ -40,6 +40,46 @@ Dictionary and grapheme segmentation follow the browser's `Intl` data. The
 pinned Unicode 17.0 tables govern the line-break profile; they do not replace
 the browser's grapheme implementation.
 
+## Visual centering and stable baselines (Core 2.5.0)
+
+Canvas and WebGL use the same alphabetic baseline and logical-pixel Canvas
+`TextMetrics`. Each cached line records `baseline`, `inkAscent` and `inkDescent`;
+rich runs share that baseline, even when their sizes or font families differ.
+Visible bounds include fallback glyphs, accents and combining marks. No language
+or operating-system offset table is used.
+
+- Dynamic text with `multiline = false` and `verticalAlign = "middle"` centers
+  the union of visible run ink in the field. Empty/whitespace-only lines use
+  the nominal line box. Changing a button caption may change its baseline so
+  its visible glyphs remain centered.
+- Multiline text and INPUT retain font-based baselines. Font-frame bounds are
+  measured with an empty string per font configuration, independently of the
+  current caption and its fallback glyphs. Empty lines retain the same frame.
+  Input caret/selection use the nominal row; composition underlines stay inside
+  the viewport. Top/bottom alignment also uses nominal line boxes.
+- `textHeight`, `measureText()`, wrapping, row spacing and layout bounds retain
+  their nominal size contract. Dynamic glyph overhang is added only to render
+  captures, together with outlines; INPUT and external clips remain exact.
+- Measurements are reused with the TextField line cache. After loading/replacing
+  a font, call `invalidateTextMetrics()` through the existing readiness path.
+  Fonts and browser rasterization can differ across systems; centering follows
+  the actual selected glyphs rather than promising identical pixels.
+
+See the [Canvas TextMetrics contract](https://html.spec.whatwg.org/multipage/canvas.html#textmetrics).
+The correction is included in published Core 2.5.0; it is not in
+published Core 2.4.0. There is no new alignment
+property, runtime dependency or XML format. Default KUI single-line control
+labels use the existing flags with symmetric padding. Adopt Core 2.5.0 and rebuild to receive this behavior; SDK peers need no
+incidental change.
+
+`test/TextVerticalLayout.test.ts` covers ink centering, mixed sizes, stable input
+and paragraph baselines, link hits, blank rows, overhang and font invalidation.
+The minified `text-alignment.spec.ts` compares 18 multilingual strings in regular
+and bold faces against an independent Canvas reference in Canvas/WebGL 1/2 at
+1×/2×, including rich runs, outlines, nested caches and tight Thai/Hindi rows.
+The continuous-frame checks also cover restoring the root WebGL target after
+its initial offscreen allocation.
+
 ## Independent measurement (Core 2.3.0)
 
 `textField.measureText(width = NaN)` measures complete content under a separate

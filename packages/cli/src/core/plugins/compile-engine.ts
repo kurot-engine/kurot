@@ -76,9 +76,9 @@ async function bundlePackage(
 		platform: 'browser',
 		target: 'es2022',
 		minify,
-		// Theme resolves default skins by constructor.name; release minification
-		// must preserve that runtime contract.
-		keepNames: minify,
+		// Theme lookup also needs original names when development bundling
+		// renames a self-referencing class expression.
+		keepNames: true,
 		metafile: true,
 		logLevel: 'warning',
 		external: project.enginePackages.filter(p => p !== pkg),

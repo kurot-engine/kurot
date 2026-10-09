@@ -1,15 +1,82 @@
 {
 	"groups": [
 		{
-			"keys": "eui",
+			"keys": "kui",
 			"name": "preload"
 		}
 	],
 	"resources": [
 		{
-			"name": "eui",
+			"name": "kui",
 			"type": "sheet",
-			"url": "assets/eui.json"
+			"url": "assets/ui/kui/kui.json",
+			"subkeys": {
+				"button_up": {
+					"scale9grid": "16,16,16,16"
+				},
+				"button_down": {
+					"scale9grid": "16,16,16,16"
+				},
+				"button_disabled": {
+					"scale9grid": "16,16,16,16"
+				},
+				"surface_up": {
+					"scale9grid": "16,16,16,16"
+				},
+				"surface_down": {
+					"scale9grid": "16,16,16,16"
+				},
+				"surface_selected": {
+					"scale9grid": "16,16,16,16"
+				},
+				"surface_selected_down": {
+					"scale9grid": "16,16,16,16"
+				},
+				"surface_disabled_selected": {
+					"scale9grid": "16,16,16,16"
+				},
+				"panel": {
+					"scale9grid": "24,24,16,16"
+				},
+				"track": {
+					"scale9grid": "3,3,2,2"
+				},
+				"progress_track": {
+					"scale9grid": "5,5,2,2"
+				},
+				"progress": {
+					"scale9grid": "5,5,2,2"
+				},
+				"scroll_thumb": {
+					"scale9grid": "3,3,2,2"
+				},
+				"checkbox_up": {},
+				"checkbox_down": {},
+				"checkbox_disabled": {},
+				"checkbox_selected": {},
+				"checkbox_selected_down": {},
+				"checkbox_selected_disabled": {},
+				"radio_up": {},
+				"radio_down": {},
+				"radio_disabled": {},
+				"radio_selected": {},
+				"radio_selected_down": {},
+				"radio_selected_disabled": {},
+				"slider_thumb": {},
+				"slider_thumb_disabled": {},
+				"switch_off": {},
+				"switch_on": {},
+				"switch_disabled_off": {},
+				"switch_disabled_on": {},
+				"switch_handle": {},
+				"switch_handle_disabled": {},
+				"chevron": {},
+				"chevron_open": {},
+				"chevron_disabled": {},
+				"close_up": {},
+				"close_down": {},
+				"close_disabled": {}
+			}
 		}
 	]
 }

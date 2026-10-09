@@ -46,20 +46,20 @@ correctness and performance validation system.
 
 ## Packages and dependencies
 
-Version audit: 2026-10-10. All nine package versions below match their manifests
-and npm `latest`; dependencies and peer ranges match the published metadata.
-Feature introductions and benchmark results retain their recorded release
-versions. CLI's new brand splash is unreleased; a source version does not prove
-that later checkout changes are included in the registry artifact.
+Version audit: 2026-10-10. The table records source manifest versions.
+Core 2.5.0 and CLI 3.6.0 are published, verified on npm on 2026-10-10,
+including latest tags and package downloads. The other seven versions match npm
+`latest`. Dependency/peer ranges remain unchanged. Feature introductions and
+benchmark results retain their recorded release versions.
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.4.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/core`](packages/core/README.md)               | 2.5.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.4.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.5.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.6.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.10.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
@@ -88,6 +88,17 @@ design tokens. It executes transactional one-way data bindings, semantic
 actions, numeric appearance transitions, component states, and
 category-specific resource adapters while keeping game logic outside the
 document.
+
+Core 2.5.0 adds independent texture source density and fixes multilingual text
+alignment, fractional WebGL viewport edges and root-target restoration. CLI 3.6.0
+adds the rounded native 2× KUI skin kit, mascot brand splash and build fixes.
+Both releases are published. New game scaffolds need Core ^2.5.0; existing SDK
+peers accept it without new releases. Existing projects update chosen installations
+and locks, then rebuild; their own skins and HTML are retained. Editor/Reskin
+resource authoring adoption additionally needs density-aware logical dimensions.
+See [texture density](packages/core/docs/texture-density.md),
+[default KUI skins](packages/cli/docs/default-ui-skins.md) and the
+[dependency policy](docs/dependency-policy.md).
 
 Core 2.4.0, UI 3.4.0 and ui-document 0.13.0 are published, verified on npm
 on 2026-10-09, with centered display/UI flips and shared authoring metadata.

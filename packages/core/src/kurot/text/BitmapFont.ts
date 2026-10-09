@@ -27,6 +27,7 @@ export class BitmapFont extends SpriteSheet {
 		this.data = parseBitmapFont(config);
 		this._ownsTexture = options.ownsTexture ?? true;
 		if (textureScaleFactor !== 1) throw new RangeError('BitmapFont requires textureScaleFactor=1.');
+		if (texture.resolution !== 1) throw new RangeError('BitmapFont metrics require a page texture with resolution=1.');
 		if (
 			texture.bitmapX !== 0 ||
 			texture.bitmapY !== 0 ||

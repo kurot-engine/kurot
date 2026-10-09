@@ -1,5 +1,5 @@
 import { getWordLineBreaks } from './LineBreaks.js';
-import { measureText } from './TextMeasurer.js';
+import { getFontString, measureTextMetrics } from './TextMeasurer.js';
 import { getGraphemeEndPositions } from './TextSegmentation.js';
 import type { ILineElement, ITextElement, ITextStyle, IWTextElement } from './types/ITextElement.js';
 
@@ -27,9 +27,10 @@ interface TextSpan {
  */
 export function layoutTextLines(elements: ITextElement[], options: TextLineLayoutOptions): ILineElement[] {
 	if (options.maxWidth === 0) {
-		return [{ width: 0, height: 0, charNum: 0, hasNextLine: false, elements: [] }];
+		return [{ width: 0, height: 0, baseline: 0, inkAscent: 0, inkDescent: 0, charNum: 0, hasNextLine: false, elements: [] }];
 	}
 
+	const fontFrames = new Map<string, TextMetrics>();
 	const text = elements.map(element => element.text).join('');
 	let offset = 0;
 	const spans: TextSpan[] = elements.map(element => {
@@ -139,6 +140,21 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 		lastLine.hasNextLine = separatorLength > 0;
 	}
 
+	// Empty-string font bounds keep fallback glyphs from moving paragraph/input baselines.
+	function getFontFrame(style?: ITextStyle): TextMetrics {
+		const size = style?.size ?? options.size;
+		const family = style?.fontFamily ?? options.fontFamily;
+		const bold = style?.bold ?? options.bold;
+		const italic = style?.italic ?? options.italic;
+		const key = getFontString(size, family, bold, italic);
+		let metrics = fontFrames.get(key);
+		if (!metrics) {
+			metrics = measureTextMetrics('', family, size, bold, italic);
+			fontFrames.set(key, metrics);
+		}
+		return metrics;
+	}
+
 	function createLine(start: number, end: number, trimSeparators: boolean): ILineElement {
 		let visibleEnd = end;
 		if (trimSeparators) {
@@ -150,6 +166,10 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 		const lineElements: IWTextElement[] = [];
 		let width = 0;
 		let height = 0;
+		let fontAscent = 0;
+		let fontDescent = 0;
+		let inkAscent = -Infinity;
+		let inkDescent = -Infinity;
 		while (spanIndex < spans.length && spans[spanIndex].end <= start) {
 			spanIndex++;
 		}
@@ -161,15 +181,22 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			const content = text.slice(Math.max(start, span.start), Math.min(visibleEnd, span.end));
 			const style = span.style;
 			const size = style?.size ?? options.size;
-			const elementWidth = measureText(
+			const metrics = measureTextMetrics(
 				content,
 				style?.fontFamily ?? options.fontFamily,
 				size,
 				style?.bold ?? options.bold,
 				style?.italic ?? options.italic,
 			);
-			lineElements.push({ text: content, width: elementWidth, style });
-			width += elementWidth;
+			lineElements.push({ text: content, width: metrics.width, style });
+			width += metrics.width;
+			const frame = getFontFrame(options.isInput ? undefined : style);
+			fontAscent = Math.max(fontAscent, frame.fontBoundingBoxAscent);
+			fontDescent = Math.max(fontDescent, frame.fontBoundingBoxDescent);
+			if (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 0) {
+				inkAscent = Math.max(inkAscent, metrics.actualBoundingBoxAscent);
+				inkDescent = Math.max(inkDescent, metrics.actualBoundingBoxDescent);
+			}
 			if (!options.isInput) {
 				height = Math.max(height, size);
 			}
@@ -180,6 +207,18 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			const blankSpan = spans[spanIndex] ?? spans[spans.length - 1];
 			height = blankSpan?.style?.size ?? options.size;
 		}
-		return { width, height, charNum: end - start, hasNextLine: false, elements: lineElements };
+		if (lineElements.length === 0) {
+			const style = options.isInput ? undefined : (spans[spanIndex] ?? spans[spans.length - 1])?.style;
+			const metrics = getFontFrame(style);
+			fontAscent = metrics.fontBoundingBoxAscent;
+			fontDescent = metrics.fontBoundingBoxDescent;
+		}
+		const baseline = (height + fontAscent - fontDescent) / 2;
+		return {
+			width, height, baseline,
+			inkAscent: inkAscent === -Infinity ? 0 : inkAscent,
+			inkDescent: inkDescent === -Infinity ? 0 : inkDescent,
+			charNum: end - start, hasNextLine: false, elements: lineElements,
+		};
 	}
 }

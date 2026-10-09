@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.TextInputSkin" states="disabled,disabledWithPrompt,normal,normalWithPrompt">
-    <Group id="root" minHeight="40" minWidth="300">
-        <Rect fillColor="#FFFFFF" height="100%" width="100%" alpha.disabled="0.5" />
-        <EditableText id="textDisplay" height="24" left="10" right="10" size="20" textColor="#000000" verticalAlign="middle" verticalCenter="0" textColor.disabled="#FF0000" />
-        <Label id="promptDisplay" height="24" left="10" multiline="false" right="10" size="20" textColor="#A9A9A9" touchEnabled="false" verticalAlign="middle" verticalCenter="0" visible="false" wordWrap="false" visible.disabledWithPrompt="true" visible.normalWithPrompt="true" />
-    </Group>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.TextInputSkin" states="disabled,disabledWithPrompt,normal,normalWithPrompt" minHeight="48" minWidth="160">
+    <Image height="100%" width="100%" source="kui.surface_up" source.disabled="kui.button_disabled" source.disabledWithPrompt="kui.button_disabled" touchEnabled="false" />
+    <EditableText id="textDisplay" height="28" left="14" right="14" size="18" textColor="@style:colors:text" verticalAlign="middle" verticalCenter="0" textColor.disabled="@style:colors:disabled-text" textColor.disabledWithPrompt="@style:colors:disabled-text" />
+    <Label id="promptDisplay" height="28" left="14" right="14" size="18" multiline="false" textColor="@style:colors:muted-text" textColor.disabledWithPrompt="@style:colors:disabled-text" touchEnabled="false" verticalAlign="middle" verticalCenter="0" visible="false" visible.disabledWithPrompt="true" visible.normalWithPrompt="true" />
 </Skin>

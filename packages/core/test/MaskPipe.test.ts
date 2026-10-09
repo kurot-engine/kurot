@@ -35,6 +35,26 @@ describe('MaskPipe viewport clipping', () => {
 		expect(enableScissor).not.toHaveBeenCalled();
 	});
 
+	it.each([
+		{ name: 'fractional viewport', matrix: new Matrix(0.971875, 0, 0, 0.9, 58.3125, 20.7), expected: [58, 259, 226, 44] },
+		{ name: 'fractional translation', matrix: new Matrix(1, 0, 0, 1, 60.7, 20.7), expected: [60, 254, 233, 49] },
+		{ name: 'reflected viewport', matrix: new Matrix(-0.75, 0, 0, -0.9, 250.8, 100.3), expected: [76, 222, 175, 44] },
+	])('quantizes the $name edges without shrinking their pixel coverage', ({ matrix, expected }) => {
+		const viewport = new Sprite();
+		viewport.scrollRect = new Rectangle(13, 27, 232, 48);
+		const enableScissor = vi.fn();
+		const buffer = {
+			globalMatrix: matrix, height: 323, hasScissor: false,
+			context: { enableScissor },
+		} as unknown as WebGLRenderBuffer;
+		const pipe = new MaskPipe(() => {});
+		const push = MaskPipe.makePush(viewport, 0, 0);
+
+		expect(pipe.executeScrollRectPush(push, buffer)).toBe(true);
+		expect(enableScissor).toHaveBeenCalledWith(...expected);
+		MaskPipe.releasePush(push);
+	});
+
 	it('preserves the local origin of a rectangular mask inside an outer clip', () => {
 		const renderable = new Sprite();
 		renderable.mask = new Rectangle(15, 25, 40, 70);

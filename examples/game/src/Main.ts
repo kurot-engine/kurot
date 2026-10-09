@@ -10,6 +10,8 @@ import { createPlayer, TextField, Shape, Event, Stage, Texture, resource } from 
 import { Button, DefaultAssetAdapter, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
 import { Tween } from '@kurot/game';
 import { LoadingUI } from './LoadingUI';
+import { DefaultUI } from './DefaultUI';
+import { StyleManager } from './StyleManager';
 
 class Main extends UILayer {
 	createChildren(): void {
@@ -28,7 +30,9 @@ class Main extends UILayer {
 		this.installResourceAssetAdapter();
 		await this.loadTheme();
 		this.createGameScene(stage);
-		this.startAnimation();
+		if (!new URLSearchParams(location.search).has('ui')) {
+			this.startAnimation();
+		}
 	}
 
 	/**
@@ -81,6 +85,13 @@ class Main extends UILayer {
 	 * 使用 Shape（矢量绘制）和 TextField（文本）等基础显示对象搭建画面。
 	 */
 	private createGameScene(stage: Stage): void {
+		if (new URLSearchParams(location.search).has('ui')) {
+			const gallery = new DefaultUI();
+			gallery.x = 20;
+			gallery.y = 20;
+			this.addChild(gallery);
+			return;
+		}
 		const stageW = stage.stageWidth;
 		const stageH = stage.stageHeight;
 
@@ -154,7 +165,7 @@ class Main extends UILayer {
 }
 
 // ── 启动 ──────────────────────────────────────────────────────────────────
-const app = createPlayer({
+export const app = createPlayer({
 	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
 	contentWidth: 640,
 	contentHeight: 1136,
@@ -162,4 +173,9 @@ const app = createPlayer({
 	frameRate: 60,
 });
 
-app.start(new Main());
+void StyleManager.init().then(() => {
+	TextField.default_fontFamily = StyleManager.fontFamily;
+	app.start(new Main());
+}).catch(error => {
+	console.error('[Main] Unable to load project fonts:', error);
+});

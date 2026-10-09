@@ -88,7 +88,7 @@ class Main extends UILayer {
 	/**
 	 * Create the game scene.
 	 *
-	 * Build a responsive view with EUI components and constraint-based layout.
+	 * Build a responsive view with Kurot UI components and constraint-based layout.
 	 */
 	private _createGameScene(): void {
 		// Responsive background

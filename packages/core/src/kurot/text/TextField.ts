@@ -11,6 +11,7 @@ import { TextFieldType } from './enums/TextFieldType.js';
 import { TextFieldInputType } from './enums/TextFieldInputType.js';
 import { InputController } from './InputController.js';
 import { layoutTextLines } from './TextLineLayout.js';
+import { getTextVerticalOffset } from './TextVerticalLayout.js';
 
 /**
  * TextField displays text content. Supports single-line, multi-line, word wrap,
@@ -744,19 +745,7 @@ export class TextField extends DisplayObject {
 		if (lines.length === 0) return 0;
 
 		const width = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
-		const height = !isNaN(this.$explicitHeight) ? this.$explicitHeight : this.textHeight;
-		let totalTextHeight = 0;
-		for (let i = 0; i < lines.length; i++) {
-			totalTextHeight += lines[i].height;
-			if (i > 0) totalTextHeight += this._lineSpacing;
-		}
-
-		let verticalOffset = 0;
-		if (this._verticalAlign === VerticalAlign.MIDDLE) {
-			verticalOffset = Math.max(0, (height - totalTextHeight) / 2);
-		} else if (this._verticalAlign === VerticalAlign.BOTTOM) {
-			verticalOffset = Math.max(0, height - totalTextHeight);
-		}
+		const verticalOffset = getTextVerticalOffset(this);
 
 		const contentY = localY + this._inputScrollY - verticalOffset;
 		let lineTop = 0;
@@ -880,20 +869,7 @@ export class TextField extends DisplayObject {
 		this.ensureLines();
 		const lines = this._linesArr ?? [];
 		const width = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
-		const height = !isNaN(this.$explicitHeight) ? this.$explicitHeight : this.textHeight;
-
-		let totalTextHeight = 0;
-		for (let i = 0; i < lines.length; i++) {
-			totalTextHeight += lines[i].height;
-			if (i > 0) totalTextHeight += this._lineSpacing;
-		}
-
-		let verticalOffset = 0;
-		if (this._verticalAlign === VerticalAlign.MIDDLE) {
-			verticalOffset = Math.max(0, (height - totalTextHeight) / 2);
-		} else if (this._verticalAlign === VerticalAlign.BOTTOM) {
-			verticalOffset = Math.max(0, height - totalTextHeight);
-		}
+		const verticalOffset = getTextVerticalOffset(this);
 
 		const scrollOffset = this.getScrollYOffset();
 
@@ -901,8 +877,10 @@ export class TextField extends DisplayObject {
 
 		let lineY = 0;
 		for (const line of lines) {
-			if (localY < lineY) break;
-			if (localY <= lineY + line.height) {
+			const top = lineY + Math.min(0, line.baseline - line.inkAscent);
+			const bottom = lineY + Math.max(line.height, line.baseline + line.inkDescent);
+			if (localY < top) break;
+			if (localY <= bottom) {
 				let lineX = 0;
 				if (this._textAlign === HorizontalAlign.RIGHT) {
 					lineX = width - line.width;

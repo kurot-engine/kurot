@@ -1,4 +1,3 @@
-import { textureScaleFactor } from '../../display/texture/Texture.js';
 import type { BitmapText } from '../../text/BitmapText.js';
 import type { Instruction, InstructionSet } from '../InstructionSet.js';
 import type { RenderBuffer } from '../RenderBuffer.js';
@@ -38,8 +37,8 @@ export class BitmapTextPipe implements RenderPipe<BitmapText> {
 				texture.bitmapHeight,
 				position.x + texture.offsetX,
 				position.y + texture.offsetY,
-				texture.bitmapWidth * textureScaleFactor,
-				texture.bitmapHeight * textureScaleFactor,
+				texture.scaleBitmapWidth,
+				texture.scaleBitmapHeight,
 				texture.sourceWidth,
 				texture.sourceHeight,
 				false,

@@ -16,10 +16,10 @@ import { DropShadowFilter } from '../../filters/DropShadowFilter.js';
 import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { HorizontalAlign } from '../../text/enums/HorizontalAlign.js';
-import { VerticalAlign } from '../../text/enums/VerticalAlign.js';
 import { TextFieldType } from '../../text/enums/TextFieldType.js';
 import { getFontString } from '../../text/TextMeasurer.js';
 import { getTextRenderPadding } from '../../text/TextRenderBounds.js';
+import { getTextVerticalOffset } from '../../text/TextVerticalLayout.js';
 import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 import { getRenderContentBounds } from '../render-bounds.js';
 import { drawUnscaledBitmapFill } from '../bitmap-fill.js';
@@ -494,8 +494,8 @@ export class CanvasRenderer {
 			ctx.imageSmoothingEnabled = text.smoothing;
 			const x = offsetX + glyph.x + texture.offsetX;
 			const y = offsetY + glyph.y + texture.offsetY;
-			const width = texture.bitmapWidth * textureScaleFactor;
-			const height = texture.bitmapHeight * textureScaleFactor;
+			const width = texture.scaleBitmapWidth;
+			const height = texture.scaleBitmapHeight;
 			if (this._globalTint === 0xffffff) {
 				ctx.drawImage(data.source as CanvasImageSource, texture.bitmapX, texture.bitmapY, texture.bitmapWidth, texture.bitmapHeight, x, y, width, height);
 			} else {
@@ -586,8 +586,9 @@ export class CanvasRenderer {
 		const scaleY = destH / bitmap.textureHeight;
 		const drawX = offsetX + bitmap.bitmapOffsetX * scaleX;
 		const drawY = offsetY + bitmap.bitmapOffsetY * scaleY;
-		const drawW = bitmap.bitmapWidth * textureScaleFactor * scaleX;
-		const drawH = bitmap.bitmapHeight * textureScaleFactor * scaleY;
+		const pixelScale = bitmap.texture?.pixelScale ?? textureScaleFactor;
+		const drawW = bitmap.bitmapWidth * pixelScale * scaleX;
+		const drawH = bitmap.bitmapHeight * pixelScale * scaleY;
 		if (this._globalTint === 0xffffff) {
 			ctx.drawImage(
 				bd.source as CanvasImageSource,
@@ -646,7 +647,7 @@ export class CanvasRenderer {
 		destW: number,
 		destH: number,
 	): void {
-		const scale = textureScaleFactor;
+		const scale = bitmap.texture?.pixelScale ?? textureScaleFactor;
 		const bw = bitmap.bitmapWidth;
 		const bh = bitmap.bitmapHeight;
 		const ox = bitmap.bitmapOffsetX;
@@ -955,21 +956,9 @@ export class CanvasRenderer {
 		ctx.rect(0 - padding, 0 - padding, width + padding * 2, height + padding * 2);
 		ctx.clip();
 
-		// ── Compute vertical offset ───────────────────────────────────────────
 		const lines = tf.getLinesArr();
 		const lineSpacing = tf.lineSpacing;
-		let totalTextHeight = 0;
-		for (let i = 0; i < lines.length; i++) {
-			totalTextHeight += lines[i].height;
-			if (i > 0) totalTextHeight += lineSpacing;
-		}
-
-		let verticalOffset = 0;
-		if (tf.verticalAlign === VerticalAlign.MIDDLE) {
-			verticalOffset = Math.max(0, (height - totalTextHeight) / 2);
-		} else if (tf.verticalAlign === VerticalAlign.BOTTOM) {
-			verticalOffset = Math.max(0, height - totalTextHeight);
-		}
+		const verticalOffset = getTextVerticalOffset(tf);
 
 		// ── ScrollV offset ────────────────────────────────────────────────────
 		const inputActive = tf.type === TextFieldType.INPUT && tf.isTyping;
@@ -994,11 +983,10 @@ export class CanvasRenderer {
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			const h = line.height;
-			drawY += h / 2;
 
-			if (drawY + h / 2 <= 0 || drawY - h / 2 >= height) {
+			if (drawY + h <= 0 || drawY >= height) {
 				characterIndex += line.charNum;
-				drawY += h / 2 + lineSpacing;
+				drawY += h + lineSpacing;
 				continue;
 			}
 
@@ -1026,10 +1014,10 @@ export class CanvasRenderer {
 
 				const fontStr = getFontString(fontSize, fontFamily, bold, italic);
 				ctx.font = fontStr;
-				ctx.textBaseline = 'middle';
+				ctx.textBaseline = 'alphabetic';
 				ctx.textAlign = 'left';
 
-				const textY = drawY + (h - fontSize) / 2;
+				const textY = drawY + line.baseline;
 				const elementStartIndex = characterIndex;
 				const elementEndIndex = elementStartIndex + el.text.length;
 
@@ -1039,14 +1027,14 @@ export class CanvasRenderer {
 					const prefixWidth = ctx.measureText(el.text.substring(0, localStart)).width;
 					const selectionWidth = ctx.measureText(el.text.substring(localStart, localEnd)).width;
 					ctx.fillStyle = 'rgba(51, 144, 255, 0.55)';
-					ctx.fillRect(lineX + prefixWidth, textY - fontSize / 2, selectionWidth, fontSize);
+					ctx.fillRect(lineX + prefixWidth, drawY, selectionWidth, h);
 				}
 
-				if (!caretLocated && tf.caretIndex >= elementStartIndex && tf.caretIndex <= elementEndIndex) {
+				if (inputActive && !caretLocated && tf.caretIndex >= elementStartIndex && tf.caretIndex <= elementEndIndex) {
 					const localCaret = tf.caretIndex - elementStartIndex;
 					caretX = lineX + ctx.measureText(el.text.substring(0, localCaret)).width;
-					caretTop = textY - fontSize / 2;
-					caretHeight = fontSize;
+					caretTop = drawY;
+					caretHeight = h;
 					caretLocated = true;
 				}
 
@@ -1068,28 +1056,30 @@ export class CanvasRenderer {
 					const prefixWidth = ctx.measureText(el.text.substring(0, localStart)).width;
 					const compositionWidth = ctx.measureText(el.text.substring(localStart, localEnd)).width;
 					ctx.fillStyle = colorToString(textColor);
-					ctx.fillRect(lineX + prefixWidth, textY + fontSize / 2, compositionWidth, 1);
+					const underlineY = Math.min(drawY + h - 1, textY + Math.max(1, line.inkDescent));
+					ctx.fillRect(lineX + prefixWidth, underlineY, compositionWidth, 1);
 				}
 
 				lineX += el.width;
 				characterIndex = elementEndIndex;
 			}
 
-			if (!caretLocated && tf.caretIndex === lineStartIndex && line.elements.length === 0) {
+			if (inputActive && !caretLocated && tf.caretIndex === lineStartIndex && line.elements.length === 0) {
 				caretX = lineStartX;
-				caretTop = drawY - tf.size / 2;
+				caretTop = drawY;
+				caretHeight = h;
 				caretLocated = true;
 			}
-			if (!caretLocated && tf.caretIndex >= characterIndex && tf.caretIndex < lineStartIndex + line.charNum) {
+			if (inputActive && !caretLocated && tf.caretIndex >= characterIndex && tf.caretIndex < lineStartIndex + line.charNum) {
 				caretX = lineX;
-				caretTop = drawY - tf.size / 2;
-				caretHeight = tf.size;
+				caretTop = drawY;
+				caretHeight = h;
 				caretLocated = true;
 			}
 			// charNum includes unpainted wrap spaces and the complete hard separator.
 			characterIndex = lineStartIndex + line.charNum;
 
-			drawY += h / 2 + lineSpacing;
+			drawY += h + lineSpacing;
 		}
 
 		// ── INPUT cursor ──────────────────────────────────────────────────────

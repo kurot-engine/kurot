@@ -6,6 +6,12 @@ export let textureScaleFactor = 1;
 export class Texture {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Source pixels per logical unit. Immutable for this texture and inherited
+	 * by SpriteSheet views; independent of the player's render resolution.
+	 */
+	public readonly resolution: number;
+
 	bitmapX = 0;
 	bitmapY = 0;
 	bitmapWidth = 0;
@@ -21,7 +27,23 @@ export class Texture {
 	private _textureWidth = 0;
 	private _textureHeight = 0;
 
+	// ── Constructor ───────────────────────────────────────────────────────────
+
+	public constructor(resolution = 1) {
+		if (!Number.isFinite(resolution) || resolution <= 0) {
+			throw new RangeError('Texture resolution must be a finite positive number.');
+		}
+		this.resolution = resolution;
+	}
+
 	// ── Getters / Setters ─────────────────────────────────────────────────────
+
+	/**
+	 * Logical units per sampled source pixel, including textureScaleFactor.
+	 */
+	public get pixelScale(): number {
+		return textureScaleFactor / this.resolution;
+	}
 
 	public get textureWidth(): number {
 		return this._textureWidth;
@@ -31,10 +53,10 @@ export class Texture {
 	}
 
 	public get scaleBitmapWidth(): number {
-		return this.bitmapWidth * textureScaleFactor;
+		return this.bitmapWidth * this.pixelScale;
 	}
 	public get scaleBitmapHeight(): number {
-		return this.bitmapHeight * textureScaleFactor;
+		return this.bitmapHeight * this.pixelScale;
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────────
@@ -79,6 +101,10 @@ export class Texture {
 
 	// ── Internal methods ──────────────────────────────────────────────────────
 
+	/**
+	 * Atlas geometry and original frame sizes are in source pixels. Stored
+	 * offsets and texture dimensions are logical; page dimensions stay physical.
+	 */
 	initData(
 		bitmapX: number,
 		bitmapY: number,
@@ -97,10 +123,10 @@ export class Texture {
 		this.bitmapY = bitmapY / scale;
 		this.bitmapWidth = bitmapWidth / scale;
 		this.bitmapHeight = bitmapHeight / scale;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-		this._textureWidth = textureWidth;
-		this._textureHeight = textureHeight;
+		this.offsetX = offsetX / this.resolution;
+		this.offsetY = offsetY / this.resolution;
+		this._textureWidth = textureWidth / this.resolution;
+		this._textureHeight = textureHeight / this.resolution;
 		this.sourceWidth = sourceWidth;
 		this.sourceHeight = sourceHeight;
 		this.rotated = rotated;

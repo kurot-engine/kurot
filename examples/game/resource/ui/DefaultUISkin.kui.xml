@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Skin xmlns="https://kurot.dev/ui/1" class="skins.DefaultUISkin" width="600" height="1080">
+    <Rect width="100%" height="100%" fillColor="@style:colors:canvas" />
+    <Label left="20" top="12" text="KUI" size="36" bold="true" textColor="@style:colors:text" />
+    <Label left="20" top="58" text="默认 XML 皮肤 · 圆润轻快" size="18" textColor="@style:colors:muted-text" />
+    <Group left="20" right="20" top="104" height="172">
+        <Image width="100%" height="100%" source="kui.panel" />
+        <Label left="20" top="16" text="按钮与状态" size="16" textColor="@style:colors:muted-text" />
+        <Button id="play" left="20" top="50" width="120" label="开始游戏" />
+        <Button left="152" top="50" width="120" label="按下" currentState="down" />
+        <ToggleButton left="284" top="50" width="120" label="已收藏" selected="true" />
+        <Button left="416" top="50" width="124" label="暂不可用" enabled="false" />
+        <Label id="status" left="20" top="118" text="准备就绪" size="16" textColor="@style:colors:muted-text" />
+    </Group>
+    <Group left="20" top="292" width="272" height="238">
+        <Image width="100%" height="100%" source="kui.panel" />
+        <Label left="20" top="16" text="输入与选择" size="16" textColor="@style:colors:muted-text" />
+        <TextInput id="nickname" left="20" right="20" top="52" prompt="给自己起个名字" />
+        <ComboBox id="difficulty" left="20" right="20" top="116" />
+        <TextInput left="20" right="20" top="180" prompt="未解锁的内容" enabled="false" />
+    </Group>
+    <Group left="308" top="292" width="272" height="238">
+        <Image width="100%" height="100%" source="kui.panel" />
+        <Label left="20" top="16" text="勾选与开关" size="16" textColor="@style:colors:muted-text" />
+        <CheckBox id="hints" left="20" top="48" label="提示" selected="true" />
+        <CheckBox left="142" top="48" label="禁用" selected="true" enabled="false" />
+        <RadioButton left="20" top="98" label="单人" groupName="mode" selected="true" />
+        <RadioButton left="142" top="98" label="组队" groupName="mode" />
+        <ToggleSwitch id="music" left="20" top="156" selected="true" />
+        <Label left="90" top="168" text="背景音乐" size="18" textColor="@style:colors:text" />
+        <ToggleSwitch left="20" top="196" enabled="false" />
+        <Label left="90" top="208" text="消息提醒" size="18" textColor="@style:colors:disabled-text" />
+    </Group>
+    <Group left="20" right="20" top="546" height="200">
+        <Image width="100%" height="100%" source="kui.panel" />
+        <Label left="20" top="16" text="标签、进度与滑块" size="16" textColor="@style:colors:muted-text" />
+        <TabBar id="tabs" left="20" right="20" top="50" height="48" itemRendererSkinName="skins.ToggleButtonSkin">
+            <layout><HorizontalLayout gap="8" horizontalAlign="contentJustify" /></layout>
+        </TabBar>
+        <HSlider id="speed" left="20" top="130" width="260" minimum="0" maximum="100" value="64" />
+        <ProgressBar id="progress" left="320" top="126" width="180" minimum="0" maximum="100" value="64" />
+        <VSlider left="504" top="106" width="44" height="80" minimum="0" maximum="100" value="72" />
+    </Group>
+    <Group left="20" top="762" width="272" height="298">
+        <Image width="100%" height="100%" source="kui.panel" />
+        <Label left="20" top="16" text="列表 · 可触摸滚动" size="16" textColor="@style:colors:muted-text" />
+        <Scroller id="levelScroller" left="20" right="20" top="52" bottom="20">
+            <List id="levels" width="100%">
+                <layout><VerticalLayout gap="8" horizontalAlign="contentJustify" /></layout>
+            </List>
+        </Scroller>
+    </Group>
+    <Panel id="panel" left="308" top="762" width="272" height="220" title="准备出发？">
+        <Label left="20" right="20" top="74" text="下一段冒险，从这里开始。" size="17" textColor="@style:colors:muted-text" />
+        <Button left="20" right="20" top="136" label="出发" />
+    </Panel>
+    <Button id="restorePanel" left="308" top="1004" width="272" label="重新打开面板" />
+</Skin>
