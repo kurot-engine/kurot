@@ -65,8 +65,7 @@ async function compare(): Promise<PixelComparison> {
 	const lines = field.getLinesArr();
 	const nominalHeight = lines.reduce((height, line) => height + line.height, 0)
 		+ (lines.length - 1) * field.lineSpacing;
-	let lineTop = Math.max(0, (field.height - nominalHeight) / 2);
-	for (const line of lines) {
+	const measured = lines.map(line => {
 		const metrics = line.elements.map(element => {
 			const style = element.style;
 			context.font = kurot.getFontString(style?.size ?? field.size,
@@ -74,27 +73,84 @@ async function compare(): Promise<PixelComparison> {
 			return { ink: context.measureText(element.text), frame: context.measureText('') };
 		});
 		const visible = metrics.map(metric => metric.ink).filter(metric => metric.actualBoundingBoxAscent + metric.actualBoundingBoxDescent > 0);
-		const ascent = Math.max(...visible.map(metric => metric.actualBoundingBoxAscent));
-		const descent = Math.max(...visible.map(metric => metric.actualBoundingBoxDescent));
-		const visual = !field.multiline && field.type === kurot.TextFieldType.DYNAMIC && visible.length > 0;
+		context.font = kurot.getFontString(field.size, field.fontFamily, field.bold, field.italic);
+		const emptyFrame = context.measureText('');
 		const fontAscent = Math.max(0, ...metrics.map(metric => metric.frame.fontBoundingBoxAscent));
 		const fontDescent = Math.max(0, ...metrics.map(metric => metric.frame.fontBoundingBoxDescent));
-		const baseline = visual ? field.height / 2 + (ascent - descent) / 2
-			: lineTop + (line.height + fontAscent - fontDescent) / 2;
-		let x = (field.width - line.width) / 2;
+		const baseline = (line.height + (metrics.length ? fontAscent : emptyFrame.fontBoundingBoxAscent)
+			- (metrics.length ? fontDescent : emptyFrame.fontBoundingBoxDescent)) / 2;
+		return { line, baseline,
+			top: visible.length ? baseline - Math.max(...visible.map(metric => metric.actualBoundingBoxAscent)) : 0,
+			bottom: visible.length ? baseline + Math.max(...visible.map(metric => metric.actualBoundingBoxDescent)) : line.height };
+	});
+	let cursor = 0;
+	const edges = measured.flatMap(row => {
+		const edge = [cursor + row.top, cursor + row.bottom];
+		cursor += row.line.height + field.lineSpacing;
+		return edge;
+	});
+	const input = field.type === kurot.TextFieldType.INPUT;
+	let lineTop = 0;
+	if (field.verticalAlign === 'middle') {
+		lineTop = input ? Math.max(0, (field.height - nominalHeight) / 2)
+			: field.height / 2 - (Math.min(...edges) + Math.max(...edges)) / 2;
+	} else if (field.verticalAlign === 'bottom') {
+		lineTop = Math.max(0, field.height - nominalHeight);
+	}
+	if (input) {
+		context.beginPath();
+		context.rect(0, 0, field.width, field.height);
+		context.clip();
+	}
+	const editing = input && field.isTyping;
+	const selectionStart = Math.min(field.selectionBeginIndex, field.selectionEndIndex);
+	const selectionEnd = Math.max(field.selectionBeginIndex, field.selectionEndIndex);
+	let characterIndex = 0;
+	let caret: { x: number; y: number; height: number } | undefined;
+	for (const { line, baseline: rowBaseline } of measured) {
+		const baseline = lineTop + rowBaseline;
+		let x = field.textAlign === 'center' ? (field.width - line.width) / 2
+			: field.textAlign === 'right' ? field.width - line.width : 0;
 		for (const element of line.elements) {
 			const style = element.style;
 			context.font = kurot.getFontString(style?.size ?? field.size,
 				style?.fontFamily ?? field.fontFamily, style?.bold ?? field.bold, style?.italic ?? field.italic);
+			const end = characterIndex + element.text.length;
+			if (editing && selectionStart < end && selectionEnd > characterIndex) {
+				const start = Math.max(0, selectionStart - characterIndex);
+				const stop = Math.min(element.text.length, selectionEnd - characterIndex);
+				context.fillStyle = 'rgba(51, 144, 255, 0.55)';
+				context.fillRect(x + context.measureText(element.text.slice(0, start)).width, lineTop,
+					context.measureText(element.text.slice(start, stop)).width, line.height);
+			}
+			if (editing && !caret && field.caretIndex >= characterIndex && field.caretIndex <= end) {
+				caret = { x: x + context.measureText(element.text.slice(0, field.caretIndex - characterIndex)).width,
+					y: lineTop, height: line.height };
+			}
+			context.fillStyle = '#ffffff';
 			const stroke = style?.stroke ?? field.stroke;
 			if (stroke > 0) {
 				context.lineWidth = stroke * 2;
 				context.strokeText(element.text, x, baseline);
 			}
 			context.fillText(element.text, x, baseline);
+			if (editing && field.$compositionStart < end && field.$compositionEnd > characterIndex
+				&& field.$compositionStart >= 0) {
+				const start = Math.max(0, field.$compositionStart - characterIndex);
+				const stop = Math.min(element.text.length, field.$compositionEnd - characterIndex);
+				const ink = context.measureText(element.text);
+				context.fillRect(x + context.measureText(element.text.slice(0, start)).width,
+					Math.min(lineTop + line.height - 1, baseline + Math.max(1, ink.actualBoundingBoxDescent)),
+					context.measureText(element.text.slice(start, stop)).width, 1);
+			}
 			x += element.width;
+			characterIndex = end;
 		}
+		characterIndex += line.charNum - line.elements.reduce((length, element) => length + element.text.length, 0);
 		lineTop += line.height + field.lineSpacing;
+	}
+	if (editing && caret && field.$caretVisible && selectionStart === selectionEnd) {
+		context.fillRect(caret.x, caret.y, 1, caret.height);
 	}
 	const expected = context.getImageData(0, 0, reference.width, reference.height).data;
 	let mismatches = 0;

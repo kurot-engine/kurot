@@ -1,4 +1,5 @@
 import type { TextField } from './TextField.js';
+import { getTextBlockBounds } from './TextBlockBounds.js';
 import { TextFieldType } from './enums/TextFieldType.js';
 import { VerticalAlign } from './enums/VerticalAlign.js';
 
@@ -11,10 +12,12 @@ export function getTextRenderPadding(textField: TextField): number {
 
 	let stroke = 0;
 	let overhang = 0;
+	const bounds = getTextBlockBounds(textField);
+	const baselineShift = textField.verticalAlign === VerticalAlign.MIDDLE
+		? (textField.textHeight - bounds.top - bounds.bottom) / 2 : 0;
 	for (const line of textField.getLinesArr()) {
 		if (line.inkAscent + line.inkDescent > 0) {
-			const baseline = !textField.multiline && textField.verticalAlign === VerticalAlign.MIDDLE
-				? (line.height + line.inkAscent - line.inkDescent) / 2 : line.baseline;
+			const baseline = line.baseline + baselineShift;
 			overhang = Math.max(overhang, line.inkAscent - baseline, baseline + line.inkDescent - line.height);
 		}
 		for (const element of line.elements) {

@@ -72,10 +72,18 @@ function compare(clip = false): PixelComparison {
 	let x = field.textAlign === kurot.HorizontalAlign.CENTER ? (field.width - line.width) / 2
 		: field.textAlign === kurot.HorizontalAlign.RIGHT ? field.width - line.width : 0;
 	context.font = '20px Arial';
-	const font = context.measureText('Mg');
+	const font = context.measureText('');
 	const baseline = (20 + font.fontBoundingBoxAscent - font.fontBoundingBoxDescent) / 2;
-	const y = baseline + (field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - 20
+	let y = baseline + (field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - 20
 		: field.verticalAlign === kurot.VerticalAlign.MIDDLE ? (field.height - 20) / 2 : 0);
+	if (field.type === kurot.TextFieldType.DYNAMIC && field.verticalAlign === kurot.VerticalAlign.MIDDLE) {
+		const ink = line.elements.map(element => context.measureText(element.text))
+			.filter(metrics => metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 0);
+		if (ink.length > 0) {
+			y = field.height / 2 + (Math.max(...ink.map(metrics => metrics.actualBoundingBoxAscent))
+				- Math.max(...ink.map(metrics => metrics.actualBoundingBoxDescent))) / 2;
+		}
+	}
 	for (const element of line.elements) {
 		const stroke = element.style?.stroke ?? field.stroke;
 		context.font = '20px Arial';

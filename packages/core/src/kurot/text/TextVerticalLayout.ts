@@ -1,19 +1,18 @@
 import type { TextField } from './TextField.js';
+import { getTextBlockBounds } from './TextBlockBounds.js';
 import { TextFieldType } from './enums/TextFieldType.js';
 import { VerticalAlign } from './enums/VerticalAlign.js';
 
 /**
- * Single-line dynamic middle alignment centers visible ink. Multiline and input
- * retain nominal line boxes so changing glyphs cannot move their baselines.
+ * Dynamic middle alignment centers the complete glyph block independently of
+ * multiline. Input retains nominal rows for stable editing geometry.
  */
 export function getTextVerticalOffset(field: TextField): number {
-	const lines = field.getLinesArr();
 	const height = !isNaN(field.$explicitHeight) ? field.$explicitHeight : field.textHeight;
-	const line = lines[0];
 	if (field.verticalAlign === VerticalAlign.MIDDLE) {
-		if (field.type === TextFieldType.DYNAMIC && !field.multiline && line
-			&& line.inkAscent + line.inkDescent > 0) {
-			return (height - line.inkAscent - line.inkDescent) / 2 + line.inkAscent - line.baseline;
+		if (field.type === TextFieldType.DYNAMIC) {
+			const bounds = getTextBlockBounds(field);
+			return (height - bounds.top - bounds.bottom) / 2;
 		}
 		return Math.max(0, (height - field.textHeight) / 2);
 	}

@@ -47,16 +47,18 @@ correctness and performance validation system.
 ## Packages and dependencies
 
 Version audit: 2026-10-10. The table records source manifest versions.
-Core 2.5.0 and CLI 3.6.0 are published, verified on npm on 2026-10-10,
-including latest tags and package downloads. The other seven versions match npm
-`latest`. Dependency/peer ranges remain unchanged. Feature introductions and
+Core 2.5.1 is published, with dynamic middle alignment independent
+of line mode. Input editing geometry and nominal measurements remain stable.
+Core 2.5.1 and CLI 3.6.0 are published, verified on npm on 2026-10-10,
+including latest tags, package downloads and registry integrity. The other seven
+versions match npm `latest`. Dependency/peer ranges remain unchanged. Feature introductions and
 benchmark results retain their recorded release versions.
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.5.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/core`](packages/core/README.md)               | 2.5.1   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.4.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.6.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
@@ -134,7 +136,7 @@ whose only content interface is textFlow, and fixes automatic BitmapLabel
 measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.4.0 and UI 3.4.0.
+Core 2.5.1 and UI 3.4.0.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with

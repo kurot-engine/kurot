@@ -40,7 +40,60 @@ Dictionary and grapheme segmentation follow the browser's `Intl` data. The
 pinned Unicode 17.0 tables govern the line-break profile; they do not replace
 the browser's grapheme implementation.
 
+## Middle alignment independent of line mode (Core 2.5.1)
+
+Core 2.5.1 is published, verified on npm on 2026-10-10, including the latest tag,
+download and registry integrity. The previous 2.5.0 single-line-only visual
+centering is described in the following section.
+
+`multiline` controls hard breaks and width wrapping. Dynamic
+`verticalAlign = "middle"` centers the complete laid-out glyph block in either
+line mode. Identical single-row content, font and bounds produce identical
+placement with `multiline = true` or `false`, including automatic height.
+Multiple rows receive one shared translation; their relative alphabetic baselines
+and line spacing are preserved. Rich runs and fallback glyphs participate in the
+same block bounds. Each blank/whitespace-only row contributes its nominal height,
+including leading and trailing blank rows. An entirely blank block uses those
+nominal rows. Outlines remain render-only and do not affect alignment.
+
+```ts
+textField.multiline = true;
+textField.verticalAlign = 'middle';
+textField.text = 'First line\nSecond line';
+```
+
+The visible block is centered within the explicit height, or the nominal content
+height when height is automatic. An overflowing dynamic block remains centered;
+ordinary viewport clipping and scrolling still apply. Changing the outer glyph
+extents can translate the complete block, without changing its row baselines or
+distances. The cache reuses block bounds until font/content/wrapping/spacing
+invalidation replaces the line layout.
+
+INPUT continues to align its stable editing rows in either line mode. Caret,
+selection, composition underline and pointer-to-character mapping use those rows,
+so changing glyphs cannot move the editing frame. `top` and `bottom` retain their
+nominal-row semantics. `textHeight`, `measureText()`, automatic dimensions, font
+fitting and wrapping measurements retain their existing contracts.
+
+Canvas, WebGL text rasterization, link hit tests and glyph/outline capture margins
+share the block alignment. External masks/scrollRect and input viewports keep
+their authored clip boundaries. No new public property, runtime dependency or
+XML/resource format is introduced. Existing multiline dynamic middle-aligned
+captions can move compared with 2.5.0; adopt Core 2.5.1 and rebuild
+the application to receive the change. Existing SDK peers accept the patch.
+
+Unit checks cover both line modes, complete paragraphs, mixed-size rich text,
+blank rows, font/spacing invalidation, top/bottom, short viewports, links and
+single/multiline input caret/selection. The minified browser checks compare
+independent Canvas measurements and actual pixels in Canvas and WebGL 1/2 at
+1×/2×, including multilingual text, wrapping, caches, outlines, caret, selection,
+composition decoration and input character hits.
+
 ## Visual centering and stable baselines (Core 2.5.0)
+
+This section records the published 2.5.0 behavior. Version 2.5.1 extends dynamic
+middle alignment to multiple rows as described above; input and top/bottom retain
+the contracts below.
 
 Canvas and WebGL use the same alphabetic baseline and logical-pixel Canvas
 `TextMetrics`. Each cached line records `baseline`, `inkAscent` and `inkDescent`;

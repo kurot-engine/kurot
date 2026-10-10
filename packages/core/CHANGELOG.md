@@ -4,6 +4,46 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.5.1] — 2026-10-10
+
+Published; npm version metadata and latest verified on 2026-10-10.
+The package downloads with matching registry integrity; its block bounds,
+vertical alignment and render bounds modules match the tested local build.
+
+### Fixed
+
+- Decouple dynamic `verticalAlign = "middle"` from `multiline`. Single and
+  multiple lines center their complete glyph block, including mixed-size rich
+  runs and fallback glyphs. Identical one-line content has the same placement
+  in either line mode. Blank rows retain their nominal height and line spacing.
+- Reuse cached block bounds for drawing, link hits and render-only glyph/outline
+  padding so nested bitmap caches and WebGL text captures retain centered ink.
+- Preserve stable input row baselines, caret, selection and composition geometry
+  in both line modes; preserve top/bottom alignment and nominal measurements.
+
+### Compatibility
+
+- No new API, dependencies, XML fields or resource format. Existing multiline
+  dynamic middle-aligned captions can move to their visual center; changing
+  glyphs can translate the block without changing its relative baselines.
+- Unchanged UI, Game, DragonBones, Spine and ui-runtime SDK peers accept this
+  patch without version bumps. Applications adopt Core and rebuild explicitly.
+  Editor's exact 2.5.0 pin must be changed to adopt it; compatible game ranges
+  such as `^2.5.0` need an installation/lock update. CLI and headless packages
+  require no release. See [text layout](docs/text-layout.md).
+
+### Verification — 2026-10-10
+
+- Core 2.5.1 build and all 900 unit tests pass (81 files).
+- All 12 minified browser checks pass in Canvas, WebGL 1/2 at 1×/2×.
+  Independent Canvas references verify identical one-row placement in both
+  line modes, 24/40/56 px automatic-height captions, multilingual paragraphs,
+  wrapping, rich text, blank rows, outlines and nested caches. Input caret,
+  selection, composition underline and second-row character hits pass.
+- Package dry-run verifies the 2.5.1 manifest, compiled block-alignment module,
+  declarations and updated documentation; `git diff --check` passes.
+  No application dependency or SDK peer changes.
+
 ## [2.5.0] — 2026-10-10
 
 Published; registry version metadata and latest verified on 2026-10-10.

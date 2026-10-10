@@ -9,7 +9,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.5.0   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.5.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.4.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.6.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
@@ -60,6 +60,30 @@ dependencies and lockfiles describe the tested checkout, not consumer minima.
   own version rules. Do not upgrade templates or other apps incidentally.
 - Report required migrations, optional adoption and unaffected consumers
   separately. Never prescribe a blanket package bump or `--latest` update.
+
+Core 2.5.1 is published; npm latest, package download and registry integrity
+were verified on 2026-10-10. Its published block-alignment modules match the
+tested local build. Dynamic middle alignment centers the complete glyph block
+independently of multiline, retaining blank rows and relative row baselines/spacing. INPUT uses
+stable editing rows; top/bottom and nominal measurements are unchanged. Block
+bounds are cached with the line layout and shared by drawing, link hits and
+render padding. Read packages/core/docs/text-layout.md. No public API, dependency
+or XML/resource-format change is required. SDK peers accept this patch without
+new versions. The explicitly selected Editor 0.27.3, Reskin, Tentax and
+MilfMaster checkouts install registry Core 2.5.1 with matching locks and rebuilt
+outputs. Editor 0.27.3's release tag has been pushed; CI completion was not
+awaited. Other SDKs and CLI are unchanged. Other
+applications and independent Reskin projects retain their own installations.
+
+Editor 0.27.3, Reskin and the explicitly selected Templates/tentax and
+Templates/milf-master now install registry Core 2.5.1 with matching app locks.
+Editor and both templates install CLI 3.6.0; Reskin keeps CLI project-owned.
+The demo/game templates use the engine example's native KUI skins, palette and
+2× atlas, replacing their EUI defaults. Tentax and MilfMaster synchronize only
+their web loading page and logo with the CLI game template. Editor frame measurements and
+grid writes are logical; Reskin grid authoring/validation is logical while source
+PNG replacement sizes remain physical and repacking retains resolution. Existing
+independent Reskin projects and other consumers are unchanged. No SDK bump is required.
 
 Atlas has a portable pixel-only root entry and a separate Node PNG subpath using
 pngjs. No current package consumes it. Core loads prebuilt sheets without atlas;
@@ -177,7 +201,7 @@ Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
 ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
-See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.0
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.1
 and UI 3.4.0; source versions do not establish npm publication.
 
 ui-document 0.12.0 is published. It adds independent
@@ -345,7 +369,7 @@ CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
 runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
-tree uses Core 2.4.0/UI 3.4.0/document 0.13.0/CLI 3.5.0/runtime 0.10.0.
+tree uses Core 2.5.1/UI 3.4.0/document 0.13.0/CLI 3.6.0/runtime 0.10.0.
 Existing signed installers are not
 rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.

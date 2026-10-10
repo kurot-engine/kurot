@@ -126,6 +126,18 @@ an automatic sequence of package version bumps.
 
 ## Current release examples
 
+- Core 2.5.1 is published, verified on npm on 2026-10-10. It decouples dynamic
+  middle alignment from line mode while preserving input editing frames, top/bottom and nominal
+  measurement contracts. No API, XML or resource migration is required. Existing
+  multiline middle-aligned captions can move to their visual center.
+  UI/Game/DragonBones/Spine/ui-runtime peers accept the patch without new SDK
+  versions or raised minima. Editor 0.27.3 pins 2.5.1; the explicitly selected
+  Reskin/Tentax/MilfMaster checkouts declare ^2.5.1 and install registry 2.5.1
+  with matching locks and rebuilt outputs. Editor 0.27.3's release tag has been
+  pushed without awaiting CI completion. Other
+  applications and examples adopt separately; SDK development adoption is optional.
+  CLI, ui-document, bitmap-font and Atlas require no release.
+
 - Core 2.3.0 adds pure TextField measurement. UI 3.3.0 adopts it and raises
   its Core minimum to ^2.3.0; its published 3.2.0 predecessor keeps ^2.2.0.
   Core 2.3.1 fixes unstyled blank rich-run heights without introducing another
@@ -222,7 +234,13 @@ Core 2.5.0 and CLI 3.6.0 through their 2.x/3.x caret ranges; their current locks
 remain older. The refreshed game resources need a Core installation/lock update
 before ordinary builds can use the 2× kit. Templates retain
 `latest` placeholders, resolved by `create` to concrete registry caret ranges.
-Editor pins Core 2.4.0 and CLI 3.5.0 exactly, so adopting these releases requires
-explicit manifest/lock updates. Reskin's Core ^2.1.1 accepts 2.5.0; the rendering
-update is optional, while authoring 2× sheets also needs density-aware geometry.
+The explicitly updated consumer checkouts now install registry Core 2.5.1:
+Editor 0.27.3 pins Core 2.5.1 and CLI 3.6.0, while Reskin declares Core ^2.5.1
+and keeps CLI/UI in each copied project. Templates/tentax and Templates/milf-master
+now declare Core ^2.5.1 and CLI ^3.6.0 with matching pnpm locks. Editor's demo
+and those two game templates adopt the example's 16 native skins, 2× KUI atlas
+and palette. The two games also adopt the CLI template web splash and logo. Business skins and presets remain project-owned. Editor
+frame previews/grid writes and Reskin grid authoring/validation account for source
+density; Reskin replacement PNG dimensions stay physical and repacking retains
+resolution. Existing independent Reskin projects and other consumers are unchanged.
 SDK development-only locks can adopt Core separately, without a new SDK release.

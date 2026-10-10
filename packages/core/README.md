@@ -1,19 +1,36 @@
 # @kurot/core
 
-**2.5.0 is published**, with registry version metadata and latest verified on
-2026-10-10. This release adds independent source texture density and fixes
-text alignment, fractional viewport edges and root WebGL target restoration.
-See [texture density](docs/texture-density.md) and [CHANGELOG.md](CHANGELOG.md).
+**2.5.1 is published.** It makes dynamic middle alignment
+independent of single/multiline mode. npm latest, the package download and
+registry integrity were verified on 2026-10-10. It also includes source texture
+density, text baselines, fractional viewport fixes and root WebGL target
+restoration. See [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.5.0 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.1 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Unified middle alignment in 2.5.1
+
+`multiline` controls hard breaks and wrapping. Dynamic `verticalAlign = "middle"`
+centers the complete glyph block in either line mode, including rich text and
+fallback fonts. Blank rows retain their space; relative baselines and line
+spacing remain unchanged. Identical single-row content centers identically
+with either `multiline` value. Input keeps stable editing rows, including its
+caret, selection and composition underline. Top/bottom alignment and nominal
+measurement sizes retain their contracts.
+
+Existing multiline middle-aligned captions may move. Adopt Core 2.5.1
+and rebuild the application; existing SDK peers accept the patch
+without new releases. This source change does not update installed Editors or
+games. See [text alignment](docs/text-layout.md#middle-alignment-independent-of-line-mode-core-251).
 
 ## Text alignment correction in 2.5.0
 
-Single-line dynamic middle alignment centers measured glyph ink, including
-fallback fonts and accents. Multiline text and input keep stable font baselines;
-rich runs share an alphabetic baseline. Layout sizes and wrapping stay nominal.
+Published 2.5.0 centers single-line dynamic middle alignment by measured glyph
+ink, including fallback fonts and accents. Its multiline text and input retain
+font-frame alignment; rich runs share an alphabetic baseline. Version 2.5.1
+extends visual middle alignment to multiline dynamic text. Layout sizes and wrapping stay nominal.
 The existing font-readiness invalidation refreshes these cached metrics.
 See [text alignment](docs/text-layout.md#visual-centering-and-stable-baselines-core-250).
 Install Core 2.5.0 and rebuild to adopt it; published 2.4.0
@@ -123,7 +140,7 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.5.0
+pnpm add @kurot/core@^2.5.1
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

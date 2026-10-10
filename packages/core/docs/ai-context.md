@@ -1,7 +1,8 @@
 # @kurot/core — AI context map
 
-Core 2.5.0 is published; registry version metadata and latest verified on
-2026-10-10. Read
+Core 2.5.1 is published, with dynamic middle alignment independent
+of multiline. npm latest, the package download and registry integrity were verified
+on 2026-10-10; published alignment modules match the tested local build. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
@@ -15,7 +16,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.5.0`, published. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.5.1`, published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -53,7 +54,7 @@ src/kurot/
 │                   push/pop scene integration in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
 │                   HtmlTextParser, InputController, TextMeasurer, TextSegmentation,
-│                   LineBreaks, TextLineLayout, WordWrap.
+│                   LineBreaks, TextLineLayout, TextBlockBounds, TextVerticalLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
 │                   (Image/Json/Text/Sound/Sheet/Font). Async, resource.json-driven (RES-compatible).
 ├── net/            HttpRequest, ImageLoader. Low-level; resource/analyzers build on these.
@@ -227,7 +228,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                                                                                     |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                                                                                |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                                                                                    |
-| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                       |
+| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextBlockBounds.ts`, `text/TextVerticalLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                                                                                    |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`                                                                   |
 
@@ -240,17 +241,21 @@ vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
 
-## Text alignment in 2.5.0
+## Text alignment in 2.5.1
 
 `TextLineLayout.ts` caches alphabetic `baseline` and visible `inkAscent` /
-`inkDescent` per line. `TextVerticalLayout.ts` centers ink only for dynamic,
-single-line middle alignment. Multiline/INPUT/top/bottom retain nominal rows
-with content-independent font frames, including blank lines. Canvas, WebGL
+`inkDescent` per line. `TextBlockBounds.ts` caches the union of row glyph bounds,
+using nominal rows for blank lines. `TextVerticalLayout.ts` centers the entire
+dynamic block in either line mode. Multiline only controls line generation;
+input/top/bottom retain nominal alignment with content-independent font frames.
+Relative row baselines and spacing stay stable, but a dynamic middle block can
+translate when its glyph extents change. Canvas, WebGL
 rasterization and link hit testing share the offset. Render bounds add glyph
 margin without changing measurement, input or external clip boundaries. See
-[text layout](text-layout.md#visual-centering-and-stable-baselines-core-250).
-Core 2.4.0 on npm does not include this correction; existing consumer peer ranges
-accept 2.5.0 without SDK bumps. Adoption updates the Core installation/lock.
+[text layout](text-layout.md#middle-alignment-independent-of-line-mode-core-251).
+Published Core 2.5.0 centers only single-line dynamic ink. Version 2.5.1 is
+published; existing consumer peers accept it without SDK bumps.
+Adoption requires an explicit installation/lock update and rebuild.
 
 ## Text layout in 2.0.1
 
