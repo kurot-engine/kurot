@@ -1,12 +1,15 @@
 # @kurot/ui
 
-**3.4.0 is published**, verified on npm on 2026-10-09. Its development
-installation and lock resolve published Core 2.4.0 without local overrides. See
-[centered flips](../../docs/centered-flips.md) for APIs and consumer adoption order.
+**3.5.0 is published, verified on npm on 2026-10-10.** Package download and
+registry integrity are verified; fitting/alignment modules match the tested build. It adds multiline
+Label shrinking and retains the original text alignment when fitting is toggled.
+The Core ^2.4.0 peer and registry Core 2.4.0 development installation/lock are
+unchanged.
+See [Label fitting](docs/label-text-layout.md) for behavior and adoption.
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.4.0 (published).** Requires `@kurot/core@^2.4.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.5.0 (published).** Requires `@kurot/core@^2.4.0`. Targets ES2022 + evergreen browsers, same as core.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -64,13 +67,15 @@ BitmapLabel now also honors maxWidth during automatic measurement. Both text
 components remeasure automatic height when an authored width changes.
 
 The unpublished UI 3.3.1 snapshot built and tested against registry Core 2.3.1.
-Current UI 3.4.0 builds and tests against registry Core 2.4.0 without overrides.
+Current UI 3.5.0 builds and tests against registry Core 2.4.0 without overrides.
 These native APIs do
 not add KUI tags or an Editor rich-text authoring interface by themselves.
 
-## Label text fitting in 3.1.0
+## Label text fitting in 3.5.0
 
-Single-line Labels can shrink their drawing size to fit the available region:
+Labels can shrink their drawing size to fit the available region. UI 3.5.0
+supports both single-line and multiline fitting; UI 3.1.0–3.4.0 fit only
+single-line Labels:
 
 ```ts
 import { Label } from '@kurot/ui';
@@ -86,8 +91,28 @@ amount.minFontSize = 16;
 `size` stays authored; `renderedSize` and `textFitOverflow` are read-only results
 after layout validation. Shorter text or larger bounds restore the base size.
 Put a Button's fitting policy on its `labelDisplay` skin part, so icon spacing
-and state overrides are respected. EditableText rejects shrinking; multiline
-Labels retain their base size.
+and state overrides are respected. EditableText rejects shrinking.
+
+For a multiline caption, keep `multiline = true` (the default), set width and
+height on the Label, and enable `textFit = 'shrink'`. Complete wrapped content,
+hard breaks and line spacing participate in fitting. If several rows fit at the
+base size, the base size is retained. Automatic axes are unconstrained, so
+width-only multiline captions normally wrap and grow taller without shrinking.
+Outline allowance participates in fitting and its shared wrap width. Text keeps
+the original Label alignment frame; automatic measurement remains nominal,
+without implicit outline padding or a position change when fitting is toggled.
+
+```ts
+const caption = new Label('Доказуемая честность');
+caption.width = 120;
+caption.height = 44;
+caption.size = 30;
+caption.wordWrap = true;
+caption.lineSpacing = 2;
+caption.stroke = 1;
+caption.textFit = 'shrink';
+caption.minFontSize = 14;
+```
 
 Label defaults to multiline, while explicit `multiline = false` displays one
 unwrapped first line. Remove an old false flag or set it to true for text
@@ -97,24 +122,35 @@ metrics even if the family name is unchanged.
 
 See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
 metadata was introduced in document 0.9.0 and remains supported in 0.13.0.
-Current CLI 3.5.0 and runtime 0.10.0 use document `^0.13.0`.
+Current CLI 3.6.0 and runtime 0.10.0 use document `^0.13.0`.
 Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`. Programmatic UI depends
 only on Core.
 
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.4.0 @kurot/core@^2.4.0
+pnpm add @kurot/ui@^3.5.0 @kurot/core@^2.4.0
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.4.0 requires Core ^2.4.0 for the centered-flip frame hook, in addition to
+UI 3.5.0 retains
+Core ^2.4.0 for the centered-flip frame hook, in addition to
 the native text APIs introduced in Core 2.2/2.3. Core installs its published
 bitmap-font dependency automatically.
 Refresh older Core/UI lockfiles and old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launching the application.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
+
+Adopting 3.5.0 needs only a UI installation/lock update and rebuild when the
+application's range already accepts it. Existing multiline Labels with `shrink`
+start fitting; ordinary Labels without that policy keep their behavior. No KUI
+or resource migration is required. ui-runtime 0.10.0 accepts it through ^3.4.0;
+its development lock may adopt it separately. CLI/ui-document need no release.
+Editor 0.28.2 removes the multiline Inspector restriction and uses exact registry
+UI 3.5.0 with a matching Bun lock and ordinary App build. The selected Tentax and
+MilfMaster templates adopt ^3.5.0 with matching pnpm locks and rebuilt outputs.
+Other applications and templates retain their own dependency trees and resources.
 
 ## Project style colors
 

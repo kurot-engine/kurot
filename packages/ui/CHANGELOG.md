@@ -4,6 +4,57 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.5.0] — 2026-10-10
+
+Published; verified on npm on 2026-10-10. Requires Core ^2.4.0, unchanged
+from 3.4.0. See [Label fitting](docs/label-text-layout.md).
+
+### Added
+
+- Extend ordinary Label `textFit="shrink"` to complete multiline layouts,
+  including wrapping, hard breaks, blank/trailing rows and line spacing.
+  Recalculate wrapping at each candidate size while retaining the authored
+  `multiline`, text and base size. No row limit or new authored property is added.
+
+### Fixed
+
+- Retain the original Label alignment frame and nominal automatic dimensions
+  while reserving outline allowance in fit checks and the shared wrapping width.
+  Toggling fitting does not move unchanged text or its icon-and-caption row.
+- Refresh automatic dimensions after authored width/height changes and refit
+  fixed-size Labels after font readiness invalidation.
+- Preserve unconstrained automatic axes, avoid repeatedly deducting outline
+  space under maximum widths, and report minimum or zero-content-width overflow
+  without confusing nonempty text with empty content.
+
+### Compatibility and adoption
+
+Existing multiline Labels with `textFit="shrink"` begin fitting instead of
+ignoring that policy. Omitted/true multiline continues to wrap; false remains
+single-line. Minimums, password/first-line semantics and EditableText restrictions
+are retained. `renderedSize` and `textFitOverflow` remain read-only results.
+Core APIs, peer minima, KUI format and resource contracts are unchanged.
+
+ui-runtime 0.10.0's UI ^3.4.0 peer already accepts 3.5.0. CLI and ui-document
+already preserve the fitting fields; neither needs a new release. Applications
+adopt the UI installation/lock and rebuild explicitly. Editor 0.28.2 uses exact
+registry UI 3.5.0 with a matching Bun lock and ordinary App build; its temporary
+UI source binding is removed. The selected Tentax and MilfMaster templates
+adopt ^3.5.0 with matching pnpm locks and rebuilt outputs. Other applications
+and SDK development locks are unchanged.
+
+### Verification
+
+The clean prepublish build, all 359 unit tests and 12 minified browser tests
+pass against installed registry Core 2.4.0. Browser coverage includes centered
+flips, independent RichLabel/BitmapLabel, multiline shrink on Canvas/WebGL 1/2
+at 1x/2x and pixel-identical fitting toggles for all alignment combinations.
+Local npm packing verifies version 3.5.0, unchanged Core ^2.4.0, compiled fitting
+and alignment modules, declarations and public documentation, excluding tests,
+node_modules and internal drafts. Registry latest, package download and integrity
+are verified; the published Label/fitting modules match the tested build.
+`git diff --check` passes.
+
 ## [3.4.0] — 2026-10-09
 
 Published; verified on npm on 2026-10-09. Requires published Core ^2.4.0.

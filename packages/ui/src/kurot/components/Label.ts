@@ -6,7 +6,7 @@ import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**
- * Optional single-line font fitting policy.
+ * Optional font fitting policy, independent of line generation.
  */
 export type TextFitMode = 'none' | 'shrink';
 
@@ -40,6 +40,26 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
+
+	public override get width(): number {
+		return super.width;
+	}
+
+	public override set width(value: number) {
+		if (Object.is(this.$explicitWidth, value)) return;
+		super.width = value;
+		this.invalidateSize();
+	}
+
+	public override get height(): number {
+		return super.height;
+	}
+
+	public override set height(value: number) {
+		if (Object.is(this.$explicitHeight, value)) return;
+		super.height = value;
+		this.invalidateSize();
+	}
 
 	public get text(): string {
 		return this._textField.text;
@@ -80,8 +100,8 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	/**
-	 * Shrink applies only to noneditable, single-line text with finite bounds.
-	 * Multiline text retains the authored size; editable text rejects shrink.
+	 * Shrink fits the laid-out text within finite bounds, retaining multiline.
+	 * Editable text rejects shrink; automatic axes do not constrain fitting.
 	 */
 	public get textFit(): TextFitMode {
 		return this._textFit;
@@ -277,6 +297,9 @@ export class Label extends Component implements IDisplayText {
 		this._fitKey = undefined;
 		this._textField?.invalidateTextMetrics();
 		super.invalidateSize();
+		if (this.textFit === 'shrink') {
+			this.invalidateDisplayList();
+		}
 	}
 
 	public override createChildren(): void {
@@ -303,7 +326,7 @@ export class Label extends Component implements IDisplayText {
 					: NaN;
 		this._applyTextFit(availableWidth, availableHeight);
 		try {
-			tf.width = availableWidth;
+			tf.width = this._getFitContentWidth(availableWidth);
 			this.setMeasuredSize(tf.textWidth, tf.textHeight);
 		} finally {
 			tf.width = oldWidth;
@@ -346,7 +369,15 @@ export class Label extends Component implements IDisplayText {
 		if (previousSize !== this.renderedSize && (isNaN(this.$explicitWidth) || isNaN(this.$explicitHeight))) {
 			this.invalidateSize();
 		}
-		this._textField.width = unscaledWidth;
+		const contentWidth = Number.isFinite(fitWidth)
+			? Math.min(unscaledWidth, this._getFitContentWidth(fitWidth))
+			: unscaledWidth;
+		// Wrapping reserves outline width; alignment still uses the original Label frame.
+		const remainingWidth = unscaledWidth - contentWidth;
+		this._textField.x =
+			this.textAlign === 'right' ? remainingWidth : this.textAlign === 'center' ? remainingWidth / 2 : 0;
+		this._textField.y = 0;
+		this._textField.width = contentWidth;
 		this._textField.height = unscaledHeight;
 	}
 
@@ -354,7 +385,7 @@ export class Label extends Component implements IDisplayText {
 
 	private _applyTextFit(width: number, height: number): void {
 		const tf = this._textField;
-		if (this.textFit !== 'shrink' || this.multiline || tf.type === TextFieldType.INPUT) {
+		if (this.textFit !== 'shrink' || tf.type === TextFieldType.INPUT) {
 			tf.size = this._baseSize;
 			this._textFitOverflow = false;
 			this._fitKey = undefined;
@@ -362,7 +393,9 @@ export class Label extends Component implements IDisplayText {
 		}
 		const text = tf.displayAsPassword
 			? '*'.repeat(this.text.length)
-			: this.text.split(/\r\n|[\n\r\v\f\u0085\u2028\u2029]/, 1)[0];
+			: this.multiline
+				? this.text
+				: this.text.split(/\r\n|[\n\r\v\f\u0085\u2028\u2029]/, 1)[0];
 		const key = JSON.stringify([
 			text,
 			tf.fontFamily,
@@ -371,6 +404,9 @@ export class Label extends Component implements IDisplayText {
 			tf.bold,
 			tf.italic,
 			tf.stroke,
+			tf.multiline,
+			tf.wordWrap,
+			tf.lineSpacing,
 			width,
 			height,
 		]);
@@ -383,11 +419,19 @@ export class Label extends Component implements IDisplayText {
 			bold: tf.bold,
 			italic: tf.italic,
 			stroke: tf.stroke,
+			multiline: tf.multiline,
+			wordWrap: tf.wordWrap,
+			lineSpacing: tf.lineSpacing,
 			width,
 			height,
 		});
 		tf.size = fitted.size;
 		this._textFitOverflow = fitted.overflow;
 		this._fitKey = key;
+	}
+
+	private _getFitContentWidth(width: number): number {
+		const outline = this.textFit === 'shrink' && this.text ? Math.max(0, this.stroke) * 2 : 0;
+		return Number.isFinite(width) ? Math.max(0, width - outline) : NaN;
 	}
 }

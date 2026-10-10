@@ -1,4 +1,4 @@
-import { measureText } from '@kurot/core';
+import { TextField } from '@kurot/core';
 
 interface LabelTextMetrics {
 	text: string;
@@ -8,6 +8,9 @@ interface LabelTextMetrics {
 	bold: boolean;
 	italic: boolean;
 	stroke: number;
+	multiline: boolean;
+	wordWrap: boolean;
+	lineSpacing: number;
 	width: number;
 	height: number;
 }
@@ -18,20 +21,33 @@ interface LabelTextFit {
 }
 
 /**
- * Fits one plain-text line within externally constrained logical bounds.
+ * Fits plain text using the same line generation as the rendered TextField.
  * A finite zero bound is meaningful; NaN represents an unconstrained axis.
  * Never changes authored size or text, and always measures from the base size.
  */
 export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
+	if (!metrics.text) return { size: metrics.size, overflow: false };
+	const field = new TextField();
+	field.text = metrics.text;
+	field.fontFamily = metrics.fontFamily;
+	field.bold = metrics.bold;
+	field.italic = metrics.italic;
+	field.multiline = metrics.multiline;
+	field.wordWrap = metrics.wordWrap;
+	field.lineSpacing = metrics.lineSpacing;
+	const outline = Math.max(0, metrics.stroke) * 2;
+	const width = Number.isFinite(metrics.width) ? Math.max(0, metrics.width - outline) : NaN;
 	const fits = (size: number): boolean => {
-		const width = measureText(metrics.text, metrics.fontFamily, size, metrics.bold, metrics.italic);
-		const outline = metrics.stroke * 2;
+		// Core intentionally measures zero-width content as empty, not as overflow.
+		if (width === 0) return false;
+		field.size = size;
+		const measured = field.measureText(width);
 		return (
-			(!Number.isFinite(metrics.width) || width + outline <= metrics.width) &&
-			(!Number.isFinite(metrics.height) || size + outline <= metrics.height)
+			(!Number.isFinite(metrics.width) || measured.width + outline <= metrics.width) &&
+			(!Number.isFinite(metrics.height) || measured.height + outline <= metrics.height)
 		);
 	};
-	if (!metrics.text || fits(metrics.size)) {
+	if (fits(metrics.size)) {
 		return { size: metrics.size, overflow: false };
 	}
 	const minimum = Math.min(metrics.minimum, metrics.size);
@@ -51,5 +67,6 @@ export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
 			upper = candidate;
 		}
 	}
-	return { size: Math.max(minimum, Math.floor(lower * 10) / 10), overflow: false };
+	const size = Math.max(minimum, Math.floor(lower * 10) / 10);
+	return { size: fits(size) ? size : minimum, overflow: false };
 }

@@ -77,6 +77,27 @@ describe('Label fitting materialization', () => {
 		}
 	});
 
+	it('passes multiline shrink and complete layout inputs to the native Label without rewriting XML', () => {
+		const document = parseUIDocument(
+			source('height="32" textFit="shrink" minFontSize="12" wordWrap="true" lineSpacing="2"'),
+		);
+		const originalXML = serializeUIDocument(document);
+		const result = createKurotUI(document);
+		try {
+			const label = result.instances.get('amount');
+			if (!(label instanceof Label)) throw new Error('Expected native Label.');
+			expect(label.multiline).toBe(true);
+			expect(label.textFit).toBe('shrink');
+			expect(label.wordWrap).toBe(true);
+			expect(label.lineSpacing).toBe(2);
+			expect(label.size).toBe(30);
+			expect(label.height).toBe(32);
+			expect(serializeUIDocument(document)).toBe(originalXML);
+		} finally {
+			result.dispose();
+		}
+	});
+
 	it('restores authored appearance state sizes instead of capturing the fitted drawing size', () => {
 		const authored = parseUIDocument(
 			'<Skin xmlns="https://kurot.dev/ui/1" class="FitSkin" states="up,down"><Label id="labelDisplay" text="ABCDEFGHIJ" width="100" size="30" size.down="16" multiline="false" textFit="shrink" minFontSize="12" /></Skin>',

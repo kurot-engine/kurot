@@ -23,7 +23,7 @@ ranges accept 0.13.1 without new SDK releases; format 2 and dependencies are unc
 
 | Component     | Content                                | Appearance                                                          | Layout                                             |
 | ------------- | -------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
-| `Label`       | Plain `text`                           | Local properties and optional `style.json.labels` preset            | Wrapping, alignment, single-line shrinking         |
+| `Label`       | Plain `text`                           | Local properties and optional `style.json.labels` preset            | Wrapping, alignment and font shrinking             |
 | `BitmapLabel` | Plain `text` and typed `font` resource | Glyph metrics and colors from the bitmap font; display scaling/tint | Wrapping, spacing and alignment                    |
 | `RichLabel`   | Ordered `textFlow` runs                | Literal per-run font, size, colors, outline, bold and italic        | Continuous Unicode wrapping, spacing and alignment |
 
@@ -32,6 +32,10 @@ BitmapLabel and RichLabel extend Component directly. Neither accepts Label's
 whole-component authoring properties. RichLabel also has no plain `text`.
 Ordinary geometry, constraints, visibility and Component properties remain
 available. Content metrics are runtime observations, never authored properties.
+
+Published UI 3.4.0 shrinks only single-line Labels; published UI 3.5.0 extends
+the same policy to multiline layouts. The headless catalog accepts either mode
+without a format change. See [Label fitting](text-layout.md).
 
 ## Bitmap font resources
 

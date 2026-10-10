@@ -10,7 +10,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `@kurot/core`        | 2.5.3   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
-| `@kurot/ui`          | 3.4.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
+| `@kurot/ui`          | 3.5.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.6.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
 | `@kurot/ui-document` | 0.13.1  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
@@ -42,6 +42,26 @@ Dependency direction is strictly one-way:
 ```
 
 ## Dependency and release policy
+
+UI 3.5.0 is published, verified on npm on 2026-10-10, including latest, package
+download and registry integrity. Its Label fitting/alignment modules match the
+tested local build. It extends Label shrink
+to complete multiline layouts, with outline allowance, stable alignment frames,
+nominal automatic dimensions and unchanged authored line modes. Published UI
+3.4.0 remains single-line only. Core peer ^2.4.0, APIs, KUI/resource formats and
+other SDK versions are unchanged; development still installs registry Core 2.4.0.
+Runtime 0.10.0's peer/dev UI ^3.4.0 accepts 3.5.0 without a new SDK release.
+The game example (^3.1.0) may update its installation/lock and rebuild separately.
+The explicitly selected Templates/tentax and Templates/milf-master now declare
+UI ^3.5.0, with matching registry installations/locks and rebuilt outputs.
+CLI's new-game template resolves latest on create; existing projects are unchanged.
+Editor 0.28.2 is a local trial with its Inspector restriction removed and fitting
+alignment corrected. Its installation/lock and ordinary App build use exact
+registry UI 3.5.0 and one Core 2.5.3; the temporary UI source binding is removed.
+Other applications and SDK development locks retain their own installations.
+Core-only SDKs, the document kernel, CLI and independent
+Reskin projects need no release. Read packages/ui/docs/label-text-layout.md and
+docs/dependency-policy.md for required versus optional consumer adoption.
 
 Read [`docs/dependency-policy.md`](docs/dependency-policy.md) before changing
 dependency ranges or planning releases. Package versions are independent.
@@ -235,7 +255,7 @@ ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
 See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.3
-and UI 3.4.0; source versions do not establish npm publication.
+and UI 3.5.0; source versions do not establish npm publication.
 
 ui-document 0.12.0 is published. It adds independent
 BitmapLabel/RichLabel catalog entries, typed bitmap-font references and literal
@@ -402,7 +422,7 @@ CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
 runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
-tree uses Core 2.5.3/UI 3.4.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
+tree (Editor 0.28.2) uses Core 2.5.3/UI 3.5.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
 Existing signed installers are not
 rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.

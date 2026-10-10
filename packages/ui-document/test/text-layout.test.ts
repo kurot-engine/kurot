@@ -70,4 +70,17 @@ describe('Label text layout authoring contract', () => {
 		const document = parseUIDocument(skin('textFit="shrink"', 'EditableText'));
 		expect(validateUIDocumentComponents(document, registry).length).toBeGreaterThan(0);
 	});
+
+	it.each(['', 'multiline="true"', 'multiline="false"'])('round-trips shrink independently of line mode %s', mode => {
+		const document = parseUIDocument(
+			skin(
+				`text="Доказуемая честность" width="120" height="44" size="20" textFit="shrink" minFontSize="14" wordWrap="true" lineSpacing="2" ${mode}`,
+			),
+		);
+		expect(validateUIDocumentComponents(document, registry)).toEqual([]);
+		expect(parseUIDocument(serializeUIDocument(document))).toEqual(document);
+		if (!mode) {
+			expect(serializeUIDocument(document)).not.toContain('multiline=');
+		}
+	});
 });

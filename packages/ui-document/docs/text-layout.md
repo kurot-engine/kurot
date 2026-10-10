@@ -54,11 +54,23 @@ The runtime fits from the currently active base size, not a persisted derived
 size. Put a Button's fitting policy on its `labelDisplay` skin part; Button
 itself does not expose these typography properties.
 
-Shrinking is a single-line native Label capability. A multiline Label may
-retain the policy in its authored document, but the runtime retains its base
-font size while multiline is enabled. Minimums above the base size do not
+The catalog accepts shrinking independently of multiline, including omission
+of the flag. Published UI 3.4.0 fits only single-line Labels; published UI 3.5.0
+extends the same policy to complete multiline layouts, retaining the
+base size whenever all rows fit. Authoring/schema/format 2 are unchanged.
+Minimums above the base size do not
 enlarge text. If content cannot fit at the minimum, the runtime reports overflow
 and uses its ordinary clipping rules; source text is never shortened or changed.
+
+For multiline fitting, constrain the Label's own width and height (or parent
+allocations/maximums), for example width="120" height="44" size="20"
+textFit="shrink" wordWrap="true". A button's height alone does not constrain an
+automatically sized Label. Automatic axes stay unconstrained; a height does not
+cap row count or switch multiline. Outline allowance participates in constrained
+fit checks and the shared wrapping width, while alignment keeps the original
+Label frame and automatic dimensions remain nominal. Adopting UI 3.5.0
+requires its native installation and rebuild, not a new authored
+property, document migration or document package release.
 
 ## Validation boundary
 

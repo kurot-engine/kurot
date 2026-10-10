@@ -1,7 +1,9 @@
 # @kurot/ui — AI context map
 
-UI 3.4.0 is published, verified on npm on 2026-10-09, and installs published
-Core 2.4.0 with a matching registry lockfile, without local overrides. Read
+UI 3.5.0 is published, verified on npm on 2026-10-10, including latest, package
+download and integrity. Its fitting/alignment modules match the tested build.
+It adds multiline Label fitting and stable alignment when fitting is toggled. Development still installs
+published Core 2.4.0 with a matching registry lockfile, without local overrides. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
@@ -18,7 +20,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.4.0`, EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@3.5.0`, EUI-compatible UI framework on top of
 `@kurot/core`. Peer-depends on `@kurot/core@^2.4.0`. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent
@@ -217,29 +219,44 @@ before patching core's transform code.
 | Understand validation/render scheduling order | `core/Validator.ts`, core `player/SystemTicker.ts`                                                                                                                        |
 | Measure UI validation/rendering performance   | `examples/benchmark/` for the visual runner, scenarios, Playwright automation, and local JSON/Markdown reports                                                            |
 
-## Label text layout contract in 3.1.0
+## Label text layout contract in 3.5.0
 
 Label defaults to multiline; explicit false draws only the first hard-separated
 line without wrapping. EditableText defaults to single-line and rejects
 shrinking. `wordWrap` chooses Unicode versus character boundaries only while
 multiline is enabled.
 
-`TextFitMode` is exported with Label. `textFit` is `none` by default or `shrink`
-for single-line Labels. `minFontSize` defaults to 12 and must be finite and >= 1.
+`TextFitMode` is exported with Label. `textFit` is `none` by default or `shrink`.
+UI 3.5.0 fits both line modes using complete Core measurement at each candidate
+size; UI 3.1.0–3.4.0 fit only single-line Labels.
+`multiline` stays authored and automatic axes stay unconstrained. Outline
+allowance affects fit checks and shared wrapping width, not the original alignment
+frame or nominal automatic dimensions. `minFontSize` defaults to
+12 and must be finite and >= 1.
 `size` stays authored; `renderedSize` and `textFitOverflow` are read-only results
 after validation. Fitting uses fixed axes, parent layout constraints or explicit
-maximums, reserves outline thickness and caches unchanged metrics. Measured
+maximums, reserves outline thickness and caches unchanged metrics, including
+multiline/wordWrap/lineSpacing. Measured
 automatic bounds are not fed back as fit constraints.
 
 `label.invalidateSize()` also invalidates Core line metrics. Call it after
 late font loading, even if the family name did not change. This requires
-Core >= 2.1.0 for that API; current UI 3.4.0 requires Core ^2.4.0 for its
+Core >= 2.1.0 for that API; current UI 3.5.0 requires Core ^2.4.0 for its
 centered-flip frame hook.
+
+Width/height setters refresh automatic text dimensions. Font readiness also
+invalidates fitting in fixed-size boxes. Fitting toggles preserve unchanged text
+positions, all nine alignments and nominal automatic dimensions.
 There is no global font-readiness listener.
+
+Existing multiline `shrink` policies begin fitting upon adoption; no XML format
+or authored-property migration is required. Runtime 0.10.0 accepts UI 3.5.0
+through its existing ^3.4.0 peer. CLI/document APIs are unchanged. Consumers
+update their own UI installations/locks and rebuild; no other SDK bump is needed.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
 font readiness and shared-schema boundaries. Native UI still depends only on
-Core; current KUI authoring uses document 0.13.x, CLI 3.5.0 and runtime 0.10.0.
+Core; current KUI authoring uses document 0.13.1, CLI 3.6.0 and runtime 0.10.0.
 Label presets expand in consumer-owned
 copies before native rendering; UI does not read style.json or consume textStyle.
 

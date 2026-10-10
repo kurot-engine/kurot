@@ -211,7 +211,7 @@ describe('Label text layout and font fitting', () => {
 		expect(label.renderedSize).toBeCloseTo(20, 0);
 	});
 
-	it('disables shrinking for multiline or editable text and restores size when disabled', () => {
+	it('retains base size when wrapping fits at automatic height, rejects editable shrinking and restores disabled size', () => {
 		const label = fitted();
 		label.multiline = true;
 		validate(label);

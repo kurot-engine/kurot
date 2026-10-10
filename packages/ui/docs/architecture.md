@@ -1,6 +1,6 @@
 # @kurot/ui architecture
 
-> Package version: 3.4.0 (published), with peerDependency `@kurot/core: ^2.4.0`.
+> Package version: 3.5.0 (published), with peerDependency `@kurot/core: ^2.4.0`.
 > Development installs published Core 2.4.0 with a matching registry lockfile.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.

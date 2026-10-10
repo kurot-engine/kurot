@@ -124,6 +124,41 @@ Propagate the analysis to downstream consumers only when the direct consumer's
 shipped behavior or compatibility changes. Do not turn the dependency graph into
 an automatic sequence of package version bumps.
 
+## Multiline Label fitting: UI 3.5.0 adoption
+
+UI 3.5.0 is published, verified on npm on 2026-10-10, including latest, package
+download and registry integrity. Its fitting/alignment modules match the tested
+local build. It adds complete
+multiline `textFit="shrink"` layouts, outline allowance and stable original
+alignment, retaining nominal automatic dimensions. Core ^2.4.0 remains the
+peer minimum, and UI's development installation/lock still resolve registry
+Core 2.4.0. KUI format and existing fitting properties are unchanged.
+
+- Required adoption for the feature: install UI 3.5.0 and rebuild. Existing
+  multiline Labels already carrying `shrink` begin fitting instead of ignoring
+  the policy. Editor 0.28.2 installs exact registry UI 3.5.0 with a matching Bun
+  lock and ordinary App build, sharing Core 2.5.3 across all imports. Its Inspector
+  restriction is removed and the temporary UI source binding is deleted.
+- Optional installation/development adoption: runtime 0.10.0's peer and
+  development UI ^3.4.0 accept 3.5.0. It already passes fitting fields to the
+  native Label and requires no SDK bump or higher peer minimum. The game example
+  (^3.1.0) may update its own UI installation/lock and rebuild. The explicitly
+  selected Templates/tentax and Templates/milf-master adopt registry UI ^3.5.0
+  with matching pnpm locks and rebuilt outputs. Existing compatible locks in
+  other consumers remain valid.
+  CLI's game template keeps latest; newly created projects resolve the published
+  UI through create, while existing projects keep their own installations.
+- Unaffected releases: Core, Game, DragonBones, Spine, bitmap-font, Atlas,
+  ui-document and CLI need no new release for this UI behavior. The document
+  catalog already validates both line modes; documentation/description updates
+  do not create a new API or format requirement. Reskin owns no direct UI SDK
+  installation; independent copied projects retain their own dependency trees.
+
+Only UI receives a new SDK version. The three selected applications adopt it
+explicitly; other applications and SDK development locks are unchanged.
+Review [Label fitting](../packages/ui/docs/label-text-layout.md)
+for bounds, line-mode and outline semantics.
+
 ## Default text alignment: Core 2.5.3 and document 0.13.1
 
 Both patches are published, verified on npm on 2026-10-10. Core TextField/BitmapText and inherited

@@ -10,6 +10,20 @@ import { generateCode, parseKUISkin } from '../src/core/kui/index.js';
 const TEMPLATE_DIRECTORY = fileURLToPath(new URL('../templates/game/resource/ui/skins/', import.meta.url));
 
 describe('KUI Skin compiler', () => {
+	it('compiles multiline fitting, height constraints and state policies as native inputs', () => {
+		const source =
+			'<Skin xmlns="https://kurot.dev/ui/1" class="FitSkin" states="compact"><Label id="caption" text="Доказуемая честность" width="120" height="44" size="20" textFit="shrink" wordWrap="true" lineSpacing="2" multiline.compact="false" textFit.compact="none" /></Skin>';
+		const generated = generateCode(parseKUISkin(source));
+		expect(generated).toContain('caption.height = 44;');
+		expect(generated).toContain('caption.textFit = "shrink";');
+		expect(generated).toContain('caption.wordWrap = true;');
+		expect(generated).toContain('caption.lineSpacing = 2;');
+		expect(generated).toContain('new SetProperty("caption", "multiline", false)');
+		expect(generated).toContain('new SetProperty("caption", "textFit", "none")');
+		expect(generated).not.toContain('caption.multiline =');
+		expect(generated).not.toContain('renderedSize');
+	});
+
 	it('compiles single-line fitting and state sizes without baking derived font sizes', () => {
 		const source =
 			'<Skin xmlns="https://kurot.dev/ui/1" class="FitSkin" states="down"><Label id="amount" text="100.80" width="140" size="24" multiline="false" textFit="shrink" minFontSize="16" size.down="20" /></Skin>';

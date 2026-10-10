@@ -95,7 +95,7 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 		valueType: 'string',
 		enumValues: ['none', 'shrink'],
 		defaultValue: 'none',
-		description: 'Shrinks single-line Label text within constrained bounds without changing size.',
+		description: 'Shrinks laid-out Label text within constrained bounds, retaining multiline and authored size.',
 	},
 	minFontSize: {
 		valueType: 'number',
