@@ -146,7 +146,7 @@ describe('Unicode width-constrained text layout', () => {
 		const start = text.indexOf('world');
 		field.setSelection(start + 2, start + 2);
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
-		expect(context.fillRect).toHaveBeenCalledWith(20, 20, 1, 20);
+		expect(context.fillRect).toHaveBeenCalledWith(20, 30, 1, 20);
 	});
 
 	it('avoids repeatedly measuring the complete remaining suffix of a long word', () => {

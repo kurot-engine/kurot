@@ -124,15 +124,55 @@ Propagate the analysis to downstream consumers only when the direct consumer's
 shipped behavior or compatibility changes. Do not turn the dependency graph into
 an automatic sequence of package version bumps.
 
+## Default text alignment: Core 2.5.3 and document 0.13.1
+
+Both patches are published, verified on npm on 2026-10-10. Core TextField/BitmapText and inherited
+UI text components default to middle. Document's catalog reports the same default
+for Label, EditableText, RichLabel and BitmapLabel, while omitted XML properties
+stay omitted. Explicit top/bottom, named states, line modes and format 2 remain
+unchanged. Old content with omitted alignment can move inside a taller box;
+set top explicitly when that placement is intended.
+
+- Required adoption: applications install Core 2.5.3 and rebuild to use the new
+  runtime default. Editors adopt document 0.13.1 alongside Core so their inspectors
+  and previews agree. Editor 0.27.5 removes the rich-text top fallback and restores
+  its native instance default. The four explicitly requested applications now
+  install Core 2.5.3/document 0.13.1 with matching locks and rebuilt outputs;
+  Editor 0.27.5 is a local trial, not a remote release.
+- Optional adoption: accepted SDK development installations/locks can update for
+  verification. Existing Core peers in UI (^2.4.0), Game (^2.0.0),
+  DragonBones (^2.1.1), Spine (Core 2.x) and ui-runtime (^2.4.0) already accept
+  Core 2.5.3. CLI 3.6.0/runtime 0.10.0 accept
+  document 0.13.1 through ^0.13.0. No SDK version bump or raised peer minimum is
+  needed merely to inherit these defaults.
+- Unaffected: Atlas and the headless bitmap-font kernel have no changed behavior
+  or release. BitmapText passes its explicit alignment into the existing kernel;
+  its standalone layout default stays top. Existing application installations,
+  copied projects, manifests and locks outside those four explicitly selected
+  applications are unchanged by this adoption.
+
 ## Current release examples
+
+- Core 2.5.2 is published, verified on npm on 2026-10-10, including the latest
+  tag, package download, integrity and alignment/rendering modules. It unifies dynamic top/middle/bottom
+  boundaries without an API, dependency or XML change. Dynamic top/bottom captions
+  may move. UI, Game, DragonBones, Spine and ui-runtime peers already accept it;
+  their SDK versions/minima/development locks remain unchanged. Apps adopt Core
+  installation/lock updates and rebuild explicitly. Editor 0.27.4 pins 2.5.2;
+  Reskin/Tentax/MilfMaster declare ^2.5.2 and install that registry release with
+  matching locks. Editor's 0.27.4 release tag was pushed; remote CI completion
+  was not awaited. Button captions use
+  middle in authored skins, with ordinary Label top unchanged in 2.5.2; MilfMaster's skin
+  omissions are corrected separately. CLI,
+  ui-document, bitmap-font and Atlas require no release.
 
 - Core 2.5.1 is published, verified on npm on 2026-10-10. It decouples dynamic
   middle alignment from line mode while preserving input editing frames, top/bottom and nominal
   measurement contracts. No API, XML or resource migration is required. Existing
   multiline middle-aligned captions can move to their visual center.
   UI/Game/DragonBones/Spine/ui-runtime peers accept the patch without new SDK
-  versions or raised minima. Editor 0.27.3 pins 2.5.1; the explicitly selected
-  Reskin/Tentax/MilfMaster checkouts declare ^2.5.1 and install registry 2.5.1
+  versions or raised minima. At the 2.5.1 adoption, Editor 0.27.3 pinned 2.5.1;
+  the selected Reskin/Tentax/MilfMaster checkouts declared ^2.5.1 and installed registry 2.5.1
   with matching locks and rebuilt outputs. Editor 0.27.3's release tag has been
   pushed without awaiting CI completion. Other
   applications and examples adopt separately; SDK development adoption is optional.
@@ -234,10 +274,10 @@ Core 2.5.0 and CLI 3.6.0 through their 2.x/3.x caret ranges; their current locks
 remain older. The refreshed game resources need a Core installation/lock update
 before ordinary builds can use the 2× kit. Templates retain
 `latest` placeholders, resolved by `create` to concrete registry caret ranges.
-The explicitly updated consumer checkouts now install registry Core 2.5.1:
-Editor 0.27.3 pins Core 2.5.1 and CLI 3.6.0, while Reskin declares Core ^2.5.1
+The explicitly updated consumer checkouts now install registry Core 2.5.3 and
+document 0.13.1: Editor 0.27.5 pins both and CLI 3.6.0, while Reskin declares Core ^2.5.3
 and keeps CLI/UI in each copied project. Templates/tentax and Templates/milf-master
-now declare Core ^2.5.1 and CLI ^3.6.0 with matching pnpm locks. Editor's demo
+now declare Core ^2.5.3, document ^0.13.1 and CLI ^3.6.0 with matching pnpm locks. Editor's demo
 and those two game templates adopt the example's 16 native skins, 2× KUI atlas
 and palette. The two games also adopt the CLI template web splash and logo. Business skins and presets remain project-owned. Editor
 frame previews/grid writes and Reskin grid authoring/validation account for source

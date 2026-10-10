@@ -55,7 +55,12 @@ layout caches assume data does not mutate. Glyph subtextures are borrowed views.
 
 BitmapText has text/font, lineSpacing/letterSpacing, smoothing, multiline,
 left/center/right textAlign and top/middle/bottom verticalAlign. The default is
-multiline=true. Font metrics, fallback spaces, kerning, wrapping and bounds come
+multiline=true. Published Core 2.5.3 defaults verticalAlign to middle; published
+2.5.2 and earlier default to top. BitmapLabel inherits its host BitmapText default.
+Explicit top/bottom remain effective in either line mode. Core passes the selected
+alignment into the unchanged headless kernel, whose standalone layout default
+remains top. Centering uses the bitmap-font line frame and retains glyph offsets.
+Font metrics, fallback spaces, kerning, wrapping and bounds come
 from layoutBitmapText. `getLayout()` and `getGlyphs()` expose borrowed readonly
 layout data, while textWidth/textHeight report admitted line metrics.
 measureText(width?, height?) measures independently without mutating rendered

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Sprite, Stage, TextField } from '../src/index.js';
+import { Sprite, Stage, TextField, TextFieldType } from '../src/index.js';
 import { StageText } from '../src/kurot/text/StageText.js';
 import { createTextMetrics } from './helpers/text-metrics.js';
 
@@ -14,7 +14,7 @@ describe('StageText DOM overlay', () => {
 		vi.restoreAllMocks();
 	});
 
-	it('copies the TextField geometry, transform, and typography to the native input', () => {
+	it.each(['top', 'middle', 'bottom'] as const)('copies geometry, transform and %s alignment to the native input', alignment => {
 		const canvas = document.createElement('canvas');
 		canvas.width = 640;
 		canvas.height = 480;
@@ -50,7 +50,9 @@ describe('StageText DOM overlay', () => {
 		field.height = 24;
 		field.size = 18;
 		field.fontFamily = 'Arial';
-		field.verticalAlign = 'middle';
+		if (alignment !== 'middle') {
+			field.verticalAlign = alignment;
+		}
 		parent.addChild(field);
 
 		const stageText = new StageText();
@@ -69,12 +71,47 @@ describe('StageText DOM overlay', () => {
 		expect(wrapper.style.height).toBe('24px');
 		expect(input.style.width).toBe('100px');
 		expect(input.style.height).toBe('18px');
-		expect(input.style.top).toBe('3px');
+		expect(input.style.top).toBe(alignment === 'top' ? '0px' : alignment === 'middle' ? '3px' : '6px');
 		expect(input.style.fontSize).toBe('18px');
 		expect(input.style.fontFamily).toBe('Arial');
 		expect(input.style.padding).toBe('0px');
 		expect(input.style.boxSizing).toBe('border-box');
 		expect(input.style.opacity).toBe('0');
+	});
+
+	it.each(['top', 'middle', 'bottom'] as const)('keeps multiline native editing rows stable at %s', alignment => {
+		const field = new TextField();
+		field.type = TextFieldType.INPUT;
+		field.multiline = true;
+		field.size = 20;
+		field.lineSpacing = 4;
+		field.width = 180;
+		field.height = 80;
+		if (alignment !== 'middle') {
+			field.verticalAlign = alignment;
+		}
+		field.text = 'ABC\nplay';
+		const stageText = new StageText();
+		stageText.setTextField(field);
+		stageText.setText(field.text);
+		stageText.show();
+		const input = document.querySelector('textarea')!;
+		const top = alignment === 'top' ? 0 : alignment === 'middle' ? 18 : 36;
+		expect(input.style.paddingTop).toBe(`${top}px`);
+		expect(input.style.paddingBottom).toBe(`${36 - top}px`);
+		expect(input.style.lineHeight).toBe('24px');
+		stageText.setSelection(4, 8);
+		field.text = 'play\nABC';
+		stageText.setText(field.text);
+		stageText.setSelection(4, 8);
+		stageText.resetStageText();
+		expect(stageText.getSelection()).toEqual([4, 8]);
+		expect(input.style.paddingTop).toBe(`${top}px`);
+		field.height = 30;
+		stageText.resetStageText();
+		expect(input.style.paddingTop).toBe('0px');
+		expect(input.style.paddingBottom).toBe('0px');
+		stageText.removeFromStage();
 	});
 
 	it('positions native input from logical stage size instead of backing-store pixels', () => {

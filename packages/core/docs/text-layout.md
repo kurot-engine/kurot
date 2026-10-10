@@ -40,6 +40,88 @@ Dictionary and grapheme segmentation follow the browser's `Intl` data. The
 pinned Unicode 17.0 tables govern the line-break profile; they do not replace
 the browser's grapheme implementation.
 
+## Default middle alignment (Core 2.5.3)
+
+Core 2.5.3 is published, verified on npm on 2026-10-10. TextField and BitmapText default to
+middle, inherited by UI Label, RichLabel, EditableText and BitmapLabel. Explicit
+`top`, `middle` and `bottom` use the same boundaries described below. Changing
+`multiline` or TextField type never changes the selected alignment.
+
+| Setting | Placement |
+| --- | --- |
+| `top` | Align the text block's top edge with the field's top. |
+| `middle` (default) | Align the block's midpoint with the field's midpoint. |
+| `bottom` | Align the block's bottom edge with the field's bottom. |
+
+Dynamic TextField uses the complete glyph block, including nominal blank rows.
+Input uses stable nominal editing rows for text, caret, selection and composition;
+overflowing input remains top-aligned for scrolling. BitmapText uses the existing
+bitmap-font line frame and glyph offsets. Nominal measurement, fitting and wrapping
+are unchanged. Outlines remain render-only. `verticalCenter` positions an entire
+UI component in its parent and does not choose its internal text alignment.
+
+Omitted alignment in old content now centers within a taller box. Set top
+explicitly where content should start at the top, for example a fixed-height
+paragraph region. Explicit top/bottom, presets and named states are retained;
+no source XML is rewritten. Published document 0.13.1 reports middle in its catalog
+without inserting omitted properties. Editors must adopt matching runtime/catalog
+installations and remove any private fallback that forces omitted alignment to top.
+Existing SDK peers accept these patches; no UI/CLI/runtime release or higher peer
+minimum is needed. The standalone bitmap-font layout default remains top.
+
+Unit and minified browser checks cover default single/multiline centering,
+explicit top/bottom, dynamic-to-input changes, caret/selection/composition, overflow,
+bitmap-font metrics, Canvas and WebGL 1/2 at 1×/2×.
+
+## Unified vertical alignment (Core 2.5.2)
+
+Core 2.5.2 is published, verified on npm on 2026-10-10, including its latest tag,
+package download, integrity and alignment/rendering modules. The sections below record earlier releases' behavior; Core 2.5.3 changes
+only the default to middle.
+
+`multiline` controls line generation: hard breaks and width wrapping. Every
+vertical alignment uses the same complete dynamic text-block boundaries:
+
+| Alignment | Dynamic text placement |
+| --- | --- |
+| `top` (default in 2.5.2) | The block's top edge is at the field's top. |
+| `middle` | The block's midpoint is at the field's midpoint. |
+| `bottom` | The block's bottom edge is at the field's bottom. |
+
+The block is the union of laid-out glyph ink. Mixed-size rich runs, fallback fonts
+and combining marks participate. Blank/whitespace-only rows contribute their
+nominal rows, including leading/trailing blank lines. Each mode applies one shared
+translation; relative alphabetic baselines and row spacing remain unchanged.
+An overflowing dynamic block retains the selected alignment under viewport clipping
+and scrolling. Automatic height still uses nominal content height as the available
+field height. Outlines and antialiasing margins belong to rendering, not alignment.
+Fully hidden glyph rows are skipped before their strokes can enter the margin.
+
+Input uses one stable nominal editing-row block for all three modes. Glyph changes
+cannot move its editing frame, caret, selection, composition or character hit
+positions. If input rows exceed the viewport, alignment leaves them top-aligned
+and existing input scrolling reveals the caret. Input and external clip boundaries
+remain exact. This is an editing-frame contract, not a multiline-dependent rule.
+
+In 2.5.2, TextField and ordinary UI Label default to top. Button skins set their caption
+Labels to middle; the native KUI kit already does so. A custom skin can explicitly
+choose top/bottom. `verticalCenter` places the entire Label box in its parent,
+whereas `verticalAlign` places text inside that box.
+
+`textHeight`, `measureText()`, automatic dimensions, wrapping and font-fitting
+measurements stay nominal. Cached block bounds and the same offset are shared by
+Canvas, WebGL text rasterization, link hits and render capture margins. Changing
+alignment introduces no new property, dependency or XML/resource format.
+Dynamic top/bottom captions can move compared with 2.5.1. Adopt the published
+Core installation/lock and rebuild to receive the correction. Existing SDK peers
+accept 2.5.2; a UI/CLI/headless SDK release is not required for this Core fix.
+
+Verification covers top/middle/bottom in both line modes, multilingual 24/40/56 px
+captions, automatic height, rich paragraphs, wrapping, blank rows, short viewports,
+links, font invalidation, outlines and nested caches. Minified browser tests use
+independent Canvas measurements in Canvas and WebGL 1/2 at 1×/2×, including input
+caret, selection, composition and single/multiline pointer-to-character mapping.
+
 ## Middle alignment independent of line mode (Core 2.5.1)
 
 Core 2.5.1 is published, verified on npm on 2026-10-10, including the latest tag,

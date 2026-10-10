@@ -4,6 +4,85 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.5.3] — 2026-10-10
+
+Published; package download, registry integrity and tested alignment modules verified on 2026-10-10.
+
+### Changed
+
+- Default TextField and BitmapText to middle alignment. Label, RichLabel,
+  EditableText and BitmapLabel inherit their host Core defaults.
+- Keep explicit top/bottom and skin-state overrides effective in both line modes.
+  Multiline only controls line generation. Dynamic glyph bounds, stable input
+  rows, overflow scrolling, bitmap-font metrics and nominal measurements retain
+  their existing contracts.
+
+### Compatibility
+
+- Text with omitted alignment can move within a taller box. Set top explicitly
+  for content intended to begin there; XML is not migrated automatically.
+- Published ui-document 0.13.1 records middle for all four UI text types without
+  adding a Core dependency or inserting omitted properties. Apps adopt runtime
+  and authoring installations/locks explicitly and rebuild.
+- No public API, runtime dependency, resource or XML-format change. Existing SDK
+  peers accept the patch without another UI/Game/DragonBones/Spine/runtime release.
+  The standalone bitmap-font kernel retains its own layout default.
+
+### Verification — 2026-10-10
+
+- Core build and all 924 unit tests pass (81 files), including default alignment,
+  both line modes, bitmap-font placement and input editing/overflow geometry.
+- All 12 minified browser checks pass in Canvas and WebGL 1/2 at 1×/2×, including
+  default single/multiline centering, explicit alignments, multilingual/rich text,
+  outlines, caches, caret, selection, composition and character hits.
+- UI 3.4.0 builds with its registry Core minimum; all 335 UI tests pass against
+  checkout Core 2.5.3 through an isolated alias and Canvas measurement fixture.
+  SDK development dependencies/locks and application installations are unchanged.
+- Package dry-run verifies version 2.5.3, all 641 files, compiled middle defaults,
+  declarations and public docs. `git diff --check` passes.
+
+## [2.5.2] — 2026-10-10
+
+Published; npm latest, package download and registry integrity verified on 2026-10-10.
+
+### Fixed
+
+- Align dynamic top, middle and bottom using the same complete glyph block in
+  single-line and multiline modes. Preserve relative baselines, row spacing,
+  blank rows, mixed-size rich runs and fallback glyph extents.
+- Preserve antialiasing at aligned glyph edges and skip fully hidden glyph rows
+  before applying outline margins. Canvas, WebGL rasterization, links, caches
+  and capture padding use the same alignment contract.
+- Retain stable input editing-row bounds for all three modes, including caret,
+  selection, composition, character hits and overflowing input scrolling.
+
+### Compatibility
+
+- TextField and ordinary Label still default to top. Button caption skins use
+  middle explicitly; multiline controls only hard breaks and wrapping.
+- Dynamic top/bottom captions can move compared with 2.5.1. Nominal measurements,
+  font fitting, public APIs, dependencies and XML/resource formats are unchanged.
+- UI/Game/DragonBones/Spine/ui-runtime peers accept this patch without new SDK
+  releases or raised minima. Applications adopt the installation/lock and rebuild
+  explicitly. CLI and headless packages require no release.
+
+### Verification — 2026-10-10
+
+- Registry package integrity is verified; its four alignment/rendering modules
+  match the tested local build.
+- Core 2.5.2 build and all 922 unit tests pass (81 files), including native
+  single-line/multiline input geometry, selection and overflowing editing rows.
+- All 12 minified browser checks pass: Canvas, WebGL 1/2 at 1×/2×. Independent
+  Canvas references verify all three alignments, 18 multilingual captions in
+  regular/bold faces, 24/40/56 px automatic height, rich paragraphs, blank rows,
+  wrapping, clipped overflow, outlines, caches, input caret/selection/composition
+  and character hits. Fully hidden scrolled glyph rows do not paint outlines.
+- UI 3.4.0 builds with its registry Core minimum; all 327 UI tests pass against
+  checkout Core 2.5.2 through an isolated test alias and Canvas measurement fixture.
+  Development dependencies/locks and application installations are not replaced.
+- Package dry-run verifies the 2.5.2 manifest, all 641 files, alignment modules,
+  declarations and public docs. `git diff --check` passes.
+
 ## [2.5.1] — 2026-10-10
 
 Published; npm version metadata and latest verified on 2026-10-10.

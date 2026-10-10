@@ -33,6 +33,30 @@ Explicit `multiline="false"` in older skins now means a real single line.
 Remove it or set it to `true` for text intended to wrap. No files are migrated
 automatically; omitted Label flags continue to allow wrapping.
 
+## Vertical alignment and skin defaults
+
+Label, RichLabel and EditableText inherit TextField's default; BitmapLabel
+inherits BitmapText's. With published Core 2.5.3 they default to
+`verticalAlign="middle"`. Published Core 2.5.2 and earlier default to top. Button
+skins in the native KUI kit already set middle explicitly. Button does not
+overwrite an authored top/bottom or a skin state. Use explicit top for content
+intended to start at the top of a taller box. `verticalCenter` positions the
+Label box in its parent; it does not align text inside the Label.
+
+Published document 0.13.1 reports the new middle default without writing omitted
+properties into XML. Adopting editors need matching Core/catalog installations;
+UI 3.4.0 itself requires no release or higher peer minimum. Existing applications
+retain their installed behavior until they update their locks and rebuild.
+
+Published Core 2.5.2 makes dynamic top/middle/bottom use the same
+complete glyph-block boundaries in single-line and multiline modes. Blank rows
+retain their height. `multiline` controls only line generation. Input uses stable
+editing-row boundaries in all three modes; its caret and selection remain stable.
+Measurements and fitting stay nominal. Older Core installations retain their
+recorded text behavior; adopt the Core installation/lock and rebuild.
+UI 3.4.0's peer accepts 2.5.2; this correction needs no UI release.
+See [Core text layout](../../core/docs/text-layout.md#unified-vertical-alignment-core-252).
+
 ## Shrink to fit
 
 ```xml

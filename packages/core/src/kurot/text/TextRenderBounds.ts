@@ -1,7 +1,6 @@
 import type { TextField } from './TextField.js';
-import { getTextBlockBounds } from './TextBlockBounds.js';
+import { getTextVerticalOffset } from './TextVerticalLayout.js';
 import { TextFieldType } from './enums/TextFieldType.js';
-import { VerticalAlign } from './enums/VerticalAlign.js';
 
 /**
  * Render-only margin for dynamic glyph overhang and run-level outlines.
@@ -11,10 +10,9 @@ export function getTextRenderPadding(textField: TextField): number {
 	if (textField.type === TextFieldType.INPUT) return 0;
 
 	let stroke = 0;
-	let overhang = 0;
-	const bounds = getTextBlockBounds(textField);
-	const baselineShift = textField.verticalAlign === VerticalAlign.MIDDLE
-		? (textField.textHeight - bounds.top - bounds.bottom) / 2 : 0;
+	let overhang = -Infinity;
+	// Use the natural height so clipping an overflowing block cannot enlarge captures.
+	const baselineShift = getTextVerticalOffset(textField, textField.textHeight);
 	for (const line of textField.getLinesArr()) {
 		if (line.inkAscent + line.inkDescent > 0) {
 			const baseline = line.baseline + baselineShift;
@@ -29,5 +27,5 @@ export function getTextRenderPadding(textField: TextField): number {
 	}
 
 	// Conservative ink margin covers glyph overhang and stroke antialiasing.
-	return (stroke > 0 ? Math.ceil(stroke * 2) + 2 : 0) + (overhang > 0 ? Math.ceil(overhang) + 1 : 0);
+	return (stroke > 0 ? Math.ceil(stroke * 2) + 2 : 0) + (overhang >= 0 ? Math.ceil(overhang) + 1 : 0);
 }

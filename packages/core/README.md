@@ -1,16 +1,55 @@
 # @kurot/core
 
-**2.5.1 is published.** It makes dynamic middle alignment
-independent of single/multiline mode. npm latest, the package download and
-registry integrity were verified on 2026-10-10. It also includes source texture
-density, text baselines, fractional viewport fixes and root WebGL target
-restoration. See [CHANGELOG.md](CHANGELOG.md).
+**2.5.3 is published**, verified on npm on 2026-10-10. TextField and BitmapText now default
+to middle alignment, inherited by UI text components. Explicit top/bottom remain
+effective and multiline controls only line generation. The package download,
+registry integrity and tested default-alignment modules are verified. See [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.5.1 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.3 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
-## Unified middle alignment in 2.5.1
+## Default middle alignment in 2.5.3
+
+TextField and BitmapText default to `verticalAlign = "middle"`, inherited by UI
+Label, RichLabel, BitmapLabel and EditableText. TextInput's text skin parts inherit
+the same host default. Explicit top/bottom and named skin states stay effective.
+`multiline` controls hard breaks and wrapping; changing line mode or input type
+does not choose an alignment. `verticalCenter` positions a component's box in its
+parent and remains independent of text alignment inside that box.
+
+Dynamic text keeps the unified glyph block introduced in 2.5.2. Input centers
+stable editing rows, including the caret, selection and composition underline;
+overflowing input retains its existing top-aligned scrolling. BitmapText centers
+its bitmap-font line frame. Nominal measurement and font-fitting sizes are unchanged.
+
+Content that omitted alignment may move within a taller box. Set
+`verticalAlign = "top"` explicitly when it should start at the top, such as a
+paragraph in a fixed-height region. No XML is rewritten automatically.
+Authoring catalog defaults match in published ui-document 0.13.1; the headless
+bitmap-font kernel is unchanged. Adopt Core 2.5.3 in the
+application installation/lock and rebuild. Existing SDK peers accept it without
+new SDK releases or higher minima. See [text layout](docs/text-layout.md#default-middle-alignment-core-253).
+
+## Unified vertical alignment in 2.5.2
+
+Dynamic `top`, `middle` and `bottom` align one complete glyph block to the top,
+center or bottom of the TextField. They use the same boundaries in both line modes,
+including rich runs and fallback glyphs. Blank rows retain their space; outlines
+are render-only. `multiline` controls only hard breaks and wrapping. TextField and
+ordinary UI Label default to top in 2.5.2; button skins set `verticalAlign="middle"`
+on their caption Labels explicitly. `verticalCenter` positions the Label itself
+in its parent and does not replace text alignment inside that Label.
+
+Input uses stable editing-row bounds for all three alignments, preserving caret,
+selection, composition and scrolling. Overflowing input rows remain top-aligned
+for editing. Layout measurements and font fitting stay nominal. Dynamic top/bottom
+captions may move compared with 2.5.1. Update the application installation/lock and
+rebuild; existing SDK peers accept 2.5.2 without new releases.
+No installed Editor/game is upgraded by this source change.
+See [text alignment](docs/text-layout.md#unified-vertical-alignment-core-252).
+
+## Published middle alignment in 2.5.1
 
 `multiline` controls hard breaks and wrapping. Dynamic `verticalAlign = "middle"`
 centers the complete glyph block in either line mode, including rich text and
@@ -140,7 +179,7 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 ## Installation
 
 ```bash
-pnpm add @kurot/core@^2.5.1
+pnpm add @kurot/core@^2.5.3
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

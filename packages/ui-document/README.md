@@ -1,14 +1,31 @@
 # @kurot/ui-document
 
-**0.13.0 is published**, verified on npm on 2026-10-09. See
+**0.13.1 is published**, verified on npm on 2026-10-10. It records middle as the text alignment
+default, matching published Core 2.5.3. The package download and registry integrity
+are verified. See
 [centered flips](../../docs/centered-flips.md) for APIs and consumer requirements.
 
 Headless semantic document foundation for Kurot UI tooling. It provides one
 format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
 Agent-driven UI generation.
 
-> **Package version: 0.13.0 (published).** KUI XML is the canonical authored format. The
+> **Package version: 0.13.1 (published).** KUI XML is the canonical authored format. The
 > schema remains pre-1.0, so later minor releases may still refine its contract.
+
+## Default middle text alignment in 0.13.1
+
+Label, EditableText, RichLabel and BitmapLabel catalog definitions report
+`verticalAlign="middle"`, matching published Core 2.5.3. Explicit top/bottom and
+named states are preserved; multiline only controls line generation. Omitted
+properties remain omitted in XML and history. The package remains headless, with
+no Core/UI dependency, new public API or format change.
+
+To use the new default, editors adopt Core 2.5.3 and document 0.13.1 together after
+publication and rebuild. CLI 3.6.0 and runtime 0.10.0 already accept this catalog
+patch through ^0.13.0; compatible SDKs need no new release. Old content with omitted
+alignment can move within a taller box. Set top explicitly for content intended
+to begin there; files are not rewritten automatically.
+See [text authoring](docs/text-layout.md#vertical-alignment-default-in-0131).
 
 ## Centered flip metadata in 0.13.0
 
@@ -77,7 +94,7 @@ Earlier 0.x kernel ranges do not automatically accept this release.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.13.0
+pnpm add @kurot/ui-document@^0.13.1
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It

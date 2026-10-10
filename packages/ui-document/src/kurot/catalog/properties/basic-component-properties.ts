@@ -125,7 +125,7 @@ export const LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = 
 	verticalAlign: {
 		valueType: 'string',
 		enumValues: ['top', 'bottom', 'middle', 'justify', 'contentJustify'],
-		defaultValue: 'top',
+		defaultValue: 'middle',
 		description: 'Vertical alignment within the label bounds.',
 	},
 	wordWrap: booleanProperty(false, 'Multiline wrapping: true uses Unicode boundaries, false character boundaries.'),

@@ -5,6 +5,13 @@ Core 2.4.0 with a matching registry lockfile, without local overrides. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
+Label/RichLabel/EditableText inherit TextField's vertical alignment;
+BitmapLabel inherits BitmapText's. Published Core 2.5.3 defaults both to middle;
+published Core 2.5.2 and earlier default to top. Explicit values remain effective
+and multiline only controls line generation. UI has no default override and needs
+no new release/peer minimum; its installed development Core remains 2.4.0.
+Published document 0.13.1 supplies matching authoring defaults.
+
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from scratch
 each session. Treat the package source and its `src/index.ts` barrel as the

@@ -332,17 +332,17 @@ describe('TextField line layout', () => {
 		field.setSelection(1, 3);
 
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
-		expect(context.fillRect).toHaveBeenCalledWith(10, 0, 20, 20);
+		expect(context.fillRect).toHaveBeenCalledWith(10, 5, 20, 20);
 
 		vi.mocked(context.fillRect).mockClear();
 		field.setSelection(2, 2);
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
-		expect(context.fillRect).toHaveBeenCalledWith(20, 0, 1, 20);
+		expect(context.fillRect).toHaveBeenCalledWith(20, 5, 1, 20);
 
 		vi.mocked(context.fillRect).mockClear();
 		field.setSelection(4, 4);
 		field.$setCompositionRange(1, 4);
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
-		expect(context.fillRect).toHaveBeenCalledWith(10, 11, 30, 1);
+		expect(context.fillRect).toHaveBeenCalledWith(10, 16, 30, 1);
 	});
 });

@@ -9,10 +9,27 @@ It remains headless: this package validates authored values and preserves them
 in KUI XML; it does not measure fonts or render text. The semantic document
 format remains version 2.
 
+## Vertical alignment default in 0.13.1
+
+Published ui-document 0.13.1 reports `verticalAlign="middle"` for Label and
+EditableText, as well as independent RichLabel/BitmapLabel. It matches published
+Core 2.5.3. Published document 0.13.0 and Core 2.5.2 use top as their defaults.
+Explicit top/bottom and named-state overrides are preserved in either line mode;
+multiline only controls hard breaks and wrapping. Omitted properties stay omitted
+in XML and history, and format 2 is unchanged.
+
+Editors adopt the new runtime and catalog together so an omitted
+value agrees between inspector and preview. CLI 3.6.0/runtime 0.10.0 already accept
+0.13.1 through ^0.13.0, with no SDK version bump or new Core dependency here.
+The catalog does not change an older runtime's defaults. Content with omitted
+alignment can move inside a taller box; set top explicitly when it should start
+at that box's top. No project files are migrated automatically.
+
 ## Properties
 
 | Property      | Label default | EditableText default | Authoring contract                                                                                               |
 | ------------- | ------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `verticalAlign` | `middle` | `middle` | Published 0.13.1 default, matching Core 2.5.3. Explicit top/bottom remain effective. |
 | `multiline`   | `true`        | `false`              | Allows hard separators and width wrapping. Explicit false renders the first line without wrapping in Core 2.1.0. |
 | `wordWrap`    | `false`       | `false`              | True chooses Unicode boundaries; false chooses character boundaries. Applies only in multiline mode.             |
 | `textFit`     | `none`        | `none`               | Label accepts `none` or `shrink`; EditableText accepts only `none`.                                              |

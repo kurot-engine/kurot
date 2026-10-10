@@ -1,8 +1,16 @@
 # @kurot/core — AI context map
 
-Core 2.5.1 is published, with dynamic middle alignment independent
-of multiline. npm latest, the package download and registry integrity were verified
-on 2026-10-10; published alignment modules match the tested local build. Read
+Core 2.5.3 is published, verified on npm on 2026-10-10. TextField and BitmapText default to
+middle; inherited UI text components use the same host default. Explicit top/bottom
+remain effective and multiline only controls line generation. Catalog metadata
+matches in published ui-document 0.13.1. Existing omitted alignment can move;
+use explicit top when required. Applications remain on their published locks.
+Read [default alignment](text-layout.md#default-middle-alignment-core-253).
+
+Core 2.5.2 is published, with all three dynamic alignments sharing one glyph block
+independently of multiline. npm latest, the package download and registry integrity
+were verified on 2026-10-10; published alignment/rendering modules match the tested
+local build. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
@@ -16,7 +24,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.5.1`, published. It provides Kurot's scene graph,
+Package identity: `@kurot/core@2.5.3`, published. It provides Kurot's scene graph,
 events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -241,7 +249,25 @@ vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
 
-## Text alignment in 2.5.1
+## Text alignment in 2.5.3
+
+Dynamic top/middle/bottom use `TextBlockBounds.ts` for the same complete glyph
+block, with nominal rows for blanks. `TextVerticalLayout.ts` translates the block
+without changing relative baselines; multiline controls only line generation.
+TextField/BitmapText default to middle; Label/RichLabel/EditableText/BitmapLabel
+inherit their host default. Explicit top/bottom remain effective. The standalone
+bitmap-font kernel is unchanged; BitmapText passes its own alignment into it.
+Input aligns stable nominal editing rows in all modes, clamping overflowing input
+to top for caret scrolling. TextRenderBounds uses the natural content height for
+capture padding so an overflowing viewport cannot inflate surfaces. Edge glyphs
+retain antialiasing; CanvasRenderer skips fully hidden dynamic glyph rows before
+stroke painting. Link hits share the offset. Measurements remain nominal.
+Read [text layout](text-layout.md#default-middle-alignment-core-253). Core 2.5.3
+is published; 2.5.2 uses the same geometry but defaults to top. Existing
+peers accept 2.5.3 without another SDK release.
+Applications update installations/locks and rebuild explicitly.
+
+## Published text alignment in 2.5.1
 
 `TextLineLayout.ts` caches alphabetic `baseline` and visible `inkAscent` /
 `inkDescent` per line. `TextBlockBounds.ts` caches the union of row glyph bounds,

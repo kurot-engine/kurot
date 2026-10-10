@@ -31,7 +31,7 @@ export class TextField extends DisplayObject {
 	private _bold = false;
 	private _italic = false;
 	private _textAlign: HorizontalAlign = HorizontalAlign.LEFT;
-	private _verticalAlign: VerticalAlign = VerticalAlign.TOP;
+	private _verticalAlign: VerticalAlign = VerticalAlign.MIDDLE;
 	private _textColor = TextField.default_textColor;
 	private _strokeColor = 0x000000;
 	private _stroke = 0;
@@ -149,6 +149,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Defaults to middle. All modes align the complete glyph block for dynamic text
+	 * and stable editing rows for input, independently of multiline.
+	 */
 	public get verticalAlign(): VerticalAlign {
 		return this._verticalAlign;
 	}

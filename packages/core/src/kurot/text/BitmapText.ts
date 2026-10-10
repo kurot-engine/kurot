@@ -23,7 +23,7 @@ export class BitmapText extends DisplayObject {
 	private _lineSpacing = 0;
 	private _letterSpacing = 0;
 	private _textAlign: 'left' | 'center' | 'right' = 'left';
-	private _verticalAlign: 'top' | 'middle' | 'bottom' = 'top';
+	private _verticalAlign: 'top' | 'middle' | 'bottom' = 'middle';
 	private _smoothing = true;
 	private _multiline = true;
 	private _layout?: BitmapTextLayout;

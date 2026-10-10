@@ -104,7 +104,8 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				field.textFlow = [
 					{ text: 'A\n', style: { textColor: 0xff0000, strokeColor: 0xff0000 } },
 					{ text: 'B\n', style: { textColor: 0x00ff00, strokeColor: 0x00ff00 } },
-					{ text: 'C', style: { textColor: 0x0000ff, strokeColor: 0x0000ff } },
+					// Matching glyph extents put the last row entirely outside this viewport.
+					{ text: 'A', style: { textColor: 0x0000ff, strokeColor: 0x0000ff } },
 				];
 				field.scrollV = 2;
 				const pixels = paint();
@@ -115,9 +116,11 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 					if (pixels[i] > 50 || pixels[i + 2] > 50) hidden++;
 					if (pixels[i + 1] > 50) visible++;
 				}
-				return { hidden, visible };
+				return { hidden, visible, multiline: field.multiline, scroll: field.getScrollYOffset(),
+					lines: field.getLinesArr().map(line => ({ height: line.height, baseline: line.baseline,
+						ascent: line.inkAscent, descent: line.inkDescent })) };
 			});
-			expect(scroll.hidden).toBe(0);
+			expect(scroll.hidden, JSON.stringify(scroll)).toBe(0);
 			expect(scroll.visible).toBeGreaterThan(100);
 			expect(errors).toEqual([]);
 		});

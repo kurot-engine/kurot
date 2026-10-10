@@ -1,13 +1,16 @@
 # @kurot/ui-document — AI context map
 
-ui-document 0.13.0 is published, verified on npm on 2026-10-09. Read
+ui-document 0.13.1 is published, verified on npm on 2026-10-10. Its four text component definitions
+report middle alignment, matching published Core 2.5.3. Explicit properties/states
+and omitted XML fields are preserved; multiline only controls line generation.
+Package download, registry integrity and tested catalog modules are verified. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.13.0` (published). This is a headless,
+Package identity: `@kurot/ui-document@0.13.1` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. Format version 2 is intentionally incompatible with the
 0.1 proof model.

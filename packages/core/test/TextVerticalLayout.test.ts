@@ -34,13 +34,13 @@ function createField(text: string): TextField {
 	field.width = 180;
 	field.height = 48;
 	field.multiline = false;
-	field.verticalAlign = 'middle';
 	field.text = text;
 	return field;
 }
 
 function paint(field: TextField): number[] {
 	context.fillText.mockClear();
+	context.fillRect.mockClear();
 	new CanvasRenderer().renderTextFieldToContext(field, drawing, 0, 0);
 	return context.fillText.mock.calls.map(call => call[2] as number);
 }
@@ -56,6 +56,23 @@ afterEach(() => {
 });
 
 describe('shared alphabetic baselines and visual alignment', () => {
+	it('defaults to middle without deriving alignment from line mode or input type', () => {
+		const field = createField('ABC');
+		expect(field.verticalAlign).toBe('middle');
+		expect(paint(field)).toEqual([31]);
+		field.multiline = true;
+		expect(paint(field)).toEqual([31]);
+		field.type = TextFieldType.INPUT;
+		expect(field.verticalAlign).toBe('middle');
+		expect(paint(field)).toEqual([30]);
+		field.multiline = false;
+		expect(paint(field)).toEqual([30]);
+		field.verticalAlign = 'top';
+		field.type = TextFieldType.DYNAMIC;
+		field.multiline = true;
+		expect(paint(field)).toEqual([14]);
+	});
+
 	it.each(Object.entries(ink))('centers the complete ink of %j without language-specific offsets', (text, extents) => {
 		const field = createField(text);
 		const [baseline] = paint(field);
@@ -178,13 +195,125 @@ describe('shared alphabetic baselines and visual alignment', () => {
 		expect(field.textHeight).toBe(52);
 	});
 
-	it.each(['top', 'bottom'] as const)('preserves nominal %s alignment in either line mode', alignment => {
+	it.each(['top', 'middle', 'bottom'] as const)('aligns the same glyph bounds at %s in either line mode', alignment => {
 		const field = createField('ABC');
 		field.verticalAlign = alignment;
 		const before = paint(field);
 		field.multiline = true;
 		expect(paint(field)).toEqual(before);
-		expect(before).toEqual([alignment === 'top' ? 16 : 44]);
+		expect(before).toEqual([alignment === 'top' ? 14 : alignment === 'middle' ? 31 : 48]);
+		const lines = field.getLinesArr();
+		const measured = field.measureText();
+		for (const [text, [ascent, descent]] of Object.entries(ink)) {
+			field.text = text;
+			const [baseline] = paint(field);
+			const top = baseline - ascent * field.size;
+			const bottom = baseline + descent * field.size;
+			expect(alignment === 'top' ? top : alignment === 'middle' ? (top + bottom) / 2 : bottom)
+				.toBeCloseTo(alignment === 'top' ? 0 : alignment === 'middle' ? 24 : 48);
+			field.multiline = false;
+			expect(paint(field)).toEqual([baseline]);
+			field.multiline = true;
+		}
+		field.text = 'ABC';
+		expect(field.measureText()).toEqual(measured);
+		expect(field.textHeight).toBe(20);
+		field.verticalAlign = 'top';
+		expect(field.getLinesArr().map(line => line.baseline)).toEqual(lines.map(line => line.baseline));
+	});
+
+	it.each(['top', 'middle', 'bottom'] as const)('aligns the complete paragraph at %s without changing row spacing', alignment => {
+		const field = createField('ABC\nplay');
+		field.multiline = true;
+		field.height = 80;
+		field.lineSpacing = 4;
+		field.verticalAlign = alignment;
+		const [first, second] = paint(field);
+		const top = first - 14;
+		const bottom = second + 4;
+		expect(alignment === 'top' ? top : alignment === 'middle' ? (top + bottom) / 2 : bottom)
+			.toBe(alignment === 'top' ? 0 : alignment === 'middle' ? 40 : 80);
+		expect(second - first).toBe(24);
+		expect(field.measureText()).toEqual({ width: 40, height: 44 });
+		field.text = '\nABC\n';
+		const blankOffset = alignment === 'top' ? 0 : alignment === 'middle' ? 6 : 12;
+		paint(field);
+		expect(context.fillText.mock.calls.find(call => call[0] === 'ABC')?.[2]).toBe(blankOffset + 24 + 16);
+		expect(field.textHeight).toBe(68);
+		field.text = ' \n \n ';
+		expect(paint(field)).toEqual([40, 64].map(baseline => baseline + blankOffset));
+		expect(field.getLinesArr().map(line => line.height)).toEqual([20, 20, 20]);
+	});
+
+	it.each(['top', 'middle', 'bottom'] as const)('preserves stable input rows and character hits at %s', alignment => {
+		for (const multiline of [false, true]) {
+			const field = createField('ABC');
+			field.type = TextFieldType.INPUT;
+			field.multiline = multiline;
+			field.verticalAlign = alignment;
+			field.setIsTyping(true);
+			field.setSelection(1, 1);
+			const rowTop = alignment === 'top' ? 0 : alignment === 'middle' ? 14 : 28;
+			const before = paint(field);
+			expect(before).toEqual([rowTop + 16]);
+			expect(context.fillRect).toHaveBeenCalledWith(10, rowTop, 1, 20);
+			expect(field.$getInputIndexAt(10, rowTop + 10)).toBe(1);
+			field.text = 'play';
+			field.setSelection(1, 3);
+			field.$setCompositionRange(1, 3);
+			expect(paint(field)).toEqual(before);
+			expect(context.fillRect).toHaveBeenCalledWith(10, rowTop, 20, 20);
+			expect(context.fillRect).toHaveBeenCalledWith(10, rowTop + 19, 20, 1);
+			field.$setCompositionRange();
+			field.setIsTyping(false);
+		}
+	});
+
+	it.each(['top', 'middle', 'bottom'] as const)('shares %s paragraph alignment with rich-text link hits', alignment => {
+		const field = createField('');
+		field.multiline = true;
+		field.height = 80;
+		field.lineSpacing = 4;
+		field.verticalAlign = alignment;
+		field.textFlow = [{ text: 'ABC\n' }, { text: 'play', style: { href: 'event:second' } }];
+		const stage = new Stage();
+		stage.addChild(field);
+		const listener = vi.fn();
+		field.addEventListener(TextEvent.LINK, listener);
+		const secondRowTop = alignment === 'top' ? 22 : alignment === 'middle' ? 41 : 60;
+		TouchEvent.dispatchTouchEvent(field, TouchEvent.TOUCH_TAP, false, false, 10, secondRowTop + 10, 0);
+		expect(listener).toHaveBeenCalledOnce();
+		expect(listener.mock.calls[0][0].text).toBe('second');
+	});
+
+	it.each(['top', 'middle', 'bottom'] as const)('keeps %s overhang padding independent of clipped viewport height', alignment => {
+		const field = createField('เริ่มเกม');
+		field.verticalAlign = alignment;
+		const padding = getTextRenderPadding(field);
+		expect(padding).toBe(alignment === 'middle' ? 2 : 3);
+		field.height = 2;
+		expect(getTextRenderPadding(field)).toBe(padding);
+	});
+
+	it('retains antialiasing at glyph edges without adding it to measurement', () => {
+		const field = createField('ABC');
+		const measured = field.measureText();
+		field.verticalAlign = 'top';
+		expect(getTextRenderPadding(field)).toBe(1);
+		field.verticalAlign = 'bottom';
+		expect(getTextRenderPadding(field)).toBe(1);
+		expect(field.measureText()).toEqual(measured);
+	});
+
+	it('skips fully hidden dynamic glyph rows before painting outlines when scrolled', () => {
+		const field = createField('ABC\nABC\nABC');
+		field.multiline = true;
+		field.height = 20;
+		field.verticalAlign = 'top';
+		field.stroke = 4;
+		field.scrollV = 2;
+		expect(paint(field)).toEqual([14]);
+		expect(context.strokeText).toHaveBeenCalledExactlyOnceWith('ABC', 0, 14);
 	});
 
 	it('keeps alignment consistent in a viewport shorter than its glyphs', () => {
@@ -207,20 +336,23 @@ describe('shared alphabetic baselines and visual alignment', () => {
 		expect((after[0] - 14 + after[1] + 4) / 2).toBe(24);
 	});
 
-	it('keeps multiline input row selection and caret aligned after text changes', () => {
+	it.each(['top', 'middle', 'bottom'] as const)('keeps multiline input editing rows stable at %s after text changes', alignment => {
 		const field = createField('ABC\nplay');
 		field.type = TextFieldType.INPUT;
 		field.multiline = true;
 		field.height = 80;
 		field.lineSpacing = 4;
+		field.verticalAlign = alignment;
 		field.setIsTyping(true);
 		field.setSelection(4, 4);
+		const secondRowTop = alignment === 'top' ? 24 : alignment === 'middle' ? 42 : 60;
 		const before = paint(field);
-		expect(context.fillRect).toHaveBeenCalledWith(0, 42, 1, 20);
+		expect(context.fillRect).toHaveBeenCalledWith(0, secondRowTop, 1, 20);
 		field.text = 'play\nABC';
 		field.setSelection(5, 8);
 		expect(paint(field)).toEqual(before);
-		expect(context.fillRect).toHaveBeenCalledWith(0, 42, 30, 20);
+		expect(context.fillRect).toHaveBeenCalledWith(0, secondRowTop, 30, 20);
+		expect(field.$getInputIndexAt(10, secondRowTop + 10)).toBe(6);
 	});
 
 	it('hits the second rich-text link at its centered paragraph position', () => {

@@ -80,6 +80,7 @@ describe('outlined text rendering', () => {
 		const field = createText();
 		field.text = 'A\nB\nC';
 		field.height = 20;
+		field.verticalAlign = 'top';
 		field.scrollV = 2;
 		new CanvasRenderer().renderTextFieldToContext(field, context, 0, 0);
 		expect(context.strokeText).toHaveBeenCalledExactlyOnceWith('B', 0, 10);

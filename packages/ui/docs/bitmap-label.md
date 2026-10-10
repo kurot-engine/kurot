@@ -44,6 +44,13 @@ DisplayObject tint. Alignments position glyphs without scaling them. Set scaleX
 and scaleY for decorative number sizing. Default multiline=true; explicit false
 keeps the first hard-separated line unwrapped.
 
+Vertical alignment inherits BitmapText's default: middle with published Core 2.5.3,
+top with published 2.5.2 and earlier. Explicit top/bottom remain effective in either
+line mode. Bitmap-font metrics and glyph offsets are unchanged. UI 3.4.0 accepts
+the patch without another UI release; applications update their Core installation/
+lock and rebuild. Published document 0.13.1 supplies the matching
+catalog default.
+
 Authoring support was introduced in document 0.12.0, CLI 3.4.0 and runtime 0.9.0.
 Current document 0.13.0, CLI 3.5.0 and runtime 0.10.0 retain BitmapLabel
 authoring, KUI compilation and materialization. Earlier compilers do not accept

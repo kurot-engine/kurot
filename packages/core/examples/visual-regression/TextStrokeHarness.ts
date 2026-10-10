@@ -76,12 +76,15 @@ function compare(clip = false): PixelComparison {
 	const baseline = (20 + font.fontBoundingBoxAscent - font.fontBoundingBoxDescent) / 2;
 	let y = baseline + (field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - 20
 		: field.verticalAlign === kurot.VerticalAlign.MIDDLE ? (field.height - 20) / 2 : 0);
-	if (field.type === kurot.TextFieldType.DYNAMIC && field.verticalAlign === kurot.VerticalAlign.MIDDLE) {
+	if (field.type === kurot.TextFieldType.DYNAMIC) {
 		const ink = line.elements.map(element => context.measureText(element.text))
 			.filter(metrics => metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 0);
 		if (ink.length > 0) {
-			y = field.height / 2 + (Math.max(...ink.map(metrics => metrics.actualBoundingBoxAscent))
-				- Math.max(...ink.map(metrics => metrics.actualBoundingBoxDescent))) / 2;
+			const ascent = Math.max(...ink.map(metrics => metrics.actualBoundingBoxAscent));
+			const descent = Math.max(...ink.map(metrics => metrics.actualBoundingBoxDescent));
+			y = field.verticalAlign === kurot.VerticalAlign.TOP ? ascent
+				: field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - descent
+					: field.height / 2 + (ascent - descent) / 2;
 		}
 	}
 	for (const element of line.elements) {

@@ -46,8 +46,14 @@ available, together with these text-layout properties:
 | wordWrap               | true      | Unicode line-break opportunities; false wraps between graphemes.          |
 | lineSpacing            | 0         | Finite, nonnegative distance between lines.                               |
 | textAlign              | left      | left, center or right.                                                    |
-| verticalAlign          | top       | top, middle or bottom.                                                    |
+| verticalAlign          | Host Core | top, middle or bottom.                                                    |
 | textWidth / textHeight | Read-only | Complete content metrics under the current width, before height clipping. |
+
+Vertical alignment inherits TextField's default: middle with published Core 2.5.3,
+top with published 2.5.2 and earlier. Explicit values remain effective in either
+line mode. UI 3.4.0 accepts the Core patch without another UI release; adopt the
+application installation/lock and rebuild. Published document
+0.13.1 supplies the matching catalog default.
 
 Measurement uses parent-assigned width first, then explicit width, then a
 configured maxWidth, otherwise unconstrained width. Automatic height includes

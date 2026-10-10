@@ -9,11 +9,11 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.5.1   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.5.3   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.4.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.6.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
-| `@kurot/ui-document` | 0.13.0  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
+| `@kurot/ui-document` | 0.13.1  | Headless UI authoring kernel: semantic assets, component capabilities, reuse, data/action/transition contracts, validation, transactions, diffs, and undo/redo. No runtime dependencies. | [`packages/ui-document/docs/ai-context.md`](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime`  | 0.10.0   | Browser materializer for reuse, appearances, transactional data bindings, semantic actions, transitions, typed resources, and project adapters.                                          | [`packages/ui-runtime/docs/ai-context.md`](packages/ui-runtime/docs/ai-context.md)   |
 | `@kurot/atlas`       | 0.1.0   | Independent build-time RGBA atlas packing and Node PNG adapter; no Core, UI or CLI dependency. Published.                                                                                | [`packages/atlas/docs/ai-context.md`](packages/atlas/docs/ai-context.md)             |
 | `@kurot/dragonbones` | 0.1.0   | Published DragonBones 5.7 runtime and native Kurot display, atlas, mesh, event and clock adapter. Core ^2.1.1 peer.                                                                      | [`packages/dragonbones/docs/ai-context.md`](packages/dragonbones/docs/ai-context.md) |
@@ -61,6 +61,39 @@ dependencies and lockfiles describe the tested checkout, not consumer minima.
 - Report required migrations, optional adoption and unaffected consumers
   separately. Never prescribe a blanket package bump or `--latest` update.
 
+Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField
+and BitmapText now default to middle, inherited by Label, RichLabel, BitmapLabel
+and EditableText. Explicit top/bottom and state overrides remain effective;
+multiline controls only line generation. Dynamic alignment uses the existing
+unified glyph block; input retains stable editing rows and overflow scrolling.
+BitmapText retains bitmap-font line metrics. The headless catalog records middle
+for all four UI text types without inserting omitted properties into XML.
+Use explicit top for content intended to begin at the top of a taller box.
+UI/Game/DragonBones/Spine/ui-runtime peers accept Core 2.5.3; no new SDK versions
+or higher minima are required. CLI 3.6.0/runtime 0.10.0 already accept document
+0.13.1 through ^0.13.0. Their development locks are unchanged. Editor 0.27.5,
+Reskin, Tentax and MilfMaster explicitly install registry Core 2.5.3 and document
+0.13.1 with matching locks and rebuilt outputs. Editor removes its rich-text top
+fallback and restores the native instance default; 0.27.5 is a local trial, not a
+remote release. Other applications and independent Reskin projects are unchanged.
+Atlas and the bitmap-font kernel are unchanged.
+Read packages/core/docs/text-layout.md and packages/ui-document/docs/text-layout.md.
+
+Core 2.5.2 is published; npm latest, package download and registry integrity
+were verified on 2026-10-10. Its alignment/rendering modules match the tested
+local build. Dynamic top/middle/bottom now share one
+complete glyph block, independent of multiline. Input uses stable nominal editing
+rows in all modes; overflowing input remains top-aligned for caret scrolling.
+Nominal measurements and public/dependency/XML contracts are unchanged. In 2.5.2,
+TextField and ordinary Label default to top; button caption skins explicitly use middle.
+Dynamic top/bottom captions can move from 2.5.1. Existing UI/Game/DragonBones/Spine/
+ui-runtime peers accept the patch without new SDK versions or higher minima.
+At the 2.5.2 adoption, Editor 0.27.4, Reskin, Tentax and MilfMaster installed
+registry Core 2.5.2 with matching locks and rebuilt outputs. Editor 0.27.4
+was committed and its release tag pushed; CI completion was not awaited. Read packages/core/docs/text-layout.md. UI/CLI/headless
+packages require no release. MilfMaster's omitted button caption alignments are
+now explicitly middle, including ButtonPlainBlueSkin.
+
 Core 2.5.1 is published; npm latest, package download and registry integrity
 were verified on 2026-10-10. Its published block-alignment modules match the
 tested local build. Dynamic middle alignment centers the complete glyph block
@@ -69,14 +102,14 @@ stable editing rows; top/bottom and nominal measurements are unchanged. Block
 bounds are cached with the line layout and shared by drawing, link hits and
 render padding. Read packages/core/docs/text-layout.md. No public API, dependency
 or XML/resource-format change is required. SDK peers accept this patch without
-new versions. The explicitly selected Editor 0.27.3, Reskin, Tentax and
-MilfMaster checkouts install registry Core 2.5.1 with matching locks and rebuilt
+new versions. At the 2.5.1 adoption, Editor 0.27.3, Reskin, Tentax and
+MilfMaster installed registry Core 2.5.1 with matching locks and rebuilt
 outputs. Editor 0.27.3's release tag has been pushed; CI completion was not
 awaited. Other SDKs and CLI are unchanged. Other
 applications and independent Reskin projects retain their own installations.
 
-Editor 0.27.3, Reskin and the explicitly selected Templates/tentax and
-Templates/milf-master now install registry Core 2.5.1 with matching app locks.
+Editor 0.27.5, Reskin and the explicitly selected Templates/tentax and
+Templates/milf-master now install registry Core 2.5.3/document 0.13.1 with matching app locks.
 Editor and both templates install CLI 3.6.0; Reskin keeps CLI project-owned.
 The demo/game templates use the engine example's native KUI skins, palette and
 2× atlas, replacing their EUI defaults. Tentax and MilfMaster synchronize only
@@ -201,7 +234,7 @@ Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
 ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
-See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.1
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.3
 and UI 3.4.0; source versions do not establish npm publication.
 
 ui-document 0.12.0 is published. It adds independent
@@ -369,7 +402,7 @@ CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
 runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
-tree uses Core 2.5.1/UI 3.4.0/document 0.13.0/CLI 3.6.0/runtime 0.10.0.
+tree uses Core 2.5.3/UI 3.4.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
 Existing signed installers are not
 rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.

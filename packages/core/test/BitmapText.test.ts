@@ -32,6 +32,23 @@ function makeText(): BitmapText {
 }
 
 describe('native bitmap text', () => {
+	it('centers its line frame by default in either line mode and retains explicit alignment', () => {
+		const text = makeText();
+		text.height = 30;
+		expect(text.verticalAlign).toBe('middle');
+		expect(text.getGlyphs().map(glyph => glyph.y)).toEqual([9, 9]);
+		text.multiline = false;
+		expect(text.getGlyphs().map(glyph => glyph.y)).toEqual([9, 9]);
+		text.multiline = true;
+		text.text = 'A\nV';
+		text.height = 40;
+		expect(text.getGlyphs().map(glyph => glyph.y)).toEqual([8, 20]);
+		text.verticalAlign = 'top';
+		expect(text.getGlyphs().map(glyph => glyph.y)).toEqual([0, 12]);
+		text.verticalAlign = 'bottom';
+		expect(text.getGlyphs().map(glyph => glyph.y)).toEqual([16, 28]);
+	});
+
 	it('measures without invalidating its rendered layout', () => {
 		const text = makeText();
 		text.width = 10;

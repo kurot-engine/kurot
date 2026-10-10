@@ -4,7 +4,7 @@ const TEXT_LAYOUT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	multiline: { valueType: 'boolean', defaultValue: true },
 	lineSpacing: { valueType: 'number', minimum: 0, defaultValue: 0 },
 	textAlign: { valueType: 'string', enumValues: ['left', 'center', 'right'], defaultValue: 'left' },
-	verticalAlign: { valueType: 'string', enumValues: ['top', 'middle', 'bottom'], defaultValue: 'top' },
+	verticalAlign: { valueType: 'string', enumValues: ['top', 'middle', 'bottom'], defaultValue: 'middle' },
 };
 
 /**

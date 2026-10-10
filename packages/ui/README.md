@@ -10,6 +10,18 @@ UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/t
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
+## Text alignment inherited from Core
+
+Label, RichLabel and EditableText inherit TextField's default alignment;
+BitmapLabel inherits BitmapText's. With published Core 2.5.3 they default to middle.
+Published Core 2.5.2 and earlier default to top. Explicit top/bottom and skin-state
+overrides stay effective; multiline only controls line generation. Set top
+explicitly when text should start at the top of a taller box.
+UI 3.4.0's existing peer range accepts Core 2.5.3 without a UI release or a higher
+minimum. Applications adopt the Core installation/lock and rebuild;
+UI's development installation remains registry Core 2.4.0.
+See [text layout](docs/label-text-layout.md#vertical-alignment-and-skin-defaults).
+
 ## Centered flips in 3.4.0
 
 All UI display components inherit independent boolean `flipX` and `flipY`,

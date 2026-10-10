@@ -4,6 +4,32 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.13.1] — 2026-10-10
+
+Published; package download, registry integrity and tested catalog modules verified on 2026-10-10.
+
+### Changed
+
+- Report middle as the verticalAlign default for Label, EditableText, RichLabel
+  and BitmapLabel, matching published Core 2.5.3 and inherited UI text behavior.
+- Preserve omitted XML properties, explicit top/bottom and named-state overrides
+  in both line modes. Multiline only controls line generation; format 2, public
+  APIs, validation and the headless dependency boundary are unchanged.
+
+### Compatibility
+
+Editors adopt Core 2.5.3 and this catalog together. CLI 3.6.0
+and runtime 0.10.0 accept 0.13.1 through their existing ^0.13.0 ranges; no new
+SDK versions or higher minima are needed. This metadata does not change an older
+installed Core's runtime default or rewrite project XML.
+
+### Verification
+
+Build and all 227 unit tests pass (19 files), including all four component
+defaults, omission, explicit top/bottom, state round trips and both line modes.
+Package dry-run verifies version 0.13.1, all 319 files, declarations, public docs
+and the four compiled catalog defaults. `git diff --check` passes.
+
 ## [0.13.0] — 2026-10-09
 
 Published; verified on npm on 2026-10-09. Consumers on ^0.12.0 must

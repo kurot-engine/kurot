@@ -5,9 +5,19 @@ keeps semantic format version 2. The native components are published in UI
 3.3.0, with Core ^2.3.0 required by UI; Core 2.3.1 contains the blank-rich-run
 measurement correction. No opened project is migrated or given new fields.
 
-Current document 0.13.0 retains these types. CLI 3.5.0/runtime 0.10.0 require
+Published document 0.13.1 retains these types and is published. CLI 3.5.0/runtime 0.10.0 require
 document ^0.13.0; current UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for
 centered flips. The text types were originally integrated by CLI 3.4.0/runtime 0.9.0.
+
+## Alignment defaults in 0.13.1
+
+BitmapLabel and RichLabel default to middle in the published catalog, matching
+published Core 2.5.3 and inherited UI behavior. Explicit top/bottom and named states
+remain effective in either line mode. Multiline controls only line generation.
+Omitted properties stay omitted in XML and history. Published document 0.13.0
+reports top; metadata alone cannot change an older installed Core's default.
+Editors adopt runtime and catalog together. Existing CLI/runtime
+ranges accept 0.13.1 without new SDK releases; format 2 and dependencies are unchanged.
 
 ## Choose the component
 

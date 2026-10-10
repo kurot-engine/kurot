@@ -984,7 +984,10 @@ export class CanvasRenderer {
 			const line = lines[i];
 			const h = line.height;
 
-			if (drawY + h <= 0 || drawY >= height) {
+			const hasInk = tf.type === TextFieldType.DYNAMIC && line.inkAscent + line.inkDescent > 0;
+			const visibleTop = drawY + (hasInk ? line.baseline - line.inkAscent : 0);
+			const visibleBottom = drawY + (hasInk ? line.baseline + line.inkDescent : h);
+			if (visibleBottom <= 0 || visibleTop >= height) {
 				characterIndex += line.charNum;
 				drawY += h + lineSpacing;
 				continue;

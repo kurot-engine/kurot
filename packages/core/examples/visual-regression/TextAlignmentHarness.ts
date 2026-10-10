@@ -3,6 +3,8 @@ import * as kurot from '../../src/index.js';
 interface PixelComparison {
 	mismatches: number;
 	inkCenter: number;
+	inkTop: number;
+	inkBottom: number;
 	inkPixels: number;
 }
 
@@ -13,7 +15,7 @@ declare global {
 			player: kurot.Player;
 			root: kurot.Sprite;
 			kurot: typeof kurot;
-			compare(): Promise<PixelComparison>;
+			compare(clip?: boolean): Promise<PixelComparison>;
 		};
 	}
 }
@@ -38,11 +40,10 @@ field.width = 240;
 field.height = 48;
 field.multiline = false;
 field.textAlign = 'center';
-field.verticalAlign = 'middle';
 field.strokeColor = 0xffffff;
 root.addChild(field);
 
-async function compare(): Promise<PixelComparison> {
+async function compare(clip = false): Promise<PixelComparison> {
 	await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 	player.render(false, 0);
 	const capture = document.createElement('canvas');
@@ -90,14 +91,12 @@ async function compare(): Promise<PixelComparison> {
 		return edge;
 	});
 	const input = field.type === kurot.TextFieldType.INPUT;
-	let lineTop = 0;
-	if (field.verticalAlign === 'middle') {
-		lineTop = input ? Math.max(0, (field.height - nominalHeight) / 2)
-			: field.height / 2 - (Math.min(...edges) + Math.max(...edges)) / 2;
-	} else if (field.verticalAlign === 'bottom') {
-		lineTop = Math.max(0, field.height - nominalHeight);
-	}
-	if (input) {
+	const top = input ? 0 : Math.min(...edges);
+	const bottom = input ? nominalHeight : Math.max(...edges);
+	const factor = field.verticalAlign === 'middle' ? 0.5 : field.verticalAlign === 'bottom' ? 1 : 0;
+	const freeHeight = field.height - (bottom - top);
+	let lineTop = (input ? Math.max(0, freeHeight) : freeHeight) * factor - top;
+	if (input || clip) {
 		context.beginPath();
 		context.rect(0, 0, field.width, field.height);
 		context.clip();
@@ -166,7 +165,8 @@ async function compare(): Promise<PixelComparison> {
 			inkPixels++;
 		}
 	}
-	return { mismatches, inkCenter: (minY + maxY + 1) / 2 / resolution - field.y, inkPixels };
+	return { mismatches, inkCenter: (minY + maxY + 1) / 2 / resolution - field.y,
+		inkTop: minY / resolution - field.y, inkBottom: (maxY + 1) / resolution - field.y, inkPixels };
 }
 
 window.textAlignment = { field, player, root, kurot, compare };
