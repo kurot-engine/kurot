@@ -438,8 +438,12 @@ It loads its bundled Chakra Petch bold font before layout, so glyph-block
 placement does not depend on a system Arial substitute. The font and its SIL
 Open Font License are in `examples/visual-regression/fonts/`. Text-alignment
 tests separately check the default and explicit top/middle/bottom modes.
-Review text-layout changes against the golden scene before updating snapshots;
-keep the existing pixel thresholds and verify shared baselines on Linux CI.
+Baselines live in `examples/visual-regression/tests/snapshots/<platform>/`
+because font rasterization and ink metrics can differ between operating systems
+even with the same font file. The Linux baselines are reviewed CI captures;
+`pnpm test:visual:update` updates only the current platform's baselines.
+Review text-layout changes before updating snapshots, keep the existing pixel
+thresholds, and verify the Linux baselines on CI.
 
 Resource-lifetime soak tests repeatedly rebuild scenes, upload and dispose
 textures, pressure blur framebuffer pools, force garbage collection, and restore

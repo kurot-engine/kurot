@@ -16,7 +16,7 @@ export default defineConfig({
 			animations: 'disabled',
 		},
 	},
-	snapshotPathTemplate: '{testDir}/snapshots/{arg}{ext}',
+	snapshotPathTemplate: '{testDir}/snapshots/{platform}/{arg}{ext}',
 	use: {
 		headless: true,
 		viewport: { width: 640, height: 480 },
