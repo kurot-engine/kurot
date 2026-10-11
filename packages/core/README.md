@@ -422,8 +422,8 @@ Release regression gates are deliberately machine-scoped. Set a stable
 name and exact browser version match. Timing limits use both observed variance
 and a 12% floor; a baseline row needs at least five samples before it can gate.
 
-Deterministic visual regression tests cover Canvas 2D, WebGL 1, WebGL 2, and
-WebGL context restoration:
+Visual regression is a local, on-demand check for renderer changes. The tests
+cover Canvas 2D, WebGL 1, WebGL 2, and WebGL context restoration:
 
 ```bash
 pnpm test:visual
@@ -440,10 +440,9 @@ Open Font License are in `examples/visual-regression/fonts/`. Text-alignment
 tests separately check the default and explicit top/middle/bottom modes.
 Baselines live in `examples/visual-regression/tests/snapshots/<platform>/`
 because font rasterization and ink metrics can differ between operating systems
-even with the same font file. The Linux baselines are reviewed CI captures;
-`pnpm test:visual:update` updates only the current platform's baselines.
-Review text-layout changes before updating snapshots, keep the existing pixel
-thresholds, and verify the Linux baselines on CI.
+even with the same font file. `pnpm test:visual:update` updates only the current
+platform's baselines. Review text-layout changes before updating snapshots and
+keep the existing pixel thresholds.
 
 Resource-lifetime soak tests repeatedly rebuild scenes, upload and dispose
 textures, pressure blur framebuffer pools, force garbage collection, and restore
