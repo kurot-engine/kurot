@@ -1,9 +1,13 @@
 # @kurot/ui — AI context map
 
-UI 3.5.0 is published, verified on npm on 2026-10-10, including latest, package
-download and integrity. Its fitting/alignment modules match the tested build.
-It adds multiline Label fitting and stable alignment when fitting is toggled. Development still installs
-published Core 2.4.0 with a matching registry lockfile, without local overrides. Read
+UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, package
+download, integrity and all 344 generated files matching the tested build. It adds outline-safe
+Label layout to normal measurement, wrapping and fitting; outlined automatic
+dimensions and line breaks can change. Its Core peer is ^2.5.2 for public line
+ink metrics and unified block alignment. Development installs registry Core
+2.5.3 with a matching lock, without local overrides; the 2.5.2 minimum is tested
+separately. Published UI 3.5.0 (verified on 2026-10-10) introduced multiline
+Label fitting and stable alignment when fitting is toggled, with Core ^2.4.0. Read
 [centered flips](../../../docs/centered-flips.md) before changing transforms,
 reflection frames, authored flags or dependency adoption.
 
@@ -11,7 +15,8 @@ Label/RichLabel/EditableText inherit TextField's vertical alignment;
 BitmapLabel inherits BitmapText's. Published Core 2.5.3 defaults both to middle;
 published Core 2.5.2 and earlier default to top. Explicit values remain effective
 and multiline only controls line generation. UI has no default override and needs
-no new release/peer minimum; its installed development Core remains 2.4.0.
+no new release for this default change alone. The separate UI 3.6.0 outline
+correction requires Core ^2.5.2.
 Published document 0.13.1 supplies matching authoring defaults.
 
 Read this before exploring `src/`. It is a compressed map so an agent
@@ -20,8 +25,8 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.5.0`, EUI-compatible UI framework on top of
-`@kurot/core`. Peer-depends on `@kurot/core@^2.4.0`. Rewritten with standard class
+Package identity: `@kurot/ui@3.6.0` (published), EUI-compatible UI framework on top of
+`@kurot/core`. Its peer is `@kurot/core@^2.5.2`; published 3.5.0 uses ^2.4.0. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent
 allocations. It has not been published; UI 3.4.0 includes the same correction. Version 3.3.0 adds RichLabel and tests against published Core 2.3.1 through its
@@ -219,7 +224,7 @@ before patching core's transform code.
 | Understand validation/render scheduling order | `core/Validator.ts`, core `player/SystemTicker.ts`                                                                                                                        |
 | Measure UI validation/rendering performance   | `examples/benchmark/` for the visual runner, scenarios, Playwright automation, and local JSON/Markdown reports                                                            |
 
-## Label text layout contract in 3.5.0
+## Label text layout contract in 3.6.0
 
 Label defaults to multiline; explicit false draws only the first hard-separated
 line without wrapping. EditableText defaults to single-line and rejects
@@ -230,8 +235,11 @@ multiline is enabled.
 UI 3.5.0 fits both line modes using complete Core measurement at each candidate
 size; UI 3.1.0–3.4.0 fit only single-line Labels.
 `multiline` stays authored and automatic axes stay unconstrained. Outline
-allowance affects fit checks and shared wrapping width, not the original alignment
-frame or nominal automatic dimensions. `minFontSize` defaults to
+allowance affected fit checks and shared wrapping width, not the original alignment
+frame or nominal automatic dimensions in 3.5.0. UI 3.6.0
+uses `text/label-text-bounds.ts` to reserve symmetric stroke/AA insets
+and contain complete ink in automatic dimensions. Measurement, wrapping, fitting
+and painting share this area. Empty/input fields add no inset. `minFontSize` defaults to
 12 and must be finite and >= 1.
 `size` stays authored; `renderedSize` and `textFitOverflow` are read-only results
 after validation. Fitting uses fixed axes, parent layout constraints or explicit
@@ -241,18 +249,19 @@ automatic bounds are not fed back as fit constraints.
 
 `label.invalidateSize()` also invalidates Core line metrics. Call it after
 late font loading, even if the family name did not change. This requires
-Core >= 2.1.0 for that API; current UI 3.5.0 requires Core ^2.4.0 for its
-centered-flip frame hook.
+Core >= 2.1.0 for that API; published UI 3.5.0 requires Core ^2.4.0 for centered
+flips, while the UI 3.6.0 outline correction needs ^2.5.2.
 
 Width/height setters refresh automatic text dimensions. Font readiness also
 invalidates fitting in fixed-size boxes. Fitting toggles preserve unchanged text
-positions, all nine alignments and nominal automatic dimensions.
+positions, all nine alignments and outline-safe automatic dimensions.
 There is no global font-readiness listener.
 
 Existing multiline `shrink` policies begin fitting upon adoption; no XML format
-or authored-property migration is required. Runtime 0.10.0 accepts UI 3.5.0
-through its existing ^3.4.0 peer. CLI/document APIs are unchanged. Consumers
-update their own UI installations/locks and rebuild; no other SDK bump is needed.
+or authored-property migration is required. Runtime 0.10.0 accepts UI 3.6.0
+through its existing ^3.4.0 peer; its host must also satisfy UI's Core ^2.5.2 peer.
+CLI/document APIs are unchanged. Consumers update their own
+UI installations/locks and rebuild; no other SDK bump is needed.
 
 See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
 font readiness and shared-schema boundaries. Native UI still depends only on

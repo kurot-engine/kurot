@@ -20,7 +20,8 @@ if (new URLSearchParams(location.search).get('backend') === 'canvas') {
 }
 Capabilities._init();
 const player = new Player(canvas);
-player.updateStageSize(320, 160);
+const density = Number(new URLSearchParams(location.search).get('density') ?? 1);
+player.updateStageSize(320, 160, 320 * density, 160 * density);
 const root = new Sprite();
 player.stage.addChild(root);
 const label = new Label('Доказуемая честность');

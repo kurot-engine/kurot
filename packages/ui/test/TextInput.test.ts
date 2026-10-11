@@ -9,6 +9,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { Component, TextInput, EditableText, Label } from '../src/index.js';
 import { attachSkin, detachSkin } from './helpers/skin.js';
 
+import { mockTextMetrics } from './helpers/text-metrics.js';
+
+mockTextMetrics();
+
 describe('TextInput', () => {
 	it('lays out EditableText with EUI constraints', () => {
 		const host = new Component();

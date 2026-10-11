@@ -111,14 +111,15 @@ describe('Label text layout and font fitting', () => {
 
 	it('uses fixed height and outline allowance, even when both authored axes are explicit', () => {
 		const label = fitted('AB');
-		label.height = 22;
+		label.height = 30;
 		label.stroke = 2;
 		validate(label);
 		expect(label.renderedSize).toBeCloseTo(18, 0);
 		label.height = 40;
 		label.width = 20;
 		validate(label);
-		expect(label.renderedSize).toBeCloseTo(16, 0);
+		expect(label.renderedSize).toBe(12);
+		expect(label.textFitOverflow).toBe(true);
 	});
 
 	it('recomputes after font, weight, italic and unchanged-family font readiness invalidations', () => {

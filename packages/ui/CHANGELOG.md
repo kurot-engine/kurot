@@ -4,6 +4,58 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.6.0] — 2026-10-11
+
+Published; verified on npm on 2026-10-11. Requires published Core ^2.5.2.
+See [Label outline layout](docs/label-text-layout.md#outline-safe-layout-in-360).
+
+### Fixed
+
+- Dynamic Label outlines now reserve a symmetric internal safety inset in normal
+  layout and fitting. Automatic dimensions include this inset and any glyph
+  block taller than nominal rows; wrapping, painting and shrink checks share the
+  same content bounds. Scroller viewports retain complete edge outlines without
+  per-Scroller configuration or relaxed clips.
+- Preserve authored alignment, state overrides, minimum overflow, blank rows,
+  automatic axes and stable top-aligned typewriter origins after clearing.
+  Empty/unoutlined Labels and EditableText retain native sizing/viewport rules.
+  RichLabel, BitmapLabel and Core nominal measurement are unchanged.
+
+### Compatibility and adoption
+
+Outlined Label dimensions and wrapping may change, including when fitting is
+disabled. Recheck tightly sized captions and keep explicit top alignment for
+progressively typed dialogue. Empty/unoutlined Labels, EditableText, RichLabel
+and BitmapLabel retain their layout contracts. No public property or KUI/resource
+format migration is added.
+
+The Core peer and development range increase from ^2.4.0 to ^2.5.2 for public
+glyph metrics and unified block alignment. Development installs registry 2.5.3;
+the 2.5.2 minimum is tested separately. Core itself needs no new release.
+ui-runtime 0.10.0 already accepts UI 3.6.0 through ^3.4.0; its host must also
+satisfy the new UI Core peer. CLI and ui-document need no changes or releases.
+
+Applications adopt UI 3.6.0 and rebuild explicitly. Editor 0.28.3 adopts an exact
+registry dependency with a matching Bun lock and ordinary local App build. The
+selected Tentax and MilfMaster templates adopt ^3.6.0 with matching pnpm locks
+and rebuilt outputs. Other applications, the game example and SDK development
+locks remain unchanged.
+
+### Verification
+
+The clean prepublish build and all 371 unit tests pass with installed registry Core
+2.5.3 and an isolated 2.5.2 minimum. All 18 minified browser tests pass, including
+exact outline clips on Canvas/WebGL 1/2 at physical 1x/2x. An isolated packed-UI
+consumer also passes all six backend/density checks for clipping, Japanese tails
+and typewriter layout with Core 2.5.2; its strict TypeScript check passes.
+The 3.6.0 tarball contains all 344 matching compiled/declaration/map files and
+public documentation, excluding tests, node_modules and internal drafts;
+frozen registry installation and `git diff --check` pass. The MilfMaster trial
+harness verifies the actual compiled Drama skin and completed render frames
+without replacing its registry dependencies. Registry latest, package download
+and SHA-512 integrity are verified; all 344 published generated files match the
+tested build.
+
 ## [3.5.0] — 2026-10-10
 
 Published; verified on npm on 2026-10-10. Requires Core ^2.4.0, unchanged

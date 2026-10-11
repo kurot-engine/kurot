@@ -28,7 +28,7 @@ The manifests are authoritative. Published-baseline Kurot package requirements a
 | Package     | Ordinary Kurot dependency | Kurot peers                                       | Purpose                                                         |
 | ----------- | ------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
 | core        | bitmap-font `^0.1.0`      | None                                              | Headless font parsing and layout used by native rendering.      |
-| ui          | None                      | core `^2.4.0`                                     | Components use the application's Core objects.                  |
+| ui          | None                      | core `^2.5.2`                                     | Components use the application's Core objects.                  |
 | game        | None                      | core `^2.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
 | dragonbones | None                      | core `^2.1.1`                                     | Animation displays and meshes use the application's Core.       |
 | ui-runtime  | None                      | core `^2.4.0`, ui `^3.4.0`, ui-document `^0.13.0` | Materializes a document into the application's Core/UI objects. |
@@ -36,6 +36,15 @@ The manifests are authoritative. Published-baseline Kurot package requirements a
 | ui-document | None                      | None                                              | Headless authoring, validation and serialization.               |
 | bitmap-font | None                      | None                                              | Headless font data, validation and layout.                      |
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
+
+UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, download
+and integrity; its generated modules match the tested build. Its outline-safe Label
+layout raises the Core peer/dev range to ^2.5.2 for public line ink metrics and
+unified block alignment. Development installs registry 2.5.3; the minimum is
+verified separately. The older published UI 3.5.0 baseline requires ^2.4.0.
+See [UI 3.6.0 adoption](#outline-safe-label-layout-ui-360-adoption) before upgrading
+consumers. Browser trial substitution is test-only and is not published package
+adoption.
 
 Core 2.3.2 is published with render-only text-outline margins. This correction adds no API
 or resource-format requirement. UI 3.3.0/runtime 0.9.0 and Game/DragonBones/Spine
@@ -124,6 +133,31 @@ Propagate the analysis to downstream consumers only when the direct consumer's
 shipped behavior or compatibility changes. Do not turn the dependency graph into
 an automatic sequence of package version bumps.
 
+## Outline-safe Label layout: UI 3.6.0 adoption
+
+UI 3.6.0 is published, verified on npm on 2026-10-11. It reserves
+internal outline space in ordinary Label layout and fitting. Automatic dimensions
+can increase and constrained text can wrap earlier, even without a shrink policy.
+No KUI/resource format or public-property migration is added. Use explicit top
+alignment for typewriter dialogue. See [Label layout](../packages/ui/docs/label-text-layout.md).
+
+- Required compatibility/adoption: applications receiving the fix must install
+  UI 3.6.0, satisfy its Core ^2.5.2 peer and rebuild. Core 2.5.3
+  already satisfies it; older accepted UI/Core combinations can remain on UI
+  3.5.0. Editor 0.28.3 adopts exact registry UI 3.6.0 with a matching Bun lock and
+  local App build; Core 2.5.3 is retained. Review tightly sized outlined captions.
+- Optional installation/development adoption: runtime 0.10.0's peer/dev UI ^3.4.0
+  accepts 3.6.0 without a runtime release or raised peer minimum. A host choosing
+  the new UI must satisfy that UI's Core peer as well. The selected Tentax/MilfMaster checkouts adopt ^3.6.0 with matching pnpm
+  locks and rebuilt outputs. The game example's ^3.1.0 accepts it but retains
+  its lock; other selected installations and outputs adopt it explicitly. Existing locked versions remain valid for
+  their own package contracts. CLI's game template resolves latest Core/UI on
+  create, so no template edit or CLI release is required.
+- Unaffected releases: Core, Game, DragonBones, Spine, ui-document, CLI, Atlas,
+  bitmap-font and the Core-only demo need no new release. Reskin has no direct
+  UI dependency; independently copied projects own their installations. Other
+  applications, templates and SDK development locks retain their installations.
+
 ## Multiline Label fitting: UI 3.5.0 adoption
 
 UI 3.5.0 is published, verified on npm on 2026-10-10, including latest, package
@@ -131,8 +165,9 @@ download and registry integrity. Its fitting/alignment modules match the tested
 local build. It adds complete
 multiline `textFit="shrink"` layouts, outline allowance and stable original
 alignment, retaining nominal automatic dimensions. Core ^2.4.0 remains the
-peer minimum, and UI's development installation/lock still resolve registry
-Core 2.4.0. KUI format and existing fitting properties are unchanged.
+peer minimum, and its release development installation/lock resolved registry
+Core 2.4.0. UI 3.6.0's newer development baseline is recorded separately above.
+KUI format and existing fitting properties are unchanged.
 
 - Required adoption for the feature: install UI 3.5.0 and rebuild. Existing
   multiline Labels already carrying `shrink` begin fitting instead of ignoring

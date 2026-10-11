@@ -35,11 +35,11 @@ describe('Label fitting external bounds', () => {
 		const result = label();
 		result.stroke = 2;
 		result.maxWidth = 100;
-		result.maxHeight = 22;
+		result.maxHeight = 30;
 		for (let pass = 0; pass < 8; pass++) {
 			validate(result);
 		}
-		expect(result.renderedSize).toBeCloseTo(18, 0);
+		expect(result.renderedSize).toBeCloseTo(17.6, 0);
 		expect(result.textFitOverflow).toBe(false);
 		metrics.measureText.mockClear();
 		validate(result);

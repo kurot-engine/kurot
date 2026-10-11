@@ -2,8 +2,9 @@
 
 Introduced in UI 3.1.0 with Core >= 2.1.0, fitting is single-line in UI 3.1.0–3.4.0.
 UI 3.5.0 extends it to multiline Labels using Core's existing independent
-measurement API. Version 3.5.0 is published, verified on npm on 2026-10-10. Its peer remains
-Core ^2.4.0 for centered flips. The public
+measurement API. Version 3.5.0 is published, verified on npm on 2026-10-10, with
+Core ^2.4.0. UI 3.6.0 is published, verified on 2026-10-11; it adds outline-safe layout
+and requires Core ^2.5.2. The public
 `TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
 authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
 0.13.1. Current CLI 3.6.0 and runtime 0.10.0 use document `^0.13.0`; runtime
@@ -11,6 +12,37 @@ also requires UI `^3.4.0` and Core `^2.4.0`. Older 0.x kernel ranges do not
 automatically accept 0.13.0. Label presets expand into native properties before
 rendering; their precedence does not change fitting behavior. See the
 [project style contract](../../ui-document/docs/project-styles.md).
+
+## Outline-safe layout in 3.6.0
+
+Nonempty dynamic Labels with a positive finite `stroke` reserve
+`ceil(2 * stroke) + 2` logical pixels on each side. This conservative allowance
+contains the stroke and antialiasing inside the Label's external layout box.
+The TextField is inset by that fixed amount; it does not change with a typewriter
+prefix or fitting candidate. Scroller clips remain exact, with no new setting.
+
+Automatic width includes both insets. Automatic height contains nominal rows
+(including blank rows and line spacing), the complete glyph block if taller,
+and both insets. Fixed/parent/max dimensions remain the outer box; line generation
+and fitting use its inner area. Minimum-size overflow still reports failure
+and permits clipping; a box too small for its inset does not become automatic.
+Fitting toggles at unchanged drawing size retain identical geometry and pixels.
+Unoutlined or empty Labels add no inset; empty-row measurements stay native.
+EditableText, RichLabel and BitmapLabel do not adopt this layout change.
+
+Keep explicit `verticalAlign="top"` for progressively typed dialogue. The origin
+stays fixed after clearing/retyping; middle alignment intentionally follows its
+changing glyph block and is not appropriate for that effect. Font readiness still
+uses `invalidateSize()`. Outline/state changes invalidate the normal UI layout.
+
+UI 3.6.0 is published. Outlined Labels can measure larger
+and wrap earlier than 3.5.0 even without `textFit`. No authored
+properties or XML/resource formats change. Its manifest requires Core
+^2.5.2 for public line ink metrics and unified vertical block alignment; development
+installs published 2.5.3. Core itself needs no new release.
+Consumers must adopt UI 3.6.0, use an accepted Core installation and rebuild; compatible
+CLI/document/runtime contracts need no new SDK release. Existing application
+installations remain on their registry versions until explicitly updated.
 
 ## Lines and bounds
 
@@ -54,7 +86,8 @@ Published Core 2.5.2 makes dynamic top/middle/bottom use the same
 complete glyph-block boundaries in single-line and multiline modes. Blank rows
 retain their height. `multiline` controls only line generation. Input uses stable
 editing-row boundaries in all three modes; its caret and selection remain stable.
-Measurements and fitting stay nominal. Older Core installations retain their
+Core measurements stay nominal; UI 3.6.0 reserves outline-safe
+layout space separately. Older Core installations retain their
 recorded text behavior; adopt the Core installation/lock and rebuild.
 UI 3.4.0's peer accepts 2.5.2; this correction needs no UI release.
 See [Core text layout](../../core/docs/text-layout.md#unified-vertical-alignment-core-252).
@@ -84,12 +117,12 @@ height clipping. If the base size fits across several rows it is retained.
 Otherwise fitting searches smaller sizes, recalculating the row breaks each time.
 No maximum row count is implied by a fixed height, and no `maxLines` is added.
 
-| Available bounds | Multiline shrink behavior |
-| --- | --- |
-| Both automatic | Retain base size; soft wrapping has no width constraint. |
+| Available bounds                    | Multiline shrink behavior                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| Both automatic                      | Retain base size; soft wrapping has no width constraint.                                    |
 | Width constrained, height automatic | Wrap and measure automatic height; shrink only if a protected sequence still exceeds width. |
-| Width automatic, height constrained | Measure hard-separated rows without soft wrapping, then fit their complete height. |
-| Both constrained | Wrap and shrink as needed to fit complete width and height. |
+| Width automatic, height constrained | Measure hard-separated rows without soft wrapping, then fit their complete height.          |
+| Both constrained                    | Wrap and shrink as needed to fit complete width and height.                                 |
 
 - `size` is always the authored/base size. `renderedSize` is the derived drawing
   size after layout validation. State overrides capture and restore `size`.
@@ -97,16 +130,12 @@ No maximum row count is implied by a fixed height, and no `maxLines` is added.
   larger region restores the base size; text never grows beyond it.
 - `minFontSize` defaults to 12 logical pixels, must be finite and at least 1,
   and acts as a lower bound. A minimum above `size` never enlarges the text.
-- Measurement uses the displayed text, font family, bold and italic settings,
-  and reserves twice the outline thickness on each constrained axis. Search,
-  measurement and drawing use the same reserved wrapping width. Horizontal
-  alignment retains the original Label's left edge, center or right edge;
-  vertical alignment retains the full original height. Fitting adds no implicit
-  padding or outline inflation to automatic measured dimensions. A maximum
-  width reserves outline space once, even when the measured Label is narrower.
-  Toggling fitting leaves unchanged text at unchanged size in its original
-  position. Core's nominal measurement, clipping and outline rendering rules
-  remain in effect.
+- Measurement uses displayed text, font family, bold/italic settings and the
+  outline-safe layout bounds described above. Search, automatic measurement and
+  drawing reserve the same inset once. Both alignments operate inside that area;
+  symmetric insets preserve the horizontal center. Automatic measurements are
+  never recycled as fitting constraints. The published 3.5.0 baseline reserved
+  only twice the stroke in fit checks and kept automatic dimensions nominal.
 - Available bounds come from fixed dimensions, parent layout constraints or
   explicit maximum dimensions. Icon spacing belongs to the skin's Label
   region. Automatic measured dimensions are not fed back as fit constraints.
@@ -133,13 +162,14 @@ Finite zero content width reports overflow for nonempty displayed text; it is
 not mistaken for empty content by Core's zero-width measurement. Empty displayed
 content retains its base size without overflow.
 
-Core, KUI format and dependency minima require no change. CLI/runtime already
-pass the fields through; runtime 0.10.0's ^3.4.0 peer accepts UI 3.5.0.
-Applications adopt the UI installation/lock and rebuild explicitly. Editor
-0.28.2's local trial removes the old single-line Inspector restriction and uses
-exact registry UI 3.5.0 with a matching lock and ordinary App build. The selected
-Tentax and MilfMaster templates also install 3.5.0 with matching locks and rebuilt
-outputs. Preview and compiled games use the native Label behavior.
+The 3.5.0 multiline extension required no Core or KUI-format change. The separate
+3.6.0 outline correction raises UI's Core minimum to ^2.5.2. CLI/runtime already
+pass the fields through; runtime 0.10.0's ^3.4.0 peer accepts UI 3.6.0, provided
+its host also satisfies UI's Core peer. Applications adopt the UI installation/lock
+and rebuild explicitly. Editor 0.28.3 adopts exact registry UI 3.6.0 and a matching
+Bun lock; the selected Tentax and MilfMaster templates adopt ^3.6.0 with matching
+pnpm locks and rebuilt outputs.
+Preview and compiled games use the native Label behavior once their host adopts it.
 
 Load fonts before constructing or measuring text where possible. If a font
 becomes ready later, call `label.invalidateSize()` before the next validation;
@@ -175,3 +205,10 @@ WebGL 1 and WebGL 2 at 1x/2x, using independent Canvas width measurements.
 Pixel comparisons verify unchanged painting across fitting toggles for all nine
 horizontal/vertical alignments and automatic dimensions; icon-and-caption row
 tests retain parent geometry.
+
+UI 3.6.0 adds exact clipped/unclipped pixel comparisons in real
+Scroller viewports, across all nine alignments, italic text, thick outlines,
+automatic/fixed/maximum/fitted bounds, and Japanese scroll tails. Minified Canvas,
+WebGL 1 and WebGL 2 tests use physical 1x/2x targets. Unit tests additionally
+cover glyphs taller than nominal rows, state outline restoration, late fonts,
+empty text, EditableText isolation and repeated top-aligned typewriter prefixes.

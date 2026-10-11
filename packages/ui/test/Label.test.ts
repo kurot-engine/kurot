@@ -8,12 +8,15 @@
  * Before the fix, Kurot left the text field's $explicitWidth at the
  * measurement value (100000 when the label had no explicit width).
  *
- * Note: real text measurement (Canvas measureText) is not available in the
- * test env, so cases use empty text — calculateLines skips measureText for
- * empty segments, letting measure() run to completion (including the restore).
+ * Empty text isolates the width-restoration contract; a Canvas metric double
+ * supplies the font frame used by blank rows.
  */
 import { describe, it, expect } from 'vitest';
 import { Label } from '../src/index.js';
+
+import { mockTextMetrics } from './helpers/text-metrics.js';
+
+mockTextMetrics();
 
 describe('Label', () => {
 	// Helper: reach the protected text field instance.

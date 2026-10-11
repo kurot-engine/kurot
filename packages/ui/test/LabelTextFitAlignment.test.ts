@@ -50,14 +50,14 @@ describe('Label fitting alignment', () => {
 		validate(label);
 		expect(label.renderedSize).toBe(20);
 		expect(label.lineStarts).toEqual(original);
-		expect(label.textRegion.slice(1)).toEqual([0, 118, 60]);
+		expect(label.textRegion.slice(1)).toEqual([4, 112, 52]);
 		label.textFit = 'none';
 		validate(label);
 		expect(label.lineStarts).toEqual(original);
-		expect(label.textRegion).toEqual([0, 0, 120, 60]);
+		expect(label.textRegion).toEqual([4, 4, 112, 52]);
 	});
 
-	it.each(['top', 'middle', 'bottom'])('preserves the full height for %s alignment', alignment => {
+	it.each(['top', 'middle', 'bottom'])('preserves the inset content height for %s alignment', alignment => {
 		const label = new InspectableLabel('A\nB');
 		label.size = 20;
 		label.width = 120;
@@ -68,11 +68,11 @@ describe('Label fitting alignment', () => {
 		label.textFit = 'shrink';
 		validate(label);
 		expect(label.renderedSize).toBe(20);
-		expect(label.textRegion).toEqual([0, 0, 116, 60]);
+		expect(label.textRegion).toEqual([6, 6, 108, 48]);
 	});
 
 	it.each(['automatic', 'width', 'height', 'maximums'])(
-		'keeps nominal automatic dimensions with %s bounds',
+		'keeps outline-safe automatic dimensions with %s bounds',
 		bounds => {
 			const label = new InspectableLabel('BET');
 			label.size = 20;
@@ -94,8 +94,8 @@ describe('Label fitting alignment', () => {
 				validate(label);
 			}
 			expect([label.width, label.height, label.renderedSize]).toEqual([...original, 20]);
-			expect(label.textRegion[0]).toBe(0);
-			expect(label.textRegion[1]).toBe(0);
+			expect(label.textRegion[0]).toBe(6);
+			expect(label.textRegion[1]).toBe(6);
 		},
 	);
 
@@ -106,13 +106,13 @@ describe('Label fitting alignment', () => {
 		label.stroke = 1;
 		label.textFit = 'shrink';
 		validate(label);
-		expect(label.lineStarts).toEqual([0]);
+		expect(label.lineStarts).toEqual([4]);
 		label.textAlign = 'right';
 		validate(label);
-		expect(label.lineStarts).toEqual([90]);
+		expect(label.lineStarts).toEqual([86]);
 		label.stroke = 3;
 		validate(label);
-		expect(label.lineStarts).toEqual([90]);
+		expect(label.lineStarts).toEqual([82]);
 		label.textAlign = 'center';
 		validate(label);
 		expect(label.lineStarts).toEqual([45]);

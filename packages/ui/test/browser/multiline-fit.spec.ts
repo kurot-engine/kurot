@@ -43,7 +43,7 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 						body: '<!doctype html><style>body{margin:0;background:#151515}</style><canvas width="320" height="160"></canvas>',
 					}),
 				);
-				await page.goto(`http://multiline-fit.test/?backend=${backend}`);
+				await page.goto(`http://multiline-fit.test/?backend=${backend}&density=${density}`);
 				await page.addScriptTag({ content: browserBundle });
 				const result = await page.evaluate(() => {
 					const { label, field, player, paint } = window.multilineFit;
@@ -71,9 +71,9 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				expect(result.size).toBeGreaterThanOrEqual(14);
 				expect(result.size).toBeLessThan(30);
 				expect(result.rows).toBe(2);
-				expect(Math.max(...result.widths)).toBeLessThanOrEqual(118);
-				expect(result.height).toBeLessThanOrEqual(42);
-				expect(result.region).toEqual([0, 0, 118, 44]);
+				expect(Math.max(...result.widths)).toBeLessThanOrEqual(112);
+				expect(result.height).toBeLessThanOrEqual(36);
+				expect(result.region).toEqual([4, 4, 112, 36]);
 				expect(result.overflow).toBe(false);
 				await page.screenshot({ path: `test-results/multiline-fit-${backend}-${density}x.png` });
 				const resized = await page.evaluate(() => {
@@ -101,8 +101,8 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				expect(resized.shrunk).toBe(result.size);
 				expect(resized.text).toBe('自动提现设置');
 				expect(resized.overflow).toBe(false);
-				expect(resized.width).toBeLessThanOrEqual(118);
-				expect(resized.height).toBeLessThanOrEqual(42);
+				expect(resized.width).toBeLessThanOrEqual(112);
+				expect(resized.height).toBeLessThanOrEqual(36);
 				await page.evaluate(() => window.multilineFit.paintAlignmentGrid(false));
 				const originalAlignment = await page.locator('canvas').screenshot();
 				await page.evaluate(() => window.multilineFit.paintAlignmentGrid(true));

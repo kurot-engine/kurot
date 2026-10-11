@@ -1,6 +1,7 @@
 import { Component } from './Component.js';
 import { TextField, TextFieldType } from '@kurot/core';
 import { fitLabelText } from '../text/fit-label-text.js';
+import { getLabelOutlinePadding, getLabelTextHeight } from '../text/label-text-bounds.js';
 import type { HorizontalAlign, VerticalAlign } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
@@ -326,8 +327,9 @@ export class Label extends Component implements IDisplayText {
 					: NaN;
 		this._applyTextFit(availableWidth, availableHeight);
 		try {
-			tf.width = this._getFitContentWidth(availableWidth);
-			this.setMeasuredSize(tf.textWidth, tf.textHeight);
+			tf.width = this._getTextContentWidth(availableWidth);
+			const outline = getLabelOutlinePadding(tf) * 2;
+			this.setMeasuredSize(tf.textWidth + outline, getLabelTextHeight(tf) + outline);
 		} finally {
 			tf.width = oldWidth;
 		}
@@ -369,16 +371,13 @@ export class Label extends Component implements IDisplayText {
 		if (previousSize !== this.renderedSize && (isNaN(this.$explicitWidth) || isNaN(this.$explicitHeight))) {
 			this.invalidateSize();
 		}
-		const contentWidth = Number.isFinite(fitWidth)
-			? Math.min(unscaledWidth, this._getFitContentWidth(fitWidth))
-			: unscaledWidth;
-		// Wrapping reserves outline width; alignment still uses the original Label frame.
-		const remainingWidth = unscaledWidth - contentWidth;
-		this._textField.x =
-			this.textAlign === 'right' ? remainingWidth : this.textAlign === 'center' ? remainingWidth / 2 : 0;
-		this._textField.y = 0;
-		this._textField.width = contentWidth;
-		this._textField.height = unscaledHeight;
+		// Measure, wrap, fit and paint reserve the same space exactly once. Core
+		// alignment remains authored and operates inside this inset text region.
+		const padding = getLabelOutlinePadding(this._textField);
+		this._textField.x = padding;
+		this._textField.y = padding;
+		this._textField.width = Math.max(0, unscaledWidth - padding * 2);
+		this._textField.height = Math.max(0, unscaledHeight - padding * 2);
 	}
 
 	// ── Private methods ────────────────────────────────────────────────────
@@ -430,8 +429,8 @@ export class Label extends Component implements IDisplayText {
 		this._fitKey = key;
 	}
 
-	private _getFitContentWidth(width: number): number {
-		const outline = this.textFit === 'shrink' && this.text ? Math.max(0, this.stroke) * 2 : 0;
+	private _getTextContentWidth(width: number): number {
+		const outline = getLabelOutlinePadding(this._textField) * 2;
 		return Number.isFinite(width) ? Math.max(0, width - outline) : NaN;
 	}
 }

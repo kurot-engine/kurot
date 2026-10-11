@@ -127,7 +127,7 @@ describe('multiline Label font fitting', () => {
 		expect(label.lines).toHaveLength(2);
 	});
 
-	it('reserves outline space without padding automatic bounds or applying it twice', () => {
+	it('includes outline space in automatic bounds without applying it twice', () => {
 		const label = fitted();
 		label.maxWidth = 44;
 		label.maxHeight = 36;
@@ -135,19 +135,19 @@ describe('multiline Label font fitting', () => {
 		for (let pass = 0; pass < 8; pass++) {
 			validate(label);
 		}
-		expect(label.renderedSize).toBeCloseTo(16, 0);
-		expect(label.contentBounds.height + 4).toBeLessThanOrEqual(36);
-		expect(label.contentBounds.width + 4).toBeLessThanOrEqual(44);
-		expect(label.textRegion).toEqual([0, 0, label.width, label.height]);
-		expect(label.width).toBeCloseTo(40, 0);
-		expect(label.height).toBeCloseTo(32, 0);
+		expect(label.renderedSize).toBeCloseTo(12, 0);
+		expect(label.contentBounds.height + 12).toBeLessThanOrEqual(36);
+		expect(label.contentBounds.width + 12).toBeLessThanOrEqual(44);
+		expect(label.textRegion).toEqual([6, 6, label.width - 12, label.height - 12]);
+		expect(label.width).toBeCloseTo(42, 0);
+		expect(label.height).toBeCloseTo(36, 0);
 		expect(label.textFitOverflow).toBe(false);
 		context.measureText.mockClear();
 		validate(label);
 		expect(context.measureText).not.toHaveBeenCalled();
 		label.textFit = 'none';
 		validate(label);
-		expect(label.textRegion.slice(0, 2)).toEqual([0, 0]);
+		expect(label.textRegion.slice(0, 2)).toEqual([6, 6]);
 	});
 
 	it.each(['Доказуемая честность', '自动提现设置', '👩‍💻👩‍💻👩‍💻'])(

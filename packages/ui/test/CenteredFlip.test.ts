@@ -12,6 +12,10 @@ import { BasicLayout } from '../src/kurot/layouts/BasicLayout.js';
 
 const componentTypes = [Group, Component, Image, Label, RichLabel, BitmapLabel, Button, Rect];
 
+import { mockTextMetrics } from './helpers/text-metrics.js';
+
+mockTextMetrics();
+
 describe('centered UI flips', () => {
 	it.each(componentTypes.map(Type => ({ name: Type.name, Type })))(
 		'$name preserves its allocated frame',

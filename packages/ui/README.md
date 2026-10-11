@@ -1,15 +1,22 @@
 # @kurot/ui
 
-**3.5.0 is published, verified on npm on 2026-10-10.** Package download and
-registry integrity are verified; fitting/alignment modules match the tested build. It adds multiline
-Label shrinking and retains the original text alignment when fitting is toggled.
-The Core ^2.4.0 peer and registry Core 2.4.0 development installation/lock are
-unchanged.
-See [Label fitting](docs/label-text-layout.md) for behavior and adoption.
+**3.6.0 is published, verified on npm on 2026-10-11.** Dynamic Label
+outlines now fit inside their layout bounds, including Scroller viewports,
+automatic dimensions, wrapping and text fitting. The release requires Core
+^2.5.2 and develops against registry Core 2.5.3 without local overrides.
+Registry latest, package download and integrity are verified; all 344 compiled,
+declaration and map files match the tested build.
+See [Label layout](docs/label-text-layout.md) for behavior and adoption.
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.5.0 (published).** Requires `@kurot/core@^2.4.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.6.0 (published).** Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
+
+Outlined Label sizes and line breaks can change, including without `textFit`;
+Scroller viewports need no extra configuration. Keep explicit top alignment for
+progressively typed dialogue. No new KUI field, Core release or unrelated SDK
+bump is required. Applications must adopt UI 3.6.0 and rebuild
+to receive the correction.
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
 
@@ -21,8 +28,9 @@ Published Core 2.5.2 and earlier default to top. Explicit top/bottom and skin-st
 overrides stay effective; multiline only controls line generation. Set top
 explicitly when text should start at the top of a taller box.
 UI 3.4.0's existing peer range accepts Core 2.5.3 without a UI release or a higher
-minimum. Applications adopt the Core installation/lock and rebuild;
-UI's development installation remains registry Core 2.4.0.
+minimum for that default change alone. Applications adopt the Core installation/lock
+and rebuild. UI 3.6.0's separate outline correction requires Core ^2.5.2;
+the development installation is registry Core 2.5.3.
 See [text layout](docs/label-text-layout.md#vertical-alignment-and-skin-defaults).
 
 ## Centered flips in 3.4.0
@@ -67,9 +75,11 @@ BitmapLabel now also honors maxWidth during automatic measurement. Both text
 components remeasure automatic height when an authored width changes.
 
 The unpublished UI 3.3.1 snapshot built and tested against registry Core 2.3.1.
-Current UI 3.5.0 builds and tests against registry Core 2.4.0 without overrides.
-These native APIs do
-not add KUI tags or an Editor rich-text authoring interface by themselves.
+Published UI 3.5.0 was tested against Core 2.4.0; UI 3.6.0 builds and tests against
+registry Core 2.5.3 and separately verifies its 2.5.2 minimum. Native KUI support
+for RichLabel and BitmapLabel is available with ui-document >= 0.12.0, CLI >= 3.4.0
+and ui-runtime >= 0.9.0. The current document 0.13.1, CLI 3.6.0 and runtime 0.10.0
+retain that support; authoring applications adopt these packages separately.
 
 ## Label text fitting in 3.5.0
 
@@ -98,9 +108,11 @@ height on the Label, and enable `textFit = 'shrink'`. Complete wrapped content,
 hard breaks and line spacing participate in fitting. If several rows fit at the
 base size, the base size is retained. Automatic axes are unconstrained, so
 width-only multiline captions normally wrap and grow taller without shrinking.
-Outline allowance participates in fitting and its shared wrap width. Text keeps
-the original Label alignment frame; automatic measurement remains nominal,
-without implicit outline padding or a position change when fitting is toggled.
+UI 3.6.0 reserves a symmetric outline inset in every nonempty dynamic
+Label with a positive finite stroke, including normal layout. Automatic dimensions
+contain the outline; fixed and maximum bounds wrap/fit inside it. Toggling fitting at unchanged drawing size
+retains geometry and painting. Published 3.5.0 kept automatic dimensions nominal.
+See [outline layout](docs/label-text-layout.md#outline-safe-layout-in-360).
 
 ```ts
 const caption = new Label('Доказуемая честность');
@@ -129,28 +141,29 @@ only on Core.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui@^3.5.0 @kurot/core@^2.4.0
+pnpm add @kurot/ui@^3.6.0 @kurot/core@^2.5.2
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-UI 3.5.0 retains
-Core ^2.4.0 for the centered-flip frame hook, in addition to
-the native text APIs introduced in Core 2.2/2.3. Core installs its published
-bitmap-font dependency automatically.
-Refresh older Core/UI lockfiles and old sheet manifests with
-string-valued `subkeys` in Kurot Editor before launching the application.
+UI 3.6.0 is available from npm. Its Core ^2.5.2 minimum supplies
+the public glyph metrics and unified alignment used by outline-safe Label layout,
+in addition to centered flips and the native text APIs from earlier releases.
+Core installs its published bitmap-font dependency automatically. Update Core
+installations older than 2.5.2 when adopting UI 3.6.0.
+For legacy projects, refresh sheet manifests with string-valued `subkeys` in
+Kurot Editor before launching the application on Core 2.x.
 See the [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
-Adopting 3.5.0 needs only a UI installation/lock update and rebuild when the
-application's range already accepts it. Existing multiline Labels with `shrink`
-start fitting; ordinary Labels without that policy keep their behavior. No KUI
-or resource migration is required. ui-runtime 0.10.0 accepts it through ^3.4.0;
-its development lock may adopt it separately. CLI/ui-document need no release.
-Editor 0.28.2 removes the multiline Inspector restriction and uses exact registry
-UI 3.5.0 with a matching Bun lock and ordinary App build. The selected Tentax and
-MilfMaster templates adopt ^3.5.0 with matching pnpm locks and rebuilt outputs.
-Other applications and templates retain their own dependency trees and resources.
+Adopting 3.6.0 requires a UI installation/lock update and rebuild, plus an accepted
+Core installation. Review outlined captions for the larger automatic dimensions
+or earlier wraps. ui-runtime 0.10.0 accepts it through ^3.4.0; its development lock
+may adopt it separately and its host must satisfy UI's Core peer. CLI/ui-document
+need no release or XML migration. Editor 0.28.3 adopts exact registry UI 3.6.0 with a matching Bun lock and local
+App build. The explicitly selected Tentax and MilfMaster templates adopt ^3.6.0
+with matching pnpm locks and rebuilt outputs. The game example's ^3.1.0 range
+already accepts 3.6.0; its lock adoption is optional and unchanged. Other
+applications and SDK development locks retain their own installations.
 
 ## Project style colors
 
@@ -171,8 +184,8 @@ The Label belongs to a Skin declaring the `disabled` state. Native Skin state
 handling applies the compiled numeric color and restores the base color on
 leaving that state. The same reference syntax works for base color properties.
 UI does not read style.json or evaluate XML references itself; programmatic
-components assign numeric colors. This release does not introduce complete
-typography presets or automatic live theme switching. See the
+components assign numeric colors. Label presets are expanded by CLI/document
+consumers before rendering; UI itself provides no automatic live theme switching. See the
 [project style contract](../ui-document/docs/project-styles.md).
 
 ## Quick Start
@@ -593,6 +606,7 @@ resource cache or caller retains ownership. Superseded async requests cannot
 replace a newer assignment. Successful named loads dispatch Event.COMPLETE;
 failed or incorrectly typed resources dispatch IOErrorEvent.IO_ERROR.
 
-The component supports native code and programmatic skins. Installed KUI
-compilers, the ui-document catalog, Editor and ui-runtime materializers do not
-yet adopt the BitmapLabel tag. Published UI 3.1.0 does not include the component.
+The component supports native code and programmatic skins. Native KUI authoring
+requires ui-document >= 0.12.0 and CLI >= 3.4.0; materialized previews require
+ui-runtime >= 0.9.0. Editor adopts those contracts explicitly. Published UI 3.1.0
+does not include BitmapLabel.
