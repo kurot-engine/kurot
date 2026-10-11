@@ -11,6 +11,7 @@ import {
 	Sprite,
 	TextField,
 	Texture,
+	VerticalAlign,
 } from '../../src/index.js';
 
 export function buildGoldenScene(): Sprite {
@@ -146,7 +147,8 @@ function makeTextScene(): TextField {
 	text.y = 186;
 	text.width = 196;
 	text.height = 68;
-	text.fontFamily = 'Arial';
+	text.verticalAlign = VerticalAlign.MIDDLE;
+	text.fontFamily = 'KurotGolden';
 	text.size = 24;
 	text.bold = true;
 	text.textColor = 0xf4f7ff;

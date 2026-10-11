@@ -433,6 +433,14 @@ After an intentional renderer change has been visually reviewed, regenerate the
 golden images with `pnpm test:visual:update`. Failed comparisons retain expected,
 actual, and diff images under the ignored local `test-results/` directory.
 
+The golden scene explicitly uses middle-aligned text, matching Core 2.5.3.
+It loads its bundled Chakra Petch bold font before layout, so glyph-block
+placement does not depend on a system Arial substitute. The font and its SIL
+Open Font License are in `examples/visual-regression/fonts/`. Text-alignment
+tests separately check the default and explicit top/middle/bottom modes.
+Review text-layout changes against the golden scene before updating snapshots;
+keep the existing pixel thresholds and verify shared baselines on Linux CI.
+
 Resource-lifetime soak tests repeatedly rebuild scenes, upload and dispose
 textures, pressure blur framebuffer pools, force garbage collection, and restore
 a lost WebGL context. The short release smoke is:

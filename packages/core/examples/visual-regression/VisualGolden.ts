@@ -37,6 +37,11 @@ void initialize().catch((error: unknown) => {
 
 async function initialize(): Promise<void> {
 	lockBackend(canvas, backend);
+	// Glyph-block alignment must use the same loaded face on every test host.
+	const font = new FontFace('KurotGolden', `url(${new URL('./fonts/ChakraPetch-Bold.ttf', import.meta.url).href})`, {
+		weight: '700',
+	});
+	document.fonts.add(await font.load());
 	const app = createPlayer({
 		canvas,
 		contentWidth: WIDTH,
