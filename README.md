@@ -1,11 +1,12 @@
 # Kurot
 
-Core 2.5.4 is prepared for publication; not yet published. It fixes continuous
-Web Audio loops while retaining `Sound.play(startTime, loops)` semantics.
-Published Core 2.5.3 does not contain this correction; dependency ranges and
-development/application locks remain unchanged. Existing SDK peers accept
-2.5.4 without bumps. Apps adopt the published patch through their Core
-installation/lock and rebuild; exact Core pins require a declaration update.
+Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
+registry integrity and all 628 generated files matching the tested build. It fixes
+continuous Web Audio loops while retaining `Sound.play(startTime, loops)` semantics.
+Editor 0.28.5, Reskin, the selected Tentax/MilfMaster templates and demo/game
+examples adopt registry 2.5.4 with matching app locks and rebuilt outputs. The
+Editor App is a local trial; no remote release is initiated. SDK peers/development
+locks and independent Reskin projects retain their own baselines.
 See [audio playback](packages/core/docs/audio-playback.md) for scheduling,
 fallback limitations and verification.
 
@@ -56,7 +57,7 @@ correctness and performance validation system.
 ## Packages and dependencies
 
 Version audit: 2026-10-12. The table records source manifest versions;
-Core 2.5.4 is prepared for publication, while registry adoption remains separate.
+Core 2.5.4 is published and verified on 2026-10-12; consumer adoption is explicit.
 Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField,
 BitmapText and their UI text components default to middle. Explicit top/bottom
 remain effective; multiline controls only line generation. Use explicit top when
@@ -70,8 +71,8 @@ generated files matching the tested build. It reserves outline-safe Label layout
 space, including automatic dimensions, wrapping and fitting; its Core peer is
 ^2.5.2. It retains 3.5.0's multiline shrinking and stable text alignment.
 At the UI 3.6.0 adoption, Editor 0.28.3, Tentax and MilfMaster explicitly installed
-registry UI 3.6.0 with matching app locks and rebuilt outputs. Their Core
-installations remain 2.5.3; this Core release preparation does not update them.
+registry UI 3.6.0 with matching app locks and rebuilt outputs. Core was 2.5.3
+at that adoption; the selected applications now adopt 2.5.4 as recorded above.
 Other application and SDK development locks retain their own installations.
 Feature introductions and benchmark results retain their recorded release versions.
 
@@ -157,7 +158,7 @@ whose only content interface is textFlow, and fixes automatic BitmapLabel
 measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.5.3 and UI 3.6.0. Core 2.5.4 is prepared for publication.
+Core 2.5.4 and UI 3.6.0.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with

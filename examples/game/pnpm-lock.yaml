@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.5.4
+        version: 2.5.4
       '@kurot/game':
         specifier: ^2.0.0
-        version: 2.0.0(@kurot/core@2.1.1)
+        version: 2.0.0(@kurot/core@2.5.4)
       '@kurot/ui':
         specifier: ^3.1.0
-        version: 3.1.0(@kurot/core@2.1.1)
+        version: 3.1.0(@kurot/core@2.5.4)
       '@kurot/ui-document':
         specifier: ^0.13.0
         version: 0.13.0
@@ -191,12 +191,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@kurot/bitmap-font@0.1.0':
+    resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
+    engines: {node: '>=20'}
+
   '@kurot/cli@3.3.1':
     resolution: {integrity: sha512-j1RX+o91SaJHyfGEgotQdJnTdwFirrtU6vuX5j6WucLl3myqc7BeP7AMSM8vmel+mxwOv/hk2ywkhx+8loOP2g==}
     hasBin: true
 
-  '@kurot/core@2.1.1':
-    resolution: {integrity: sha512-/jQgTjvps+djsUfyW0p+VSkpoGWf728J/tUrc/K8ngijW76KhEKdeGl4kXvNp0RecSw49FquM2SqrPIB/bOcIw==}
+  '@kurot/core@2.5.4':
+    resolution: {integrity: sha512-XBlGKlohioJEIy/Nf8Gkl7mr7PSoK/uQkugM6lLyuKdzPSq01a+X+p89anOzQrUCfXmBp7sUCrkV2U0hnd1nFA==}
 
   '@kurot/game@2.0.0':
     resolution: {integrity: sha512-pjB/I9vQJ8wo7PoWSpU8N2SaCl+g4b/2FF/NGfOsf5Ah2XfIiAVWW2+f8ogT4m6JsdzMTRQxGCpJioIFesmQSA==}
@@ -314,27 +318,30 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
+  '@kurot/bitmap-font@0.1.0': {}
+
   '@kurot/cli@3.3.1':
     dependencies:
       '@kurot/ui-document': 0.11.0
       commander: 13.1.0
       esbuild: 0.25.12
 
-  '@kurot/core@2.1.1':
+  '@kurot/core@2.5.4':
     dependencies:
       '@cto.af/linebreak': 4.0.3
+      '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/game@2.0.0(@kurot/core@2.1.1)':
+  '@kurot/game@2.0.0(@kurot/core@2.5.4)':
     dependencies:
-      '@kurot/core': 2.1.1
+      '@kurot/core': 2.5.4
 
   '@kurot/ui-document@0.11.0': {}
 
   '@kurot/ui-document@0.13.0': {}
 
-  '@kurot/ui@3.1.0(@kurot/core@2.1.1)':
+  '@kurot/ui@3.1.0(@kurot/core@2.5.4)':
     dependencies:
-      '@kurot/core': 2.1.1
+      '@kurot/core': 2.5.4
 
   commander@13.1.0: {}
 

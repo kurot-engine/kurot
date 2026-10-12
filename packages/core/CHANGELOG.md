@@ -6,7 +6,8 @@ All notable changes to `@kurot/core` are documented here.
 
 ## [2.5.4] — 2026-10-12
 
-Prepared for publication; not yet published.
+Published; npm latest, package download and registry integrity verified on 2026-10-12.
+All 628 generated files match the tested local build.
 
 ### Fixed
 
@@ -26,7 +27,7 @@ Prepared for publication; not yet published.
   are unlimited, positive counts are total plays, and the offset applies only to
   the first play. No public API, dependency, resource or XML-format change.
 - Existing UI/Game/DragonBones/Spine/ui-runtime peers accept 2.5.4 without new
-  SDK releases or raised minima. Development and application locks are unchanged.
+  SDK releases or raised minima. SDK development locks are unchanged.
   Apps adopt published 2.5.4 through their installation/lock and rebuild; exact
   Core pins must be updated explicitly. CLI and headless packages need no release.
 - Published Core 2.5.3 does not contain the fix. Continuous scheduling reproduces

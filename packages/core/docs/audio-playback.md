@@ -1,8 +1,9 @@
 # Sound playback and continuous loops
 
-Core 2.5.4 fixes continuous Web Audio looping and is prepared for publication;
-not yet published. Published Core 2.5.3 does not contain this correction.
-Dependency ranges and consumer locks are unchanged. Native Sound loads through
+Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
+registry integrity and generated modules matching the tested build. It fixes
+continuous Web Audio looping; published Core 2.5.3 lacks this correction.
+SDK dependency ranges and development locks are unchanged. Native Sound loads through
 Web Audio when available and decodable, with HTMLAudioElement as a fallback. `Sound.type` labels
 music/effects; it does not select a different loop implementation.
 
@@ -47,13 +48,16 @@ waveform discontinuities or apply a crossfade. MP3 encoder delay/padding handlin
 belongs to the browser decoder. Prepare seamless source material as needed; the
 runtime reproduces the decoded samples at their original loop boundary.
 
-After 2.5.4 is published, applications adopt it through their Core installation/
+Applications adopt published 2.5.4 through their Core installation/
 lock and rebuild. Compatible ranges such as `^2.5.3` already accept it; exact
 Core pins require an explicit declaration update. Existing Core 2.x peers,
 including UI 3.6.0's ^2.5.2, accept 2.5.4 without new SDK versions or raised peer
 minima. Development lock adoption is optional. UI, Game, DragonBones, Spine,
 runtime, CLI and the document kernel have no API migration.
-No application dependency or audio asset is edited for isolated verification.
+Editor 0.28.5, Reskin, the selected Tentax/MilfMaster templates and demo/game
+examples adopt registry 2.5.4 with matching app locks and rebuilt outputs. Other
+SDK development and independent Reskin project installations retain their own
+baselines. Isolated verification does not edit application sources or audio assets.
 
 ## Verification
 
@@ -80,3 +84,9 @@ after the 0.6 gain is 4.77e-8. Finite output stops at the exact expected boundar
 An isolated minified bundle of Tentax's unchanged SoundMusicManager with built
 checkout Core crosses the real-time music boundary on one source, even with a
 200 ms control-thread stall at the join. The verification output is muted.
+
+After registry adoption, Tentax minified release 261012182738 passes the same
+unlimited/two-play MP3 sample comparisons using its generated Core chunk and
+copied runtime MP3. It uses one looping source, inserts zero missing frames,
+retains the 4.77e-8 maximum gain-rounding difference and stops finite output
+at the exact boundary. Application source audio and authored Skins are retained.

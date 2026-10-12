@@ -1,14 +1,16 @@
 # @kurot/core — AI context map
 
-Core 2.5.4 is prepared for publication; not yet published. It fixes SoundChannel
+Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
+registry integrity and all 628 generated files matching the tested build. It fixes SoundChannel
 loops with one native Web Audio source and audio-clock finite duration.
 Preserve total `loops` counts and initial offset semantics, wrapped position,
 completion once and manual-stop cleanup.
 HTML unlimited loops are native; finite fallback timing is browser-dependent.
-Read [audio playback](audio-playback.md). Registry 2.5.3 and consumer installations
-do not contain this correction. Dependency ranges and consumer/development locks
-are unchanged. Existing SDK peers accept 2.5.4 without bumps; applications adopt
-the published patch through their own installation/lock and rebuild.
+Read [audio playback](audio-playback.md). Registry 2.5.3 lacks this correction.
+SDK ranges/development locks are unchanged; existing peers accept 2.5.4 without
+bumps. Editor 0.28.5, Reskin, the selected Tentax/MilfMaster templates and demo/game
+examples adopt registry 2.5.4 with matching app locks and rebuilt outputs. Other
+applications and independent Reskin projects retain their own installations.
 
 Core 2.5.3 is published, verified on npm on 2026-10-10. TextField and BitmapText default to
 middle; inherited UI text components use the same host default. Explicit top/bottom
@@ -34,7 +36,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.5.4`, prepared for publication. It provides Kurot's
+Package identity: `@kurot/core@2.5.4`, published. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two

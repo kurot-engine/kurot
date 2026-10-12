@@ -135,25 +135,27 @@ an automatic sequence of package version bumps.
 
 ## Continuous audio loops: Core 2.5.4 adoption
 
-Core 2.5.4 is prepared for publication; not yet published. Its Web Audio loop
-correction is independent of UI adoption and preserves the existing API, total
-`loops` counts and first-play offset. Published 2.5.3 lacks this correction.
+Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
+registry integrity and all 628 generated files matching the tested build. Its
+Web Audio correction preserves the API, total `loops` counts and first-play offset.
+Published 2.5.3 lacks this correction; UI adoption remains independent.
 
-- Required to receive the fix: after publication, install Core 2.5.4 with a matching
-  lock and rebuild the application. Editor's exact 2.5.3 pin requires an explicit
-  declaration update when adopting it. No source or resource-format migration.
-- Optional adoption: UI ^2.5.2, Game ^2.0.0, DragonBones ^2.1.1, ui-runtime ^2.4.0
-  and Spine ^1.0.16 || ^2.0.0 peers already accept Core 2.5.4. Their development
-  ranges also accept it; development lock adoption is optional, without new SDK
-  versions or raised minima. No development installation is changed here.
-- Optional application/example adoption: Tentax, MilfMaster and Reskin declare
-  Core ^2.5.3; demo/game examples declare ^2.1.1. Their ranges accept 2.5.4, but
-  existing installations/locks and outputs retain their previous Core until an
-  explicit update and rebuild. Independent Reskin projects are unchanged.
-- Unaffected releases: CLI, ui-document, Atlas and bitmap-font have no Core
-  dependency and need no new release. CLI scaffold creation resolves registry
-  Core; new projects can receive 2.5.4 after publication, while existing projects
-  retain their own dependencies and locks. Legacy Core 1.x projects are unchanged.
+- Required to receive the fix: install Core 2.5.4 with a matching lock and rebuild
+  the application. Exact Core pins need an explicit declaration update. No source
+  or resource-format migration is required.
+- Selected application adoption: Editor 0.28.5 pins registry 2.5.4 with a matching
+  Bun lock and rebuilt local App. Reskin, Tentax and MilfMaster declare ^2.5.4
+  with matching locks, registry installations and rebuilt outputs. The demo/game
+  examples also adopt ^2.5.4 and rebuild. Other SDK versions are unchanged; no
+  remote Editor release is initiated by this dependency update.
+- Optional SDK development adoption: UI ^2.5.2, Game ^2.0.0, DragonBones ^2.1.1,
+  ui-runtime ^2.4.0 and Spine ^1.0.16 || ^2.0.0 peers accept Core 2.5.4. Their
+  development ranges also accept it; these development locks/installations stay
+  unchanged, without new SDK releases or raised minima.
+- Unaffected releases/projects: CLI, ui-document, Atlas and bitmap-font have no
+  Core dependency and need no release. CLI scaffold creation resolves registry
+  Core; existing unselected projects retain their own dependencies/locks, including
+  independent Reskin projects and legacy Core 1.x applications.
 
 HTML unlimited fallback uses native looping; finite fallback timing remains
 browser-dependent. Tentax's MP3 verification uses an isolated checkout bundle

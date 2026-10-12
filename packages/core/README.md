@@ -1,13 +1,13 @@
 # @kurot/core
 
-**2.5.4 is prepared for publication; not yet published.** It fixes continuous
-Web Audio loops while preserving `Sound.play(startTime, loops)` semantics.
-Published 2.5.3 remains the verified registry baseline and does not include this
-audio correction. See [CHANGELOG.md](CHANGELOG.md).
+**2.5.4 is published**, verified on npm on 2026-10-12, including latest, package
+download and registry integrity. All 628 generated files match the tested build.
+It fixes continuous Web Audio loops while preserving `Sound.play(startTime, loops)`
+semantics. Published 2.5.3 lacks this audio correction. See [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.5.4 (prepared for publication).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.4 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
 
 ## Continuous audio loops in 2.5.4
 
@@ -18,7 +18,7 @@ and the offset applies only to the first play. Position wraps per iteration;
 manual stop suppresses completion and releases nodes. HTML unlimited playback
 uses native looping; finite HTML fallback retains browser-dependent transitions.
 
-After 2.5.4 is published, update the application's Core installation/lock and
+Update the application's Core installation/lock to published 2.5.4 and
 rebuild to adopt the fix. Exact Core pins require an explicit declaration update;
 compatible ranges such as `^2.5.3` already accept it. SDK peers and development
 locks remain unchanged; UI/Game/DragonBones/Spine/runtime need no new release.
@@ -193,8 +193,6 @@ Automatic Label font shrinking is a separate UI capability and requires the
 matching UI release; Core does not expose `textFit` or `minFontSize`.
 
 ## Installation
-
-After 2.5.4 is published:
 
 ```bash
 pnpm add @kurot/core@^2.5.4

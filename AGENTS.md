@@ -43,16 +43,21 @@ Dependency direction is strictly one-way:
 
 ## Dependency and release policy
 
-Core 2.5.4 is prepared for publication; not yet published. It fixes continuous
+Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, package
+download, registry integrity and all 628 generated files matching the tested
+build. It fixes continuous
 SoundChannel Web Audio loops, including finite counts on the audio clock, initial
 offsets, position and cleanup. Existing `loops` semantics are preserved.
 HTML unlimited fallback uses native looping; finite fallback remains browser-timed.
-Published 2.5.3 lacks this correction. Dependency ranges and development/consumer
-locks are unchanged. Existing Core peers accept 2.5.4 without dependent SDK bumps
-or raised minima. Apps adopt the published patch through their Core installation/
-lock and rebuild; exact Core pins need an explicit declaration update.
-Tentax's current MP3 and music manager are verified through
-an isolated checkout bundle; its installation, source and assets are unchanged.
+Published 2.5.3 lacks this correction. SDK dependency ranges and development locks
+are unchanged; existing peers accept 2.5.4 without dependent SDK bumps or raised
+minima. Editor 0.28.5 uses exact registry Core 2.5.4 with a matching Bun lock and
+rebuilt local trial App; no remote release is initiated. Reskin and the selected
+Templates/tentax and Templates/milf-master adopt ^2.5.4 with matching registry
+installations/locks and rebuilt outputs. The demo/game examples also adopt ^2.5.4
+and rebuild; other SDK and independent Reskin project installations are unchanged.
+Tentax's unchanged MP3 and music manager were verified through an isolated checkout
+bundle; its newly minified release is checked against repeated decoded samples.
 Read packages/core/docs/audio-playback.md.
 
 UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, package
@@ -284,7 +289,7 @@ Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
 ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
 matching authoring, compilation and materialization contracts. Editor adoption
 is explicit; templates and other projects are unchanged.
-See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.3
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.4
 and UI 3.6.0; source versions do not establish npm publication.
 
 ui-document 0.12.0 is published. It adds independent
@@ -452,7 +457,7 @@ CLI-built skins do not require ui-runtime.
 Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
 dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
 runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
-tree (Editor 0.28.3) uses Core 2.5.3/UI 3.6.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
+tree (Editor 0.28.5) uses Core 2.5.4/UI 3.6.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
 Existing signed installers are not
 rebuilt by a dependency update.
 Package source versions alone do not confirm npm publication.
