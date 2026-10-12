@@ -9,7 +9,7 @@ doc so you don't have to re-explore the whole codebase from scratch.
 
 | Package              | Version | One-line role                                                                                                                                                                            | Read this first                                                                      |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@kurot/core`        | 2.5.3   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
+| `@kurot/core`        | 2.5.4   | Display objects, rendering (WebGL InstructionSet pipeline + Canvas 2D fallback), events, geometry, text, resources, net, media. Uses the headless bitmap-font kernel.                    | [`packages/core/docs/ai-context.md`](packages/core/docs/ai-context.md)               |
 | `@kurot/ui`          | 3.6.0   | EUI-compatible UI components, layouts, skins, theming, data binding. Depends only on `core`.                                                                                             | [`packages/ui/docs/ai-context.md`](packages/ui/docs/ai-context.md)                   |
 | `@kurot/game`        | 2.0.0   | Tween, MovieClip, ScrollView, particle systems, URLLoader. Depends only on `core`.                                                                                                       | [`packages/game/docs/ai-context.md`](packages/game/docs/ai-context.md)               |
 | `@kurot/cli`         | 3.6.0   | Editor-focused KUI XML→ESM build tool. Existing EXML game projects remain on the 1.3.x line. Build-time only, never runs in the browser.                                                 | [`packages/cli/docs/ai-context.md`](packages/cli/docs/ai-context.md)                 |
@@ -42,6 +42,18 @@ Dependency direction is strictly one-way:
 ```
 
 ## Dependency and release policy
+
+Core 2.5.4 is prepared for publication; not yet published. It fixes continuous
+SoundChannel Web Audio loops, including finite counts on the audio clock, initial
+offsets, position and cleanup. Existing `loops` semantics are preserved.
+HTML unlimited fallback uses native looping; finite fallback remains browser-timed.
+Published 2.5.3 lacks this correction. Dependency ranges and development/consumer
+locks are unchanged. Existing Core peers accept 2.5.4 without dependent SDK bumps
+or raised minima. Apps adopt the published patch through their Core installation/
+lock and rebuild; exact Core pins need an explicit declaration update.
+Tentax's current MP3 and music manager are verified through
+an isolated checkout bundle; its installation, source and assets are unchanged.
+Read packages/core/docs/audio-playback.md.
 
 UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, package
 download, integrity and all 344 generated files matching the tested build. It reserves

@@ -133,6 +133,33 @@ Propagate the analysis to downstream consumers only when the direct consumer's
 shipped behavior or compatibility changes. Do not turn the dependency graph into
 an automatic sequence of package version bumps.
 
+## Continuous audio loops: Core 2.5.4 adoption
+
+Core 2.5.4 is prepared for publication; not yet published. Its Web Audio loop
+correction is independent of UI adoption and preserves the existing API, total
+`loops` counts and first-play offset. Published 2.5.3 lacks this correction.
+
+- Required to receive the fix: after publication, install Core 2.5.4 with a matching
+  lock and rebuild the application. Editor's exact 2.5.3 pin requires an explicit
+  declaration update when adopting it. No source or resource-format migration.
+- Optional adoption: UI ^2.5.2, Game ^2.0.0, DragonBones ^2.1.1, ui-runtime ^2.4.0
+  and Spine ^1.0.16 || ^2.0.0 peers already accept Core 2.5.4. Their development
+  ranges also accept it; development lock adoption is optional, without new SDK
+  versions or raised minima. No development installation is changed here.
+- Optional application/example adoption: Tentax, MilfMaster and Reskin declare
+  Core ^2.5.3; demo/game examples declare ^2.1.1. Their ranges accept 2.5.4, but
+  existing installations/locks and outputs retain their previous Core until an
+  explicit update and rebuild. Independent Reskin projects are unchanged.
+- Unaffected releases: CLI, ui-document, Atlas and bitmap-font have no Core
+  dependency and need no new release. CLI scaffold creation resolves registry
+  Core; new projects can receive 2.5.4 after publication, while existing projects
+  retain their own dependencies and locks. Legacy Core 1.x projects are unchanged.
+
+HTML unlimited fallback uses native looping; finite fallback timing remains
+browser-dependent. Tentax's MP3 verification uses an isolated checkout bundle
+without altering installed dependencies or authored assets.
+See [audio playback](../packages/core/docs/audio-playback.md).
+
 ## Outline-safe Label layout: UI 3.6.0 adoption
 
 UI 3.6.0 is published, verified on npm on 2026-10-11. It reserves

@@ -104,6 +104,11 @@ export class Sound extends EventDispatcher<SoundEvents> {
 		}
 	}
 
+	/**
+	 * Starts at startTime seconds on the first play, then repeats from zero.
+	 * loops <= 0 repeats indefinitely; positive loops is the total play count.
+	 * Web Audio loops continuously; finite counts end on the audio clock.
+	 */
 	public play(startTime = 0, loops = 0): SoundChannel {
 		if (!this._loaded) {
 			IOErrorEvent.dispatchIOErrorEvent(this);

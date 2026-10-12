@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.5.0 (published; registry version metadata verified on 2026-10-10). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 2.5.4 (prepared for publication; not yet published). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -17,6 +17,12 @@ resources, networking and media runtime. Public APIs follow Egret's
 Since 2.2.0, Core uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
+
+Since 2.5.4, SoundChannel schedules Web Audio repeats through one native looping
+source. Finite total counts end on the audio clock, independently of JavaScript
+completion callbacks. HTML unlimited fallback uses native looping; finite
+fallback transitions remain browser-timed. See [audio playback](audio-playback.md)
+for count/offset semantics, lifecycle, asset boundaries and verification.
 
 Since 2.4.0, `DisplayObject.flipX`/`flipY` reflect around a local frame center
 independently of authored scale and anchors. `matrix` exposes the authored

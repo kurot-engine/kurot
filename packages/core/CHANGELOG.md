@@ -4,6 +4,47 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.5.4] — 2026-10-12
+
+Prepared for publication; not yet published.
+
+### Fixed
+
+- Fix Web Audio repeats to use one native looping source, retaining the total
+  `loops` count and first-play offset. Finite playback ends on the audio clock;
+  joins no longer wait for JavaScript ended callbacks.
+- Wrap channel position per iteration, freeze finite completion, suppress queued
+  callbacks after manual stop and release source/gain nodes.
+- Use native HTML looping for unlimited fallback playback; retain finite fallback
+  counting and document its browser-dependent timing limitation.
+- Add unit and minified browser regressions, including sample comparisons with
+  Tentax's application-owned MP3. See [audio playback](docs/audio-playback.md).
+
+### Compatibility
+
+- Preserve existing `Sound.play(startTime, loops)` parameters: non-positive counts
+  are unlimited, positive counts are total plays, and the offset applies only to
+  the first play. No public API, dependency, resource or XML-format change.
+- Existing UI/Game/DragonBones/Spine/ui-runtime peers accept 2.5.4 without new
+  SDK releases or raised minima. Development and application locks are unchanged.
+  Apps adopt published 2.5.4 through their installation/lock and rebuild; exact
+  Core pins must be updated explicitly. CLI and headless packages need no release.
+- Published Core 2.5.3 does not contain the fix. Continuous scheduling reproduces
+  decoded samples; it does not trim asset silence or repair waveform boundaries.
+
+### Verification — 2026-10-12
+
+- Core build and all 941 unit tests pass (81 files), including 41 audio tests.
+- All 22 minified browser checks pass, covering 44.1/48 kHz, finite/unlimited
+  counts and first-play offsets. Tentax's current MP3 has zero inserted/missing
+  frames across unlimited/two-play joins and stops at the exact finite boundary.
+  Its unchanged music manager crosses the real-time boundary on one source
+  during a 200 ms control-thread stall, using an isolated checkout Core bundle.
+- Clean prepublish build and package packing verify version 2.5.4, all 642 files,
+  native looping/finite scheduling, declarations and public docs. Packed files
+  match the checkout byte for byte; tests and the application MP3 are excluded.
+  Dependency declarations are unchanged and `git diff --check` passes.
+
 ## [2.5.3] — 2026-10-10
 
 Published; package download, registry integrity and tested alignment modules verified on 2026-10-10.

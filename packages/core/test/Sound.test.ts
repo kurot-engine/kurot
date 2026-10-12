@@ -23,7 +23,7 @@ function installAudioContextMock() {
 		disconnect: vi.fn(),
 		onended: null as (() => void) | null,
 	};
-	const gainNode = { gain: { value: 1 }, connect: vi.fn() };
+	const gainNode = { gain: { value: 1 }, connect: vi.fn(), disconnect: vi.fn() };
 	const ctx = {
 		currentTime: 0,
 		destination: {},

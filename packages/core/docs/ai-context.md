@@ -1,5 +1,15 @@
 # @kurot/core — AI context map
 
+Core 2.5.4 is prepared for publication; not yet published. It fixes SoundChannel
+loops with one native Web Audio source and audio-clock finite duration.
+Preserve total `loops` counts and initial offset semantics, wrapped position,
+completion once and manual-stop cleanup.
+HTML unlimited loops are native; finite fallback timing is browser-dependent.
+Read [audio playback](audio-playback.md). Registry 2.5.3 and consumer installations
+do not contain this correction. Dependency ranges and consumer/development locks
+are unchanged. Existing SDK peers accept 2.5.4 without bumps; applications adopt
+the published patch through their own installation/lock and rebuild.
+
 Core 2.5.3 is published, verified on npm on 2026-10-10. TextField and BitmapText default to
 middle; inherited UI text components use the same host default. Explicit top/bottom
 remain effective and multiline only controls line generation. Catalog metadata
@@ -24,8 +34,8 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.5.3`, published. It provides Kurot's scene graph,
-events, rendering, text, resource, network and media runtime. Rendering uses a
+Package identity: `@kurot/core@2.5.4`, prepared for publication. It provides Kurot's
+scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
 rendering backends: WebGL (primary, two-phase build/execute, InstructionSet-

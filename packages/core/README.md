@@ -1,13 +1,29 @@
 # @kurot/core
 
-**2.5.3 is published**, verified on npm on 2026-10-10. TextField and BitmapText now default
-to middle alignment, inherited by UI text components. Explicit top/bottom remain
-effective and multiline controls only line generation. The package download,
-registry integrity and tested default-alignment modules are verified. See [CHANGELOG.md](CHANGELOG.md).
+**2.5.4 is prepared for publication; not yet published.** It fixes continuous
+Web Audio loops while preserving `Sound.play(startTime, loops)` semantics.
+Published 2.5.3 remains the verified registry baseline and does not include this
+audio correction. See [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.5.3 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.4 (prepared for publication).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## Continuous audio loops in 2.5.4
+
+Core 2.5.4 loops Web Audio through one native source, with
+finite counts ending on the audio clock. Existing `sound.play(startTime, loops)`
+semantics remain: `loops <= 0` is unlimited, positive `loops` counts total plays,
+and the offset applies only to the first play. Position wraps per iteration;
+manual stop suppresses completion and releases nodes. HTML unlimited playback
+uses native looping; finite HTML fallback retains browser-dependent transitions.
+
+After 2.5.4 is published, update the application's Core installation/lock and
+rebuild to adopt the fix. Exact Core pins require an explicit declaration update;
+compatible ranges such as `^2.5.3` already accept it. SDK peers and development
+locks remain unchanged; UI/Game/DragonBones/Spine/runtime need no new release.
+No new dependency or public API is introduced.
+See [audio playback](docs/audio-playback.md) for asset boundaries and tests.
 
 ## Default middle alignment in 2.5.3
 
@@ -178,8 +194,10 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 
 ## Installation
 
+After 2.5.4 is published:
+
 ```bash
-pnpm add @kurot/core@^2.5.3
+pnpm add @kurot/core@^2.5.4
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

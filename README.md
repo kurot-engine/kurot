@@ -1,5 +1,14 @@
 # Kurot
 
+Core 2.5.4 is prepared for publication; not yet published. It fixes continuous
+Web Audio loops while retaining `Sound.play(startTime, loops)` semantics.
+Published Core 2.5.3 does not contain this correction; dependency ranges and
+development/application locks remain unchanged. Existing SDK peers accept
+2.5.4 without bumps. Apps adopt the published patch through their Core
+installation/lock and rebuild; exact Core pins require a declaration update.
+See [audio playback](packages/core/docs/audio-playback.md) for scheduling,
+fallback limitations and verification.
+
 Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, and EUI developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
 
 > Kurot continues Egret 5.4.1's display-object and development model while
@@ -46,7 +55,8 @@ correctness and performance validation system.
 
 ## Packages and dependencies
 
-Version audit: 2026-10-10. The table records source manifest versions.
+Version audit: 2026-10-12. The table records source manifest versions;
+Core 2.5.4 is prepared for publication, while registry adoption remains separate.
 Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField,
 BitmapText and their UI text components default to middle. Explicit top/bottom
 remain effective; multiline controls only line generation. Use explicit top when
@@ -54,23 +64,23 @@ content should start at the top of a taller box. Catalog metadata matches the ne
 Core default without rewriting XML. See [text layout](packages/core/docs/text-layout.md).
 Core 2.5.3, document 0.13.1 and CLI 3.6.0 are verified published releases,
 including package downloads and registry integrity. Core/default-catalog modules
-match the tested local builds. UI 3.5.0 is published, verified on npm on
-2026-10-10, including latest, package download and registry integrity. Its
-fitting/alignment modules match the tested build. It adds multiline Label shrinking and preserves original text
-alignment when fitting is toggled. Other source versions match their recorded
-npm releases. Dependency/peer ranges are unchanged. Applications adopt their
-UI installations/locks and rebuild; unchanged SDKs need no version bump.
-Editor 0.28.2, Tentax and MilfMaster explicitly install registry UI 3.5.0 with
-matching app locks and rebuilt outputs. Other applications and SDK development
-locks retain their own installations.
+match the tested local builds. UI 3.6.0 is published, verified on npm on
+2026-10-11, including latest, package download, registry integrity and all 344
+generated files matching the tested build. It reserves outline-safe Label layout
+space, including automatic dimensions, wrapping and fitting; its Core peer is
+^2.5.2. It retains 3.5.0's multiline shrinking and stable text alignment.
+At the UI 3.6.0 adoption, Editor 0.28.3, Tentax and MilfMaster explicitly installed
+registry UI 3.6.0 with matching app locks and rebuilt outputs. Their Core
+installations remain 2.5.3; this Core release preparation does not update them.
+Other application and SDK development locks retain their own installations.
 Feature introductions and benchmark results retain their recorded release versions.
 
 Kurot is composed of several independently maintained pnpm packages. The repository root currently has no `pnpm-workspace.yaml` or unified root-level build script, so install dependencies and run commands from within each package directory.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.5.3   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.5.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/core`](packages/core/README.md)               | 2.5.4   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.6.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.6.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.1  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
@@ -147,7 +157,7 @@ whose only content interface is textFlow, and fixes automatic BitmapLabel
 measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.5.3 and UI 3.5.0.
+Core 2.5.3 and UI 3.6.0. Core 2.5.4 is prepared for publication.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with
@@ -182,8 +192,8 @@ Current manifest dependency ranges:
 
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
-| Core 2.5.3        | bitmap-font `^0.1.0`                              |
-| UI 3.5.0          | Core `^2.4.0`                                     |
+| Core 2.5.4        | bitmap-font `^0.1.0`                              |
+| UI 3.6.0          | Core `^2.5.2`                                     |
 | Game 2.0.0        | Core `^2.0.0`                                     |
 | CLI 3.6.0         | ui-document `^0.13.0`                             |
 | ui-runtime 0.10.0 | Core `^2.4.0`, UI `^3.4.0`, ui-document `^0.13.0` |
