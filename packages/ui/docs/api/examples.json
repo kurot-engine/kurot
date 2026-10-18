@@ -1,0 +1,34 @@
+{
+  "package": "@kurot/ui",
+  "version": "3.6.1",
+  "examples": [
+    {
+      "file": "examples/37f49b480a1c.ts",
+      "owner": "Theme"
+    },
+    {
+      "file": "examples/792376c209f3.ts",
+      "owner": "ProgressBar.slideDuration"
+    },
+    {
+      "file": "examples/cf815db7641e.ts",
+      "owner": "Skin"
+    },
+    {
+      "file": "examples/3a55b7096483.ts",
+      "owner": "Binding.bindProperty"
+    },
+    {
+      "file": "examples/d9d3bd3be01f.ts",
+      "owner": "Binding.bindHandler"
+    },
+    {
+      "file": "examples/fb47cf74e457.ts",
+      "owner": "Binding.bindProperties"
+    },
+    {
+      "file": "examples/2c2da36fc6fc.ts",
+      "owner": "Watcher.watch"
+    }
+  ]
+}

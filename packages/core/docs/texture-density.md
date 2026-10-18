@@ -73,13 +73,15 @@ Core ^2.5.0. Existing 1× resources require no
 migration. UI/Game/DragonBones/Spine/ui-runtime peer ranges accepting Core 2.x
 can use that Core release without an SDK bump. CLI still has no Core dependency.
 
-The source trial lives in an isolated directory under docs-internal and binds
-the built checkout Core explicitly; it does not alter registry locks. Read
-[default KUI skins](../../cli/docs/default-ui-skins.md) for the preview command.
-Publish Core 2.5.0 before CLI 3.6.0 so new scaffolds resolve the required Core.
+The example's registry Core 2.5.4 already supports density. Read
+[default KUI skins](../../cli/docs/default-ui-skins.md) for ordinary gallery
+commands using the example's installed SDKs and checkout CLI. The private asset
+tool also supports an isolated source trial for testing checkout engine changes.
+Core 2.5.0 was published before CLI 3.6.0 so new scaffolds resolve a suitable Core.
 Editor/Reskin resource authoring tools must adopt the new Core and divide physical
 frame dimensions by sheet resolution when validating logical grids or measuring
-previews; their current released installations do not understand this metadata.
+previews. Installations predating that authoring adoption need the corresponding
+application update; a newer SDK source checkout alone does not change them.
 
 Unit regressions cover mixed densities, nested trimmed views, atlas loading,
 fixed borders, trim, clip/repeat and rotated edge crops. The minified browser

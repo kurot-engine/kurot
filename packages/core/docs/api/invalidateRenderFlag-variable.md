@@ -1,0 +1,9 @@
+# invalidateRenderFlag
+
+Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+
+```ts
+invalidateRenderFlag: boolean;
+```
+
+**Default/initializer:** `false`

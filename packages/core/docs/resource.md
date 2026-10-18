@@ -39,8 +39,10 @@ packages/core/src/kurot/resource/
 
 ### 1. Prepare a configuration file
 
+Save this as `resource/default.res.json`. Resource URLs below are relative to
+the `resource/` prefix passed to `loadConfig`.
+
 ```json
-// resource.json
 {
 	"resources": [
 		{ "name": "bg", "type": "image", "url": "assets/bg.png" },
@@ -57,10 +59,11 @@ packages/core/src/kurot/resource/
 ### 2. Load and use resources
 
 ```typescript
-import { resource, ResourceType } from '@kurot/core';
+import { resource } from '@kurot/core';
+import type { Texture } from '@kurot/core';
 
 // Load the configuration.
-await resource.loadConfig('resource.json', 'assets/');
+await resource.loadConfig('resource/default.res.json', 'resource/');
 
 // Load a resource group.
 await resource.loadGroup('preload');

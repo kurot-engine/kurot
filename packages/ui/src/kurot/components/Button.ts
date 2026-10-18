@@ -38,6 +38,10 @@ export class Button extends Component implements IDisplayText {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Button caption, initially empty. Copied into labelDisplay when that optional
+	 * skin part is available; changing the label does not load or attach a skin.
+	 */
 	public get label(): string {
 		return this._label;
 	}
@@ -53,6 +57,10 @@ export class Button extends Component implements IDisplayText {
 		return this._label;
 	}
 
+	/**
+	 * Borrowed Texture or image-adapter string, initially undefined. Passed to the
+	 * optional iconDisplay skin part; replacement does not dispose a texture.
+	 */
 	public get icon(): string | Texture | undefined {
 		return this._icon;
 	}
@@ -64,6 +72,10 @@ export class Button extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Selection flag, initially false. Assignment updates view state and dispatches
+	 * a property change, but does not dispatch the user CHANGE event itself.
+	 */
 	public get selected(): boolean {
 		return this._selected;
 	}
@@ -75,6 +87,10 @@ export class Button extends Component implements IDisplayText {
 		this.invalidateState();
 	}
 
+	/**
+	 * Whether a completed user press flips selected; defaults to false. User
+	 * release dispatches CHANGE; setting this flag does not perform a press.
+	 */
 	public get toggle(): boolean {
 		return this._toggle;
 	}
@@ -83,6 +99,11 @@ export class Button extends Component implements IDisplayText {
 		this._toggle = value;
 	}
 
+	/**
+	 * Whether a press is in progress, initially false. Stage removal cancels
+	 * capture and detaches internal stage handlers. Application event handlers remain
+	 * owned by the game and must be removed when their round/view ends.
+	 */
 	public get touchCaptured(): boolean {
 		return this._touchCaptured;
 	}

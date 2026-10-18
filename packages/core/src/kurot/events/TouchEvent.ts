@@ -3,6 +3,11 @@ import type { IEventDispatcher } from './IEventDispatcher.js';
 import { Point } from '../geom/Point.js';
 import { setRequestRenderingFlag } from '../player/SystemTicker.js';
 
+/**
+ * Canvas pointer event expressed in logical stage and target-local units.
+ * Use stageX/stageY for stage-level game controls; CSS pixels are not the
+ * same coordinate system when the stage is scaled.
+ */
 export class TouchEvent extends Event {
 	// ── Static constants ──────────────────────────────────────────────────────
 
@@ -36,7 +41,15 @@ export class TouchEvent extends Event {
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Pointer identifier, initially 0 unless provided. Use it to associate one
+	 * begin/move/end sequence when multiple simultaneous pointers are allowed.
+	 */
 	public touchPointID = 0;
+	/**
+	 * Whether the pointer is marked down for this event, initially false for
+	 * manually constructed events. The input dispatcher supplies the current state.
+	 */
 	public touchDown = false;
 
 	private _stageX = 0;
@@ -61,19 +74,36 @@ export class TouchEvent extends Event {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/**
+	 * Horizontal logical stage coordinate, initially the supplied value or 0.
+	 * Already adjusted for stage scaling; do not treat it as browser clientX.
+	 */
 	public get stageX(): number {
 		return this._stageX;
 	}
 
+	/**
+	 * Vertical logical stage coordinate, initially the supplied value or 0.
+	 * Already adjusted for stage scaling; do not treat it as browser clientY.
+	 */
 	public get stageY(): number {
 		return this._stageY;
 	}
 
+	/**
+	 * Horizontal coordinate in the original event target's local logical space.
+	 * It is not automatically recomputed relative to each bubbling currentTarget;
+	 * use currentTarget.globalToLocal(stageX, stageY) for that listener's space.
+	 */
 	public get localX(): number {
 		if (this._targetChanged) this.computeLocalXY();
 		return this._localX;
 	}
 
+	/**
+	 * Vertical coordinate in the original event target's local logical space.
+	 * Without a display transform on the target, it falls back to stageY.
+	 */
 	public get localY(): number {
 		if (this._targetChanged) this.computeLocalXY();
 		return this._localY;

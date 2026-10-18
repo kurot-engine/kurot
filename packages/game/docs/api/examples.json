@@ -1,0 +1,30 @@
+{
+  "package": "@kurot/game",
+  "version": "2.0.1",
+  "examples": [
+    {
+      "file": "examples/41c4476bd377.ts",
+      "owner": "Tween"
+    },
+    {
+      "file": "examples/b30036f77dcd.ts",
+      "owner": "TweenGroup"
+    },
+    {
+      "file": "examples/0d7ee4a4b944.ts",
+      "owner": "ScrollView"
+    },
+    {
+      "file": "examples/9a271f2a916b.ts",
+      "owner": "ParticleSystem.emitterX"
+    },
+    {
+      "file": "examples/0932be938b3e.ts",
+      "owner": "URLLoader"
+    },
+    {
+      "file": "examples/796aee79f522.ts",
+      "owner": "URLRequest"
+    }
+  ]
+}

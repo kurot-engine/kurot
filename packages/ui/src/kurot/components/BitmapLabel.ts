@@ -34,6 +34,9 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this._invalidateText();
 	}
 
+	/**
+	 * Plain text, initially empty. Without a resolved bitmap font, layout is empty.
+	 */
 	public get text(): string {
 		return this._bitmapText.text;
 	}
@@ -43,6 +46,14 @@ export class BitmapLabel extends Component implements IDisplayText {
 		PropertyEvent.dispatchPropertyEvent(this, 'text');
 		this._invalidateText();
 	}
+	/**
+	 * Borrowed BitmapFont or configured font-resource name, initially undefined.
+	 * Strings are resource keys, not arbitrary URLs. Loading success dispatches
+	 * COMPLETE; failed loads or wrong resource types dispatch IO_ERROR with source
+	 * and error data. New assignments invalidate old requests' results. Stage removal
+	 * does not cancel shared resource loading; clear/change font on permanent closure
+	 * and let the resource owner release it after pending work completes.
+	 */
 	public get font(): string | BitmapFont | undefined {
 		return this._font;
 	}
@@ -55,6 +66,9 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this.invalidateProperties();
 		this._invalidateText();
 	}
+	/**
+	 * Horizontal alignment, defaulting to left. Invalid strings throw RangeError.
+	 */
 	public get textAlign(): 'left' | 'center' | 'right' {
 		return this._bitmapText.textAlign;
 	}
@@ -63,6 +77,11 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this._bitmapText.textAlign = value;
 		this.invalidateDisplayList();
 	}
+	/**
+	 * Text-block alignment inherited from Core (middle on 2.5.3+, top on older
+	 * compatible versions). Invalid strings throw RangeError. Set top explicitly for
+	 * a HUD whose text should begin at the top of a taller box.
+	 */
 	public get verticalAlign(): 'top' | 'middle' | 'bottom' {
 		return this._bitmapText.verticalAlign;
 	}
@@ -71,6 +90,10 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this._bitmapText.verticalAlign = value;
 		this.invalidateDisplayList();
 	}
+	/**
+	 * Additional glyph spacing in logical pixels; defaults to 0. Finite negative
+	 * values are allowed; non-finite values throw RangeError.
+	 */
 	public get letterSpacing(): number {
 		return this._bitmapText.letterSpacing;
 	}
@@ -79,6 +102,10 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this._bitmapText.letterSpacing = value;
 		this._invalidateText();
 	}
+	/**
+	 * Additional row spacing in logical pixels; defaults to 0. Must be finite and
+	 * nonnegative or throws RangeError.
+	 */
 	public get lineSpacing(): number {
 		return this._bitmapText.lineSpacing;
 	}
@@ -95,6 +122,10 @@ export class BitmapLabel extends Component implements IDisplayText {
 		this._bitmapText.multiline = value;
 		this._invalidateText();
 	}
+	/**
+	 * Whether bitmap glyphs use linear sampling; defaults to true. Set false for
+	 * nearest-neighbor pixel art.
+	 */
 	public get smoothing(): boolean {
 		return this._bitmapText.smoothing;
 	}
@@ -109,6 +140,10 @@ export class BitmapLabel extends Component implements IDisplayText {
 	public get textWidth(): number {
 		return this._measureText().width;
 	}
+	/**
+	 * Content height in logical pixels under the current width constraint, before
+	 * height clipping; 0 without a resolved font or text.
+	 */
 	public get textHeight(): number {
 		return this._measureText().height;
 	}

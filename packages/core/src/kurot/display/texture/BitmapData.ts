@@ -10,6 +10,11 @@ export class CompressedTextureData {
 	level = 0;
 }
 
+/**
+ * Shared image/canvas/video pixel source used by Texture views.
+ * After editing a mutable source, call BitmapData.invalidate() to refresh
+ * render uploads. Coordinate disposal with every texture using the source.
+ */
 export class BitmapData {
 	// ── Static fields ─────────────────────────────────────────────────────────
 

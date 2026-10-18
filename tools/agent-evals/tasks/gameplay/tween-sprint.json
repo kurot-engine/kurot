@@ -1,0 +1,13 @@
+{
+	"schemaVersion": "1",
+	"id": "gameplay.tween-sprint",
+	"category": "gameplay",
+	"title": "Tween Sprint: laps, pause and cancellation",
+	"prompt": "Build Tween Sprint using installed Core 2.5.4 and Game 2.0.0 public APIs. Read AGENTS.md and relevant docs/types. Stay in the supplied project; no network, installation, upgrade or publication. Edit only src/** and template/web/index.html. Strict TypeScript, named exports, no any/internal APIs, globals or test bridges. Export app, the single createPlayer result, from Main.ts for embedding/lifecycle use. Stage 640x800, canvas#gameCanvas. Show a Shape named runner at (120,360), clear lane/HUD/instructions, and DOM buttons #start/#pause/#restart/#close with corresponding accessible names. Initial ready, score 0. Start uses actual @kurot/game Tween with linear easing to move runner.x from 120 to 520 over 800ms; on natural completion score one lap, reset x=120, start the next lap. End after 3 completed laps, score 3, x=520, no active/paused tweens. No timers, CSS animations or custom per-frame interpolation as substitutes for Tween. Pause toggles playing/paused, freezing motion and score; resume continues remaining time. Restart while active/paused or ended cancels old work before starting a fresh playing round with score 0/x120. Cancelled tween promises may settle; ensure old completion cannot score or start another lap. End/Close/pagehide remove all owned tweens and listeners. Close is idempotent, disables controls, leaves final output, and cannot be revived by late callbacks. Mirror actual state in output#status data-phase=ready|playing|paused|ended|disposed, data-score, data-x (actual runner position). Leave a final UI/status after Close; the display subtree may be removed. Work at width 360 and retain CLI placeholders. You may run npm run build/typecheck. Deliver implemented files, not a proposal.",
+	"acceptance": [
+		{ "id": "build", "kind": "command", "description": "Fixed SDK build/types pass and native Game Tween is used." },
+		{ "id": "interpolate-pause", "kind": "behavior", "description": "Actual display x interpolates at 800ms/lap and pauses/resumes without a time jump." },
+		{ "id": "cancel-restart", "kind": "behavior", "description": "Mid-flight restart suppresses old completions; repeated restarts do not accumulate activity." },
+		{ "id": "end-cleanup", "kind": "behavior", "description": "Three natural completions end; public Tween.getCount is zero after end and disposal." }
+	]
+}

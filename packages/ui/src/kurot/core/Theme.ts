@@ -11,11 +11,19 @@ interface ThemeConfig {
 
 /**
  * Maps component class names to default skins.
+ * Construction registers this as the active theme and starts loading the
+ * JSON configuration. COMPLETE follows loading its optional skinsJs module;
+ * failures dispatch IO_ERROR instead. Wait for component skin readiness before
+ * using its typed parts.
  *
  * @example
  * ```ts
- * const theme = new Theme('resource/default.thm.js');
-	 * theme.addEventListener(Event.COMPLETE, handleComplete);
+ * import { Event, IOErrorEvent } from '@kurot/core';
+ * import { Theme } from '@kurot/ui';
+ *
+ * const theme = new Theme('resource/default.thm.json');
+ * theme.once(Event.COMPLETE, () => console.log('Theme and skin module ready'));
+ * theme.once(IOErrorEvent.IO_ERROR, () => console.error('Theme failed'));
  * ```
  */
 export class Theme extends EventDispatcher {

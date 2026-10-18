@@ -35,6 +35,10 @@ function _validateFrameNumber(value: number, frameCount: number, name: string): 
 export class MovieClipDataFactory {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Whether to reuse the same mutable MovieClipData instance for each clip name;
+	 * defaults to true. Setting false bypasses caching without evicting older entries.
+	 */
 	public enableCache = true;
 
 	private _mcDataSet: EgretMovieClipDataSet | undefined;
@@ -106,15 +110,18 @@ export class MovieClipDataFactory {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Clear all generated MovieClipData instances.
+	 * Forget cached MovieClipData references. Existing clips/data remain usable;
+	 * this does not dispose frame textures, the atlas or previously returned objects.
 	 */
 	public clearCache(): void {
 		this._cache.clear();
 	}
 
 	/**
-	 * Generate data for a named Egret MovieClip. With no name, generates the
-	 * first clip in the data set. Returns undefined when no matching clip exists.
+	 * Generate a named clip; an empty/omitted name selects the first clip. Returns
+	 * undefined for missing data/name. Reuses the cached mutable data when enabled.
+	 * Malformed frame, timing, label or atlas metadata can throw RangeError. The
+	 * resource owner retains responsibility for the borrowed atlas and frame textures.
 	 */
 	public generateMovieClipData(movieClipName = ''): MovieClipData | undefined {
 		const clips = this._mcDataSet?.mc;

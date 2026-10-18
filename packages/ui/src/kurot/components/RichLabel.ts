@@ -51,6 +51,10 @@ export class RichLabel extends Component {
 		PropertyEvent.dispatchPropertyEvent(this, 'textFlow');
 	}
 
+	/**
+	 * Whether to generate multiple rows; defaults to true. False displays only the
+	 * first unwrapped hard-separated line, regardless of the available height.
+	 */
 	public get multiline(): boolean {
 		return this._textField.multiline;
 	}
@@ -61,8 +65,8 @@ export class RichLabel extends Component {
 	}
 
 	/**
-	 * True uses Unicode line-break opportunities; false wraps by graphemes.
-	 * Explicit multiline=false displays only the first unwrapped hard line.
+	 * Whether to use Unicode line-break opportunities; defaults to true. False wraps
+	 * by graphemes. Explicit multiline=false shows only the first unwrapped hard line.
 	 */
 	public get wordWrap(): boolean {
 		return this._textField.wordWrap;
@@ -73,6 +77,10 @@ export class RichLabel extends Component {
 		this._invalidateText();
 	}
 
+	/**
+	 * Extra spacing between rows in logical pixels; defaults to 0. Negative or
+	 * non-finite values throw RangeError.
+	 */
 	public get lineSpacing(): number {
 		return this._textField.lineSpacing;
 	}
@@ -85,6 +93,10 @@ export class RichLabel extends Component {
 		this._invalidateText();
 	}
 
+	/**
+	 * Horizontal alignment, defaulting to left. Only left, center and right are
+	 * accepted; other values throw RangeError.
+	 */
 	public get textAlign(): 'left' | 'center' | 'right' {
 		return this._textField.textAlign as 'left' | 'center' | 'right';
 	}
@@ -97,6 +109,10 @@ export class RichLabel extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Text-block alignment inherited from Core (middle on 2.5.3+, top on 2.5.2).
+	 * Only top, middle and bottom are accepted; other values throw RangeError.
+	 */
 	public get verticalAlign(): 'top' | 'middle' | 'bottom' {
 		return this._textField.verticalAlign as 'top' | 'middle' | 'bottom';
 	}
@@ -116,6 +132,10 @@ export class RichLabel extends Component {
 	public get textWidth(): number {
 		return this._measureText().width;
 	}
+	/**
+	 * Complete content height in logical pixels at the current width constraint,
+	 * before height clipping. Empty text has height 0.
+	 */
 	public get textHeight(): number {
 		return this._measureText().height;
 	}

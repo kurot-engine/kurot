@@ -18,21 +18,35 @@ export interface ImageLoaderEvents extends EventMap {
 export class ImageLoader extends EventDispatcher<ImageLoaderEvents> {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
-	/** Default cross-origin mode applied to newly created loaders. */
+	/**
+	 * Default cross-origin mode copied by new loaders; initially undefined. Changing
+	 * it does not update existing instances or bypass server CORS restrictions.
+	 */
 	public static crossOrigin?: string;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	/** Bitmap data from the most recently completed image request. */
+	/**
+	 * Most recently completed BitmapData, initially undefined. close() retains it;
+	 * a new request does not clear an earlier result. Read after COMPLETE. The caller
+	 * owns disposal after all textures/users of this bitmap data have released it.
+	 */
 	public data?: BitmapData;
-	/** Cross-origin mode applied to the next image request, when specified. */
+	/**
+	 * Cross-origin mode for the next request, copied from ImageLoader.crossOrigin
+	 * at construction. Initially undefined; browser image/CORS rules apply.
+	 */
 	public crossOrigin?: string = ImageLoader.crossOrigin;
 
 	private _img?: HTMLImageElement;
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
-	/** Start loading an image URL, cancelling any previous request first. */
+	/**
+	 * Start an image URL request, cancelling the prior request first. Success
+	 * replaces data and emits COMPLETE; browser load failure emits IO_ERROR and leaves
+	 * the previous data available. Replaced bitmap data is not automatically disposed.
+	 */
 	public load(url: string): void {
 		this.close();
 

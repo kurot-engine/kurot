@@ -1,0 +1,9 @@
+# CONTENT_JUSTIFY
+
+Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+
+```ts
+readonly CONTENT_JUSTIFY: "contentJustify";
+```
+
+**Default/initializer:** `'contentJustify'`

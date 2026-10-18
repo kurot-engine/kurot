@@ -1,5 +1,13 @@
 # @kurot/core — AI context map
 
+For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
+These generated docs are included in the prepared Core 2.5.5 documentation patch,
+which is not published. Runtime code, signatures, exports and dependencies are unchanged.
+
+For game development, start with [game authoring](game-authoring.md) instead of
+the maintainer map below. The guide and Star Catcher reference are unreleased
+checkout additions; the guide uses the published Core 2.5.4 API.
+
 Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
 registry integrity and all 628 generated files matching the tested build. It fixes SoundChannel
 loops with one native Web Audio source and audio-clock finite duration.
@@ -36,7 +44,7 @@ agent unfamiliar with Kurot does not need to re-derive the architecture from
 scratch on every session. Treat the package source and its `src/index.ts`
 barrel as the authority for current behavior and exports.
 
-Package identity: `@kurot/core@2.5.4`, published. It provides Kurot's
+Package identity: `@kurot/core@2.5.5`, prepared but not published. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two

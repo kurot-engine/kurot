@@ -1,0 +1,11 @@
+# updateCacheTexture
+
+Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+
+```ts
+updateCacheTexture(): void;
+```
+
+Inherited from `updateCacheTexture`; shown with this receiver's substituted types.
+
+Marks cached content for regeneration on the next render.

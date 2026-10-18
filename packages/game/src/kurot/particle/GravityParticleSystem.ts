@@ -5,6 +5,11 @@ import { ParticleSystem } from './ParticleSystem.js';
 
 // ── Particle config (JSON format from Particle Designer) ────────────────────────
 
+/**
+ * Configuration accepted by GravityParticleSystem. Although several fields
+ * are optional in the declaration, maxParticles must be positive in a usable
+ * emitter. Lifespan values use milliseconds; emitter positions are local.
+ */
 export interface ParticleConfig {
 	emitter: { x?: number; y?: number };
 	emitterVariance: { x?: number; y?: number };
@@ -46,6 +51,12 @@ function getValue(value: unknown): number {
 
 // ── GravityParticleSystem ─────────────────────────────────────────────────────
 
+/**
+ * Particle Designer-style gravity emitter. Configuration must supply a
+ * positive maxParticles; omission produces an invalid emission interval.
+ * Lifetime and emission timing use milliseconds. Stop with clear=true
+ * before releasing a game view and its shared texture.
+ */
 export class GravityParticleSystem extends ParticleSystem {
 	// ── Private fields ────────────────────────────────────────────────────────
 

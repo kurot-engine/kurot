@@ -1,5 +1,10 @@
 import { Particle } from './Particle.js';
 
+/**
+ * Particle state extended with gravity, velocity and acceleration values.
+ * Instances are pooled by GravityParticleSystem and should not be retained
+ * after the owning system recycles them.
+ */
 export class GravityParticle extends Particle {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

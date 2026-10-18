@@ -81,9 +81,18 @@ export const enum RenderObjectType {
 	BITMAP_TEXT = 7,
 }
 
+/**
+ * Base scene-graph node with logical coordinates, transforms and events.
+ * Removing a node from its parent does not release resources, application
+ * listeners or Tweens. Centered flipX/flipY are independent of authored scale.
+ */
 export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
+	/**
+	 * Initial touchEnabled copied by newly constructed display objects; false by
+	 * default. Changing this value does not update existing objects.
+	 */
 	static defaultTouchEnabled = false;
 	static $enterFrameCallBackList: DisplayObject[] = [];
 	static $renderCallBackList: DisplayObject[] = [];
@@ -169,10 +178,18 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Retained drawing commands when the subclass provides Graphics. Base nodes
+	 * return undefined; use Shape or Sprite for vector drawing.
+	 */
 	public get graphics(): Graphics | undefined {
 		return this._graphics;
 	}
 
+	/**
+	 * Application lookup name, initially ''. Names need not be unique; a parent's
+	 * getChildByName() returns its first matching direct child.
+	 */
 	public get name(): string {
 		return this._name;
 	}
@@ -180,9 +197,17 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this._name = value;
 	}
 
+	/**
+	 * Current direct container, or undefined while detached. Use container
+	 * add/remove methods to change ownership; detachment does not dispose the node.
+	 */
 	public get parent(): DisplayObjectContainer | undefined {
 		return this.$parent;
 	}
+	/**
+	 * Stage reached through the current display tree, or undefined off stage.
+	 * An off-stage object may still have active application listeners or Tweens.
+	 */
 	public get stage(): Stage | undefined {
 		return this.$stage;
 	}
@@ -198,6 +223,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setMatrix(value);
 	}
 
+	/**
+	 * Horizontal translation in parent-local logical units; defaults to 0.
+	 * CSS canvas pixels and physical texture pixels use different coordinate spaces.
+	 */
 	public get x(): number {
 		return this.$x;
 	}
@@ -205,6 +234,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setX(value);
 	}
 
+	/**
+	 * Vertical translation in parent-local logical units; defaults to 0.
+	 * Use localToGlobal()/globalToLocal() when crossing display coordinate spaces.
+	 */
 	public get y(): number {
 		return this.$y;
 	}
@@ -212,6 +245,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setY(value);
 	}
 
+	/**
+	 * Horizontal dimensionless scale, initially 1. A negative value reflects about
+	 * the authored anchor; flipX separately reflects about the content center.
+	 */
 	public get scaleX(): number {
 		return this._scaleX;
 	}
@@ -219,6 +256,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setScaleX(value);
 	}
 
+	/**
+	 * Vertical dimensionless scale, initially 1. A negative value reflects about
+	 * the authored anchor; flipY separately reflects about the content center.
+	 */
 	public get scaleY(): number {
 		return this._scaleY;
 	}
@@ -256,6 +297,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markTransformDirty();
 	}
 
+	/**
+	 * Clockwise rotation in degrees, initially 0. Assignment normalizes the angle
+	 * into the engine's rotation interval; this property does not take radians.
+	 */
 	public get rotation(): number {
 		return this._rotation;
 	}
@@ -263,6 +308,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setRotation(value);
 	}
 
+	/**
+	 * Horizontal skew angle in degrees, initially 0. Unlike Matrix angle helpers,
+	 * display-object skew properties do not take radians.
+	 */
 	public get skewX(): number {
 		return this._skewXdeg;
 	}
@@ -270,6 +319,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setSkewX(value);
 	}
 
+	/**
+	 * Vertical skew angle in degrees, initially 0. Rotation and skew contribute
+	 * together to the authored affine transform.
+	 */
 	public get skewY(): number {
 		return this._skewYdeg;
 	}
@@ -277,6 +330,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setSkewY(value);
 	}
 
+	/**
+	 * Unscaled logical width: measured content unless explicitly assigned.
+	 * NaN restores automatic measurement. Base assignment records an explicit size;
+	 * subclasses such as Bitmap, TextField and UI define how that size affects drawing.
+	 */
 	public get width(): number {
 		return isNaN(this.$explicitWidth) ? this.$getOriginalBounds().width : this.$explicitWidth;
 	}
@@ -284,6 +342,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$explicitWidth = isNaN(value) ? NaN : value;
 	}
 
+	/**
+	 * Unscaled logical height: measured content unless explicitly assigned.
+	 * NaN restores automatic measurement; changing this value does not change scaleY.
+	 * Subclasses define how an explicit height constrains or draws their content.
+	 */
 	public get height(): number {
 		return isNaN(this.$explicitHeight) ? this.$getOriginalBounds().height : this.$explicitHeight;
 	}
@@ -291,13 +354,25 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$explicitHeight = isNaN(value) ? NaN : value;
 	}
 
+	/**
+	 * Read-only unscaled content-bound width in local logical units, independent
+	 * of an explicitly assigned width. This is not a transformed screen-space width.
+	 */
 	public get measuredWidth(): number {
 		return this.$getOriginalBounds().width;
 	}
+	/**
+	 * Read-only unscaled content-bound height in local logical units, independent
+	 * of an explicitly assigned height or the object's rotation and scale.
+	 */
 	public get measuredHeight(): number {
 		return this.$getOriginalBounds().height;
 	}
 
+	/**
+	 * Horizontal origin offset in local logical units, initially 0. This is an
+	 * absolute distance, not a normalized fraction of width.
+	 */
 	public get anchorOffsetX(): number {
 		return this.$anchorOffsetX;
 	}
@@ -305,6 +380,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setAnchorOffsetX(value);
 	}
 
+	/**
+	 * Vertical origin offset in local logical units, initially 0. This is an
+	 * absolute distance, not a normalized fraction of height.
+	 */
 	public get anchorOffsetY(): number {
 		return this.$anchorOffsetY;
 	}
@@ -312,6 +391,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setAnchorOffsetY(value);
 	}
 
+	/**
+	 * Whether this node/subtree participates in drawing and normal hit testing;
+	 * true by default. Hiding does not stop ticker callbacks, timers or Tweens.
+	 */
 	public get visible(): boolean {
 		return this.$visible;
 	}
@@ -319,6 +402,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setVisible(value);
 	}
 
+	/**
+	 * Alias for cacheAsTexture(true/false), initially false. Disabling releases
+	 * this node's display-list cache, not textures owned by application resources.
+	 */
 	public get cacheAsBitmap(): boolean {
 		return this.isCachedAsTexture;
 	}
@@ -327,7 +414,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	}
 
 	/**
-	 * Caches this display subtree as a reusable texture.
+	 * Enables a Canvas-rasterized subtree cache, or releases it when value is false.
+	 * true uses the default cache options; an options object configures resolution
+	 * and scale mode. GPU-only custom effects are not captured by this Canvas path.
+	 * Release with false when the owning view no longer needs the cache.
 	 */
 	public cacheAsTexture(value: boolean | CacheAsTextureOptions): void {
 		if (value === false) {
@@ -350,10 +440,19 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$cacheDirtyUp();
 	}
 
+	/**
+	 * Whether a display-list texture cache currently exists, initially false.
+	 * The cache uses Canvas capture even when the application renders with WebGL.
+	 */
 	public get isCachedAsTexture(): boolean {
 		return !!this.$displayList;
 	}
 
+	/**
+	 * Ordered filter list, initially empty. Assignment copies the list and
+	 * updates filter attachment; reassign after changing its membership. Application
+	 * resource ownership is not transferred when a filter is attached or removed.
+	 */
 	public get filters(): Filter[] {
 		return this.$filters;
 	}
@@ -369,6 +468,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markDirty();
 	}
 
+	/**
+	 * Opacity multiplier, initially 1; author values in [0, 1]. The setter stores
+	 * the supplied number without clamping. Alpha <= 0 suppresses rendering but is
+	 * not a way to unregister input or application callbacks.
+	 */
 	public get alpha(): number {
 		return this.$alpha;
 	}
@@ -376,6 +480,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setAlpha(value);
 	}
 
+	/**
+	 * Whether this node can be selected as a touch target; copied from
+	 * DisplayObject.defaultTouchEnabled (false initially). This does not control
+	 * touchable descendants; containers expose touchChildren separately.
+	 */
 	public get touchEnabled(): boolean {
 		return this.$touchEnabled;
 	}
@@ -383,6 +492,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$touchEnabled = !!value;
 	}
 
+	/**
+	 * Optional logical viewport. Its width/height clip at local (0, 0), while x/y
+	 * scroll content. Assignment copies the rectangle; reassign after editing it.
+	 * Assign undefined to clear the viewport.
+	 */
 	public get scrollRect(): Rectangle | undefined {
 		return this.$scrollRect;
 	}
@@ -390,6 +504,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setScrollRect(value);
 	}
 
+	/**
+	 * Canvas composite-operation name; defaults to 'source-over'. Unknown names
+	 * fall back to normal blending instead of throwing. Use BlendMode constants.
+	 */
 	public get blendMode(): string {
 		return numberToBlendMode(this.$blendMode);
 	}
@@ -403,6 +521,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markDirty();
 	}
 
+	/**
+	 * Optional DisplayObject or logical Rectangle clipping mask, initially
+	 * undefined. Assign undefined to detach it. A display mask is shared by at most
+	 * one masked object; assigning it elsewhere transfers that mask association.
+	 */
 	public get mask(): DisplayObject | Rectangle | undefined {
 		return this.$mask ?? this.$maskRect;
 	}
@@ -410,6 +533,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$setMask(value);
 	}
 
+	/**
+	 * Multiplicative RGB color, initially 0xffffff (white). Values outside
+	 * [0, 0xffffff] or non-numeric values reset to white; this does not set alpha.
+	 */
 	public get tint(): number {
 		return this._tint;
 	}
@@ -419,6 +546,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markTransformDirty();
 	}
 
+	/**
+	 * Relative sibling draw-order value, initially 0. Assignment marks the parent
+	 * for sorting; automatic sorting requires parent.sortableChildren = true.
+	 */
 	public get zIndex(): number {
 		return this._zIndex;
 	}
@@ -429,6 +560,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		}
 	}
 
+	/**
+	 * Whether the renderer automatically orders container children by zIndex;
+	 * false by default. Equal zIndex values retain their current list order.
+	 */
 	public get sortableChildren(): boolean {
 		return this._sortableChildren;
 	}
@@ -438,6 +573,11 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Returns local logical content bounds, optionally writing into resultRect.
+	 * calculateAnchor defaults to true and subtracts anchor offsets. Omit the
+	 * result rectangle to allocate one; bounds do not include the parent's transform.
+	 */
 	public getBounds(resultRect?: Rectangle, calculateAnchor = true): Rectangle {
 		resultRect = this.$getTransformedBoundsInternal(this, resultRect);
 		if (calculateAnchor) {
@@ -451,18 +591,38 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return resultRect;
 	}
 
+	/**
+	 * Returns an axis-aligned logical bounding box in targetCoordinateSpace.
+	 * Rotation/skew can enlarge the box. A supplied resultRect is overwritten and
+	 * returned; otherwise a new rectangle is allocated.
+	 */
 	public getTransformedBounds(targetCoordinateSpace: DisplayObject, resultRect?: Rectangle): Rectangle {
 		return this.$getTransformedBoundsInternal(targetCoordinateSpace ?? this, resultRect);
 	}
 
+	/**
+	 * Converts logical stage coordinates to this object's local coordinates,
+	 * including ancestors, anchors and scrolling. Defaults to stage (0, 0).
+	 * Writes into resultPoint when supplied; browser client coordinates need conversion first.
+	 */
 	public globalToLocal(stageX = 0, stageY = 0, resultPoint?: Point): Point {
 		return this.$getInvertedConcatenatedMatrix().transformPoint(stageX, stageY, resultPoint);
 	}
 
+	/**
+	 * Converts local logical coordinates to logical stage coordinates, including
+	 * ancestors, anchors and scrolling. Inputs default to (0, 0); resultPoint is
+	 * reused when supplied. The result is not a browser client-pixel position.
+	 */
 	public localToGlobal(localX = 0, localY = 0, resultPoint?: Point): Point {
 		return this.$getConcatenatedMatrix().transformPoint(localX, localY, resultPoint);
 	}
 
+	/**
+	 * Tests a point in logical stage coordinates. By default tests bounds and
+	 * rectangular clipping; shapeFlag = true additionally uses display hit testing.
+	 * A zero scale returns false. The bounds-only path is not an input-enabled check.
+	 */
 	public hitTestPoint(x: number, y: number, shapeFlag?: boolean): boolean {
 		if (this._scaleX === 0 || this._scaleY === 0) {
 			return false;
@@ -484,10 +644,19 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return this.$hitTest(x, y) !== undefined;
 	}
 
+	/**
+	 * Clears this node's sort-dirty marker. DisplayObject has no child list;
+	 * DisplayObjectContainer overrides this to perform a stable zIndex sort.
+	 */
 	public sortChildren(): void {
 		this.$sortDirty = false;
 	}
 
+	/**
+	 * Dispatches synchronously; bubbling events traverse display ancestors through
+	 * capture, target and bubble phases. Returns false when default is prevented.
+	 * Do not retain pooled event instances after their dispatch owner releases them.
+	 */
 	public override dispatchEvent(event: Event): boolean {
 		if (!event.bubbles) {
 			return super.dispatchEvent(event);
@@ -499,6 +668,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return !event.isDefaultPrevented();
 	}
 
+	/**
+	 * Whether this node or any current ancestor has a listener for the event type.
+	 * This checks the current tree; it does not dispatch an event or register a listener.
+	 */
 	public override willTrigger(type: string): boolean {
 		let node: DisplayObject | undefined = this;
 		while (node) {

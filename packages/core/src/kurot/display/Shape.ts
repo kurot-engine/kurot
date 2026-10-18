@@ -2,6 +2,10 @@ import { Rectangle } from '../geom/Rectangle.js';
 import { DisplayObject, RenderObjectType } from './DisplayObject.js';
 import { Graphics } from './Graphics.js';
 
+/**
+ * A display node with retained vector Graphics and no child container.
+ * Draw in local logical units; clear graphics explicitly when replacing paths.
+ */
 export class Shape extends DisplayObject {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

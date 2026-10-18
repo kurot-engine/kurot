@@ -1,0 +1,34 @@
+name: API documentation
+
+on:
+  pull_request:
+    paths:
+      - packages/core/**
+      - packages/game/**
+      - packages/ui/**
+      - tools/api-docs/**
+      - .github/workflows/api-docs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --global pnpm@10.33.0
+      - run: pnpm --dir packages/core install --frozen-lockfile
+      - run: pnpm --dir packages/game install --frozen-lockfile
+      - run: pnpm --dir packages/ui install --frozen-lockfile
+      - run: pnpm --dir tools/api-docs install --frozen-lockfile
+      - run: pnpm --dir packages/core build
+      - run: pnpm --dir packages/game build
+      - run: pnpm --dir packages/ui build
+      - run: pnpm --dir tools/api-docs verify
+      - run: git diff --check

@@ -56,7 +56,10 @@ correctness and performance validation system.
 
 ## Packages and dependencies
 
-Version audit: 2026-10-12. The table records source manifest versions;
+Version audit: 2026-10-18. The table records source manifest versions. Core
+2.5.5, Game 2.0.1 and UI 3.6.1 are prepared documentation-only patches and are
+not published. Dependency requirements and consumer locks remain unchanged.
+Earlier publication evidence follows:
 Core 2.5.4 is published and verified on 2026-10-12; consumer adoption is explicit.
 Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField,
 BitmapText and their UI text components default to middle. Explicit top/bottom
@@ -80,9 +83,9 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 2.5.4   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.6.0   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
-| [`@kurot/game`](packages/game/README.md)               | 2.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
+| [`@kurot/core`](packages/core/README.md)               | 2.5.5   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.6.1   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/game`](packages/game/README.md)               | 2.0.1   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
 | [`@kurot/cli`](packages/cli/README.md)                 | 3.6.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.1  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.10.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
@@ -193,9 +196,9 @@ Current manifest dependency ranges:
 
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
-| Core 2.5.4        | bitmap-font `^0.1.0`                              |
-| UI 3.6.0          | Core `^2.5.2`                                     |
-| Game 2.0.0        | Core `^2.0.0`                                     |
+| Core 2.5.5        | bitmap-font `^0.1.0`                              |
+| UI 3.6.1          | Core `^2.5.2`                                     |
+| Game 2.0.1        | Core `^2.0.0`                                     |
 | CLI 3.6.0         | ui-document `^0.13.0`                             |
 | ui-runtime 0.10.0 | Core `^2.4.0`, UI `^3.4.0`, ui-document `^0.13.0` |
 | dragonbones 0.1.0 | Core `^2.1.1`                                     |
@@ -398,6 +401,7 @@ are mapped through `ui.namespaces` or discovered through `ui.components` in
 
 ## Examples
 
+- [`examples/star-catcher`](examples/star-catcher/README.md): a complete Core-only game with keyboard/touch input, score, game over, restart, cleanup and one-command development/release verification. Start with the [game-authoring quick guide](packages/core/docs/game-authoring.md).
 - [`examples/demo`](examples/demo/): a minimal CLI-built rendering and engine integration example.
 - [`examples/game`](examples/game/): a CLI-built game project example with KUI XML skins.
 

@@ -12,19 +12,37 @@ import { CanvasRenderer, CanvasBuffer } from './canvas/index.js';
 import type { KurotOptions } from './KurotOptions.js';
 import { Capabilities } from '../system/Capabilities.js';
 
+/**
+ * Owns one Player, its stage, canvas input and browser lifecycle bindings.
+ * Only one live Kurot application is supported at a time.
+ */
 export interface KurotApp {
 	player: Player;
 	stage: Stage;
 	touchHandler: TouchHandler;
 	screenAdapter: ScreenAdapter;
+	/**
+	 * Starts rendering and optionally attaches the root display object.
+	 * Throws after destroy(); create a new application to mount again.
+	 */
 	start(root?: DisplayObject): void;
+	/**
+	 * Stops this Player without releasing input or lifecycle bindings.
+	 * Application-owned ticker callbacks and Tweens require their own cleanup.
+	 */
 	stop(): void;
+	/**
+	 * Idempotently destroys the Player and detaches canvas input, sizing and
+	 * lifecycle bindings. Remove application-owned handlers, ticker callbacks
+	 * and Tweens separately; this does not dispose every resource in a scene.
+	 */
 	destroy(): void;
 }
 
 /**
  * Creates and initializes a Kurot player from the given options.
  * This is the main entry point for starting a Kurot application.
+ * Use a single live application and call destroy() when its page/view closes.
  *
  * ```ts
  * import { createPlayer, Sprite } from '@kurot/core';

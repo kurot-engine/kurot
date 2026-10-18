@@ -40,7 +40,8 @@ export class MovieClipData {
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
 	/**
-	 * Fixed-rate timing metadata used by factories and external schedulers.
+	 * Frames-per-second metadata; defaults to 24. Must be finite and positive or
+	 * throws RangeError. MovieClip does not schedule frames from this value itself.
 	 */
 	public get frameRate(): number {
 		return this._frameRate;
@@ -71,10 +72,13 @@ export class MovieClipData {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Append a frame to the animation.
-	 * @param texture Texture to display; undefined creates a blank frame.
-	 * @param duration Timing metadata in milliseconds for an external scheduler.
-	 * @param label Optional label beginning at this 0-based frame index.
+	 * Append a borrowed texture and positive, finite duration in milliseconds.
+	 * Undefined texture creates a blank frame. Textures remain owned by their resource
+	 * owner; appending does not copy or dispose them.
+	 * @param texture Borrowed texture, or undefined for a blank frame.
+	 * @param duration External scheduling metadata; invalid values throw RangeError.
+	 * @param label Optional label for this new 0-based index. An empty string is
+	 * ignored; a truthy but whitespace-only label throws RangeError.
 	 */
 	public addFrame(texture: Texture | undefined, duration: number, label?: string): void {
 		const index = this._frames.length;
@@ -85,10 +89,12 @@ export class MovieClipData {
 	}
 
 	/**
-	 * Add or replace a named, inclusive playback range.
-	 * @param name Label name.
-	 * @param startFrame 0-based first frame in the range.
-	 * @param endFrame 0-based final frame in the range; defaults to startFrame.
+	 * Add or replace an inclusive label range, using 0-based integer indices.
+	 * Unlike MovieClip's navigation methods, these indices are not 1-based.
+	 * @param name Non-blank label name.
+	 * @param startFrame First frame, within the existing frame array.
+	 * @param endFrame Last frame, defaulting to startFrame.
+	 * @throws RangeError For blank names, invalid indices or endFrame before startFrame.
 	 */
 	public setFrameLabel(name: string, startFrame: number, endFrame: number = startFrame): void {
 		_validateLabelName(name);
@@ -111,7 +117,8 @@ export class MovieClipData {
 	}
 
 	/**
-	 * Set a custom event name to dispatch when a specific frame becomes current.
+	 * Assign a non-blank event name to a 0-based frame. The clip dispatches it when
+	 * that frame is applied. Invalid indices or blank event names throw RangeError.
 	 */
 	public setFrameEvent(frameIndex: number, eventName: string): void {
 		_validateFrameIndex(frameIndex, this._frames.length, 'MovieClip frame index');
@@ -165,7 +172,9 @@ export class MovieClipData {
 	// ── Static factories ──────────────────────────────────────────────────────
 
 	/**
-	 * Create fixed-rate frame data from an array of textures.
+	 * Create frame data borrowing the supplied textures. fps defaults to 12 frames
+	 * per second; each frame receives duration 1000 / fps milliseconds. Non-positive
+	 * or non-finite fps throws RangeError. The caller still owns the textures.
 	 */
 	public static fromTextureArray(textures: Texture[], fps = 12): MovieClipData {
 		const frameRate = _validatePositiveFinite(fps, 'MovieClip factory fps');
@@ -179,7 +188,9 @@ export class MovieClipData {
 	}
 
 	/**
-	 * Create fixed-rate frame data from a SpriteSheet and frame-name list.
+	 * Create frame data from named borrowed atlas textures. fps defaults to 12 frames
+	 * per second and must be finite and positive, or throws RangeError. Missing
+	 * textures become blank frames; this does not load assets or dispose the sheet.
 	 */
 	public static fromSpriteSheet(
 		sheet: { getTexture(name: string): Texture | undefined },

@@ -13,6 +13,7 @@ test-results/
 bin-debug/
 bin-release/
 coverage/
+tools/api-docs/site/
 *.tsbuildinfo
 
 # Generated Agent Eval results (keep the directory documentation)

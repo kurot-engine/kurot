@@ -3,6 +3,11 @@ import { Rectangle, sharedRectangle } from '../geom/Rectangle.js';
 import { DisplayObject } from './DisplayObject.js';
 import type { Stage } from './Stage.js';
 
+/**
+ * Owns an ordered list of display children and propagates stage events.
+ * Reparenting moves a child from its previous parent; removal does not imply
+ * resource disposal. WebGL render groups affect batching, not Canvas pixels.
+ */
 export class DisplayObjectContainer extends DisplayObject {
 	// ── Declare fields ─────────────────────────────────────────────────────────
 
@@ -30,10 +35,17 @@ export class DisplayObjectContainer extends DisplayObject {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Number of direct children, initially 0; descendants are not counted.
+	 */
 	public get numChildren(): number {
 		return this.$children.length;
 	}
 
+	/**
+	 * Whether a hit child remains the input target, true by default. When false,
+	 * child hits are retargeted to this container; they are not individually disposed.
+	 */
 	public get touchChildren(): boolean {
 		return this._touchChildren;
 	}
@@ -43,12 +55,22 @@ export class DisplayObjectContainer extends DisplayObject {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Parents a child at the top of this container's list and returns it.
+	 * Automatically detaches it from its previous parent. Re-adding an existing
+	 * child moves it to the top; listeners and resources stay owned by the child/view.
+	 */
 	public addChild(child: DisplayObject): DisplayObject {
 		let index = this.$children.length;
 		if (child.$parent === this) index--;
 		return this.doAddChild(child, index);
 	}
 
+	/**
+	 * Parents a child at a zero-based list index and returns it. The index is
+	 * integer-coerced; out-of-range values append rather than throw. Reparenting
+	 * detaches the previous parent without disposing the child.
+	 */
 	public addChildAt(child: DisplayObject, index: number): DisplayObject {
 		index = +index | 0;
 		const len = this.$children.length;
@@ -59,6 +81,10 @@ export class DisplayObjectContainer extends DisplayObject {
 		return this.doAddChild(child, index);
 	}
 
+	/**
+	 * Whether child is this container itself or any of its descendants.
+	 * This is a recursive ancestry check, not only a direct-child lookup.
+	 */
 	public contains(child: DisplayObject): boolean {
 		let current: DisplayObject | undefined = child;
 		while (current) {
@@ -70,25 +96,45 @@ export class DisplayObjectContainer extends DisplayObject {
 		return false;
 	}
 
+	/**
+	 * Returns the child at a zero-based index, or undefined outside the list.
+	 */
 	public getChildAt(index: number): DisplayObject | undefined {
 		index = +index | 0;
 		return this.$children[index];
 	}
 
+	/**
+	 * Returns the child's zero-based direct-list index, or -1 when absent.
+	 * A descendant nested in another container is not a direct child.
+	 */
 	public getChildIndex(child: DisplayObject): number {
 		return this.$children.indexOf(child);
 	}
 
+	/**
+	 * Returns the first direct child with the given name, or undefined.
+	 * This does not search nested containers or require unique names.
+	 */
 	public getChildByName(name: string): DisplayObject | undefined {
 		return this.$children.find(c => c.name === name);
 	}
 
+	/**
+	 * Detaches a direct child and returns it, or returns undefined when absent.
+	 * Removal emits display/stage events but does not stop its application callbacks,
+	 * remove all listeners, or destroy its textures.
+	 */
 	public removeChild(child: DisplayObject): DisplayObject | undefined {
 		const index = this.$children.indexOf(child);
 		if (index >= 0) return this.doRemoveChild(index);
 		return undefined;
 	}
 
+	/**
+	 * Detaches the child at a zero-based index, or returns undefined when absent.
+	 * This does not destroy its textures, listeners or application callbacks.
+	 */
 	public removeChildAt(index: number): DisplayObject | undefined {
 		index = +index | 0;
 		if (index >= 0 && index < this.$children.length) {
@@ -97,12 +143,21 @@ export class DisplayObjectContainer extends DisplayObject {
 		return undefined;
 	}
 
+	/**
+	 * Detaches every child and returns no removed array. Resource and callback
+	 * cleanup remains the responsibility of each child/view owner.
+	 */
 	public removeChildren(): void {
 		for (let i = this.$children.length - 1; i >= 0; i--) {
 			this.doRemoveChild(i);
 		}
 	}
 
+	/**
+	 * Moves an existing direct child within the list. The index is integer-coerced;
+	 * out-of-range values use the last position. A child outside this container is
+	 * ignored rather than reparented.
+	 */
 	public setChildIndex(child: DisplayObject, index: number): void {
 		index = +index | 0;
 		const len = this.$children.length;
@@ -112,6 +167,10 @@ export class DisplayObjectContainer extends DisplayObject {
 		this.doSetChildIndex(child, index);
 	}
 
+	/**
+	 * Exchanges two direct children. If either is absent, does nothing; resource
+	 * ownership and callback registrations are unchanged.
+	 */
 	public swapChildren(child1: DisplayObject, child2: DisplayObject): void {
 		const i1 = this.$children.indexOf(child1);
 		const i2 = this.$children.indexOf(child2);
@@ -120,6 +179,10 @@ export class DisplayObjectContainer extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Exchanges two zero-based direct-child positions after integer coercion.
+	 * An out-of-range index is ignored rather than throwing.
+	 */
 	public swapChildrenAt(index1: number, index2: number): void {
 		index1 = +index1 | 0;
 		index2 = +index2 | 0;
@@ -129,6 +192,10 @@ export class DisplayObjectContainer extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Sorts direct children by increasing zIndex while preserving equal-value
+	 * order. Calling this explicitly sorts even when sortableChildren is false.
+	 */
 	public override sortChildren(): void {
 		super.sortChildren();
 		this.$sortDirty = false;

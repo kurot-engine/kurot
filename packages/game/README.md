@@ -2,9 +2,12 @@
 
 Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Current release: 2.0.0.** Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 2.0.1 (prepared, not published).** Documentation-only patch over 2.0.0. Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
 
 ## Installation
+
+Until 2.0.1 is published, install the published baseline below and read the new
+reference from the repository. Core peer/dev requirements and locks are unchanged.
 
 ```bash
 pnpm add @kurot/game@^2.0.0 @kurot/core@^2.1.1
@@ -21,6 +24,25 @@ string-valued `subkeys` in Kurot Editor before launch. See the
 [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
 For the full list of changes in this release, see [CHANGELOG.md](./CHANGELOG.md).
+
+## Documentation
+
+For API lookup, open [capability topics](docs/api/topics.md) or the
+[symbol index](docs/api/index.md), then read only the needed member pages.
+[Coverage](docs/api/coverage.md) records signatures and remaining comment gaps
+separately. This generated reference and its compiled examples are included in
+the prepared 2.0.1 patch; registry Game 2.0.0 remains unchanged. Runtime code,
+signatures and exports are unchanged, so no application migration is required.
+
+Start with the usage examples below. For scheduling, ownership and module
+details, read [architecture](docs/architecture.md); contributors can use the
+[AI context map](docs/ai-context.md) before exploring source. Installed packages
+provide public signatures through `dist/index.d.ts` and its re-exported types.
+Source paths in the context map refer to the engine repository.
+
+The prepared 2.0.1 patch includes `docs/` in its package artifact. The already
+published Game 2.0.0 artifact omits that directory; use the repository docs for
+that installation. This packaging correction has not been published.
 
 ## Tween
 

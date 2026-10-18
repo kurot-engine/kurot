@@ -57,6 +57,10 @@ export class SoundChannel extends EventDispatcher {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Playback gain in [0, 1], initially 1. Assignments clamp to that interval.
+	 * Changing one channel does not change other channels created by the Sound.
+	 */
 	public get volume(): number {
 		return this._volume;
 	}
@@ -66,6 +70,11 @@ export class SoundChannel extends EventDispatcher {
 		if (this._audio) this._audio.volume = this._volume;
 	}
 
+	/**
+	 * Playback offset in seconds within the current audio iteration, initially
+	 * the requested start offset. Web Audio wraps on repeats and reports duration
+	 * at finite completion. Manual HTML stop resets its reported position to 0.
+	 */
 	public get position(): number {
 		if (this._context && this._audioBuffer) {
 			if (this._stopped) return this._endPosition;
@@ -80,6 +89,11 @@ export class SoundChannel extends EventDispatcher {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Idempotently stops this channel and releases its active audio nodes or
+	 * HTML playback handler. Manual stop suppresses SOUND_COMPLETE. The loaded
+	 * Sound and other channels remain usable; stop every channel owned by the view.
+	 */
 	public stop(): void {
 		if (this._stopped) return;
 		this._stopped = true;

@@ -106,6 +106,11 @@ resource loading, and an editable HTML template. Fonts load before creating UI;
 translations register after preload. The `empty` template contains a minimal
 `Sprite` application without UI/style/language dependencies.
 
+The unreleased checkout adds project README and AGENTS files to both templates.
+They route gameplay work to installed SDK guides/types, document startup and
+build checks, and distinguish authored files from generated output. Published
+CLI 3.6.0 templates are unchanged until a new release is explicitly prepared.
+
 CLI 3.6.0 supplies rounded Kurot-owned textures,
 native `.kui.xml` component states and resource-default nine-slice grids under
 `resource/assets/ui/kui`. See [default KUI skins](docs/default-ui-skins.md).

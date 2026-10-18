@@ -1,0 +1,40 @@
+{
+	"format": "kurot-doc-comparison-v1",
+	"experiment": "gameplay-extension-v2",
+	"model": "gpt-6.1-sol",
+	"reasoningEffort": "medium",
+	"codexVersion": "codex-cli 0.163.0",
+	"baselineRevision": "2a7176c",
+	"contextManifestSha256": "448f8b52fcde44058723e011d4f9ceeeedf7dc2fd7f67900e5f83dd727868273",
+	"trialsPerArm": 5,
+	"maxRepairRounds": 2,
+	"modelTimeoutMs": 600000,
+	"concurrency": 2,
+	"tasks": [
+		"resources",
+		"tween",
+		"kui"
+	],
+	"sdk": {
+		"@kurot/core": "2.5.4",
+		"@kurot/game": "2.0.0",
+		"@kurot/ui": "3.1.0",
+		"@kurot/ui-document": "0.13.0",
+		"@kurot/cli": "3.3.1",
+		"typescript": "5.9.3",
+		"tsx": "4.21.0"
+	},
+	"order": [
+		"old",
+		"new",
+		"new",
+		"old",
+		"old",
+		"new",
+		"new",
+		"old",
+		"old",
+		"new"
+	],
+	"oracleRevision": 2
+}

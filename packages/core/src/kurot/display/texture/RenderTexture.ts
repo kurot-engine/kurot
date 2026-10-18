@@ -11,6 +11,11 @@ type RenderFunction = (
 	offsetY: number,
 ) => HTMLCanvasElement;
 
+/**
+ * A Texture backed by a Canvas capture of a display subtree.
+ * Capture uses the Canvas rendering path; GPU-only custom filters are not
+ * included. Dispose the capture when its owning view releases it.
+ */
 export class RenderTexture extends Texture {
 	// ── Static fields ─────────────────────────────────────────────────────────
 

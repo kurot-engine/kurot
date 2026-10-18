@@ -8,8 +8,12 @@
 		"build": "tsc --build",
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist coverage",
-		"test": "vitest run",
-		"test:watch": "vitest"
+		"test": "vitest run --exclude \"reports/**\" --exclude \"test/oracle.test.ts\"",
+		"test:oracle": "vitest run test/oracle.test.ts --exclude \"reports/**\"",
+		"compare:docs": "node --import ../../examples/star-catcher/node_modules/tsx/dist/loader.mjs src/comparison/run.ts",
+		"calibrate:suite": "node --import ../../examples/star-catcher/node_modules/tsx/dist/loader.mjs src/suite/calibrate.ts",
+		"compare:suite": "node --import ../../examples/star-catcher/node_modules/tsx/dist/loader.mjs src/suite/run.ts",
+		"test:watch": "vitest --exclude \"reports/**\" --exclude \"test/oracle.test.ts\""
 	},
 	"dependencies": {
 		"ajv": "^8.17.1",

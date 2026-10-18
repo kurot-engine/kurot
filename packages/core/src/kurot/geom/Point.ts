@@ -2,6 +2,11 @@ import { NumberUtils } from '../utils/NumberUtils.js';
 
 const pointPool: Point[] = [];
 
+/**
+ * Mutable two-dimensional logical coordinate/vector value.
+ * Pooled create()/release() and sharedPoint are temporary storage; clone
+ * values that must outlive the current calculation.
+ */
 export class Point {
 	// ── Static methods ────────────────────────────────────────────────────────
 

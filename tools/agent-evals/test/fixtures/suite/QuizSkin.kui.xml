@@ -1,0 +1,9 @@
+<Skin xmlns="https://kurot.dev/ui/1" class="QuizSkin" width="640" height="800">
+    <Rect width="640" height="800" fillColor="1324093" />
+    <Label id="scoreLabel" x="32" y="40" width="576" height="70" size="32" textColor="16777215" />
+    <Label id="promptLabel" x="32" y="110" width="576" height="60" size="24" textColor="16777215" />
+    <Button id="start" x="220" y="180" width="200" height="64" label="Start" skinName="ButtonSkin" />
+    <Button id="left" x="80" y="340" width="200" height="80" label="Left" skinName="ButtonSkin" />
+    <Button id="right" x="360" y="340" width="200" height="80" label="Right" skinName="ButtonSkin" />
+    <Button id="restart" x="220" y="560" width="200" height="64" label="Restart" skinName="ButtonSkin" />
+</Skin>

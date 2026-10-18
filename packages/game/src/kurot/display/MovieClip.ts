@@ -37,6 +37,11 @@ export class MovieClip extends Bitmap {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Borrowed animation data, initially undefined. Assigning data stops playback,
+	 * resets the frame/range and displays the first frame. Neither replacement nor
+	 * stage removal disposes shared frame textures or the external animation scheduler.
+	 */
 	public get movieClipData(): MovieClipData | undefined {
 		return this._data;
 	}
@@ -92,13 +97,11 @@ export class MovieClip extends Bitmap {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Start or resume playback from the current frame.
-	 *
-	 * Calling play does not schedule updates. The owning game loop must call
-	 * advanceFrame() whenever this clip should enter its next animation frame.
-	 *
-	 * @param playTimes -1 loops forever; 0 keeps the current setting; a positive
-	 * integer plays that many times.
+	 * Start or resume at the current frame. Does nothing if already playing or
+	 * there are no frames. No updates are scheduled: the game calls advanceFrame().
+	 * @param playTimes Total plays: -1 forever; 0 (default) preserves the previous
+	 * setting, initially 1; positive integers set a new count.
+	 * @throws RangeError If playTimes is not an integer of at least -1.
 	 */
 	public play(playTimes = 0): void {
 		_validatePlayTimes(playTimes);
@@ -149,7 +152,9 @@ export class MovieClip extends Bitmap {
 	}
 
 	/**
-	 * Stop playback and stay on the current frame.
+	 * Stop on the current frame without dispatching COMPLETE. Stage removal also
+	 * stops playback. The game must detach its own scheduler/listeners separately;
+	 * this method does not dispose borrowed frame data or textures.
 	 */
 	public stop(): void {
 		this._isPlaying = false;
@@ -172,14 +177,14 @@ export class MovieClip extends Bitmap {
 	}
 
 	/**
-	 * Jump to a frame or label and start a new playback session.
-	 *
-	 * A label plays only its declared inclusive frame range. A numeric frame
-	 * clears any active label range and plays through the full animation.
-	 *
-	 * @param frame 1-based frame number or a frame label string.
-	 * @param playTimes -1 loops forever; 0 keeps the current setting; a positive
-	 * integer plays that many times.
+	 * Jump to a frame/label and start a new session. Numeric frames use 1-based
+	 * indices, clamped to the available range. Labels play their inclusive range;
+	 * numeric navigation clears that range. With no frames, stops and returns.
+	 * @param frame Integer frame number or existing label.
+	 * @param playTimes Total plays: -1 forever, 0 (default) preserves the previous
+	 * setting (initially 1), or a positive integer.
+	 * @throws RangeError For invalid playTimes, or, when data exists, an unknown
+	 * label or non-integer frame number.
 	 */
 	public gotoAndPlay(frame: number | string, playTimes = 0): void {
 		_validatePlayTimes(playTimes);
@@ -196,8 +201,9 @@ export class MovieClip extends Bitmap {
 	}
 
 	/**
-	 * Jump to a frame or label and stop.
-	 * @param frame 1-based frame number or a frame label string.
+	 * Jump to a 1-based frame/label and stop, clearing any label playback range.
+	 * Integer indices clamp to the available range. With no frames, returns unchanged.
+	 * @throws RangeError For an unknown label or non-integer number when data exists.
 	 */
 	public gotoAndStop(frame: number | string): void {
 		const target = this._resolveFrame(frame);

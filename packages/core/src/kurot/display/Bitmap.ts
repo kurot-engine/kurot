@@ -11,9 +11,18 @@ export function setBitmapPixelHitTest(fn: (bitmap: Bitmap, localX: number, local
 	bitmapPixelHitTest = fn;
 }
 
+/**
+ * Displays a Texture without taking ownership of its lifetime.
+ * Assign undefined to texture to clear the image. Texture dimensions and
+ * nine-slice grids are logical units, independent of the canvas resolution.
+ */
 export class Bitmap extends DisplayObject {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
+	/**
+	 * Initial smoothing copied by new Bitmap instances, true by default.
+	 * Changing this value does not affect existing bitmaps.
+	 */
 	public static defaultSmoothing = true;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -50,6 +59,11 @@ export class Bitmap extends DisplayObject {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Texture reference, initially undefined. Assignment does not transfer
+	 * resource ownership; assigning undefined clears the image without disposing
+	 * the old texture or its shared BitmapData.
+	 */
 	public get texture(): Texture | undefined {
 		return this._texture;
 	}
@@ -57,6 +71,10 @@ export class Bitmap extends DisplayObject {
 		this.setTexture(value);
 	}
 
+	/**
+	 * Whether scaled texture sampling is smoothed; initially the value of
+	 * Bitmap.defaultSmoothing (true). Set false for nearest-neighbor pixel art.
+	 */
 	public get smoothing(): boolean {
 		return this._smoothing;
 	}
@@ -68,6 +86,10 @@ export class Bitmap extends DisplayObject {
 		this.$markDirty();
 	}
 
+	/**
+	 * How the texture fills explicit dimensions: 'scale' by default, or 'clip'
+	 * and 'repeat'. Nine-slice scaling is used only with 'scale'.
+	 */
 	public get fillMode(): BitmapFillMode {
 		return this._fillMode;
 	}
@@ -80,6 +102,11 @@ export class Bitmap extends DisplayObject {
 		this.$markDirty();
 	}
 
+	/**
+	 * Optional nine-slice rectangle in logical texture coordinates, initially
+	 * undefined. It is retained by reference; reassign after editing to invalidate
+	 * render data. Has an effect only when fillMode is 'scale'.
+	 */
 	public get scale9Grid(): Rectangle | undefined {
 		return this._scale9Grid;
 	}
@@ -89,6 +116,11 @@ export class Bitmap extends DisplayObject {
 		this.$markDirty();
 	}
 
+	/**
+	 * Whether bitmap hit testing consults the installed pixel-test callback;
+	 * false by default. With no callback, bounds hits remain accepted. This does
+	 * not enable touchEnabled by itself.
+	 */
 	public get pixelHitTest(): boolean {
 		return this._pixelHitTest;
 	}
@@ -96,6 +128,11 @@ export class Bitmap extends DisplayObject {
 		this._pixelHitTest = !!value;
 	}
 
+	/**
+	 * Drawn width in unscaled logical units, initially the texture frame width.
+	 * NaN restores automatic width; negative values are ignored. This resizes the
+	 * bitmap's fill region without changing scaleX.
+	 */
 	public override get width(): number {
 		return isNaN(this._explicitBitmapWidth) ? this.$getContentBounds().width : this._explicitBitmapWidth;
 	}
@@ -108,6 +145,11 @@ export class Bitmap extends DisplayObject {
 		this.$markDirty();
 	}
 
+	/**
+	 * Drawn height in unscaled logical units, initially the texture frame height.
+	 * NaN restores automatic height; negative values are ignored. This resizes the
+	 * bitmap's fill region without changing scaleY.
+	 */
 	public override get height(): number {
 		return isNaN(this._explicitBitmapHeight) ? this.$getContentBounds().height : this._explicitBitmapHeight;
 	}

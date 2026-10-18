@@ -6,22 +6,35 @@ The `?ui=1` route shows the default KUI skin kit, authored in
 rendering. Buttons, selected/disabled states, text input, ComboBox, TabBar,
 sliders, progress, panel closing and hidden-bar list scrolling are interactive.
 
-The current 2× skin kit needs published Core ^2.5.0; the registry
-lock still installs an older Core. Use an isolated source trial for now:
+## Run the example
+
+The lock installs registry Core 2.5.4, which supports the 2× skin kit. It also
+retains UI 3.1.0, Game 2.0.0, document 0.13.0 and CLI 3.3.1. These are this
+example's baseline, not the versions resolved by today's new-project template.
+
+For the ordinary scene, run from this directory:
 
 ```sh
-pnpm --dir packages/core build
-pnpm --dir packages/cli build
-pnpm --dir tools/default-ui-assets preview
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-The tool prints its trial directory under docs-internal. Run the repository CLI
-dev command from that directory and open its URL with `?ui=1`. The tool also
-creates a strict minified release directory for static serving. It binds checkout
-Core explicitly without changing this example's installation or registry lock.
-After Core 2.5.0 is explicitly installed here, ordinary
-builds can run directly in examples/game. Existing compatible dependency ranges
-need no incidental bump.
+For the current `?ui=1` gallery, use this checkout's CLI: its constructor-name
+preservation fixes default Theme lookup for controls such as Scroller. The
+example's installed CLI 3.3.1 predates that correction. From the repository root:
+
+```sh
+pnpm --dir packages/cli build
+cd examples/game
+node ../../packages/cli/dist/index.js dev
+```
+
+Open the printed URL with `?ui=1`; refresh manually after rebuilds. For one-shot
+checks, use the same CLI with `build` or `build --release`. It consumes this
+example's installed SDKs without changing dependencies or locks. Neither a Core
+source build nor an isolated source trial is needed for its installed Core.
+
+## Ownership
 
 Registry SDK versions remain controlled by this example's package.json and
 lockfile. StyleManager loads licensed project fonts before starting the scene.

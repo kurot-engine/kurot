@@ -58,9 +58,20 @@ export class Watcher {
 	/**
 	 * Creates and starts a Watcher for a property chain.
 	 * Returns `undefined` when the chain is empty.
+	 * Does not emit an initial callback; read getValue() or use Binding.bindHandler
+	 * for that behavior. Each defined chain host must implement IEventDispatcher
+	 * and notify PROPERTY_CHANGE. Call unwatch() when its owner closes; errors from
+	 * property access or handlers propagate rather than becoming an error event.
 	 *
 	 * ```ts
-	 * Watcher.watch(host, ['profile', 'name'], value => updateName(value));
+	 * import { EventDispatcher } from '@kurot/core';
+	 * import { Watcher, PropertyEvent } from '@kurot/ui';
+	 *
+	 * const host = Object.assign(new EventDispatcher(), { name: 'Player' });
+	 * const watcher = Watcher.watch(host, ['name'], value => console.log(value));
+	 * host.name = 'Ada';
+	 * PropertyEvent.dispatchPropertyEvent(host, 'name');
+	 * watcher?.unwatch();
 	 * ```
 	 */
 	public static watch(
@@ -78,11 +89,19 @@ export class Watcher {
 		return watcher;
 	}
 
+	/**
+	 * Return the current chain's leaf value, or undefined when a host/leaf is absent.
+	 * Reading does not dispatch a change or validate the value's runtime type.
+	 */
 	public getValue(): unknown {
 		if (this._next) return this._next.getValue();
 		return this._getHostPropertyValue();
 	}
 
+	/**
+	 * Replace the chain's handler and callback receiver. Does not immediately emit
+	 * the current value; call getValue() for an initial read. Handler errors propagate.
+	 */
 	public setHandler(handler: (value: unknown) => void, thisObject: unknown): void {
 		this._handler = handler;
 		this._thisObject = thisObject;
@@ -90,8 +109,9 @@ export class Watcher {
 	}
 
 	/**
-	 * Re-points this watcher at a new host.
-	 * Pass `undefined` to detach from the current host.
+	 * Detach old property-change subscriptions and point the chain at a new host.
+	 * Undefined detaches it. Does not immediately invoke the handler; unlike a plain
+	 * object, each defined host must implement the property-change dispatcher contract.
 	 */
 	public reset(newHost: IEventDispatcher | undefined): void {
 		if (this._host) {
@@ -109,6 +129,11 @@ export class Watcher {
 		}
 	}
 
+	/**
+	 * Detach property-change listeners throughout the chain and clear this watcher's
+	 * handler. Call on round/view disposal; removing a display object does not unwatch
+	 * manual bindings. Does not dispose the observed data or target.
+	 */
 	public unwatch(): void {
 		this.reset(undefined);
 		this._handler = undefined;

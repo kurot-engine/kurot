@@ -3,6 +3,11 @@ import { DisplayObjectContainer } from './DisplayObjectContainer.js';
 import { DisplayObject, RenderObjectType } from './DisplayObject.js';
 import { Graphics } from './Graphics.js';
 
+/**
+ * A display container that also owns retained Graphics.
+ * Use Shape when child parenting is unnecessary. Neither type owns the
+ * lifetime of resources referenced by its children.
+ */
 export class Sprite extends DisplayObjectContainer {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

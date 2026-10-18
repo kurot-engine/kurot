@@ -1,5 +1,9 @@
 import { Matrix, NumberUtils } from '@kurot/core';
 
+/**
+ * Mutable pooled particle state, including position, appearance and age.
+ * The owning ParticleSystem reinitializes instances when reusing them.
+ */
 export class Particle {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

@@ -58,6 +58,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Layout instance, initially undefined. First initialization installs BasicLayout
+	 * if none was assigned. Replacement detaches the old layout's target and attaches
+	 * the new one; do not share one layout instance between simultaneous groups.
+	 */
 	public get layout(): LayoutBase | undefined {
 		return this._layout;
 	}
@@ -71,14 +76,26 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Measured content extent in logical pixels, initially 0. This can exceed the
+	 * viewport width; it is maintained by the layout via setContentSize().
+	 */
 	public get contentWidth(): number {
 		return this._contentWidth;
 	}
 
+	/**
+	 * Measured content extent in logical pixels, initially 0. This can exceed the
+	 * viewport height; it is maintained by the layout via setContentSize().
+	 */
 	public get contentHeight(): number {
 		return this._contentHeight;
 	}
 
+	/**
+	 * Whether to apply the scrolling clip rectangle; defaults to false. Scroller
+	 * manages this for its viewport. Enabling clipping does not add drag handling.
+	 */
 	public get scrollEnabled(): boolean {
 		return this._scrollEnabled;
 	}
@@ -90,6 +107,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this._updateScrollRect();
 	}
 
+	/**
+	 * Horizontal content offset in logical pixels, initially 0. Assignment does not
+	 * clamp to content bounds. Clipping requires scrollEnabled; Scroller supplies
+	 * bounded touch/inertia behavior.
+	 */
 	public get scrollH(): number {
 		return this._scrollH;
 	}
@@ -104,6 +126,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		PropertyEvent.dispatchPropertyEvent(this, 'scrollH');
 	}
 
+	/**
+	 * Vertical content offset in logical pixels, initially 0. Assignment does not
+	 * clamp to content bounds. This is a pixel offset, not an item index.
+	 */
 	public get scrollV(): number {
 		return this._scrollV;
 	}
@@ -118,6 +144,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		PropertyEvent.dispatchPropertyEvent(this, 'scrollV');
 	}
 
+	/**
+	 * Whether empty areas pass hit testing through the group; defaults to false.
+	 * Children remain independently hittable when this is true.
+	 */
 	public get touchThrough(): boolean {
 		return this._touchThrough;
 	}
@@ -126,6 +156,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this._touchThrough = !!value;
 	}
 
+	/**
+	 * Authored state array, initially empty and retained by reference. Assign again
+	 * after changing its membership so the state-name map is rebuilt.
+	 */
 	public get states(): State[] {
 		return this._states;
 	}
@@ -142,6 +176,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		}
 	}
 
+	/**
+	 * Requested view state, initially an empty string. After state initialization,
+	 * an unknown state falls back to the first defined state instead of throwing.
+	 */
 	public get currentState(): string {
 		return this._currentState;
 	}
@@ -156,6 +194,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		return this.numChildren;
 	}
 
+	/**
+	 * Whether the parent layout measures and positions this element; defaults to
+	 * true. Setting false does not hide it, disable input or stop its callbacks.
+	 */
 	public get includeInLayout(): boolean {
 		return this.ui.includeInLayout;
 	}
@@ -164,6 +206,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.includeInLayout = v;
 	}
 
+	/**
+	 * Left-edge layout constraint: logical pixels, or a percentage string interpreted
+	 * by the parent layout. NaN (default) means unset; BasicLayout supports percentages.
+	 */
 	public get left(): number | string {
 		return this.ui.left;
 	}
@@ -172,6 +218,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.left = v;
 	}
 
+	/**
+	 * Right-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). BasicLayout stretches width when both left and right are set.
+	 */
 	public get right(): number | string {
 		return this.ui.right;
 	}
@@ -180,6 +230,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.right = v;
 	}
 
+	/**
+	 * Top-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). Interpretation is supplied by the parent layout.
+	 */
 	public get top(): number | string {
 		return this.ui.top;
 	}
@@ -188,6 +242,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.top = v;
 	}
 
+	/**
+	 * Bottom-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). BasicLayout stretches height when both top and bottom are set.
+	 */
 	public get bottom(): number | string {
 		return this.ui.bottom;
 	}
@@ -196,6 +254,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.bottom = v;
 	}
 
+	/**
+	 * Horizontal center offset in logical pixels, or a percentage string; defaults
+	 * to NaN (unset). BasicLayout measures percentage offsets against half the parent
+	 * width, with 0 centering the element.
+	 */
 	public get horizontalCenter(): number | string {
 		return this.ui.horizontalCenter;
 	}
@@ -204,6 +267,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.horizontalCenter = v;
 	}
 
+	/**
+	 * Vertical center offset in logical pixels, or a percentage string; defaults to
+	 * NaN (unset). BasicLayout measures percentage offsets against half the parent
+	 * height, with 0 centering the element.
+	 */
 	public get verticalCenter(): number | string {
 		return this.ui.verticalCenter;
 	}
@@ -212,6 +280,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.verticalCenter = v;
 	}
 
+	/**
+	 * Requested percentage of parent width; 100 means full width, not 1. Defaults
+	 * to NaN (automatic). BasicLayout gives paired edge constraints precedence.
+	 */
 	public get percentWidth(): number {
 		return this.ui.percentWidth;
 	}
@@ -220,6 +292,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.percentWidth = v;
 	}
 
+	/**
+	 * Requested percentage of parent height; 100 means full height, not 1. Defaults
+	 * to NaN (automatic). BasicLayout gives paired edge constraints precedence.
+	 */
 	public get percentHeight(): number {
 		return this.ui.percentHeight;
 	}
@@ -272,6 +348,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		return changed;
 	}
 
+	/**
+	 * Current unscaled UI width in logical pixels. Explicit width starts as NaN
+	 * (automatic measurement); assigning NaN restores automatic sizing. Parent layout
+	 * constraints may allocate a different size. Reading can validate pending size.
+	 */
 	public override get width(): number {
 		return this.ui.getWidth();
 	}
@@ -280,6 +361,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.setWidth(v);
 	}
 
+	/**
+	 * Current unscaled UI height in logical pixels. Explicit height starts as NaN
+	 * (automatic measurement); assigning NaN restores automatic sizing. Parent layout
+	 * constraints may allocate a different size. Reading can validate pending size.
+	 */
 	public override get height(): number {
 		return this.ui.getHeight();
 	}
@@ -288,6 +374,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.setHeight(v);
 	}
 
+	/**
+	 * Minimum unscaled layout width in logical pixels; defaults to 0.
+	 */
 	public get minWidth(): number {
 		return this.ui.minWidth;
 	}
@@ -296,6 +385,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.minWidth = v;
 	}
 
+	/**
+	 * Maximum unscaled layout width in logical pixels; defaults to 100000.
+	 */
 	public get maxWidth(): number {
 		return this.ui.maxWidth;
 	}
@@ -304,6 +396,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.maxWidth = v;
 	}
 
+	/**
+	 * Minimum unscaled layout height in logical pixels; defaults to 0.
+	 */
 	public get minHeight(): number {
 		return this.ui.minHeight;
 	}
@@ -312,6 +407,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.minHeight = v;
 	}
 
+	/**
+	 * Maximum unscaled layout height in logical pixels; defaults to 100000.
+	 */
 	public get maxHeight(): number {
 		return this.ui.maxHeight;
 	}
@@ -322,6 +420,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Set content extents in logical pixels, rounding up and dispatching property
+	 * change notifications. Layouts call this; viewport width/height are unchanged.
+	 */
 	public setContentSize(w: number, h: number): void {
 		w = Math.ceil(+w || 0);
 		h = Math.ceil(+h || 0);
@@ -338,10 +440,18 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		}
 	}
 
+	/**
+	 * Return the direct child at a 0-based index, or undefined when absent.
+	 * DataGroup specializes this for logical item indices.
+	 */
 	public getElementAt(index: number): DisplayObject | undefined {
 		return this.getChildAt(index);
 	}
 
+	/**
+	 * For a plain Group, return getChildAt(index) without creating anything.
+	 * Virtualized DataGroup can instead materialize a renderer for a logical index.
+	 */
 	public getVirtualElementAt(index: number): DisplayObject | undefined {
 		return this.getElementAt(index);
 	}
@@ -350,6 +460,11 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		// no-op in base Group; overridden by virtual-layout containers
 	}
 
+	/**
+	 * Add/reparent these display children in order. This setter appends to existing
+	 * children; it does not replace or dispose the previous contents. Remove old
+	 * children explicitly and release their application-owned resources separately.
+	 */
 	public set elementsContent(value: DisplayObject[]) {
 		if (!value) return;
 		for (let i = 0; i < value.length; i++) {
@@ -357,6 +472,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		}
 	}
 
+	/**
+	 * Whether a state name exists. Missing names return false rather than throwing.
+	 */
 	public hasState(stateName: string): boolean {
 		return !!this._statesMap[stateName];
 	}
@@ -371,6 +489,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.setMeasuredSize(w, h);
 	}
 
+	/**
+	 * Queue a deferred commitProperties() pass. Repeated invalidations coalesce;
+	 * this does not synchronously commit or schedule application game logic.
+	 */
 	public invalidateProperties(): void {
 		this.ui.invalidateProperties();
 	}
@@ -379,6 +501,10 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.validateProperties();
 	}
 
+	/**
+	 * Queue deferred measurement and parent layout updates. Use validateNow() after
+	 * attachment if code must read the resulting UI layout synchronously.
+	 */
 	public invalidateSize(): void {
 		this.ui.invalidateSize();
 	}
@@ -387,6 +513,9 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.validateSize(recursive);
 	}
 
+	/**
+	 * Queue a deferred layout/redraw pass using the current unscaled UI size.
+	 */
 	public invalidateDisplayList(): void {
 		this.ui.invalidateDisplayList();
 	}
@@ -395,22 +524,43 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 		this.ui.validateDisplayList();
 	}
 
+	/**
+	 * Synchronously validate this UI subtree when attached to a stage. Does nothing
+	 * off-stage; it is not an initialization or disposal method.
+	 */
 	public validateNow(): void {
 		this.ui.validateNow();
 	}
 
+	/**
+	 * Allocate parent-space layout width/height in logical pixels, accounting for
+	 * transforms and size constraints. NaN selects the preferred size on that axis;
+	 * negative dimensions cause the request to be ignored. Normally called by layouts.
+	 */
 	public setLayoutBoundsSize(lw: number, lh: number): void {
 		this.ui.setLayoutBoundsSize(lw, lh);
 	}
 
+	/**
+	 * Position the element's transformed layout bounds at parent-space logical
+	 * coordinates, accounting for its anchor. Normally called by layouts.
+	 */
 	public setLayoutBoundsPosition(x: number, y: number): void {
 		this.ui.setLayoutBoundsPosition(x, y);
 	}
 
+	/**
+	 * Write current transformed layout bounds in parent-space logical pixels into
+	 * the caller's Rectangle. The rectangle is reused, not retained.
+	 */
 	public getLayoutBounds(bounds: Rectangle): void {
 		this.ui.getLayoutBounds(bounds);
 	}
 
+	/**
+	 * Write preferred (explicit or measured) transformed bounds in parent-space
+	 * logical pixels into the caller's Rectangle, before parent size allocation.
+	 */
 	public getPreferredBounds(bounds: Rectangle): void {
 		this.ui.getPreferredBounds(bounds);
 	}

@@ -2,6 +2,11 @@ import { Point } from './Point.js';
 
 const rectanglePool: Rectangle[] = [];
 
+/**
+ * Mutable axis-aligned bounds in the coordinate space of its caller.
+ * Pooled create()/release() and sharedRectangle must not be retained after
+ * release or across unrelated calculations.
+ */
 export class Rectangle {
 	// ── Static methods ────────────────────────────────────────────────────────
 

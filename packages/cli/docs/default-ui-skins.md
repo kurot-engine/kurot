@@ -87,24 +87,23 @@ and wrap the node with Group/Image/Scroller for its surface and viewport.
 `src/DefaultUI.ts` only connects data and events. The example installs its own
 project font loader and document dependency; other projects are unchanged.
 
-Core 2.5.0 is published. Until the example adopts it, build Core/CLI for an isolated
-source trial. The example's registry lock does not yet contain density support:
+The example now locks registry Core 2.5.4, which supports sheet density. Its
+installed CLI remains 3.3.1, so use checkout CLI 3.6.0 for the current gallery's
+constructor-name preservation. From the repository root:
 
 ```sh
-pnpm --dir packages/core build
 pnpm --dir packages/cli build
-pnpm --dir tools/default-ui-assets preview
+cd examples/game
+node ../../packages/cli/dist/index.js dev
 ```
 
-The preview tool prints a new directory under docs-internal, with strict dev
-and minified release builds. It links the built checkout Core and the example's
-installed UI/Game/document packages; it does not edit application installations
-or locks. Run the repository CLI dev command in that printed directory and open
-the server URL with `?ui=1`. The ordinary game remains available without
+Open the server URL with `?ui=1`; the ordinary scene remains available without
 that parameter. Try the inputs, switches, ComboBox, tabs, sliders, panel close
-button and draggable List. The gallery is rendered by Core/UI from compiled
-KUI XML. After explicitly installing the Core 2.5.0 release in the
-example, ordinary repository-CLI builds can run directly from examples/game.
+button and draggable List. The gallery uses the example's installed Core/UI
+with compiled KUI XML, without modifying dependencies or locks. In that example
+directory, the same CLI accepts `build` and `build --release` for one-shot builds.
+The private asset tool's isolated source preview remains an optional maintenance
+tool for testing checkout engine changes; it is not required by the installed Core.
 
 CLI 3.6.0 preserves constructor names in development and release
 engine/namespace bundles so Theme lookup also works for self-referencing

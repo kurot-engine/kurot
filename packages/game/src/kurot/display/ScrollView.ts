@@ -35,6 +35,11 @@ const FRAME_MS = 16.67;
  *
  * @example
  * ```ts
+ * import { Sprite } from '@kurot/core';
+ * import { ScrollView } from '@kurot/game';
+ *
+ * const stage = new Sprite();
+ * const myContentSprite = new Sprite();
  * const sv = new ScrollView();
  * sv.width = 640;
  * sv.height = 960;
@@ -45,10 +50,27 @@ const FRAME_MS = 16.67;
 export class ScrollView extends Sprite {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Horizontal scrolling policy; defaults to AUTO (enabled when content overflows).
+	 */
 	public horizontalScrollPolicy: ScrollPolicy = ScrollPolicy.AUTO;
+	/**
+	 * Vertical scrolling policy; defaults to AUTO (enabled when content overflows).
+	 */
 	public verticalScrollPolicy: ScrollPolicy = ScrollPolicy.AUTO;
+	/**
+	 * Drag distance in logical stage pixels before scrolling begins; defaults to 10.
+	 */
 	public scrollBeginThreshold = 10;
+	/**
+	 * Multiplier for offset-based scrolling and touch movement; defaults to 1.
+	 * Absolute setScrollPosition coordinates are not multiplied.
+	 */
 	public scrollSpeed = 1;
+	/**
+	 * Whether drag/offset scrolling may overshoot the bounds with resistance;
+	 * defaults to true. Absolute positions and programmatic targets remain clamped.
+	 */
 	public bounces = true;
 
 	private _content?: Sprite;
@@ -175,7 +197,9 @@ export class ScrollView extends Sprite {
 	}
 
 	/**
-	 * Remove the current content object.
+	 * Detach the current content without disposing its textures or application
+	 * listeners. This does not cancel the view's touch/inertia/animation state;
+	 * removing the ScrollView itself from the stage cancels that scrolling work.
 	 */
 	public removeContent(): void {
 		if (!this._content) return;
@@ -186,10 +210,10 @@ export class ScrollView extends Sprite {
 	}
 
 	/**
-	 * Set both scroll axes simultaneously.
-	 * @param top Vertical scroll position.
-	 * @param left Horizontal scroll position.
-	 * @param isOffset If true, values are treated as deltas relative to the current position.
+	 * Set top and left scroll positions in logical pixels and dispatch CHANGE,
+	 * even if unchanged. Defaults to absolute, clamped coordinates. With isOffset=true, applies
+	 * deltas multiplied by scrollSpeed and allows resistance when bounces is true.
+	 * Axes disabled by their scroll policy are not advanced.
 	 */
 	public setScrollPosition(top: number, left: number, isOffset = false): void {
 		if (isOffset) {
@@ -205,9 +229,9 @@ export class ScrollView extends Sprite {
 	}
 
 	/**
-	 * Scroll to the given vertical position.
-	 * @param scrollTop Target vertical scroll position.
-	 * @param duration Tween duration in ms. 0 = instant.
+	 * Set the vertical target in logical pixels, clamped to content bounds.
+	 * Duration is milliseconds, defaulting to 0 for an immediate change. Removing
+	 * the ScrollView itself from the stage cancels its animated scrolling.
 	 */
 	public setScrollTop(scrollTop: number, duration = 0): void {
 		const target = Math.max(0, Math.min(scrollTop, this._maxScrollTop));
@@ -219,9 +243,9 @@ export class ScrollView extends Sprite {
 	}
 
 	/**
-	 * Scroll to the given horizontal position.
-	 * @param scrollLeft Target horizontal scroll position.
-	 * @param duration Tween duration in ms. 0 = instant.
+	 * Set the horizontal target in logical pixels, clamped to content bounds.
+	 * Duration is milliseconds, defaulting to 0 for an immediate change. Removing
+	 * the ScrollView itself from the stage cancels its animated scrolling.
 	 */
 	public setScrollLeft(scrollLeft: number, duration = 0): void {
 		const target = Math.max(0, Math.min(scrollLeft, this._maxScrollLeft));

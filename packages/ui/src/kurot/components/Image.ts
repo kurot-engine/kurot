@@ -29,6 +29,16 @@ export class Image extends Component {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Borrowed Texture or asset-adapter string, initially undefined. Direct textures
+	 * apply synchronously; strings load during property commit and dispatch COMPLETE
+	 * on success. Adapter callbacks with undefined clear the image. Image does not
+	 * forward IO_ERROR, and the default adapter does not report image-load failure
+	 * to the component; load through Resource first when failure handling is needed.
+	 * Stage removal does not cancel requests; clear/change source to prevent a late
+	 * result for the old string from applying. Textures are never disposed by Image;
+	 * the asset provider/application must manage their lifetime.
+	 */
 	public get source(): string | Texture | undefined {
 		return this._source;
 	}
@@ -44,6 +54,11 @@ export class Image extends Component {
 		}
 	}
 
+	/**
+	 * Optional nine-slice grid in logical texture pixels, initially undefined.
+	 * The Rectangle is retained by reference; reassign after edits to invalidate UI.
+	 * Nine-slice scaling applies only with fillMode=SCALE.
+	 */
 	public get scale9Grid(): Rectangle | undefined {
 		return this._scale9Grid;
 	}
@@ -55,6 +70,10 @@ export class Image extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Bitmap fill policy; defaults to SCALE. REPEAT tiles and CLIP crops at the
+	 * texture's logical size, rather than using scale9Grid.
+	 */
 	public get fillMode(): BitmapFillMode {
 		return this._fillMode;
 	}
@@ -66,6 +85,10 @@ export class Image extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Whether the child bitmap uses linear sampling; defaults to true.
+	 * Use false for nearest-neighbor pixel art.
+	 */
 	public get smoothing(): boolean {
 		return this._smoothing;
 	}
@@ -77,6 +100,10 @@ export class Image extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Owned child Bitmap, initially undefined until a texture is first applied.
+	 * Its texture is borrowed; prefer Image.source to keep UI measurement in sync.
+	 */
 	public get bitmap(): Bitmap | undefined {
 		return this._bitmap;
 	}

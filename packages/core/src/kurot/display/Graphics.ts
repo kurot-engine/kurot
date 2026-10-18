@@ -44,6 +44,11 @@ function createBezierPoints(data: number[], count: number): Point[] {
 	return points;
 }
 
+/**
+ * Retained local-space vector commands consumed by the renderer.
+ * Fill and stroke calls append commands; clear() removes previous commands.
+ * Graphics content is rasterized through Canvas for WebGL texture upload.
+ */
 export class Graphics {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
@@ -70,11 +75,20 @@ export class Graphics {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Begins a solid RGB fill for subsequently appended paths. alpha defaults to
+	 * 1; color uses 0xRRGGBB. Existing commands remain until clear().
+	 */
 	public beginFill(color: number, alpha = 1): void {
 		this.commands.push({ type: PathCommandType.BeginFill, color: +color || 0, alpha: +alpha || 0 });
 		this.dirty();
 	}
 
+	/**
+	 * Begins a linear/radial fill for subsequent paths. Colors use 0xRRGGBB,
+	 * alphas use [0, 1], and ratios use [0, 255]. The optional Matrix transforms
+	 * the gradient. Arrays/matrix are retained in the command; keep their values stable.
+	 */
 	public beginGradientFill(
 		gradientType: string,
 		colors: number[],
@@ -86,11 +100,21 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends an end-fill command. Existing geometry is retained; use clear()
+	 * to replace a previous drawing rather than adding to it.
+	 */
 	public endFill(): void {
 		this.commands.push({ type: PathCommandType.EndFill });
 		this.dirty();
 	}
 
+	/**
+	 * Sets the stroke used by subsequent geometry in local logical units.
+	 * Defaults: thickness NaN (no new stroke command), black, alpha 1, miterLimit 3.
+	 * Zero/non-positive thickness adds no LineStyle command; it does not erase an
+	 * already recorded stroke. pixelHinting and scaleMode are currently ignored.
+	 */
 	public lineStyle(
 		thickness: number = NaN,
 		color: number = 0,
@@ -121,6 +145,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a rectangle using local logical x/y and width/height.
+	 * Requires a fill or stroke for visible output; repeated calls retain earlier geometry.
+	 */
 	public drawRect(x: number, y: number, width: number, height: number): void {
 		x = +x || 0;
 		y = +y || 0;
@@ -132,6 +160,11 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a rounded rectangle in local logical units. ellipseWidth and
+	 * ellipseHeight are corner ellipse diameters; omitted ellipseHeight uses
+	 * ellipseWidth. Existing fill/stroke state determines its appearance.
+	 */
 	public drawRoundRect(
 		x: number,
 		y: number,
@@ -153,6 +186,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a circle centered at local logical (x, y), with radius in logical
+	 * units. This retains previous commands and uses the current fill/stroke state.
+	 */
 	public drawCircle(x: number, y: number, radius: number): void {
 		x = +x || 0;
 		y = +y || 0;
@@ -164,6 +201,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends an ellipse inside a local logical x/y/width/height rectangle.
+	 * Unlike drawCircle(), x/y locate the rectangle rather than its center.
+	 */
 	public drawEllipse(x: number, y: number, width: number, height: number): void {
 		x = +x || 0;
 		y = +y || 0;
@@ -176,6 +217,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Moves the drawing cursor in local logical units without appending a line.
+	 * Use before lineTo()/curveTo() when beginning a new path.
+	 */
 	public moveTo(x: number, y: number): void {
 		x = +x || 0;
 		y = +y || 0;
@@ -186,6 +231,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a straight segment from the current cursor to local logical (x, y),
+	 * then updates the cursor. It uses the current stroke/fill configuration.
+	 */
 	public lineTo(x: number, y: number): void {
 		x = +x || 0;
 		y = +y || 0;
@@ -194,6 +243,11 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a quadratic Bezier from the cursor through one control point to
+	 * an anchor point. All coordinates use local logical units; the cursor ends
+	 * at the anchor, and existing geometry is retained.
+	 */
 	public curveTo(controlX: number, controlY: number, anchorX: number, anchorY: number): void {
 		controlX = +controlX || 0;
 		controlY = +controlY || 0;
@@ -210,6 +264,10 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a cubic Bezier with two control points and an endpoint, all in
+	 * local logical units. The cursor moves to (ax, ay).
+	 */
 	public cubicCurveTo(cx1: number, cy1: number, cx2: number, cy2: number, ax: number, ay: number): void {
 		cx1 = +cx1 || 0;
 		cy1 = +cy1 || 0;
@@ -228,6 +286,11 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Appends a circular arc centered at local logical (x, y). Radius is logical;
+	 * startAngle/endAngle are radians, not display-object degrees. anticlockwise
+	 * defaults to false. Negative radius or equal angles do nothing rather than throw.
+	 */
 	public drawArc(
 		x: number,
 		y: number,
@@ -262,6 +325,11 @@ export class Graphics {
 		this.dirty();
 	}
 
+	/**
+	 * Clears retained drawing commands, bounds and the Canvas cache dimensions.
+	 * Call before redrawing replacement geometry. This does not remove the owning
+	 * Shape/Sprite or dispose unrelated textures, listeners or callbacks.
+	 */
 	public clear(): void {
 		this.commands.length = 0;
 		this._lastX = 0;

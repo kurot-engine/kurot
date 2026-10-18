@@ -31,13 +31,23 @@ const vpBounds = new Rectangle();
 export class Scroller extends Component {
 	// ── Static fields ─────────────────────────────────────────────────────
 
+	/**
+	 * Touch movement threshold in logical stage pixels; fixed at 8.
+	 */
 	public static readonly DEFAULT_THRESHOLD = 8;
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	public horizontalScrollBar?: HScrollBar;
 	public verticalScrollBar?: VScrollBar;
+	/**
+	 * Throw/inertia speed multiplier, defaulting to 1. Prefer throwSpeed when
+	 * setting it so both axis controllers are updated immediately.
+	 */
 	public scrollFactor = 1.0;
+	/**
+	 * Whether touch scrolling may overshoot and rebound; defaults to true.
+	 */
 	public bounces = true;
 
 	private _viewport?: IViewport;
@@ -75,6 +85,13 @@ export class Scroller extends Component {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Attached content viewport, initially undefined. Setting it reparents the
+	 * viewport and enables its scrolling clip. Replacement/undefined detaches old
+	 * viewport handlers, stops inertia and disables its clip, without disposing its
+	 * data, renderers or textures. Stage removal stops gestures, inertia and the
+	 * scrollbar timer but retains viewport subscriptions for reuse.
+	 */
 	public get viewport(): IViewport | undefined {
 		return this._viewport;
 	}
@@ -111,6 +128,10 @@ export class Scroller extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Horizontal policy string: auto (default), on or off. Unknown strings are not
+	 * validated; use the ScrollPolicy constants.
+	 */
 	public get horizontalScrollPolicy(): string {
 		return this._horizontalScrollPolicy;
 	}
@@ -121,6 +142,10 @@ export class Scroller extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Vertical policy string: auto (default), on or off. Unknown strings are not
+	 * validated; use the ScrollPolicy constants.
+	 */
 	public get verticalScrollPolicy(): string {
 		return this._verticalScrollPolicy;
 	}
@@ -132,9 +157,8 @@ export class Scroller extends Component {
 	}
 
 	/**
-	 * Speed multiplier for scroll throw animation (egret parity).
-	 * Delegates to the underlying {@link TouchScroll} instances.
-	 * @default 1.0
+	 * Throw/inertia multiplier for both axes; defaults to 1. Negative values clamp
+	 * to 0; non-finite values are not rejected. Prefer this setter over scrollFactor.
 	 */
 	public get throwSpeed(): number {
 		return this._hScroll.scrollFactor;

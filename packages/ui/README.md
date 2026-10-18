@@ -10,7 +10,18 @@ See [Label layout](docs/label-text-layout.md) for behavior and adoption.
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.6.0 (published).** Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.6.1 (prepared, not published).** Documentation-only patch over 3.6.0. Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
+
+## API reference in 3.6.1 (not published)
+
+Start with [API topics](docs/api/topics.md) or the [symbol index](docs/api/index.md),
+then open only the relevant widget/member pages. Public and protected extension
+contracts are labeled separately; [coverage](docs/api/coverage.md) records
+remaining behavioral-comment gaps. These generated docs and strict-compiled
+examples are included in the prepared 3.6.1 patch, not changes to the published
+3.6.0 artifact. Runtime code, signatures and exports are unchanged. The Core
+peer/dev range remains ^2.5.2; ui-runtime's UI ^3.4.0 peer already accepts 3.6.1.
+No dependent release, raised minimum or application migration is required.
 
 Outlined Label sizes and line breaks can change, including without `textFit`;
 Scroller viewports need no extra configuration. Keep explicit top alignment for
@@ -139,6 +150,9 @@ Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`. Programmatic UI depe
 only on Core.
 
 ## Installation
+
+Until 3.6.1 is published, install the recorded published baseline below and read
+the new API reference from the repository. Existing dependency locks are unchanged.
 
 ```bash
 pnpm add @kurot/ui@^3.6.0 @kurot/core@^2.5.2

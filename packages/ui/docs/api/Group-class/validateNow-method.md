@@ -1,0 +1,10 @@
+# validateNow
+
+Package: `@kurot/ui@3.6.1`. Generated from public declarations and JSDoc.
+
+```ts
+validateNow(): void;
+```
+
+Synchronously validate this UI subtree when attached to a stage. Does nothing
+off-stage; it is not an initialization or disposal method.

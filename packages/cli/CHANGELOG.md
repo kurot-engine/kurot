@@ -7,6 +7,18 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## Unreleased
+
+### Documentation — 2026-10-18
+
+- Add project README/AGENTS navigation to both templates, using installed SDK
+  guides/types and explicit build/browser verification boundaries.
+- Route gameplay tasks to the unreleased Core quick guide and repository Star
+  Catcher reference when available, with installed README/types as the fallback.
+- Correct gallery instructions for its installed Core 2.5.4 and older CLI lock;
+  source-engine trials remain optional maintenance tooling.
+- Package versions and dependency ranges/locks are unchanged; not published.
+
 ## 3.6.0 — 2026-10-10
 
 Published; verified on npm on 2026-10-10, including latest, package download

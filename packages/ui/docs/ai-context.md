@@ -1,5 +1,10 @@
 # @kurot/ui — AI context map
 
+For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
+These generated docs are included in the prepared UI 3.6.1 documentation patch,
+which is not published. Runtime code, signatures, exports and dependency requirements
+are unchanged; follow the installed Core version for inherited behavior/defaults.
+
 UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, package
 download, integrity and all 344 generated files matching the tested build. It adds outline-safe
 Label layout to normal measurement, wrapping and fitting; outlined automatic
@@ -25,7 +30,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.6.0` (published), EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@3.6.1` (prepared, not published), EUI-compatible UI framework on top of
 `@kurot/core`. Its peer is `@kurot/core@^2.5.2`; published 3.5.0 uses ^2.4.0. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent

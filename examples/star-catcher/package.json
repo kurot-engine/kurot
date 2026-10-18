@@ -1,0 +1,27 @@
+{
+	"name": "kurot-star-catcher",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "node --import tsx node_modules/@kurot/cli/dist/index.js dev",
+		"build": "node --import tsx node_modules/@kurot/cli/dist/index.js build",
+		"release": "node --import tsx node_modules/@kurot/cli/dist/index.js build --release",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run test/model.test.ts",
+		"test:browser": "node --import tsx tools/browser-check.ts",
+		"check": "pnpm typecheck && pnpm test && pnpm build && pnpm release && pnpm test:browser"
+	},
+	"dependencies": {
+		"@kurot/core": "2.5.4"
+	},
+	"devDependencies": {
+		"@kurot/cli": "3.3.1",
+		"@playwright/test": "1.62.1",
+		"@types/node": "22.19.17",
+		"tsx": "4.21.0",
+		"typescript": "5.9.3",
+		"vitest": "4.1.4"
+	},
+	"packageManager": "pnpm@10.33.0"
+}

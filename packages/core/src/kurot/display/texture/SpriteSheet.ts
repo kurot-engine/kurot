@@ -1,5 +1,9 @@
 import { Texture } from './Texture.js';
 
+/**
+ * Named Texture views sharing one page's BitmapData and resolution.
+ * Disposing the sheet disposes the page; coordinate shared users beforehand.
+ */
 export class SpriteSheet {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
@@ -18,6 +22,10 @@ export class SpriteSheet {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Returns a previously created named view, or undefined. It performs no
+	 * network request and does not create a frame when a name is missing.
+	 */
 	public getTexture(name: string): Texture | undefined {
 		return this._textureMap.get(name);
 	}
@@ -58,6 +66,10 @@ export class SpriteSheet {
 		return texture;
 	}
 
+	/**
+	 * Disposes the underlying page texture. Child views are non-owning and
+	 * must no longer be rendered once the shared page source is released.
+	 */
 	public dispose(): void {
 		this._texture.dispose();
 	}

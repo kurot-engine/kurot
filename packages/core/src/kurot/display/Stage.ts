@@ -5,6 +5,11 @@ import { DisplayObjectContainer } from './DisplayObjectContainer.js';
 import { OrientationMode } from './enums/OrientationMode.js';
 import { StageScaleMode } from './enums/StageScaleMode.js';
 
+/**
+ * Root display container created by createPlayer(). Its logical stage
+ * dimensions and scale mode define input coordinates independently of CSS
+ * canvas size and physical render resolution.
+ */
 export class Stage extends DisplayObjectContainer {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

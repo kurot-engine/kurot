@@ -5,6 +5,12 @@ check affected consumers, not an instruction to bump every consumer version.
 Refreshing a development lockfile is maintenance; publishing a changed runtime
 or a changed compatibility requirement is a release.
 
+Core 2.5.5, Game 2.0.1 and UI 3.6.1 are prepared, unpublished documentation
+patches. Runtime APIs and dependency requirements are unchanged. See
+[documentation patch adoption](api-documentation.md#documentation-patch-adoption)
+for required migrations (none), optional installed/locked adoption and unaffected
+packages. No dependent SDK release or application update is implied.
+
 ## Package graph
 
 Arrows point from a consumer to its dependency. Solid arrows are ordinary
@@ -368,12 +374,14 @@ remains ^0.13.0, with no Core/UI/Atlas dependency.
   Documentation-only updates and private atlas-generation tooling require no
   package release. Other applications and their registry locks remain unchanged.
 
-Checked application declarations: examples/demo and examples/game already accept
-Core 2.5.0 and CLI 3.6.0 through their 2.x/3.x caret ranges; their current locks
-remain older. The refreshed game resources need a Core installation/lock update
-before ordinary builds can use the 2× kit. Templates retain
+The examples/demo and examples/game locks now resolve registry Core 2.5.4,
+which supports the refreshed 2× resources. Their CLI locks remain 3.3.1;
+use checkout CLI 3.6.0 for the current gallery's constructor-name fix as described
+in [the example README](../examples/game/README.md). No Core source binding or
+incidental dependency update is required. Templates retain
 `latest` placeholders, resolved by `create` to concrete registry caret ranges.
-The explicitly updated consumer checkouts now install registry Core 2.5.3 and
+At the earlier Core 2.5.3 adoption, the selected consumer checkouts installed
+registry Core 2.5.3 and
 document 0.13.1: Editor 0.27.5 pins both and CLI 3.6.0, while Reskin declares Core ^2.5.3
 and keeps CLI/UI in each copied project. Templates/tentax and Templates/milf-master
 now declare Core ^2.5.3, document ^0.13.1 and CLI ^3.6.0 with matching pnpm locks. Editor's demo

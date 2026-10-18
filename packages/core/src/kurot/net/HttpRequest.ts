@@ -23,11 +23,20 @@ export interface HttpRequestEvents extends EventMap {
 export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	/** Response body representation requested from XMLHttpRequest. */
+	/**
+	 * Body representation for the next send(), defaulting to TEXT. ARRAY_BUFFER requests
+	 * an ArrayBuffer. This does not parse JSON or validate its application schema.
+	 */
 	public responseType: HttpResponseType = HttpResponseType.TEXT;
-	/** Whether cross-origin requests include credentials. */
+	/**
+	 * Whether the next cross-origin request includes credentials; defaults to false.
+	 * Server/browser CORS rules still apply; request failure dispatches IO_ERROR.
+	 */
 	public withCredentials = false;
-	/** Request timeout in milliseconds; 0 disables the browser timeout. */
+	/**
+	 * Browser request timeout in milliseconds; defaults to 0 (no timeout). Only
+	 * positive values are assigned to the native request. A timeout dispatches IO_ERROR.
+	 */
 	public timeout = 0;
 
 	private _xhr?: XMLHttpRequest;
@@ -37,7 +46,10 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
-	/** Response body from the active or most recently completed request. */
+	/**
+	 * Native response body, or undefined before send()/after abort(). Inspect only
+	 * after COMPLETE. A generic application cast does not parse or validate JSON.
+	 */
 	public get response(): string | ArrayBuffer | undefined {
 		return this._xhr?.response;
 	}
@@ -54,9 +66,9 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Prepare a request URL and method.
-	 *
-	 * Aborts an active request and discards headers queued for the prior request.
+	 * Prepare an asynchronous request URL and method (GET by default). Aborts any
+	 * active request and discards previously queued headers. Does not send until
+	 * send(); native URL/header/send errors may throw synchronously at that step.
 	 */
 	public open(url: string, method: HttpMethod = HttpMethod.GET): void {
 		this.abort();
@@ -66,12 +78,12 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 	}
 
 	/**
-	 * Create and send the underlying XMLHttpRequest.
-	 *
-	 * Queued headers are applied after the native request is opened and before
-	 * its body is sent. Successful responses dispatch HTTP_STATUS followed by
-	 * COMPLETE; network errors, timeouts, status 0, and status >= 400 dispatch
-	 * IOErrorEvent.IO_ERROR.
+	 * Send after open() and optional setRequestHeader(). COMPLETE reports a successful
+	 * load; IO_ERROR reports network failure, timeout, status 0 or HTTP status >=400.
+	 * A native load first emits HTTP_STATUS, including error status codes. Native
+	 * setup/send errors can throw synchronously; register event handlers before calling.
+	 * Call open() for each new request; repeated send() alone does not abort a prior
+	 * native request. Abort owned work and remove listeners when the view closes.
 	 */
 	public send(data?: string | ArrayBuffer | FormData): void {
 		const xhr = new XMLHttpRequest();
@@ -111,7 +123,11 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 		xhr.send(data);
 	}
 
-	/** Abort the active native request and clear its response/status accessors. */
+	/**
+	 * Abort the active native request and clear this wrapper's response/status
+	 * access. Does not dispatch COMPLETE or remove application event listeners;
+	 * remove those separately on view disposal. Repeated calls are harmless.
+	 */
 	public abort(): void {
 		if (this._xhr) {
 			this._xhr.abort();
@@ -119,7 +135,10 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 		}
 	}
 
-	/** Return all response headers, or an empty string when no response is available. */
+	/**
+	 * Return native response headers, or an empty string before a request exists.
+	 * Only browser/CORS-exposed headers are readable.
+	 */
 	public getAllResponseHeaders(): string {
 		return this._xhr?.getAllResponseHeaders() ?? '';
 	}
@@ -134,7 +153,10 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 		this._pendingHeaders.push({ name: header, value });
 	}
 
-	/** Return a named response header, or an empty string when it is unavailable. */
+	/**
+	 * Return a named browser-exposed response header, or an empty string if absent.
+	 * Header access remains subject to native XMLHttpRequest/CORS behavior.
+	 */
 	public getResponseHeader(header: string): string {
 		return this._xhr?.getResponseHeader(header) ?? '';
 	}

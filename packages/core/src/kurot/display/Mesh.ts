@@ -3,6 +3,10 @@ import { Bitmap } from './Bitmap.js';
 import { RenderObjectType } from './DisplayObject.js';
 import type { Texture } from './texture/Texture.js';
 
+/**
+ * Textured triangle geometry with explicit vertices, UVs and indices.
+ * Geometry coordinates belong to this display object's local space.
+ */
 export class Mesh extends Bitmap {
 	// ── Instance fields ───────────────────────────────────────────────────────
 

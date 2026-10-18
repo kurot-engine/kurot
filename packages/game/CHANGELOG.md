@@ -4,6 +4,31 @@ All notable changes to `@kurot/game` are documented here.
 
 ---
 
+## [2.0.1] — 2026-10-18
+
+Prepared locally; not published. Documentation-only patch over 2.0.0.
+
+### Documentation
+
+- Clarify Tween option defaults, MovieClip frame/timing validation, cached-data
+  ownership, ScrollView lifecycle and particle/loader cleanup in source JSDoc.
+  Keep all runtime behavior, public declarations and exports unchanged.
+- Add generated public API references, capability/symbol/member indexes,
+  explicit coverage reports and strict-compiled JSDoc examples. Fill in
+  Tween timing/cancellation, particle ownership and standalone example imports without changing
+  executable code, public signatures or SDK dependencies.
+- Include public `docs/` in future package artifacts and link usage, architecture
+  and contributor context from README. Published 2.0.0 lacks the docs directory.
+- Runtime implementations, signatures and exports are unchanged.
+
+### Compatibility
+
+- The Core peer remains ^2.0.0 and the development declaration/lock remain
+  unchanged. This documentation patch does not require Core 2.5.5 or UI.
+- Game consumers may update their installation after publication to read docs
+  from the package; existing compatible games require no code migration. No
+  dependent SDK, application, example or template is upgraded here.
+
 ## [2.0.0] — 2026-10-03
 
 ### Breaking

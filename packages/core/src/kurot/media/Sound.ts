@@ -73,6 +73,10 @@ function processDecodeQueue(): void {
 export class Sound extends EventDispatcher<SoundEvents> {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Application sound category, initially SoundType.EFFECT. This metadata does
+	 * not change volume, looping or automatically manage playback channels.
+	 */
 	public type: SoundType = SoundType.EFFECT;
 
 	private _audioBuffer?: AudioBuffer;
@@ -83,6 +87,10 @@ export class Sound extends EventDispatcher<SoundEvents> {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/**
+	 * Audio duration in seconds, or 0 when no duration is available. It is not
+	 * milliseconds; read after COMPLETE when preparing finite playback.
+	 */
 	public get length(): number {
 		if (this._audioBuffer) return this._audioBuffer.duration;
 		if (this._audio) return this._audio.duration || 0;
@@ -91,6 +99,11 @@ export class Sound extends EventDispatcher<SoundEvents> {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Starts asynchronous loading; completion dispatches COMPLETE and network or
+	 * terminal media errors dispatch IO_ERROR. It returns no Promise. A new load
+	 * supersedes earlier callbacks but does not stop channels already playing.
+	 */
 	public load(url: string): void {
 		this._url = url;
 		this._loaded = false;
@@ -105,9 +118,13 @@ export class Sound extends EventDispatcher<SoundEvents> {
 	}
 
 	/**
-	 * Starts at startTime seconds on the first play, then repeats from zero.
-	 * loops <= 0 repeats indefinitely; positive loops is the total play count.
-	 * Web Audio loops continuously; finite counts end on the audio clock.
+	 * Starts a new independent SoundChannel at startTime seconds (default 0).
+	 * loops defaults to 0: non-positive means unlimited; positive counts total plays,
+	 * including the first partial play. Repeats restart at zero. Web Audio finite
+	 * loops use its audio clock; finite HTML fallback is browser-event timed.
+	 * Before loading completes, dispatches IO_ERROR and returns an inert channel.
+	 * Provide a valid non-negative offset; browser playback/start errors are not
+	 * converted to a returned Promise. Retain and stop channels when their view exits.
 	 */
 	public play(startTime = 0, loops = 0): SoundChannel {
 		if (!this._loaded) {
@@ -122,6 +139,11 @@ export class Sound extends EventDispatcher<SoundEvents> {
 		return new SoundChannel(undefined, undefined, audio, startTime, loops);
 	}
 
+	/**
+	 * Invalidates pending load callbacks and releases this Sound's loaded data.
+	 * It does not abort every pending network/decode operation or stop previously
+	 * returned SoundChannels; stop each owned channel separately.
+	 */
 	public close(): void {
 		this._generation++;
 		this._audioBuffer = undefined;

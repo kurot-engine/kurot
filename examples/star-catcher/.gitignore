@@ -1,0 +1,7 @@
+node_modules/
+bin-debug/
+bin-release/
+.kurot/
+test-results/
+playwright-report/
+*.tsbuildinfo

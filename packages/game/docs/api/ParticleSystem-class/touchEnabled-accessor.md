@@ -1,0 +1,14 @@
+# touchEnabled
+
+Package: `@kurot/game@2.0.1`. Generated from public declarations and JSDoc.
+
+```ts
+get touchEnabled(): boolean;
+set touchEnabled(value: boolean);
+```
+
+Inherited from `DisplayObject.touchEnabled`; shown with this receiver's substituted types.
+
+Whether this node can be selected as a touch target; copied from
+DisplayObject.defaultTouchEnabled (false initially). This does not control
+touchable descendants; containers expose touchChildren separately.

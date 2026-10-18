@@ -62,6 +62,10 @@ export class Label extends Component implements IDisplayText {
 		this.invalidateSize();
 	}
 
+	/**
+	 * Plain text, initially empty. Assignment invalidates size/layout and notifies
+	 * text bindings. Use RichLabel for styled runs; Label has no public textFlow.
+	 */
 	public get text(): string {
 		return this._textField.text;
 	}
@@ -74,6 +78,11 @@ export class Label extends Component implements IDisplayText {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * CSS font family copied from TextField defaults (initially Arial). Assignment
+	 * does not load a font. After asynchronous font readiness, invalidateSize() to
+	 * refresh metrics and fitting.
+	 */
 	public get fontFamily(): string {
 		return this._textField.fontFamily;
 	}
@@ -86,6 +95,11 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Authored font size in logical pixels, initially 30 unless the Core default
+	 * was changed before construction. Shrink fitting changes renderedSize, not this
+	 * value. This setter does not enforce a finite positive size.
+	 */
 	public get size(): number {
 		return this._baseSize;
 	}
@@ -101,8 +115,10 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	/**
-	 * Shrink fits the laid-out text within finite bounds, retaining multiline.
-	 * Editable text rejects shrink; automatic axes do not constrain fitting.
+	 * Font fitting mode, defaulting to none. shrink reduces laid-out text within
+	 * finite width/height bounds without changing multiline or the authored size.
+	 * Automatic axes do not constrain fitting. Invalid modes and shrink on
+	 * EditableText throw RangeError.
 	 */
 	public get textFit(): TextFitMode {
 		return this._textFit;
@@ -123,8 +139,8 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	/**
-	 * Readable lower limit in logical pixels; must be finite and at least one.
-	 * A limit above size does not enlarge the text.
+	 * Lower shrink-fitting limit in logical pixels; defaults to 12. Must be finite
+	 * and at least 1 or throws RangeError. A limit above size does not enlarge text.
 	 */
 	public get minFontSize(): number {
 		return this._minFontSize;
@@ -155,6 +171,9 @@ export class Label extends Component implements IDisplayText {
 		return this._textFitOverflow;
 	}
 
+	/**
+	 * Whether the text uses bold weight; defaults to false.
+	 */
 	public get bold(): boolean {
 		return this._textField.bold;
 	}
@@ -167,6 +186,9 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Whether the text uses italic style; defaults to false.
+	 */
 	public get italic(): boolean {
 		return this._textField.italic;
 	}
@@ -179,6 +201,10 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Text color as an RGB integer (0xRRGGBB), initially white (0xffffff) unless
+	 * TextField.default_textColor was changed before construction.
+	 */
 	public get textColor(): number {
 		return this._textField.textColor;
 	}
@@ -187,6 +213,9 @@ export class Label extends Component implements IDisplayText {
 		this._textField.textColor = value;
 	}
 
+	/**
+	 * Outline color as an RGB integer; defaults to black (0x000000).
+	 */
 	public get strokeColor(): number {
 		return this._textField.strokeColor;
 	}
@@ -195,6 +224,10 @@ export class Label extends Component implements IDisplayText {
 		this._textField.strokeColor = value;
 	}
 
+	/**
+	 * Outline width in logical pixels; defaults to 0. UI 3.6 reserves outline-safe
+	 * measurement/layout space. Assignment does not validate the numeric range.
+	 */
 	public get stroke(): number {
 		return this._textField.stroke;
 	}
@@ -206,6 +239,9 @@ export class Label extends Component implements IDisplayText {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Horizontal text alignment; defaults to left. Use left, center or right.
+	 */
 	public get textAlign(): string {
 		return this._textField.textAlign;
 	}
@@ -217,6 +253,11 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Text-block alignment: top, middle or bottom. Inherits the installed Core
+	 * default (middle on Core 2.5.3+, top on 2.5.2). Set explicitly when positioning
+	 * dialogue progressively in a taller box.
+	 */
 	public get verticalAlign(): string {
 		return this._textField.verticalAlign;
 	}
@@ -246,7 +287,8 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	/**
-	 * In multiline mode, true uses Unicode word boundaries; false wraps by character.
+	 * Whether to use Unicode line-break opportunities; defaults to false (grapheme
+	 * wrapping). Requires multiline; this flag alone does not force single-line text.
 	 */
 	public get wordWrap(): boolean {
 		return this._textField.wordWrap;
@@ -260,6 +302,10 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Extra space between rows in logical pixels; defaults to 0. Values are passed
+	 * to TextField without finite/nonnegative validation.
+	 */
 	public get lineSpacing(): number {
 		return this._textField.lineSpacing;
 	}
@@ -272,6 +318,10 @@ export class Label extends Component implements IDisplayText {
 		}
 	}
 
+	/**
+	 * Editable-input length limit in UTF-16 code units; defaults to 0 (unlimited).
+	 * Ordinary dynamic Label rendering and programmatic text assignment are not truncated.
+	 */
 	public get maxChars(): number {
 		return this._textField.maxChars;
 	}
@@ -280,6 +330,10 @@ export class Label extends Component implements IDisplayText {
 		this._textField.maxChars = value;
 	}
 
+	/**
+	 * Whether to mask displayed characters; defaults to false. Does not encrypt
+	 * or change the text property and should not be used to protect stored data.
+	 */
 	public get displayAsPassword(): boolean {
 		return this._textField.displayAsPassword;
 	}

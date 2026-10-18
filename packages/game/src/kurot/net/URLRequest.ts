@@ -7,6 +7,8 @@ import type { URLVariables } from './URLVariables.js';
  *
  * @example
  * ```ts
+ * import { URLRequest, URLRequestHeader, URLRequestMethod } from '@kurot/game';
+ *
  * const req = new URLRequest('https://example.com/data.json');
  * req.method = URLRequestMethod.POST;
  * req.data = JSON.stringify({ key: 'value' });

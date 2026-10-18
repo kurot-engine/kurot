@@ -29,6 +29,9 @@ export interface URLLoaderEvents extends EventMap {
  *
  * @example
  * ```ts
+ * import { Event, IOErrorEvent } from '@kurot/core';
+ * import { URLLoader, URLLoaderDataFormat, URLRequest } from '@kurot/game';
+ *
  * const loader = new URLLoader();
  * loader.dataFormat = URLLoaderDataFormat.JSON;
  * loader.addEventListener(Event.COMPLETE, () => console.log(loader.data));
@@ -39,7 +42,17 @@ export interface URLLoaderEvents extends EventMap {
 export class URLLoader extends EventDispatcher<URLLoaderEvents> {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Result format for the next request; defaults to TEXT. Set before load().
+	 * JSON parsing failures dispatch IO_ERROR. SOUND and TEXTURE return owned resource
+	 * objects whose lifetime must be managed after loading.
+	 */
 	public dataFormat: URLLoaderDataFormat = URLLoaderDataFormat.TEXT;
+	/**
+	 * Last loaded result, initially undefined and reset when a new load starts.
+	 * Read after COMPLETE. Runtime type follows dataFormat; no generic cast validates
+	 * it. Closing the loader does not replace application-owned result cleanup.
+	 */
 	public data: unknown;
 
 	private _xhr?: HttpRequest;
@@ -62,6 +75,9 @@ export class URLLoader extends EventDispatcher<URLLoaderEvents> {
 
 	/**
 	 * Start loading from the specified URL.
+	 * Closes the previous request first. JSON parse and network failures dispatch
+	 * IO_ERROR; await an event rather than this void-returning method. Progress
+	 * is available for HTTP text/binary/JSON, not image or sound loader paths.
 	 */
 	public load(request: URLRequest): void {
 		this.close();

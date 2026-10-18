@@ -19,6 +19,11 @@ function getPool<T extends Event>(EventClass: EventConstructor<T>): T[] {
 	return pool;
 }
 
+/**
+ * Mutable event with capture/target/bubble context and cancellation flags.
+ * Events created through the pool may be reused after dispatch/release; copy
+ * needed values rather than retaining a pooled event object.
+ */
 export class Event {
 	// ── Static constants ──────────────────────────────────────────────────────
 

@@ -34,6 +34,11 @@ export class ListBase extends DataGroup {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Selected 0-based logical item index; initially -1 for no selection. Assignment
+	 * queues selection validation and does not dispatch a user CHANGE event. Use
+	 * validateNow() on an attached list if visual selection must update immediately.
+	 */
 	public get selectedIndex(): number {
 		return this._selectedIndex;
 	}
@@ -42,6 +47,11 @@ export class ListBase extends DataGroup {
 		this.setSelectedIndex(value, false);
 	}
 
+	/**
+	 * Selected provider item, or undefined without selection/provider. Assignment
+	 * uses getItemIndex identity matching. Before a provider is available, stores a
+	 * pending item for the next property commit; no data object is copied or disposed.
+	 */
 	public get selectedItem(): unknown {
 		if (this._selectedIndex < 0 || !this.dataProvider) return undefined;
 		return this.dataProvider.getItemAt(this._selectedIndex);
@@ -58,8 +68,9 @@ export class ListBase extends DataGroup {
 	}
 
 	/**
-	 * If `true`, the list always keeps an item selected (defaults to the first).
-	 * Setting this to true when no item is selected selects index 0.
+	 * Whether a nonempty provider must keep an item selected; defaults to false.
+	 * When enabled with no selection, selects index 0 on property commit if an item
+	 * exists. An empty provider can still have selectedIndex=-1.
 	 */
 	public get requireSelection(): boolean {
 		return this._requireSelection;

@@ -1,0 +1,18 @@
+{
+	"format": "kurot-doc-comparison-v1",
+	"model": "gpt-6.1-sol",
+	"reasoningEffort": "medium",
+	"codexVersion": "codex-cli 0.163.0",
+	"baselineRevision": "2a7176c",
+	"trialsPerArm": 3,
+	"maxRepairRounds": 2,
+	"modelTimeoutMs": 600000,
+	"sdk": {
+		"@kurot/core": "2.5.4",
+		"@kurot/cli": "3.3.1",
+		"@playwright/test": "1.62.1",
+		"typescript": "5.9.3",
+		"tsx": "4.21.0"
+	},
+	"order": ["old", "new", "new", "old", "old", "new"]
+}

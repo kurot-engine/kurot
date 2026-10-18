@@ -4,6 +4,17 @@ Project-owned style/font/language initialization was introduced in CLI 3.2.1
 and remains in published CLI 3.6.0. Existing projects keep their own startup
 code and HTML; the empty template stays minimal.
 
+## Project documentation (unreleased)
+
+Both checkout templates include a project README and a short AGENTS entry.
+They identify the gameplay entry, commands, expected startup, generated files
+and task-specific guides in installed SDK packages. Read the consumer project's
+manifest, lock and installation for its actual versions. These additions are
+not in the already published CLI 3.6.0 artifact and do not rewrite existing games.
+For gameplay, the entries point to Core's game-authoring guide when installed,
+or the Star Catcher reference in an engine checkout; older packages retain their
+README/type-declaration fallback.
+
 ## Files
 
 - resource/config/style.json declares the primary font role and skin text colors.

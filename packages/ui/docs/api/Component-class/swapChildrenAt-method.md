@@ -1,0 +1,12 @@
+# swapChildrenAt
+
+Package: `@kurot/ui@3.6.1`. Generated from public declarations and JSDoc.
+
+```ts
+swapChildrenAt(index1: number, index2: number): void;
+```
+
+Inherited from `Sprite.swapChildrenAt`; shown with this receiver's substituted types.
+
+Exchanges two zero-based direct-child positions after integer coercion.
+An out-of-range index is ignored rather than throwing.

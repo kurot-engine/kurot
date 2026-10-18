@@ -49,6 +49,12 @@ export class DataGroup extends Group {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Borrowed observable collection, initially undefined. Changing it removes the
+	 * old collection listener and queues renderer rebuilding. Stage removal alone
+	 * does not detach this collection subscription; assign undefined when permanently
+	 * closing the view. Data items are never disposed by the group.
+	 */
 	public get dataProvider(): ICollection | undefined {
 		return this._dataProvider;
 	}
@@ -64,6 +70,11 @@ export class DataGroup extends Group {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Renderer constructor, initially undefined (fallback: ItemRenderer). The group
+	 * creates/recycles instances. Keep per-item listeners/resources in renderer hooks
+	 * so a recycled renderer does not retain the previous item's game state.
+	 */
 	public get itemRenderer(): (new () => ItemRenderer) | undefined {
 		return this._itemRenderer;
 	}
@@ -78,6 +89,10 @@ export class DataGroup extends Group {
 		this.invalidateProperties();
 	}
 
+	/**
+	 * Optional synchronous per-item renderer-class resolver. An undefined result
+	 * falls back to itemRenderer, then ItemRenderer. Resolver exceptions propagate.
+	 */
 	public get itemRendererFunction(): ((item: unknown) => (new () => ItemRenderer) | undefined) | undefined {
 		return this._itemRendererFunction;
 	}
@@ -91,6 +106,10 @@ export class DataGroup extends Group {
 		this.invalidateProperties();
 	}
 
+	/**
+	 * Skin passed to generated renderers, initially undefined. Uses Component's
+	 * skin-name resolution; shared textures remain owned by their resource provider.
+	 */
 	public get itemRendererSkinName(): SkinName {
 		return this._itemRendererSkinName;
 	}
@@ -102,6 +121,11 @@ export class DataGroup extends Group {
 		this.invalidateProperties();
 	}
 
+	/**
+	 * Whether a supported layout creates/reuses only visible renderers; initially
+	 * false. Reads the active layout's setting when present. Data indices remain
+	 * logical item indices and differ from the current display-child indices.
+	 */
 	public get useVirtualLayout(): boolean {
 		const layout = this.layout;
 		if (layout) return layout.useVirtualLayout;
@@ -133,15 +157,28 @@ export class DataGroup extends Group {
 
 	// ── Override methods ──────────────────────────────────────────────────────
 
+	/**
+	 * Logical provider length, or 0 without a provider. With virtualization this can
+	 * exceed numChildren, which counts currently attached renderers.
+	 */
 	public override get numElements(): number {
 		if (!this._dataProvider) return 0;
 		return this._dataProvider.length;
 	}
 
+	/**
+	 * Return an already materialized renderer for a 0-based logical item index.
+	 * Returns undefined for absent/offscreen items; does not create a renderer.
+	 */
 	public override getElementAt(index: number): DisplayObject | undefined {
 		return this._indexToRenderer[index] ?? undefined;
 	}
 
+	/**
+	 * Return or materialize/recycle a renderer for a logical item index. Integer-
+	 * coerces the index; returns undefined without a provider or when out of bounds.
+	 * Renderer construction and data callbacks run synchronously and may throw.
+	 */
 	public override getVirtualElementAt(index: number): DisplayObject | undefined {
 		index = index | 0;
 		if (!this._dataProvider || index < 0 || index >= this._dataProvider.length) return undefined;

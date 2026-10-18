@@ -371,7 +371,7 @@ boundary applies to cacheAsTexture and RenderTexture capture.
 ### `createPlayer(options)`
 
 ```typescript
-import { createPlayer, Event } from '@kurot/core';
+import { createPlayer, Sprite } from '@kurot/core';
 
 const app = createPlayer({
 	canvas: document.getElementById('game-canvas') as HTMLCanvasElement,
@@ -381,7 +381,7 @@ const app = createPlayer({
 	contentHeight: 1136,
 });
 
-app.start(root);
+app.start(new Sprite());
 ```
 
 `createPlayer` initializes:
@@ -389,7 +389,8 @@ app.start(root);
 1. Capabilities._init() for OS, isMobile and language detection.
 2. RenderTexture.renderer on first use, providing offscreen Canvas 2D rendering.
 3. Stage, Player, TouchHandler and ScreenAdapter, preferring WebGL with Canvas fallback.
-4. setupLifecycle(stage) for ENTER_FRAME and RENDER broadcasts.
+4. setupLifecycle(stage) to pause/resume the shared ticker on document visibility
+   changes and dispatch stage DEACTIVATE/ACTIVATE events.
 
 ### KurotOptions
 
@@ -409,13 +410,19 @@ app.start(root);
 
 | Property        | Type                             | Description                                            |
 | --------------- | -------------------------------- | ------------------------------------------------------ |
-| `player`        | `Player`                         | Renderer and game loop                                 |
+| `player`        | `Player`                         | Stage rendering registered with the shared ticker      |
 | `stage`         | `Stage`                          | Scene root                                             |
 | `touchHandler`  | `TouchHandler`                   | Touch and mouse input                                  |
 | `screenAdapter` | `ScreenAdapter`                  | Screen adaptation                                      |
-| `start(root?)`  | `(root?: DisplayObject) => void` | Start or resume the game loop                          |
-| `stop()`        | `() => void`                     | Stop the loop; it can be resumed                       |
+| `start(root?)`  | `(root?: DisplayObject) => void` | Register this Player for rendering; start the ticker   |
+| `stop()`        | `() => void`                     | Unregister this Player from rendering; start resumes it |
 | `destroy()`     | `() => void`                     | Release the player, input, adapter and lifecycle hooks |
+
+`stop()` leaves the shared ticker running: registered tick callbacks and
+`ENTER_FRAME` listeners can still advance gameplay, Tween and Timer work.
+Pause or unregister application-owned activity explicitly when implementing a
+game pause. `destroy()` performs final app cleanup; the application still owns
+its listeners, timers, tweens and sound channels.
 
 ---
 

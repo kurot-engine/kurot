@@ -1,0 +1,3324 @@
+{
+  "format": "kurot-api-index-v1",
+  "package": "@kurot/game",
+  "version": "2.0.1",
+  "symbols": [
+    {
+      "name": "Ease",
+      "kind": "Variable",
+      "file": "Ease-variable.md",
+      "topic": "tween",
+      "members": [
+        {
+          "name": "backIn",
+          "file": "Ease-variable/backIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "backInOut",
+          "file": "Ease-variable/backInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "backOut",
+          "file": "Ease-variable/backOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bounceIn",
+          "file": "Ease-variable/bounceIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bounceInOut",
+          "file": "Ease-variable/bounceInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bounceOut",
+          "file": "Ease-variable/bounceOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "circIn",
+          "file": "Ease-variable/circIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "circInOut",
+          "file": "Ease-variable/circInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "circOut",
+          "file": "Ease-variable/circOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cubicIn",
+          "file": "Ease-variable/cubicIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cubicInOut",
+          "file": "Ease-variable/cubicInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cubicOut",
+          "file": "Ease-variable/cubicOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "elasticIn",
+          "file": "Ease-variable/elasticIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "elasticInOut",
+          "file": "Ease-variable/elasticInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "elasticOut",
+          "file": "Ease-variable/elasticOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "expoIn",
+          "file": "Ease-variable/expoIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "expoInOut",
+          "file": "Ease-variable/expoInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "expoOut",
+          "file": "Ease-variable/expoOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "get",
+          "file": "Ease-variable/get-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getBackIn",
+          "file": "Ease-variable/getBackIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getBackInOut",
+          "file": "Ease-variable/getBackInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getBackOut",
+          "file": "Ease-variable/getBackOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getElasticIn",
+          "file": "Ease-variable/getElasticIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getElasticInOut",
+          "file": "Ease-variable/getElasticInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getElasticOut",
+          "file": "Ease-variable/getElasticOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getPowIn",
+          "file": "Ease-variable/getPowIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getPowInOut",
+          "file": "Ease-variable/getPowInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getPowOut",
+          "file": "Ease-variable/getPowOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "linear",
+          "file": "Ease-variable/linear-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quadIn",
+          "file": "Ease-variable/quadIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quadInOut",
+          "file": "Ease-variable/quadInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quadOut",
+          "file": "Ease-variable/quadOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quartIn",
+          "file": "Ease-variable/quartIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quartInOut",
+          "file": "Ease-variable/quartInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quartOut",
+          "file": "Ease-variable/quartOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quintIn",
+          "file": "Ease-variable/quintIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quintInOut",
+          "file": "Ease-variable/quintInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quintOut",
+          "file": "Ease-variable/quintOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "sineIn",
+          "file": "Ease-variable/sineIn-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "sineInOut",
+          "file": "Ease-variable/sineInOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "sineOut",
+          "file": "Ease-variable/sineOut-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cubicBezier",
+          "file": "Ease-variable/cubicBezier-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EaseFunction",
+      "kind": "TypeAlias",
+      "file": "EaseFunction-typealias.md",
+      "topic": "tween",
+      "members": []
+    },
+    {
+      "name": "EgretMovieClipData",
+      "kind": "Interface",
+      "file": "EgretMovieClipData-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "events",
+          "file": "EgretMovieClipData-interface/events-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "frameRate",
+          "file": "EgretMovieClipData-interface/frameRate-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "frames",
+          "file": "EgretMovieClipData-interface/frames-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "labels",
+          "file": "EgretMovieClipData-interface/labels-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipDataSet",
+      "kind": "Interface",
+      "file": "EgretMovieClipDataSet-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "mc",
+          "file": "EgretMovieClipDataSet-interface/mc-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "res",
+          "file": "EgretMovieClipDataSet-interface/res-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipEventData",
+      "kind": "Interface",
+      "file": "EgretMovieClipEventData-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "frame",
+          "file": "EgretMovieClipEventData-interface/frame-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "EgretMovieClipEventData-interface/name-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipFrameData",
+      "kind": "Interface",
+      "file": "EgretMovieClipFrameData-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "duration",
+          "file": "EgretMovieClipFrameData-interface/duration-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "res",
+          "file": "EgretMovieClipFrameData-interface/res-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "EgretMovieClipFrameData-interface/x-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "y",
+          "file": "EgretMovieClipFrameData-interface/y-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipLabelData",
+      "kind": "Interface",
+      "file": "EgretMovieClipLabelData-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "end",
+          "file": "EgretMovieClipLabelData-interface/end-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "frame",
+          "file": "EgretMovieClipLabelData-interface/frame-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "EgretMovieClipLabelData-interface/name-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipResourceData",
+      "kind": "Interface",
+      "file": "EgretMovieClipResourceData-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "h",
+          "file": "EgretMovieClipResourceData-interface/h-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "w",
+          "file": "EgretMovieClipResourceData-interface/w-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "EgretMovieClipResourceData-interface/x-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "y",
+          "file": "EgretMovieClipResourceData-interface/y-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "EgretMovieClipTextureParser",
+      "kind": "Class",
+      "file": "EgretMovieClipTextureParser-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "EgretMovieClipTextureParser-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "createFrameTexture",
+          "file": "EgretMovieClipTextureParser-class/createFrameTexture-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "GravityParticle",
+      "kind": "Class",
+      "file": "GravityParticle-class.md",
+      "topic": "particle",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "GravityParticle-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "GravityParticle-class/alpha-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alphaDelta",
+          "file": "GravityParticle-class/alphaDelta-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "blendMode",
+          "file": "GravityParticle-class/blendMode-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "currentTime",
+          "file": "GravityParticle-class/currentTime-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "radialAcceleration",
+          "file": "GravityParticle-class/radialAcceleration-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "rotation",
+          "file": "GravityParticle-class/rotation-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "rotationDelta",
+          "file": "GravityParticle-class/rotationDelta-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scale",
+          "file": "GravityParticle-class/scale-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleDelta",
+          "file": "GravityParticle-class/scaleDelta-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "startX",
+          "file": "GravityParticle-class/startX-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "startY",
+          "file": "GravityParticle-class/startY-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "tangentialAcceleration",
+          "file": "GravityParticle-class/tangentialAcceleration-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "totalTime",
+          "file": "GravityParticle-class/totalTime-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "velocityX",
+          "file": "GravityParticle-class/velocityX-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "velocityY",
+          "file": "GravityParticle-class/velocityY-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "GravityParticle-class/x-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "GravityParticle-class/y-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "reset",
+          "file": "GravityParticle-class/reset-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "GravityParticleSystem",
+      "kind": "Class",
+      "file": "GravityParticleSystem-class.md",
+      "topic": "particle",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "GravityParticleSystem-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "emissionTime",
+          "file": "GravityParticleSystem-class/emissionTime-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "maxParticles",
+          "file": "GravityParticleSystem-class/maxParticles-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "numParticles",
+          "file": "GravityParticleSystem-class/numParticles-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "particleClass",
+          "file": "GravityParticleSystem-class/particleClass-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "texture",
+          "file": "GravityParticleSystem-class/texture-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "GravityParticleSystem-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static RENDER_TYPE_PARTICLE",
+          "file": "GravityParticleSystem-class/static-RENDER_TYPE_PARTICLE-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "GravityParticleSystem-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "GravityParticleSystem-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "GravityParticleSystem-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "GravityParticleSystem-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "GravityParticleSystem-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "emissionRate",
+          "file": "GravityParticleSystem-class/emissionRate-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "emitterBounds",
+          "file": "GravityParticleSystem-class/emitterBounds-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "emitterX",
+          "file": "GravityParticleSystem-class/emitterX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "emitterY",
+          "file": "GravityParticleSystem-class/emitterY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "filters",
+          "file": "GravityParticleSystem-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "GravityParticleSystem-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "GravityParticleSystem-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "GravityParticleSystem-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "GravityParticleSystem-class/height-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "GravityParticleSystem-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "mask",
+          "file": "GravityParticleSystem-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "GravityParticleSystem-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "GravityParticleSystem-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "GravityParticleSystem-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "name",
+          "file": "GravityParticleSystem-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "GravityParticleSystem-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "particles",
+          "file": "GravityParticleSystem-class/particles-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "rotation",
+          "file": "GravityParticleSystem-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "GravityParticleSystem-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "GravityParticleSystem-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRect",
+          "file": "GravityParticleSystem-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewX",
+          "file": "GravityParticleSystem-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "GravityParticleSystem-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "GravityParticleSystem-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "GravityParticleSystem-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "GravityParticleSystem-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchEnabled",
+          "file": "GravityParticleSystem-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "GravityParticleSystem-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "GravityParticleSystem-class/width-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "x",
+          "file": "GravityParticleSystem-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "GravityParticleSystem-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "GravityParticleSystem-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "GravityParticleSystem-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "advanceParticle",
+          "file": "GravityParticleSystem-class/advanceParticle-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "GravityParticleSystem-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "changeTexture",
+          "file": "GravityParticleSystem-class/changeTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "GravityParticleSystem-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "GravityParticleSystem-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "GravityParticleSystem-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "GravityParticleSystem-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "GravityParticleSystem-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "GravityParticleSystem-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "GravityParticleSystem-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "initParticle",
+          "file": "GravityParticleSystem-class/initParticle-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "localToGlobal",
+          "file": "GravityParticleSystem-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "notifyListener",
+          "file": "GravityParticleSystem-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "GravityParticleSystem-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "GravityParticleSystem-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setCurrentParticles",
+          "file": "GravityParticleSystem-class/setCurrentParticles-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortChildren",
+          "file": "GravityParticleSystem-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "start",
+          "file": "GravityParticleSystem-class/start-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stop",
+          "file": "GravityParticleSystem-class/stop-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "GravityParticleSystem-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "GravityParticleSystem-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "MovieClip",
+      "kind": "Class",
+      "file": "MovieClip-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "MovieClip-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bitmapData",
+          "file": "MovieClip-class/bitmapData-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapHeight",
+          "file": "MovieClip-class/bitmapHeight-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapOffsetX",
+          "file": "MovieClip-class/bitmapOffsetX-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapOffsetY",
+          "file": "MovieClip-class/bitmapOffsetY-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapWidth",
+          "file": "MovieClip-class/bitmapWidth-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapX",
+          "file": "MovieClip-class/bitmapX-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "bitmapY",
+          "file": "MovieClip-class/bitmapY-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sourceHeight",
+          "file": "MovieClip-class/sourceHeight-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sourceWidth",
+          "file": "MovieClip-class/sourceWidth-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "textureHeight",
+          "file": "MovieClip-class/textureHeight-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "textureWidth",
+          "file": "MovieClip-class/textureWidth-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static defaultSmoothing",
+          "file": "MovieClip-class/static-defaultSmoothing-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "MovieClip-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "MovieClip-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "MovieClip-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "MovieClip-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "MovieClip-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "MovieClip-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "currentFrame",
+          "file": "MovieClip-class/currentFrame-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "currentFrameLabel",
+          "file": "MovieClip-class/currentFrameLabel-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "currentLabel",
+          "file": "MovieClip-class/currentLabel-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "fillMode",
+          "file": "MovieClip-class/fillMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "filters",
+          "file": "MovieClip-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "MovieClip-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "MovieClip-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "MovieClip-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "MovieClip-class/height-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "MovieClip-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "isPlaying",
+          "file": "MovieClip-class/isPlaying-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "mask",
+          "file": "MovieClip-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "MovieClip-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "MovieClip-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "MovieClip-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "movieClipData",
+          "file": "MovieClip-class/movieClipData-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "MovieClip-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "MovieClip-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "pixelHitTest",
+          "file": "MovieClip-class/pixelHitTest-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "rotation",
+          "file": "MovieClip-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scale9Grid",
+          "file": "MovieClip-class/scale9Grid-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "MovieClip-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "MovieClip-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRect",
+          "file": "MovieClip-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewX",
+          "file": "MovieClip-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "MovieClip-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "smoothing",
+          "file": "MovieClip-class/smoothing-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "MovieClip-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "MovieClip-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "texture",
+          "file": "MovieClip-class/texture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "MovieClip-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "totalFrames",
+          "file": "MovieClip-class/totalFrames-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "touchEnabled",
+          "file": "MovieClip-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "MovieClip-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "MovieClip-class/width-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "x",
+          "file": "MovieClip-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "MovieClip-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "MovieClip-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "MovieClip-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "advanceFrame",
+          "file": "MovieClip-class/advanceFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "MovieClip-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "MovieClip-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "MovieClip-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "MovieClip-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "MovieClip-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "MovieClip-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "gotoAndPlay",
+          "file": "MovieClip-class/gotoAndPlay-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "gotoAndStop",
+          "file": "MovieClip-class/gotoAndStop-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "hasEventListener",
+          "file": "MovieClip-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "MovieClip-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "localToGlobal",
+          "file": "MovieClip-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "nextFrame",
+          "file": "MovieClip-class/nextFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "notifyListener",
+          "file": "MovieClip-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "MovieClip-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "play",
+          "file": "MovieClip-class/play-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "prevFrame",
+          "file": "MovieClip-class/prevFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "removeEventListener",
+          "file": "MovieClip-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortChildren",
+          "file": "MovieClip-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stop",
+          "file": "MovieClip-class/stop-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "MovieClip-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "MovieClip-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "MovieClipData",
+      "kind": "Class",
+      "file": "MovieClipData-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "MovieClipData-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "frameCount",
+          "file": "MovieClipData-class/frameCount-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "frameRate",
+          "file": "MovieClipData-class/frameRate-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "totalDuration",
+          "file": "MovieClipData-class/totalDuration-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "addFrame",
+          "file": "MovieClipData-class/addFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getFrame",
+          "file": "MovieClipData-class/getFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getFrameByLabel",
+          "file": "MovieClipData-class/getFrameByLabel-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getFrameLabel",
+          "file": "MovieClipData-class/getFrameLabel-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getFrameLabelForFrame",
+          "file": "MovieClipData-class/getFrameLabelForFrame-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getFrameLabelRange",
+          "file": "MovieClipData-class/getFrameLabelRange-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setFrameEvent",
+          "file": "MovieClipData-class/setFrameEvent-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setFrameLabel",
+          "file": "MovieClipData-class/setFrameLabel-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static fromSpriteSheet",
+          "file": "MovieClipData-class/static-fromSpriteSheet-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static fromTextureArray",
+          "file": "MovieClipData-class/static-fromTextureArray-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipDataFactory",
+      "kind": "Class",
+      "file": "MovieClipDataFactory-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "MovieClipDataFactory-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "enableCache",
+          "file": "MovieClipDataFactory-class/enableCache-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "mcDataSet",
+          "file": "MovieClipDataFactory-class/mcDataSet-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "spriteSheet",
+          "file": "MovieClipDataFactory-class/spriteSheet-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "texture",
+          "file": "MovieClipDataFactory-class/texture-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "textureParser",
+          "file": "MovieClipDataFactory-class/textureParser-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "clearCache",
+          "file": "MovieClipDataFactory-class/clearCache-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "generateMovieClipData",
+          "file": "MovieClipDataFactory-class/generateMovieClipData-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipEvent",
+      "kind": "Variable",
+      "file": "MovieClipEvent-variable.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "COMPLETE",
+          "file": "MovieClipEvent-variable/COMPLETE-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "FRAME_CHANGE",
+          "file": "MovieClipEvent-variable/FRAME_CHANGE-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "LOOP_COMPLETE",
+          "file": "MovieClipEvent-variable/LOOP_COMPLETE-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipEventType",
+      "kind": "TypeAlias",
+      "file": "MovieClipEventType-typealias.md",
+      "topic": "display",
+      "members": []
+    },
+    {
+      "name": "MovieClipFrame",
+      "kind": "Interface",
+      "file": "MovieClipFrame-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "duration",
+          "file": "MovieClipFrame-interface/duration-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "event",
+          "file": "MovieClipFrame-interface/event-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "label",
+          "file": "MovieClipFrame-interface/label-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "texture",
+          "file": "MovieClipFrame-interface/texture-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipLabel",
+      "kind": "Interface",
+      "file": "MovieClipLabel-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "endFrame",
+          "file": "MovieClipLabel-interface/endFrame-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "MovieClipLabel-interface/name-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "startFrame",
+          "file": "MovieClipLabel-interface/startFrame-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipTextureParser",
+      "kind": "Interface",
+      "file": "MovieClipTextureParser-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "createFrameTexture",
+          "file": "MovieClipTextureParser-interface/createFrameTexture-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "MovieClipTextureSource",
+      "kind": "Interface",
+      "file": "MovieClipTextureSource-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "bitmapHeight",
+          "file": "MovieClipTextureSource-interface/bitmapHeight-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bitmapWidth",
+          "file": "MovieClipTextureSource-interface/bitmapWidth-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bitmapX",
+          "file": "MovieClipTextureSource-interface/bitmapX-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bitmapY",
+          "file": "MovieClipTextureSource-interface/bitmapY-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "MovieClipTextureSource-interface/name-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "offsetX",
+          "file": "MovieClipTextureSource-interface/offsetX-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "offsetY",
+          "file": "MovieClipTextureSource-interface/offsetY-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "Particle",
+      "kind": "Class",
+      "file": "Particle-class.md",
+      "topic": "particle",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "Particle-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "alpha",
+          "file": "Particle-class/alpha-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "blendMode",
+          "file": "Particle-class/blendMode-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "currentTime",
+          "file": "Particle-class/currentTime-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "rotation",
+          "file": "Particle-class/rotation-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scale",
+          "file": "Particle-class/scale-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "totalTime",
+          "file": "Particle-class/totalTime-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "Particle-class/x-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "y",
+          "file": "Particle-class/y-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "reset",
+          "file": "Particle-class/reset-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "ParticleSystem",
+      "kind": "Class",
+      "file": "ParticleSystem-class.md",
+      "topic": "particle",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "ParticleSystem-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "emissionTime",
+          "file": "ParticleSystem-class/emissionTime-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "maxParticles",
+          "file": "ParticleSystem-class/maxParticles-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "numParticles",
+          "file": "ParticleSystem-class/numParticles-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "particleClass",
+          "file": "ParticleSystem-class/particleClass-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "texture",
+          "file": "ParticleSystem-class/texture-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "ParticleSystem-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static RENDER_TYPE_PARTICLE",
+          "file": "ParticleSystem-class/static-RENDER_TYPE_PARTICLE-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "alpha",
+          "file": "ParticleSystem-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "ParticleSystem-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "ParticleSystem-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "ParticleSystem-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "ParticleSystem-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "emissionRate",
+          "file": "ParticleSystem-class/emissionRate-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "emitterBounds",
+          "file": "ParticleSystem-class/emitterBounds-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "emitterX",
+          "file": "ParticleSystem-class/emitterX-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "emitterY",
+          "file": "ParticleSystem-class/emitterY-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "filters",
+          "file": "ParticleSystem-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "ParticleSystem-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "ParticleSystem-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "ParticleSystem-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "ParticleSystem-class/height-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "ParticleSystem-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "mask",
+          "file": "ParticleSystem-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "ParticleSystem-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "ParticleSystem-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "ParticleSystem-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "name",
+          "file": "ParticleSystem-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "ParticleSystem-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "particles",
+          "file": "ParticleSystem-class/particles-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "rotation",
+          "file": "ParticleSystem-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "ParticleSystem-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "ParticleSystem-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRect",
+          "file": "ParticleSystem-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewX",
+          "file": "ParticleSystem-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "ParticleSystem-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "ParticleSystem-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "ParticleSystem-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "ParticleSystem-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchEnabled",
+          "file": "ParticleSystem-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "ParticleSystem-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "ParticleSystem-class/width-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "x",
+          "file": "ParticleSystem-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "ParticleSystem-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "ParticleSystem-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "ParticleSystem-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "advanceParticle",
+          "file": "ParticleSystem-class/advanceParticle-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "ParticleSystem-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "changeTexture",
+          "file": "ParticleSystem-class/changeTexture-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "ParticleSystem-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "ParticleSystem-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "ParticleSystem-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "ParticleSystem-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "ParticleSystem-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "ParticleSystem-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "ParticleSystem-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "initParticle",
+          "file": "ParticleSystem-class/initParticle-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "localToGlobal",
+          "file": "ParticleSystem-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "notifyListener",
+          "file": "ParticleSystem-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "ParticleSystem-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "ParticleSystem-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setCurrentParticles",
+          "file": "ParticleSystem-class/setCurrentParticles-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "sortChildren",
+          "file": "ParticleSystem-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "start",
+          "file": "ParticleSystem-class/start-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "stop",
+          "file": "ParticleSystem-class/stop-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "ParticleSystem-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "ParticleSystem-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "ScrollPolicy",
+      "kind": "TypeAlias",
+      "file": "ScrollPolicy-typealias.md",
+      "topic": "display",
+      "members": []
+    },
+    {
+      "name": "ScrollPolicy",
+      "kind": "Variable",
+      "file": "ScrollPolicy-variable.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "AUTO",
+          "file": "ScrollPolicy-variable/AUTO-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "OFF",
+          "file": "ScrollPolicy-variable/OFF-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "ON",
+          "file": "ScrollPolicy-variable/ON-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "ScrollView",
+      "kind": "Class",
+      "file": "ScrollView-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "ScrollView-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bounces",
+          "file": "ScrollView-class/bounces-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "horizontalScrollPolicy",
+          "file": "ScrollView-class/horizontalScrollPolicy-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "isRenderGroup",
+          "file": "ScrollView-class/isRenderGroup-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollBeginThreshold",
+          "file": "ScrollView-class/scrollBeginThreshold-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scrollSpeed",
+          "file": "ScrollView-class/scrollSpeed-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "verticalScrollPolicy",
+          "file": "ScrollView-class/verticalScrollPolicy-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "ScrollView-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "ScrollView-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "ScrollView-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "ScrollView-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "ScrollView-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "ScrollView-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "content",
+          "file": "ScrollView-class/content-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "filters",
+          "file": "ScrollView-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "ScrollView-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "ScrollView-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "ScrollView-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "ScrollView-class/height-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "ScrollView-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "mask",
+          "file": "ScrollView-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "ScrollView-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "ScrollView-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "ScrollView-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "name",
+          "file": "ScrollView-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "numChildren",
+          "file": "ScrollView-class/numChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "ScrollView-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "rotation",
+          "file": "ScrollView-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "ScrollView-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "ScrollView-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollBottom",
+          "file": "ScrollView-class/scrollBottom-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scrollLeft",
+          "file": "ScrollView-class/scrollLeft-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scrollRect",
+          "file": "ScrollView-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRight",
+          "file": "ScrollView-class/scrollRight-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "scrollTop",
+          "file": "ScrollView-class/scrollTop-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "skewX",
+          "file": "ScrollView-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "ScrollView-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "ScrollView-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "ScrollView-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "ScrollView-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchChildren",
+          "file": "ScrollView-class/touchChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchEnabled",
+          "file": "ScrollView-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "ScrollView-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "ScrollView-class/width-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "ScrollView-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "ScrollView-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "ScrollView-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addChild",
+          "file": "ScrollView-class/addChild-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addChildAt",
+          "file": "ScrollView-class/addChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "ScrollView-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "ScrollView-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "childAdded",
+          "file": "ScrollView-class/childAdded-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "childRemoved",
+          "file": "ScrollView-class/childRemoved-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "contains",
+          "file": "ScrollView-class/contains-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "ScrollView-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "ScrollView-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "ScrollView-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildAt",
+          "file": "ScrollView-class/getChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildByName",
+          "file": "ScrollView-class/getChildByName-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildIndex",
+          "file": "ScrollView-class/getChildIndex-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getMaxScrollLeft",
+          "file": "ScrollView-class/getMaxScrollLeft-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getMaxScrollTop",
+          "file": "ScrollView-class/getMaxScrollTop-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "ScrollView-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "ScrollView-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "ScrollView-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "ScrollView-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "localToGlobal",
+          "file": "ScrollView-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "notifyListener",
+          "file": "ScrollView-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "ScrollView-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeChild",
+          "file": "ScrollView-class/removeChild-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeChildAt",
+          "file": "ScrollView-class/removeChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeChildren",
+          "file": "ScrollView-class/removeChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeContent",
+          "file": "ScrollView-class/removeContent-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "removeEventListener",
+          "file": "ScrollView-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setChildIndex",
+          "file": "ScrollView-class/setChildIndex-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setContent",
+          "file": "ScrollView-class/setContent-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setScrollLeft",
+          "file": "ScrollView-class/setScrollLeft-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setScrollPosition",
+          "file": "ScrollView-class/setScrollPosition-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setScrollTop",
+          "file": "ScrollView-class/setScrollTop-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "sortChildren",
+          "file": "ScrollView-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "swapChildren",
+          "file": "ScrollView-class/swapChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "swapChildrenAt",
+          "file": "ScrollView-class/swapChildrenAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "ScrollView-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "ScrollView-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "Tween",
+      "kind": "Class",
+      "file": "Tween-class.md",
+      "topic": "tween",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "Tween-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "isActive",
+          "file": "Tween-class/isActive-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "call",
+          "file": "Tween-class/call-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "from",
+          "file": "Tween-class/from-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "pause",
+          "file": "Tween-class/pause-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "remove",
+          "file": "Tween-class/remove-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resume",
+          "file": "Tween-class/resume-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "set",
+          "file": "Tween-class/set-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setPaused",
+          "file": "Tween-class/setPaused-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setPosition",
+          "file": "Tween-class/setPosition-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "then",
+          "file": "Tween-class/then-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "to",
+          "file": "Tween-class/to-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "wait",
+          "file": "Tween-class/wait-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static get",
+          "file": "Tween-class/static-get-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static getCount",
+          "file": "Tween-class/static-getCount-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static pauseAll",
+          "file": "Tween-class/static-pauseAll-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static pauseTweens",
+          "file": "Tween-class/static-pauseTweens-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static removeAllTweens",
+          "file": "Tween-class/static-removeAllTweens-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static removeTweens",
+          "file": "Tween-class/static-removeTweens-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static resumeAll",
+          "file": "Tween-class/static-resumeAll-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static resumeTweens",
+          "file": "Tween-class/static-resumeTweens-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "TweenGroup",
+      "kind": "Class",
+      "file": "TweenGroup-class.md",
+      "topic": "tween",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "TweenGroup-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "TweenGroup-class/name-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "size",
+          "file": "TweenGroup-class/size-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "add",
+          "file": "TweenGroup-class/add-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "get",
+          "file": "TweenGroup-class/get-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "pause",
+          "file": "TweenGroup-class/pause-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "removeAll",
+          "file": "TweenGroup-class/removeAll-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resume",
+          "file": "TweenGroup-class/resume-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "TweenOptions",
+      "kind": "Interface",
+      "file": "TweenOptions-interface.md",
+      "topic": "tween",
+      "members": [
+        {
+          "name": "ease",
+          "file": "TweenOptions-interface/ease-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "ignoreGlobalPause",
+          "file": "TweenOptions-interface/ignoreGlobalPause-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "loop",
+          "file": "TweenOptions-interface/loop-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "onChange",
+          "file": "TweenOptions-interface/onChange-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "onChangeObj",
+          "file": "TweenOptions-interface/onChangeObj-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "onLoopComplete",
+          "file": "TweenOptions-interface/onLoopComplete-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "onLoopCompleteObj",
+          "file": "TweenOptions-interface/onLoopCompleteObj-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "paused",
+          "file": "TweenOptions-interface/paused-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "position",
+          "file": "TweenOptions-interface/position-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "repeat",
+          "file": "TweenOptions-interface/repeat-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "yoyo",
+          "file": "TweenOptions-interface/yoyo-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "URLLoader",
+      "kind": "Class",
+      "file": "URLLoader-class.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "URLLoader-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "data",
+          "file": "URLLoader-class/data-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dataFormat",
+          "file": "URLLoader-class/dataFormat-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "addEventListener",
+          "file": "URLLoader-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "close",
+          "file": "URLLoader-class/close-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "URLLoader-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "URLLoader-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "URLLoader-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "load",
+          "file": "URLLoader-class/load-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "notifyListener",
+          "file": "URLLoader-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "URLLoader-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "URLLoader-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "URLLoader-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "URLLoaderDataFormat",
+      "kind": "TypeAlias",
+      "file": "URLLoaderDataFormat-typealias.md",
+      "topic": "net",
+      "members": []
+    },
+    {
+      "name": "URLLoaderDataFormat",
+      "kind": "Variable",
+      "file": "URLLoaderDataFormat-variable.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "BINARY",
+          "file": "URLLoaderDataFormat-variable/BINARY-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "JSON",
+          "file": "URLLoaderDataFormat-variable/JSON-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "SOUND",
+          "file": "URLLoaderDataFormat-variable/SOUND-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "TEXT",
+          "file": "URLLoaderDataFormat-variable/TEXT-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "TEXTURE",
+          "file": "URLLoaderDataFormat-variable/TEXTURE-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "URLRequest",
+      "kind": "Class",
+      "file": "URLRequest-class.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "URLRequest-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "data",
+          "file": "URLRequest-class/data-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "method",
+          "file": "URLRequest-class/method-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "requestHeaders",
+          "file": "URLRequest-class/requestHeaders-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "url",
+          "file": "URLRequest-class/url-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "URLRequestHeader",
+      "kind": "Class",
+      "file": "URLRequestHeader-class.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "URLRequestHeader-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "name",
+          "file": "URLRequestHeader-class/name-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "value",
+          "file": "URLRequestHeader-class/value-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "URLRequestMethod",
+      "kind": "TypeAlias",
+      "file": "URLRequestMethod-typealias.md",
+      "topic": "net",
+      "members": []
+    },
+    {
+      "name": "URLRequestMethod",
+      "kind": "Variable",
+      "file": "URLRequestMethod-variable.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "GET",
+          "file": "URLRequestMethod-variable/GET-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "POST",
+          "file": "URLRequestMethod-variable/POST-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "URLVariables",
+      "kind": "Class",
+      "file": "URLVariables-class.md",
+      "topic": "net",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "URLVariables-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "variables",
+          "file": "URLVariables-class/variables-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "decode",
+          "file": "URLVariables-class/decode-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "toString",
+          "file": "URLVariables-class/toString-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    }
+  ],
+  "supportingTypes": [
+    "supporting/game-ParticleConfig.md",
+    "supporting/game-URLLoaderEvents.md"
+  ]
+}

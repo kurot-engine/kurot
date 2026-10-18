@@ -103,6 +103,12 @@ class Region {
 
 // ── ParticleSystem ────────────────────────────────────────────────────────────
 
+/**
+ * Display object that emits, pools and advances textured particles.
+ * Each running system owns a Core ticker callback. emissionRate is the
+ * interval in milliseconds, not particles per second; stop(true) clears
+ * particles and detaches its callback during view disposal.
+ */
 export class ParticleSystem extends DisplayObject {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
@@ -118,8 +124,20 @@ export class ParticleSystem extends DisplayObject {
 	 * Remaining emission time in milliseconds. A value of -1 emits indefinitely.
 	 */
 	public emissionTime = -1;
+	/**
+	 * Borrowed particle texture. Stopping or removing the system does not dispose
+	 * it; the resource owner releases it after all consumers have stopped.
+	 */
 	public texture: Texture;
+	/**
+	 * Maximum concurrently live particles; defaults to 200. Assigning this value
+	 * does not immediately remove existing particles.
+	 */
 	public maxParticles = 200;
+	/**
+	 * Current live particle count, initially 0; maintained by the system.
+	 * Use setCurrentParticles() to add particles rather than assigning this field.
+	 */
 	public numParticles = 0;
 	/**
 	 * Particle constructor used when the pool is empty. Defaults to Particle.
@@ -139,6 +157,11 @@ export class ParticleSystem extends DisplayObject {
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
+	/**
+	 * Create a stopped system borrowing a texture. emissionRate is an interval
+	 * in milliseconds, not a particles-per-second count. Non-finite or negative
+	 * intervals throw RangeError; 0 disables emission.
+	 */
 	public constructor(texture: Texture, emissionRate: number) {
 		super();
 		this._emissionRate = this.validateEmissionRate(emissionRate);
@@ -157,7 +180,8 @@ export class ParticleSystem extends DisplayObject {
 	}
 
 	/**
-	 * Interval between particle emissions in milliseconds. Zero disables emission.
+	 * Interval between emissions in milliseconds; 0 disables emission. Non-finite
+	 * or negative values throw RangeError. Existing particles can continue updating.
 	 */
 	public get emissionRate(): number {
 		return this._emissionRate;
@@ -204,8 +228,9 @@ export class ParticleSystem extends DisplayObject {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Start emitting particles.
-	 * @param duration Total emission time in ms. -1 = infinite.
+	 * Start emitting on the shared Core ticker. Duration defaults to -1 for unlimited
+	 * emission; positive values are milliseconds. Does nothing when emissionRate is 0.
+	 * Stage removal does not unregister this callback; call stop(true) on disposal.
 	 */
 	public start(duration = -1): void {
 		if (this.emissionRate === 0) return;
@@ -216,8 +241,10 @@ export class ParticleSystem extends DisplayObject {
 	}
 
 	/**
-	 * Stop emitting particles.
-	 * @param clear Whether to remove all existing particles immediately.
+	 * Stop new emissions. clear defaults to false, letting live particles expire
+	 * before the ticker callback is removed. With true, clears live particles and
+	 * unregisters the callback immediately. Use stop(true) when closing a game round;
+	 * borrowed textures and application event listeners are not disposed.
 	 */
 	public stop(clear = false): void {
 		this.emissionTime = 0;
@@ -228,7 +255,8 @@ export class ParticleSystem extends DisplayObject {
 	}
 
 	/**
-	 * Set the number of current particles directly (up to maxParticles).
+	 * Add particles until the requested count or maxParticles is reached. Requests
+	 * below the current count do not remove particles; use stop(true) to clear them.
 	 */
 	public setCurrentParticles(num: number): void {
 		for (let i = this.numParticles; i < num && this.numParticles < this.maxParticles; i++) {

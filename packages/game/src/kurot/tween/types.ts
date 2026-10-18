@@ -49,47 +49,60 @@ export type TweenStep = ToStep | FromStep | WaitStep | CallStep | SetStep;
  */
 export interface TweenOptions {
 	/**
-	 * Repeats indefinitely when `repeat` is not set.
+	 * Whether to repeat indefinitely when repeat is omitted; defaults to false.
+	 * An explicit repeat value takes precedence. Remove infinite tweens when their
+	 * owning game round ends; removing a display object does not remove its tweens.
 	 */
 	loop?: boolean;
 	/**
-	 * Number of additional playback cycles; `-1` repeats indefinitely.
+	 * Additional cycles after the first; defaults to 0, or -1 when loop is true.
+	 * Exactly -1 repeats forever. Other finite values are floored and clamped to 0;
+	 * non-finite values become 0. Counts are cycles, not milliseconds.
 	 */
 	repeat?: number;
 	/**
-	 * Alternates playback direction between cycles.
+	 * Whether successive cycles alternate direction; defaults to false.
+	 * This changes repeat direction but does not itself enable repetition.
 	 */
 	yoyo?: boolean;
 	/**
-	 * Allows the tween to advance while all tweens are globally paused.
+	 * Whether to advance during Tween.pauseAll(); defaults to false.
+	 * An individually paused tween still stays paused.
 	 */
 	ignoreGlobalPause?: boolean;
 	/**
-	 * Default easing function for property steps.
+	 * Default easing for to/from steps; defaults to Ease.linear.
+	 * Receives normalized progress, independent of the millisecond step duration.
 	 */
 	ease?: EaseFunction;
 	/**
-	 * Starts the tween in a paused state.
+	 * Whether to register the tween in a paused state; defaults to false.
+	 * Paused tweens remain active and retain their target until removed or completed.
 	 */
 	paused?: boolean;
 	/**
-	 * Applies this forward-sequence position on the first active tick.
+	 * Initial forward-sequence position in milliseconds; omitted means 0.
+	 * Applied on the first active update, rather than synchronously at construction.
+	 * Negative values clamp to 0; non-finite values throw RangeError.
 	 */
 	position?: number;
 	/**
-	 * Runs after each tween update, including the final update.
+	 * Optional callback after each tween update, including the final update.
+	 * Called synchronously with the Tween argument; exceptions propagate to the caller
+	 * or ticker. Stop/remove the tween to end future callbacks during game disposal.
 	 */
 	onChange?: (tween: Tween) => void;
 	/**
-	 * Provides the `this` value for `onChange`.
+	 * Callback receiver for onChange; defaults to the tween target when omitted.
 	 */
 	onChangeObj?: object;
 	/**
-	 * Runs after each completed cycle that will repeat.
+	 * Optional synchronous callback after a cycle that will repeat, before the
+	 * next cycle. It does not run for the final finite cycle. Exceptions propagate.
 	 */
 	onLoopComplete?: (tween: Tween) => void;
 	/**
-	 * Provides the `this` value for `onLoopComplete`.
+	 * Callback receiver for onLoopComplete; defaults to the tween target when omitted.
 	 */
 	onLoopCompleteObj?: object;
 }

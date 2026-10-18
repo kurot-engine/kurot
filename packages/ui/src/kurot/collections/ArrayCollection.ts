@@ -22,6 +22,10 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
+	/**
+	 * Wrap an existing array without copying; omitted source creates an empty array.
+	 * Items are borrowed data and are never disposed by collection mutations.
+	 */
 	public constructor(source?: unknown[]) {
 		super();
 		this._source = source ?? [];
@@ -29,6 +33,11 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Live backing array, initially the supplied array or an empty array. Assignment
+	 * retains the array and dispatches RESET. Direct array mutation sends no events;
+	 * use collection methods or refresh() to notify views.
+	 */
 	public get source(): unknown[] {
 		return this._source;
 	}
@@ -38,25 +47,42 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		this._dispatchCoEvent(CollectionEventKind.RESET);
 	}
 
+	/**
+	 * Number of backing-array items, initially 0 for an empty collection.
+	 */
 	public get length(): number {
 		return this._source.length;
 	}
 
 	// ── Public methods ────────────────────────────────────────────────────
 
+	/**
+	 * Read a 0-based item index; absent indices return undefined rather than throwing.
+	 */
 	public getItemAt(index: number): unknown {
 		return this._source[index];
 	}
 
+	/**
+	 * Return the first identity/equality match index, or -1 when the item is absent.
+	 */
 	public getItemIndex(item: unknown): number {
 		return this._source.indexOf(item);
 	}
 
+	/**
+	 * Append a borrowed item and synchronously dispatch ADD. Does not clone the item.
+	 */
 	public addItem(item: unknown): void {
 		this._source.push(item);
 		this._dispatchCoEvent(CollectionEventKind.ADD, this._source.length - 1, -1, [item]);
 	}
 
+	/**
+	 * Insert a borrowed item and dispatch ADD. Pass an integer index from 0 through
+	 * length (inclusive). Bounds below 0 or above length throw RangeError; there is
+	 * no separate integer validation.
+	 */
 	public addItemAt(item: unknown, index: number): void {
 		if (index < 0 || index > this._source.length) {
 			throw new RangeError(`ArrayCollection.addItemAt: index ${index} out of range`);
@@ -65,6 +91,11 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		this._dispatchCoEvent(CollectionEventKind.ADD, index, -1, [item]);
 	}
 
+	/**
+	 * Remove and return an item, dispatching REMOVE without disposing it. Pass an
+	 * integer index from 0 through length-1. Out-of-bounds values throw RangeError;
+	 * there is no separate integer validation.
+	 */
 	public removeItemAt(index: number): unknown {
 		if (index < 0 || index >= this._source.length) {
 			throw new RangeError(`ArrayCollection.removeItemAt: index ${index} out of range`);
@@ -74,6 +105,11 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		return item;
 	}
 
+	/**
+	 * Replace an item, return the previous item and dispatch REPLACE. Neither item
+	 * is disposed. Pass an integer index within 0..length-1; bounds violations throw
+	 * RangeError, without separate integer validation.
+	 */
 	public replaceItemAt(item: unknown, index: number): unknown {
 		if (index < 0 || index >= this._source.length) {
 			throw new RangeError(`ArrayCollection.replaceItemAt: index ${index} out of range`);
@@ -83,6 +119,10 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		return old;
 	}
 
+	/**
+	 * Dispatch UPDATE for an existing item's first matching index. Missing items are
+	 * ignored; changing an object's fields alone does not notify collection views.
+	 */
 	public itemUpdated(item: unknown): void {
 		const index = this.getItemIndex(item);
 		if (index !== -1) {
@@ -90,6 +130,10 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		}
 	}
 
+	/**
+	 * Empty the live backing array and dispatch REMOVE. The same array remains in
+	 * use; removed data objects and their external resources are not disposed.
+	 */
 	public removeAll(): void {
 		const items = this._source.slice();
 		this._source.length = 0;
@@ -115,6 +159,10 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		this._source = src;
 	}
 
+	/**
+	 * Dispatch REFRESH so views reread current data. Does not sort, copy or load
+	 * items; useful after direct backing-array changes.
+	 */
 	public refresh(): void {
 		this._dispatchCoEvent(CollectionEventKind.REFRESH);
 	}

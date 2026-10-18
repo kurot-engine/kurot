@@ -56,10 +56,20 @@ export class SystemTicker {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Requested rendered frame rate in frames per second, initially 30 for a
+	 * standalone ticker. createPlayer() normally sets the shared rate to 60.
+	 * Actual frame scheduling caps at 60 and remains browser-timing dependent.
+	 */
 	public get frameRate(): number {
 		return this._frameRate;
 	}
 
+	/**
+	 * Updates the requested frame rate in frames per second. Returns false for
+	 * values <= 0 or an unchanged value; scheduling caps at 60 even when the
+	 * reported requested value is larger. Supply a finite positive number.
+	 */
 	public setFrameRate(value: number): boolean {
 		if (value <= 0 || this._frameRate === value) return false;
 		this._frameRate = value;
@@ -80,20 +90,53 @@ export class SystemTicker {
 		if (i !== -1) this._players.splice(i, 1);
 	}
 
+	/**
+	 * Registers a callback receiving absolute milliseconds from getTimer(), not
+	 * a delta or seconds. Returning true requests rendering. The callback and
+	 * thisObject pair is deduplicated and must match when calling stopTick().
+	 * Registration does not start the requestAnimationFrame loop by itself.
+	 *
+	 * @example
+	 * ```ts
+	 * import { ticker } from '@kurot/core';
+	 *
+	 * let previous: number | undefined;
+	 * const onTick = (now: number): boolean => {
+	 *   const deltaSeconds = previous === undefined ? 0 : (now - previous) / 1000;
+	 *   previous = now;
+	 *   console.log(deltaSeconds);
+	 *   return false;
+	 * };
+	 * ticker.startTick(onTick, undefined);
+	 * ticker.stopTick(onTick, undefined);
+	 * ```
+	 */
 	public startTick(callback: TickCallback, thisObject: unknown): void {
 		if (this.getTickIndex(callback, thisObject) !== -1) return;
 		this._ticks.push({ callback, thisObject });
 	}
 
+	/**
+	 * Detaches the exact callback/thisObject pair passed to startTick().
+	 * A missing pair is harmless; a newly bound callback is a different identity.
+	 */
 	public stopTick(callback: TickCallback, thisObject: unknown): void {
 		const i = this.getTickIndex(callback, thisObject);
 		if (i !== -1) this._ticks.splice(i, 1);
 	}
 
+	/**
+	 * Queues work for the next render preparation while a Player is registered.
+	 * This has no cancellation handle; guard callbacks owned by a disposed view.
+	 */
 	public callLater(fn: (...args: unknown[]) => void, ...args: unknown[]): void {
 		this._callLaterList.push({ fn, args });
 	}
 
+	/**
+	 * Starts the requestAnimationFrame loop; repeated starts are harmless.
+	 * This is shared scheduling, so stopping it affects all users of this ticker.
+	 */
 	public start(): void {
 		if (this._running) return;
 		this._running = true;
@@ -101,6 +144,11 @@ export class SystemTicker {
 		this._rafId = requestAnimationFrame(this.onFrame);
 	}
 
+	/**
+	 * Cancels the requestAnimationFrame loop without clearing players, tick
+	 * callbacks, deferred calls or pause state. Registration owners must detach
+	 * their own callbacks; stop() alone does not dispose them.
+	 */
 	public stop(): void {
 		this._running = false;
 		if (this._rafId) {
@@ -109,9 +157,17 @@ export class SystemTicker {
 		}
 	}
 
+	/**
+	 * Pauses callback execution and rendering while keeping the frame loop and
+	 * registrations. This is a ticker-wide pause, affecting every registered user.
+	 */
 	public pause(): void {
 		this._isPaused = true;
 	}
+	/**
+	 * Clears the ticker-wide pause flag. This does not start a stopped frame loop
+	 * or individually resume Tweens that were explicitly paused by their owner.
+	 */
 	public resume(): void {
 		this._isPaused = false;
 	}

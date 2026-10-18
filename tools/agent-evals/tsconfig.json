@@ -11,7 +11,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		"lib": ["ES2022"],
+		"lib": ["ES2022", "DOM"],
 		"resolveJsonModule": true,
 		"esModuleInterop": true
 	},

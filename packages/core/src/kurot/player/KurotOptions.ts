@@ -49,7 +49,9 @@ export interface KurotOptions {
 	maxTouches?: number;
 
 	/**
-	 * Background color as a CSS string (default: '#000000').
+	 * Optional CSS background applied to the canvas element. Omission leaves the
+	 * canvas's existing CSS background unchanged; no default black value is assigned.
+	 * This styles the element, not a retained display-list background object.
 	 */
 	background?: string;
 }

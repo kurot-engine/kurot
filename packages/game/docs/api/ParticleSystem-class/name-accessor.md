@@ -1,0 +1,13 @@
+# name
+
+Package: `@kurot/game@2.0.1`. Generated from public declarations and JSDoc.
+
+```ts
+get name(): string;
+set name(value: string);
+```
+
+Inherited from `DisplayObject.name`; shown with this receiver's substituted types.
+
+Application lookup name, initially ''. Names need not be unique; a parent's
+getChildByName() returns its first matching direct child.

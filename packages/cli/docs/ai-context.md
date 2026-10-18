@@ -32,6 +32,8 @@ src/
 ```
 
 Project templates are under `templates/game` and `templates/empty`.
+Both checkout templates now include README/AGENTS consumer navigation; this
+documentation addition is unreleased. See [game-template.md](game-template.md).
 The CLI 3.6.0 game template's default KUI skin refresh includes 16 native Skin files,
 a Kurot-owned 2× atlas with logical resource-default nine-slice grids, and project palette
 colors. These replace the old EUI assets. Group/List/TabBar and text/image nodes use

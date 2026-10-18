@@ -6,6 +6,11 @@ const DEG_TO_RAD = Math.PI / 180;
 const TWO_PI = Math.PI * 2;
 const matrixPool: Matrix[] = [];
 
+/**
+ * Mutable affine transform for logical display coordinates.
+ * Rotation/skew inputs use the units of the individual method. Pooled and
+ * shared instances are scratch values; clone when storing a transform.
+ */
 export class Matrix {
 	// ── Static methods ────────────────────────────────────────────────────────
 

@@ -7,7 +7,18 @@ semantics. Published 2.5.3 lacks this audio correction. See [CHANGELOG.md](CHANG
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
-> **Package version: 2.5.4 (published).** Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+> **Package version: 2.5.5 (prepared, not published).** Documentation-only patch over 2.5.4. Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
+
+## API reference in 2.5.5 (not published)
+
+Find capabilities in [API topics](docs/api/topics.md), names in the
+[symbol index](docs/api/index.md), and individual members through each symbol's
+page. [Coverage](docs/api/coverage.md) distinguishes declaration coverage from
+remaining behavioral-comment gaps. Examples are checked with strict TypeScript.
+The generated reference is included by this checkout's package configuration;
+existing registry artifacts are unchanged. The 2.5.5 patch changes comments and
+distributed documentation, with no runtime/signature/export changes. Existing
+peer ranges still apply; other SDKs and applications need no upgrade for it.
 
 ## Continuous audio loops in 2.5.4
 
@@ -194,6 +205,9 @@ matching UI release; Core does not expose `textFit` or `minFontSize`.
 
 ## Installation
 
+Until 2.5.5 is published, install the recorded published baseline below. Its
+runtime supports the same APIs; use repository docs for the new reference.
+
 ```bash
 pnpm add @kurot/core@^2.5.4
 ```
@@ -324,6 +338,10 @@ performance rankings.
 
 ## Quick Start
 
+For a complete gameplay loop, read the [game-authoring guide](docs/game-authoring.md)
+and the repository's Star Catcher reference project. The guide is included in
+the prepared 2.5.5 patch; the published 2.5.4 artifact retains its original contents.
+
 ```typescript
 import { createPlayer, Sprite, Shape } from '@kurot/core';
 
@@ -346,7 +364,8 @@ rect.x = 100;
 rect.y = 100;
 root.addChild(rect);
 
-// stop() is resumable; destroy() performs final lifecycle cleanup.
+// stop() pauses this Player's rendering; the shared ticker can keep running.
+// Clean up application-owned activity before final app destruction.
 // app.destroy();
 ```
 
@@ -384,6 +403,7 @@ pnpm run dev          # watch mode
 
 ## Documentation
 
+- [Game authoring](./docs/game-authoring.md) — short consumer path through input, time, rules, restart, cleanup and acceptance checks (unreleased)
 - [CHANGELOG.md](./CHANGELOG.md) — versioned release notes, including the full list of 1.0.0 breaking changes
 - [Architecture](./docs/architecture.md) — engine structure and rendering pipeline
 - [Resource system](./docs/resource.md) — resource configuration, loading, and lifecycle

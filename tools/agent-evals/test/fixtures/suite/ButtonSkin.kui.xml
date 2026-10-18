@@ -1,0 +1,4 @@
+<Skin xmlns="https://kurot.dev/ui/1" class="ButtonSkin" states="up,down,disabled" width="200" height="80">
+    <Rect width="100%" height="100%" fillColor="9483441" fillColor.down="5414531" fillColor.disabled="5133666" />
+    <Label id="labelDisplay" width="100%" height="100%" size="24" textAlign="center" verticalAlign="middle" />
+</Skin>

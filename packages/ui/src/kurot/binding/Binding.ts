@@ -8,9 +8,21 @@ import type { IEventDispatcher } from '@kurot/core';
 export class Binding {
 	/**
 	 * Binds a property chain on `host` to a target property.
+	 * Assigns the initial value synchronously. An empty chain returns undefined.
+	 * Hosts along the chain must dispatch PROPERTY_CHANGE; ordinary assignment
+	 * alone is not observed. Retain the returned Watcher and unwatch it when the
+	 * owning view closes. Assignment/handler errors propagate synchronously.
 	 *
 	 * ```ts
-	 * Binding.bindProperty(user, ['name'], label, 'text');
+	 * import { EventDispatcher } from '@kurot/core';
+	 * import { Binding, Label, PropertyEvent } from '@kurot/ui';
+	 *
+	 * const user = Object.assign(new EventDispatcher(), { name: 'Player' });
+	 * const label = new Label();
+	 * const watcher = Binding.bindProperty(user, ['name'], label, 'text');
+	 * user.name = 'Ada';
+	 * PropertyEvent.dispatchPropertyEvent(user, 'name');
+	 * watcher?.unwatch();
 	 * ```
 	 */
 	public static bindProperty(host: unknown, chain: string[], target: unknown, prop: string): Watcher | undefined {
@@ -27,9 +39,18 @@ export class Binding {
 
 	/**
 	 * Binds a property chain on `host` to a handler function.
+	 * Calls the handler synchronously with the initial value before returning.
+	 * An empty chain returns undefined without calling the handler. Changes need
+	 * PROPERTY_CHANGE notifications; exceptions propagate. The caller must unwatch
+	 * the returned Watcher on disposal, independently of stage removal.
 	 *
 	 * ```ts
-	 * Binding.bindHandler(user, ['name'], value => console.log(value), undefined);
+	 * import { EventDispatcher } from '@kurot/core';
+	 * import { Binding } from '@kurot/ui';
+	 *
+	 * const user = Object.assign(new EventDispatcher(), { name: 'Player' });
+	 * const watcher = Binding.bindHandler(user, ['name'], value => console.log(value), undefined);
+	 * watcher?.unwatch();
 	 * ```
 	 */
 	public static bindHandler(
@@ -49,6 +70,29 @@ export class Binding {
 	 * Binds a mixture of literal values and property chains to a string property.
 	 *
 	 * `chainIndex` identifies entries in `templates` that contain property chains.
+	 * With multiple template entries, replaces watched entries with Watchers and
+	 * returns only the last one. Keep/unwatch every Watcher in templates on disposal;
+	 * the returned Watcher alone does not clean up all bindings. The single-chain,
+	 * single-entry fast path instead returns bindProperty's Watcher without changing
+	 * templates. Assignment is immediate and errors propagate synchronously.
+	 *
+	 * ```ts
+	 * import { EventDispatcher } from '@kurot/core';
+	 * import { Binding, Label, Watcher } from '@kurot/ui';
+	 *
+	 * const score = Object.assign(new EventDispatcher(), { hits: 0, total: 10 });
+	 * const label = new Label();
+	 * const templates: unknown[] = ['hits', ' / ', 'total'];
+	 * Binding.bindProperties(score, templates, [0, 2], label, 'text');
+	 * function disposeScoreBinding(): void {
+	 *   for (const entry of templates) {
+	 *     if (entry instanceof Watcher) {
+	 *       entry.unwatch();
+	 *     }
+	 *   }
+	 * }
+	 * disposeScoreBinding();
+	 * ```
 	 */
 	public static bindProperties(
 		host: unknown,

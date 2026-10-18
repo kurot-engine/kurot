@@ -4,6 +4,29 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.6.1] — 2026-10-18
+
+Prepared locally; not published. Documentation-only patch over 3.6.0.
+
+### Documentation
+
+- Expand layout, skin, text, image, button, collection, renderer and scroller
+  JSDoc with defaults, units, errors and cleanup responsibilities. Document
+  manual binding teardown and the multiple-Watcher bindProperties cleanup case.
+  Preserve runtime code, signatures, exports and dependency locks.
+- Add generated public API references, capability/symbol/member indexes,
+  explicit coverage reports and strict-compiled JSDoc examples. Fill in
+  theme JSON loading, skin ownership and detachable binding examples without changing
+  executable code, public signatures or SDK dependencies.
+
+### Compatibility
+
+- The Core peer/dev range remains ^2.5.2, with the existing registry Core 2.5.3
+  development installation/lock. This patch does not require Core 2.5.5.
+- ui-runtime's existing UI ^3.4.0 peer accepts 3.6.1; it needs no release or
+  raised minimum. Adoption in SDK development locks or application/example locks
+  is optional after publication; no KUI, skin or resource migration is required.
+
 ## [3.6.0] — 2026-10-11
 
 Published; verified on npm on 2026-10-11. Requires published Core ^2.5.2.

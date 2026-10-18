@@ -29,7 +29,7 @@ export type ResourceEventListener = (event: ResourceEvent) => void;
  *
  * @example
  * ```ts
- * import { resource } from '@kurot/core';
+ * import { resource, type Texture } from '@kurot/core';
  *
  * await resource.loadConfig('resource.json', 'assets/');
  * await resource.loadGroup('preload');
@@ -58,6 +58,8 @@ export class Resource {
 	 * Load and parse a resource configuration file.
 	 * @param url URL of the resource.json file
 	 * @param folder Base URL prefix for resource files (default: '')
+	 * Resource URLs are prefixed with folder, independently of the config URL.
+	 * Network and JSON/config errors reject the returned promise.
 	 */
 	public async loadConfig(url: string, folder = ''): Promise<void> {
 		const data = await this.fetchConfig(url);
@@ -98,6 +100,10 @@ export class Resource {
 	 * @param groupName Name of the group to load
 	 * @param priority Reserved for future prioritized loading; currently unused by `ResourceLoader`
 	 * @param onProgress Optional progress callback
+	 * @throws When the group is absent/empty or any item exhausts its retries.
+	 * Already cached items are skipped; an entirely cached group resolves
+	 * without emitting a new progress event. Successfully loaded items remain
+	 * cached if another item fails.
 	 */
 	public async loadGroup(groupName: string, priority = 0, onProgress?: ProgressCallback): Promise<void> {
 		const items = this.config.getGroupByName(groupName);
@@ -120,6 +126,8 @@ export class Resource {
 
 	/**
 	 * Load a single resource by name. Returns the cached data.
+	 * Rejects for an unknown name, unsupported type or failed load. The type
+	 * parameter describes expected data; it does not validate downloaded JSON.
 	 */
 	public async load<T = unknown>(name: string): Promise<T> {
 		const cached = this.get<T>(name);
@@ -185,6 +193,9 @@ export class Resource {
 
 	/**
 	 * Destroy a single cached resource by name.
+	 * Returns false if no analyzer owns that cached entry. This does not cancel
+	 * an in-flight request; a later completion may populate the cache again.
+	 * Callers sharing the entry must coordinate ownership before destroying it.
 	 */
 	public destroy(name: string): boolean {
 		for (const analyzer of this.analyzerMap.values()) {
@@ -198,6 +209,8 @@ export class Resource {
 
 	/**
 	 * Destroy all resources in a group.
+	 * Configuration remains registered. Shared entries are also removed for
+	 * other groups that refer to them; pending loads are not cancelled.
 	 */
 	public destroyGroup(groupName: string): void {
 		const items = this.config.getGroupByName(groupName);
@@ -221,6 +234,8 @@ export class Resource {
 
 	/**
 	 * Listen for resource events.
+	 * Listeners persist until off() receives the same callback and event type.
+	 * Resource uses this API rather than EventDispatcher.addEventListener().
 	 */
 	public on(type: ResourceEventType, listener: ResourceEventListener): void {
 		let set = this.eventListeners.get(type);
@@ -242,8 +257,10 @@ export class Resource {
 	}
 
 	/**
-	 * Listen for loading progress on the next loadGroup/load call.
-	 * Convenience method — shorthand for on(ResourceEventType.GROUP_PROGRESS, ...).
+	 * Adds a persistent listener for GROUP_PROGRESS events from group loads.
+	 * This does not track load() and is not limited to the next group. The
+	 * wrapper has no removal handle; prefer loadGroup's callback for one batch,
+	 * or on()/off() with the same listener when detachable tracking is needed.
 	 */
 	public onProgress(callback: ProgressCallback): void {
 		this.on(ResourceEventType.GROUP_PROGRESS, event => {

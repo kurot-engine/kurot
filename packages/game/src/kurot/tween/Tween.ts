@@ -123,6 +123,9 @@ function _releaseTween(tween: Tween): void {
  *
  * @example
  * ```ts
+ * import { Tween, Ease } from '@kurot/game';
+ *
+ * const sprite = { x: 0, alpha: 1 };
  * await Tween.get(sprite)
  * 	.to({ x: 200, alpha: 0 }, 300, Ease.cubicOut)
  * 	.wait(100);
@@ -133,6 +136,8 @@ export class Tween {
 
 	/**
 	 * Creates a Tween for a target.
+	 * override removes existing target Tweens before registering this one.
+	 * Playback uses the shared Core ticker; no per-instance update is needed.
 	 */
 	public static get(target: object, options?: TweenOptions, override = false): Tween {
 		if (override) {
@@ -155,6 +160,8 @@ export class Tween {
 
 	/**
 	 * Removes every tween targeting an object.
+	 * Includes paused Tweens. Pending then()/await completion resolves even
+	 * when removed, so guard post-await game logic against a disposed round.
 	 */
 	public static removeTweens(target: object): void {
 		for (const tween of [..._activeTweens]) {
@@ -263,6 +270,7 @@ export class Tween {
 	/**
 	 * Adds a property interpolation step. Start values are sampled on first use
 	 * and then retained, keeping repeat and yoyo cycles continuous.
+	 * @param duration Finite, non-negative milliseconds; invalid values throw RangeError.
 	 */
 	public to(props: Record<string, number>, duration: number, ease?: EaseFunction): this {
 		const stepDuration = _validateDuration(duration);
@@ -274,6 +282,7 @@ export class Tween {
 	/**
 	 * Adds an interpolation from explicit values to the target's initial values.
 	 * The original end values are captured once and reused by later cycles.
+	 * @param duration Finite, non-negative milliseconds; invalid values throw RangeError.
 	 */
 	public from(props: Record<string, number>, duration: number, ease?: EaseFunction): this {
 		const stepDuration = _validateDuration(duration);
@@ -284,6 +293,7 @@ export class Tween {
 
 	/**
 	 * Adds a delay to the sequence.
+	 * @param duration Finite, non-negative milliseconds. Zero adds no step.
 	 */
 	public wait(duration: number): this {
 		const stepDuration = _validateDuration(duration);
@@ -297,6 +307,7 @@ export class Tween {
 
 	/**
 	 * Adds a callback step.
+	 * Runs only in forward playback; seeking and yoyo reverse passes skip it.
 	 */
 	public call(callback: (...args: unknown[]) => void, thisObj?: object, params?: unknown[]): this {
 		this._steps.push({ type: 'call', duration: 0, fn: callback, thisObj, params: params ?? [] });
@@ -305,6 +316,7 @@ export class Tween {
 
 	/**
 	 * Adds an immediate property update.
+	 * Runs only in forward playback, including forward seeking.
 	 */
 	public set(props: Record<string, unknown>): this {
 		this._steps.push({ type: 'set', duration: 0, props });
@@ -335,6 +347,7 @@ export class Tween {
 
 	/**
 	 * Removes the tween.
+	 * Releases target ownership and resolves waiting consumers without rejection.
 	 */
 	public remove(): void {
 		_releaseTween(this);
@@ -344,6 +357,8 @@ export class Tween {
 	 * Moves the sequence to an absolute position in its initial forward pass.
 	 * Seeking applies prior interpolations and `set` steps, but deliberately
 	 * skips `call` steps to avoid replaying arbitrary side effects.
+	 * @param value Finite milliseconds from the start. Negative values clamp
+	 * to zero; seeking beyond the sequence releases the Tween.
 	 */
 	public setPosition(value: number): void {
 		if (!this._target) {

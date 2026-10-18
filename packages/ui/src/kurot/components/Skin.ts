@@ -21,17 +21,68 @@ export interface SkinEvents extends EventMap {
  *
  * The skin also owns the view-state list (`states`) and applies state
  * changes to its $children when `currentState` changes.
+ * Skin itself is not a DisplayObject; the host parents elementsContent.
+ *
+ * @example
+ * ```ts
+ * import { Button, Label, Rect, Skin } from '@kurot/ui';
+ *
+ * class AnswerSkin extends Skin {
+ *   public constructor() {
+ *     super();
+ *     const background = new Rect();
+ *     background.width = 160;
+ *     background.height = 48;
+ *     background.fillColor = 0x345678;
+ *     const caption = new Label();
+ *     caption.width = 160;
+ *     caption.height = 48;
+ *     this.skinParts = ['labelDisplay'];
+ *     this.setPart('labelDisplay', caption);
+ *     this.elementsContent = [background, caption];
+ *   }
+ * }
+ * const answer = new Button();
+ * answer.skinName = AnswerSkin;
+ * answer.label = 'Answer';
+ * ```
  */
 export class Skin extends EventDispatcher<SkinEvents> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * Names exposed to the host's skinParts map, initially empty. Registering a name
+	 * does not create/parent the corresponding display object; generated skins or
+	 * setPart() supply it.
+	 */
 	public skinParts: string[] = [];
+	/**
+	 * Preferred host width in logical pixels; NaN (default) leaves it automatic.
+	 */
 	public width: number = NaN;
+	/**
+	 * Preferred host height in logical pixels; NaN (default) leaves it automatic.
+	 */
 	public height: number = NaN;
+	/**
+	 * Minimum host width in logical pixels; defaults to 0.
+	 */
 	public minWidth: number = 0;
+	/**
+	 * Maximum host width in logical pixels; defaults to 100000.
+	 */
 	public maxWidth: number = 100000;
+	/**
+	 * Minimum host height in logical pixels; defaults to 0.
+	 */
 	public minHeight: number = 0;
+	/**
+	 * Maximum host height in logical pixels; defaults to 100000.
+	 */
 	public maxHeight: number = 100000;
+	/**
+	 * Authored skin states, initially empty. Populate before host attachment.
+	 */
 	public states: State[] = [];
 
 	/**
@@ -49,6 +100,11 @@ export class Skin extends EventDispatcher<SkinEvents> {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Visual child list, initially empty and retained by reference. Skin is not a
+	 * display object: Component parents these children during attachment. Assigning
+	 * this list alone does not reparent or dispose any objects.
+	 */
 	public get elementsContent(): DisplayObject[] {
 		return this._elementsContent;
 	}
@@ -57,6 +113,11 @@ export class Skin extends EventDispatcher<SkinEvents> {
 		this._elementsContent = value ?? [];
 	}
 
+	/**
+	 * Attached host, initially undefined and managed by Component. Host changes
+	 * undo old state overrides and update host bindings. They do not dispose shared
+	 * textures or arbitrary listeners owned by the application.
+	 */
 	public get hostComponent(): Component | undefined {
 		return this._hostComponent;
 	}
@@ -112,6 +173,9 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	 * Set a skin part by name. Write-side counterpart to {@link getPart},
 	 * used by programmatic materializers to install parts whose names come
 	 * from authored data and therefore cannot be declared as class fields.
+	 * Rejects a name that conflicts with an existing runtime member. Listing
+	 * the name in skinParts and including visuals in elementsContent are
+	 * separate authoring responsibilities; this method does not parent objects.
 	 */
 	public setPart(name: string, value: DisplayObject): void {
 		if (!this._programmaticPartNames.has(name) && name in this) {
@@ -122,9 +186,10 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	}
 
 	/**
-	 * Unwatch every binding created from this skin.
-	 * Called by the host component when the skin is detached or replaced
-	 * so stale watchers don't leak or fire on the wrong host.
+	 * Unwatch and clear the registered $watchers list. Component calls this when the
+	 * skin is detached or replaced. Manually created bindings that were not registered
+	 * in that list, application listeners and shared textures require separate cleanup;
+	 * removing the host from the stage alone does not detach the skin.
 	 */
 	public unwatchAll(): void {
 		if (this.$watchers && this.$watchers.length > 0) {

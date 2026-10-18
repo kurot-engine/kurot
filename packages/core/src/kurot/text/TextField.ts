@@ -20,8 +20,20 @@ import { getTextVerticalOffset } from './TextVerticalLayout.js';
 export class TextField extends DisplayObject {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
+	/**
+	 * Font family copied into new fields; initially 'Arial'. Changing this default
+	 * does not restyle existing fields or load a font file.
+	 */
 	public static default_fontFamily = 'Arial';
+	/**
+	 * Font size copied into new fields in logical pixels; initially 30.
+	 * This is independent of the canvas backing-store pixel density.
+	 */
 	public static default_size = 30;
+	/**
+	 * RGB fill color copied into new fields; initially 0xffffff. Does not include
+	 * an alpha channel; use the display object's alpha for opacity.
+	 */
 	public static default_textColor = 0xffffff;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -77,6 +89,11 @@ export class TextField extends DisplayObject {
 		this.invalidateFontString();
 	}
 
+	/**
+	 * Text layout width in logical units. Initially measured automatically;
+	 * NaN restores automatic measurement. A finite width constrains wrapping only
+	 * when multiline permits it; it does not set scaleX.
+	 */
 	public override get width(): number {
 		return isNaN(this.$explicitWidth) ? this.$getOriginalBounds().width : this.$explicitWidth;
 	}
@@ -87,6 +104,11 @@ export class TextField extends DisplayObject {
 		this.invalidateText();
 	}
 
+	/**
+	 * Text viewport height in logical units. Initially measured automatically;
+	 * NaN restores automatic measurement. A finite height can clip/scroll rendered
+	 * lines, while textHeight describes text content rather than this viewport.
+	 */
 	public override get height(): number {
 		return isNaN(this.$explicitHeight) ? this.$getOriginalBounds().height : this.$explicitHeight;
 	}
@@ -99,6 +121,11 @@ export class TextField extends DisplayObject {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * CSS font-family name, initially TextField.default_fontFamily ('Arial').
+	 * Assignment does not load the font. After a late font becomes available, call
+	 * invalidateTextMetrics() even if the family string is unchanged.
+	 */
 	public get fontFamily(): string {
 		return this._fontFamily;
 	}
@@ -109,6 +136,11 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Authored font size in logical pixels, initially TextField.default_size (30).
+	 * Supply a finite positive value; the setter does not validate or clamp it.
+	 * Text raster resolution is a separate setting.
+	 */
 	public get size(): number {
 		return this._fontSize;
 	}
@@ -119,6 +151,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Bold face request, false by default. Font availability and fallback are
+	 * controlled by the browser; this does not load a bold font resource.
+	 */
 	public get bold(): boolean {
 		return this._bold;
 	}
@@ -129,6 +165,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Italic face request, false by default. Font selection uses the browser's
+	 * available font faces and can affect measured glyph widths.
+	 */
 	public get italic(): boolean {
 		return this._italic;
 	}
@@ -139,6 +179,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Horizontal line alignment in the logical field width; 'left' by default.
+	 * This positions text inside the field, not the field inside a parent layout.
+	 */
 	public get textAlign(): HorizontalAlign {
 		return this._textAlign;
 	}
@@ -163,6 +207,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Plain-run RGB fill, initially TextField.default_textColor (white).
+	 * Styled textFlow runs can override it. Alpha belongs to the display object.
+	 */
 	public get textColor(): number {
 		return this._textColor;
 	}
@@ -174,6 +222,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Outline RGB color, initially 0x000000. Visible only when stroke is positive;
+	 * this value has no independent alpha component.
+	 */
 	public get strokeColor(): number {
 		return this._strokeColor;
 	}
@@ -184,6 +236,11 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Outline width in logical pixels, initially 0. Paint padding contains the
+	 * outline without increasing Core's nominal layout dimensions. Use a finite
+	 * non-negative width; assignment does not perform range validation.
+	 */
 	public get stroke(): number {
 		return this._stroke;
 	}
@@ -212,6 +269,10 @@ export class TextField extends DisplayObject {
 		this.$markDirty();
 	}
 
+	/**
+	 * Extra logical pixels between text rows, initially 0. Negative values are
+	 * stored without validation and may overlap rows. Does not alter the font size.
+	 */
 	public get lineSpacing(): number {
 		return this._lineSpacing;
 	}
@@ -255,6 +316,12 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Dynamic canvas text by default. INPUT creates browser editing support,
+	 * enables touch and supplies 100 by 30 logical defaults on still-automatic axes.
+	 * Switching back removes editing support and disables touch. Input DOM bindings
+	 * are detached on stage removal; application event listeners remain owner-managed.
+	 */
 	public get type(): TextFieldType {
 		return this._type;
 	}
@@ -283,6 +350,10 @@ export class TextField extends DisplayObject {
 		this.invalidateText();
 	}
 
+	/**
+	 * Browser input type, initially TextFieldInputType.TEXT. Applies to editing
+	 * support in INPUT mode; it is a keyboard/input hint, not application validation.
+	 */
 	public get inputType(): TextFieldInputType {
 		return this._inputType;
 	}
@@ -292,6 +363,11 @@ export class TextField extends DisplayObject {
 		this._inputController?.updateProperties();
 	}
 
+	/**
+	 * Plain content, initially ''. Assignment replaces rich text styling even
+	 * when the characters match an existing rich value. Programmatic assignment
+	 * is not constrained by maxChars/restrict in the same way as browser editing.
+	 */
 	public get text(): string {
 		return this._text;
 	}
@@ -306,6 +382,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Whether to mask rendered characters, false by default. This changes
+	 * presentation rather than encrypting or removing the underlying text.
+	 */
 	public get displayAsPassword(): boolean {
 		return this._displayAsPassword;
 	}
@@ -316,6 +396,11 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Maximum browser-editable length, initially 0 (unlimited). Input offsets and
+	 * lengths use UTF-16 code units, not grapheme counts. Programmatic text assignment
+	 * is not truncated by this property.
+	 */
 	public get maxChars(): number {
 		return this._maxChars;
 	}
@@ -325,6 +410,10 @@ export class TextField extends DisplayObject {
 		this._inputController?.updateProperties();
 	}
 
+	/**
+	 * One-based index of the first visible row, initially 1. Reading/assignment
+	 * clamp to [1, maxScrollV]; this is a row index, not a pixel offset.
+	 */
 	public get scrollV(): number {
 		return Math.min(Math.max(this._scrollV, 1), this.maxScrollV);
 	}
@@ -340,16 +429,29 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Largest one-based row-scroll position for the current content and viewport;
+	 * never less than 1. Reading ensures the text layout is up to date.
+	 */
 	public get maxScrollV(): number {
 		this.ensureLines();
 		return Math.max(1, this._numLines - this.getScrollNum() + 1);
 	}
 
+	/**
+	 * Current laid-out row count; reading performs pending line measurement.
+	 * Hard breaks and width wrapping depend on multiline and wordWrap.
+	 */
 	public get numLines(): number {
 		this.ensureLines();
 		return this._numLines;
 	}
 
+	/**
+	 * Optional allowed/excluded input character-set expression, initially
+	 * undefined. A first unescaped '^' separates allowed and excluded portions;
+	 * undefined clears both. Applies to browser editing, not arbitrary text assignment.
+	 */
 	public get restrict(): string | undefined {
 		return this._restrict;
 	}
@@ -383,14 +485,26 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Allowed portion parsed from restrict, or undefined for no allow-list.
+	 * This is derived input configuration rather than a separately editable value.
+	 */
 	get restrictAnd(): string | undefined {
 		return this._restrictAnd;
 	}
 
+	/**
+	 * Excluded portion parsed from restrict after its unescaped '^', or undefined.
+	 * This is derived input configuration rather than a separate regular expression API.
+	 */
 	get restrictNot(): string | undefined {
 		return this._restrictNot;
 	}
 
+	/**
+	 * Whether to draw the field border, false by default. It is presentation only
+	 * and does not add padding to text layout.
+	 */
 	public get border(): boolean {
 		return this._border;
 	}
@@ -401,6 +515,9 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Border RGB color, initially black (0x000000), used only while border is true.
+	 */
 	public get borderColor(): number {
 		return this._borderColor;
 	}
@@ -411,6 +528,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Whether to paint a rectangular field background, false by default.
+	 * Changing background does not create a touch hit area or stop gameplay work.
+	 */
 	public get background(): boolean {
 		return this._background;
 	}
@@ -421,6 +542,10 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Background RGB color, initially white (0xffffff); used only when background
+	 * is true. This does not set the field's opacity.
+	 */
 	public get backgroundColor(): number {
 		return this._backgroundColor;
 	}
@@ -431,6 +556,12 @@ export class TextField extends DisplayObject {
 		}
 	}
 
+	/**
+	 * Rich text runs, initially undefined. Assignment and reads expose the run
+	 * array by reference; reassign after external edits to invalidate measurement.
+	 * Defined runs replace plain text with their concatenation. Assigning undefined
+	 * clears styling while retaining the current plain characters.
+	 */
 	public get textFlow(): ITextElement[] | undefined {
 		return this._textFlow;
 	}
@@ -442,10 +573,19 @@ export class TextField extends DisplayObject {
 		this.invalidateText();
 	}
 
+	/**
+	 * Measured maximum row width in logical units; reading measures pending
+	 * layout. It is not the explicit field width or transformed screen-space width.
+	 */
 	public get textWidth(): number {
 		this.ensureLines();
 		return this._textWidth;
 	}
+	/**
+	 * Laid-out content height in logical units, including inter-row spacing.
+	 * Single-line INPUT reports its nominal font size. This differs from an explicit
+	 * viewport height and from painted ink/outline bounds.
+	 */
 	public get textHeight(): number {
 		this.ensureLines();
 		if (this._type === TextFieldType.INPUT && !this.multiline) {
@@ -458,12 +598,24 @@ export class TextField extends DisplayObject {
 		return this._fontString;
 	}
 
+	/**
+	 * Selection anchor as a UTF-16 offset, initially 0. It can be greater than
+	 * selectionEndIndex for a reverse selection; it is not always the lower bound.
+	 */
 	public get selectionBeginIndex(): number {
 		return this._selectionAnchor;
 	}
+	/**
+	 * Active selection/caret endpoint as a UTF-16 offset, initially 0.
+	 * Use setSelection() to update both endpoints and synchronize browser editing.
+	 */
 	public get selectionEndIndex(): number {
 		return this._selectionActive;
 	}
+	/**
+	 * Active caret endpoint in UTF-16 code units, initially 0. Equals
+	 * selectionEndIndex; it is not a visual glyph or grapheme index.
+	 */
 	public get caretIndex(): number {
 		return this._selectionActive;
 	}
@@ -519,10 +671,19 @@ export class TextField extends DisplayObject {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Appends characters while retaining existing rich runs through appendElement().
+	 * In password mode it appends to plain text. Does not enforce input maxChars.
+	 */
 	public appendText(text: string): void {
 		this.appendElement({ text });
 	}
 
+	/**
+	 * Appends a rich run without copying the supplied element. Existing plain text
+	 * becomes an unstyled first run. Reassign textFlow after mutating a retained run;
+	 * in password mode only the appended characters are used.
+	 */
 	public appendElement(element: ITextElement): void {
 		if (this._displayAsPassword) {
 			this.text = this._text + element.text;
@@ -541,9 +702,11 @@ export class TextField extends DisplayObject {
 	}
 
 	/**
-	 * Measures complete content independently of the rendered width and height.
-	 * NaN means unconstrained. Height clipping, scrolling, line caches and dirty
-	 * flags are unchanged; line spacing and rich-text styles remain effective.
+	 * Measures complete content in logical units without changing the rendered
+	 * field's viewport, scrolling or line caches. width defaults to NaN (unconstrained).
+	 * Finite non-negative widths constrain wrapping according to multiline/wordWrap.
+	 * Throws RangeError for a negative or non-finite width other than NaN.
+	 * Returns nominal text layout dimensions, including line spacing and rich styles.
 	 */
 	public measureText(width: number = NaN): { width: number; height: number } {
 		if (!Number.isNaN(width) && (!Number.isFinite(width) || width < 0)) {
@@ -566,12 +729,21 @@ export class TextField extends DisplayObject {
 		return { width: measuredWidth, height };
 	}
 
+	/**
+	 * Requests browser editing focus only for an on-stage INPUT field.
+	 * Otherwise does nothing. Browser gesture/focus restrictions still apply.
+	 */
 	public setFocus(): void {
 		if (this._type === TextFieldType.INPUT && this.stage && this._inputController) {
 			this._inputController.focus(true);
 		}
 	}
 
+	/**
+	 * Sets selection anchor and active endpoint using UTF-16 offsets. Values are
+	 * clamped to the current text range and synchronized with the input controller;
+	 * reverse selections are preserved rather than sorted.
+	 */
 	public setSelection(beginIndex: number, endIndex: number): void {
 		this.$setSelectionFromInput(beginIndex, endIndex);
 		this._inputController?.setSelection(this._selectionAnchor, this._selectionActive);

@@ -5,6 +5,11 @@ import { Event } from '../events/Event.js';
 import { IOErrorEvent } from '../events/IOErrorEvent.js';
 import { ImageLoader } from '../net/ImageLoader.js';
 
+/**
+ * Renderable Bitmap whose texture follows a video element or poster.
+ * Media playback and loading are asynchronous. Close the media when the
+ * owning view exits; removal from the display list alone is not cleanup.
+ */
 export class Video extends Bitmap {
 	// ── Instance fields ───────────────────────────────────────────────────────
 	public fullscreen = true;

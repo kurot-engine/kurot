@@ -12,6 +12,22 @@ interface EventBin {
 	once: boolean;
 }
 
+/**
+ * Dispatches listeners by event type, function identity and capture phase.
+ * Priority orders listeners; once() unregisters after its notification.
+ * DisplayObject adds scene-graph propagation on top of this dispatcher.
+ *
+ * @example
+ * ```ts
+ * import { Event, EventDispatcher } from '@kurot/core';
+ *
+ * const events = new EventDispatcher();
+ * const onComplete = (event: Event): void => console.log(event.type);
+ * events.addEventListener(Event.COMPLETE, onComplete);
+ * events.dispatchEventWith(Event.COMPLETE);
+ * events.removeEventListener(Event.COMPLETE, onComplete);
+ * ```
+ */
 export class EventDispatcher<TMap extends EventMap = Record<string, Event>> implements IEventDispatcher {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
@@ -30,6 +46,11 @@ export class EventDispatcher<TMap extends EventMap = Record<string, Event>> impl
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Adds a listener with this dispatcher as its event source. The same
+	 * function/capture pair is registered once; larger priorities run first.
+	 * Preserve the function identity to remove it when its owner is disposed.
+	 */
 	public addEventListener<K extends keyof TMap & string>(
 		type: K,
 		listener: (event: TMap[K]) => void,
@@ -51,6 +72,11 @@ export class EventDispatcher<TMap extends EventMap = Record<string, Event>> impl
 		this.addListener(type, listener, useCapture, priority, false);
 	}
 
+	/**
+	 * Registers a listener that removes itself after notification. If its owner
+	 * closes before the event occurs, remove it explicitly using the same
+	 * callback and capture phase.
+	 */
 	public once<K extends keyof TMap & string>(
 		type: K,
 		listener: (event: TMap[K]) => void,
@@ -67,6 +93,11 @@ export class EventDispatcher<TMap extends EventMap = Record<string, Event>> impl
 		this.addListener(type, listener, useCapture, priority, true);
 	}
 
+	/**
+	 * Removes the matching event type, function identity and capture phase.
+	 * Missing listeners are harmless; a newly created bound function does not
+	 * match the original callback.
+	 */
 	public removeEventListener<K extends keyof TMap & string>(
 		type: K,
 		listener: (event: TMap[K]) => void,

@@ -1,0 +1,30 @@
+{
+  "package": "@kurot/core",
+  "version": "2.5.5",
+  "examples": [
+    {
+      "file": "examples/c54bc3fde14d.ts",
+      "owner": "EventDispatcher"
+    },
+    {
+      "file": "examples/db6f82242b56.ts",
+      "owner": "Timer.stop"
+    },
+    {
+      "file": "examples/3e3cd12d6e21.ts",
+      "owner": "Texture"
+    },
+    {
+      "file": "examples/203bf7b1f013.ts",
+      "owner": "createPlayer"
+    },
+    {
+      "file": "examples/3d05a120a788.ts",
+      "owner": "SystemTicker.startTick"
+    },
+    {
+      "file": "examples/557adea48559.ts",
+      "owner": "Resource"
+    }
+  ]
+}

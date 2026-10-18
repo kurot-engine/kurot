@@ -4,6 +4,34 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.5.5] — 2026-10-18
+
+Prepared locally; not published. Documentation-only patch over 2.5.4.
+
+### Documentation
+
+- Expand common display, graphics, text, input, timer, texture, audio and network
+  JSDoc with checked defaults, logical/physical units, failure paths and cleanup
+  ownership. Add a timer-disposal example; remove resolved comment-gap exemptions.
+- Add generated public API references, capability/symbol/member indexes,
+  explicit coverage reports and strict-compiled JSDoc examples. Fill in
+  application/resource ownership, ticker identity and texture-density guidance without changing
+  executable code, public signatures or SDK dependencies.
+- Add a short public game-authoring guide and a complete repository Star Catcher
+  reference with deterministic rules, keyboard/touch input, pause, restart and
+  cleanup. Its check command verifies development and release behavior.
+- Correct resource quick-start paths/imports and document the Player stop versus
+  gameplay pause boundary. Runtime implementations, signatures and exports are unchanged.
+
+### Compatibility
+
+- Existing Core peers accept 2.5.5; no consumer migration or raised dependency
+  minimum is required. UI, Game, DragonBones, ui-runtime and compatible Spine
+  adapters need no dependent release for this Core patch.
+- Applications may adopt the documentation after publication, or read repository
+  docs while retaining their installed runtime. SDK/app locks and dependencies
+  are unchanged; no application or template is upgraded by this preparation.
+
 ## [2.5.4] — 2026-10-12
 
 Published; npm latest, package download and registry integrity verified on 2026-10-12.

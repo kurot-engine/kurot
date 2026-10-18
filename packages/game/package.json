@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/game",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Game extensions for the Kurot engine — Tween, Ease, MovieClip, ScrollView, URLLoader",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -16,6 +16,7 @@
 	},
 	"files": [
 		"dist/**/*",
+		"docs/**/*",
 		"CHANGELOG.md",
 		"LICENSE"
 	],

@@ -87,10 +87,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	}
 
 	/**
-	 * Skin identifier. Can be:
-	 * - A Skin subclass constructor
-	 * - A Skin instance
-	 * - A class name string (resolved via global scope)
+	 * Skin constructor, instance or global class-name string, initially undefined.
+	 * A missing global name clears the attached skin rather than throwing; exceptions
+	 * from a supplied factory propagate. Assigning undefined detaches the skin.
+	 * Replacement invokes skin cleanup hooks, but stage removal alone retains the skin.
 	 */
 	public get skinName(): string | (new () => Skin) | Skin | undefined {
 		return this._skinName;
@@ -103,10 +103,20 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this._parseSkinName();
 	}
 
+	/**
+	 * Currently attached skin, or undefined. Skin replacement detaches old visuals
+	 * and tracked skin watchers; removing the component from the stage retains its
+	 * skin. The game still owns its manual listeners, timers and bindings.
+	 */
 	public get skin(): Skin | undefined {
 		return this._skin;
 	}
 
+	/**
+	 * Whether this component accepts input; defaults to true. Disabling immediately
+	 * suppresses touchEnabled/touchChildren and invalidates the skin state; re-enabling
+	 * restores requested flags. This does not stop game callbacks, timers or tweens.
+	 */
 	public get enabled(): boolean {
 		return this._enabled;
 	}
@@ -150,6 +160,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.invalidateState();
 	}
 
+	/**
+	 * Whether the parent layout measures and positions this element; defaults to
+	 * true. Setting false does not hide it, disable input or stop its callbacks.
+	 */
 	public get includeInLayout(): boolean {
 		return this.ui.includeInLayout;
 	}
@@ -158,6 +172,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.includeInLayout = v;
 	}
 
+	/**
+	 * Left-edge layout constraint: logical pixels, or a percentage string interpreted
+	 * by the parent layout. NaN (default) means unset; BasicLayout supports percentages.
+	 */
 	public get left(): number | string {
 		return this.ui.left;
 	}
@@ -166,6 +184,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.left = v;
 	}
 
+	/**
+	 * Right-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). BasicLayout stretches width when both left and right are set.
+	 */
 	public get right(): number | string {
 		return this.ui.right;
 	}
@@ -174,6 +196,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.right = v;
 	}
 
+	/**
+	 * Top-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). Interpretation is supplied by the parent layout.
+	 */
 	public get top(): number | string {
 		return this.ui.top;
 	}
@@ -182,6 +208,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.top = v;
 	}
 
+	/**
+	 * Bottom-edge layout constraint in logical pixels or a percentage string; defaults
+	 * to NaN (unset). BasicLayout stretches height when both top and bottom are set.
+	 */
 	public get bottom(): number | string {
 		return this.ui.bottom;
 	}
@@ -190,6 +220,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.bottom = v;
 	}
 
+	/**
+	 * Horizontal center offset in logical pixels, or a percentage string; defaults
+	 * to NaN (unset). BasicLayout measures percentage offsets against half the parent
+	 * width, with 0 centering the element.
+	 */
 	public get horizontalCenter(): number | string {
 		return this.ui.horizontalCenter;
 	}
@@ -198,6 +233,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.horizontalCenter = v;
 	}
 
+	/**
+	 * Vertical center offset in logical pixels, or a percentage string; defaults to
+	 * NaN (unset). BasicLayout measures percentage offsets against half the parent
+	 * height, with 0 centering the element.
+	 */
 	public get verticalCenter(): number | string {
 		return this.ui.verticalCenter;
 	}
@@ -206,6 +246,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.verticalCenter = v;
 	}
 
+	/**
+	 * Requested percentage of parent width; 100 means full width, not 1. Defaults
+	 * to NaN (automatic). BasicLayout gives paired edge constraints precedence.
+	 */
 	public get percentWidth(): number {
 		return this.ui.percentWidth;
 	}
@@ -214,6 +258,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.percentWidth = v;
 	}
 
+	/**
+	 * Requested percentage of parent height; 100 means full height, not 1. Defaults
+	 * to NaN (automatic). BasicLayout gives paired edge constraints precedence.
+	 */
 	public get percentHeight(): number {
 		return this.ui.percentHeight;
 	}
@@ -266,6 +314,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		return changed;
 	}
 
+	/**
+	 * Current unscaled UI width in logical pixels. Explicit width starts as NaN
+	 * (automatic measurement); assigning NaN restores automatic sizing. Parent layout
+	 * constraints may allocate a different size. Reading can validate pending size.
+	 */
 	public override get width(): number {
 		return this.ui.getWidth();
 	}
@@ -274,6 +327,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.setWidth(v);
 	}
 
+	/**
+	 * Current unscaled UI height in logical pixels. Explicit height starts as NaN
+	 * (automatic measurement); assigning NaN restores automatic sizing. Parent layout
+	 * constraints may allocate a different size. Reading can validate pending size.
+	 */
 	public override get height(): number {
 		return this.ui.getHeight();
 	}
@@ -282,6 +340,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.setHeight(v);
 	}
 
+	/**
+	 * Minimum unscaled layout width in logical pixels; defaults to 0.
+	 */
 	public get minWidth(): number {
 		return this.ui.minWidth;
 	}
@@ -290,6 +351,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.minWidth = v;
 	}
 
+	/**
+	 * Maximum unscaled layout width in logical pixels; defaults to 100000.
+	 */
 	public get maxWidth(): number {
 		return this.ui.maxWidth;
 	}
@@ -298,6 +362,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.maxWidth = v;
 	}
 
+	/**
+	 * Minimum unscaled layout height in logical pixels; defaults to 0.
+	 */
 	public get minHeight(): number {
 		return this.ui.minHeight;
 	}
@@ -306,6 +373,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.minHeight = v;
 	}
 
+	/**
+	 * Maximum unscaled layout height in logical pixels; defaults to 100000.
+	 */
 	public get maxHeight(): number {
 		return this.ui.maxHeight;
 	}
@@ -326,6 +396,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		return this.height;
 	}
 
+	/**
+	 * Always 0 for a plain Component; assignment has no effect. Use a Group viewport
+	 * inside Scroller for scrollable content.
+	 */
 	public get scrollH(): number {
 		return 0;
 	}
@@ -334,6 +408,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		// No-op for Component.
 	}
 
+	/**
+	 * Always 0 for a plain Component; assignment has no effect. Use a Group viewport
+	 * inside Scroller for scrollable content.
+	 */
 	public get scrollV(): number {
 		return 0;
 	}
@@ -343,10 +421,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	}
 
 	/**
-	 * Parts exported by the attached skin.
-	 *
-	 * Access is only valid after the skin has completed attachment. Generated
-	 * declarations provide the exact part names and types for known skins.
+	 * Read-only named parts exported by the attached skin. Access before completed
+	 * skin attachment throws Error; use onSkinReady() to access the full part set.
+	 * Old parts remain available inside onSkinRemoved(), before detachment. Generated
+	 * declarations provide exact names/types for known skins.
 	 */
 	public get skinParts(): Readonly<SkinPartsOf<TSkin>> {
 		if (!this._skinReady) {
@@ -416,6 +494,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.setMeasuredSize(w, h);
 	}
 
+	/**
+	 * Queue a deferred commitProperties() pass. Repeated invalidations coalesce;
+	 * this does not synchronously commit or schedule application game logic.
+	 */
 	public invalidateProperties(): void {
 		this.ui.invalidateProperties();
 	}
@@ -424,6 +506,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.validateProperties();
 	}
 
+	/**
+	 * Queue deferred measurement and parent layout updates. Use validateNow() after
+	 * attachment if code must read the resulting UI layout synchronously.
+	 */
 	public invalidateSize(): void {
 		this.ui.invalidateSize();
 	}
@@ -432,6 +518,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.validateSize(recursive);
 	}
 
+	/**
+	 * Queue a deferred layout/redraw pass using the current unscaled UI size.
+	 */
 	public invalidateDisplayList(): void {
 		this.ui.invalidateDisplayList();
 	}
@@ -440,22 +529,43 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		this.ui.validateDisplayList();
 	}
 
+	/**
+	 * Synchronously validate this UI subtree when attached to a stage. Does nothing
+	 * off-stage; it is not an initialization or disposal method.
+	 */
 	public validateNow(): void {
 		this.ui.validateNow();
 	}
 
+	/**
+	 * Allocate parent-space layout width/height in logical pixels, accounting for
+	 * transforms and size constraints. NaN selects the preferred size on that axis;
+	 * negative dimensions cause the request to be ignored. Normally called by layouts.
+	 */
 	public setLayoutBoundsSize(lw: number, lh: number): void {
 		this.ui.setLayoutBoundsSize(lw, lh);
 	}
 
+	/**
+	 * Position the element's transformed layout bounds at parent-space logical
+	 * coordinates, accounting for its anchor. Normally called by layouts.
+	 */
 	public setLayoutBoundsPosition(x: number, y: number): void {
 		this.ui.setLayoutBoundsPosition(x, y);
 	}
 
+	/**
+	 * Write current transformed layout bounds in parent-space logical pixels into
+	 * the caller's Rectangle. The rectangle is reused, not retained.
+	 */
 	public getLayoutBounds(bounds: Rectangle): void {
 		this.ui.getLayoutBounds(bounds);
 	}
 
+	/**
+	 * Write preferred (explicit or measured) transformed bounds in parent-space
+	 * logical pixels into the caller's Rectangle, before parent size allocation.
+	 */
 	public getPreferredBounds(bounds: Rectangle): void {
 		this.ui.getPreferredBounds(bounds);
 	}
@@ -520,6 +630,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 
 	// ── IUIOwner lifecycle ────────────────────────────────────────────────
 
+	/**
+	 * One-time initialization hook on first stage attachment. Applies the active
+	 * theme's skin when no explicit skin is set. Call super.createChildren() when
+	 * overriding; stage reattachment does not call this hook again.
+	 */
 	public createChildren(): void {
 		if (!this._skinName) {
 			const theme = getTheme();
@@ -530,6 +645,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		}
 	}
 
+	/**
+	 * One-time hook after createChildren() and before CREATION_COMPLETE. It is not
+	 * called on every round restart or stage reattachment.
+	 */
 	public childrenCreated(): void {}
 
 	public commitProperties(): void {
@@ -591,7 +710,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	protected onSkinReady(): void {}
 
 	/**
-	 * Called before the current skin and its complete part set are detached.
+	 * Called before the current skin and complete part set are detached/replaced.
+	 * Release listeners/bindings installed by onSkinReady() here. Merely removing the
+	 * component from the stage does not call this hook; application round resources
+	 * need their own cleanup path.
 	 */
 	protected onSkinRemoved(): void {}
 

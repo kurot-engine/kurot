@@ -6,6 +6,9 @@ import type { TweenOptions } from './types.js';
  *
  * @example
  * ```ts
+ * import { TweenGroup } from '@kurot/game';
+ *
+ * const button = { alpha: 1 };
  * const group = new TweenGroup('ui');
  * group.get(button).to({ alpha: 0 }, 200);
  * group.pause();
@@ -16,6 +19,10 @@ import type { TweenOptions } from './types.js';
 export class TweenGroup {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Diagnostic group name, defaulting to an empty string. Names do not register
+	 * or share groups; keep the group instance that owns a round's tweens.
+	 */
 	public readonly name: string;
 	private _tweens: Tween[] = [];
 
@@ -28,7 +35,8 @@ export class TweenGroup {
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
 	/**
-	 * Number of active Tweens currently tracked by this group.
+	 * Number of tracked active tweens, including paused tweens. Completed or removed
+	 * tweens automatically leave the group.
 	 */
 	public get size(): number {
 		return this._tweens.length;
@@ -37,7 +45,8 @@ export class TweenGroup {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Create and track a Tween for the specified target.
+	 * Create and track a tween without overriding other tweens on the target.
+	 * Uses TweenOptions defaults. Call removeAll() when this group's round ends.
 	 */
 	public get(target: object, options?: TweenOptions): Tween {
 		const tween = Tween.get(target, options);
@@ -46,14 +55,16 @@ export class TweenGroup {
 	}
 
 	/**
-	 * Add an existing active Tween to this group.
+	 * Track an existing active tween. Duplicate entries and already released tweens
+	 * are ignored. A tween may be tracked by multiple independent groups.
 	 */
 	public add(tween: Tween): void {
 		this._track(tween);
 	}
 
 	/**
-	 * Pause every tracked Tween.
+	 * Pause tracked tweens while retaining targets and group membership.
+	 * Use removeAll() for disposal; pausing does not release them.
 	 */
 	public pause(): void {
 		for (const tween of this._tweens) {
@@ -71,7 +82,9 @@ export class TweenGroup {
 	}
 
 	/**
-	 * Remove every tracked Tween and clear the group.
+	 * Remove all tracked tweens and clear the group. Pending await/then completion
+	 * resolves even on removal; guard continuation code against an ended game round.
+	 * Tweens that are not tracked by this instance are unaffected.
 	 */
 	public removeAll(): void {
 		for (const tween of this._tweens.slice()) {
