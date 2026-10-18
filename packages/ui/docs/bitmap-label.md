@@ -1,20 +1,7 @@
 # BitmapLabel
 
-Available in UI 3.2.0 with `@kurot/core ^2.2.0`. Core resolves its published
-@kurot/bitmap-font dependency from npm. UI 3.2.0 is published;
-published UI 3.1.0 does not contain this component. Core 2.1.1 does not contain
-its required BitmapText rendering.
-
-UI 3.3.0 retains this API and raises the package's Core minimum to ^2.3.0 for
-RichLabel. During automatic sizing it also uses maxWidth when neither a parent
-width nor an explicit width is present, so wrapped height matches rendering.
-Changing an authored width also invalidates automatic height after layout.
-UI 3.3.0 builds and tests against published Core 2.3.1 without local overrides.
-
-Current UI 3.6.2 retains BitmapLabel. Its package-wide Core peer/dev minimum is
-^2.5.2 for outline-safe Label layout; the unchanged development installation
-and lock use published Core 2.5.3. This component's original API minimum above
-is separate from the current UI package requirement.
+Native bitmap-font text with UI layout and configured resource loading.
+Use the installed UI/Core peer pair; public declarations define the available API.
 
 ```ts
 import { BitmapLabel } from '@kurot/ui';
@@ -46,15 +33,11 @@ DisplayObject tint. Alignments position glyphs without scaling them. Set scaleX
 and scaleY for decorative number sizing. Default multiline=true; explicit false
 keeps the first hard-separated line unwrapped.
 
-Vertical alignment inherits BitmapText's default: middle with published Core 2.5.3,
-top with published 2.5.2 and earlier. Explicit top/bottom remain effective in either
-line mode. Bitmap-font metrics and glyph offsets are unchanged. UI 3.4.0 accepts
-the patch without another UI release; applications update their Core installation/
-lock and rebuild. Published document 0.13.1 supplies the matching
-catalog default.
+Vertical alignment inherits BitmapText's default: middle with Core >= 2.5.3,
+top with the accepted Core 2.5.2 baseline. Explicit alignment remains effective
+in either line mode. The headless catalog records middle; omitted XML values
+still use the native host default.
 
-Authoring support was introduced in document 0.12.0, CLI 3.4.0 and runtime 0.9.0.
-Current document 0.13.1, CLI 3.6.0 and runtime 0.10.0 retain BitmapLabel
-authoring, KUI compilation and materialization. Earlier compilers do not accept
-this built-in XML tag; update applications explicitly when adopting it. Editor
-controls are owned by the separate application.
+Authoring requires document >= 0.12.0, CLI >= 3.4.0 or runtime >= 0.9.0,
+plus their declared peers.
+Editor controls belong to the consuming application.

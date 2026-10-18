@@ -16,10 +16,10 @@ files differ:
 - **new**: the corresponding working-tree files, including the concise root
   entry, guide and complete Star Catcher reference.
 
-These are the combined step 1/2 changes. This experiment cannot attribute an
-effect separately to root trimming, corrections, the guide or the example.
+The treatment combines entry trimming, corrections, the guide and the example.
+This experiment cannot attribute an effect separately to any one change.
 Engine source is not supplied; the installed public SDK/types are identical.
-Current release history remains available on demand in the new arm.
+Changelog records remain available on demand in the new arm.
 Only textual md/ts/json/html/yaml/xml/kui files are copied; binary assets are
 omitted in both arms for this asset-free task.
 

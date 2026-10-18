@@ -1,50 +1,11 @@
 # @kurot/ui — AI context map
 
-For game UI creation, read [standard authoring](ui-authoring.md): directory
-conventions, component/Skin pairs, typed parts and cleanup. Its
-[complete ScoreHUD pair](recipes/score-hud.md) ships in published UI 3.6.2.
-Published CLI 3.6.1 supplies template navigation and corrected declarations.
-The maintainer map below is needed only for SDK work; see
-[publication evidence](../../../docs/release-history.md).
-
-For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
-UI 3.6.2 is published, verified on npm on 2026-10-18 with its API reference and
-authoring guides. Latest, SHA-512 integrity, 344 runtime and 5,165 API files match.
-Runtime code, signatures, exports and dependency requirements are unchanged; follow
-the installed Core version for inherited behavior/defaults.
-
-UI 3.6.0 is published, verified on npm on 2026-10-11, including latest, package
-download, integrity and all 344 generated files matching the tested build. It adds outline-safe
-Label layout to normal measurement, wrapping and fitting; outlined automatic
-dimensions and line breaks can change. Its Core peer is ^2.5.2 for public line
-ink metrics and unified block alignment. Development installs registry Core
-2.5.3 with a matching lock, without local overrides; the 2.5.2 minimum is tested
-separately. Published UI 3.5.0 (verified on 2026-10-10) introduced multiline
-Label fitting and stable alignment when fitting is toggled, with Core ^2.4.0. Read
-[centered flips](../../../docs/centered-flips.md) before changing transforms,
-reflection frames, authored flags or dependency adoption.
-
-Label/RichLabel/EditableText inherit TextField's vertical alignment;
-BitmapLabel inherits BitmapText's. Published Core 2.5.3 defaults both to middle;
-published Core 2.5.2 and earlier default to top. Explicit values remain effective
-and multiline only controls line generation. UI has no default override and needs
-no new release for this default change alone. The separate UI 3.6.0 outline
-correction requires Core ^2.5.2.
-Published document 0.13.1 supplies matching authoring defaults.
-
-Read this before exploring `src/`. It is a compressed map so an agent
-unfamiliar with Kurot does not need to re-derive the architecture from scratch
-each session. Treat the package source and its `src/index.ts` barrel as the
-authority for current behavior and exports; this file provides the compressed
-map, runtime contracts and task→file lookup.
-
-Package identity: `@kurot/ui@3.6.2` (published), EUI-compatible UI framework on top of
-`@kurot/core`. Its peer is `@kurot/core@^2.5.2`; published 3.5.0 uses ^2.4.0. Rewritten with standard class
-inheritance and delegation — no namespace mixins, no prototype copying.
-Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent
-allocations. It has not been published; UI 3.4.0 includes the same correction. Version 3.3.0 adds RichLabel and tests against published Core 2.3.1 through its
-development installation and lockfile, without overrides. Version 3.2.0 is published with BitmapLabel against published Core 2.2.0,
-without local dependency overrides. Published UI 3.1.0 does not contain BitmapLabel.
+For game UI, read [standard authoring](ui-authoring.md) and the
+[ScoreHUD pair](recipes/score-hud.md). For API lookup, use
+[topics](api/topics.md) and the [symbol/member index](api/index.md).
+This maintainer map covers `@kurot/ui@3.6.2`, with Core peer **^2.5.2**.
+Inherited defaults follow the installed Core; set important alignment explicitly.
+Source and its public barrel define the current API.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of
 7 barrels — `core`, `layouts`, `components`, `events`, `states`, `collections`,
@@ -133,13 +94,12 @@ skin)` signature, but `Group._commitCurrentState()` passes `this` cast
 - Anchor/percent constraints (`left`/`right`/`percentWidth`, etc.) have zero
   effect until the component is added to a `Group` that has a `layout`
   assigned. Setting them on a standalone/unparented component is a no-op.
-- **Since 3.3.1: transformed allocations use parent-space dimensions.**
+- **Transformed allocations use parent-space dimensions.**
   `core/fit-transformed-bounds.ts` converts them to local sizes for negative scale,
   rotation and skew. UIState tracks the allocated local axes so width/height
   reads do not discard a rotated one-axis allocation. Anchor/translation affect
   positioning, not size. Incompatible aspect ratios fit the largest contained
-  local rectangle; local minima win when containment is impossible. The published
-  UI 3.3.0 still falls back to preferred dimensions for non-identity transforms.
+  local rectangle; local minima win when containment is impossible.
 - `isUIComponent()` is duck-typed (`'ui' in obj`) — any object with a `.ui`
   property passes, not necessarily a real `Group`/`Component`.
 - **Virtual layout defaults to OFF.**
@@ -237,71 +197,21 @@ before patching core's transform code.
 | Understand validation/render scheduling order | `core/Validator.ts`, core `player/SystemTicker.ts`                                                                                                                        |
 | Measure UI validation/rendering performance   | `examples/benchmark/` for the visual runner, scenarios, Playwright automation, and local JSON/Markdown reports                                                            |
 
-## Label text layout contract in 3.6.0
+## Text and font contracts
 
-Label defaults to multiline; explicit false draws only the first hard-separated
-line without wrapping. EditableText defaults to single-line and rejects
-shrinking. `wordWrap` chooses Unicode versus character boundaries only while
-multiline is enabled.
+Label layout reserves symmetric outline/AA insets and complete ink bounds.
+Normal measurement, wrapping and fitting share those content bounds. Empty
+Label and EditableText preserve their native sizing rules. `textFit` defaults
+to `none`; `shrink` supports single/multiline text, keeps authored `size` and
+reports read-only renderedSize/textFitOverflow. `minFontSize` defaults to 12
+logical units and must be finite and >= 1. Automatic axes are unconstrained.
+Font readiness requires `label.invalidateSize()` even when the family name is
+unchanged. See [Label layout](label-text-layout.md).
 
-`TextFitMode` is exported with Label. `textFit` is `none` by default or `shrink`.
-UI 3.5.0 fits both line modes using complete Core measurement at each candidate
-size; UI 3.1.0–3.4.0 fit only single-line Labels.
-`multiline` stays authored and automatic axes stay unconstrained. Outline
-allowance affected fit checks and shared wrapping width, not the original alignment
-frame or nominal automatic dimensions in 3.5.0. UI 3.6.0
-uses `text/label-text-bounds.ts` to reserve symmetric stroke/AA insets
-and contain complete ink in automatic dimensions. Measurement, wrapping, fitting
-and painting share this area. Empty/input fields add no inset. `minFontSize` defaults to
-12 and must be finite and >= 1.
-`size` stays authored; `renderedSize` and `textFitOverflow` are read-only results
-after validation. Fitting uses fixed axes, parent layout constraints or explicit
-maximums, reserves outline thickness and caches unchanged metrics, including
-multiline/wordWrap/lineSpacing. Measured
-automatic bounds are not fed back as fit constraints.
+BitmapLabel uses Core BitmapText and borrows a configured BitmapFont/resource.
+Superseded loads cannot overwrite a new font; asynchronous failures dispatch
+IO_ERROR. [BitmapLabel](bitmap-label.md) documents ownership and constraints.
 
-`label.invalidateSize()` also invalidates Core line metrics. Call it after
-late font loading, even if the family name did not change. This requires
-Core >= 2.1.0 for that API; published UI 3.5.0 requires Core ^2.4.0 for centered
-flips, while the UI 3.6.0 outline correction needs ^2.5.2.
-
-Width/height setters refresh automatic text dimensions. Font readiness also
-invalidates fitting in fixed-size boxes. Fitting toggles preserve unchanged text
-positions, all nine alignments and outline-safe automatic dimensions.
-There is no global font-readiness listener.
-
-Existing multiline `shrink` policies begin fitting upon adoption; no XML format
-or authored-property migration is required. Runtime 0.10.0 accepts UI 3.6.0
-through its existing ^3.4.0 peer; its host must also satisfy UI's Core ^2.5.2 peer.
-CLI/document APIs are unchanged. Consumers update their own
-UI installations/locks and rebuild; no other SDK bump is needed.
-
-See [Label text layout](label-text-layout.md) for fit bounds, state restoration,
-font readiness and shared-schema boundaries. Native UI still depends only on
-Core; current KUI authoring uses document 0.13.1, CLI 3.6.1 and runtime 0.10.0.
-Label presets expand in consumer-owned
-copies before native rendering; UI does not read style.json or consume textStyle.
-
-## Bitmap labels in 3.2.0
-
-[bitmap-label.md](bitmap-label.md) documents the new exported BitmapLabel,
-using one BitmapText child and the configured Core resource singleton for string
-font names. Stale async results are guarded by request generation. Core ^2.2.0
-is required; local Core overrides have been removed. Published UI 3.1.0 does
-not contain it. KUI catalog, installed compilers and Editor adoption are separate.
-
-## Rich labels in 3.3.0
-
-[rich-label.md](rich-label.md) defines RichLabel, an independent Component using
-one native TextField. Only textFlow supplies content; no Label text/appearance
-properties, textFit or textStyle. Reads and assignments copy runs and styles;
-[] clears content. Wrapping is continuous across styles. Measurement uses Core
-2.3.0's pure measureText with parent width, explicit width or maxWidth; cached
-metrics clear on invalidateSize, including after fonts load. Geometry, multiline,
-wordWrap, lineSpacing, textAlign and verticalAlign remain component-level.
-
-Task → `components/RichLabel.ts`, `test/RichLabel.test.ts`,
-`test/browser/text-labels.spec.ts`. Run `pnpm test:text-labels` after building
-Core and UI. BitmapLabel automatic measurement now uses maxWidth too. The KUI
-catalog is available in published ui-document 0.12.0+, CLI 3.4.0+ and
-ui-runtime 0.9.0+. Editor adoption remains an explicit application update.
+RichLabel is an independent Component with `textFlow`, not Label text/fitting
+properties. It owns copies of runs/styles, uses continuous wrapping and restores
+whole-flow states. [RichLabel](rich-label.md) documents measurement and cleanup.

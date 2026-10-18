@@ -1,9 +1,7 @@
 # Make a game with Kurot
 
-This guide is for game authors and models using the public SDK. It ships since
-Core 2.5.5 and uses APIs verified on Core 2.5.4/2.5.5. The older
-2.5.4 package does not include this file. Read installed declarations
-for APIs, then open only the topic guides needed by the current task.
+Use the public SDK and the consumer project's own README, declarations and
+bundled topic guides. This workflow needs no engine source in the game project.
 
 ## 1. Establish the project and its baseline
 

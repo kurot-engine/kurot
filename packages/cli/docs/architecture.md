@@ -84,7 +84,7 @@ convention-based reusable components. A component change can affect its source
 namespace, paired skin, generated type declaration, and editor catalog, so that
 path refreshes all four outputs as one operation. The server preserves the last
 successful output after an invalid edit.
-Since 3.3.1, the resource watcher synchronizes all runtime assets even without UI,
+The resource watcher synchronizes all runtime assets even without UI,
 and reconciles additions, deletions and directory replacement. Runtime-only
 changes do not recompile skins. The fixed style.json and default.res.json paths
 still trigger KUI compilation; font loading remains an application responsibility.

@@ -1,9 +1,5 @@
 # @kurot/ui-runtime
 
-**0.10.0 is published**, verified on npm on 2026-10-09. Development installs published
-Core 2.4.0, UI 3.4.0 and ui-document 0.13.0 with a matching registry lock and
-no local overrides. See [centered flips](../../docs/centered-flips.md) for adoption.
-
 Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
@@ -20,18 +16,15 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 pnpm add @kurot/ui-runtime@^0.10.0 @kurot/ui-document@^0.13.0 @kurot/ui@^3.4.0 @kurot/core@^2.4.0
 ```
 
-Install all peers explicitly. Runtime 0.10.0 requires the
-centered flip API and layout frame in Core 2.4.0/UI 3.4.0, plus document 0.13.0
-authoring metadata. Older runtime 0.9.0 remains valid for native text on its
-published Core/UI/document chain. Public creation/controller APIs and semantic
-format version 2 remain unchanged; existing apps do not require an upgrade.
+Install all peers explicitly and satisfy the chosen UI package's Core peer
+as well as runtime's own peers. Semantic format version is 2.
 
 Current CLI 3.6.1 uses document ^0.13.0 for build-time Label presets/colors and emits
 skins that run directly through UI. That compilation path does not require
 ui-runtime. Runtime 0.10.0 and CLI 3.6.1 use the same document 0.13.x contract.
 See the [project style contract](../ui-document/docs/project-styles.md).
 
-## Centered flips in 0.10.0
+## Centered flips
 
 Display property handlers apply typed boolean `flipX`/`flipY` to native objects.
 Group and Component subclasses reflect around their validated local layout
@@ -39,11 +32,7 @@ frame while retaining authored scale and position. State removal restores prior
 flags; failed data-binding updates roll back without losing the applied flag.
 Reflection geometry and input coordinates remain Core/UI responsibilities.
 
-Development installs published Core 2.4.0, UI 3.4.0 and document 0.13.0 with one
-shared Core. Runtime 0.10.0 is published. Consumers install
-all matching peers explicitly and rebuild when adopting it.
-
-## BitmapLabel and RichLabel in 0.9.0
+## BitmapLabel and RichLabel
 
 Native BitmapLabel uses typed font resources and glyph metrics. RichLabel uses
 literal textFlow runs, continuous wrapping and automatic sizing. Neither
@@ -56,7 +45,7 @@ restoration paths. Empty arrays clear content; state removal and failed writes
 restore prior runs/fonts. See [text materialization](docs/text-components.md)
 for resource setup, example XML and lifecycle boundaries.
 
-## Project style colors in 0.8.1
+## Project style colors
 
 Read the optional `resource/config/style.json` in the application or Editor,
 then resolve color references into a disposable preview copy:
@@ -87,7 +76,7 @@ The internal token record is unchanged. Font loading, Stage ownership and
 live project theme updates remain application responsibilities; dispose the
 materialization and remove its root when it is no longer needed.
 
-## Label presets in 0.8.2
+## Label presets
 
 Expand Default-only Label `textStyle="@style:labels:<key>"` before color
 resolution. Local fields and individual Skin state fields take precedence:
@@ -109,9 +98,9 @@ root before materialization. Preserve `authored` for saving/history; expanded
 native fields do not replace the preset reference. Missing presets fail explicitly.
 The runtime accepts the resolved native properties and does not perform stylesheet
 I/O, font loading or live theme switching. Resource defaults, if used, resolve
-before Label presets. Core/UI need no new release for preset expansion.
+before Label presets. Preset expansion does not change Core/UI behavior.
 
-## Label text fitting in 0.8.0
+## Label text fitting
 
 Materialized Labels support `textFit: 'none' | 'shrink'` and `minFontSize`.
 Set `multiline: false` and constrain the available size to shrink a single line;
@@ -121,19 +110,17 @@ data bindings and font readiness follow the same UI contract as CLI-built skins.
 See [runtime text layout](docs/label-text-layout.md) for an example and lifecycle
 guidance.
 
-Explicit `multiline: false` now remains single-line even with automatic height.
+Explicit `multiline: false` remains single-line even with automatic height.
 Use `true` or omit the flag when wrapping is intended. Shrinking defaults to off
 and does not apply to EditableText. Derived size and overflow are read-only
 runtime observations; they are never written into the document.
 
-Upgrade these dependencies together. Refresh legacy sheet manifests in Kurot
-Editor before loading resources; see the
+Resource manifests must satisfy the current object-valued subkey contract; see the
 [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 
-Version 0.7 adopts the document kernel's literal-string XML contract. Parsed
+The document kernel uses literal-string XML attributes. Parsed
 `text="100.80"` and `text.down="false"` remain exact strings when materialized,
-including native appearance states and restoration. Remove earlier synthetic
-backslash type escapes explicitly; they now represent literal characters. XML
+including native appearance states and restoration. Backslashes are literal; XML
 entities, numeric/boolean properties and schema-free collection types are
 unchanged. The runtime does not migrate authored XML or add another parser.
 See [KUI XML values](../ui-document/docs/kui-xml.md#values).
@@ -167,9 +154,8 @@ state or variant properties authored on the implicit root apply to that native
 Skin. Anonymous appearance nodes remain internal, while generated synthetic
 identities still allow native states such as `source.down` to update them.
 
-Version 0.5 carries the first bounded visual-semantics slice onto the typed,
-atomic UI 2.0 skin lifecycle while retaining component capability validation
-and transactional data updates. Contract data fields drive declared one-way
+Materialization uses the typed atomic Skin lifecycle, component capability
+validation and transactional data updates. Contract data fields drive declared one-way
 property bindings, semantic actions expose declared `tap` and `change` events,
 and numeric appearance overrides may use bounded transitions. The package still
 performs full-tree creation; incremental preview reconciliation belongs to the
@@ -251,10 +237,10 @@ pnpm preview
 
 The preview is available at `http://localhost:5173/preview/` by default.
 
-## Resource nine-slice defaults in 0.6.0
+## Resource nine-slice defaults
 
 Resolve each authored document and registered appearance with
-`resolveUIResourceDefaults()` from `@kurot/ui-document@^0.12.0` before passing
+`resolveUIResourceDefaults()` from `@kurot/ui-document` before passing
 it to `createKurotUI()`. Runtime Images then receive resource-derived grids.
 `scale9Grid: false` clears an inherited grid, including during native Skin
 state changes; leaving the state restores the previous grid. The runtime does

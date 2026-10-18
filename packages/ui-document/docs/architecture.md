@@ -130,11 +130,11 @@ the asset registry instead.
 
 ## Project styles
 
-The 0.11.0 kernel validates project fonts, colors and Label appearance presets
+The kernel validates project fonts, colors and Label appearance presets
 without configuration I/O or native rendering. `resolveUILabelStyles()` expands
 Default-only `textStyle` references into a disposable copy before
 `resolveUIStyleColors()`. Local properties and individual state fields take
-precedence. XML and editing history retain the original references. CLI 3.3.0
+precedence. XML and editing history retain the original references. The CLI
 uses this expansion order at build time; ui-runtime callers prepare every root
 and registered appearance/component before materialization. See
 [project styles](./project-styles.md).
@@ -146,8 +146,8 @@ resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
 Published `@kurot/ui-runtime@0.10.0` consumes format version 2 with ui-document
-`^0.13.0` and passes the shared component, screen, and appearance conformance
-fixtures. It expands reusable instances, executes bounded data bindings and
+`^0.13.0`. Shared fixtures define component, screen and appearance conformance.
+The runtime expands reusable instances, executes bounded data bindings and
 semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected
 variants and numeric transitions. Incremental reconciliation remains runtime

@@ -1,10 +1,5 @@
 # @kurot/ui-runtime — AI context map
 
-Runtime 0.10.0 is published, verified on npm on 2026-10-09. Development
-installs published Core 2.4.0, UI 3.4.0 and
-ui-document 0.13.0 with a matching registry lock and one shared Core. Read
-[centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
-
 Package identity: `@kurot/ui-runtime@0.10.0` (published). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
@@ -38,7 +33,7 @@ Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
 - `KurotUIRuntimeError` exposes a stable `code`, exact semantic `path`, and any
   document validation `diagnostics`.
 
-## Text integration in 0.9.0
+## Text integration
 
 BitmapLabel/RichLabel are independent Component subclasses. Explicit handlers
 under `builtins/` share only text layout; Label typography is not inherited.
@@ -47,9 +42,7 @@ adapters return either a configured resource key or a real BitmapFont.
 Native measurement, resource loading/cache ownership and content copy rules
 remain in Core/UI. Whole-flow states and typed data bindings use existing
 native/transactional restoration, including undefined base fonts. See
-[text-components.md](text-components.md). The 0.9.0 development lock used registry
-Core 2.3.1 and required native text API 2.3.0. Current 0.10.0 development uses
-registry Core 2.4.0/UI 3.4.0/document 0.13.0 for the centered-flip contract.
+[text-components.md](text-components.md).
 
 ## Built-in boundary
 
@@ -187,16 +180,16 @@ pnpm --dir packages/ui-runtime test
 pnpm --dir packages/ui-runtime preview
 ```
 
-## Resource configuration change in 0.6.0
+## Resource configuration
 
 The runtime accepts resolved `scale9Grid` rectangles and clears inherited
 grids when an Image receives `false`. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
 
-## Project style adoption in 0.8.1
+## Project styles
 
-The published ui-document 0.10.0 parser owns `@style:colors:<key>` XML syntax
+The ui-document parser owns `@style:colors:<key>` XML syntax
 and the optional fixed `resource/config/style.json` contract. Internal color
 token records remain unchanged; no runtime property-routing change is needed.
 Consumers perform configuration I/O and font loading. They may resolve every
@@ -205,23 +198,21 @@ copies, or register palette entries as color tokens in `UIAssetRegistry` before
 materializing the original document. Never save the expanded copies or rewrite
 authored references. The previous XML color prefix is rejected without an alias.
 
-## Label preset adoption in 0.8.2
+## Label presets
 
 Read the shared project-styles.md contract before materializing Label presets.
 Callers resolve resource defaults, then `resolveUILabelStyles()` with the parsed
 stylesheet, then colors into disposable copies of every root/appearance/component.
 The runtime does not read config or consume textStyle as a native property.
 Local/state fields win and native states restore the resolved baseline. Keep
-authored references for saving/history. Runtime 0.8.2 originally adopted document
-0.11.0; runtime 0.8.1's ^0.10.0 range excludes that kernel. Current runtime
-0.10.0 uses published document ^0.13.0 without overrides, and CLI 3.5.0 uses
-the same preset expansion order at build time.
+authored references for saving/history. CLI uses the same preset expansion
+order at build time; runtime and CLI resolve their own document dependencies.
 
-## Label text layout in 0.8.0
+## Label text layout
 
-`textFit` and `minFontSize` route directly to native Label properties. Core 2.1
+`textFit` and `minFontSize` route directly to native Label properties. Core
 keeps explicit `multiline = false` single-line, including automatic height.
-The shared 0.9 authoring catalog rejects invalid fitting modes and minimum sizes,
+The shared authoring catalog rejects invalid fitting modes and minimum sizes,
 and only permits `textFit = 'none'` on EditableText. The runtime does not author
 `renderedSize` or `textFitOverflow`; these are native observations after layout.
 See [runtime text layout](label-text-layout.md) for defaults, fit bounds,

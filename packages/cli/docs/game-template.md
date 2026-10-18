@@ -1,28 +1,11 @@
-# Project styles and languages in the game template
+# Game template startup and project services
 
-Project-owned style/font/language initialization was introduced in CLI 3.2.1
-and remains in published CLI 3.6.0. Existing projects keep their own startup
-code and HTML; the empty template stays minimal.
-
-## Project documentation in 3.6.1
-
-CLI 3.6.1 includes a project README and short AGENTS entry in both templates.
-This version is published and verified on npm on 2026-10-18, including the
-README/AGENTS files in both template directories.
-They identify the gameplay entry, commands, expected startup, generated files
-and task-specific guides in installed SDK packages. Read the consumer project's
-manifest, lock and installation for its actual versions. These additions are
-not in the already published CLI 3.6.0 artifact and do not rewrite existing games.
-For gameplay, the entries point to Core's game-authoring guide when installed,
-or the Star Catcher reference in an engine checkout; older packages retain their
-README/type-declaration fallback.
-
-The [standard UI guide](../../ui/docs/ui-authoring.md), bundled in UI 3.6.2, adds
-directory, TS/Skin pairing and lifecycle rules above the API reference, with a
-complete HUD recipe. The game README points at its installed copy. UI 3.6.2 and
-CLI 3.6.1 are separate packages: installing UI supplies the guides, while using
-the new CLI for create supplies template entry docs. Existing projects keep
-their own instructions and can add the links explicitly.
+The game template owns its style/font/language initialization, HTML, README and
+AGENTS entry. The empty template stays Core-only. New scaffolds receive these
+files; existing projects keep their own authored resources and instructions.
+For UI organization and component/Skin pairing use
+[standard authoring](../../ui/docs/ui-authoring.md) and the
+[ScoreHUD recipe](../../ui/docs/recipes/score-hud.md).
 
 ## Files
 
@@ -50,8 +33,6 @@ Templates do not implement live font/theme/language replacement.
 
 ## HTML brand splash
 
-This splash is included in published CLI 3.6.0; npm CLI 3.5.0 lacks it.
-
 The game template's `web/index.html` presents `web/logo.png` beneath a small
 "Made with" caption. The mascot makes a gentle entrance, then repeats a playful
 hop and sway every 3.2 seconds while the entry module loads. Sparkles and a soft
@@ -68,9 +49,8 @@ existing project HTML is project-owned.
 
 ## Change fonts and colors
 
-The CLI 3.6.0 [default KUI skins](default-ui-skins.md) use Kurot-owned textures
-under resource/assets/ui/kui and a matching color palette. Registry CLI 3.5.0
-does not include this skin refresh. Skin state text colors compile from the
+The [default KUI skins](default-ui-skins.md) use Kurot-owned textures under
+resource/assets/ui/kui and a matching color palette. Skin state text colors compile from the
 project stylesheet; texture colors are baked into the PNG, without live palette
 switching. Templates inherit project fonts and retain the existing licensed files.
 

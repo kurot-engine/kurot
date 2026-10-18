@@ -1,9 +1,7 @@
-# Resource default nine-slice grids
+# Resource nine-slice defaults
 
-This is a **breaking resource format change**, introduced with Core 2.0,
-CLI 3.0, ui-document 0.7 and ui-runtime 0.6. Later releases retain the same
-object-valued frame map and local-override rules. Current CLI 3.6.1 and runtime
-0.10.0 require document `^0.13.0`; UI's Rectangle setter needs no additional API.
+The resource contract uses an object-valued frame map and local-override rules. CLI compilation and semantic previews resolve the
+same defaults before applying local appearance properties.
 
 ## Authored configuration
 
@@ -78,7 +76,7 @@ Before building with the new Core/CLI, explicitly refresh every old sheet in the
 Editor. No project-wide migration, alternate schema or runtime string fallback
 is provided.
 
-## Release boundary
+## Integration boundary
 
 Core's exported `ResourceConfigEntry.subkeys` changes from a string to an object.
 CLI now validates resource manifests before installing Skin bundles. ui-document
@@ -87,11 +85,6 @@ consumes that opt-out. A failed manifest rebuild retains the last good Skin
 bundle in watch mode. Manifest edits rebuild all dependent Skin factories;
 resource/component watch builds are serialized.
 
-Current CLI 3.6.1 and runtime 0.10.0 require document `^0.13.0`. UI 3.6.2
-requires Core `^2.5.2`; runtime 0.10.0 keeps Core `^2.4.0`
-and UI `^3.4.0` peers. Game 2.0.1 accepts Core `^2.0.0`. Core 2.1.1 adds the nested/rotated scroll
-clipping fix without changing this resource contract.
-
-The Editor working tree uses CLI 3.5.0/runtime 0.10.0. The KUI sample and
-engine examples retain published CLI 3.3.1. Convert old sheets in the Editor before
-moving applications to the new package set. Old EXML projects can remain on CLI 1.3.x.
+Use the [dependency policy](../../../docs/dependency-policy.md) for installed
+compatibility requirements. Validate authored resource data before compilation
+or materialization; the document kernel does not load images or replace assets.

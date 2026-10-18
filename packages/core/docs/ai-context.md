@@ -1,48 +1,11 @@
 # @kurot/core — AI context map
 
-For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
-Core 2.5.5 is published, verified on npm on 2026-10-18; its bundled API references
-and game guide are present. Runtime code, signatures, exports and dependencies are unchanged.
-
-For game development, start with [game authoring](game-authoring.md) instead of
-the maintainer map below. The guide ships in Core 2.5.5 and uses the same API as
-Core 2.5.4; Star Catcher remains a repository example.
-
-Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
-registry integrity and all 628 generated files matching the tested build. It fixes SoundChannel
-loops with one native Web Audio source and audio-clock finite duration.
-Preserve total `loops` counts and initial offset semantics, wrapped position,
-completion once and manual-stop cleanup.
-HTML unlimited loops are native; finite fallback timing is browser-dependent.
-Read [audio playback](audio-playback.md). Registry 2.5.3 lacks this correction.
-SDK ranges/development locks are unchanged; existing peers accept 2.5.4 without
-bumps. Editor 0.28.5, Reskin, the selected Tentax/MilfMaster templates and demo/game
-examples adopt registry 2.5.4 with matching app locks and rebuilt outputs. Other
-applications and independent Reskin projects retain their own installations.
-
-Core 2.5.3 is published, verified on npm on 2026-10-10. TextField and BitmapText default to
-middle; inherited UI text components use the same host default. Explicit top/bottom
-remain effective and multiline only controls line generation. Catalog metadata
-matches in published ui-document 0.13.1. Existing omitted alignment can move;
-use explicit top when required. Applications remain on their published locks.
-Read [default alignment](text-layout.md#default-middle-alignment-core-253).
-
-Core 2.5.2 is published, with all three dynamic alignments sharing one glyph block
-independently of multiline. npm latest, the package download and registry integrity
-were verified on 2026-10-10; published alignment/rendering modules match the tested
-local build. Read
-[centered flips](../../../docs/centered-flips.md) before changing transforms,
-reflection frames, authored flags or dependency adoption.
-
-Core 2.5.0 adds independent Texture/SpriteSheet source density. Read [texture density](texture-density.md) before changing texture
-dimensions or sheet loading. `resolution` defaults to 1 and is immutable;
-sampling and page coordinates are physical, frame bounds/trim/grid are logical.
-The default KUI kit uses 2× assets and requires this new Core implementation.
-
-Read this before exploring `src/`. It is a compressed map of the package so an
-agent unfamiliar with Kurot does not need to re-derive the architecture from
-scratch on every session. Treat the package source and its `src/index.ts`
-barrel as the authority for current behavior and exports.
+For game work, read [game authoring](game-authoring.md). For API lookup, use
+[topics](api/topics.md) and the [symbol/member index](api/index.md). The map
+below describes SDK maintenance; source and public exports are authoritative.
+Use [text layout](text-layout.md), [texture density](texture-density.md),
+[audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
+when changing those contracts.
 
 Package identity: `@kurot/core@2.5.5`, published. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
@@ -121,7 +84,7 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   content, not the clip. WebGL's nested/rotated stencil path must use the same
   viewport origin as its axis-aligned scissor path. Rectangle masks retain
   their own local x/y. See `player/pipes/MaskPipe.ts`.
-- The Core 2.5.0 axis-aligned WebGL scissor correction encloses fractional
+- Axis-aligned WebGL scissors enclose fractional
   physical bounds with floor(left/top) and ceil(right/bottom), then subtracts
   those integer edges. Do not truncate position and size independently: this
   cuts boundary pixels from scaled ItemRenderer skins. Stencil clips are unchanged.
@@ -129,7 +92,7 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   internally to rasterize Graphics/Text to offscreen canvases before texture
   upload, and to snapshot `RenderTexture`. Don't reason about it as dead code
   when WebGL is active.
-- The 2.3.2 TextField outline fix uses render-only margins, including rich
+- TextField outline rendering uses render-only margins, including rich
   run strokes. `text/TextRenderBounds.ts` supplies padding; `player/render-bounds.ts`
   includes descendant ink in caches and effect captures. Layout measurements and
   hit areas remain unchanged. Input viewports and external clips remain exact;
@@ -269,7 +232,7 @@ vertices, UVs, or indices, call updateVertices(). WebGL keeps Mesh indices
 separate from quad indices and splits oversized meshes into ordered batches
 with local index remapping (player/webgl/split-mesh.ts).
 
-## Text alignment in 2.5.3
+## Text alignment
 
 Dynamic top/middle/bottom use `TextBlockBounds.ts` for the same complete glyph
 block, with nominal rows for blanks. `TextVerticalLayout.ts` translates the block
@@ -282,32 +245,13 @@ to top for caret scrolling. TextRenderBounds uses the natural content height for
 capture padding so an overflowing viewport cannot inflate surfaces. Edge glyphs
 retain antialiasing; CanvasRenderer skips fully hidden dynamic glyph rows before
 stroke painting. Link hits share the offset. Measurements remain nominal.
-Read [text layout](text-layout.md#default-middle-alignment-core-253). Core 2.5.3
-is published; 2.5.2 uses the same geometry but defaults to top. Existing
-peers accept 2.5.3 without another SDK release.
-Applications update installations/locks and rebuild explicitly.
+Read [text layout](text-layout.md#vertical-alignment).
 
-## Published text alignment in 2.5.1
-
-`TextLineLayout.ts` caches alphabetic `baseline` and visible `inkAscent` /
-`inkDescent` per line. `TextBlockBounds.ts` caches the union of row glyph bounds,
-using nominal rows for blank lines. `TextVerticalLayout.ts` centers the entire
-dynamic block in either line mode. Multiline only controls line generation;
-input/top/bottom retain nominal alignment with content-independent font frames.
-Relative row baselines and spacing stay stable, but a dynamic middle block can
-translate when its glyph extents change. Canvas, WebGL
-rasterization and link hit testing share the offset. Render bounds add glyph
-margin without changing measurement, input or external clip boundaries. See
-[text layout](text-layout.md#middle-alignment-independent-of-line-mode-core-251).
-Published Core 2.5.0 centers only single-line dynamic ink. Version 2.5.1 is
-published; existing consumer peers accept it without SDK bumps.
-Adoption requires an explicit installation/lock update and rebuild.
-
-## Text layout in 2.0.1
+## Line breaking
 
 Word-wrapped text uses Unicode 17.0 UAX #14, dictionary tailoring for SA scripts
 and alphabetic overflow tailoring. Style runs never introduce break positions.
-Core 2.2.1 tailors rules by imported function identity and filters optional
+Line breaking tailors rules by imported function identity and filters optional
 breaks through grapheme boundaries. Character wrapping also uses complete
 graphemes. Never introduce a break inside a cluster; an oversized cluster
 overflows intact. The untailored default profile stays unchanged for Unicode
@@ -319,26 +263,26 @@ Canvas renderer advances input indices by line.charNum, including hidden spaces
 and CRLF; do not derive the next line's source offset from painted text lengths.
 See [text layout](text-layout.md).
 
-## Resource configuration change in 2.0.0
+## Resource configuration
 
 `ResourceConfigEntry.subkeys` is an object map, and Core rejects legacy strings
 before mutating the resource registry. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
 
-## Text layout contract in 2.1.0
+## Line policy and font readiness
 
 Explicit `TextField.multiline = false` renders the first hard-separated line
 without width wrapping. Dynamic fields default to multiline and input fields
 to single-line until assigned; explicit intent survives type changes.
 `TextField.invalidateTextMetrics()` clears line measurements after a late-loaded
 font becomes ready. Core does not implement Label font shrinking; that is a
-separate UI capability requiring Core 2.1.0 or later.
+separate UI capability.
 See [text layout](text-layout.md) for the Core contract and
 [Label text layout](../../ui/docs/label-text-layout.md) for fit bounds, state
 restoration and shared-schema boundaries.
 
-## Independent text measurement in 2.3.0
+## Independent text measurement
 
 `TextField.measureText(width = NaN)` returns complete content width/height without
 changing rendered constraints, line caches, scrolling or dirty flags. NaN is
@@ -346,27 +290,25 @@ unconstrained; finite nonnegative widths are accepted; other widths throw.
 Rich-text line height follows the largest run on that line rather than the
 base size; blank lines retain their applicable style. Assigning plain `text`
 always clears a previous rich flow, including identical string assignments.
-In 2.3.1, an unstyled blank run uses the base size rather than borrowing a
+An unstyled blank run uses the base size rather than borrowing a
 later styled run's size. See `test/TextMeasurement.test.ts` and `docs/text-layout.md`.
 
-## Bitmap fill modes in 2.3.3
+## Bitmap fill modes
 
 Both BitmapPipe and CanvasRenderer honor repeat/clip through internal
 `player/bitmap-fill.ts`. Repeat periods use original logical texture dimensions,
 including trim margins; edge regions crop source pixels. Rotated atlas coordinates
 and tinting remain supported. Nine-slice applies only to scale. CanvasRenderer is
 also the nested bitmap-cache rasterizer, so both render paths must stay aligned.
-See docs/bitmap-fill.md. This compatible patch requires application installation
-and rebuild, not another UI/CLI/ui-runtime version bump.
+See docs/bitmap-fill.md.
 
-## Bitmap fonts in 2.2.0
+## Bitmap fonts
 
 [bitmap-fonts.md](bitmap-fonts.md) documents the headless bitmap-font dependency,
 FontAnalyzer and BitmapTextPipe. ResourceType.Font is built in; BitmapText
-now draws via WebGL/Canvas. BitmapFontOptions controls page ownership. Native
+draws via WebGL/Canvas. BitmapFontOptions controls page ownership. Native
 font data comes from @kurot/bitmap-font; do not reimplement parsing/layout here.
 The dependency is published @kurot/bitmap-font ^0.1.0, with no local override.
 BitmapText.measureText() leaves rendered constraints and layout caches unchanged;
 text borrows the font and the resource/caller retains ownership. Font pages are
-full, unrotated textures at scale factor 1. Core 2.1.1 does not include these
-changes. Core 2.2.0 is published with its registry bitmap-font dependency.
+full, unrotated textures at scale factor 1.

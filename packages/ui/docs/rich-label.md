@@ -1,12 +1,7 @@
 # RichLabel
 
-Native API introduced in UI 3.3.0, requiring Core ^2.3.0. Core 2.3.1 is
-published and installed from npm for this release's build and verification.
-
-Current UI 3.6.2 retains RichLabel. Its package-wide Core peer/dev minimum is
-^2.5.2 for outline-safe Label layout; the unchanged development installation
-and lock use published Core 2.5.3. This component's original API minimum above
-is separate from the current UI package requirement.
+Native rich textFlow content in an independent Component using Core TextField.
+Use the installed UI/Core peer pair; public declarations define the available API.
 
 ```ts
 import { RichLabel } from '@kurot/ui';
@@ -51,18 +46,17 @@ available, together with these text-layout properties:
 | verticalAlign          | Host Core | top, middle or bottom.                                                    |
 | textWidth / textHeight | Read-only | Complete content metrics under the current width, before height clipping. |
 
-Vertical alignment inherits TextField's default: middle with published Core 2.5.3,
-top with published 2.5.2 and earlier. Explicit values remain effective in either
-line mode. UI 3.4.0 accepts the Core patch without another UI release; adopt the
-application installation/lock and rebuild. Published document
-0.13.1 supplies the matching catalog default.
+Vertical alignment inherits TextField's default: middle with Core >= 2.5.3,
+top with the accepted Core 2.5.2 baseline. Explicit alignment remains effective
+in either line mode. The headless catalog records middle; omitted XML values
+still use the native host default.
 
 Measurement uses parent-assigned width first, then explicit width, then a
 configured maxWidth, otherwise unconstrained width. Automatic height includes
 every wrapped line and inter-line spacing. Each line uses the largest font size
 of its runs, rather than imposing the TextField base size. Hard line separators
-and trailing blank lines follow the Core text contract. Core 2.3.1 corrects the
-base size of unstyled blank runs between styled runs; the API minimum stays 2.3.0. Empty content measures
+and trailing blank lines follow the Core text contract. Unstyled blank runs
+between styled runs use the base size. Empty content measures
 0 × 0; Component minWidth/minHeight can still enlarge its layout bounds.
 
 Fixed height clips drawing without discarding content. Alignment positions the
@@ -78,11 +72,10 @@ call `label.invalidateSize()` to clear both component and native text metrics,
 then allow normal layout validation. RichLabel does not load font files or
 install global font-loading listeners.
 
-Authoring support was introduced in document 0.12.0, CLI 3.4.0 and runtime 0.9.0.
-Current document 0.13.1, CLI 3.6.0 and runtime 0.10.0 retain RichLabel
-authoring, KUI compilation and materialization. Earlier versions lack these
-built-in registrations. Editor controls are owned by the separate application;
-all consumers retain textFlow ownership and separation from Label presets.
+Authoring requires document >= 0.12.0, CLI >= 3.4.0 or runtime >= 0.9.0,
+plus their declared peers.
+Editor controls belong to the consuming application; all consumers retain
+textFlow ownership and separation from Label presets.
 
 See [Core text layout](../../core/docs/text-layout.md) for Unicode wrapping,
 single-line behavior and independent measurement. Run `pnpm test:text-labels`

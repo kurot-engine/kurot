@@ -1,95 +1,14 @@
 # @kurot/ui-document
 
-**0.13.1 is published**, verified on npm on 2026-10-10. It records middle as the text alignment
-default, matching published Core 2.5.3. The package download and registry integrity
-are verified. See
-[centered flips](../../docs/centered-flips.md) for APIs and consumer requirements.
+Headless semantic UI documents, canonical Skin KUI XML, validation, reusable
+assets and transactional editing. Package version: **0.13.1**. The semantic
+format is **2**; the package has no Kurot runtime dependency.
 
-Headless semantic document foundation for Kurot UI tooling. It provides one
-format and one mutation model shared by Kurot Editor, `@kurot/cli`, and
-Agent-driven UI generation.
-
-> **Package version: 0.13.1 (published).** KUI XML is the canonical authored format. The
-> schema remains pre-1.0, so later minor releases may still refine its contract.
-
-## Default middle text alignment in 0.13.1
-
-Label, EditableText, RichLabel and BitmapLabel catalog definitions report
-`verticalAlign="middle"`, matching published Core 2.5.3. Explicit top/bottom and
-named states are preserved; multiline only controls line generation. Omitted
-properties remain omitted in XML and history. The package remains headless, with
-no Core/UI dependency, new public API or format change.
-
-To use the new default, editors adopt Core 2.5.3 and document 0.13.1 together after
-publication and rebuild. CLI 3.6.0 and runtime 0.10.0 already accept this catalog
-patch through ^0.13.0; compatible SDKs need no new release. Old content with omitted
-alignment can move within a taller box. Set top explicitly for content intended
-to begin there; files are not rewritten automatically.
-See [text authoring](docs/text-layout.md#vertical-alignment-default-in-0131).
-
-## Centered flip metadata in 0.13.0
-
-Display nodes inherit boolean `flipX` and `flipY`, defaulting to false. XML,
-state overrides and transactional history preserve the flags without changing
-negative scale or semantic format version 2. The headless kernel has no runtime
-dependency on Core/UI and does not calculate reflection geometry.
-
-```xml
-<Skin xmlns="https://kurot.dev/ui/1" class="skins.Reflected" states="down">
-    <Image id="art" flipX="true" flipX.down="false" />
-</Skin>
-```
-
-Rendering requires published Core 2.4.0/UI 3.4.0. Compilation uses CLI 3.5.0;
-materialization uses ui-runtime 0.10.0. Both consumer releases are published. Consumers on ^0.12.0 explicitly adopt ^0.13.0 and rebuild.
-
-## BitmapLabel and RichLabel in 0.12.0
-
-The foundation catalog now models both native components independently of Label.
-BitmapLabel uses literal `text` plus a typed bitmap-font resource. RichLabel uses
-only `textFlow`, with literal font, size, emphasis, colors and outline per run:
-
-```xml
-<BitmapLabel text="100.80" font="score_font" />
-<RichLabel width="240">
-    <textFlow>
-        <Span text="Balance: " size="20" />
-        <Span text="100.80" bold="true" size="20" textColor="#FFCC00" />
-    </textFlow>
-</RichLabel>
-```
-
-RichLabel supports continuous wrapping and automatic geometry, with whole-flow
-Skin state overrides. Exported `UITextFlow`, `UITextRun`, `UITextRunStyle` and
-`isUITextFlow` share the strict data contract without any engine dependency.
-Label presets and automatic shrinking stay on Label. Format version 2 is unchanged.
-See [the text component contract](docs/text-components.md) for fields, literal
-whitespace, clearing, states and consumer requirements. Native rendering uses
-published UI 3.3.0 and Core ^2.3.0 (tested Core 2.3.1). Published CLI 3.3.1 and
-ui-runtime 0.8.2 still use ^0.11.0. Published CLI 3.4.0 and ui-runtime 0.9.0
-adopt this contract; applications must upgrade explicitly to author the new types.
-
-## Label text authoring in 0.9.0
-
-The foundation catalog now declares `textFit` (`none` or `shrink`) and
-`minFontSize` for Labels. Authored `size` and state overrides remain unchanged;
-derived `renderedSize` and `textFitOverflow` are runtime observations and are
-rejected as document properties. EditableText accepts only `textFit="none"`.
-
-```xml
-<Label text="KZT 10 000,00" width="140" size="24"
-       multiline="false" textFit="shrink" minFontSize="16" />
-```
-
-Label's catalog default for `multiline` is true; EditableText's is false.
-Omitted defaults are not inserted into XML. Explicit `multiline="false"` uses
-Core 2.1.0's single-line behavior; remove the flag or set it to true for wrapping.
-The semantic format remains version 2, and files are not migrated automatically.
-See the [text authoring contract](docs/text-layout.md) for validation and
-consumer requirements. This package models these fields; the original native
-API minimum is UI 3.1.0/Core 2.1.0. Current CLI 3.6.1 and runtime 0.10.0 use
-document `^0.13.0`; runtime also requires UI `^3.4.0` and Core `^2.4.0`.
-Earlier 0.x kernel ranges do not automatically accept this release.
+Read [KUI XML](docs/kui-xml.md), [text components](docs/text-components.md),
+[project styles](docs/project-styles.md) and
+[resource defaults](docs/resource-nine-slice.md) for authoring contracts.
+Native components own layout/rendering; this kernel validates data and preserves
+authored property/state intent without loading fonts, images or engine code.
 
 ## Installation
 
@@ -389,7 +308,7 @@ format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
 skins/states. It also executes the bounded data, action, and transition
-contracts introduced in 0.4. Incremental reconciliation remains separate
+contracts. Incremental reconciliation remains separate
 runtime work.
 
 ## Development
@@ -400,7 +319,7 @@ pnpm build
 pnpm test
 ```
 
-## Resource nine-slice defaults in 0.7.0
+## Resource nine-slice defaults
 
 `parseUIResourceConfigEntries()` validates object-valued sheet `subkeys` and
 image/frame `scale9grid` values. Old comma-separated subkeys are rejected;
@@ -411,9 +330,9 @@ preserving authored XML and history. A local `scale9Grid="false"` disables
 inheritance, and state source changes get matching grid overrides.
 
 See the [resource nine-slice contract](docs/resource-nine-slice.md) for lookup
-priority, conversion, and release order.
+priority, validation and authored format.
 
-## Project fonts and colors in 0.10.0
+## Project fonts and colors
 
 The optional fixed `resource/config/style.json` is independent of
 `default.res.json`. `parseUIStyleSheet()` validates schemaVersion 1, font roles,
@@ -436,8 +355,7 @@ remain consumer responsibilities.
 
 `@style:colors:<key>` selects the `colors` section of `style.json`. The internal
 reference remains `{ kind: 'token', tokenType: 'color', key }`; semantic format
-version 2 is unchanged. Version 0.11.0 also supports Label presets as described
-below. Schema-defined strings such as Label text
+version 2 is unchanged. Label presets are described below. Schema-defined strings such as Label text
 remain literal.
 
 ```ts
@@ -454,9 +372,8 @@ skins and inactive states/variants. Continue saving and editing `authored`;
 never replace it with `preview` or persist the expanded RGB values. Missing
 colors report the semantic path, and other token categories stay unresolved.
 
-This is an XML syntax change: the previous `@token:color:<key>` prefix is
-rejected. Update authored color references explicitly; files are not migrated
-automatically. Current CLI 3.6.1 depends on document `^0.13.0` and resolves
+Authored palette references use `@style:colors:<key>`; other XML prefixes are
+rejected. Authoring files remain unchanged by resolution. Current CLI 3.6.1 depends on document `^0.13.0` and resolves
 stylesheet colors and Label presets during KUI compilation. Runtime 0.10.0
 requires the same document range;
 consumers resolve colors in preview copies or register palette entries in the
@@ -464,18 +381,17 @@ runtime asset registry. Editor and application dependencies must also adopt the 
 No Core/UI rendering change is required. See
 [project styles](docs/project-styles.md) for the full contract.
 
-## Label presets in 0.11.0
+## Label presets
 
 `style.json.labels` defines reusable Label appearance: font, size, color, outline,
 emphasis, alignment and spacing. `textStyle="@style:labels:<key>"` selects one in
-Default; local fields and state field overrides take precedence. Use the new
+Default; local fields and state field overrides take precedence. Use
 `resolveUILabelStyles()` before `resolveUIStyleColors()` on disposable copies,
 retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 `UILabelStyleProperty` and `UI_LABEL_STYLE_PROPERTIES` describe this contract.
 The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
-See [project styles](docs/project-styles.md) for configuration and release order.
-Presets were introduced in document 0.11.0 and CLI 3.3.0; CLI 3.2.1 lacks them.
+See [project styles](docs/project-styles.md) for configuration and resolution order.
 Current CLI 3.6.1 and runtime 0.10.0 use document `^0.13.0` without overrides.
 Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`; preset expansion
 itself does not introduce a new native rendering requirement.

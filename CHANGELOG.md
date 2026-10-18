@@ -1,15 +1,16 @@
-# Release and adoption history: Core 2.4–2.5
+# Changelog
 
-These records were moved from the root AGENTS.md on 2026-10-18. Publication
-checks and application adoption describe the recorded release, not the current
-state of every checkout. Read the target project's manifest, lock and installed
-packages for its actual versions; source versions alone do not establish npm
-publication. Bare package paths below are relative to the repository root.
+Repository-wide documentation, publication and application-adoption records.
+Observations below describe their recorded event. Current package versions and
+usage are indexed in [README.md](README.md); SDK changes are recorded in each
+package's CHANGELOG.md.
 
-For current dependency rules read [dependency policy](dependency-policy.md).
-Consult package docs for current APIs and migration contracts.
+## 2026-10-18 — Documentation organization
 
-Earlier Core/text/style records: [early 2.x history](release-history-early-2x.md).
+- Keep API indexes, README files, context maps and guides focused on current
+  contracts, usage, compatibility requirements and verification commands.
+- Consolidate historical publication/adoption records here and in package/tool
+  changelogs. Preserve the earlier source documents in Git history.
 
 ## Published SDK snapshot — 2026-10-18
 
@@ -65,8 +66,8 @@ Core/UI implementations and engine dependency ranges/locks are unchanged.
 Other SDKs and applications retain their own adoption schedules. Published
 archives retain their preparation-time documentation; these post-publication
 status updates apply to the repository and do not replace an npm artifact.
-See [dependency impact](api-documentation.md#ui-362-and-cli-361-authoring-patches)
-and [verification](../tools/api-docs/VERIFICATION.md).
+See [dependency impact](CHANGELOG.md#ui-authoring-and-cli-declaration-patches--2026-10-18)
+and [verification](tools/api-docs/VERIFICATION.md).
 
 ### API documentation patches — 2026-10-18
 

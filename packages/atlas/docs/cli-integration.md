@@ -1,8 +1,6 @@
 # Atlas integration with CLI and optimization recommendations
 
-Status: source analysis and sample validation from 2026-10-07. This document
-proposes follow-up work. That validation did not modify CLI, Core, Editor or
-Reskin, or add dependencies to consumers.
+This document describes the current atlas pipeline and optional tooling work.
 
 ## Current pipeline
 
@@ -23,7 +21,7 @@ authored KUI and generated theme files.
 
 Core's `packages/core/src/kurot/resource/analyzers/SheetAnalyzer.ts` reads
 `file/frames` at runtime and passes crop coordinates, offsets and original sizes
-to `SpriteSheet.createTexture`. The verified output format is sufficient for
+to `SpriteSheet.createTexture`. The output format supports
 this pipeline; adopting the library does not require changes to CLI's KUI parser
 or Core.
 
@@ -31,37 +29,16 @@ Atlas remains independent. Reskin/Editor resource services can call it. If CLI
 later offers packing, CLI may depend on atlas; atlas must not depend on CLI/Core.
 Copying or consuming prebuilt atlases requires no new dependency.
 
-## First priority: resource updates reach the preview
+## Resource updates and grouped commits
 
-Subsequent progress: the CLI working tree added whole-resource watching, batched
-synchronization, deletion handling and no-store responses. CLI 3.3.1 is published;
-installed CLI 3.3.0 lacks these capabilities and needs a dependency and lockfile
-update. The gaps below describe the older implementation examined during the
-analysis. See [CLI resource watching](../../cli/docs/dev-resource-watching.md)
-for the current implementation and batch limits. Strict PNG/JSON transactions
-remain future work.
+The CLI watches the resource tree, batches copies, handles deletion and serves
+no-store responses. Resource watching works without a UI configuration. See
+[CLI resource watching](../../cli/docs/dev-resource-watching.md) for the current
+implementation and batch limits. PNG/atlas JSON changes refresh resources;
+manifest defaults, styles and KUI changes also request Skin recompilation. Browser
+refresh remains manual.
 
-At the time of analysis, `watchResources` in CLI's `src/core/dev-server.ts`
-responded only to `.kui.xml`, `default.res.json` and `config/style.json`, and
-required a project `ui` configuration. PNG and ordinary atlas JSON edits did not
-trigger that watcher. A full build could copy new outputs, while the running dev
-server could continue serving old resources. Source inspection confirmed this
-gap; live watcher acceptance testing had not been performed at that point.
-
-The recommended resource-change branches were:
-
-| Change                                                                        | Recommended action                                                                  |
-| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Atlas PNG / frame JSON, with unchanged resource names and nine-slice defaults | Validate the output pair, copy resources and notify the preview to reload           |
-| Resource nine-slice defaults change in default.res.json                       | Validate the manifest, recompile affected KUI and copy resources                    |
-| Colors / fonts / Label presets change in style.json                           | Use the existing style-resolution pipeline on copies and recompile KUI              |
-| KUI changes                                                                   | Keep the existing compilation flow; Reskin does not expose this editing entry point |
-
-An initial implementation can reuse copyAssets to establish correctness before
-copying only changed files. Resource watching should also work without a `ui`
-configuration, since Core-only projects need resource updates. Changes should
-not require artificial edits or touches to KUI/default.res.json.
-
+Strict PNG/JSON transactions remain a separate tooling concern.
 Renaming PNG and JSON separately does not create an atomic two-file transaction.
 The caller should generate and validate temporary outputs, then commit the whole
 pair. In one process, a commit-complete event can serialize copying. External
@@ -126,14 +103,13 @@ to return only in-memory results.
 
 ## Atlas optimization opportunities
 
-Both new atlases match TexturePacker's area, so prioritize the update pipeline
-and diagnostics. Experiments can compare PNG filter/deflate settings, alternative
+Experiments can compare PNG filter/deflate settings, alternative
 lossless encoders and MaxRects sorting combinations, recording time, PNG bytes,
 atlas area and peak memory. Choose strategies using several resource benchmarks.
 Every strategy must pass RGBA, crop and extrusion checks again. Fewer PNG bytes
 do not imply lower GPU memory use.
 
-Pixel aliases provide no benefit for the two current samples. Rotation and
+Rotation and
 multipack would expand Core, manifest and tooling contracts, so they are outside
 the current format-compatibility optimization scope. Lossy quantization,
 discarding low-alpha pixels or reducing margin/extrusion cannot claim compliance
@@ -150,4 +126,5 @@ with the current pixel contract just because they reduce output size.
 4. Introduce input caching, incremental copying or opt-in CLI packing afterward;
    measure each improvement and test rollback on failure.
 
-Compatibility evidence is recorded in [reference-validation.md](./reference-validation.md).
+Use [reference validation](reference-validation.md) to check format compatibility;
+record completed results in CHANGELOG.md.

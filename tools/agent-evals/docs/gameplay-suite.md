@@ -1,9 +1,7 @@
 # Resource, Tween and KUI documentation comparison
 
-Status on 2026-10-18: **stopped at the user's request, incomplete**. The harness
-and calibration are available; the planned repeated comparison has not finished.
-See the [checkpoint](gameplay-suite-checkpoint-2026-10-18.md). No background run
-or automatic continuation is scheduled.
+Evaluation work is **paused**. No background run or automatic continuation is
+scheduled. Recorded results and limitations are in [CHANGELOG.md](../CHANGELOG.md).
 
 ## Frozen experiment
 
@@ -15,7 +13,7 @@ jobs concurrently; browser acceptance is serialized. Task order rotates between
 repetitions and arm order alternates. A model identifier does not pin server-side
 weights indefinitely.
 
-The documentation treatment is the same as the completed Coin Lanes experiment:
+The documentation treatment is the same as the Coin Lanes comparison protocol:
 old Git revision `2a7176c`, versus the frozen new guide/example context. Both arms
 can read installed SDK types and documentation; only their repository context
 differs. The context manifest SHA-256 is
@@ -52,8 +50,8 @@ complete visual-quality or memory-leak audit.
 
 Hidden local positive controls implement all three tasks. Negative controls
 respectively break resource paths, leave paused Tweens allocated, and double
-quiz points. All three positives pass; all three negatives still compile and
-are rejected by behavior checks. Control implementations are outside the model
+quiz points. Calibration must accept all three positives; all three negatives must still
+compile and be rejected by behavior checks. Control implementations are outside the model
 context and consume no model tokens.
 
 ## Accounting and retained evidence
@@ -71,8 +69,8 @@ Five trials per arm provide a small exploratory sample, not a general claim.
 
 Each run retains prompts, raw JSONL, submissions, checks, command logs,
 screenshots, traces, context snapshots, original locks, SDK file hashes and a
-harness snapshot under local gitignored `reports/`. Summaries in `docs/` remain
-available to fresh checkouts; large local evidence is not committed by default.
+harness snapshot under local gitignored `reports/`. Historical summaries in CHANGELOG.md remain available to fresh checkouts;
+large local evidence is not committed by default.
 
 ## Running later
 
@@ -87,11 +85,7 @@ pnpm --dir tools/agent-evals calibrate:suite /absolute/new-calibration-directory
 pnpm --dir tools/agent-evals compare:suite /absolute/new-run-directory /absolute/calibration-directory
 ```
 
-`gameplay-suite.json` is the historical v1 plan. Its resource oracle mistakenly
-required Restart during active play, although the task only required restarting
-after end. Revision 2 completes each round before restarting and validates a
-control that disables active-play Restart. Preserve v1 evidence and exclude
-repairs prompted by that invalid feedback. An optional fourth runner argument
-can identify original evidence to rescore its first resource pair; SDK/context
-hashes, model arguments and prompt bytes must match. This recovery path does not
-resume the remaining original jobs and was not run as a complete experiment.
+Use `gameplay-suite-v2.json` for new comparisons. The optional fourth runner
+argument rescores an existing resource pair without resuming the remaining jobs.
+SDK/context hashes, model arguments and prompt bytes must match that evidence.
+See the tool changelog for earlier oracle limitations.

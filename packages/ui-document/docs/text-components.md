@@ -1,24 +1,10 @@
 # BitmapLabel and RichLabel authoring
 
-ui-document 0.12.0 adds two independent built-in types. It remains headless and
-keeps semantic format version 2. The native components are published in UI
-3.3.0, with Core ^2.3.0 required by UI; Core 2.3.1 contains the blank-rich-run
-measurement correction. No opened project is migrated or given new fields.
-
-Published document 0.13.1 retains these types and is published. CLI 3.6.1/runtime 0.10.0 require
-document ^0.13.0; current UI 3.6.2 requires Core ^2.5.2 for outline-safe Label layout,
-while runtime 0.10.0 keeps its Core ^2.4.0 peer for centered flips. The text types
-were originally integrated by CLI 3.4.0/runtime 0.9.0.
-
-## Alignment defaults in 0.13.1
-
-BitmapLabel and RichLabel default to middle in the published catalog, matching
-published Core 2.5.3 and inherited UI behavior. Explicit top/bottom and named states
-remain effective in either line mode. Multiline controls only line generation.
-Omitted properties stay omitted in XML and history. Published document 0.13.0
-reports top; metadata alone cannot change an older installed Core's default.
-Editors adopt runtime and catalog together. Existing CLI/runtime
-ranges accept 0.13.1 without new SDK releases; format 2 and dependencies are unchanged.
+These independent built-in types use semantic format 2. The headless catalog
+validates font references and literal textFlow runs; native components own layout.
+Alignment defaults to middle in the catalog, while the actual omitted-property
+behavior comes from the installed Core. Explicit alignment and state values
+remain authoritative, and omitted fields remain omitted in authored XML.
 
 ## Choose the component
 
@@ -34,9 +20,8 @@ whole-component authoring properties. RichLabel also has no plain `text`.
 Ordinary geometry, constraints, visibility and Component properties remain
 available. Content metrics are runtime observations, never authored properties.
 
-Published UI 3.4.0 shrinks only single-line Labels; published UI 3.5.0 extends
-the same policy to multiline layouts. The headless catalog accepts either mode
-without a format change. See [Label fitting](text-layout.md).
+Native Label shrinking supports single-line and multiline layouts. The headless
+catalog accepts either mode without measuring text. See [Label fitting](text-layout.md).
 
 ## Bitmap font resources
 
@@ -131,18 +116,9 @@ run shape. Generic array schemas cannot bind to this constrained format. Use
 `validateUIDocumentComponents` checks the base node properties and child policies.
 Parsing rejects malformed flow syntax and run styles immediately.
 
-## Adoption boundary
+## Integration boundary
 
-The original document 0.12.0 release did not make old compilers or materializers
-instantiate the new components. CLI 3.3.1 and runtime 0.8.2 depend on ^0.11.0,
-which excludes 0.12.0, and lack the new built-in registrations. The first matching
-integrations were CLI 3.4.0 and runtime 0.9.0.
-Those initial CLI 3.4.0/runtime 0.9.0 releases require document ^0.12.0;
-runtime 0.9.0 also requires UI ^3.3.0 and Core ^2.3.0. UI 3.3.0
-already supplies the native classes; Core/UI need no further version bump for
-this headless addition. Other SDKs, templates and existing projects remain on
-their current contracts until they deliberately adopt the authoring feature.
-
-Editor must remove its earlier private BitmapLabel definition before using this
-foundation catalog, or duplicate registration will correctly fail. Consumers
-with exhaustive `UIPropertyFormat` handling must account for `text-flow`.
+Use a matching native UI/CLI or materializer with these built-in registrations.
+Project component definitions must not duplicate foundation types; duplicate
+registration fails. Exhaustive UIPropertyFormat consumers must handle text-flow.
+The kernel validates data; Core/UI owns fonts, layout and borrowed resources.

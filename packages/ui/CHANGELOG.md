@@ -8,7 +8,7 @@ All notable changes to `@kurot/ui` are documented here.
 
 Published; verified on npm on 2026-10-18, including latest, downloaded tarball
 SHA-512 integrity, all 344 runtime and 5,165 API files, and both new guides.
-Documentation-only patch over 3.6.1. See [release history](../../docs/release-history.md).
+Documentation-only patch over 3.6.1. See [release history](../../CHANGELOG.md).
 
 ### Documentation
 
@@ -64,7 +64,7 @@ over 3.6.0.
 ## [3.6.0] — 2026-10-11
 
 Published; verified on npm on 2026-10-11. Requires published Core ^2.5.2.
-See [Label outline layout](docs/label-text-layout.md#outline-safe-layout-in-360).
+See [Label outline layout](docs/label-text-layout.md#outline-safe-layout).
 
 ### Fixed
 

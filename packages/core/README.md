@@ -1,209 +1,21 @@
 # @kurot/core
 
-**2.5.5 is published**, verified on npm on 2026-10-18, including latest, tarball
-integrity, the API reference and game-authoring guide. Runtime behavior includes
-the 2.5.4 continuous Web Audio loop correction, with unchanged signatures,
-exports and dependency requirements. See [CHANGELOG.md](CHANGELOG.md).
+TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
+for browser games. Package version: **2.5.5**.
 
-A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
+Start with the [game authoring guide](docs/game-authoring.md),
+[API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
+the relevant symbol/member pages; installed packages include public declarations
+and docs without requiring the engine source.
 
-> **Package version: 2.5.5 (published).** Documentation-only patch over 2.5.4. Targets ES2022 and evergreen browsers (Chrome / Edge / Firefox / Safari). No IE / old-Android / pre-2022 Safari support shims.
-
-## API reference in 2.5.5
-
-Find capabilities in [API topics](docs/api/topics.md), names in the
-[symbol index](docs/api/index.md), and individual members through each symbol's
-page. [Coverage](docs/api/coverage.md) distinguishes declaration coverage from
-remaining behavioral-comment gaps. Examples are checked with strict TypeScript.
-Core 2.5.5 is published with this reference and game guide; npm latest, tarball
-integrity and API files were verified on 2026-10-18. It changes comments and
-distributed documentation, with no runtime/signature/export changes. Existing
-peer ranges still apply; other SDKs and applications need no upgrade for it.
-
-## Continuous audio loops in 2.5.4
-
-Core 2.5.4 loops Web Audio through one native source, with
-finite counts ending on the audio clock. Existing `sound.play(startTime, loops)`
-semantics remain: `loops <= 0` is unlimited, positive `loops` counts total plays,
-and the offset applies only to the first play. Position wraps per iteration;
-manual stop suppresses completion and releases nodes. HTML unlimited playback
-uses native looping; finite HTML fallback retains browser-dependent transitions.
-
-Update the application's Core installation/lock to published 2.5.4 and
-rebuild to adopt the fix. Exact Core pins require an explicit declaration update;
-compatible ranges such as `^2.5.3` already accept it. SDK peers and development
-locks remain unchanged; UI/Game/DragonBones/Spine/runtime need no new release.
-No new dependency or public API is introduced.
-See [audio playback](docs/audio-playback.md) for asset boundaries and tests.
-
-## Default middle alignment in 2.5.3
-
-TextField and BitmapText default to `verticalAlign = "middle"`, inherited by UI
-Label, RichLabel, BitmapLabel and EditableText. TextInput's text skin parts inherit
-the same host default. Explicit top/bottom and named skin states stay effective.
-`multiline` controls hard breaks and wrapping; changing line mode or input type
-does not choose an alignment. `verticalCenter` positions a component's box in its
-parent and remains independent of text alignment inside that box.
-
-Dynamic text keeps the unified glyph block introduced in 2.5.2. Input centers
-stable editing rows, including the caret, selection and composition underline;
-overflowing input retains its existing top-aligned scrolling. BitmapText centers
-its bitmap-font line frame. Nominal measurement and font-fitting sizes are unchanged.
-
-Content that omitted alignment may move within a taller box. Set
-`verticalAlign = "top"` explicitly when it should start at the top, such as a
-paragraph in a fixed-height region. No XML is rewritten automatically.
-Authoring catalog defaults match in published ui-document 0.13.1; the headless
-bitmap-font kernel is unchanged. Adopt Core 2.5.3 in the
-application installation/lock and rebuild. Existing SDK peers accept it without
-new SDK releases or higher minima. See [text layout](docs/text-layout.md#default-middle-alignment-core-253).
-
-## Unified vertical alignment in 2.5.2
-
-Dynamic `top`, `middle` and `bottom` align one complete glyph block to the top,
-center or bottom of the TextField. They use the same boundaries in both line modes,
-including rich runs and fallback glyphs. Blank rows retain their space; outlines
-are render-only. `multiline` controls only hard breaks and wrapping. TextField and
-ordinary UI Label default to top in 2.5.2; button skins set `verticalAlign="middle"`
-on their caption Labels explicitly. `verticalCenter` positions the Label itself
-in its parent and does not replace text alignment inside that Label.
-
-Input uses stable editing-row bounds for all three alignments, preserving caret,
-selection, composition and scrolling. Overflowing input rows remain top-aligned
-for editing. Layout measurements and font fitting stay nominal. Dynamic top/bottom
-captions may move compared with 2.5.1. Update the application installation/lock and
-rebuild; existing SDK peers accept 2.5.2 without new releases.
-No installed Editor/game is upgraded by this source change.
-See [text alignment](docs/text-layout.md#unified-vertical-alignment-core-252).
-
-## Published middle alignment in 2.5.1
-
-`multiline` controls hard breaks and wrapping. Dynamic `verticalAlign = "middle"`
-centers the complete glyph block in either line mode, including rich text and
-fallback fonts. Blank rows retain their space; relative baselines and line
-spacing remain unchanged. Identical single-row content centers identically
-with either `multiline` value. Input keeps stable editing rows, including its
-caret, selection and composition underline. Top/bottom alignment and nominal
-measurement sizes retain their contracts.
-
-Existing multiline middle-aligned captions may move. Adopt Core 2.5.1
-and rebuild the application; existing SDK peers accept the patch
-without new releases. This source change does not update installed Editors or
-games. See [text alignment](docs/text-layout.md#middle-alignment-independent-of-line-mode-core-251).
-
-## Text alignment correction in 2.5.0
-
-Published 2.5.0 centers single-line dynamic middle alignment by measured glyph
-ink, including fallback fonts and accents. Its multiline text and input retain
-font-frame alignment; rich runs share an alphabetic baseline. Version 2.5.1
-extends visual middle alignment to multiline dynamic text. Layout sizes and wrapping stay nominal.
-The existing font-readiness invalidation refreshes these cached metrics.
-See [text alignment](docs/text-layout.md#visual-centering-and-stable-baselines-core-250).
-Install Core 2.5.0 and rebuild to adopt it; published 2.4.0
-does not include the correction. Existing SDK peer ranges require no change.
-
-## Bitmap fill correction in 2.3.3
-
-`Bitmap.fillMode` / UI `Image.fillMode` now honor `repeat` and `clip` in both
-backends and bitmap caches. Repeat uses the original texture dimensions, including
-transparent trim margins; partial edge tiles are cropped rather than stretched.
-Nine-slice remains active only for `scale`. No XML or resource migration is needed.
-Core 2.3.3 is published; Core 2.3.2 does not include this fix. UI 3.3.0/runtime
-0.9.0 and Game/DragonBones/Spine peers accept it without SDK bumps. Current
-UI 3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps Core ^2.4.0. Both baselines
-include the correction. Applications adopt their own installation/lock and
-rebuild; templates are not rewritten.
-See [bitmap fill modes](docs/bitmap-fill.md).
-
-## Text outline fix in 2.3.2
-
-Version 2.3.2 preserves dynamic TextField outlines beyond the layout box in
-Canvas drawing, WebGL text textures, display-list caches, filter captures and
-object-mask buffers. Rich-text run strokes are included. Layout measurements,
-wrapping and alignment retain their existing dimensions; input viewports and
-external clips remain exact. This fix is not included in published 2.3.1.
-No API or resource-format migration is required. UI 3.3.0/runtime 0.9.0 and
-Game/DragonBones/Spine peers accept the patch without SDK bumps. Current
-UI 3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps Core ^2.4.0. Both baselines
-include the correction.
-Update the application's installation and lockfile, then rebuild; existing
-bundled Editor Apps retain their old Core until rebuilt.
-See [text layout](docs/text-layout.md#text-outlines-core-232).
-
-## Blank rich-text lines in 2.3.1
-
-An unstyled blank run between styled runs now uses the TextField base font size,
-matching other unstyled content, rather than borrowing a later run's size.
-Core 2.3.1 is published as a compatible patch. Consumers whose Core peer range
-accepts it need no SDK bump. Current UI 3.6.2 requires Core ^2.5.2; runtime
-0.10.0 keeps Core ^2.4.0. Both baselines include the correction.
-
-## Independent text measurement in 2.3.0
-
-```ts
-const metrics = textField.measureText(240);
-const naturalSize = textField.measureText(); // NaN: no width constraint
-```
-
-Measurements honor rich-text runs, wrapping and line spacing without changing
-rendered bounds, line caches or scrolling. Height is the complete content height
-before clipping. Rich-text lines use their actual run sizes, including blank
-lines. Assigning `text` clears a previous `textFlow`, even for an identical string.
-See [text layout](docs/text-layout.md) for font-readiness and width contracts.
-
-Core 2.3.1 is published.
-UI 3.3.0 adds RichLabel using this API; other existing Core 2.x consumers do not
-need package version bumps merely to accept Core 2.3.0.
-
-## Text wrapping fixes in 2.2.1
-
-TextField wrapping remains functional when a bundler renames functions.
-Dictionary wrapping and alphabetic overflow no longer depend on Unicode rule
-function names. Both word wrapping and `wordWrap = false` keep grapheme
-clusters intact, including family emoji, flags, skin-tone modifiers and combining
-marks. A cluster wider than the field can overflow intact. Source and input
-indices continue to use UTF-16 offsets.
-
-The patch adds no public API, runtime dependency or resource/KUI format change.
-The existing UI 3.2.0, Game 2.0.0, ui-runtime 0.8.2 and DragonBones 0.1.0 peer
-ranges accept it. Update the installed Core version and lockfile to receive
-the fixes; see [text layout](docs/text-layout.md).
-
-## Fractional viewport clipping in 2.5.0
-
-Axis-aligned WebGL clips now floor their left/top physical edges and ceil their
-right/bottom edges before calculating scissor dimensions. This preserves boundary
-pixels when a scaled UI list or another viewport lands between pixels, avoiding
-cut-off nine-slice outlines. Scissor precision remains one physical pixel; nested
-or rotated clips retain the stencil path. No skin padding or layout change is
-required. Published Core 2.4.0 does not include this correction.
-
-## Scroll clipping in 2.1.1
-
-WebGL keeps a `scrollRect` viewport fixed when it is nested inside another clip
-or rotated. Its `x`/`y` move the content; they do not move the viewport boundary.
-This fixes the shifted visible area in nested UI Scrollers, including Editor
-Preview. Rectangular masks keep their own local origin.
-
-This patch changes no public API, text behavior or resource/KUI format, and
-requires no project migration. The UI 3.1, game 2.0 and ui-runtime 0.8 peer ranges
-accept it; update the installed Core version and lockfile to receive the fix.
-UI Scrollers use the corrected Core path without a separate UI release.
-
-## Text layout in 2.1.0
-
-Explicit `TextField.multiline = false` now renders only the first hard-separated
-line, without width wrapping. Dynamic text defaults to multiline and input text
-to single-line until the flag is assigned. Fixed height clips drawing without
-changing the measured line count. If an older skin set `multiline="false"` but
-expected wrapping, remove that flag or set it to `true`; files are not migrated
-automatically.
-
-Load fonts before measuring text. If a font becomes ready later, call
-`textField.invalidateTextMetrics()` to refresh cached measurements even when its
-family name is unchanged. See the [Core text contract](docs/text-layout.md).
-Automatic Label font shrinking is a separate UI capability and requires the
-matching UI release; Core does not expose `textFit` or `minFontSize`.
+| Contract | Guide |
+| --- | --- |
+| Text wrapping, alignment, measurement and fonts | [Text layout](docs/text-layout.md) |
+| Texture units, density and atlas frames | [Texture density](docs/texture-density.md) |
+| Bitmap scale, repeat and clip | [Bitmap fill](docs/bitmap-fill.md) |
+| Audio time units, loops and channel cleanup | [Audio playback](docs/audio-playback.md) |
+| Resources, manifests and errors | [Resource loading](docs/resource.md) |
+| Shader and filter ownership | [Filters](docs/filters.md) |
 
 ## Installation
 
@@ -217,8 +29,7 @@ pnpm add @kurot/core@^2.5.5
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
 layout. Package installation resolves this dependency from npm. Install other
 Kurot packages separately when the application needs their capabilities.
-Published UI 3.2.0 provides BitmapLabel and requires Core `^2.2.0`;
-UI 3.1.0 does not contain this component.
+UI provides BitmapLabel when the application needs native bitmap-font UI layout.
 
 ## Features
 
@@ -307,42 +118,10 @@ The rendering pipeline borrows concepts from Pixi.js 8 while keeping the Egret d
 | WebGL state management                | Egret     | DrawCmdManager batching command queue                           |
 | Mask strategies                       | Egret     | scissor / stencil / offscreen compositing                       |
 
-## Validated renderer comparison
-
-Kurot 1.0.15 was compared with PixiJS 8.20.0 and Egret 5.4.1 across seven
-deterministic workloads. The complete run used headless Chromium 151.0.7922.34
-on an Apple M1 Max, an 800×600 surface at DPR/resolution 1, 60 warmup frames,
-300 measured frames, five fresh browser contexts per case, and 175 total cases.
-
-| WebGL 2 workload   | Objects | Frame P95 Kurot / PixiJS | Render P95 Kurot / PixiJS | Draw calls Kurot / PixiJS |
-| ------------------ | ------: | -----------------------: | ------------------------: | ------------------------: |
-| Sprite batch       |     500 |           16.8 / 17.2 ms |              0.2 / 0.2 ms |                     1 / 1 |
-| Mixed textures     |     500 |           17.0 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
-| Dynamic transforms |     300 |           17.1 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
-| Deep container     |     500 |           17.1 / 17.1 ms |              0.3 / 0.2 ms |                     1 / 1 |
-| Rapid churn        |     500 |           17.0 / 17.0 ms |              0.3 / 0.3 ms |                     1 / 1 |
-| Texture swap       |     500 |           16.8 / 16.8 ms |              0.3 / 0.2 ms |                     1 / 1 |
-| Filter heavy       |      50 |           25.0 / 17.9 ms |              0.7 / 0.4 ms |                 200 / 150 |
-
-The result supports a narrow conclusion: Kurot's sprite/container batching is
-competitive in these six ordinary workloads, while PixiJS has a small
-renderer-call advantage in several cases and is clearly ahead in the measured
-filter workload. Kurot's next renderer priority is reducing filter passes and
-offscreen-composition cost.
-
-It does not establish overall PixiJS feature parity, mobile performance, or a
-memory advantage. Most ordinary cases are close to browser refresh cadence, so
-they demonstrate batching and the absence of obvious stalls more strongly than
-they distinguish CPU limits. Canvas2D/WebGL1/WebGL2 golden tests and manual
-checks on macOS Chrome, Windows Chrome/Firefox, recent iOS browsers, and a
-recent Android Chrome device provide correctness evidence, not cross-device
-performance rankings.
-
 ## Quick Start
 
 For a complete gameplay loop, read the [game-authoring guide](docs/game-authoring.md)
-and the repository's Star Catcher reference project. The guide is included in
-published Core 2.5.5; the older 2.5.4 artifact retains its original contents.
+and the repository's [Star Catcher reference project](../../examples/star-catcher/README.md).
 
 ```typescript
 import { createPlayer, Sprite, Shape } from '@kurot/core';
@@ -383,7 +162,7 @@ their cached sampling scale is capped at 8× to bound zoom-related memory use.
 The Core 2.5.0 [texture density API](docs/texture-density.md) adds independent
 source density through `new Texture(2)` and sheet JSON `resolution: 2`.
 High-density images retain logical dimensions and nine-slice corners while
-sampling physical atlas pixels. Published Core 2.4.0 does not contain this API.
+sampling physical atlas pixels.
 
 ## Multilingual text
 
@@ -405,7 +184,7 @@ pnpm run dev          # watch mode
 
 ## Documentation
 
-- [Game authoring](./docs/game-authoring.md) — short consumer path through input, time, rules, restart, cleanup and acceptance checks (included since 2.5.5)
+- [Game authoring](./docs/game-authoring.md) — short consumer path through input, time, rules, restart, cleanup and acceptance checks
 - [CHANGELOG.md](./CHANGELOG.md) — versioned release notes, including the full list of 1.0.0 breaking changes
 - [Architecture](./docs/architecture.md) — engine structure and rendering pipeline
 - [Resource system](./docs/resource.md) — resource configuration, loading, and lifecycle
@@ -507,24 +286,13 @@ does not replace the manual checks on physical devices.
 
 MIT
 
-## Resource manifest migration in 2.0.0
+## Resource manifests
 
-Sheet `subkeys` now maps each frame name to a metadata object instead of using
-a comma-separated string. Old manifests fail validation before any resource
-is registered. Refresh every old sheet explicitly in Kurot Editor before using
-the new Core and CLI. Core indexes the frame aliases; `scale9grid` metadata is
-applied to UI Images by the compiler or document resolver, not automatically
-to arbitrary `Bitmap` objects. See the
-[resource format](docs/resource.md) and
-[nine-slice contract](../ui-document/docs/resource-nine-slice.md).
+Sheet subkeys are metadata objects. Image/frame grids use logical coordinates;
+see the [resource format contract](../ui-document/docs/resource-nine-slice.md)
+for validation, defaults and authoring rules.
 
-The optional `resource/config/style.json` is handled by current document 0.13.0 and
-CLI 3.5.0, including named colors and Label presets. Core does not read this file or interpret `@style:colors:<key>` XML
-references. Compiled skins receive numeric RGB values; the application loads
-fonts before measuring text. See the
-[project style contract](../ui-document/docs/project-styles.md).
-
-## Bitmap fonts in 2.2.0
+## Bitmap fonts
 
 [Core bitmap fonts](docs/bitmap-fonts.md) use the headless @kurot/bitmap-font
 package for data and layout. Built-in `font` resources load the descriptor and
@@ -536,6 +304,6 @@ Widths/heights are layout constraints; use scaleX/scaleY to resize the artwork.
 Height admits complete lines, and explicit `multiline = false` keeps the first
 hard-separated line unwrapped. `BitmapText.EMPTY_FACTOR` is deprecated in favor
 of `font.data.spaceAdvance`. See the linked contracts before migrating custom
-bitmap-text measurements. Native UI BitmapLabel was introduced in UI 3.2.0;
-current UI 3.6.2, document 0.13.1, CLI 3.6.1 and runtime 0.10.0 include its native,
-authoring, compilation and materialization contracts. Editor adoption is separate.
+bitmap-text measurements.
+UI BitmapLabel, document font references and CLI/runtime font adapters use
+this contract; project resource ownership remains explicit.

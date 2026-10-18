@@ -131,14 +131,9 @@ pnpm --dir packages/atlas test
 ```
 
 Unit tests use synthetic images and do not require the local game checkout.
-Initial local validation against the updated KUI sample on 2026-10-07 packed
-all 29 basis and 32 basis_icon sources to 1024×1024 and 256×512 respectively.
-All 61 frame field shapes and crop geometries match the existing export. Retained
-RGBA pixels and edge/corner extrusion match the sources, and reversed source
-order produces identical JSON and PNG bytes. CLI 3.3.0 development/release builds
-accept the new resources without authored skin, manifest or stylesheet changes.
-That validation does not promise identical layout to TexturePacker or replace
-future Editor/Reskin integration and rendered-game acceptance.
+Reference verification checks frame geometry, retained pixels, extrusion and
+input-order determinism against supplied read-only assets. Format compatibility
+does not promise identical packing to TexturePacker or establish game acceptance.
 
 To repeat local reference verification, provide the sample project root and a new
 output directory outside that project:

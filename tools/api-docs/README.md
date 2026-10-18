@@ -73,12 +73,6 @@ then the needed symbol and member pages. `api-index.json` maps names to paths;
 `supporting/index.md` routes to parameter/result helper definitions. Type
 declarations remain the fallback for older releases that lack generated docs.
 
-The generated Markdown is committed and covered by existing `docs/**/*` package
-allowlists. Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published with their API files,
-verified on 2026-10-18. Later documentation edits need a new release to appear
-in npm; existing published archives are immutable.
-
-UI 3.6.2 is published and verified with a version-matched API reference and the
-standard UI authoring/ScoreHUD guides. CLI 3.6.1 is published and verified with template entry documentation
-and corrected host declarations. Engine dependency ranges/locks are unchanged;
-Kurot-Studio separately adopts CLI 3.6.1. See the [publication record](../../docs/release-history.md).
+The generated Markdown is committed and included by each SDK's docs/ allowlist.
+Its version follows that package's manifest. Read declarations and documentation
+from the same installed version; existing published archives are immutable.

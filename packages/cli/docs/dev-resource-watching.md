@@ -1,8 +1,7 @@
 # Development resource watching
 
-Available in published CLI 3.3.1. No configuration or
-dependency-range changes are required. Projects must install the new CLI to
-receive these behaviors; installed CLI 3.3.0 does not include them.
+`kurot dev` synchronizes runtime assets without additional watcher configuration.
+Browser refresh remains manual.
 
 ## Inputs and rebuilds
 

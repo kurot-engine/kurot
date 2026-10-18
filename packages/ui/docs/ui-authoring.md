@@ -5,12 +5,9 @@ native `@kurot/ui`, CLI-compiled Skin XML and project TypeScript. It requires
 no engine source and no `ui-runtime` dependency. For API details, read only the
 relevant [capability](api/topics.md) and member page.
 
-This guide and the [ScoreHUD recipe](recipes/score-hud.md) ship in UI 3.6.2.
-The recipe targets Core 2.5.5 and CLI 3.6.1, whose templates link these installed
-guides. UI 3.6.2 and CLI 3.6.1 are published and verified on npm on 2026-10-18.
-Read this guide from the installed UI package; older artifacts retain their
-original docs. Existing projects keep their compatible versions and directory
-conventions.
+Use this guide with the installed SDK declarations and the
+[ScoreHUD recipe](recipes/score-hud.md). Existing projects retain their own
+compatible versions and directory conventions.
 
 ## 1. Decide what owns each change
 

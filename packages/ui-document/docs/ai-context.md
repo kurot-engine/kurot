@@ -1,19 +1,11 @@
 # @kurot/ui-document — AI context map
 
-ui-document 0.13.1 is published, verified on npm on 2026-10-10. Its four text component definitions
-report middle alignment, matching published Core 2.5.3. Explicit properties/states
-and omitted XML fields are preserved; multiline only controls line generation.
-Package download, registry integrity and tested catalog modules are verified. Read
-[centered flips](../../../docs/centered-flips.md) before changing transforms,
-reflection frames, authored flags or dependency adoption.
-
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
 Package identity: `@kurot/ui-document@0.13.1` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
-runtime dependencies. Format version 2 is intentionally incompatible with the
-0.1 proof model.
+runtime dependencies. The semantic format version is 2.
 
 ## 1. Directory map
 
@@ -75,9 +67,9 @@ src/
 - Properties accept strings, booleans, finite numbers, arrays, and plain
   string-keyed objects. Undefined, null, functions, platform objects, cyclic
   values, and non-finite numbers are invalid.
-- XML changes in 0.8.0 treat schema-defined string properties
+- XML treats schema-defined string properties
   (`text`, `label`, state text) as literal strings without backslash type escaping.
-  Old synthetic prefixes become literal characters; do not migrate them silently.
+  Backslashes remain literal characters; the parser does not rewrite them.
   Numeric/boolean properties and schema-free collection fields retain their types.
   Editor and CLI must share this parser contract; see `docs/kui-xml.md`.
 - Tagged references use explicit records: `{ kind: 'asset', assetId }`,
@@ -141,7 +133,7 @@ src/
 - `Label.fontFamily` accepts either a CSS font-family string or a registered
   `font` resource reference.
 - Label's catalog default for `multiline` is true; EditableText's is false.
-  Omitted default properties are not inserted into XML. Core 2.1.0 interprets
+  Omitted default properties are not inserted into XML. Core interprets
   explicit false as one unwrapped first line.
 - BitmapLabel and RichLabel extend Component directly, not Label. BitmapLabel
   uses literal text and a typed font resource. RichLabel uses only validated
@@ -230,26 +222,24 @@ pnpm --dir packages/ui-document build
 pnpm --dir packages/ui-document test
 ```
 
-## Resource configuration change in 0.7.0
+## Resource configuration
 
 `parseUIResourceConfigEntries()` validates object subkeys, and
 `resolveUIResourceDefaults()` injects nine-slice defaults into a copy. See
 [the resource-default contract](resource-nine-slice.md)
 for conversion and compilation boundaries.
 
-## Text authoring contract in 0.9.0
+## Text authoring contract
 
 The package describes and validates fitting policy; it does not measure text,
 derive font sizes or import runtime classes. The semantic format remains 2.
-Current CLI 3.6.1 and runtime 0.10.0 consume this catalog through document
-^0.13.0 without local overrides. Fitting's native API minimum remains Core
-2.1.0/UI 3.1.0; current runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for its
-centered-flip contract.
+CLI compilation and runtime materialization use the shared catalog and their
+declared document dependencies. The host must satisfy its native UI/Core peers.
 See [text authoring](text-layout.md) for defaults, XML preservation and
 validation boundaries, and [Label text layout](../../ui/docs/label-text-layout.md)
 for native rendering behavior.
 
-## Project styles in 0.10.0
+## Project styles
 
 Read [project-styles.md](project-styles.md). UIStyleSheet.ts owns the shared font
 and immutable RGB color contract; resolveUIStyleColors.ts resolves only color tokens
@@ -260,13 +250,12 @@ prefix and unsupported style sections; never reinterpret schema-defined strings.
 Only resolve disposable copies for compilation/preview, retaining the authored
 document for XML/history. Font loading and configuration I/O belong to consumers.
 
-## Label preset extension in 0.11.0
+## Label presets
 
 Read project-styles.md before extending labels. UILabelStyle.ts validates sparse
 appearance-only presets; resolveUILabelStyles.ts expands a disposable tree before
 color resolution. Label textStyle is a Default-only authoring directive, removed
 before native rendering/code generation. Local fields and state field overrides
 win. Reject dynamic selection, non-Label use and instance overrides. No I/O or
-migration; schemaVersion 1/format 2 stay unchanged. UIStyleSheet now requires a
+migration; schemaVersion 1/format 2 stay unchanged. UIStyleSheet requires a
 labels map; parsing an omitted JSON section produces an empty immutable map.
-Version 0.11.0 is published; 0.10.0 lacks these APIs.

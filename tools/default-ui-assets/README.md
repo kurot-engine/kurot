@@ -42,4 +42,4 @@ isolated example under docs-internal, with both strict dev and minified release
 output. The trial links the checkout Core and installed example UI/Game/document
 packages explicitly. Original package declarations, installations and locks
 remain registry-based. Run the repository CLI dev command in the printed trial
-directory and open `?ui=1`. Core 2.5.0 and CLI 3.6.0 are published; see [texture density](../../packages/core/docs/texture-density.md).
+directory and open `?ui=1`. See [texture density](../../packages/core/docs/texture-density.md).

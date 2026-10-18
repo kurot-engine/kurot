@@ -1535,3 +1535,255 @@ First stable release. From this version forward the public API surface (exports 
 - **Utilities**: `ByteArray`, `Timer`, `Base64Util`, `Logger`, `toColorString`.
 - **External interface**: Bridge for JS ↔ game communication.
 - Project initialized as `@kurot/core` (formerly `heron-core`), a modern TypeScript rewrite of the Egret game engine targeting WebGL multi-texture batching and a strict instruction-driven render pipeline.
+
+## Repository adoption notes — early Core 2.x
+
+## Release and adoption history: early Core 2.x
+
+These records were moved from the root AGENTS.md on 2026-10-18. Publication
+checks and application adoption describe the recorded release, not the current
+state of every checkout. Read the target project's manifest, lock and installed
+packages for its actual versions; source versions alone do not establish npm
+publication. Bare package paths below are relative to the repository root.
+
+For current dependency rules read [dependency policy](../../docs/dependency-policy.md).
+Consult package docs for current APIs and migration contracts.
+
+Later releases: [Core 2.4–2.5 history](../../CHANGELOG.md).
+
+### Recorded early 2.x releases
+
+Core 2.3.3 is published, verified on npm on 2026-10-09. It fixes Bitmap/Image
+repeat and clip in WebGL, Canvas and nested bitmap caches. Repeat retains original
+texture periods, trim margins, rotated atlas regions and clipped edge tiles;
+nine-slice applies only to scale. See packages/core/docs/bitmap-fill.md.
+No API/resource/KUI/dependency migration or dependent SDK bump is required.
+UI 3.3.0/runtime 0.9.0 and Game/DragonBones/Spine peers accept it. Current
+UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes the correction. Editor 0.23.2
+installs exact registry Core 2.3.3 with a matching Bun lock, replacing 0.23.1's
+explicit local trial binding. Ordinary builds need no local engine checkout.
+Templates, examples and Reskin are unchanged; their compatible installations
+may adopt the patch separately. Source versions never confirm publication.
+
+Core 2.3.1 and UI 3.3.0 are published.
+UI 3.3.1 is preserved in commit 60e6404, not published. It contains the transformed-layout correction in
+`packages/ui/src/kurot/core/fit-transformed-bounds.ts` and UIState. It applies
+parent allocations to flipped/scaled/rotated/skewed components and tracks the
+affected local axes. Published UI 3.3.0 still falls back to preferred dimensions
+for non-identity transforms. Only the UI patch version changes for this repair. Peer ranges and application
+locks are unchanged. The correction is also included in published UI 3.4.0;
+adopting that release requires Core ^2.4.0.
+Centered flipX/flipY are published in Core 2.4.0, UI 3.4.0 and document 0.13.0.
+CLI 3.5.0 and runtime 0.10.0 are also published and consume those releases.
+Read docs/centered-flips.md for Core 2.4.0/UI 3.4.0/document 0.13.0/CLI 3.5.0/
+runtime 0.10.0 requirements and the temporary-test/registry-lock boundary.
+Negative scale continues to use the existing anchor transform.
+Core 2.3.2 is published. It fixes TextField outline clipping using render-only
+stroke margins in Canvas/WebGL, caches and effect captures, without changing
+layout or input/external clip boundaries; see packages/core/docs/text-layout.md.
+It is not included in published Core 2.3.1. No API migration, dependency-range
+change or dependent SDK bump is required. UI 3.3.0/runtime 0.9.0 and
+Game/DragonBones/Spine peers accept 2.3.2; current UI 3.4.0/runtime 0.10.0
+require Core ^2.4.0, which includes the fix. Development locks may adopt accepted
+versions separately.
+Editor 0.22.1's local trial pins published Core 2.3.2 with an updated Bun lockfile.
+Reskin, templates and examples receive the correction only after an explicit
+installation/lock update and rebuild;
+legacy Core 1.x projects remain unaffected.
+Core 2.3.1 fixes an unstyled blank run borrowing a later rich run's size.
+It introduces no API requirement; published UI 3.3.0 retains Core ^2.3.0. Core adds pure
+TextField.measureText and fixes rich-run line heights and clearing rich styling
+with an identical plain string. UI adds independent RichLabel (textFlow only)
+and fixes BitmapLabel automatic maxWidth measurement; its peer minimum is
+Core ^2.3.0 and development baseline is ^2.3.1. The UI 3.3.0 registry baseline
+installs Core 2.3.1 from npm with a matching
+registry lockfile without local overrides. UI 3.2.0/runtime 0.8.2 and
+Game/DragonBones/Spine peers accept 2.3.0 without SDK bumps. KUI/document,
+ui-document 0.12.0, CLI 3.4.0 and ui-runtime 0.9.0 are published with the
+matching authoring, compilation and materialization contracts. Editor adoption
+is explicit; templates and other projects are unchanged.
+See packages/ui/docs/rich-label.md. Latest published versions are Core 2.5.4
+and UI 3.6.0; source versions do not establish npm publication.
+
+ui-document 0.12.0 is published. It adds independent
+BitmapLabel/RichLabel catalog entries, typed bitmap-font references and literal
+textFlow Span property elements, including named states, without changing format 2.
+Read packages/ui-document/docs/text-components.md. Published CLI 3.3.1 and
+ui-runtime 0.8.2 still use ^0.11.0 and do not support these built-in types.
+CLI 3.4.0 and ui-runtime 0.9.0 are published with native
+BitmapLabel/RichLabel compilation and materialization. CLI depends on published
+ui-document ^0.12.0; runtime requires Core ^2.3.0, UI ^3.3.0 and document ^0.12.0.
+Editor 0.22.1's local trial adopts this published chain and replaces its private
+BitmapLabel catalog/adapter with the native font contract. It adds BitmapLabel
+and RichLabel authoring, scoped bitmap-font refresh and native rich-text editing.
+These local trial changes do not publish a desktop release or upgrade external projects.
+Other SDKs, templates and examples are unchanged. Older CLI/runtime locks remain
+valid for their existing features; adopting these new text types requires explicit
+upgrades. Core 2.3.1 is an optional patch over the runtime minimum 2.3.0.
+
+Core 2.2.1 is published. It fixes minified TextField dictionary
+and emergency wrapping and protects complete graphemes in both wrapping modes.
+It retains Unicode 17.0, the pinned linebreak dependency and UTF-16 input offsets.
+UI 3.2.0/runtime 0.8.2 and Game/DragonBones peers accept this patch; installed
+and locked Core versions must be updated to receive it. Current UI 3.4.0/runtime
+0.10.0 require Core ^2.4.0, which includes the correction.
+Core 2.2.0 is published with bitmap-font ^0.1.0 and no local dependency override.
+It adds font resources and native BitmapText rendering. UI 3.2.0 is published
+with BitmapLabel and Core ^2.2.0 in peer/dev dependencies, without local overrides.
+Published UI 3.1.0 requires Core
+^2.1.0 and does not contain BitmapLabel. KUI/Editor adoption is separate.
+Game 2.0 declares Core 2.x.
+The separate Kurot-Spine repository publishes Spine 4.0–4.2 adapter 0.2.1 and
+Spine 4.3 adapter 0.3.1 with peer ^1.0.16 || ^2.0.0 and development ^2.2.1.
+Publication was verified on npm on 2026-10-08. Packed adapters pass
+type/behavior/browser checks on Core 1.0.16, 2.0.0 and 2.2.1. Earlier
+0.2.0 / 0.3.0 declare only ^1.0.16, which excludes Core 2.x. Reskin and
+the copied Tentax project accept the Spine 4.0 patch through ^0.2.0. Update their
+installations/locks and rebuild when adopting it; no unrelated SDK bump is needed.
+Templates/tentax now declares Core ^2.2.1, UI ^3.2.0 and Spine 4.0 ^0.2.1;
+its lockfile and installation resolve those published versions with one shared Core.
+ui-runtime 0.8.2 requires Core ^2.1.0, UI ^3.1.0 and ui-document ^0.11.0.
+CLI 3.3 requires ui-document ^0.11.0.
+CLI 3.3.1 is published with whole-resource dev synchronization,
+including Core-only projects, without adding an atlas dependency. Installed CLI
+3.3.0 does not include these watcher fixes. Source versions do not confirm npm
+publication. Engine examples and the KUI sample install CLI 3.3.1 from npm;
+the Editor working tree uses CLI 3.5.0. Legacy EXML projects remain on CLI 1.3.x. See
+packages/cli/docs/dev-resource-watching.md for manual refresh and batch boundaries.
+ui-document 0.9.0 adds Label fitting metadata without changing format version 2.
+ui-document 0.10.0 adds shared style.json fonts/colors and @style:colors:<key>
+XML references without changing the internal color-token record or format version 2.
+ui-runtime 0.8.2 adopts the published document kernel; consumers expand Label
+presets and resolve stylesheet colors in preview copies. Colors can alternatively
+be registered as color design tokens.
+Core 2.1.0 makes explicit `multiline = false` single-line; remove the flag or
+use `true` where wrapping is intended. UI 3.1 uses `invalidateTextMetrics()`
+for Label fitting and late font readiness; Core 2.0.x is not sufficient.
+Core 2.1.1 fixes nested/rotated WebGL scrollRect clipping without API or format
+changes. Update installed/locked Core versions to receive the correction;
+UI 3.1.0/runtime 0.8.2 and Game peers accept this patch. Current UI 3.4.0/runtime
+0.10.0 require Core ^2.4.0, which includes the correction.
+Schema-defined XML strings are literal: remove old synthetic backslash type
+escapes explicitly; Editor and CLI must adopt the same parser contract.
+Core 2.0 and CLI 3.0+ reject comma-separated sheet `subkeys`
+in resource manifests. Refresh legacy sheets in the Editor before upgrading KUI projects;
+see [`packages/ui-document/docs/resource-nine-slice.md`](../ui-document/docs/resource-nine-slice.md).
+
+### Project style support in ui-document 0.10.0
+
+ui-document 0.10.0 and CLI 3.2.0 share style.json font parsing and a named colors
+palette. Skin XML uses @style:colors:<key> references; compilation/preview
+resolve copies while authoring XML/history keep references. Core/UI rendering is
+unchanged. See packages/ui-document/docs/project-styles.md before extending this
+contract. The previous @token:color:<key> XML prefix is rejected; update authored
+references explicitly. Literal strings and other token categories are unchanged.
+The original color integration shipped in ui-document 0.10.0, CLI 3.2.0 and
+ui-runtime 0.8.1. The Label preset integration originally used document 0.11.0
+and CLI 3.3.0. Current CLI 3.6.0/runtime 0.10.0 require document ^0.13.0;
+CLI-built skins do not require ui-runtime.
+Engine examples use CLI 3.3.1, while legacy EXML projects keep their independent
+dependency set. Editor 0.19.2 adopted document 0.11.0, CLI 3.3.0 and
+runtime 0.8.2; its 0.19.3 snapshot pinned CLI 3.3.1. The current Editor working
+tree (Editor 0.28.5) uses Core 2.5.4/UI 3.6.0/document 0.13.1/CLI 3.6.0/runtime 0.10.0.
+Existing signed installers are not
+rebuilt by a dependency update.
+Package source versions alone do not confirm npm publication.
+
+CLI 3.2.1 is published. Its game template includes style.json, locale.json, English
+properties and licensed regular/bold fonts with project-owned initialization.
+See packages/cli/docs/game-template.md for the initialization and fallback contract.
+The empty template stays Core-only, and existing projects are not modified.
+
+### Label presets in ui-document 0.11.0
+
+ui-document 0.11.0 supports style.json.labels and Default-only Label
+textStyle="@style:labels:<key>". Local fields and individual Skin state fields win.
+`resolveUILabelStyles` expands compilation/preview copies before color resolution;
+XML/history retain references. No Core/UI changes or migration. See packages/ui-document/docs/project-styles.md.
+ui-document 0.11.0 and CLI 3.3.0 are published. CLI uses
+published ui-document ^0.11.0 without a local override. UIStyleSheet requires
+labels; the parser supplies an empty map for an absent JSON section.
+These APIs are not in ui-document 0.10.0 or CLI 3.2.1. Published ui-runtime 0.8.2
+requires ^0.11.0; runtime 0.8.1 excludes the new kernel.
+The KUI sample and engine examples use published CLI 3.3.1; the sample also uses
+ui-document 0.11.0 without local overrides. Editor 0.19.2 adopts the matching
+published runtime. Package source versions alone do not confirm publication.
+
+## Text-layout adoption audit — 2026-10-08
+
+### Core 2.2.1 adoption snapshot
+
+This section records the dependency audit for 2.2.1, before the later native
+RichLabel releases and Editor 0.22.0. For current peer requirements and 2.3.2
+adoption, see the [independent release policy](../../docs/dependency-policy.md).
+
+Published UI 3.2.0 requires Core `^2.2.0` for BitmapLabel. Older UI 3.1.0 and
+ui-runtime 0.8.2 declare Core `^2.1.0`; game 2.0.0 declares `^2.0.0`.
+Existing example lockfiles still resolve Core 2.1.1 and UI 3.1.0; accepting a
+version in a dependency range does not update an installed package.
+DragonBones 0.1.0 declares Core `^2.1.1` and develops against published Core
+2.2.0. Its animation adapter does not depend on TextField wrapping changes.
+CLI templates use `latest`.
+Label font shrinking calls `invalidateTextMetrics()` and requires Core 2.1.0
+or later. Core 2.2.1 preserves that TextField contract and remains accepted by
+these existing peer ranges. Bitmap-font rendering is separate from TextField;
+see [bitmap fonts](docs/bitmap-fonts.md). The new UI BitmapLabel requires Core 2.2.0
+and published UI 3.2.0; published UI 3.1.0 does not contain it.
+
+Core 2.2.1 is published. The 2026-10-08 dependency audit checked declarations,
+lockfiles and installed package versions. Older versions inside an accepted
+range are optional adoption for projects/development, not SDK release blockers.
+See the [independent release policy](../../docs/dependency-policy.md).
+
+| Consumer                                | Audited Core declaration                                                  | Locked or pinned Core at audit                               | Adoption or migration                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| UI development                          | `^2.2.0`                                                                  | 2.2.0                                                        | Optionally refresh the development lockfile.                                                                               |
+| DragonBones development                 | `^2.2.0`; peer `^2.1.1`                                                   | 2.2.0                                                        | Optionally refresh the development lockfile. The peer already accepts 2.2.1.                                               |
+| Game / ui-runtime development           | `^2.1.1`                                                                  | 2.1.1                                                        | Optionally refresh the development lockfiles. Their peers already accept 2.2.1.                                            |
+| Engine examples / copied Reskin project | `^2.1.1`                                                                  | 2.1.1                                                        | Refresh application lockfiles when adopting the fix.                                                                       |
+| Templates/tentax                        | `^2.2.1`                                                                  | 2.2.1                                                        | Adopted with UI 3.2.0 and Spine 4.0 adapter 0.2.1; strict development/release builds and all 170 application tests passed. |
+| Editor                                  | `2.1.1`                                                                   | 2.1.1 in bun.lock and the installation                       | Update the exact dependency, lockfile and installation; rebuild to deliver the fix.                                        |
+| Reskin application                      | `^2.1.1`                                                                  | 2.1.1 in bun.lock and the installation                       | Refresh the Bun lockfile and installation when adopting the fix; validate the Spine 4.0 adapter.                           |
+| milf-master template                    | `^2.1.1`                                                                  | No lockfile or installed Core                                | New installs accept 2.2.1; use `^2.2.1` to require the corrected baseline.                                                 |
+| Separate Spine 4.0–4.3 adapters         | Published 0.2.1 / 0.3.1 peers `^1.0.16 \|\| ^2.0.0`; development `^2.2.1` | Development 2.2.1; earlier 0.2.0 / 0.3.0 have Core 1.x peers | Refresh consumer installations/locks to adopt the published adapter patches.                                               |
+
+UI, Game, ui-runtime and DragonBones need no new release solely to receive this
+Core patch: their published peers already accept 2.2.1. Development installs
+may be refreshed independently. Raising their development baseline to 2.2.1 is separate
+from raising the minimum supported peer version.
+
+Earlier Spine 4.0–4.2 adapter 0.2.0 and 4.3 adapter 0.3.0 peers exclude Core
+2.x. Published 0.2.1 / 0.3.1 have peers `^1.0.16 || ^2.0.0`, validated using
+packed adapters on Core 1.0.16, 2.0.0 and 2.2.1. Publication was verified on
+npm on 2026-10-08. Reskin and the copied Tentax project accept the Spine 4.0
+patch through their existing `^0.2.0` range; refresh their installed adapter and
+rebuild. Templates/tentax has adopted published adapter 0.2.1 and Core 2.2.1,
+with UI/Game/Spine resolving the same Core instance. The Core patch itself does
+not update these consumers.
+
+CLI's empty/game templates use `latest`, which resolved to Core 2.2.1 at this audit.
+CLI itself, bitmap-font, atlas and ui-document have no Core dependency to update.
+The Kurot-Dev website is static and does not install the engine runtime.
+
+### Updating from Core 2.2.0 to 2.2.1
+
+The 2.2.0 wrapper customizes rules by function name. Minifiers that rename
+functions can silently disable alphabetic overflow tailoring and cause SA-script
+dictionary wrapping to throw `Rule not found: "LB28"`. Core 2.2.1 customizes
+the pinned dependency's rules by imported function identity, so this text path
+no longer requires preserved function names. Kurot CLI's existing
+`keepNames: true` setting remains useful for other name-based consumer APIs;
+this patch does not change the CLI build contract.
+
+Passing the official default corpus does not cover every real-text sequence.
+The dependency exposes internal break opportunities for some composed emoji,
+including family ZWJ sequences. Core 2.2.1 filters optional layout opportunities
+through grapheme boundaries and uses those boundaries for character wrapping.
+The untailored default Unicode profile remains unchanged. This affects
+TextField layout without changing DragonBones playback or the separate
+bitmap-font layout contract. No asset or project migration is required; update
+the installed package and lockfile. Core 2.2.1 is published to npm.
+
+References: [UAX #14 revision 55](https://www.unicode.org/reports/tr14/tr14-55.html),
+[official corpus](https://www.unicode.org/Public/17.0.0/ucd/auxiliary/LineBreakTest.txt),
+[@cto.af/linebreak](https://github.com/cto-af/linebreak).

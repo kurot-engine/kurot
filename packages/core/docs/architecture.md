@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.5.5 (published; API references and game guide verified on 2026-10-18). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 2.5.5 (published). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -14,17 +14,17 @@ resources, networking and media runtime. Public APIs follow Egret's
 `DisplayObject` and event model, while rendering uses a flat
 `InstructionSet + RenderPipe` pipeline inspired by Pixi.js 8.
 
-Since 2.2.0, Core uses published `@kurot/bitmap-font ^0.1.0` as the headless font-data
+Core uses `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
 
-Since 2.5.4, SoundChannel schedules Web Audio repeats through one native looping
+SoundChannel schedules Web Audio repeats through one native looping
 source. Finite total counts end on the audio clock, independently of JavaScript
 completion callbacks. HTML unlimited fallback uses native looping; finite
 fallback transitions remain browser-timed. See [audio playback](audio-playback.md)
 for count/offset semantics, lifecycle, asset boundaries and verification.
 
-Since 2.4.0, `DisplayObject.flipX`/`flipY` reflect around a local frame center
+`DisplayObject.flipX`/`flipY` reflect around a local frame center
 independently of authored scale and anchors. `matrix` exposes the authored
 transform; `$getMatrix()` supplies the effective reflection transform to
 rendering and coordinate conversion. UI provides its validated layout frame
@@ -32,7 +32,7 @@ through `$getFlipBounds()`. See [centered flips](centered-flips.md) for frame,
 scrolling, caching and consumer requirements.
 
 TextField uses Unicode 17.0 line-break rules with dictionary and overflow
-tailoring. Since 2.2.1, tailoring uses imported rule identities, and layout
+tailoring. Tailoring uses imported rule identities, and layout
 filters optional break positions through `Intl.Segmenter` grapheme boundaries.
 Word and grapheme segmenters are cached; paragraph results remain local to
 each layout. See [text layout](text-layout.md).

@@ -1,9 +1,6 @@
 # @kurot/game — AI context map
 
-For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
-Game 2.0.1 is published, verified on npm on 2026-10-18 with its API reference and
-docs/ packaging. Registry Game 2.0.0 remains unchanged. Runtime code, signatures,
-exports and dependency requirements are unchanged.
+For API lookup, use [topics](api/topics.md) and [symbol/member references](api/index.md).
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from

@@ -1,16 +1,9 @@
 # @kurot/cli — AI context map
 
-CLI 3.6.1 is published, verified on npm on 2026-10-18, including latest,
-package download, SHA-512 integrity and all 234 files matching commit 46459e97.
-Kurot-Studio adopts exact CLI 3.6.1 with its own lock and validated build;
-existing games continue using their own installed CLI. Development installs
-published ui-document 0.13.0 with a matching
-registry lockfile, without local overrides. Read
-[centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
-
-Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. Version `@kurot/cli@3.6.1` is published, runs on Node.js 20+,
-and is installed as a project dev dependency.
+`@kurot/cli@3.6.1` is build-time tooling on Node.js >= 20, with ordinary
+ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
+Read [architecture](architecture.md) for the plugin pipeline; the source and
+configuration exports establish current behavior.
 
 ## Directory map
 
@@ -33,34 +26,15 @@ src/
 └── utils/
 ```
 
-Project templates are under `templates/game` and `templates/empty`.
-CLI 3.6.1 includes README/AGENTS consumer navigation in both templates; its
-game entry links the new UI 3.6.2 authoring guide and complete ScoreHUD recipe. See [game-template.md](game-template.md).
-The CLI 3.6.0 game template's default KUI skin refresh includes 16 native Skin files,
-a Kurot-owned 2× atlas with logical resource-default nine-slice grids, and project palette
-colors. These replace the old EUI assets. Group/List/TabBar and text/image nodes use
-native XML composition rather than unused default Skin placeholders. See
-[default KUI skins](default-ui-skins.md). Private tools/default-ui-assets generates
-the committed assets with registry Atlas; CLI gains no atlas runtime dependency.
-The 2× sheet requires Core ^2.5.0; published Core 2.4.0
-does not interpret it. Private preview tooling binds checkout Core in an isolated
-trial. Core 2.5.0 was published before CLI 3.6.0; both are verified on npm.
-The CLI 3.6.0 game template includes the looping mascot brand splash; registry
-CLI 3.5.0 does not contain that HTML/logo refresh. See game-template.md.
-The 3.2.1 game template includes fixed style/locale configuration,
-English properties and licensed regular/bold font files. StyleManager finishes
-font loading before Main creates Player/Preloader; LocaleManager registers
-preload texts before creating the scene. See [game-template.md](game-template.md).
-Version 3.3.0 is published with Label preset compilation and
-published ui-document 0.11.0. It has no local document-kernel override.
-Published version 3.3.1 adds whole-resource dev synchronization, deletion/reconnect
-handling and no-store responses. Installed CLI 3.3.0 lacks these fixes; consumers
-must update their installed/locked version to receive them.
+Project templates are under `templates/game` and `templates/empty`, including
+README/AGENTS entries for installed SDK guides and project commands. The game
+template supplies paired KUI/TS components, default skins, a 2× atlas, palette,
+fonts, translations and splash HTML. See [template startup](game-template.md)
+and [default skins](default-ui-skins.md).
 
-## Native text adoption in 3.4.0
+## Native text compilation
 
-Version 3.4.0 registers BitmapLabel and RichLabel from published UI
-3.3.0 and consumes document 0.12.0. `kui/validate-text-components.ts` applies
+The compiler registers BitmapLabel and RichLabel through ui-document. `kui/validate-text-components.ts` applies
 strict shared property/state validation only to these new built-ins, preserving
 existing CLI-only and custom class contracts. Text flows remain literal arrays;
 Span data does not create nodes/parts. Only width/height use percent conversion.
@@ -82,11 +56,11 @@ transforms such as `flipX`/`flipY` belong on those children. Overrides use local
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
 authored XML fields.
 
-CLI 3.5.0 validates centered-flip booleans on display nodes and named-state
+The compiler validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
 nonvisual Skin root fail compilation. Negative scales are preserved.
 
-CLI 3.6.1 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
+The CLI requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -109,10 +83,9 @@ as the part name. Internal nodes can omit `id`; the declaration augments
 component classes. The file is development metadata and is excluded from
 runtime output.
 
-CLI 3.6.1 narrows host `skinParts` through a getter signature,
-preserving Component's accessor kind under `skipLibCheck=false`. Published CLI
-3.6.0 instead emits a readonly property and can report TS2610. Regenerate with
-the fixed CLI; do not change Core/UI or hand-edit the generated declaration.
+The generator narrows host `skinParts` through a getter signature,
+preserving Component's accessor kind under `skipLibCheck=false`. Regenerate after
+authored Skin changes; keep generated declarations out of manual edits.
 
 ## Reusable components
 
@@ -134,7 +107,7 @@ manual prefix cannot conflict with `ui.components.namespace`.
   `--strict` or release policy.
 - Machine diagnostic modes own stdout: build emits one JSON result; dev emits
   JSONL lifecycle events.
-- Since 3.3.1, dev watches all resource assets even without UI, emits
+- Dev watches all resource assets even without UI, emits
   resource-change for copy-only batches, retains KUI requirements across mixed
   batches, and reconciles deletions. Browser refresh remains manual; HTTP is
   no-store. Per-file staging/rename is not an atomic atlas pair transaction.
@@ -145,9 +118,8 @@ manual prefix cannot conflict with `ui.components.namespace`.
 - Engine and custom namespace chunks share `ctx.outputs.engine` because the
   import-map writer treats both as external specifier mappings.
 - Engine and reusable namespace bundles preserve class names in both modes.
-  The CLI 3.6.0 development fix also protects self-referencing classes, which
-  esbuild can rename without minification. Registry CLI 3.5.0 protects release
-  names only. Theme fallback uses constructor names.
+  Self-referencing classes retain stable names in both modes because Theme
+  fallback uses constructor names.
 - The Skin module builder stages output in a temporary directory and installs a
   bundle only after every Skin succeeds.
 - `cleanOutput` wipes the active output directory at the start of each build.
@@ -155,11 +127,10 @@ manual prefix cannot conflict with `ui.components.namespace`.
 - `create` queries the npm registry for current Kurot package versions and falls
   back to `latest` if the request fails.
 - Release output is timestamped and `manifest.json` exists only in release.
-- The CLI 3.6.0 asset-copy correction omits empty runtime directory trees,
+- Asset copying omits empty runtime directory trees,
   including skin-only `resource/ui`. Runtime files under UI directories remain
   eligible; generated theme JSON and the compiled Skin module remain required.
-  Template copies still preserve empty directories. Registry CLI 3.5.0 does not
-  include this correction.
+  Template copies still preserve empty directories.
 
 ## Plugin order
 
@@ -207,14 +178,14 @@ pnpm test
 CLI end-to-end tests bind localhost and may require permission in a restricted
 execution environment.
 
-## Resource configuration change in 3.0.0
+## Resource configuration
 
 KUI builds validate object subkeys, resolve resource nine-slice defaults, and
 watch the manifest during development. See
 [the resource-default contract](../../ui-document/docs/resource-nine-slice.md)
 for conversion and compilation boundaries.
 
-## Label text compilation in 3.1.0
+## Label text compilation
 
 The compiler consumes the shared ui-document catalog and emits Label `textFit`,
 `minFontSize`, authored `size` and state-size overrides unchanged. Runtime
@@ -224,7 +195,7 @@ within their respective majors. Neither engine is a CLI runtime dependency.
 See [text compilation](label-text-layout.md) and
 [native Label text layout](../../ui/docs/label-text-layout.md) for the boundary.
 
-## Project styles in 3.2.0
+## Project styles
 
 Read [project styles](../../ui-document/docs/project-styles.md). buildSkinsModule
 reads the optional fixed config/style.json once per build and forwards its numeric
@@ -235,13 +206,11 @@ without migrating files. Fonts are validated but not loaded; the application own
 font loading and rendering. Build/preview copies resolve references while authored
 XML retains them. No live runtime palette switching is introduced.
 
-## Label presets in 3.3.0
+## Label presets
 
 skin-module-builder.ts reads the entire stylesheet once per build and passes it
 through parseToIR/parseKUISkin. Resolve resource defaults, then Label presets, then colors before
 native emission; retain XML references and local/state precedence. compileKUI
 accepts an optional styleSheet. style.json changes already trigger whole-Skin
-rebuilds. Invalid presets retain the last successful bundle. The 3.3.0 dependency and
-lockfile used published ui-document 0.11.0 without a local override. Current
-CLI 3.6.1 development uses published ui-document 0.13.0. textStyle is
+rebuilds. Invalid presets retain the last successful bundle. textStyle is
 Default-only; individual named-state fields can still override preset properties.

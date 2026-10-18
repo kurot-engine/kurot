@@ -4,10 +4,6 @@ Version 0.1.0. Pure TypeScript / ESM / ES2022 with no runtime
 dependencies or DOM typings. See [format.md](format.md) before changing imports,
 validation, geometry or layout.
 
-Version 0.1.0 and its consumer Core 2.2.0 are published. Published UI 3.2.0
-adds BitmapLabel and requires Core ^2.2.0, without local dependency overrides.
-Published UI 3.1.0 does not contain the component.
-
 | File                | Responsibility                                                 |
 | ------------------- | -------------------------------------------------------------- |
 | src/types.ts        | Version-1 interchange, glyphs and layout contracts             |

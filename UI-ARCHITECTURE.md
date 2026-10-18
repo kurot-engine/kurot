@@ -5,7 +5,7 @@ For the current game UI workflow and directory conventions, read
 the semantic architecture and roadmap separate from that production recipe.
 
 This document records UI authoring ownership and the longer-term collaboration
-design. The implementation snapshot in section 3 was audited on 2026-10-10;
+design. Section 3 describes the implemented boundary;
 later workflow and roadmap sections describe the broader target where it is
 not yet implemented. Package `docs/ai-context.md` files and manifests define
 current APIs and version requirements.
@@ -107,19 +107,18 @@ describe their ownership boundaries.
 screen and a reusable inventory row are compositions; a button's normal,
 pressed, selected, and disabled visuals are an appearance or skin.
 
-## 3. Implementation snapshot — 2026-10-10
+## 3. Implemented boundary
 
-At this audit, published Core 2.4.0, UI 3.4.0, document 0.13.0, CLI 3.5.0 and
-runtime 0.10.0 provided the SDK chain. Current published versions are recorded
-in [release history](docs/release-history.md); the versions below identify this
-implementation snapshot. Document format remains 2. CLI compiles Skin
+Core/UI own display and component behavior; ui-document owns the semantic
+model, CLI compiles Skin appearances, and ui-runtime materializes semantic
+assets. Current versions and dependency ranges are in the root README. Document format remains 2. CLI compiles Skin
 appearances from KUI XML, and the separate Kurot Editor edits those same files.
 Semantic screen/component assets and incremental preview reconciliation retain
 their narrower programmatic/runtime boundary.
 
 ### 3.1 Implemented
 
-`@kurot/ui-document@0.13.0` provides:
+`@kurot/ui-document` provides:
 
 - runtime-independent `UIDocument`, `UINode`, and serializable property values;
 - stable document and node identifiers;
@@ -190,12 +189,10 @@ their narrower programmatic/runtime boundary.
 
 The existing `@kurot/ui` package already owns the real UI behavior: measurement,
 layout, validation, skins, states, bindings, collections, themes, and controls.
-CLI 3.5.0 parses canonical KUI XML through document ^0.13.0 and emits ESM Skin
+The CLI parses canonical KUI XML through document ^0.13.0 and emits ESM Skin
 factories, theme output and typed skin-part declarations. It also handles project
-namespace components and development resource synchronization. The separate
-Editor 0.27.1 working tree declares this published SDK chain and implements
-Skin open/save, hierarchy/property editing, preview, resources and undo/redo;
-its desktop publication status belongs to that repository.
+namespace components and development resource synchronization. Editor implementation and application lifecycle belong to their own
+integration repository.
 
 ### 3.2 Not implemented
 
@@ -232,7 +229,7 @@ legacy EXML applications retain their independent CLI 1.3.x workflow.
 | Editing operations and history | Implemented | Typed semantic operations, atomic transactions, expected revisions, inverse operations, deterministic diffs, and monotonic undo/redo history. |
 | Visual editor | Implemented for KUI Skins in a separate repository | Kurot Editor provides file editing, hierarchy, Inspector, preview, resources and history; broader semantic asset workflows remain separate. |
 | Agent collaboration | Separate integration work | SDK schemas and transactions exist; the full Agent workflow is outside this engine audit. |
-| Static UI compiler | Implemented for KUI Skins | CLI 3.5.0 emits ESM Skin factories and typed parts; semantic screen/reuse compilation remains pending. |
+| Static UI compiler | Implemented for KUI Skins | The CLI emits ESM Skin factories and typed parts; semantic screen/reuse compilation remains pending. |
 
 ## 4. Target collaboration workflow
 

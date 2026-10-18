@@ -27,10 +27,9 @@ const exportedJSON = serializeBitmapFont(font);
 Exported types: `BitmapFontData`, `BitmapGlyph`, `BitmapTextLayoutOptions`,
 `BitmapTextLayout`, `BitmapTextLine`, `PositionedBitmapGlyph`.
 
-See [format and layout contract](docs/format.md) and [verification](docs/verification.md). Importing this package does
-not load images. Published Core 2.2.0 adds font resources and BitmapText
-rendering using this package. Published UI 3.2.0 adds BitmapLabel and requires
-Core ^2.2.0; published UI 3.1.0 does not contain the component.
+See [format and layout](docs/format.md) and [verification](docs/verification.md).
+Core owns image/resource loading and BitmapText rendering; UI BitmapLabel adds
+component constraints. This headless package does not load images.
 
 A future editor keeps original glyph images, names and editing history in its
 own project format. It uses this package for interchange and preview layout,
@@ -46,5 +45,4 @@ pnpm test
 
 Tests include the existing number-font descriptor; test resources are excluded
 from the package. No font-editor application or CLI/KUI catalog adoption is
-included. Published Core 2.2.0 and UI 3.2.0 resolve registry dependencies
-without local pnpm overrides.
+included.

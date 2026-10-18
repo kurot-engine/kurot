@@ -153,15 +153,8 @@ release. Confirm that
 generated theme JSON maps ScoreHUD to components.hud.ScoreHUDSkin and that the
 part declarations type scoreLabel as Label and restartButton as Button.
 
-The documentation check compiles these exact TS/XML fences using locally packed
-CLI 3.6.1/UI 3.6.2 and published Core 2.5.5, without engine source. Development
-and release builds pass strict checking with skipLibCheck=false, including the
-custom namespace tag, generated mappings and part types. CLI 3.6.1 is published
-and verified, as is UI 3.6.2. The published UI tarball is byte-identical to the
-prepared local archive used by the recipe checks. This is compile validation;
-verify startup, visual bounds and repeated open/restart/close in the host browser.
-
-Published CLI 3.6.0 emits a readonly property over Component's accessor and can
-report TS2610 with skipLibCheck=false. CLI 3.6.1 emits a getter signature instead.
-Regenerate declarations with the fixed CLI; no Core/UI implementation change or
-unsafe cast is needed.
+Run development and release builds followed by strict TypeScript checking with
+skipLibCheck=false. Use the generated getter declaration for skinParts; rebuild
+it from the authored Skin rather than adding casts or editing declarations.
+Serve the host game and verify startup, visual bounds and repeated open/restart/
+close with its actual fonts, resources and theme readiness.

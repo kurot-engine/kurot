@@ -13,24 +13,21 @@ Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
   or [empty](packages/cli/templates/empty/README.md) README. In a consumer project,
   use its own README/AGENTS and installed SDK docs/types; source may be absent.
 - **Look up an API:** start with Core/Game/UI `docs/api/topics.md`, then read
-  only the needed symbol/member pages. Use the installed package's version;
-  Core 2.5.5, Game 2.0.1 and UI 3.6.2 include the generated reference.
+  only the needed symbol/member pages. Use docs from the installed package version.
 - **Make game UI:** read [standard UI authoring](packages/ui/docs/ui-authoring.md)
   for directory/TS–Skin pairing, layout, startup and teardown; use its
   [ScoreHUD recipe](packages/ui/docs/recipes/score-hud.md) for a complete pair.
-  These guides target UI 3.6.2; published CLI 3.6.1 adds template entry docs.
+  Use the consumer project's own template README/AGENTS and installed SDK docs.
 - **Change a dependency or plan a release:** read
   [dependency policy](docs/dependency-policy.md). When asked to bump or prepare
   a package version, complete the [version checklist](docs/release-checklist.md).
-- **Investigate an older release, publication check or application adoption:**
-  read [release history](docs/release-history.md), with linked early 2.x records.
-  Historical adoption is evidence for that event, not an instruction to upgrade.
+- **Investigate changes:** read the target package's CHANGELOG.md; repository-wide
+  publication and adoption records are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Package map
 
-The source versions below match npm latest, checked on 2026-10-18. Publication
-evidence is in release history; a consumer's manifest, lock and installation
-establish its runtime baseline. Package versions are independent.
+The table records source manifest versions. A consumer's manifest, lock and
+installation establish its baseline. Package versions are independent.
 
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
@@ -43,15 +40,6 @@ establish its runtime baseline. Package versions are independent.
 | `@kurot/atlas` | 0.1.0 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
 | `@kurot/dragonbones` | 0.1.0 | DragonBones 5.7 runtime and native adapter | [context](packages/dragonbones/docs/ai-context.md) |
 | `@kurot/bitmap-font` | 0.1.0 | Headless font parsing, validation and layout | [context](packages/bitmap-font/docs/ai-context.md) |
-
-Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches,
-verified on npm on 2026-10-18; bundled API docs match the tested commit. Runtime
-implementations, exports and dependency ranges are unchanged. Adoption is optional.
-
-UI 3.6.2 and CLI 3.6.1 are published and verified. UI bundles the authoring
-guides; CLI supplies template entries and the strict skinParts declaration fix.
-Kurot-Studio adopts CLI 3.6.1. See [release history](docs/release-history.md).
-Engine dependency ranges/locks and Core/UI implementations are unchanged.
 
 Dependency direction is one-way. Core depends on bitmap-font. UI, Game and
 DragonBones use Core peers. CLI depends on ui-document and runs only at build
@@ -119,7 +107,10 @@ contexts describe additional relevant browser/integration checks.
 
 - `packages/`: independently released SDKs; `examples/`: CLI-built consumer
   projects; `tools/`: private tooling including agent evaluations.
-- `docs/` and package `docs/`: committed public contracts and guides.
+- `docs/` and package `docs/`: current contracts, indexes and usage/verification guides.
+  Keep release chronology, application adoption and past validation results in
+  CHANGELOG.md; keep API availability and current compatibility requirements with
+  the relevant contract. Do not append release journals to ordinary guides.
 - `docs-internal/`: gitignored local plans/audits, optional context only. Current
   public behavior must be established by public docs and source.
 - `reference/`: local read-only material, absent from distributed checkouts.

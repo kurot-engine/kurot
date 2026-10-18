@@ -1,6 +1,6 @@
 # Label text compilation
 
-CLI 3.6.0 consumes ui-document ^0.13.0 and compiles KUI text-fitting properties
+The CLI consumes ui-document ^0.13.0 and compiles KUI text-fitting properties
 through the existing UIDocument → SkinIR → ESM factory pipeline. The semantic
 document format remains version 2.
 
@@ -34,12 +34,10 @@ introduces build-time text measurement. See the
 
 ## Runtime boundary
 
-- The application must install UI `^3.1.0` and Core `^2.1.0` for shrinking.
-  These are the feature's original API minimums. Installing current UI 3.6.2
-  requires Core `^2.5.2` for its package-wide outline-safe Label contract.
-  They remain application dependencies; CLI depends on the headless document
-  package rather than importing the engine into the build process.
-- `textFit` is `none` by default or `shrink` for ordinary single-line Labels.
+- Applications supply an accepted Core/UI pair and satisfy the installed UI's
+  Core peer. The compiler depends on the headless document kernel.
+- `textFit` is `none` by default or `shrink` for ordinary Labels.
+  Supported fitting modes and bounds follow the installed native UI contract.
   Put a Button's policy on its `labelDisplay` skin part.
 - `minFontSize` defaults to 12 logical pixels and must be finite and >= 1.
   A minimum greater than the authored size does not enlarge the text.
@@ -47,20 +45,20 @@ introduces build-time text measurement. See the
   State removal restores the authored base size before fitting again.
 - `renderedSize` and `textFitOverflow` are runtime observations; do not author
   them in KUI XML.
-- Multiline Labels keep their base size; EditableText rejects shrinking.
+- EditableText rejects shrinking. Current native Label supports fitting in either
+  line mode; `multiline` continues to choose line generation.
 - Load fonts before measuring text. For late loading, native UI callers use
   `label.invalidateSize()` after the font becomes ready.
 
-UI 3.1's public Label contract owns the full fitting, overflow, layout and
-font-readiness rules. ui-document 0.9's catalog describes the authoring fields.
-The build does not rewrite existing skins or apply project translation rules.
+The [native Label contract](../../ui/docs/label-text-layout.md) owns fitting,
+overflow, layout and font-readiness rules. The compiler does not rewrite
+existing skins or apply project translation rules.
 
-## Migration
+## Authored line policy
 
-In Core 2.1.0, explicit `multiline="false"` means one unwrapped first line.
+Explicit `multiline="false"` means one unwrapped first line.
 Remove that flag or set it to true where wrapping is intended. The literal-string
 XML contract is retained: a backslash followed by `n` stays literal text rather
 than becoming a hard separator.
 
-Existing EXML projects remain on CLI 1.3.x. The KUI release does not introduce
-an EXML migration or resource-format change.
+EXML authoring uses the CLI 1.x line. This KUI compiler does not migrate EXML.

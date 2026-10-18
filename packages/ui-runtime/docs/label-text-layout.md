@@ -2,7 +2,7 @@
 
 Runtime 0.10.0 requires Core `^2.4.0`, UI `^3.4.0` and document `^0.13.0`.
 It applies authored text properties to native Labels rather than measuring text
-or fitting fonts itself. CLI 3.5.0 compiles the same properties into KUI skins.
+or fitting fonts itself. The CLI compiles the same properties into KUI skins.
 
 Callers expand Label presets with `resolveUILabelStyles()` before color resolution
 and materialization. Presets supply appearance defaults; local and state fields
@@ -37,9 +37,10 @@ if (amount instanceof Label) {
 `false` keeps only the first hard line and disables automatic wrapping even when
 height is automatic. With `true`, wrapping remains native Core behavior.
 
-`textFit` defaults to `'none'`. `'shrink'` fits a single-line Label to its native
-layout bounds, including explicit dimensions, parent constraints and maximum
-size limits. Automatic axes without a constraint do not impose a fit limit.
+`textFit` defaults to `'none'`. `'shrink'` delegates fitting to the installed
+native UI's Label, including explicit dimensions, parent constraints and maximum
+size limits. Supported line modes and outline bounds follow that UI's contract.
+Automatic axes without a constraint do not impose a fit limit.
 `minFontSize` defaults to 12 and accepts finite values at least 1; it never
 enlarges text above the authored size. EditableText permits only `'none'`.
 

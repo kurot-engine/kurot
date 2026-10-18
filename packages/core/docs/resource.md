@@ -190,7 +190,7 @@ Load a plain-text file through `HttpRequest`.
 const text = resource.get<string>('readme');
 ```
 
-### FontAnalyzer (2.2.0)
+### FontAnalyzer
 
 Load a font descriptor and its image page, resolved relative to the descriptor,
 and return a `BitmapFont`. Supported formats are Egret JSON `.fnt`, native JSON
@@ -227,7 +227,7 @@ Load a sprite sheet in TexturePacker JSON format in two steps:
 The Core 2.5.0 [texture density extension](texture-density.md) accepts optional
 sheet JSON `resolution` (default 1). Frame coordinates and original dimensions
 in JSON remain physical pixels; loaded Texture dimensions and trim offsets are
-logical. Published Core 2.4.0 does not interpret this field.
+logical.
 
 Resources can be retrieved in three ways:
 
@@ -291,7 +291,7 @@ Applications normally use `Resource.loadGroup()` instead of accessing
 
 ## Configuration format
 
-### Standard format (2.0.0)
+### Standard format
 
 ```json
 {

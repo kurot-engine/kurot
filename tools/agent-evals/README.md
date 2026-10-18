@@ -34,13 +34,11 @@ pnpm --dir tools/agent-evals test
 
 ## Documentation comparison
 
-The first executable experiment is `gameplay.coin-lanes`: a Core-only game
-with keyboard/touch input, deterministic scoring, lives, game over, restart
-and disposal. See [the protocol](docs/documentation-comparison.md).
+The documentation comparison task `gameplay.coin-lanes` is a Core-only game with
+keyboard/touch input, deterministic scoring, lives, game over, restart and disposal. See [the protocol](docs/documentation-comparison.md).
 
 It uses the existing authenticated Codex CLI, not an API-key application.
-The [2026-10-18 baseline](docs/coin-lanes-baseline-2026-10-18.md) records the
-first completed 3+3 comparison and its evidence fingerprints.
+Recorded results and evidence fingerprints are in [CHANGELOG.md](CHANGELOG.md).
 The plan pins the model identifier, reasoning effort, CLI and SDK versions.
 It reuses Star Catcher's frozen browser/compiler tools; it does not install
 or upgrade dependencies. First install the reference project's exact lock if
@@ -63,9 +61,9 @@ JSONL usage, command logs, screenshots and browser traces. Nothing is published.
 
 The [expanded gameplay protocol](docs/gameplay-suite.md) adds resource loading,
 native Tween and compiled KUI tasks, with five planned repetitions per arm.
-Its three positive and three negative controls are calibrated. The real run
-was stopped before completion; see the [2026-10-18 checkpoint](docs/gameplay-suite-checkpoint-2026-10-18.md).
-No repeated-comparison conclusion is claimed for this extension.
+Evaluation work is paused, with no background run or automatic continuation.
+Use the protocol to calibrate controls before explicitly starting a comparison.
+Recorded partial results and limitations are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Planned domain scope
 

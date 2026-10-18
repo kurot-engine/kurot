@@ -1,8 +1,5 @@
 # Bitmap fill modes
 
-Core 2.3.3 is published. Version 2.3.2 stretches all fill modes;
-adopt the patch and rebuild to receive this correction.
-
 `Bitmap.fillMode` also controls UI `Image` rendering:
 
 | Mode | Behavior |
@@ -35,16 +32,7 @@ invalid periods, fractional dimensions and nine-slice precedence. The minified
 native Canvas patterns on Canvas/WebGL 1/WebGL 2 at 1x/2x, including rotation,
 tint, cache updates and the existing scale path.
 
-The Core 2.5.0 [texture density extension](texture-density.md) additionally
+[Texture density](texture-density.md) additionally
 tests source densities 1×/2×/3× at both output resolutions. Physical atlas sampling
 and logical repeat periods remain separate, including tinted cached images and
-nine-slice texture swaps. Published 2.4.0 does not interpret sheet density metadata.
-
-There are no new APIs or dependencies. UI 3.3.0/runtime 0.9.0 and
-Game/DragonBones/Spine peers accept this patch without SDK bumps. Current UI
-3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps its Core ^2.4.0 peer for centered
-flips. Both accepted Core baselines include the fill correction. Optional
-development lock adoption is separate. Editor's local
-0.23.1 trial bound one built Core through `KUROT_CORE_PATH` while retaining its
-published 2.3.2 dependency lock. Editor 0.23.2 adopts registry Core 2.3.3 and
-updates its Bun lock; ordinary builds no longer require a local engine checkout.
+nine-slice texture swaps.

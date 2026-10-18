@@ -3,15 +3,14 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 3.6.2 (published; verified on 2026-10-18), with peerDependency `@kurot/core: ^2.5.2`.
-> Development retains published Core 2.5.3 with its existing registry lockfile.
+> Package version: 3.6.2 (published), with peerDependency `@kurot/core: ^2.5.2`.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal
 > mechanisms for human readers; the two documents complement each other.
-> Version 3.3.0 also exports independent [RichLabel](./rich-label.md).
-> Version 3.2.0 introduced BitmapLabel for native code and programmatic skins.
+> Independent [RichLabel](rich-label.md) and BitmapLabel support native code and
+> programmatic skins.
 > See [bitmap-label.md](./bitmap-label.md) for its resource and ownership contract.
 
 ---

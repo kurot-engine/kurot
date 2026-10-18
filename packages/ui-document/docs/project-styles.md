@@ -1,10 +1,9 @@
 # Project styles
 
 The fixed resource/config/style.json is plain project configuration, independent
-of default.res.json. ui-document 0.10.0 exports parseUIStyleSheet,
-getUIStyleFontAlias, getUIStyleFontFamily, getUIStyleColor and resolveUIStyleColors.
-Version 0.11.0 adds Label presets and is published. The document
-format remains version 2; style schemaVersion remains 1.
+of default.res.json. The kernel exports parseUIStyleSheet, getUIStyleFontAlias,
+getUIStyleFontFamily, getUIStyleColor and resolveUIStyleColors, plus Label preset
+resolution. The document format is 2 and style schemaVersion is 1.
 
 ```json
 {
@@ -39,10 +38,8 @@ Missing keys and invalid colors fail rather than silently substituting values.
 `@style:colors:<key>` selects the `colors` section of `style.json`; the key maps
 to an authored RGB value. Parsing retains the semantic color-token record and
 serialization emits this stylesheet reference in both base properties and state
-overrides. Published 0.10.0 supports colors in XML; the 0.11.0 Label preset
-extension below adds labels.
-The previous `@token:color:<key>` syntax is rejected; update authored references
-explicitly. Ordinary string properties remain literal, including reference-looking text.
+overrides. Label presets are described below. Authored palette references use
+`@style:colors:<key>`; other color-token prefixes are rejected. Ordinary string properties remain literal, including reference-looking text.
 
 resolveUIStyleColors resolves color-token records into a disposable copy, including
 nested trees and state/variant overrides. Literal text resembling a token stays
@@ -56,18 +53,7 @@ design tokens. Label preset support in 0.11.0 is specified below.
 An enabled control restores its own normal color rather than a
 hardcoded universal white. Build-time expansion does not add live game theme switching.
 
-## Adoption
-
-CLI and Editor must share the parser and stylesheet contract. Current CLI
-3.6.1 and runtime 0.10.0 require document `^0.13.0`, retaining fonts, colors and
-Label presets. Older 0.x dependency/peer ranges do not automatically accept
-0.13.0. Applications expand presets and resolve colors in
-preview copies before materialization. Color-only consumers may register the
-palette as color design tokens. No Core/UI rendering change is required. Consumers read the
-optional configuration, load/register fonts and resolve colors before materialization;
-the kernel never creates a missing style.json or rewrites project files.
-
-## Label typography presets in 0.11.0
+## Label typography presets
 
 The optional `labels` section contains sparse, non-inheriting presets. Names use
 lowercase letter-led keys with digits/hyphens. Omitting the section yields an empty
@@ -124,10 +110,6 @@ configuration or preset references fail explicitly; the resolver performs no I/O
 Font loading remains a consumer responsibility. No live theme switching or native
 renderer change is required. SchemaVersion stays 1 and document format stays 2.
 
-Presets were introduced in document 0.11.0, CLI 3.3.0 and runtime 0.8.2.
-Document 0.10.0/CLI 3.2.1 lack these APIs. Current CLI 3.6.1 and runtime 0.10.0
-use registry document `^0.13.0` without overrides; the KUI sample and engine
-examples retain CLI 3.3.1. Preset expansion itself needs no new Core/UI API,
-but installing runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for centered flips.
-Editor and application locks must use the same published
-kernel contract; do not silently upgrade legacy EXML projects.
+Compiler/preview consumers must share the installed kernel's parser and style
+contract. Expand disposable copies and retain authored preset/color references
+for saving and undo. CLI-built games need no ui-runtime dependency.

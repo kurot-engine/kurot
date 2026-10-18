@@ -1,19 +1,11 @@
 # Label text layout and fitting
 
-Introduced in UI 3.1.0 with Core >= 2.1.0, fitting is single-line in UI 3.1.0–3.4.0.
-UI 3.5.0 extends it to multiline Labels using Core's existing independent
-measurement API. Version 3.5.0 is published, verified on npm on 2026-10-10, with
-Core ^2.4.0. UI 3.6.0 is published, verified on 2026-10-11; it adds outline-safe layout
-and requires Core ^2.5.2. The public
-`TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
-authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
-0.13.1. Current CLI 3.6.1 and runtime 0.10.0 use document `^0.13.0`; runtime
-also requires UI `^3.4.0` and Core `^2.4.0`. Older 0.x kernel ranges do not
-automatically accept 0.13.0. Label presets expand into native properties before
-rendering; their precedence does not change fitting behavior. See the
-[project style contract](../../ui-document/docs/project-styles.md).
+`TextFitMode` is `none | shrink`. Native Label owns normal layout, single- and
+multiline fitting, outline-safe bounds and derived rendering observations.
+KUI compilation and semantic materialization pass the authored policy to that
+same native component. UI's Core peer requirement is ^2.5.2.
 
-## Outline-safe layout in 3.6.0
+## Outline-safe layout
 
 Nonempty dynamic Labels with a positive finite `stroke` reserve
 `ceil(2 * stroke) + 2` logical pixels on each side. This conservative allowance
@@ -35,15 +27,6 @@ stays fixed after clearing/retyping; middle alignment intentionally follows its
 changing glyph block and is not appropriate for that effect. Font readiness still
 uses `invalidateSize()`. Outline/state changes invalidate the normal UI layout.
 
-UI 3.6.0 is published. Outlined Labels can measure larger
-and wrap earlier than 3.5.0 even without `textFit`. No authored
-properties or XML/resource formats change. Its manifest requires Core
-^2.5.2 for public line ink metrics and unified vertical block alignment; development
-installs published 2.5.3. Core itself needs no new release.
-Consumers must adopt UI 3.6.0, use an accepted Core installation and rebuild; compatible
-CLI/document/runtime contracts need no new SDK release. Existing application
-installations remain on their registry versions until explicitly updated.
-
 ## Lines and bounds
 
 - `Label.multiline` defaults to `true`. Text wraps at a finite available width;
@@ -63,34 +46,25 @@ installations remain on their registry versions until explicitly updated.
   separators. In single-line mode, only the content before the first is drawn.
   A literal backslash followed by `n` remains literal text in KUI strings.
 
-Explicit `multiline="false"` in older skins now means a real single line.
+Explicit `multiline="false"` selects a single line.
 Remove it or set it to `true` for text intended to wrap. No files are migrated
 automatically; omitted Label flags continue to allow wrapping.
 
 ## Vertical alignment and skin defaults
 
 Label, RichLabel and EditableText inherit TextField's default; BitmapLabel
-inherits BitmapText's. With published Core 2.5.3 they default to
-`verticalAlign="middle"`. Published Core 2.5.2 and earlier default to top. Button
+inherits BitmapText's. With Core >= 2.5.3 they default to
+`verticalAlign="middle"`; the accepted Core 2.5.2 baseline defaults to top. Button
 skins in the native KUI kit already set middle explicitly. Button does not
 overwrite an authored top/bottom or a skin state. Use explicit top for content
 intended to start at the top of a taller box. `verticalCenter` positions the
 Label box in its parent; it does not align text inside the Label.
 
-Published document 0.13.1 reports the new middle default without writing omitted
-properties into XML. Adopting editors need matching Core/catalog installations;
-UI 3.4.0 itself requires no release or higher peer minimum. Existing applications
-retain their installed behavior until they update their locks and rebuild.
-
-Published Core 2.5.2 makes dynamic top/middle/bottom use the same
-complete glyph-block boundaries in single-line and multiline modes. Blank rows
-retain their height. `multiline` controls only line generation. Input uses stable
-editing-row boundaries in all three modes; its caret and selection remain stable.
-Core measurements stay nominal; UI 3.6.0 reserves outline-safe
-layout space separately. Older Core installations retain their
-recorded text behavior; adopt the Core installation/lock and rebuild.
-UI 3.4.0's peer accepts 2.5.2; this correction needs no UI release.
-See [Core text layout](../../core/docs/text-layout.md#unified-vertical-alignment-core-252).
+The authoring catalog reports middle without inserting omitted properties.
+Dynamic top/middle/bottom align the complete glyph block in either line mode;
+blank rows retain their height. Input uses stable editing-row boundaries. Core
+measurements stay nominal while Label reserves its outline-safe layout area.
+See [Core text layout](../../core/docs/text-layout.md).
 
 ## Shrink to fit
 
@@ -134,8 +108,7 @@ No maximum row count is implied by a fixed height, and no `maxLines` is added.
   outline-safe layout bounds described above. Search, automatic measurement and
   drawing reserve the same inset once. Both alignments operate inside that area;
   symmetric insets preserve the horizontal center. Automatic measurements are
-  never recycled as fitting constraints. The published 3.5.0 baseline reserved
-  only twice the stroke in fit checks and kept automatic dimensions nominal.
+  never recycled as fitting constraints.
 - Available bounds come from fixed dimensions, parent layout constraints or
   explicit maximum dimensions. Icon spacing belongs to the skin's Label
   region. Automatic measured dimensions are not fed back as fit constraints.
@@ -155,21 +128,9 @@ These two read-only results are runtime observations, not authored KUI fields.
 CLI emits the policy and base size; ui-runtime uses the same native Label. Neither
 writes the derived size into XML, styles, semantic documents or history.
 
-Existing multiline Labels with an authored `shrink` policy begin fitting when
-they adopt UI 3.5.0; the published 3.4.0 runtime ignored that
-combination. Single-line hard-separator/password semantics remain effective.
 Finite zero content width reports overflow for nonempty displayed text; it is
 not mistaken for empty content by Core's zero-width measurement. Empty displayed
 content retains its base size without overflow.
-
-The 3.5.0 multiline extension required no Core or KUI-format change. The separate
-3.6.0 outline correction raises UI's Core minimum to ^2.5.2. CLI/runtime already
-pass the fields through; runtime 0.10.0's ^3.4.0 peer accepts UI 3.6.0, provided
-its host also satisfies UI's Core peer. Applications adopt the UI installation/lock
-and rebuild explicitly. Editor 0.28.3 adopts exact registry UI 3.6.0 and a matching
-Bun lock; the selected Tentax and MilfMaster templates adopt ^3.6.0 with matching
-pnpm locks and rebuilt outputs.
-Preview and compiled games use the native Label behavior once their host adopts it.
 
 Load fonts before constructing or measuring text where possible. If a font
 becomes ready later, call `label.invalidateSize()` before the next validation;
@@ -206,7 +167,7 @@ Pixel comparisons verify unchanged painting across fitting toggles for all nine
 horizontal/vertical alignments and automatic dimensions; icon-and-caption row
 tests retain parent geometry.
 
-UI 3.6.0 adds exact clipped/unclipped pixel comparisons in real
+Browser suites include exact clipped/unclipped pixel comparisons in real
 Scroller viewports, across all nine alignments, italic text, thick outlines,
 automatic/fixed/maximum/fitted bounds, and Japanese scroll tails. Minified Canvas,
 WebGL 1 and WebGL 2 tests use physical 1x/2x targets. Unit tests additionally

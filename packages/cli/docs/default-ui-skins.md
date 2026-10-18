@@ -1,8 +1,6 @@
 # Default KUI skins
 
-This game-template refresh is included in published CLI 3.6.0, verified on npm
-on 2026-10-10. CLI 3.5.0 contains the older atlas. The 2× kit requires published
-Core ^2.5.0; actual published CLI scaffolding resolves that dependency.
+The 2× atlas needs Core >= 2.5.0 within 2.x for source-density metadata.
 The template owns the XML, textures and project colors; `@kurot/ui`
 does not ship a bitmap theme or load a stylesheet itself.
 
@@ -30,14 +28,12 @@ to draw the components, and no runtime light/dark switching is introduced.
 ## Text and spacing
 
 Single-line captions use `multiline="false" verticalAlign="middle"` with the
-Core 2.5.0 ink-centering correction. Button label padding is 10 pixels
+native dynamic-text ink centering. Button label padding is 10 pixels
 above/below; its down state uses 12/8 to retain a deliberate 2-pixel press offset.
 The icon has the same neutral/down centers. Panel titles also opt into middle
 alignment. Input text retains Core's stable font baseline while its placeholder
 uses dynamic visual centering. No language-specific skin offsets are required.
-See [Core text alignment](../../core/docs/text-layout.md#visual-centering-and-stable-baselines-core-250).
-Published Core 2.4.0 does not contain that correction; the isolated preview uses
-checkout Core for both text alignment and source density.
+See [Core text alignment](../../core/docs/text-layout.md#baselines-and-cached-metrics).
 
 ## Resources and XML
 
@@ -72,13 +68,11 @@ automatic scrolling policies and touch/trackpad scrolling. To display bars in a
 project, edit those parts explicitly.
 
 ItemRenderer backgrounds fit the allocated row width without extra horizontal
-padding. The checkout Core also fixes fractional WebGL scissor bounds so scaled
-Lists retain their right outline. Published Core 2.4.0 lacks that correction;
-shrinking the skin or changing its nine-slice grid is not required.
+padding. Core encloses fractional WebGL scissor bounds so scaled Lists retain their
+right outline; use the allocated row geometry without compensating skin offsets.
 
 Group, List, TabBar, ViewStack and text/image nodes are composed directly in XML;
-their old default-Skin placeholders were not conventional Theme mappings and
-are removed. Use `itemRendererSkinName` to choose a List/TabBar row appearance,
+they do not require placeholder default skins. Use `itemRendererSkinName` to choose a List/TabBar row appearance,
 and wrap the node with Group/Image/Scroller for its surface and viewport.
 
 ## Native preview and maintenance
@@ -87,9 +81,7 @@ and wrap the node with Group/Image/Scroller for its surface and viewport.
 `src/DefaultUI.ts` only connects data and events. The example installs its own
 project font loader and document dependency; other projects are unchanged.
 
-The example now locks registry Core 2.5.4, which supports sheet density. Its
-installed CLI remains 3.3.1, so use checkout CLI 3.6.0 for the current gallery's
-constructor-name preservation. From the repository root:
+Use the checkout CLI with the example's installed SDKs. From the repository root:
 
 ```sh
 pnpm --dir packages/cli build
@@ -105,18 +97,15 @@ directory, the same CLI accepts `build` and `build --release` for one-shot build
 The private asset tool's isolated source preview remains an optional maintenance
 tool for testing checkout engine changes; it is not required by the installed Core.
 
-CLI 3.6.0 preserves constructor names in development and release
+The CLI preserves constructor names in development and release
 engine/namespace bundles so Theme lookup also works for self-referencing
-classes such as Scroller. Published CLI 3.5.0 lacks the development correction.
+classes such as Scroller.
 
 `tools/default-ui-assets` contains editable SVG geometry and the reproducible
 PNG/atlas generator. It uses registry `@kurot/atlas@0.1.0` only as private
 repository tooling. CLI and runtime SDKs gain no atlas dependency. See its
 [maintenance instructions](../../../tools/default-ui-assets/README.md).
 
-Core 2.5.0 and CLI 3.6.0 are published; Core was published first.
-UI/Game/document/runtime need no incidental release; existing 1× consumers keep
-their behavior. See [density units and adoption](../../core/docs/texture-density.md).
-Existing projects keep their own skins, resource keys and startup code. New
-scaffolds receive this kit after the supporting Core and CLI publications;
-installing a new CLI does not rewrite an existing project's resources.
+Existing projects keep their own skins, resource keys and startup code. Updating
+the installed CLI does not rewrite authored resources. New scaffolds receive
+the template's current kit.

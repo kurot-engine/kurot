@@ -1,10 +1,5 @@
 # Bitmap fonts
 
-Available in Core 2.2.0 with the published `@kurot/bitmap-font ^0.1.0` dependency.
-Package installs and local builds resolve the font kernel from npm. Installed
-Core 2.1.1 does not include FontAnalyzer or BitmapText rendering; update Core and
-the lockfile to receive them. Source versions alone do not confirm publication.
-
 A bitmap font is a descriptor plus a full image page. Core owns image loading and
 rendering; @kurot/bitmap-font owns validation, parsing, serialization and layout.
 See [the shared format](../../bitmap-font/docs/format.md).
@@ -55,7 +50,7 @@ layout caches assume data does not mutate. Glyph subtextures are borrowed views.
 
 BitmapText has text/font, lineSpacing/letterSpacing, smoothing, multiline,
 left/center/right textAlign and top/middle/bottom verticalAlign. The default is
-multiline=true. Published Core 2.5.3 defaults verticalAlign to middle; published
+multiline=true. Core >= 2.5.3 defaults verticalAlign to middle; Core
 2.5.2 and earlier default to top. BitmapLabel inherits its host BitmapText default.
 Explicit top/bottom remain effective in either line mode. Core passes the selected
 alignment into the unchanged headless kernel, whose standalone layout default
@@ -70,8 +65,7 @@ Width and height are constraints, not scales; set scaleX/scaleY to resize font
 art. NaN removes a dimension constraint. Height admits complete line boxes;
 multiline=false draws the first hard-separated line without width wrapping.
 Explicit zero height draws nothing. Default textureScaleFactor=1 is required for
-font assets in this initial implementation.
-The Core 2.5.0 texture-density extension keeps literal font metrics separate:
+font assets. Texture density keeps literal font metrics separate:
 BitmapFont page textures require resolution=1. See [texture density](texture-density.md).
 
 WebGL's BitmapTextPipe submits cropped glyph quads to ordinary texture batching,
@@ -81,14 +75,11 @@ use that Canvas path. Both honor font offsets without allocating child nodes.
 Changing text/font/metrics invalidates layout and rendering, including an
 existing WebGL instruction without a scene rebuild.
 
-Core 2.2.0 fixes BitmapText's previous setter-only width/height accessors.
 BitmapText.EMPTY_FACTOR is retained as a deprecated field; per-font spaceAdvance
-now controls fallback spaces. Line-height, trailing-advance and complete-line
-clipping follow the shared
-format contract rather than the old unrendered class's approximate measurements.
+controls fallback spaces. Line-height, trailing-advance and complete-line
+clipping follow the shared format contract.
 
-UI 3.2.0 introduced native BitmapLabel; UI 3.1.0 does not include it. Current UI
-3.6.2 retains it and requires Core ^2.5.2. Published document 0.13.1,
-CLI 3.6.1 and runtime 0.10.0 support font authoring, compilation and materialization;
-existing installed compilers do not gain a new tag automatically. See
-[BitmapLabel](../../ui/docs/bitmap-label.md) for the feature's introduction versions.
+UI BitmapLabel adds native constraints and asynchronous configured-font loading.
+CLI and semantic runtime integrations use registered font resources; see
+[BitmapLabel](../../ui/docs/bitmap-label.md) and the
+[authoring contract](../../ui-document/docs/text-components.md).

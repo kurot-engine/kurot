@@ -1,7 +1,6 @@
 # Native text materialization
 
-Native text materialization was introduced in runtime 0.9.0. Current runtime
-0.10.0 requires Core `^2.4.0`, UI `^3.4.0` and document `^0.13.0`.
+The runtime requires Core `^2.4.0`, UI `^3.4.0` and document `^0.13.0`.
 It materializes BitmapLabel and RichLabel with their real native constructors;
 neither inherits Label or accepts whole-component Label typography/presets.
 
@@ -53,7 +52,5 @@ An unconstrained array schema is insufficient because every supported run must
 be validated before assignment. Plain malformed values and unsupported native
 properties fail instead of being attached as arbitrary object fields.
 
-Core 2.3.0 is the original native text API minimum; 2.3.1 fixes blank-run metrics.
-Current runtime 0.10.0 requires Core ^2.4.0, which includes that correction.
-Existing apps retaining runtime 0.8.2 need no forced migration. Editor-specific
-font controls and rich-text editing remain a separate consumer integration.
+Use the runtime's declared peer ranges and the chosen UI's Core requirements.
+Editor-specific font controls and rich-text editing belong to consumer tooling.
