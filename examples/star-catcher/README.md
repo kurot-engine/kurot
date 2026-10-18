@@ -71,6 +71,7 @@ creating a new one on the same Player. Final Close/pagehide also aborts DOM
 controls, destroys app adapters and stops the shared ticker because this page
 owns all its consumers. Removing a display child alone is not teardown.
 
-The quick guide is an unreleased checkout addition: published Core 2.5.4 does
-not yet contain that file. Installed public API declarations still come from
+The quick guide ships in Core 2.5.5. This example keeps its exact published
+Core 2.5.4 pin, which does not contain that file; read the repository guide.
+Installed public API declarations still come from
 the exact registry package. No local engine-source binding is needed.

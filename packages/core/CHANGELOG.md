@@ -4,9 +4,18 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## Unreleased
+
+### Documentation — 2026-10-18
+
+- Record 2.5.5 publication and route game authors to the repository's new UI
+  workflow. The UI guides postdate UI 3.6.1; Core runtime/dependencies are unchanged.
+
 ## [2.5.5] — 2026-10-18
 
-Prepared locally; not published. Documentation-only patch over 2.5.4.
+Published; verified on npm on 2026-10-18, including latest, tarball integrity
+and bundled API references matching the tested commit. Documentation-only patch
+over 2.5.4.
 
 ### Documentation
 

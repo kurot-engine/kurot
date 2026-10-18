@@ -1,8 +1,8 @@
 # API documentation verification — 2026-10-18
 
-These results apply to the local checkout. Nothing was published, deployed or
-submitted to the model evaluation harness. The GitHub workflow is configured;
-no remote CI result is claimed.
+The build/test results below apply to the local checkout at preparation time.
+Publication verification is recorded separately below. The GitHub workflow is
+configured; no remote CI result is claimed and no model evaluation was resumed.
 
 | Package | Public export names | Public/protected member inventory, including inheritance | Missing reference entries | Compiled JSDoc examples |
 | --- | ---: | ---: | ---: | ---: |
@@ -66,7 +66,7 @@ Reproduce the local checks with the commands in [README](README.md).
 
 ## Patch-version preparation — 2026-10-18
 
-Core 2.5.5, Game 2.0.1 and UI 3.6.1 are prepared locally and not published.
+At preparation time Core 2.5.5, Game 2.0.1 and UI 3.6.1 were not yet published.
 Their manifests, READMEs, dated changelogs, context identities and generated API
 version metadata are synchronized. All dependency sections, locks and other
 package versions remain unchanged. Documentation adoption requires no consumer
@@ -82,3 +82,74 @@ A preparation snapshot compares 32 manifests/lockfiles: only the three requested
 manifest version fields changed. Against the original API-work source snapshot,
 all 265 source files retain identical non-comment ASTs; 60 files have comment-only
 changes across the complete documentation work. `git diff --check` passes.
+
+## Publication and UI workflow follow-up — 2026-10-18
+
+Registry latest, exact-version metadata, downloaded tarball SHA-512 integrity
+and all 8,277 API files are verified for Core 2.5.5, Game 2.0.1 and UI 3.6.1.
+The API files match d081f6a, Core's game guide is present, and no engine src/
+directory is shipped. See [publication history](../../docs/release-history.md#api-documentation-patches--2026-10-18).
+
+The new UI authoring guide and ScoreHUD recipe are repository-only additions
+after publication. Their four exact TS/XML fences are validated in an isolated
+project using downloaded registry Core 2.5.5/UI 3.6.1/CLI 3.6.0, with existing
+tool dependencies linked rather than installed/upgraded. CLI-generated theme,
+custom namespace and typed parts are checked in development and release modes.
+Strict source checking uses the game template's skipLibCheck=true.
+
+The initial full declaration check with published CLI 3.6.0 reproduced TS2610:
+generated ScoreHUD.skinParts was a property over Component's accessor. The
+unreleased generator repair is recorded below. The API tool's independent 19
+JSDoc samples use skipLibCheck=false and are separate from this generated
+project case.
+Browser behavior for the recipe must be verified in a host game's startup flow.
+
+## CLI declaration fix — 2026-10-18 (unreleased)
+
+The CLI generator now narrows host skinParts through a getter signature. The
+compiler-based regression first reproduced TS2610 for four host discovery paths:
+generic, explicit skinName, naming convention and configured component pair.
+It now passes with strict=true and skipLibCheck=false, while separately checking
+that incorrect value types, missing parts and readonly replacement still fail.
+The test uses a minimal public getter contract to keep CLI tests independent
+of Core/UI development dependencies.
+
+The original complete ScoreHUD recipe is also rebuilt with the corrected CLI
+checkout against the downloaded published Core 2.5.5/UI 3.6.1 packages. Both
+development and release output pass `tsc --noEmit --skipLibCheck false`, with
+the generated namespace, theme mapping and typed parts retained. No Core/UI
+implementation or package/dependency/lock change is made; published CLI 3.6.0
+still has the original defect until a later release includes this fix.
+
+CLI build passes, and `pnpm --dir packages/cli test --maxWorkers=1` passes all
+23 files / 114 tests. Initial sandbox execution blocked seven local-server
+tests; with localhost access, parallel execution passed 112/114 but two watcher
+tests timed out. The serial run retains their original assertions/timeouts and
+passes the whole suite. All 278 protected Core/UI source and package-manifest/
+lock snapshots remain unchanged. `git diff --check` passes; nothing is published.
+
+## UI 3.6.2 / CLI 3.6.1 preparation — 2026-10-18
+
+Only UI and CLI package versions change, to 3.6.2 and 3.6.1. All dependency
+declarations/locks and Core/UI implementation sources remain unchanged. Earlier
+unreleased checks above describe the preceding snapshot; neither new version
+has been published. See [dependency impact](../../docs/api-documentation.md#ui-362-and-cli-361-authoring-patches).
+
+- UI/CLI builds pass. UI passes 38 files / 371 tests; CLI passes 23 files /
+  114 tests with maxWorkers=1 and localhost test access, without changing any
+  assertions or timeouts. The declaration regression covers four host paths.
+- API-tool tests pass 6/6. Regeneration/check records Core 167 exports / 2,152
+  members, Game 33 / 480 and UI 88 / 4,979, with zero missing references.
+  The 19 extracted examples pass strict compilation against built and packed
+  declarations. Packed API counts remain 2,552 / 560 / 5,165; UI pages identify
+  3.6.2 and Core/Game references are unchanged. Existing JSDoc gaps are unchanged.
+- Offline local tarballs contain UI's new authoring/ScoreHUD guides and CLI's
+  game/empty README/AGENTS entries plus the getter declaration fix. An isolated
+  project uses those exact packed docs/templates and published Core 2.5.5, with
+  existing tool dependencies linked rather than installed or upgraded. All four
+  recipe fences compile in development/release modes with skipLibCheck=false;
+  namespace resolution, exact part types and generated theme mapping pass.
+  No engine source is present in that project. Browser acceptance remains a
+  host-game responsibility; no agent evaluation or publication is run.
+- `git diff --check` passes. Other SDK versions and consumer installations retain
+  their baselines; new guide adoption and CLI regeneration are explicit choices.

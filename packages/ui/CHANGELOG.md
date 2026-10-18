@@ -4,9 +4,41 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.6.2] — 2026-10-18
+
+Prepared locally; not published. Documentation-only patch over 3.6.1.
+
+### Documentation
+
+- Add standard game UI authoring and project-directory conventions, plus a
+  complete ScoreHUD TS/Skin pair with lifecycle and controller cleanup. These
+  guides ship under docs/ in this version; published 3.6.1 lacks them.
+- Record published package verification and correct the architecture baseline.
+- Document CLI 3.6.1's skinParts declaration fix and full declaration checks.
+
+### Compatibility
+
+- Runtime implementations, types, exports and KUI/resource formats are unchanged.
+  Core peer/dev requirements remain ^2.5.2 with registry 2.5.3 in the existing lock.
+- ui-runtime's UI ^3.4.0 already accepts 3.6.2. No dependent SDK release,
+  dependency-range update or application migration is required. Installing this
+  patch for bundled guides is optional after publication.
+
+### Verification
+
+- Build and all 371 unit tests pass with the unchanged registry Core 2.5.3 lock.
+- API coverage/version checks pass with zero missing declarations; 19 extracted
+  Core/Game/UI examples compile against built and packed SDK declarations.
+- The packed UI 3.6.2 guides and CLI 3.6.1 template compile the exact ScoreHUD
+  recipe against published Core 2.5.5 in development/release modes, with strict
+  TypeScript and skipLibCheck=false, without engine source. Browser acceptance
+  remains a host-game check. No Core/UI implementation or dependency lock changes.
+
 ## [3.6.1] — 2026-10-18
 
-Prepared locally; not published. Documentation-only patch over 3.6.0.
+Published; verified on npm on 2026-10-18, including latest, tarball integrity
+and bundled API references matching the tested commit. Documentation-only patch
+over 3.6.0.
 
 ### Documentation
 

@@ -1,6 +1,6 @@
 # CollectionEventKind
 
-Package: `@kurot/ui@3.6.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
 
 ```ts
 CollectionEventKind: { ADD: "add"; MOVE: "move"; REFRESH: "refresh"; REMOVE: "remove"; REPLACE: "replace"; RESET: "reset"; UPDATE: "update" };

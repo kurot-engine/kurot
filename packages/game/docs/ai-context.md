@@ -1,16 +1,16 @@
 # @kurot/game — AI context map
 
 For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
-These generated docs and docs/ packaging are included in the prepared Game 2.0.1
-documentation patch, not a registry Game 2.0.0 change. The patch is not published;
-runtime code, signatures, exports and dependency requirements are unchanged.
+Game 2.0.1 is published, verified on npm on 2026-10-18 with its API reference and
+docs/ packaging. Registry Game 2.0.0 remains unchanged. Runtime code, signatures,
+exports and dependency requirements are unchanged.
 
 Read this before exploring `src/`. It is a compressed map so an agent
 unfamiliar with Kurot does not need to re-derive the architecture from
 scratch each session. It describes the current source and public exports;
 internal plans and reviews are not required context.
 
-Package identity: `@kurot/game@2.0.1`, prepared but not published. Peer-depends on `@kurot/core@^2.0.0`.
+Package identity: `@kurot/game@2.0.1`, published. Peer-depends on `@kurot/core@^2.0.0`.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` groups exports into
 tween / display / particle / net — see §4.

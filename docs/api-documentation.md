@@ -1,8 +1,8 @@
 # Public API reference and package distribution
 
-Core, Game and UI carry generated API references under `docs/api/` in prepared
-patches Core 2.5.5, Game 2.0.1 and UI 3.6.1. None of these patches is published;
-existing registry artifacts have not been replaced.
+Published Core 2.5.5, Game 2.0.1 and UI 3.6.1 carry generated API references under
+`docs/api/`. npm latest, downloaded tarball integrity and every bundled API file
+were verified on 2026-10-18. Older version artifacts retain their original files.
 
 | Package | Read by capability | Look up a symbol |
 | --- | --- | --- |
@@ -17,6 +17,14 @@ The game authoring guide and complete examples explain composition/lifecycle;
 the API reference gives exact signatures, overloads, defaults and available
 JSDoc. A consumer needs installed runtime code, public declarations and docs;
 engine source is not required for these lookups.
+
+For standard UI production, use [UI authoring](../packages/ui/docs/ui-authoring.md)
+and its [paired ScoreHUD recipe](../packages/ui/docs/recipes/score-hud.md).
+They add the missing directory/workflow layer above the API reference and are
+bundled in prepared UI 3.6.2 (not published). CLI 3.6.1 supplies scaffold entry
+docs. Keep a short project README/AGENTS entry pointing at the selected workflow,
+installed versions and relevant member
+pages; providing all API pages or engine source in each prompt is unnecessary.
 
 The reference follows public entry points, not every file exported somewhere
 inside the repository. Public and protected members include inherited contracts.
@@ -66,7 +74,7 @@ The three patch versions are for distributing the reference, JSDoc and guides;
 Game also adds its previously omitted docs/ package allowlist. They do not add
 runtime requirements or fix implementation behavior.
 
-| Consumer | Required migration | Optional adoption after publication |
+| Consumer | Required migration | Optional installed adoption |
 | --- | --- | --- |
 | UI/Game/DragonBones and compatible Spine Core peers | None; existing Core ranges accept 2.5.5 | Install the Core patch for its bundled docs |
 | ui-runtime Core/UI peers | None; ^2.4.0 / ^3.4.0 accept the patches | Refresh its development locks separately if desired |
@@ -76,6 +84,30 @@ runtime requirements or fix implementation behavior.
 | CLI templates | No template change; latest placeholders stay unchanged | Future create commands resolve the then-published registry versions |
 | CLI, ui-document, bitmap-font and Atlas | None | No release or dependency change required |
 
-Existing games may read repository docs without upgrading their runtime. Only
-Core/Game/UI source versions change here; all dependency declarations, SDK/app
-locks and other package versions retain their existing values.
+Existing games may read repository docs without upgrading their runtime. The original
+documentation release changed only Core/Game/UI source versions. Dependency
+declarations and SDK/app locks remain unchanged by these patches.
+
+## UI 3.6.2 and CLI 3.6.1 authoring patches
+
+Both versions are prepared locally on 2026-10-18 and have not been published.
+UI distributes the standard directory/workflow guide and complete ScoreHUD
+recipe. CLI distributes template README/AGENTS entries and corrects generated
+host skinParts declarations for skipLibCheck=false. Core/UI implementations,
+public exports and all dependency ranges/locks are unchanged.
+
+| Consumer | Required compatibility migration | Optional adoption after publication |
+| --- | --- | --- |
+| UI Core peer/dev ^2.5.2 | None; guides add no runtime API | Keep existing Core 2.5.3 development lock |
+| CLI ui-document ^0.13.0 | None; generator fix needs no new kernel API | Keep existing document 0.13.0 lock |
+| ui-runtime UI peer/dev ^3.4.0 | None; already accepts UI 3.6.2 | Update its UI development lock only when selected |
+| examples/game UI ^3.1.0, CLI ^3.3.1; examples/demo CLI ^3.3.1 | None; ranges already accept these patches | Update installations/locks and rebuild if adopting |
+| Star Catcher CLI exact 3.3.1 and application exact pins | None for existing behavior | Change the exact CLI pin and lock only when adopting the declaration fix |
+| Kurot-Studio CLI exact 3.6.0 | None for existing behavior; inspected separately | Update its CLI pin/lock and rebuild to adopt the generator fix or template entries |
+| CLI game/empty templates | No dependency placeholder changes | create resolves published versions; new entries do not retrofit existing games |
+| Core, Game, DragonBones, ui-document, bitmap-font, Atlas and Spine adapters | None; no UI/CLI dependency needs migration | No SDK release required |
+
+To obtain the declaration correction, a project must install CLI 3.6.1 or later
+and rebuild `.kurot/skin-parts.d.ts`; updating UI alone does not change generated
+declarations. To read the bundled UI guides, install UI 3.6.2 or use the
+repository copy. Neither adoption requires raising the engine's peer minimum.

@@ -13,6 +13,41 @@ Earlier Core/text/style records: [early 2.x history](release-history-early-2x.md
 
 ## Recorded releases and adoption
 
+### UI authoring and CLI declaration patches — 2026-10-18 (prepared)
+
+UI 3.6.2 and CLI 3.6.1 are prepared locally and are not published. UI adds the
+standard production workflow, directory conventions and complete ScoreHUD recipe.
+CLI adds template README/AGENTS navigation and getter-based host skinParts
+declarations compatible with skipLibCheck=false. Runtime Skin output and
+Core/UI implementations are unchanged. Existing SDK dependency ranges accept
+these patches; no dependency lock or other package version changes. Projects
+adopt CLI installation/lock updates and rebuild explicitly after publication.
+See [dependency impact](api-documentation.md#ui-362-and-cli-361-authoring-patches)
+and [verification](../tools/api-docs/VERIFICATION.md).
+
+### API documentation patches — 2026-10-18
+
+Published versions and their registry latest tags were verified on 2026-10-18:
+
+| Registry version | Bundled API files | Checked content |
+| --- | ---: | --- |
+| [Core 2.5.5](https://registry.npmjs.org/@kurot%2fcore/2.5.5) | 2,552 | API reference and game-authoring guide |
+| [Game 2.0.1](https://registry.npmjs.org/@kurot%2fgame/2.0.1) | 560 | API reference and public docs/ packaging |
+| [UI 3.6.1](https://registry.npmjs.org/@kurot%2fui/3.6.1) | 5,165 | API reference and JSDoc examples |
+
+All three downloaded tarballs pass their registry SHA-512 integrity check.
+Every API file matches commit d081f6a byte-for-byte; each archive includes public
+declarations and excludes engine src/. No consumer source, peer minimum or
+dependency lock change is required to read these references. These checks do
+not update application installations or publish any further package.
+
+The standard UI authoring guide and ScoreHUD recipe were added to the repository
+after UI 3.6.1 publication, so they are not inside that archive. Published CLI
+3.6.0 remains latest at this check, and its downloaded game template contains
+neither the newly added README nor AGENTS.md. Those future template docs need a
+separate CLI release to reach new scaffolds; existing projects need their own
+instruction entry. The CLI download also passes its registry integrity check.
+
 Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, package
 download, registry integrity and all 628 generated files matching the tested
 build. It fixes continuous

@@ -7,17 +7,53 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## Unreleased
+## 3.6.1 — 2026-10-18
 
-### Documentation — 2026-10-18
+Prepared locally; not published.
+
+### Fixed
+
+- Emit getter signatures when narrowing host skinParts in generated module
+  augmentations, preserving Component's accessor contract. This fixes TS2610
+  with skipLibCheck=false without changing runtime Skin output or Core/UI.
+- Add compiler regression coverage for generic, explicitly named, conventionally
+  named and configured reusable hosts. Preserve exact part types and read-only
+  access; reject wrong values, unknown parts and attempted replacement.
+
+### Documentation
 
 - Add project README/AGENTS navigation to both templates, using installed SDK
   guides/types and explicit build/browser verification boundaries.
-- Route gameplay tasks to the unreleased Core quick guide and repository Star
+- Route gameplay tasks to Core's quick guide (published in 2.5.5) and repository Star
   Catcher reference when available, with installed README/types as the fallback.
+- Link installed UI 3.6.2's standard UI workflow and complete ScoreHUD example
+  for directory/TS–Skin conventions, with fallbacks for older installations.
 - Correct gallery instructions for its installed Core 2.5.4 and older CLI lock;
   source-engine trials remain optional maintenance tooling.
-- Package versions and dependency ranges/locks are unchanged; not published.
+
+### Compatibility and adoption
+
+- Command/configuration APIs, KUI format and runtime Skin output are unchanged.
+  ui-document remains ^0.13.0, locked to registry 0.13.0; no Core/UI dependency
+  or other dependency/lock update is added.
+- To receive the declaration correction after publication, update the project's
+  CLI installation/lock and rebuild to regenerate .kurot/skin-parts.d.ts.
+  Published 3.6.0 keeps the old property form. Core/UI runtime upgrades are not
+  required for this fix; existing compatible application ranges remain valid.
+- New scaffolds receive README/AGENTS entries. Existing games retain their own
+  instructions, resources and directories. Template latest placeholders remain
+  unchanged; UI 3.6.2 is needed only to read the new bundled UI guides.
+
+### Verification
+
+- Build and all 23 test files / 114 tests pass with maxWorkers=1, including
+  compiler checks for four host discovery paths and rejected invalid part access.
+  Serial execution avoids existing parallel watcher timing failures.
+- Packed CLI 3.6.1 contains both templates' README/AGENTS entries and the fixed
+  generator. Its game template and the packed UI 3.6.2 ScoreHUD example pass
+  development/release builds and strict tsc --noEmit --skipLibCheck false against
+  published Core 2.5.5 without engine source. Runtime browser behavior is not
+  revalidated for this declaration/documentation patch.
 
 ## 3.6.0 — 2026-10-10
 

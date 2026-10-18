@@ -1,6 +1,6 @@
 # flexChildrenProportionally
 
-Package: `@kurot/ui@3.6.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
 
 ```ts
 protected flexChildrenProportionally(spaceForChildren: number, spaceToDistribute: number, totalPercent: number, childInfoArray: ChildInfo[]): void;

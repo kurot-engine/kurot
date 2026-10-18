@@ -8,13 +8,20 @@ Core 2.5.0 is also published and verified; new game scaffolds resolve Core ^2.5.
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.6.0 (published).** Requires `@kurot/ui-document@^0.13.0`
+> **Current version: 3.6.1 (prepared; not published).** Requires `@kurot/ui-document@^0.13.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
 > Existing game projects that use EXML should remain on
 > `@kurot/cli@1.3.x`. The KUI toolchain is not an in-place project upgrade and does
 > not require those projects to change their configuration or UI assets.
+
+Version 3.6.1 fixes generated host skinParts declarations for full TypeScript
+checks with skipLibCheck=false and ships README/AGENTS entries in both templates.
+The game entry links UI 3.6.2's authoring/directory guide and complete ScoreHUD
+recipe. Runtime Skin output, dependency ranges and locks are unchanged. After
+publication, existing projects adopt the fix by updating their CLI installation/
+lock and rebuilding; new template docs do not overwrite existing project files.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 
@@ -106,10 +113,11 @@ resource loading, and an editable HTML template. Fonts load before creating UI;
 translations register after preload. The `empty` template contains a minimal
 `Sprite` application without UI/style/language dependencies.
 
-The unreleased checkout adds project README and AGENTS files to both templates.
+CLI 3.6.1 adds project README and AGENTS files to both templates.
 They route gameplay work to installed SDK guides/types, document startup and
 build checks, and distinguish authored files from generated output. Published
-CLI 3.6.0 templates are unchanged until a new release is explicitly prepared.
+CLI 3.6.0 templates retain their original contents. Existing project files are
+not overwritten when adopting the new CLI.
 
 CLI 3.6.0 supplies rounded Kurot-owned textures,
 native `.kui.xml` component states and resource-default nine-slice grids under
@@ -231,7 +239,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-Current CLI 3.6.0 uses published `@kurot/ui-document@^0.13.0` and retains its literal-string XML rules.
+CLI 3.6.0/3.6.1 uses published `@kurot/ui-document@^0.13.0` and retains its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -256,6 +264,12 @@ Successful compilation also writes `.kurot/skin-parts.d.ts`. Every identified
 node inside the Skin is inferred as a skin part; its `id` is the part
 name. The declaration augments the UI runtime with those exact names and types.
 This file is editor-only, ignored by git, and never enters browser bundles.
+
+CLI 3.6.1 emits a getter for each host's narrowed skinParts,
+matching Component's accessor and supporting `tsc --noEmit --skipLibCheck false`.
+Published CLI 3.6.0 emits a readonly property and can fail with TS2610. Rebuild
+using the fixed CLI to regenerate declarations; Core/UI and project dependency
+requirements are unchanged. Generated runtime Skin factories are unaffected.
 
 ## Reusable components
 
@@ -369,6 +383,6 @@ than selecting a different preset. Missing presets, unsupported selection or
 invalid configuration fail explicitly. Expansion runs after resource defaults
 and before color resolution. It does not load fonts or measure text.
 
-Current CLI 3.6.0 uses published ui-document 0.13.0 without local overrides. CLI
+CLI 3.6.0/3.6.1 uses published ui-document 0.13.0 without local overrides. CLI
 3.2.1 does not include this feature. Existing projects are not migrated.
 See [the shared contract](../ui-document/docs/project-styles.md).

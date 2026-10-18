@@ -59,10 +59,11 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 	lines.push('\t}', '}', '');
 
 	for (const host of hosts) {
+		// Preserve Component's accessor kind when narrowing the inherited member.
 		lines.push(
 			`declare module ${JSON.stringify(host.module)} {`,
 			`\tinterface ${host.className} {`,
-			`\t\treadonly skinParts: import("@kurot/ui").SkinPartsOf<${JSON.stringify(host.skinName)}>;`,
+			`\t\tget skinParts(): import("@kurot/ui").SkinPartsOf<${JSON.stringify(host.skinName)}>;`,
 			'\t}',
 			'}',
 			'',

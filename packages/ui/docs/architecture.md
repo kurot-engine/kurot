@@ -1,7 +1,10 @@
 # @kurot/ui architecture
 
-> Package version: 3.5.0 (published), with peerDependency `@kurot/core: ^2.4.0`.
-> Development installs published Core 2.4.0 with a matching registry lockfile.
+For production game UI and project directories, use
+[standard authoring](ui-authoring.md); this document explains engine internals.
+
+> Package version: 3.6.2 (prepared; not published), with peerDependency `@kurot/core: ^2.5.2`.
+> Development retains published Core 2.5.3 with its existing registry lockfile.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology

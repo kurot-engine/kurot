@@ -4,9 +4,10 @@ Project-owned style/font/language initialization was introduced in CLI 3.2.1
 and remains in published CLI 3.6.0. Existing projects keep their own startup
 code and HTML; the empty template stays minimal.
 
-## Project documentation (unreleased)
+## Project documentation in 3.6.1
 
-Both checkout templates include a project README and a short AGENTS entry.
+CLI 3.6.1 includes a project README and short AGENTS entry in both templates.
+This version is prepared locally and has not been published.
 They identify the gameplay entry, commands, expected startup, generated files
 and task-specific guides in installed SDK packages. Read the consumer project's
 manifest, lock and installation for its actual versions. These additions are
@@ -14,6 +15,13 @@ not in the already published CLI 3.6.0 artifact and do not rewrite existing game
 For gameplay, the entries point to Core's game-authoring guide when installed,
 or the Star Catcher reference in an engine checkout; older packages retain their
 README/type-declaration fallback.
+
+The [standard UI guide](../../ui/docs/ui-authoring.md), bundled in UI 3.6.2, adds
+directory, TS/Skin pairing and lifecycle rules above the API reference, with a
+complete HUD recipe. The game README points at its installed copy. UI 3.6.2 and
+CLI 3.6.1 are separate packages: installing UI supplies the guides, while using
+the new CLI for create supplies template entry docs. Existing projects keep
+their own instructions and can add the links explicitly.
 
 ## Files
 

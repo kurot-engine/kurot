@@ -5,11 +5,18 @@ check affected consumers, not an instruction to bump every consumer version.
 Refreshing a development lockfile is maintenance; publishing a changed runtime
 or a changed compatibility requirement is a release.
 
-Core 2.5.5, Game 2.0.1 and UI 3.6.1 are prepared, unpublished documentation
-patches. Runtime APIs and dependency requirements are unchanged. See
+Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches, verified
+on npm on 2026-10-18. Runtime APIs and dependency requirements are unchanged. See
 [documentation patch adoption](api-documentation.md#documentation-patch-adoption)
 for required migrations (none), optional installed/locked adoption and unaffected
 packages. No dependent SDK release or application update is implied.
+
+UI 3.6.2 and CLI 3.6.1 are prepared locally (not published) for UI authoring
+guides, template instruction entries and the CLI skinParts declaration fix.
+No SDK dependency range or lock update is required. Projects adopting the fix
+update their CLI installation/lock and regenerate declarations after publication;
+UI 3.6.2 supplies the new guides without an engine API requirement. See the
+[consumer classification](api-documentation.md#ui-362-and-cli-361-authoring-patches).
 
 ## Package graph
 

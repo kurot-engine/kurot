@@ -1,5 +1,9 @@
 # Kurot UI Authoring Architecture
 
+For the current game UI workflow and directory conventions, read
+[standard UI authoring](packages/ui/docs/ui-authoring.md). This document keeps
+the semantic architecture and roadmap separate from that production recipe.
+
 This document records UI authoring ownership and the longer-term collaboration
 design. The implementation snapshot in section 3 was audited on 2026-10-10;
 later workflow and roadmap sections describe the broader target where it is

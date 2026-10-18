@@ -1,8 +1,8 @@
 # Make a game with Kurot
 
-This guide is for game authors and models using the public SDK. It is an
-unreleased documentation addition, verified against registry Core 2.5.4; that
-published artifact does not yet include this file. Read installed declarations
+This guide is for game authors and models using the public SDK. It ships since
+Core 2.5.5 and uses APIs verified on Core 2.5.4/2.5.5. The older
+2.5.4 package does not include this file. Read installed declarations
 for APIs, then open only the topic guides needed by the current task.
 
 ## 1. Establish the project and its baseline
@@ -22,6 +22,12 @@ reproduction and preserve the chosen SDK versions while developing gameplay.
 
 CLI-compiled skins run through UI without ui-runtime. ui-document is headless;
 the game starter uses it for project styles, not as a rendering engine.
+
+For authored game UI, use the repository's
+[standard UI workflow](../../ui/docs/ui-authoring.md), including its directory
+map and paired ScoreHUD example. Those new guides postdate UI 3.6.1; use the
+repository copy until a later package includes them. The installed UI API
+reference remains the source for exact methods and properties.
 
 For a complete reference in an engine checkout, read
 [Star Catcher](../../../examples/star-catcher/README.md) and run its `pnpm check`.

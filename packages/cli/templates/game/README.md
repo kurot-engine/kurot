@@ -18,6 +18,7 @@ Refresh the browser manually after a successful rebuild.
 
 ```sh
 pnpm build
+pnpm exec tsc --noEmit --skipLibCheck false
 pnpm release
 ```
 
@@ -25,6 +26,8 @@ Development output is `bin-debug/`; release output is
 `bin-release/web/<timestamp>/`. Serve the generated directory over HTTP for
 browser checks. `pnpm clean` removes both output trees.
 
+The full declaration check requires CLI >= 3.6.1 for generated host skinParts;
+rebuild after adopting it. Use the project's installed TypeScript compiler.
 The CLI transpiles with esbuild; a successful build does not establish complete
 TypeScript type correctness or gameplay behavior. Check console errors, resource
 requests and the intended interactions in the browser.
@@ -48,10 +51,19 @@ requests and the intended interactions in the browser.
 
 ## Read only what the task needs
 
+For UI creation, read [standard UI authoring](node_modules/@kurot/ui/docs/ui-authoring.md)
+and the [complete ScoreHUD pair](node_modules/@kurot/ui/docs/recipes/score-hud.md).
+They specify the project tree above, typed component/Skin pairing and caller-owned
+cleanup, and ship since UI 3.6.2. If an older installation lacks them, use that
+version's README/types or the engine checkout's `packages/ui/docs/` guides when
+available; verify APIs against the installed version.
+Keep any game-specific variations in this project's README/AGENTS rather than
+re-reading engine source for ordinary UI tasks.
+
 For gameplay, use Core's `docs/game-authoring.md` when available. In an engine
 checkout, it links `examples/star-catcher`, a complete game with `pnpm check`.
-Both are unreleased additions; published Core 2.5.4 does not contain the guide,
-so use installed README/types as the fallback.
+The game guide ships since Core 2.5.5; Star Catcher is repository content.
+Older installed packages retain the README/type-declaration fallback.
 
 After installation, choose the relevant guide:
 
@@ -60,6 +72,8 @@ After installation, choose the relevant guide:
 | Startup, display and input APIs | [Core README](node_modules/@kurot/core/README.md) |
 | Resource loading | [Resource guide](node_modules/@kurot/core/docs/resource.md) |
 | Tween/MovieClip | [Game README](node_modules/@kurot/game/README.md) |
+| UI workflow, directories and cleanup | [UI authoring](node_modules/@kurot/ui/docs/ui-authoring.md) (UI >= 3.6.2) |
+| Complete TS/Skin pair | [ScoreHUD](node_modules/@kurot/ui/docs/recipes/score-hud.md) (UI >= 3.6.2) |
 | HUD, controls and skin lifecycle | [UI README](node_modules/@kurot/ui/README.md) |
 | KUI/build commands | [CLI README](node_modules/@kurot/cli/README.md) |
 | Fonts, colors and language startup | [Template guide](node_modules/@kurot/cli/docs/game-template.md) |

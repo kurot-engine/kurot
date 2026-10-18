@@ -41,8 +41,8 @@ browser console, resource requests and intended interactions.
 
 For gameplay, read Core's `docs/game-authoring.md` when the installed package
 includes it. In an engine checkout, that guide links `examples/star-catcher`,
-a complete game with `pnpm check`. These are unreleased additions and the guide
-is absent from published Core 2.5.4; use installed README/types as the fallback.
+a complete game with `pnpm check`. The guide ships since Core 2.5.5; Star Catcher
+is repository content. Older installations can use their README/types instead.
 
 After installation, start with [Core usage](node_modules/@kurot/core/README.md).
 Use [resources](node_modules/@kurot/core/docs/resource.md),

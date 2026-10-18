@@ -14,7 +14,11 @@ Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
   use its own README/AGENTS and installed SDK docs/types; source may be absent.
 - **Look up an API:** start with Core/Game/UI `docs/api/topics.md`, then read
   only the needed symbol/member pages. Use the installed package's version;
-  generated API docs in this checkout have not been published yet.
+  Core 2.5.5, Game 2.0.1 and UI 3.6.1 include the generated reference.
+- **Make game UI:** read [standard UI authoring](packages/ui/docs/ui-authoring.md)
+  for directory/TS–Skin pairing, layout, startup and teardown; use its
+  [ScoreHUD recipe](packages/ui/docs/recipes/score-hud.md) for a complete pair.
+  These guides ship in prepared UI 3.6.2; CLI 3.6.1 adds template entry docs.
 - **Change a dependency or plan a release:** read
   [dependency policy](docs/dependency-policy.md). When asked to bump or prepare
   a package version, complete the [version checklist](docs/release-checklist.md).
@@ -31,18 +35,22 @@ its runtime baseline. Package versions are independent.
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
 | `@kurot/core` | 2.5.5 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
-| `@kurot/ui` | 3.6.1 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
+| `@kurot/ui` | 3.6.2 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 2.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
-| `@kurot/cli` | 3.6.0 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
+| `@kurot/cli` | 3.6.1 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.13.1 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime` | 0.10.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
 | `@kurot/atlas` | 0.1.0 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
 | `@kurot/dragonbones` | 0.1.0 | DragonBones 5.7 runtime and native adapter | [context](packages/dragonbones/docs/ai-context.md) |
 | `@kurot/bitmap-font` | 0.1.0 | Headless font parsing, validation and layout | [context](packages/bitmap-font/docs/ai-context.md) |
 
-Core 2.5.5, Game 2.0.1 and UI 3.6.1 prepare the API-documentation patches;
-they have not been published. Runtime implementations, exports and dependency
-ranges are unchanged; consumer adoption is optional after publication.
+Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches,
+verified on npm on 2026-10-18; bundled API docs match the tested commit. Runtime
+implementations, exports and dependency ranges are unchanged. Adoption is optional.
+
+UI 3.6.2 and CLI 3.6.1 are prepared locally, not published. They distribute UI
+authoring guides/template entries and fix CLI host declarations for skipLibCheck=false.
+No dependency ranges or locks change; Core/UI runtime implementations are unchanged.
 
 Dependency direction is one-way. Core depends on bitmap-font. UI, Game and
 DragonBones use Core peers. CLI depends on ui-document and runs only at build

@@ -7,7 +7,7 @@ registry lockfile, without local overrides. Read
 [centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. Version `@kurot/cli@3.6.0` is published, runs on Node.js 20+,
+explains the plugin pipeline. Version `@kurot/cli@3.6.1` is prepared locally (not published), runs on Node.js 20+,
 and is installed as a project dev dependency.
 
 ## Directory map
@@ -32,8 +32,8 @@ src/
 ```
 
 Project templates are under `templates/game` and `templates/empty`.
-Both checkout templates now include README/AGENTS consumer navigation; this
-documentation addition is unreleased. See [game-template.md](game-template.md).
+CLI 3.6.1 includes README/AGENTS consumer navigation in both templates; its
+game entry links the new UI 3.6.2 authoring guide and complete ScoreHUD recipe. See [game-template.md](game-template.md).
 The CLI 3.6.0 game template's default KUI skin refresh includes 16 native Skin files,
 a Kurot-owned 2× atlas with logical resource-default nine-slice grids, and project palette
 colors. These replace the old EUI assets. Group/List/TabBar and text/image nodes use
@@ -106,6 +106,11 @@ as the part name. Internal nodes can omit `id`; the declaration augments
 `SkinPartsMap` and narrows matching exported
 component classes. The file is development metadata and is excluded from
 runtime output.
+
+CLI 3.6.1 narrows host `skinParts` through a getter signature,
+preserving Component's accessor kind under `skipLibCheck=false`. Published CLI
+3.6.0 instead emits a readonly property and can report TS2610. Regenerate with
+the fixed CLI; do not change Core/UI or hand-edit the generated declaration.
 
 ## Reusable components
 

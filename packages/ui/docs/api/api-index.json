@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "symbols": [
     {
       "name": "AddItems",

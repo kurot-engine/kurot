@@ -4,9 +4,18 @@ All notable changes to `@kurot/game` are documented here.
 
 ---
 
+## Unreleased
+
+### Documentation — 2026-10-18
+
+- Record 2.0.1 publication and correct installation/docs-distribution status.
+  Runtime, public signatures and dependency requirements remain unchanged.
+
 ## [2.0.1] — 2026-10-18
 
-Prepared locally; not published. Documentation-only patch over 2.0.0.
+Published; verified on npm on 2026-10-18, including latest, tarball integrity
+and bundled API references matching the tested commit. Documentation-only patch
+over 2.0.0.
 
 ### Documentation
 

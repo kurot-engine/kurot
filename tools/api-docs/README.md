@@ -74,5 +74,11 @@ then the needed symbol and member pages. `api-index.json` maps names to paths;
 declarations remain the fallback for older releases that lack generated docs.
 
 The generated Markdown is committed and covered by existing `docs/**/*` package
-allowlists. Registry artifacts already published under the displayed SDK
-versions remain unchanged until a separately authorized future release.
+allowlists. Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published with their API files,
+verified on 2026-10-18. Later documentation edits need a new release to appear
+in npm; existing published archives are immutable.
+
+UI 3.6.2 is prepared locally with a regenerated version-matched API reference
+and the standard UI authoring/ScoreHUD guides. CLI 3.6.1 is prepared for template
+entry documentation and corrected host declarations. Neither is published;
+dependency ranges and SDK/application locks remain unchanged.

@@ -10,18 +10,25 @@ See [Label layout](docs/label-text-layout.md) for behavior and adoption.
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.6.1 (prepared, not published).** Documentation-only patch over 3.6.0. Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.6.2 (prepared; not published).** Documentation-only patch over 3.6.1. Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
 
-## API reference in 3.6.1 (not published)
+## API reference in 3.6.1
 
 Start with [API topics](docs/api/topics.md) or the [symbol index](docs/api/index.md),
 then open only the relevant widget/member pages. Public and protected extension
 contracts are labeled separately; [coverage](docs/api/coverage.md) records
 remaining behavioral-comment gaps. These generated docs and strict-compiled
-examples are included in the prepared 3.6.1 patch, not changes to the published
-3.6.0 artifact. Runtime code, signatures and exports are unchanged. The Core
-peer/dev range remains ^2.5.2; ui-runtime's UI ^3.4.0 peer already accepts 3.6.1.
+examples are included in published UI 3.6.1; the 3.6.0 artifact remains unchanged.
+Runtime code, signatures and exports are unchanged. The Core
+peer/dev range remains ^2.5.2; ui-runtime's UI ^3.4.0 peer already accepts 3.6.2.
 No dependent release, raised minimum or application migration is required.
+
+For building game UI, start with [standard authoring](docs/ui-authoring.md) and
+the [complete ScoreHUD pair](docs/recipes/score-hud.md). They define project
+directories, editable XML versus component/controller ownership, typed parts
+and cleanup. These guides are bundled in prepared UI 3.6.2; published 3.6.1
+contains API references but lacks these additions. CLI 3.6.1 fixes generated
+host declarations for `tsc --noEmit --skipLibCheck false`; the UI runtime is unchanged.
 
 Outlined Label sizes and line breaks can change, including without `textFit`;
 Scroller viewports need no extra configuration. Keep explicit top alignment for
@@ -145,17 +152,18 @@ metrics even if the family name is unchanged.
 
 See the [text layout and fitting contract](docs/label-text-layout.md). Fitting
 metadata was introduced in document 0.9.0 and remains supported in 0.13.0.
-Current CLI 3.6.0 and runtime 0.10.0 use document `^0.13.0`.
+CLI 3.6.0/3.6.1 and runtime 0.10.0 use document `^0.13.0`.
 Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`. Programmatic UI depends
 only on Core.
 
 ## Installation
 
-Until 3.6.1 is published, install the recorded published baseline below and read
-the new API reference from the repository. Existing dependency locks are unchanged.
+UI 3.6.1 is published with the API reference. UI 3.6.2 is prepared for the new
+authoring guides and is not yet available from npm. After publication, optionally
+install it as below; the Core minimum and existing dependency locks are unchanged.
 
 ```bash
-pnpm add @kurot/ui@^3.6.0 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^3.6.2 @kurot/core@^2.5.2
 ```
 
 `@kurot/ui` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.

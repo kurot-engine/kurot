@@ -1,6 +1,6 @@
 # @kurot/ui API
 
-Version: **3.6.1**. Read the installed package's matching documentation.
+Version: **3.6.2**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).

@@ -1,6 +1,6 @@
 # dispatchEventWith
 
-Package: `@kurot/ui@3.6.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
 
 ```ts
 dispatchEventWith(type: string, bubbles?: boolean, data?: unknown, cancelable?: boolean): boolean;

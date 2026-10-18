@@ -12,6 +12,13 @@ fallback limitations and verification.
 
 Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, and EUI developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
 
+For AI-assisted game work, use the [game guide](packages/core/docs/game-authoring.md),
+[standard UI workflow and directories](packages/ui/docs/ui-authoring.md), and
+[versioned API index](docs/api-documentation.md). The UI workflow includes a
+complete paired component recipe, bundled in prepared UI 3.6.2. Prepared CLI
+3.6.1 adds template README/AGENTS entries and fixes strict skin-part declarations.
+These two patches have not been published; dependency ranges and locks are unchanged.
+
 > Kurot continues Egret 5.4.1's display-object and development model while
 > upgrading its rendering core to a WebGL2-first, InstructionSet/RenderPipe,
 > multi-texture batching architecture. In the validated mixed-texture, deep
@@ -57,8 +64,11 @@ correctness and performance validation system.
 ## Packages and dependencies
 
 Version audit: 2026-10-18. The table records source manifest versions. Core
-2.5.5, Game 2.0.1 and UI 3.6.1 are prepared documentation-only patches and are
-not published. Dependency requirements and consumer locks remain unchanged.
+2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches, verified on
+npm on 2026-10-18, including latest, tarball integrity and bundled API references.
+UI 3.6.2 and CLI 3.6.1 are now prepared locally for the authoring guides, template
+entries and CLI declaration fix; neither is published. Dependency requirements
+and consumer locks remain unchanged.
 Earlier publication evidence follows:
 Core 2.5.4 is published and verified on 2026-10-12; consumer adoption is explicit.
 Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField,
@@ -84,9 +94,9 @@ Kurot is composed of several independently maintained pnpm packages. The reposit
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
 | [`@kurot/core`](packages/core/README.md)               | 2.5.5   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
-| [`@kurot/ui`](packages/ui/README.md)                   | 3.6.1   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
+| [`@kurot/ui`](packages/ui/README.md)                   | 3.6.2   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.1   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.6.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.6.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.1  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.10.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
@@ -161,7 +171,7 @@ whose only content interface is textFlow, and fixes automatic BitmapLabel
 measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.5.4 and UI 3.6.0.
+Core 2.5.5 and UI 3.6.1.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with
