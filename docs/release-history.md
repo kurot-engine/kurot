@@ -13,15 +13,34 @@ Earlier Core/text/style records: [early 2.x history](release-history-early-2x.md
 
 ## Recorded releases and adoption
 
-### UI authoring and CLI declaration patches — 2026-10-18 (prepared)
+### UI authoring and CLI declaration patches — 2026-10-18
 
-UI 3.6.2 and CLI 3.6.1 are prepared locally and are not published. UI adds the
-standard production workflow, directory conventions and complete ScoreHUD recipe.
-CLI adds template README/AGENTS navigation and getter-based host skinParts
-declarations compatible with skipLibCheck=false. Runtime Skin output and
-Core/UI implementations are unchanged. Existing SDK dependency ranges accept
-these patches; no dependency lock or other package version changes. Projects
-adopt CLI installation/lock updates and rebuild explicitly after publication.
+[CLI 3.6.1](https://registry.npmjs.org/@kurot%2fcli/3.6.1) is published. Its latest
+tag, downloaded tarball and SHA-512 integrity are verified; all 234 files match
+prepared commit 46459e97. Both game/empty templates contain README/AGENTS entry
+docs, and the compiled generator emits getter-based host skinParts declarations
+compatible with skipLibCheck=false. Runtime Skin output is unchanged.
+
+UI 3.6.2 contains the standard production workflow, directory conventions and
+complete ScoreHUD recipe. The user reported publication, but public npm checks
+at 2026-10-18 14:03 UTC return [latest=3.6.1](https://registry.npmjs.org/@kurot%2fui/latest)
+and HTTP 404 for the exact 3.6.2 version, including a fresh query. Its registry
+publication remains unconfirmed; this record does not establish publication
+failure or a different registry's state. Use the repository guides while the
+intended installation source is being confirmed.
+
+Kurot-Studio adopts exact registry CLI 3.6.1 in commit 048e5c1, updating only its
+CLI pin and corresponding lock version/integrity. All other direct and transitive
+dependency resolutions remain unchanged. Offline frozen installation with
+lifecycle scripts disabled, the Host/renderer/preload build, complete format/
+code-rule/boundary/type checks and 175 test files / 1,451 tests pass. Its real
+CLI development and release integration baselines now check 3.6.1. Existing games
+keep their own CLI installations. The application is not published or pushed.
+
+Core/UI implementations and engine dependency ranges/locks are unchanged.
+Other SDKs and applications retain their own adoption schedules. Published
+archives retain their preparation-time documentation; these post-publication
+status updates apply to the repository and do not replace an npm artifact.
 See [dependency impact](api-documentation.md#ui-362-and-cli-361-authoring-patches)
 and [verification](../tools/api-docs/VERIFICATION.md).
 
@@ -43,7 +62,7 @@ not update application installations or publish any further package.
 
 The standard UI authoring guide and ScoreHUD recipe were added to the repository
 after UI 3.6.1 publication, so they are not inside that archive. Published CLI
-3.6.0 remains latest at this check, and its downloaded game template contains
+3.6.0 was latest at that earlier check, and its downloaded game template contains
 neither the newly added README nor AGENTS.md. Those future template docs need a
 separate CLI release to reach new scaffolds; existing projects need their own
 instruction entry. The CLI download also passes its registry integrity check.

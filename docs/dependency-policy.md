@@ -11,11 +11,13 @@ on npm on 2026-10-18. Runtime APIs and dependency requirements are unchanged. Se
 for required migrations (none), optional installed/locked adoption and unaffected
 packages. No dependent SDK release or application update is implied.
 
-UI 3.6.2 and CLI 3.6.1 are prepared locally (not published) for UI authoring
-guides, template instruction entries and the CLI skinParts declaration fix.
-No SDK dependency range or lock update is required. Projects adopting the fix
-update their CLI installation/lock and regenerate declarations after publication;
-UI 3.6.2 supplies the new guides without an engine API requirement. See the
+CLI 3.6.1 is published and verified for template instruction entries and the
+skinParts declaration fix. UI 3.6.2 supplies authoring guides without an engine
+API requirement, but its reported publication remains unconfirmed on npm.
+No SDK dependency range or lock update is required. Kurot-Studio adopts exact
+CLI 3.6.1 with a matching lock, application build and complete check; its other
+dependencies are unchanged. Other projects adopt CLI installation/lock updates
+and regenerate declarations explicitly. See the
 [consumer classification](api-documentation.md#ui-362-and-cli-361-authoring-patches).
 
 ## Package graph

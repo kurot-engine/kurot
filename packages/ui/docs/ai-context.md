@@ -2,8 +2,10 @@
 
 For game UI creation, read [standard authoring](ui-authoring.md): directory
 conventions, component/Skin pairs, typed parts and cleanup. Its
-[complete ScoreHUD pair](recipes/score-hud.md) ships in prepared UI 3.6.2
-(not published); CLI 3.6.1 supplies template navigation and corrected declarations. The maintainer map below is needed only for SDK work.
+[complete ScoreHUD pair](recipes/score-hud.md) targets UI 3.6.2, whose reported
+publication remains unconfirmed on npm. Published CLI 3.6.1 supplies template
+navigation and corrected declarations. The maintainer map below is needed only
+for SDK work; see [publication status](../../../docs/release-history.md).
 
 For API lookup, use [capability topics](api/topics.md) and [symbol/member references](api/index.md).
 UI 3.6.1 is published, verified on npm on 2026-10-18 with its bundled API reference.
@@ -35,7 +37,7 @@ each session. Treat the package source and its `src/index.ts` barrel as the
 authority for current behavior and exports; this file provides the compressed
 map, runtime contracts and task→file lookup.
 
-Package identity: `@kurot/ui@3.6.2` (prepared; not published), EUI-compatible UI framework on top of
+Package identity: `@kurot/ui@3.6.2` (prepared; registry publication unconfirmed), EUI-compatible UI framework on top of
 `@kurot/core`. Its peer is `@kurot/core@^2.5.2`; published 3.5.0 uses ^2.4.0. Rewritten with standard class
 inheritance and delegation — no namespace mixins, no prototype copying.
 Version 3.3.1 is preserved in commit 60e6404 and fixes transformed parent

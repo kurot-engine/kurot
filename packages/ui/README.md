@@ -10,7 +10,7 @@ See [Label layout](docs/label-text-layout.md) for behavior and adoption.
 
 UI component framework for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core). Migrated from Egret EUI, rewritten in modern TypeScript with clean class inheritance — no namespace hacks, no prototype manipulation.
 
-> **Package version: 3.6.2 (prepared; not published).** Documentation-only patch over 3.6.1. Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.6.2 (prepared; registry publication unconfirmed).** Documentation-only patch over 3.6.1. Requires `@kurot/core@^2.5.2`. Targets ES2022 + evergreen browsers, same as core.
 
 ## API reference in 3.6.1
 
@@ -26,7 +26,8 @@ No dependent release, raised minimum or application migration is required.
 For building game UI, start with [standard authoring](docs/ui-authoring.md) and
 the [complete ScoreHUD pair](docs/recipes/score-hud.md). They define project
 directories, editable XML versus component/controller ownership, typed parts
-and cleanup. These guides are bundled in prepared UI 3.6.2; published 3.6.1
+and cleanup. These guides target UI 3.6.2; its reported publication remains
+unconfirmed on npm (see the [status record](../../docs/release-history.md)). Published 3.6.1
 contains API references but lacks these additions. CLI 3.6.1 fixes generated
 host declarations for `tsc --noEmit --skipLibCheck false`; the UI runtime is unchanged.
 
@@ -158,9 +159,12 @@ only on Core.
 
 ## Installation
 
-UI 3.6.1 is published with the API reference. UI 3.6.2 is prepared for the new
-authoring guides and is not yet available from npm. After publication, optionally
-install it as below; the Core minimum and existing dependency locks are unchanged.
+UI 3.6.1 is published with the API reference. UI 3.6.2 contains the new authoring
+guides; publication was reported by the user but could not be verified on npm
+on 2026-10-18. The registry still reports latest=3.6.1 and returns 404 for 3.6.2.
+Use the repository guides until the version is available from the chosen
+registry, then optionally install it below. The Core minimum and engine locks
+are unchanged.
 
 ```bash
 pnpm add @kurot/ui@^3.6.2 @kurot/core@^2.5.2

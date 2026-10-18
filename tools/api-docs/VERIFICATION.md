@@ -132,8 +132,8 @@ lock snapshots remain unchanged. `git diff --check` passes; nothing is published
 
 Only UI and CLI package versions change, to 3.6.2 and 3.6.1. All dependency
 declarations/locks and Core/UI implementation sources remain unchanged. Earlier
-unreleased checks above describe the preceding snapshot; neither new version
-has been published. See [dependency impact](../../docs/api-documentation.md#ui-362-and-cli-361-authoring-patches).
+unreleased checks above describe the preceding snapshot. Neither version had
+been published at preparation time; the follow-up below records later checks. See [dependency impact](../../docs/api-documentation.md#ui-362-and-cli-361-authoring-patches).
 
 - UI/CLI builds pass. UI passes 38 files / 371 tests; CLI passes 23 files /
   114 tests with maxWorkers=1 and localhost test access, without changing any
@@ -153,3 +153,26 @@ has been published. See [dependency impact](../../docs/api-documentation.md#ui-3
   host-game responsibility; no agent evaluation or publication is run.
 - `git diff --check` passes. Other SDK versions and consumer installations retain
   their baselines; new guide adoption and CLI regeneration are explicit choices.
+
+## CLI publication and Studio adoption — 2026-10-18
+
+- Published CLI 3.6.1's exact registry metadata and latest tag are checked. The
+  downloaded package passes SHA-512 integrity; all 234 files match preparation
+  commit 46459e97, including the game/empty README/AGENTS entries and compiled
+  getter declaration fix. No publication or installation is performed here.
+- UI 3.6.2 publication is user-reported but not yet verified on public npm.
+  At 14:03 UTC its exact-version endpoint returns 404 and latest remains 3.6.1;
+  the standard scoped path and a fresh query give the same result. Earlier local
+  UI packing/recipe evidence remains valid as local verification, without being
+  relabeled as registry verification.
+- Kurot-Studio commit 048e5c1 pins registry CLI 3.6.1 and updates only that lock
+  entry's version/integrity. Other direct/transitive resolutions are unchanged.
+  Offline frozen installation with scripts disabled, the full application build,
+  and format/code-rule/boundary/type checks plus 175 files / 1,451 tests pass.
+  Existing games keep their own dependencies; the application is not published.
+- This follow-up changes Markdown only. Historical preparation checks retain
+  their original scope; current status points to the
+  [publication record](../../docs/release-history.md#ui-authoring-and-cli-declaration-patches--2026-10-18).
+  All 176 relative links in the 17 changed Markdown files resolve. The API-tool
+  check passes with zero missing references for Core/Game/UI, and
+  `git diff --check` passes. No source, manifest, lock or generated API file changes.

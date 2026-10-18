@@ -15,9 +15,10 @@ Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine buil
 For AI-assisted game work, use the [game guide](packages/core/docs/game-authoring.md),
 [standard UI workflow and directories](packages/ui/docs/ui-authoring.md), and
 [versioned API index](docs/api-documentation.md). The UI workflow includes a
-complete paired component recipe, bundled in prepared UI 3.6.2. Prepared CLI
-3.6.1 adds template README/AGENTS entries and fixes strict skin-part declarations.
-These two patches have not been published; dependency ranges and locks are unchanged.
+complete paired component recipe for UI 3.6.2, whose registry publication remains
+unconfirmed. Published CLI 3.6.1 adds template README/AGENTS entries and fixes
+strict skin-part declarations. Kurot-Studio adopts CLI 3.6.1; engine dependency
+ranges and locks are unchanged. See [release history](docs/release-history.md).
 
 > Kurot continues Egret 5.4.1's display-object and development model while
 > upgrading its rendering core to a WebGL2-first, InstructionSet/RenderPipe,
@@ -66,9 +67,11 @@ correctness and performance validation system.
 Version audit: 2026-10-18. The table records source manifest versions. Core
 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches, verified on
 npm on 2026-10-18, including latest, tarball integrity and bundled API references.
-UI 3.6.2 and CLI 3.6.1 are now prepared locally for the authoring guides, template
-entries and CLI declaration fix; neither is published. Dependency requirements
-and consumer locks remain unchanged.
+CLI 3.6.1 is published and verified, including latest, tarball integrity and
+all 234 files matching the prepared commit. UI 3.6.2 publication is user-reported
+but not confirmed by the public registry check. Kurot-Studio adopts CLI 3.6.1
+with a matching lock and successful build/check; engine dependency requirements
+and locks are unchanged. See [release history](docs/release-history.md).
 Earlier publication evidence follows:
 Core 2.5.4 is published and verified on 2026-10-12; consumer adoption is explicit.
 Core 2.5.3 and ui-document 0.13.1 are published, verified on npm on 2026-10-10. TextField,

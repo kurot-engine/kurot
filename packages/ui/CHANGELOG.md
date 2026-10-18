@@ -6,7 +6,9 @@ All notable changes to `@kurot/ui` are documented here.
 
 ## [3.6.2] — 2026-10-18
 
-Prepared locally; not published. Documentation-only patch over 3.6.1.
+Documentation-only patch over 3.6.1. Publication is user-reported; public npm
+verification on 2026-10-18 remains unconfirmed (latest=3.6.1; exact 3.6.2 returns
+404). See [release history](../../docs/release-history.md).
 
 ### Documentation
 

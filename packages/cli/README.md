@@ -8,7 +8,7 @@ Core 2.5.0 is also published and verified; new game scaffolds resolve Core ^2.5.
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
 
-> **Current version: 3.6.1 (prepared; not published).** Requires `@kurot/ui-document@^0.13.0`
+> **Current version: 3.6.1 (published; verified on 2026-10-18).** Requires `@kurot/ui-document@^0.13.0`
 > and Node.js 20 or later. The CLI runs only at build time.
 
 > **Release scope:** The 3.x line is dedicated to Kurot Editor integration.
@@ -16,12 +16,16 @@ ESM, and compiles canonical KUI XML skins into runtime theme modules.
 > `@kurot/cli@1.3.x`. The KUI toolchain is not an in-place project upgrade and does
 > not require those projects to change their configuration or UI assets.
 
-Version 3.6.1 fixes generated host skinParts declarations for full TypeScript
+Version 3.6.1 is verified on npm, including latest, downloaded tarball SHA-512
+integrity and all 234 files matching prepared commit 46459e97. It fixes
+generated host skinParts declarations for full TypeScript
 checks with skipLibCheck=false and ships README/AGENTS entries in both templates.
 The game entry links UI 3.6.2's authoring/directory guide and complete ScoreHUD
-recipe. Runtime Skin output, dependency ranges and locks are unchanged. After
-publication, existing projects adopt the fix by updating their CLI installation/
-lock and rebuilding; new template docs do not overwrite existing project files.
+recipe (UI 3.6.2 registry publication remains unconfirmed). Runtime Skin output,
+dependency ranges and engine locks are unchanged. Existing projects adopt the
+fix by updating their CLI installation/lock and rebuilding; new template docs
+do not overwrite existing project files. Kurot-Studio adopts exact CLI 3.6.1
+with a matching lock and validated build; existing games keep their own CLI.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
 

@@ -9,7 +9,8 @@ format changes are documented explicitly in each release.
 
 ## 3.6.1 — 2026-10-18
 
-Prepared locally; not published.
+Published; verified on npm on 2026-10-18, including latest, downloaded tarball
+SHA-512 integrity and all 234 files matching prepared commit 46459e97.
 
 ### Fixed
 
@@ -36,13 +37,17 @@ Prepared locally; not published.
 - Command/configuration APIs, KUI format and runtime Skin output are unchanged.
   ui-document remains ^0.13.0, locked to registry 0.13.0; no Core/UI dependency
   or other dependency/lock update is added.
-- To receive the declaration correction after publication, update the project's
+- To receive the declaration correction, update the project's
   CLI installation/lock and rebuild to regenerate .kurot/skin-parts.d.ts.
   Published 3.6.0 keeps the old property form. Core/UI runtime upgrades are not
   required for this fix; existing compatible application ranges remain valid.
 - New scaffolds receive README/AGENTS entries. Existing games retain their own
   instructions, resources and directories. Template latest placeholders remain
   unchanged; UI 3.6.2 is needed only to read the new bundled UI guides.
+- Kurot-Studio adopts exact registry CLI 3.6.1 with a matching lock in commit
+  048e5c1. Its application build and complete check (175 files / 1,451 tests)
+  pass; other direct/transitive dependencies and game installations are unchanged.
+  The application has not been published.
 
 ### Verification
 

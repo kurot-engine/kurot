@@ -1,13 +1,15 @@
 # @kurot/cli — AI context map
 
-CLI 3.6.0 is published, verified on npm on 2026-10-10, including latest,
-package download and matching registry integrity. Development installs
+CLI 3.6.1 is published, verified on npm on 2026-10-18, including latest,
+package download, SHA-512 integrity and all 234 files matching commit 46459e97.
+Kurot-Studio adopts exact CLI 3.6.1 with its own lock and validated build;
+existing games continue using their own installed CLI. Development installs
 published ui-document 0.13.0 with a matching
 registry lockfile, without local overrides. Read
 [centered flips](../../../docs/centered-flips.md) for transform and adoption contracts.
 
 Read this before exploring `src/`. [`architecture.md`](./architecture.md)
-explains the plugin pipeline. Version `@kurot/cli@3.6.1` is prepared locally (not published), runs on Node.js 20+,
+explains the plugin pipeline. Version `@kurot/cli@3.6.1` is published, runs on Node.js 20+,
 and is installed as a project dev dependency.
 
 ## Directory map

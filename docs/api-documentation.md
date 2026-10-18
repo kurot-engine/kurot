@@ -21,9 +21,9 @@ engine source is not required for these lookups.
 For standard UI production, use [UI authoring](../packages/ui/docs/ui-authoring.md)
 and its [paired ScoreHUD recipe](../packages/ui/docs/recipes/score-hud.md).
 They add the missing directory/workflow layer above the API reference and are
-bundled in prepared UI 3.6.2 (not published). CLI 3.6.1 supplies scaffold entry
-docs. Keep a short project README/AGENTS entry pointing at the selected workflow,
-installed versions and relevant member
+prepared for UI 3.6.2, whose reported registry publication remains unconfirmed.
+Published CLI 3.6.1 supplies scaffold entry docs. Keep a short project README/AGENTS
+entry pointing at the selected workflow, installed versions and relevant member
 pages; providing all API pages or engine source in each prompt is unnecessary.
 
 The reference follows public entry points, not every file exported somewhere
@@ -90,20 +90,23 @@ declarations and SDK/app locks remain unchanged by these patches.
 
 ## UI 3.6.2 and CLI 3.6.1 authoring patches
 
-Both versions are prepared locally on 2026-10-18 and have not been published.
+CLI 3.6.1 is published and verified on 2026-10-18. UI 3.6.2 publication was
+reported by the user but could not be verified on public npm: latest remains
+3.6.1 and the exact 3.6.2 endpoint returns 404. See
+[publication evidence](release-history.md).
 UI distributes the standard directory/workflow guide and complete ScoreHUD
 recipe. CLI distributes template README/AGENTS entries and corrects generated
 host skinParts declarations for skipLibCheck=false. Core/UI implementations,
 public exports and all dependency ranges/locks are unchanged.
 
-| Consumer | Required compatibility migration | Optional adoption after publication |
+| Consumer | Required compatibility migration | Installed adoption |
 | --- | --- | --- |
 | UI Core peer/dev ^2.5.2 | None; guides add no runtime API | Keep existing Core 2.5.3 development lock |
 | CLI ui-document ^0.13.0 | None; generator fix needs no new kernel API | Keep existing document 0.13.0 lock |
 | ui-runtime UI peer/dev ^3.4.0 | None; already accepts UI 3.6.2 | Update its UI development lock only when selected |
 | examples/game UI ^3.1.0, CLI ^3.3.1; examples/demo CLI ^3.3.1 | None; ranges already accept these patches | Update installations/locks and rebuild if adopting |
 | Star Catcher CLI exact 3.3.1 and application exact pins | None for existing behavior | Change the exact CLI pin and lock only when adopting the declaration fix |
-| Kurot-Studio CLI exact 3.6.0 | None for existing behavior; inspected separately | Update its CLI pin/lock and rebuild to adopt the generator fix or template entries |
+| Kurot-Studio CLI exact 3.6.1 | None | Adopted in 048e5c1; matching lock, application build and complete check (1,451 tests) pass; application unpublished |
 | CLI game/empty templates | No dependency placeholder changes | create resolves published versions; new entries do not retrofit existing games |
 | Core, Game, DragonBones, ui-document, bitmap-font, Atlas and Spine adapters | None; no UI/CLI dependency needs migration | No SDK release required |
 

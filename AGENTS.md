@@ -18,7 +18,7 @@ Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
 - **Make game UI:** read [standard UI authoring](packages/ui/docs/ui-authoring.md)
   for directory/TS–Skin pairing, layout, startup and teardown; use its
   [ScoreHUD recipe](packages/ui/docs/recipes/score-hud.md) for a complete pair.
-  These guides ship in prepared UI 3.6.2; CLI 3.6.1 adds template entry docs.
+  These guides target UI 3.6.2; published CLI 3.6.1 adds template entry docs.
 - **Change a dependency or plan a release:** read
   [dependency policy](docs/dependency-policy.md). When asked to bump or prepare
   a package version, complete the [version checklist](docs/release-checklist.md).
@@ -48,9 +48,10 @@ Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches,
 verified on npm on 2026-10-18; bundled API docs match the tested commit. Runtime
 implementations, exports and dependency ranges are unchanged. Adoption is optional.
 
-UI 3.6.2 and CLI 3.6.1 are prepared locally, not published. They distribute UI
-authoring guides/template entries and fix CLI host declarations for skipLibCheck=false.
-No dependency ranges or locks change; Core/UI runtime implementations are unchanged.
+CLI 3.6.1 is published and verified; Kurot-Studio adopts it with its own lock.
+UI 3.6.2 contains the new authoring guides, but registry publication remains
+unconfirmed. See [release history](docs/release-history.md) for current evidence.
+Engine dependency ranges/locks and Core/UI implementations are unchanged.
 
 Dependency direction is one-way. Core depends on bitmap-font. UI, Game and
 DragonBones use Core peers. CLI depends on ui-document and runs only at build

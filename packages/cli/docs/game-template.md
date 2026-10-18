@@ -7,7 +7,8 @@ code and HTML; the empty template stays minimal.
 ## Project documentation in 3.6.1
 
 CLI 3.6.1 includes a project README and short AGENTS entry in both templates.
-This version is prepared locally and has not been published.
+This version is published and verified on npm on 2026-10-18, including the
+README/AGENTS files in both template directories.
 They identify the gameplay entry, commands, expected startup, generated files
 and task-specific guides in installed SDK packages. Read the consumer project's
 manifest, lock and installation for its actual versions. These additions are
