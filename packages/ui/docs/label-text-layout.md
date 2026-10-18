@@ -7,7 +7,7 @@ Core ^2.4.0. UI 3.6.0 is published, verified on 2026-10-11; it adds outline-safe
 and requires Core ^2.5.2. The public
 `TextFitMode` type is `none | shrink`. Native UI depends only on Core. KUI
 authoring introduced fitting metadata in ui-document 0.9.0 and retains it in
-0.13.1. Current CLI 3.6.0 and runtime 0.10.0 use document `^0.13.0`; runtime
+0.13.1. Current CLI 3.6.1 and runtime 0.10.0 use document `^0.13.0`; runtime
 also requires UI `^3.4.0` and Core `^2.4.0`. Older 0.x kernel ranges do not
 automatically accept 0.13.0. Label presets expand into native properties before
 rendering; their precedence does not change fitting behavior. See the

@@ -6,9 +6,9 @@ All notable changes to `@kurot/ui` are documented here.
 
 ## [3.6.2] — 2026-10-18
 
-Documentation-only patch over 3.6.1. Publication is user-reported; public npm
-verification on 2026-10-18 remains unconfirmed (latest=3.6.1; exact 3.6.2 returns
-404). See [release history](../../docs/release-history.md).
+Published; verified on npm on 2026-10-18, including latest, downloaded tarball
+SHA-512 integrity, all 344 runtime and 5,165 API files, and both new guides.
+Documentation-only patch over 3.6.1. See [release history](../../docs/release-history.md).
 
 ### Documentation
 
@@ -24,7 +24,7 @@ verification on 2026-10-18 remains unconfirmed (latest=3.6.1; exact 3.6.2 return
   Core peer/dev requirements remain ^2.5.2 with registry 2.5.3 in the existing lock.
 - ui-runtime's UI ^3.4.0 already accepts 3.6.2. No dependent SDK release,
   dependency-range update or application migration is required. Installing this
-  patch for bundled guides is optional after publication.
+  patch for bundled guides is optional.
 
 ### Verification
 

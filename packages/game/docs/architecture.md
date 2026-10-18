@@ -1,6 +1,6 @@
 # @kurot/game architecture
 
-> Current version: 2.0.0, with peerDependency `@kurot/core: ^2.0.0`.
+> Current version: 2.0.1 (published), with peerDependency `@kurot/core: ^2.0.0`.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal

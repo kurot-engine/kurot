@@ -160,11 +160,10 @@ been published at preparation time; the follow-up below records later checks. Se
   downloaded package passes SHA-512 integrity; all 234 files match preparation
   commit 46459e97, including the game/empty README/AGENTS entries and compiled
   getter declaration fix. No publication or installation is performed here.
-- UI 3.6.2 publication is user-reported but not yet verified on public npm.
-  At 14:03 UTC its exact-version endpoint returns 404 and latest remains 3.6.1;
-  the standard scoped path and a fresh query give the same result. Earlier local
-  UI packing/recipe evidence remains valid as local verification, without being
-  relabeled as registry verification.
+- At the initial 14:03 UTC check, UI 3.6.2 was user-reported but not yet visible
+  on public npm: its exact-version endpoint returned 404 and latest was 3.6.1.
+  This is the earlier observation; the confirmed publication recheck below
+  supersedes its pending status. Local packing/recipe evidence retains its scope.
 - Kurot-Studio commit 048e5c1 pins registry CLI 3.6.1 and updates only that lock
   entry's version/integrity. Other direct/transitive resolutions are unchanged.
   Offline frozen installation with scripts disabled, the full application build,
@@ -176,3 +175,29 @@ been published at preparation time; the follow-up below records later checks. Se
   All 176 relative links in the 17 changed Markdown files resolve. The API-tool
   check passes with zero missing references for Core/Game/UI, and
   `git diff --check` passes. No source, manifest, lock or generated API file changes.
+
+## UI publication and current-version audit — 2026-10-18
+
+- At 14:06 UTC, exact registry versions and latest tags match all nine SDK
+  manifests. The [published snapshot](../../docs/release-history.md#published-sdk-snapshot--2026-10-18)
+  records those versions separately from application/development locks and
+  historical feature minimums.
+- UI 3.6.2's downloaded tarball passes SHA-512 integrity and is byte-identical
+  to the previously tested local archive: 5,520 files, including 344 compiled/
+  declaration/map files, 5,165 API files and both UI authoring/ScoreHUD guides.
+  Runtime and API files match the checkout. Its six differing Markdown files
+  reflect later repository status edits, not runtime or type changes.
+- CLI 3.6.1's downloaded tarball also passes SHA-512 integrity. All 176 dist/
+  files, both templates' README/AGENTS entries and the getter declaration fix
+  match; four Markdown files reflect later status edits. Published npm archives
+  retain their original contents, while this change updates repository docs.
+- Update current release banners, Core/Game architecture headers, active CLI
+  version references and UI's Core requirement (UI 3.6.2: ^2.5.2). Preserve
+  runtime 0.10.0's actual peers, accepted older development locks, original API
+  minimums, dated architecture snapshots and Star Catcher's fixed dependencies.
+  No model evaluation, dependency adoption or publication is performed.
+- All nine README versions and the Core/Game/UI architecture headers agree
+  with the verified manifests. Active current-version references are consistent;
+  all 257 relative links across 35 changed Markdown files resolve. Code fences,
+  source, manifests, dependency locks and generated API files are unchanged.
+  The API-tool check passes with zero missing references; `git diff --check` passes.

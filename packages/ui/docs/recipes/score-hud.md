@@ -157,8 +157,8 @@ The documentation check compiles these exact TS/XML fences using locally packed
 CLI 3.6.1/UI 3.6.2 and published Core 2.5.5, without engine source. Development
 and release builds pass strict checking with skipLibCheck=false, including the
 custom namespace tag, generated mappings and part types. CLI 3.6.1 is published
-and verified; UI 3.6.2 publication is user-reported but not yet verified on npm.
-The recipe checks used the prepared local UI archive. This is compile validation;
+and verified, as is UI 3.6.2. The published UI tarball is byte-identical to the
+prepared local archive used by the recipe checks. This is compile validation;
 verify startup, visual bounds and repeated open/restart/close in the host browser.
 
 Published CLI 3.6.0 emits a readonly property over Component's accessor and can

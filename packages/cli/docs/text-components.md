@@ -1,12 +1,12 @@
 # BitmapLabel and RichLabel compilation
 
 Native text compilation was introduced in CLI 3.4.0 with document 0.12.0.
-Current CLI 3.6.0 requires published ui-document ^0.13.0 and retains these tags.
+Current CLI 3.6.1 requires published ui-document ^0.13.0 and retains these tags.
 Applications rendering these tags
 must install UI `^3.3.0` and Core `^2.3.0`; Core 2.3.1 fixes unstyled blank
 rich-text line metrics. The CLI does not install or bundle its own Core/UI.
 Document format version 2 and existing project configuration are unchanged.
-Installing UI 3.4.0 requires Core ^2.4.0 for that package's centered-flip contract.
+Installing UI 3.6.2 requires Core ^2.5.2 for its package-wide outline-safe Label contract.
 
 ```xml
 <Skin xmlns="https://kurot.dev/ui/1" class="TextSkin" states="disabled">

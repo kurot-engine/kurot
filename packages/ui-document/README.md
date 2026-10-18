@@ -87,7 +87,7 @@ Core 2.1.0's single-line behavior; remove the flag or set it to true for wrappin
 The semantic format remains version 2, and files are not migrated automatically.
 See the [text authoring contract](docs/text-layout.md) for validation and
 consumer requirements. This package models these fields; the original native
-API minimum is UI 3.1.0/Core 2.1.0. Current CLI 3.5.0 and runtime 0.10.0 use
+API minimum is UI 3.1.0/Core 2.1.0. Current CLI 3.6.1 and runtime 0.10.0 use
 document `^0.13.0`; runtime also requires UI `^3.4.0` and Core `^2.4.0`.
 Earlier 0.x kernel ranges do not automatically accept this release.
 
@@ -456,7 +456,7 @@ colors report the semantic path, and other token categories stay unresolved.
 
 This is an XML syntax change: the previous `@token:color:<key>` prefix is
 rejected. Update authored color references explicitly; files are not migrated
-automatically. Current CLI 3.5.0 depends on document `^0.13.0` and resolves
+automatically. Current CLI 3.6.1 depends on document `^0.13.0` and resolves
 stylesheet colors and Label presets during KUI compilation. Runtime 0.10.0
 requires the same document range;
 consumers resolve colors in preview copies or register palette entries in the
@@ -476,6 +476,6 @@ The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and release order.
 Presets were introduced in document 0.11.0 and CLI 3.3.0; CLI 3.2.1 lacks them.
-Current CLI 3.5.0 and runtime 0.10.0 use document `^0.13.0` without overrides.
+Current CLI 3.6.1 and runtime 0.10.0 use document `^0.13.0` without overrides.
 Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`; preset expansion
 itself does not introduce a new native rendering requirement.

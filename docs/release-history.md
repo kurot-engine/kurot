@@ -11,6 +11,28 @@ Consult package docs for current APIs and migration contracts.
 
 Earlier Core/text/style records: [early 2.x history](release-history-early-2x.md).
 
+## Published SDK snapshot — 2026-10-18
+
+At 14:06 UTC, each exact registry version and latest tag below matches its
+source manifest. These are published SDK versions; application installations,
+SDK development locks and feature-introduction versions are separate baselines.
+
+| Package | Verified npm latest |
+| --- | --- |
+| [@kurot/core](https://registry.npmjs.org/@kurot%2fcore/2.5.5) | 2.5.5 |
+| [@kurot/ui](https://registry.npmjs.org/@kurot%2fui/3.6.2) | 3.6.2 |
+| [@kurot/game](https://registry.npmjs.org/@kurot%2fgame/2.0.1) | 2.0.1 |
+| [@kurot/cli](https://registry.npmjs.org/@kurot%2fcli/3.6.1) | 3.6.1 |
+| [@kurot/ui-document](https://registry.npmjs.org/@kurot%2fui-document/0.13.1) | 0.13.1 |
+| [@kurot/ui-runtime](https://registry.npmjs.org/@kurot%2fui-runtime/0.10.0) | 0.10.0 |
+| [@kurot/atlas](https://registry.npmjs.org/@kurot%2fatlas/0.1.0) | 0.1.0 |
+| [@kurot/dragonbones](https://registry.npmjs.org/@kurot%2fdragonbones/0.1.0) | 0.1.0 |
+| [@kurot/bitmap-font](https://registry.npmjs.org/@kurot%2fbitmap-font/0.1.0) | 0.1.0 |
+
+UI/CLI package downloads and SHA-512 integrity are rechecked below. Other SDK
+publication checks retain their earlier artifact evidence; this snapshot
+rechecks their version metadata without changing dependencies or installations.
+
 ## Recorded releases and adoption
 
 ### UI authoring and CLI declaration patches — 2026-10-18
@@ -21,13 +43,15 @@ prepared commit 46459e97. Both game/empty templates contain README/AGENTS entry
 docs, and the compiled generator emits getter-based host skinParts declarations
 compatible with skipLibCheck=false. Runtime Skin output is unchanged.
 
-UI 3.6.2 contains the standard production workflow, directory conventions and
-complete ScoreHUD recipe. The user reported publication, but public npm checks
-at 2026-10-18 14:03 UTC return [latest=3.6.1](https://registry.npmjs.org/@kurot%2fui/latest)
-and HTTP 404 for the exact 3.6.2 version, including a fresh query. Its registry
-publication remains unconfirmed; this record does not establish publication
-failure or a different registry's state. Use the repository guides while the
-intended installation source is being confirmed.
+[UI 3.6.2](https://registry.npmjs.org/@kurot%2fui/3.6.2) is now published and
+verified, including latest, downloaded tarball and SHA-512 integrity. The archive
+has 5,520 files, including 344 compiled/declaration/map files, 5,165 API files,
+the standard production/directory guide and complete ScoreHUD recipe. It is
+byte-identical to the local package used for preparation checks in 46459e97.
+Runtime/API files match the checkout; subsequent status edits affect only docs.
+
+The earlier 14:03 UTC check returned UI latest=3.6.1 and HTTP 404 for 3.6.2.
+The 14:06 UTC recheck confirms 3.6.2 and supersedes that pending status.
 
 Kurot-Studio adopts exact registry CLI 3.6.1 in commit 048e5c1, updating only its
 CLI pin and corresponding lock version/integrity. All other direct and transitive

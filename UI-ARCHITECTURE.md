@@ -69,7 +69,7 @@ an exact node and property path.
 The future model must not inherit EXML namespaces, reflection rules, global
 component exports, stringly typed attributes, or EUI-specific skin lookup merely
 for compatibility. Legacy EXML projects remain on the independent CLI 1.3.x
-line. Current CLI 3.5.0 compiles KUI XML.
+line. Current CLI 3.6.1 compiles KUI XML.
 
 ### 1.5 Serialization syntax is not the semantic model
 
@@ -107,10 +107,12 @@ describe their ownership boundaries.
 screen and a reusable inventory row are compositions; a button's normal,
 pressed, selected, and disabled visuals are an appearance or skin.
 
-## 3. Current position
+## 3. Implementation snapshot — 2026-10-10
 
-Published Core 2.4.0, UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0
-provide the current SDK chain. Document format remains 2. CLI compiles Skin
+At this audit, published Core 2.4.0, UI 3.4.0, document 0.13.0, CLI 3.5.0 and
+runtime 0.10.0 provided the SDK chain. Current published versions are recorded
+in [release history](docs/release-history.md); the versions below identify this
+implementation snapshot. Document format remains 2. CLI compiles Skin
 appearances from KUI XML, and the separate Kurot Editor edits those same files.
 Semantic screen/component assets and incremental preview reconciliation retain
 their narrower programmatic/runtime boundary.

@@ -3,8 +3,10 @@
 Native API introduced in UI 3.3.0, requiring Core ^2.3.0. Core 2.3.1 is
 published and installed from npm for this release's build and verification.
 
-Current UI 3.5.0 retains RichLabel and requires Core ^2.4.0 for centered flips.
-Its development installation and lock use published Core 2.4.0.
+Current UI 3.6.2 retains RichLabel. Its package-wide Core peer/dev minimum is
+^2.5.2 for outline-safe Label layout; the unchanged development installation
+and lock use published Core 2.5.3. This component's original API minimum above
+is separate from the current UI package requirement.
 
 ```ts
 import { RichLabel } from '@kurot/ui';

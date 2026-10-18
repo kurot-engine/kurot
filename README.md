@@ -1,22 +1,19 @@
 # Kurot
 
-Core 2.5.4 is published, verified on npm on 2026-10-12, including latest, download,
-registry integrity and all 628 generated files matching the tested build. It fixes
-continuous Web Audio loops while retaining `Sound.play(startTime, loops)` semantics.
-Editor 0.28.5, Reskin, the selected Tentax/MilfMaster templates and demo/game
-examples adopt registry 2.5.4 with matching app locks and rebuilt outputs. The
-Editor App is a local trial; no remote release is initiated. SDK peers/development
-locks and independent Reskin projects retain their own baselines.
-See [audio playback](packages/core/docs/audio-playback.md) for scheduling,
-fallback limitations and verification.
+Core 2.5.5, UI 3.6.2, Game 2.0.1 and CLI 3.6.1 are published. All nine SDK
+source versions match npm latest, verified on 2026-10-18; see the
+[package table](#packages-and-dependencies) and [publication record](docs/release-history.md).
+UI includes the standard production guide and ScoreHUD recipe; CLI includes
+template README/AGENTS entries and the strict skinParts declaration fix.
+Kurot-Studio adopts CLI 3.6.1; other applications retain their own installations.
 
 Kurot is a web-focused 2D game engine: a modern rewrite of the Egret engine built on **TypeScript, ESM, and ES2022**. It preserves the Egret-style display object, event, graphics, and EUI developer experience while adopting an instruction-based rendering architecture: a flat instruction set is built first, then executed by the rendering pipelines.
 
 For AI-assisted game work, use the [game guide](packages/core/docs/game-authoring.md),
 [standard UI workflow and directories](packages/ui/docs/ui-authoring.md), and
 [versioned API index](docs/api-documentation.md). The UI workflow includes a
-complete paired component recipe for UI 3.6.2, whose registry publication remains
-unconfirmed. Published CLI 3.6.1 adds template README/AGENTS entries and fixes
+complete paired component recipe bundled in published UI 3.6.2. Published CLI
+3.6.1 adds template README/AGENTS entries and fixes
 strict skin-part declarations. Kurot-Studio adopts CLI 3.6.1; engine dependency
 ranges and locks are unchanged. See [release history](docs/release-history.md).
 
@@ -68,8 +65,9 @@ Version audit: 2026-10-18. The table records source manifest versions. Core
 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches, verified on
 npm on 2026-10-18, including latest, tarball integrity and bundled API references.
 CLI 3.6.1 is published and verified, including latest, tarball integrity and
-all 234 files matching the prepared commit. UI 3.6.2 publication is user-reported
-but not confirmed by the public registry check. Kurot-Studio adopts CLI 3.6.1
+all 234 files matching the prepared commit. UI 3.6.2 is now verified on npm,
+including latest, tarball integrity, all 344 runtime files, 5,165 API files and
+the new authoring/ScoreHUD guides. Kurot-Studio adopts CLI 3.6.1
 with a matching lock and successful build/check; engine dependency requirements
 and locks are unchanged. See [release history](docs/release-history.md).
 Earlier publication evidence follows:
@@ -174,7 +172,7 @@ whose only content interface is textFlow, and fixes automatic BitmapLabel
 measurement under maxWidth. UI 3.3.0 builds against published Core 2.3.1 without
 local overrides; its registry installation and lockfile are ready. Native/programmatic support precedes KUI, CLI and Editor
 integration; existing projects are not changed. Latest published native versions are
-Core 2.5.5 and UI 3.6.1.
+Core 2.5.5 and UI 3.6.2.
 
 Published ui-document 0.12.0 provides the shared BitmapLabel/RichLabel authoring contract,
 including typed bitmap-font resources and literal textFlow Span elements with
@@ -187,9 +185,9 @@ Editor adoption is explicit; old apps and templates are unchanged.
 Core 2.2.1 is published. The patch
 fixes minified dictionary/emergency wrapping and keeps grapheme clusters intact
 in TextField word and character wrapping. UI 3.2.0/runtime 0.8.2 and
-Game/DragonBones peers accept it. Current UI 3.4.0/runtime 0.10.0 require Core
-^2.4.0, which includes it. To adopt the fix, update the Core installation/lock; unchanged SDKs need
-no new release. See
+Game/DragonBones peers accept it. Current UI 3.6.2 requires Core ^2.5.2; runtime
+0.10.0 keeps Core ^2.4.0. Both baselines include the correction. To adopt the fix,
+update the Core installation/lock; unchanged SDKs need no new release. See
 [text layout](packages/core/docs/text-layout.md).
 
 The separate Spine repository publishes 4.0–4.2 adapter 0.2.1 and 4.3 adapter
@@ -210,9 +208,9 @@ Current manifest dependency ranges:
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
 | Core 2.5.5        | bitmap-font `^0.1.0`                              |
-| UI 3.6.1          | Core `^2.5.2`                                     |
+| UI 3.6.2          | Core `^2.5.2`                                     |
 | Game 2.0.1        | Core `^2.0.0`                                     |
-| CLI 3.6.0         | ui-document `^0.13.0`                             |
+| CLI 3.6.1         | ui-document `^0.13.0`                             |
 | ui-runtime 0.10.0 | Core `^2.4.0`, UI `^3.4.0`, ui-document `^0.13.0` |
 | dragonbones 0.1.0 | Core `^2.1.1`                                     |
 

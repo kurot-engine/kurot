@@ -1,9 +1,9 @@
 # @kurot/core
 
-**2.5.4 is published**, verified on npm on 2026-10-12, including latest, package
-download and registry integrity. All 628 generated files match the tested build.
-It fixes continuous Web Audio loops while preserving `Sound.play(startTime, loops)`
-semantics. Published 2.5.3 lacks this audio correction. See [CHANGELOG.md](CHANGELOG.md).
+**2.5.5 is published**, verified on npm on 2026-10-18, including latest, tarball
+integrity, the API reference and game-authoring guide. Runtime behavior includes
+the 2.5.4 continuous Web Audio loop correction, with unchanged signatures,
+exports and dependency requirements. See [CHANGELOG.md](CHANGELOG.md).
 
 A modern rewrite of the Egret game engine. Maintains Egret-compatible display object and event APIs while upgrading the rendering architecture, type safety, and tooling.
 
@@ -110,8 +110,9 @@ transparent trim margins; partial edge tiles are cropped rather than stretched.
 Nine-slice remains active only for `scale`. No XML or resource migration is needed.
 Core 2.3.3 is published; Core 2.3.2 does not include this fix. UI 3.3.0/runtime
 0.9.0 and Game/DragonBones/Spine peers accept it without SDK bumps. Current
-UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes it. Applications adopt
-its installation/lock and rebuild; templates are not rewritten.
+UI 3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps Core ^2.4.0. Both baselines
+include the correction. Applications adopt their own installation/lock and
+rebuild; templates are not rewritten.
 See [bitmap fill modes](docs/bitmap-fill.md).
 
 ## Text outline fix in 2.3.2
@@ -123,7 +124,8 @@ wrapping and alignment retain their existing dimensions; input viewports and
 external clips remain exact. This fix is not included in published 2.3.1.
 No API or resource-format migration is required. UI 3.3.0/runtime 0.9.0 and
 Game/DragonBones/Spine peers accept the patch without SDK bumps. Current
-UI 3.4.0/runtime 0.10.0 require Core ^2.4.0, which includes it.
+UI 3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps Core ^2.4.0. Both baselines
+include the correction.
 Update the application's installation and lockfile, then rebuild; existing
 bundled Editor Apps retain their old Core until rebuilt.
 See [text layout](docs/text-layout.md#text-outlines-core-232).
@@ -133,8 +135,8 @@ See [text layout](docs/text-layout.md#text-outlines-core-232).
 An unstyled blank run between styled runs now uses the TextField base font size,
 matching other unstyled content, rather than borrowing a later run's size.
 Core 2.3.1 is published as a compatible patch. Consumers whose Core peer range
-accepts it need no SDK bump. Current UI 3.4.0/runtime 0.10.0 require Core ^2.4.0,
-which includes the correction.
+accepts it need no SDK bump. Current UI 3.6.2 requires Core ^2.5.2; runtime
+0.10.0 keeps Core ^2.4.0. Both baselines include the correction.
 
 ## Independent text measurement in 2.3.0
 
@@ -535,5 +537,5 @@ Height admits complete lines, and explicit `multiline = false` keeps the first
 hard-separated line unwrapped. `BitmapText.EMPTY_FACTOR` is deprecated in favor
 of `font.data.spaceAdvance`. See the linked contracts before migrating custom
 bitmap-text measurements. Native UI BitmapLabel was introduced in UI 3.2.0;
-current UI 3.4.0, document 0.13.0, CLI 3.5.0 and runtime 0.10.0 include its native,
+current UI 3.6.2, document 0.13.1, CLI 3.6.1 and runtime 0.10.0 include its native,
 authoring, compilation and materialization contracts. Editor adoption is separate.

@@ -86,7 +86,7 @@ CLI 3.5.0 validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
 nonvisual Skin root fail compilation. Negative scales are preserved.
 
-CLI 3.6.0 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
+CLI 3.6.1 requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -243,5 +243,5 @@ native emission; retain XML references and local/state precedence. compileKUI
 accepts an optional styleSheet. style.json changes already trigger whole-Skin
 rebuilds. Invalid presets retain the last successful bundle. The 3.3.0 dependency and
 lockfile used published ui-document 0.11.0 without a local override. Current
-CLI 3.5.0 development uses published ui-document 0.13.0. textStyle is
+CLI 3.6.1 development uses published ui-document 0.13.0. textStyle is
 Default-only; individual named-state fields can still override preset properties.

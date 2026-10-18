@@ -241,7 +241,7 @@ for conversion and compilation boundaries.
 
 The package describes and validates fitting policy; it does not measure text,
 derive font sizes or import runtime classes. The semantic format remains 2.
-Current CLI 3.5.0 and runtime 0.10.0 consume this catalog through document
+Current CLI 3.6.1 and runtime 0.10.0 consume this catalog through document
 ^0.13.0 without local overrides. Fitting's native API minimum remains Core
 2.1.0/UI 3.1.0; current runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for its
 centered-flip contract.

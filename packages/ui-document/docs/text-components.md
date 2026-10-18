@@ -5,9 +5,10 @@ keeps semantic format version 2. The native components are published in UI
 3.3.0, with Core ^2.3.0 required by UI; Core 2.3.1 contains the blank-rich-run
 measurement correction. No opened project is migrated or given new fields.
 
-Published document 0.13.1 retains these types and is published. CLI 3.5.0/runtime 0.10.0 require
-document ^0.13.0; current UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for
-centered flips. The text types were originally integrated by CLI 3.4.0/runtime 0.9.0.
+Published document 0.13.1 retains these types and is published. CLI 3.6.1/runtime 0.10.0 require
+document ^0.13.0; current UI 3.6.2 requires Core ^2.5.2 for outline-safe Label layout,
+while runtime 0.10.0 keeps its Core ^2.4.0 peer for centered flips. The text types
+were originally integrated by CLI 3.4.0/runtime 0.9.0.
 
 ## Alignment defaults in 0.13.1
 

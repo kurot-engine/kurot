@@ -59,7 +59,7 @@ hardcoded universal white. Build-time expansion does not add live game theme swi
 ## Adoption
 
 CLI and Editor must share the parser and stylesheet contract. Current CLI
-3.5.0 and runtime 0.10.0 require document `^0.13.0`, retaining fonts, colors and
+3.6.1 and runtime 0.10.0 require document `^0.13.0`, retaining fonts, colors and
 Label presets. Older 0.x dependency/peer ranges do not automatically accept
 0.13.0. Applications expand presets and resolve colors in
 preview copies before materialization. Color-only consumers may register the
@@ -125,7 +125,7 @@ Font loading remains a consumer responsibility. No live theme switching or nativ
 renderer change is required. SchemaVersion stays 1 and document format stays 2.
 
 Presets were introduced in document 0.11.0, CLI 3.3.0 and runtime 0.8.2.
-Document 0.10.0/CLI 3.2.1 lack these APIs. Current CLI 3.5.0 and runtime 0.10.0
+Document 0.10.0/CLI 3.2.1 lack these APIs. Current CLI 3.6.1 and runtime 0.10.0
 use registry document `^0.13.0` without overrides; the KUI sample and engine
 examples retain CLI 3.3.1. Preset expansion itself needs no new Core/UI API,
 but installing runtime 0.10.0 requires Core ^2.4.0/UI ^3.4.0 for centered flips.

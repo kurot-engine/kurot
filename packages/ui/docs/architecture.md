@@ -3,7 +3,7 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 3.6.2 (prepared; registry publication unconfirmed), with peerDependency `@kurot/core: ^2.5.2`.
+> Package version: 3.6.2 (published; verified on 2026-10-18), with peerDependency `@kurot/core: ^2.5.2`.
 > Development retains published Core 2.5.3 with its existing registry lockfile.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.

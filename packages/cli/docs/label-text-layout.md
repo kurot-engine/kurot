@@ -35,8 +35,8 @@ introduces build-time text measurement. See the
 ## Runtime boundary
 
 - The application must install UI `^3.1.0` and Core `^2.1.0` for shrinking.
-  These are the feature's original API minimums. Installing current UI 3.4.0
-  requires Core `^2.4.0` for that package's centered-flip contract.
+  These are the feature's original API minimums. Installing current UI 3.6.2
+  requires Core `^2.5.2` for its package-wide outline-safe Label contract.
   They remain application dependencies; CLI depends on the headless document
   package rather than importing the engine into the build process.
 - `textFit` is `none` by default or `shrink` for ordinary single-line Labels.

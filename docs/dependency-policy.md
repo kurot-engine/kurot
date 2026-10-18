@@ -12,8 +12,8 @@ for required migrations (none), optional installed/locked adoption and unaffecte
 packages. No dependent SDK release or application update is implied.
 
 CLI 3.6.1 is published and verified for template instruction entries and the
-skinParts declaration fix. UI 3.6.2 supplies authoring guides without an engine
-API requirement, but its reported publication remains unconfirmed on npm.
+skinParts declaration fix. UI 3.6.2 is also published and verified, supplying
+authoring guides without a new engine API requirement.
 No SDK dependency range or lock update is required. Kurot-Studio adopts exact
 CLI 3.6.1 with a matching lock, application build and complete check; its other
 dependencies are unchanged. Other projects adopt CLI installation/lock updates
@@ -63,9 +63,10 @@ adoption.
 
 Core 2.3.2 is published with render-only text-outline margins. This correction adds no API
 or resource-format requirement. UI 3.3.0/runtime 0.9.0 and Game/DragonBones/Spine
-peers accept 2.3.2 without another SDK release or raised minimum. Current
-UI 3.4.0/runtime 0.10.0 require Core ^2.4.0 for centered flips; that release
-includes this text-outline correction.
+peers accept 2.3.2 without another SDK release or raised minimum. Current UI
+3.6.2 requires Core ^2.5.2; runtime 0.10.0 keeps its Core ^2.4.0
+peer for centered flips. Both accepted Core baselines include this text-outline
+correction.
 Development lock adoption is optional. Editor 0.22.1's local trial pins published
 Core 2.3.2 with an updated Bun lockfile and rebuild. Reskin,
 examples and Core 2.x templates can adopt it through their accepted ranges and
@@ -265,7 +266,7 @@ set top explicitly when that placement is intended.
   copied projects, manifests and locks outside those four explicitly selected
   applications are unchanged by this adoption.
 
-## Current release examples
+## Recorded release examples
 
 - Core 2.5.2 is published, verified on npm on 2026-10-10, including the latest
   tag, package download, integrity and alignment/rendering modules. It unifies dynamic top/middle/bottom

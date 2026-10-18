@@ -11,8 +11,10 @@ width nor an explicit width is present, so wrapped height matches rendering.
 Changing an authored width also invalidates automatic height after layout.
 UI 3.3.0 builds and tests against published Core 2.3.1 without local overrides.
 
-Current UI 3.5.0 retains BitmapLabel and requires Core ^2.4.0 for centered flips.
-Its development installation and lock use published Core 2.4.0.
+Current UI 3.6.2 retains BitmapLabel. Its package-wide Core peer/dev minimum is
+^2.5.2 for outline-safe Label layout; the unchanged development installation
+and lock use published Core 2.5.3. This component's original API minimum above
+is separate from the current UI package requirement.
 
 ```ts
 import { BitmapLabel } from '@kurot/ui';

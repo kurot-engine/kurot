@@ -7,10 +7,10 @@ relevant [capability](api/topics.md) and member page.
 
 This guide and the [ScoreHUD recipe](recipes/score-hud.md) ship in UI 3.6.2.
 The recipe targets Core 2.5.5 and CLI 3.6.1, whose templates link these installed
-guides. CLI 3.6.1 is published. UI 3.6.2 publication is user-reported but remains
-unconfirmed on public npm; use this repository guide until it is available in
-your registry. Older artifacts retain their original docs. Existing projects
-keep their compatible versions and directory conventions.
+guides. UI 3.6.2 and CLI 3.6.1 are published and verified on npm on 2026-10-18.
+Read this guide from the installed UI package; older artifacts retain their
+original docs. Existing projects keep their compatible versions and directory
+conventions.
 
 ## 1. Decide what owns each change
 

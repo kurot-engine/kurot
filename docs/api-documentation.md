@@ -1,6 +1,6 @@
 # Public API reference and package distribution
 
-Published Core 2.5.5, Game 2.0.1 and UI 3.6.1 carry generated API references under
+Published Core 2.5.5, Game 2.0.1 and UI 3.6.2 carry generated API references under
 `docs/api/`. npm latest, downloaded tarball integrity and every bundled API file
 were verified on 2026-10-18. Older version artifacts retain their original files.
 
@@ -21,7 +21,7 @@ engine source is not required for these lookups.
 For standard UI production, use [UI authoring](../packages/ui/docs/ui-authoring.md)
 and its [paired ScoreHUD recipe](../packages/ui/docs/recipes/score-hud.md).
 They add the missing directory/workflow layer above the API reference and are
-prepared for UI 3.6.2, whose reported registry publication remains unconfirmed.
+included in published UI 3.6.2.
 Published CLI 3.6.1 supplies scaffold entry docs. Keep a short project README/AGENTS
 entry pointing at the selected workflow, installed versions and relevant member
 pages; providing all API pages or engine source in each prompt is unnecessary.
@@ -90,9 +90,8 @@ declarations and SDK/app locks remain unchanged by these patches.
 
 ## UI 3.6.2 and CLI 3.6.1 authoring patches
 
-CLI 3.6.1 is published and verified on 2026-10-18. UI 3.6.2 publication was
-reported by the user but could not be verified on public npm: latest remains
-3.6.1 and the exact 3.6.2 endpoint returns 404. See
+UI 3.6.2 and CLI 3.6.1 are published and verified on npm on 2026-10-18, including
+latest tags, downloaded packages and SHA-512 integrity. See
 [publication evidence](release-history.md).
 UI distributes the standard directory/workflow guide and complete ScoreHUD
 recipe. CLI distributes template README/AGENTS entries and corrects generated

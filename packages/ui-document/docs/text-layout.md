@@ -92,7 +92,7 @@ or automatic migration occurs in this package.
 
 ## Consumers and migration
 
-Current CLI 3.5.0 and runtime 0.10.0 consume the fitting catalog through document
+Current CLI 3.6.1 and runtime 0.10.0 consume the fitting catalog through document
 ^0.13.0. Older 0.x dependency/peer ranges do not automatically accept it;
 the fitting metadata and semantic format remain unchanged. Fitting's original
 native API minimum is Core 2.1.0/UI 3.1.0. Current runtime 0.10.0 requires Core

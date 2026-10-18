@@ -2,7 +2,7 @@
 
 This is a **breaking resource format change**, introduced with Core 2.0,
 CLI 3.0, ui-document 0.7 and ui-runtime 0.6. Later releases retain the same
-object-valued frame map and local-override rules. Current CLI 3.5.0 and runtime
+object-valued frame map and local-override rules. Current CLI 3.6.1 and runtime
 0.10.0 require document `^0.13.0`; UI's Rectangle setter needs no additional API.
 
 ## Authored configuration
@@ -87,9 +87,9 @@ consumes that opt-out. A failed manifest rebuild retains the last good Skin
 bundle in watch mode. Manifest edits rebuild all dependent Skin factories;
 resource/component watch builds are serialized.
 
-Current CLI 3.5.0 and runtime 0.10.0 require document `^0.13.0`. UI 3.4.0 and
-runtime 0.10.0 require Core `^2.4.0`; runtime also requires UI `^3.4.0`.
-Game 2.0.0 accepts Core `^2.0.0`. Core 2.1.1 adds the nested/rotated scroll
+Current CLI 3.6.1 and runtime 0.10.0 require document `^0.13.0`. UI 3.6.2
+requires Core `^2.5.2`; runtime 0.10.0 keeps Core `^2.4.0`
+and UI `^3.4.0` peers. Game 2.0.1 accepts Core `^2.0.0`. Core 2.1.1 adds the nested/rotated scroll
 clipping fix without changing this resource contract.
 
 The Editor working tree uses CLI 3.5.0/runtime 0.10.0. The KUI sample and

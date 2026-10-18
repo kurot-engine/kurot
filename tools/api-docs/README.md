@@ -78,8 +78,7 @@ allowlists. Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published with their API fil
 verified on 2026-10-18. Later documentation edits need a new release to appear
 in npm; existing published archives are immutable.
 
-UI 3.6.2 contains a regenerated version-matched API reference and the standard
-UI authoring/ScoreHUD guides; its reported publication remains unconfirmed on
-public npm. CLI 3.6.1 is published and verified with template entry documentation
+UI 3.6.2 is published and verified with a version-matched API reference and the
+standard UI authoring/ScoreHUD guides. CLI 3.6.1 is published and verified with template entry documentation
 and corrected host declarations. Engine dependency ranges/locks are unchanged;
 Kurot-Studio separately adopts CLI 3.6.1. See the [publication record](../../docs/release-history.md).

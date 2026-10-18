@@ -14,7 +14,7 @@ Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
   use its own README/AGENTS and installed SDK docs/types; source may be absent.
 - **Look up an API:** start with Core/Game/UI `docs/api/topics.md`, then read
   only the needed symbol/member pages. Use the installed package's version;
-  Core 2.5.5, Game 2.0.1 and UI 3.6.1 include the generated reference.
+  Core 2.5.5, Game 2.0.1 and UI 3.6.2 include the generated reference.
 - **Make game UI:** read [standard UI authoring](packages/ui/docs/ui-authoring.md)
   for directory/TS–Skin pairing, layout, startup and teardown; use its
   [ScoreHUD recipe](packages/ui/docs/recipes/score-hud.md) for a complete pair.
@@ -28,9 +28,9 @@ Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
 
 ## Package map
 
-Versions below are source manifest versions. Recorded publication evidence is
-in release history; a consumer's manifest, lock and actual installation establish
-its runtime baseline. Package versions are independent.
+The source versions below match npm latest, checked on 2026-10-18. Publication
+evidence is in release history; a consumer's manifest, lock and installation
+establish its runtime baseline. Package versions are independent.
 
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
@@ -48,9 +48,9 @@ Core 2.5.5, Game 2.0.1 and UI 3.6.1 are published documentation patches,
 verified on npm on 2026-10-18; bundled API docs match the tested commit. Runtime
 implementations, exports and dependency ranges are unchanged. Adoption is optional.
 
-CLI 3.6.1 is published and verified; Kurot-Studio adopts it with its own lock.
-UI 3.6.2 contains the new authoring guides, but registry publication remains
-unconfirmed. See [release history](docs/release-history.md) for current evidence.
+UI 3.6.2 and CLI 3.6.1 are published and verified. UI bundles the authoring
+guides; CLI supplies template entries and the strict skinParts declaration fix.
+Kurot-Studio adopts CLI 3.6.1. See [release history](docs/release-history.md).
 Engine dependency ranges/locks and Core/UI implementations are unchanged.
 
 Dependency direction is one-way. Core depends on bitmap-font. UI, Game and

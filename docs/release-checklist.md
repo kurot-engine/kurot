@@ -24,3 +24,11 @@ of the following unless the user explicitly narrows the scope:
 Preparing source changes does not establish publication. When publication is
 authorized, record registry version/tag, downloaded artifact and integrity
 verification separately from the source version.
+
+For a documentation/publication status sync, check README opening banners,
+package identity blocks, architecture headers and active compatibility guides
+against the manifest and exact registry/latest metadata. Update current
+cross-package requirements from the real peer ranges; preserve feature-introduction
+minimums, dated validation snapshots and accepted older application/development
+locks. Keep the [published snapshot](release-history.md) current and distinguish
+repository documentation updates from immutable published package contents.

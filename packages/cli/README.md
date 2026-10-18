@@ -1,9 +1,10 @@
 # @kurot/cli
 
-**3.6.0 is published**, verified on npm on 2026-10-10 with matching registry
-integrity and successful package download. It adds the rounded 2× KUI game skin kit and mascot brand splash,
-and fixes development Theme lookup and empty runtime asset directories.
-Core 2.5.0 is also published and verified; new game scaffolds resolve Core ^2.5.0. The dependency/lock remains published ui-document 0.13.0.
+**3.6.1 is published**, verified on npm on 2026-10-18. It fixes generated
+skinParts declarations for full TypeScript checking and adds template README/AGENTS
+entries. The inherited 3.6.0 template supplies rounded 2× KUI skins and the mascot
+splash. New scaffolds resolve published SDK versions; the 2× skin kit requires
+Core >= 2.5.0 within 2.x. CLI's document dependency and development lock are unchanged.
 
 Build tooling for the Kurot UI Editor workflow. It uses esbuild, emits ES2022
 ESM, and compiles canonical KUI XML skins into runtime theme modules.
@@ -21,7 +22,7 @@ integrity and all 234 files matching prepared commit 46459e97. It fixes
 generated host skinParts declarations for full TypeScript
 checks with skipLibCheck=false and ships README/AGENTS entries in both templates.
 The game entry links UI 3.6.2's authoring/directory guide and complete ScoreHUD
-recipe (UI 3.6.2 registry publication remains unconfirmed). Runtime Skin output,
+recipe, included in published UI 3.6.2. Runtime Skin output,
 dependency ranges and engine locks are unchanged. Existing projects adopt the
 fix by updating their CLI installation/lock and rebuilding; new template docs
 do not overwrite existing project files. Kurot-Studio adopts exact CLI 3.6.1
@@ -60,8 +61,9 @@ children or Skin parts. New native text fields are validated before output,
 and percentage-looking text such as `100%` remains literal.
 
 Rendering these new tags requires UI `^3.3.0` and Core `^2.3.0` in the app;
-these are the original native API minimums. Current UI 3.4.0 requires Core
-`^2.4.0`, which includes the Core 2.3.1 blank rich-text line correction. Existing controls
+these are the original native API minimums. Current UI 3.6.2 requires Core
+`^2.5.2` for its package-wide outline-safe Label contract, including the Core
+2.3.1 blank rich-text line correction. Existing controls
 and templates do not require automatic upgrades or migrations. See
 [text component compilation](docs/text-components.md).
 
@@ -80,7 +82,7 @@ in KUI XML:
 The compiler emits the policy, base size and state overrides unchanged. UI
 derives the drawing size after layout validation. Rendering this capability
 requires `@kurot/ui@^3.1.0` and `@kurot/core@^2.1.0` in the application.
-These are the original fitting API minimums; current UI 3.4.0 requires Core ^2.4.0.
+These are the original fitting API minimums; current UI 3.6.2 requires Core ^2.5.2.
 Explicit `multiline="false"` means one unwrapped first line; remove it or set
 it to true for text intended to wrap. Files are not migrated automatically.
 See the [compilation contract](docs/label-text-layout.md) and
