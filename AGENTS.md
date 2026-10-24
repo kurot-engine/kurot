@@ -77,8 +77,9 @@ Full contribution rules: [docs/code-rules.md](docs/code-rules.md).
 - Comments describe non-obvious contracts. JSDoc is multi-line, even for one
   sentence; ordinary single-line notes use `//`. Private/internal members need
   documentation only for non-obvious invariants.
-- Control-flow bodies use braces; a single early return/throw/continue guard
-  may omit them. New files should stay under 300 lines; split by responsibility.
+- All control-flow bodies use multi-line braced blocks, including single-statement
+  return/throw/continue/break guards. New files should stay under 300 lines;
+  split by responsibility.
 - Reordering/comment cleanup preserves behavior. Make behavioral changes
   explicit; implement only documented compatibility, using public contracts
   rather than assuming Egret/Pixi conventions.

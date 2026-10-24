@@ -172,18 +172,19 @@ function drawTexture(smoothing: boolean | undefined): void { ... }
 
 ### 3.5 控制流大括号
 
-`if` / `else` / `for` / `while` 的代码块**必须**加大括号，唯一的例外是**提前退出守卫**：
-
-- 允许：`if (!condition) return;` — 单行提前退出，可省略大括号
-- 允许：`if (!condition) throw new Error();` — 单行抛出异常
-- 允许：`if (!condition) continue;` — 单行跳过
-- 不允许：其他所有情况必须加大括号
+`if` / `else` / `for`（含 `for...in`、`for...of`）/ `while` / `do...while`
+的语句体**一律使用大括号，并将语句体另起一行**。即使只有一条语句，
+包括提前 `return`、`throw`、`continue`、`break`，也必须使用完整代码块。
 
 ```typescript
-// 正确 — 提前退出守卫：允许单行省略大括号（意图明确，减少视觉噪音）
-if (!texture) return;
-if (this.contextLost) return;
-if (!this._currentBuffer) return;
+// 正确 — 提前退出守卫也使用大括号
+if (!texture) {
+	return;
+}
+
+if (!this._currentBuffer) {
+	throw new Error('Render buffer is not ready.');
+}
 
 // 正确 — 正常逻辑：必须加大括号
 if (value < 0) {
@@ -196,7 +197,10 @@ if (anticlockwise) {
 	this.arcBounds(x, y, radius, startAngle, endAngle);
 }
 
-// 错误 — 非提前退出不能省略大括号
+// 错误 — 单条语句也必须使用大括号
+if (!texture) return;
+if (!this._currentBuffer) throw new Error('Render buffer is not ready.');
+if (!condition) continue;
 if (value < 0) value += Math.PI * 2;
 if (anticlockwise) this.arcBounds(x, y, radius, endAngle, startAngle);
 ```
