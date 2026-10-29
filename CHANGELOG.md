@@ -5,6 +5,55 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-10-30 — CLI 3.8.0 publication
+
+- Verify npm exact version and latest as CLI 3.8.0, with Core latest 2.6.0.
+  Download the published CLI archive, verify registry SHA-512 integrity and
+  compare all 243 files byte for byte with the tested preparation checkout.
+  The configuration watcher, diagnostics, guides and both new starters are included.
+- Synchronize CLI's repository README/context and release publication status.
+  Core 2.6.0 and CLI 3.8.0 are both published; the CLI's new template runtime
+  prerequisite is available. Preserve earlier dated preparation/publication
+  snapshots and the immutable package documentation.
+- No further SDK bumps or application/example dependency adoption are included.
+  Existing build, 957 Core / 145 CLI unit-test and both browser-backend results
+  apply to the verified published code; this follow-up changes documentation only.
+
+## 2026-10-30 — Core 2.6.0 publication
+
+- Verify npm exact version and latest as Core 2.6.0. Download the published
+  archive, verify registry SHA-512 integrity and compare all 3200 files byte
+  for byte with the tested preparation checkout. Stage-option resolution,
+  declarations and generated API metadata are included.
+- Synchronize Core's repository README/context/architecture publication status.
+  The immutable npm archive retains the documentation from preparation.
+- CLI 3.8.0 remains prepared and unpublished, with npm latest still 3.7.0.
+  Its new starters' Core prerequisite is now available. No SDK/application
+  dependency declarations, locks or installations are adopted here.
+
+## 2026-10-30 — Core 2.6.0 and CLI 3.8.0 preparation
+
+- Prepare Core 2.6.0 for per-field canvas stage defaults and CLI 3.8.0 for
+  validated stage configuration watching, atomic HTML updates and canvas-only
+  game/empty starters. Both are feature releases; publication is pending.
+- Synchronize manifests, README files, context/version indexes, startup and
+  watching contracts, and generated Core API references. Preserve historical
+  release records and feature-introduction minimums.
+- Publish Core first, then CLI. New starters need Core >= 2.6.0 within 2.x;
+  the template registry placeholders remain. Existing UI/Game/DragonBones/
+  ui-runtime and compatible Spine peers already accept Core 2.6.0, so their
+  package versions and compatibility minima remain unchanged.
+- SDK development locks and application/example installations are not adopted
+  here. demo/game's ranges accept both releases as optional adoption;
+  Star Catcher's exact Core 2.5.4 / CLI 3.7.0 pins need explicit declaration
+  changes if selected later. Existing explicit startup options retain priority.
+- Core build/declarations and 957 tests pass; CLI build and 145 tests pass.
+  The two real browser backend runs pass dev save/reload, recovery, overrides
+  and release startup. API generation/consistency and all 19 strict examples
+  pass against built and source-free packed SDKs. Core's API files match 2.6.0;
+  the CLI archive includes all 243 expected files. Registry checks confirm both
+  target versions are unpublished.
+
 ## 2026-10-28 — Published CLI/document dependency adoption
 
 - Verify registry ui-document 0.13.2 (323 files) and CLI 3.7.0 (239 files)

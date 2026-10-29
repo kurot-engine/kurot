@@ -1,6 +1,6 @@
 # lineStyle
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 lineStyle(thickness: number, color: number, alpha: number, _pixelHinting: boolean, _scaleMode: string, caps?: string, joints?: string, miterLimit: number, lineDash?: number[]): void;

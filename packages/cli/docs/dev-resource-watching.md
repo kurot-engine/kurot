@@ -17,9 +17,26 @@ translations and other project-owned files.
 | PNG, fonts, language properties and other runtime files | Synchronize assets |
 | Resource directory creation, replacement or deletion | Reconnect watcher and reconcile output; compile KUI when enabled |
 | Reusable component source or skin | Retain component discovery/namespace/catalog rebuild and synchronize assets |
+| Root kurot.config.ts or .js stage defaults | Validate and atomically regenerate HTML; refresh manually |
 
-Changes to `kurot.config.ts`, dependencies or build configuration still require
-restarting dev. Locale configuration is consumed by project code; the CLI does
+With CLI >= 3.8.0 within 3.x, stage defaults in `kurot.config.ts` / `.js` can be
+saved without restarting `kurot dev`. `kurot build --watch` retains its existing
+source-watch behavior and does not install the configuration watcher.
+After the successful configuration update, refresh the browser manually. The
+new Player consumes HTML canvas attributes with the Core behavior described in
+[stage configuration](../../core/docs/stage-configuration.md), requiring Core
+>= 2.6.0 within 2.x; explicit runtime options still take priority.
+
+The watcher handles ordinary and atomic editor saves of the root ESM config file,
+re-evaluates it with a fresh module URL, validates width/height, scale mode,
+orientation and frame rate, and atomically replaces only the generated HTML.
+Invalid edits keep the last successful page, report an error and allow correction
+without restarting. Imported configuration helpers and dependencies are not
+reloaded; edits to them still require restarting dev.
+
+Changes outside `stage`, including entry/output/UI paths, or dependencies still
+require restarting dev. A detected structural config change reports
+`KUROT_CONFIG_RESTART_REQUIRED` and leaves the active outputs intact. Locale configuration is consumed by project code; the CLI does
 not introduce a locale parser or mutate authored skins. A style edit may change
 compiled skin assignments while its XML remains untouched.
 
@@ -52,6 +69,9 @@ A resource-only batch emits JSONL build-start with reason `resource-change`,
 followed by build-complete after synchronization. Existing `kui-change` and
 `source-change` reasons retain their meaning. Consumers should tolerate the
 additional reason and refresh only after a successful build-complete event.
+Root configuration updates emit `config-change`; failures additionally emit
+`KUROT_CONFIG_RELOAD_FAILED` or `KUROT_CONFIG_RESTART_REQUIRED` diagnostics.
+The stage watcher shares this serialized queue with resource/component work.
 
 ## Preview and atlas boundaries
 

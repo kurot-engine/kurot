@@ -45,7 +45,10 @@ requests and the intended interactions in the browser.
   `src/components/<Name>.ts` with
   `resource/ui/components/<Name>Skin.kui.xml`; export the matching class name.
 - `kurot.config.ts`: build/stage/component settings; `template/web/index.html`:
-  authored HTML. Keep explicit createPlayer options consistent with stage intent.
+  authored HTML. Main uses `createPlayer({ canvas })` with the generated canvas
+  attributes; edit stage defaults only in config. This requires Core >= 2.6.0
+  within 2.x. With CLI >= 3.8.0 within 3.x, save stage edits, wait for the update
+  and refresh the browser; structural build changes require restarting.
 - `bin-debug/`, `bin-release/`, `.kurot/` and generated theme JSON: build outputs.
   Edit authored inputs; the CLI generates the Skin module and part declarations.
 

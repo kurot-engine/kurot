@@ -1,6 +1,6 @@
 # @kurot/core API
 
-Version: **2.5.5**. Read the installed package's matching documentation.
+Version: **2.6.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).

@@ -33,6 +33,12 @@ describe('HTML generation', () => {
 			'missing required placeholders',
 		);
 	});
+
+	it.each(['game', 'empty'])('keeps stage defaults out of the %s starter entry', async template => {
+		const source = await fs.readFile(path.resolve(testDir, `../templates/${template}/src/Main.ts`), 'utf8');
+		expect(source).toContain('createPlayer({ canvas })');
+		expect(source).not.toMatch(/contentWidth:|contentHeight:|scaleMode:|frameRate:/);
+	});
 });
 
 function createProject(htmlTemplate: string): Project {

@@ -40,7 +40,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.7.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 3.8.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
@@ -97,6 +97,10 @@ and reconciles additions, deletions and directory replacement. Runtime-only
 changes do not recompile skins. The fixed style.json and default.res.json paths
 still trigger KUI compilation; font loading remains an application responsibility.
 Changes are debounced and queued, with changed bytes staged before publication.
+A shallow root configuration watcher re-evaluates ESM config after stage edits
+and publishes complete HTML through an atomic rename. Invalid values retain the
+last successful page; structural build changes require restarting dev. This path
+shares the resource build queue and does not mutate the immutable Project.
 Browser refresh remains manual and HTTP responses use no-store. Individual
 renames do not form an atomic multi-file transaction. See
 [resource watching](dev-resource-watching.md).

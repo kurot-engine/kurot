@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/core",
-	"version": "2.5.5",
+	"version": "2.6.0",
 	"description": "Modern rewrite of the Egret game engine — WebGL multi-texture batching, instruction-driven render pipeline, strict TypeScript, Egret-compatible API",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -26,6 +26,7 @@
 		"dev": "tsc --watch",
 		"clean": "rm -rf dist",
 		"test": "vitest run",
+		"test:stage-config": "node tools/verify-stage-config.mjs",
 		"test:visual": "playwright test --config examples/visual-regression/playwright.config.ts",
 		"test:visual:update": "playwright test --config examples/visual-regression/playwright.config.ts --update-snapshots",
 		"test:watch": "vitest",

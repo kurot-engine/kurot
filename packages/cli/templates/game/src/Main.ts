@@ -181,13 +181,7 @@ async function start(): Promise<void> {
 	if (!(canvas instanceof HTMLCanvasElement)) {
 		throw new Error('Missing gameCanvas.');
 	}
-	const app = createPlayer({
-		canvas,
-		contentWidth: 640,
-		contentHeight: 1136,
-		scaleMode: 'showAll',
-		frameRate: 60,
-	});
+	const app = createPlayer({ canvas });
 	app.start(new Main());
 }
 

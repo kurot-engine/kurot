@@ -2,7 +2,9 @@ import type { StageScaleMode } from '../display/enums/StageScaleMode.js';
 import type { OrientationMode } from '../display/enums/OrientationMode.js';
 
 /**
- * Configuration options for initializing the Kurot engine.
+ * Configuration options for initializing the Kurot engine. Stage settings use
+ * explicit options first, then the canvas attributes documented below, then
+ * their original defaults. Attributes are read once when createPlayer is called.
  */
 export interface KurotOptions {
 	/**
@@ -11,22 +13,24 @@ export interface KurotOptions {
 	canvas: HTMLCanvasElement;
 
 	/**
-	 * Frame rate (default: 60).
+	 * Target frame rate. Falls back to data-frame-rate, then 60.
 	 */
 	frameRate?: number;
 
 	/**
-	 * Stage scale mode (default: 'showAll').
+	 * Stage scale mode. Falls back to data-scale-mode, then 'showAll'.
 	 */
 	scaleMode?: StageScaleMode;
 
 	/**
-	 * Initial content width in logical pixels.
+	 * Initial content width in logical pixels. Falls back to data-content-width,
+	 * then canvas.width or 640 when the canvas width is zero.
 	 */
 	contentWidth?: number;
 
 	/**
-	 * Initial content height in logical pixels.
+	 * Initial content height in logical pixels. Falls back to data-content-height,
+	 * then canvas.height or 1136 when the canvas height is zero.
 	 */
 	contentHeight?: number;
 
@@ -39,7 +43,7 @@ export interface KurotOptions {
 	resolution?: number;
 
 	/**
-	 * Screen orientation mode (default: 'auto').
+	 * Screen orientation mode. Falls back to data-orientation, then 'auto'.
 	 */
 	orientation?: OrientationMode;
 

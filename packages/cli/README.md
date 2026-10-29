@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **3.7.0** (published).
+resource watching. Package version: **3.8.0** (published).
 Requires Node.js >= 20 and
 ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
 
@@ -11,11 +11,12 @@ the separate CLI 1.3.x line. KUI configuration and resource files are project-ow
 
 ## Usage
 
-The CLI does not require a global install. Install the CLI as a project development dependency. New game scaffolds need Core ^2.5.0 for the
-2× skin kit; existing projects keep their own installed SDKs and resources.
+The CLI does not require a global install. Install it as a project development
+dependency. Both new scaffolds need Core ^2.6.0 for canvas stage-attribute
+startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@3.7.0 create my-game
+npx @kurot/cli@3.8.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -23,7 +24,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.7.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.8.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -86,6 +87,13 @@ The development server rebuilds TypeScript, KUI XML, custom namespaces, and
 the component catalog as their sources change. Browser refresh is currently
 manual. JSONL mode reserves stdout for incremental build and server events.
 
+Root `kurot.config.ts` / `.js` stage edits are reloaded and published to HTML
+without restarting dev. Wait for the successful update, then refresh manually.
+Invalid edits retain the last valid page; structural build configuration and
+imported configuration helper changes still require restarting dev. Configuration
+watching requires CLI >= 3.8.0 within 3.x and applies to `kurot dev`;
+`kurot build --watch` keeps its existing source-watch behavior.
+
 Dev also synchronizes the complete `resource/` tree,
 including locale JSON, atlas PNG/JSON, fonts and translation files, with deletion
 and rename handling. Runtime-only edits do not recompile skins; style and resource
@@ -128,6 +136,10 @@ export default {
 `ui.sourceDir` contains `.kui.xml` documents. The build always generates the
 runtime theme manifest at `resource/default.thm.json`; it is not an authored
 input. `ui.namespaces` can map additional XML prefixes to project barrel files.
+
+`stage` supplies the generated canvas defaults. With Core >= 2.6.0 within 2.x,
+entry code can use `createPlayer({ canvas })`. Explicit options override the corresponding defaults;
+see [Core stage configuration](../core/docs/stage-configuration.md).
 
 The HTML template must contain these placeholders:
 

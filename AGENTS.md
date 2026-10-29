@@ -31,10 +31,10 @@ installation establish its baseline. Package versions are independent.
 
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
-| `@kurot/core` | 2.5.5 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
+| `@kurot/core` | 2.6.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
 | `@kurot/ui` | 3.6.2 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 2.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
-| `@kurot/cli` | 3.7.0 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
+| `@kurot/cli` | 3.8.0 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.13.2 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime` | 0.10.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
 | `@kurot/atlas` | 0.1.0 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
@@ -54,6 +54,7 @@ do not establish the required implementation.
 
 | Changing or using | Contract |
 | --- | --- |
+| Stage defaults, canvas startup or config watching | [stage configuration](packages/core/docs/stage-configuration.md), [CLI watching](packages/cli/docs/dev-resource-watching.md) |
 | Texture/sheet dimensions, density, trim or grids | [texture density](packages/core/docs/texture-density.md) |
 | Text alignment, wrapping, input, measurement or outlines | [Core text](packages/core/docs/text-layout.md), [Label layout](packages/ui/docs/label-text-layout.md) |
 | Sound playback and loop counts | [audio playback](packages/core/docs/audio-playback.md) |

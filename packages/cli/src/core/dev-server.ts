@@ -17,6 +17,7 @@ import { refreshProjectComponents } from './components/discover-components.js';
 import { createResourceAssetSync } from './resource-asset-sync.js';
 import { watchResourceDirectory } from './resource-watcher.js';
 import { KUI_THEME_OUTPUT_PATH } from './project.js';
+import { watchStageConfiguration } from './config-watcher.js';
 import { logger } from '../utils/logger.js';
 import type { DevEvent } from './diagnostics/index.js';
 import type { BuildContext } from './pipeline.js';
@@ -100,6 +101,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 	const componentSkinsWatched = watchComponents(project, ctx, options, enqueue, syncAssets);
 
 	watchResources(project, ctx, options, componentSkinsWatched, enqueue, syncAssets);
+	watchStageConfiguration(ctx, enqueue, options.onEvent);
 
 	const server = startHttpServer(project, options);
 

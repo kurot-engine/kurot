@@ -47,6 +47,9 @@ app.start(root);
 ```
 
 `createPlayer` initializes capabilities, rendering, input and screen adaptation.
+CLI pages can use `createPlayer({ canvas })` with the defaults described in
+[stage configuration](stage-configuration.md). This requires Core >= 2.6.0
+within 2.x; keep explicit options with older installations.
 When customizing CLI-authored HTML, retain its import-map, stage and entry-script
 placeholders; the CLI validates all of them before generating the page.
 One Player owns the page's runtime hooks. Keep its canvas parent sized: the

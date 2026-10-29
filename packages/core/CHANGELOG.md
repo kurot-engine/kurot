@@ -4,12 +4,55 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
-## Unreleased
+## [2.6.0] — 2026-10-30
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-10-30.
+
+### Added
+
+- Resolve initial stage settings from explicit options, then canvas `data-*`
+  attributes, then existing defaults. Support CLI canvas-only startup without
+  a runtime dependency on CLI configuration. Validate consumed attributes before
+  allocating a Player; preserve explicit overrides and existing DPR/sizing behavior.
+- Add public startup regressions and a real CLI/browser save/reload check for
+  both backends, invalid configuration recovery, explicit overrides and release.
+
+### Compatibility and adoption
+
+- This minor release adds canvas stage-attribute defaults without changing the
+  public option types or package dependencies. Each explicit option still wins;
+  absent attributes retain the previous defaults. Invalid consumed attributes
+  fail before Player allocation. Attributes are read once at startup.
+- UI, Game, DragonBones, ui-runtime and compatible Spine Core peers accept
+  2.6.0. Their SDK versions, peer minima and development locks do not need to
+  change. CLI's build-time document dependency is unaffected.
+- CLI 3.8.0's updated starters require Core 2.6.0 for canvas-only startup.
+  Existing applications can retain explicit options and their current
+  SDK installations. Compatible ranges may adopt through a lock update; exact
+  Core pins require an explicit declaration update when adopting.
 
 ### Documentation — 2026-10-18
 
 - Record 2.5.5 publication and route game authors to the repository's new UI
   workflow. The UI guides postdate UI 3.6.1; Core runtime/dependencies are unchanged.
+
+### Verification — 2026-10-30
+
+- Build, declaration generation and all 957 unit tests pass (81 files), including
+  per-field attribute resolution, explicit overrides, defaults and invalid values.
+- Real CLI/browser checks pass on WebGL and Canvas 2D for canvas-only startup,
+  repeated stage saves and manual reloads on the same dev process, invalid-config
+  retention/recovery, explicit overrides and minified release startup. Neither
+  backend reports browser errors.
+- Regenerated API references match 2.6.0 with 167 exports, 2152 members and zero
+  missing entries. All 19 Core/Game/UI JSDoc examples compile strictly against
+  built declarations and source-free packages. The packed Core includes all
+  2552 API documentation files; other SDK versions are unchanged.
+- The published archive contains 3200 files, all matching the prepared checkout
+  byte for byte, including stage-option resolution, declarations and API metadata.
+  Repository publication-status updates follow verification; the npm archive
+  retains its preparation-time documentation.
 
 ## [2.5.5] — 2026-10-18
 

@@ -1,12 +1,14 @@
 # KurotOptions
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 interface KurotOptions
 ```
 
-Configuration options for initializing the Kurot engine.
+Configuration options for initializing the Kurot engine. Stage settings use
+explicit options first, then the canvas attributes documented below, then
+their original defaults. Attributes are read once when createPlayer is called.
 
 ## Members
 

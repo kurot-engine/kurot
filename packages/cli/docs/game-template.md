@@ -31,6 +31,16 @@ This ordering includes loading-screen Labels in the project font. The loading
 screen's startup messages stay in English because translations are not loaded yet.
 Templates do not implement live font/theme/language replacement.
 
+## Stage defaults
+
+Both starters use `createPlayer({ canvas })`. Configure width, height, scale mode,
+orientation and frame rate in `kurot.config.ts`; the CLI writes canvas attributes.
+This requires Core >= 2.6.0 within 2.x, documented in
+[stage configuration](../../core/docs/stage-configuration.md). Explicit options
+remain available for intentional overrides. In dev, save stage settings, wait
+for the configuration update and refresh the browser with CLI >= 3.8.0 within
+3.x; no dev restart is needed.
+
 ## HTML brand splash
 
 The game template's `web/index.html` presents `web/logo.png` beneath a small

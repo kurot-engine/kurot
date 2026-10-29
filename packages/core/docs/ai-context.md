@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@2.5.5`, published. It provides Kurot's
+Package identity: `@kurot/core@2.6.0` (published). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -18,6 +18,9 @@ InstructionSet, no dirty-flag optimization).
 Source root: `src/kurot/`. Public API: `src/index.ts` re-exports each
 subfolder's `index.ts` — see §4 for the full grouped list before assuming
 something isn't exported.
+
+Core >= 2.6.0 can consume canvas stage attributes in `createPlayer`; see
+[stage configuration](stage-configuration.md) for precedence and validation.
 
 ## 1. Directory map
 

@@ -1,6 +1,4 @@
 import { Stage } from '../display/Stage.js';
-import { StageScaleMode } from '../display/enums/StageScaleMode.js';
-import { OrientationMode } from '../display/enums/OrientationMode.js';
 import { DisplayObject } from '../display/DisplayObject.js';
 import { RenderTexture } from '../display/texture/RenderTexture.js';
 import { Matrix } from '../geom/Matrix.js';
@@ -11,6 +9,7 @@ import { setupLifecycle } from './SystemTicker.js';
 import { CanvasRenderer, CanvasBuffer } from './canvas/index.js';
 import type { KurotOptions } from './KurotOptions.js';
 import { Capabilities } from '../system/Capabilities.js';
+import { resolveCanvasStageOptions } from './canvas-stage-options.js';
 
 /**
  * Owns one Player, its stage, canvas input and browser lifecycle bindings.
@@ -43,6 +42,9 @@ export interface KurotApp {
  * Creates and initializes a Kurot player from the given options.
  * This is the main entry point for starting a Kurot application.
  * Use a single live application and call destroy() when its page/view closes.
+ * Stage settings resolve per field from explicit options, then canvas data-*
+ * attributes, then existing defaults. CLI pages can call createPlayer({ canvas }).
+ * Invalid consumed attributes throw before Player resources are allocated.
  *
  * ```ts
  * import { createPlayer, Sprite } from '@kurot/core';
@@ -60,6 +62,7 @@ export interface KurotApp {
  * ```
  */
 export function createPlayer(options: KurotOptions): KurotApp {
+	const { contentWidth, contentHeight, scaleMode, orientation, frameRate } = resolveCanvasStageOptions(options);
 	Capabilities._init();
 
 	if (!RenderTexture.renderer) {
@@ -74,12 +77,7 @@ export function createPlayer(options: KurotOptions): KurotApp {
 	}
 	const {
 		canvas,
-		frameRate = 60,
-		scaleMode = StageScaleMode.SHOW_ALL,
-		contentWidth = canvas.width || 640,
-		contentHeight = canvas.height || 1136,
 		resolution = Math.min(window.devicePixelRatio || 1, 2),
-		orientation = OrientationMode.AUTO,
 		maxTouches = 99,
 		background,
 	} = options;

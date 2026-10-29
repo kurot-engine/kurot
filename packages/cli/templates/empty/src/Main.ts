@@ -21,12 +21,10 @@ class Main extends Sprite {
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────
-const app = createPlayer({
-	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
-	contentWidth: 640,
-	contentHeight: 1136,
-	scaleMode: 'showAll',
-	frameRate: 60,
-});
+const canvas = document.getElementById('gameCanvas');
+if (!(canvas instanceof HTMLCanvasElement)) {
+	throw new Error('Missing gameCanvas.');
+}
+const app = createPlayer({ canvas });
 
 app.start(new Main());

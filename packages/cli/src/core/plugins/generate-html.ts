@@ -1,9 +1,11 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import { BuildError } from '../errors.js';
 import { writeFile } from '../../utils/fs.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
+import type { StageConfig } from '../config.js';
 
 const PLACEHOLDERS = {
 	importMap: '{{KUROT_IMPORT_MAP}}',
@@ -71,14 +73,28 @@ export function generateHtml(): BuildPlugin {
 		 * Writes the entry page with generated scripts and import-map entries.
 		 */
 		async apply(ctx: BuildContext): Promise<void> {
-			const entryScript = ctx.outputs.entryScript ?? 'main.js';
-			const template = await loadTemplate(ctx.project);
-			const html = renderHtml(template, ctx.project, entryScript, ctx.outputs.engine);
-
-			await writeFile(path.join(ctx.project.outputDir, 'index.html'), html);
+			await writeStageHtml(ctx, ctx.project.config.stage);
 			await copyTemplateAssets(ctx.project);
 		},
 	};
+}
+
+/**
+ * Publish a complete entry page with the supplied stage defaults. A failed
+ * render/write keeps the previous page; the immutable build project is unchanged.
+ */
+export async function writeStageHtml(ctx: BuildContext, stage: StageConfig): Promise<void> {
+	const project = { ...ctx.project, config: { ...ctx.project.config, stage } };
+	const template = await loadTemplate(project);
+	const html = renderHtml(template, project, ctx.outputs.entryScript ?? 'main.js', ctx.outputs.engine);
+	const destination = path.join(project.outputDir, 'index.html');
+	const temporary = `${destination}.${randomUUID()}.tmp`;
+	try {
+		await writeFile(temporary, html);
+		await fs.rename(temporary, destination);
+	} finally {
+		await fs.rm(temporary, { force: true });
+	}
 }
 
 /**

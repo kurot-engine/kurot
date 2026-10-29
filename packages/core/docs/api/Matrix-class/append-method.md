@@ -1,6 +1,6 @@
 # append
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 append(a: number, b: number, c: number, d: number, tx: number, ty: number): Matrix;

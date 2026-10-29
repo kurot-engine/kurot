@@ -1,6 +1,6 @@
 # initData
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 initData(bitmapX: number, bitmapY: number, bitmapWidth: number, bitmapHeight: number, offsetX: number, offsetY: number, textureWidth: number, textureHeight: number, sourceWidth: number, sourceHeight: number, rotated: boolean): void;

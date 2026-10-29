@@ -1,6 +1,6 @@
 # setSelection
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 setSelection(beginIndex: number, endIndex: number): void;

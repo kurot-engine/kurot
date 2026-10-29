@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **2.5.5**.
+for browser games. Package version: **2.6.0** (published).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -19,11 +19,11 @@ and docs without requiring the engine source.
 
 ## Installation
 
-Core 2.5.5 includes the generated reference and game guide. Existing compatible
-installations can keep their runtime and read repository docs when needed.
+The package includes the generated API reference and game authoring guide.
+Canvas stage-attribute startup requires Core >= 2.6.0 within 2.x.
 
 ```bash
-pnpm add @kurot/core@^2.5.5
+pnpm add @kurot/core@^2.6.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -151,6 +151,9 @@ root.addChild(rect);
 ```
 
 `createPlayer()` automatically uses the device pixel ratio, capped at `2`.
+Stage defaults can also come from canvas attributes emitted by the CLI; see
+[stage configuration](docs/stage-configuration.md) for precedence, validation
+and the Core >= 2.6.0 requirement.
 Pass `resolution` explicitly when a project needs a different sharpness and
 GPU-memory tradeoff. Individual `TextField` instances can also override their
 raster density through `textField.resolution`. The value can be changed while

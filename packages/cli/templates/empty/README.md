@@ -33,7 +33,10 @@ browser console, resource requests and intended interactions.
 - `src/Main.ts`: creates the single Player and root Sprite; add game objects
   and input/update logic here or in application modules it imports.
 - `kurot.config.ts`: build entry, stage settings and output paths. Keep explicit
-  createPlayer options in Main consistent with the intended stage settings.
+  stage defaults here; Main uses `createPlayer({ canvas })` to consume the generated
+  canvas attributes. This requires Core >= 2.6.0 within 2.x. With CLI >= 3.8.0
+  within 3.x, save stage edits, wait for the dev update, then refresh the browser;
+  structural build changes require restarting dev.
 - `template/web/index.html`: authored HTML and canvas.
 - `bin-debug/`, `bin-release/` and `.kurot/`: generated files; edit their inputs.
 

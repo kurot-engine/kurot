@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-Published `@kurot/cli@3.7.0` is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@3.8.0` (published) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -156,6 +156,11 @@ output root and moves all other files under assets/<hash>/. The HTML base URL
 versions document-relative requests; callers that explicitly resolve URLs must
 use document.baseURI. Existing UI Theme must receive an absolute config URL.
 See [release assets](release-assets.md). This option requires CLI >= 3.7.0 within 3.x.
+
+Since CLI 3.8.0, root ESM config stage changes regenerate HTML in `kurot dev` without
+restarting dev; `core/config-watcher.ts` owns this path. See
+[development watching](dev-resource-watching.md). Core canvas-attribute startup
+requires Core >= 2.6.0 within 2.x; explicit overrides remain supported.
 
 ## Configuration lookup
 

@@ -1,9 +1,9 @@
 # frameRate
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 frameRate?: number;
 ```
 
-Frame rate (default: 60).
+Target frame rate. Falls back to data-frame-rate, then 60.

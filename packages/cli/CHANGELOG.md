@@ -7,6 +7,56 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.8.0 — 2026-10-30
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-10-30.
+
+### Added
+
+- Watch root ESM TS/JS configuration stage defaults in dev, including atomic
+  replacement saves. Re-evaluate the root module, validate values and atomically
+  publish HTML on the existing server; manual refresh applies the new defaults.
+- Retain valid HTML after malformed edits and recover after correction; report
+  restart-required diagnostics for structural configuration changes. Add
+  `config-change` JSONL events and stage width/height/orientation validation.
+- Update game/empty starters to canvas-only Player startup using Core >= 2.6.0
+  within 2.x. Keep explicit runtime options available as per-field overrides.
+
+### Compatibility and adoption
+
+- This minor release adds configuration watching to `kurot dev`. Stage defaults
+  apply after a successful HTML update and manual browser refresh; running
+  Players are not reconfigured. `build --watch` retains its existing behavior.
+- Root ESM configuration is re-evaluated; imported helpers and structural
+  changes still require restarting dev. Shared configuration loading now rejects
+  invalid width/height/orientation values for build, dev and clean commands.
+- Core 2.6.0 is published, providing the required canvas-attribute startup for
+  newly created game/empty projects. Template latest placeholders and registry
+  resolution remain; CLI does not acquire a Core runtime dependency.
+- ui-document remains ^0.13.0, with development lock 0.13.2. Other SDK versions,
+  peer minima, installations and locks are unchanged. Existing CLI ^3.x ranges
+  accept optional adoption; exact pins require an explicit declaration update.
+- JSONL clients receive the added `config-change` build reason and the
+  `KUROT_CONFIG_RELOAD_FAILED` / `KUROT_CONFIG_RESTART_REQUIRED` diagnostic codes.
+
+### Verification — 2026-10-30
+
+- Build and all 145 tests pass (27 files), including TS/JS root configuration
+  reloads, atomic replacement saves, invalid-value retention/recovery,
+  restart-required diagnostics and generated HTML.
+- Integration with built Core 2.6.0 passes the real dev save/manual-refresh and
+  release startup checks on WebGL and Canvas 2D, including explicit overrides
+  and recovery on the same server process without browser errors.
+- The 243-file local package includes the compiled configuration watcher,
+  diagnostics, watching guide and both canvas-only starters with their Core
+  2.6.0 requirement. ui-document remains ^0.13.0; no Core runtime dependency
+  is added.
+- The published archive contains 243 files, all matching the tested preparation
+  checkout byte for byte. npm latest is CLI 3.8.0 and its required Core startup
+  behavior is available in published Core 2.6.0. Repository publication-status
+  updates follow verification; the npm archive retains preparation-time docs.
+
 ## 3.7.0 — 2026-10-27
 
 Published on npm; registry version, downloaded archive and integrity verified on 2026-10-28.

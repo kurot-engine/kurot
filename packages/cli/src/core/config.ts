@@ -1,4 +1,5 @@
 import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { exists } from '../utils/fs.js';
 import { ConfigError } from './errors.js';
 
@@ -142,24 +143,33 @@ const VALID_SCALE_MODES = [
 	'fixedWide',
 ] as const;
 
+let configRevision = 0;
+
 /**
  * Loads and validates `kurot.config.ts` (or `.js`) from the current working
  * directory, merging it over `DEFAULTS`. Falls back to `DEFAULTS` entirely
  * when no config file is present.
  *
+ * @param options - Optional project root and fresh root-module evaluation. Imported
+ * helpers retain Node module caching; changes to them require restarting dev.
  * @returns The validated project configuration.
  * @throws {ConfigError} If the project configuration is invalid.
  */
-export async function loadConfig(): Promise<ProjectConfig> {
-	const configPath = path.resolve('kurot.config.ts');
-	const jsConfigPath = path.resolve('kurot.config.js');
+export async function loadConfig(options: { root?: string; fresh?: boolean } = {}): Promise<ProjectConfig> {
+	const root = options.root ?? process.cwd();
+	const configPath = path.resolve(root, 'kurot.config.ts');
+	const jsConfigPath = path.resolve(root, 'kurot.config.js');
 
 	let config: ProjectConfig;
 
 	if ((await exists(configPath)) || (await exists(jsConfigPath))) {
 		// Dynamic import of `kurot.config.ts` relies on Node's built-in
 		// TypeScript type-stripping support (no `tsx`/`ts-node` involved).
-		const mod = await import((await exists(configPath)) ? configPath : jsConfigPath);
+		const url = pathToFileURL((await exists(configPath)) ? configPath : jsConfigPath);
+		if (options.fresh) {
+			url.searchParams.set('kurotConfigRevision', String(++configRevision));
+		}
+		const mod = await import(url.href);
 		const userConfig: ProjectConfig = mod.default ?? mod;
 		config = { ...DEFAULTS, ...userConfig, stage: { ...DEFAULTS.stage, ...userConfig.stage } };
 	} else {
@@ -175,6 +185,14 @@ export async function loadConfig(): Promise<ProjectConfig> {
 			`Invalid config: stage.frameRate must be a positive integer, got ${config.stage.frameRate}`,
 		);
 	}
+	for (const key of ['width', 'height'] as const) {
+		if (!Number.isFinite(config.stage[key]) || config.stage[key] <= 0) {
+			throw new ConfigError(`Invalid config: stage.${key} must be a positive finite number, got ${config.stage[key]}`);
+		}
+	}
+	if (!['auto', 'portrait', 'landscape', 'landscapeFlipped'].includes(config.stage.orientation)) {
+		throw new ConfigError(`Invalid config: stage.orientation must be auto, portrait, landscape or landscapeFlipped, got '${config.stage.orientation}'`);
+	}
 
 	if (!VALID_SCALE_MODES.includes(config.stage.scaleMode as (typeof VALID_SCALE_MODES)[number])) {
 		throw new ConfigError(
@@ -182,14 +200,14 @@ export async function loadConfig(): Promise<ProjectConfig> {
 		);
 	}
 
-	const entryPath = path.resolve(config.entry);
+	const entryPath = path.resolve(root, config.entry);
 
 	if (!(await exists(entryPath))) {
 		throw new ConfigError(`Invalid config: entry file '${config.entry}' does not exist`);
 	}
 
 	if (config.html) {
-		const templatePath = path.resolve(config.html.template);
+		const templatePath = path.resolve(root, config.html.template);
 		if (!(await exists(templatePath))) {
 			throw new ConfigError(`Invalid config: HTML template '${config.html.template}' does not exist`);
 		}

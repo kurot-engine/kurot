@@ -1,6 +1,6 @@
 # makeBlurV
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 readonly makeBlurV: ((tier: 4 | 8 | 16 | 32) => string) | ((tier: 4 | 8 | 16 | 32) => string);

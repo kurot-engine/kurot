@@ -1,6 +1,6 @@
 # cubicCurveTo
 
-Package: `@kurot/core@2.5.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 cubicCurveTo(cx1: number, cy1: number, cx2: number, cy2: number, ax: number, ay: number): void;
