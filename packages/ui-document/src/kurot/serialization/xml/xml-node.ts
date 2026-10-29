@@ -2,15 +2,15 @@ import type { UIPropertyOverride, UIStateDefinition } from '../../model/UIAssetC
 import type { UINode } from '../../model/UINode.js';
 import type { UIPropertyValue } from '../../model/UIPropertyValue.js';
 import { createSyntheticNodeId, isSyntheticNodeId } from '../../model/synthetic-node-id.js';
-import { createKurotUIFoundationRegistry } from '../../catalog/kurot-ui-foundation.js';
 import { compareStrings } from '../../shared/strings.js';
 import type { XMLElement } from './xml-parser.js';
 import { decodeXMLValue, encodeXMLValue, escapeXML } from './xml-values.js';
 import { parseArrayCollection, serializeArrayCollection, supportsArrayCollection } from './xml-array-collection.js';
 import { parseTextFlow, serializeTextFlow } from './xml-text-flow.js';
+import { createXMLComponentRegistry } from './xml-component-registry.js';
 
 const RESERVED_ATTRIBUTES = new Set(['id', 'xmlns']);
-const FOUNDATION_COMPONENTS = createKurotUIFoundationRegistry();
+const xmlComponents = createXMLComponentRegistry();
 const LAYOUT_TYPES = new Set(['BasicLayout', 'HorizontalLayout', 'TileLayout', 'VerticalLayout']);
 const PERCENT_SIZE_PROPERTIES = {
 	percentHeight: 'height',
@@ -292,7 +292,7 @@ function serializeNodeMetadata(
 }
 
 function assertTextFlowTarget(type: string): void {
-	const definition = FOUNDATION_COMPONENTS.resolve(type);
+	const definition = xmlComponents.resolve(type);
 	// Project subclasses are validated later against their project component registry.
 	if (definition && definition.properties.textFlow?.format !== 'text-flow') {
 		throw new Error(`Component "${type}" does not support textFlow.`);
@@ -377,7 +377,7 @@ function sortedEntries<T>(record: Readonly<Record<string, T>>): [string, T][] {
 }
 
 function propertyDefinition(type: string, property: string) {
-	return FOUNDATION_COMPONENTS.resolve(type)?.properties[property];
+	return xmlComponents.resolve(type)?.properties[property];
 }
 
 function decodeSizeProperty(type: string, name: string, source: string): { name: string; value: UIPropertyValue } {

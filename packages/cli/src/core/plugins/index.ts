@@ -8,6 +8,7 @@ import { compileSource } from './compile-source.js';
 import { generateHtml } from './generate-html.js';
 import { writeManifest } from './manifest.js';
 import { copyAssets } from './copy-assets.js';
+import { versionAssets } from './version-assets.js';
 
 export { cleanOutput } from './clean-output.js';
 export { compileKUI } from './compile-kui.js';
@@ -18,6 +19,7 @@ export { compileSource } from './compile-source.js';
 export { generateHtml } from './generate-html.js';
 export { writeManifest } from './manifest.js';
 export { copyAssets } from './copy-assets.js';
+export { versionAssets } from './version-assets.js';
 
 /**
  * The standard build sequence.
@@ -27,7 +29,7 @@ export { copyAssets } from './copy-assets.js';
  * files external and exclude them from per-file dev output (see
  * `compile-source.ts`). Engine and source compilation report their output
  * paths, then the HTML and manifest referencing them are written, and
- * finally static assets are copied.
+ * finally static assets are copied and optionally versioned for release.
  */
 export function defaultPlugins(): BuildPlugin[] {
 	return [
@@ -40,5 +42,6 @@ export function defaultPlugins(): BuildPlugin[] {
 		generateHtml(),
 		writeManifest(),
 		copyAssets(),
+		versionAssets(),
 	];
 }

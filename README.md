@@ -21,8 +21,8 @@ has no unified workspace install/build command.
 | [`@kurot/core`](packages/core/README.md)               | 2.5.5   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 3.6.2   | `packages/ui`          | EUI-compatible UI components, layout, skins, theming, and data binding                                           | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 2.0.1   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 3.6.1   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
-| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.1  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
+| [`@kurot/cli`](packages/cli/README.md)                 | 3.7.0   | `packages/cli`         | Editor-focused KUI XML build tooling; EXML game projects remain on CLI 1.3.x                                     | `ui-document`               |
+| [`@kurot/ui-document`](packages/ui-document/README.md) | 0.13.2  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.10.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
 | [`@kurot/dragonbones`](packages/dragonbones/README.md) | 0.1.0   | `packages/dragonbones` | Published DragonBones 5.7 runtime, native displays, atlas regions, deformable meshes, events and clock           | `@kurot/core`               |
@@ -40,7 +40,7 @@ Current manifest dependency ranges:
 | Core 2.5.5        | bitmap-font `^0.1.0`                              |
 | UI 3.6.2          | Core `^2.5.2`                                     |
 | Game 2.0.1        | Core `^2.0.0`                                     |
-| CLI 3.6.1         | ui-document `^0.13.0`                             |
+| CLI 3.7.0         | ui-document `^0.13.0`                             |
 | ui-runtime 0.10.0 | Core `^2.4.0`, UI `^3.4.0`, ui-document `^0.13.0` |
 | dragonbones 0.1.0 | Core `^2.1.1`                                     |
 

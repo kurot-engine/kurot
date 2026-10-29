@@ -18,6 +18,7 @@ clean output
   → generate HTML
   → write release manifest
   → copy runtime assets
+  → optionally version release assets
 ```
 
 KUI compilation runs first because skin factories can import project namespace
@@ -39,7 +40,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.6.1 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 3.7.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
@@ -70,6 +71,13 @@ Development builds preserve application source module structure under
 `bin-release/web/`, minify bundles, add content hashes, and write
 `manifest.json`. Static resources retain stable paths because application code
 addresses them by key or URL.
+
+With `output.versionedAssets: true`, the final stage hashes the complete output
+and moves runtime files into `assets/<hash>/`. The entry HTML receives a base URL;
+the root release manifest and BuildContext script paths receive the same prefix.
+Relative references inside resources and ESM modules remain intact. This is one
+version for the complete build, rather than independent hashes per resource.
+See [release deployment](release-assets.md) for URL and hosting requirements.
 
 Asset copying creates directories only when an accepted runtime file needs them.
 KUI source files and source theme JSON are excluded when UI compilation is enabled,

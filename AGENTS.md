@@ -34,8 +34,8 @@ installation establish its baseline. Package versions are independent.
 | `@kurot/core` | 2.5.5 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
 | `@kurot/ui` | 3.6.2 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 2.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
-| `@kurot/cli` | 3.6.1 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
-| `@kurot/ui-document` | 0.13.1 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
+| `@kurot/cli` | 3.7.0 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
+| `@kurot/ui-document` | 0.13.2 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime` | 0.10.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
 | `@kurot/atlas` | 0.1.0 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
 | `@kurot/dragonbones` | 0.1.0 | DragonBones 5.7 runtime and native adapter | [context](packages/dragonbones/docs/ai-context.md) |

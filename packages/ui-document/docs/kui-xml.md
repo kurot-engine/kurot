@@ -37,6 +37,15 @@ including `text`, `label` and their state overrides, contain literal strings:
 No backslash type escape is added or removed for these properties. XML entities
 such as `&amp;` and `&quot;` still escape XML syntax.
 
+The literal-string rule includes `label` on Button, ToggleButton, RadioButton,
+CheckBox and ToggleSwitch, plus RadioButton's `groupName` and their named-state
+overrides. For example, `label="10.00"` stays exactly `"10.00"`, not the number
+10. The codec resolves these built-in inheritance relationships internally;
+it does not add those extra controls to the intentionally partial public
+foundation catalog. Consumers continue registering their component definitions
+for semantic validation. Unknown project component properties still use scalar
+inference because the codec has no project schema for them.
+
 Other property types retain scalar inference: `true` and `false` are booleans,
 and numeric literals are numbers. Schema-free ArrayCollection Object attributes
 and union-valued properties still use a leading `\` for strings that would

@@ -4,6 +4,67 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## [0.13.2] — 2026-10-28
+
+Published on npm; registry version, downloaded archive and integrity verified on 2026-10-28.
+
+### Fixed
+
+- Resolve RadioButton, CheckBox and ToggleSwitch inheritance in the XML codec.
+  Their labels and named-state labels now remain literal strings, including
+  numeric formatting, boolean-looking text, reference prefixes and backslashes.
+  This fixes numeric RadioButton labels failing consumer schema validation.
+- Preserve RadioButton groupName strings and inherited string/resource fields
+  during parsing and serialization. Numeric and boolean properties and
+  schema-free collection data retain their existing types.
+- Keep the public foundation catalog unchanged so existing Editor/CLI component
+  registrations do not conflict. No document-format or runtime dependency change.
+
+### Compatibility and adoption
+
+- This is a compatible parser/serializer fix on the 0.13.x line. Public exports,
+  format 2 and foundation catalog membership remain unchanged.
+- CLI's ordinary document dependency and ui-runtime 0.10.0's peer/development
+  ranges, all ^0.13.0, accept 0.13.2. Their own SDK versions and peer minima need
+  no bump; their older development locks can be updated independently.
+- Consumers on ^0.13.0/^0.13.1 or latest can adopt through a targeted dependency
+  and lock update after publication. Exact 0.13.1 pins require declaration updates.
+  Bundled applications must rebuild to deliver the fix.
+- Skia 0.1.5 pins document 0.13.1. Adopting the fix in the published Skia SDK
+  requires changing that dependency and releasing a Skia patch; this is not a
+  requirement for consumers that remain on the existing Skia version.
+- CLI 3.3.1 installations resolve document 0.11.x. Updating a project's separate
+  0.13.x document dependency does not upgrade that compiler copy; those projects
+  must also adopt a CLI whose document range accepts 0.13.2.
+- Core, UI, Game, DragonBones, Atlas, bitmap-font and Spine adapters have no
+  dependency on this kernel and need no release for this fix.
+
+### Verification
+
+Build and all 319 unit tests pass (20 files), including 89 new regression cases.
+The four-radio numeric-label fixture reproduces the original schema errors
+before the fix and validates afterward. Read-only checks of all 61 KUI files
+in the runaway consumer pass Editor validation and parse/serialize/parse equality;
+file hashes remain unchanged. The active AutoBetPanelSkin's four label errors
+drop to zero with the built kernel. Source preparation did not modify consumer
+installations; subsequent publication/adoption is recorded below.
+
+The 0.13.2 package archive contains 323 files, including the compiled codec
+metadata and declarations. Isolated integration with the unchanged published
+CLI 3.6.1 passes parsing/code generation for all five Button-family controls
+and named-state labels. Public export names and foundation type membership
+match installed 0.13.1.
+
+### Registry adoption — 2026-10-28
+
+The published 0.13.2 archive has 323 files and its SHA-512 integrity matches
+registry metadata. CLI 3.7.0 and ui-runtime 0.10.0 development installations
+adopt the patch through their existing ^0.13.0 ranges. Tauri Editor adopts the
+registry dependency with 436 passing unit tests, including four new
+open/format/state/native-preview regressions. Read-only validation of all 61
+Runaway skins passes against the actual installed package. Electron adoption
+is explicitly deferred; no new Core/UI or runtime release is required.
+
 ## [0.13.1] — 2026-10-10
 
 Published; package download, registry integrity and tested catalog modules verified on 2026-10-10.

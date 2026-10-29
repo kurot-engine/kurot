@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@3.6.1` is build-time tooling on Node.js >= 20, with ordinary
+Published `@kurot/cli@3.7.0` is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -144,10 +144,18 @@ manual prefix cannot conflict with `ui.components.namespace`.
 6. compile application source;
 7. generate HTML;
 8. write the release manifest;
-9. copy runtime assets.
+9. copy runtime assets;
+10. optionally version release assets with `output.versionedAssets`.
 
 Do not reorder namespace or source compilation without reviewing externalization
 in `namespace-external-plugin.ts`.
+
+Release versioning runs last so the digest covers generated themes, scripts,
+resource bytes and template assets. It keeps index.html/manifest.json at the
+output root and moves all other files under assets/<hash>/. The HTML base URL
+versions document-relative requests; callers that explicitly resolve URLs must
+use document.baseURI. Existing UI Theme must receive an absolute config URL.
+See [release assets](release-assets.md). This option requires CLI >= 3.7.0 within 3.x.
 
 ## Configuration lookup
 

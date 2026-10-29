@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.13.1` (published). This is a headless,
+Package identity: `@kurot/ui-document@0.13.2` (published). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. The semantic format version is 2.
 
@@ -116,6 +116,12 @@ src/
   `toggle` default to `true`. `kui.ProgressBar` directly extends
   `kui.Component`, matching the runtime class rather than pretending it
   inherits the separate `Range` implementation.
+- The XML codec privately resolves `kui.RadioButton`, `kui.CheckBox` and
+  `kui.ToggleSwitch` through ToggleButton so inherited string/resource fields
+  and state overrides retain their types. RadioButton `groupName` is a literal
+  string. These types are not added to the public foundation registry, so
+  existing consumer registrations remain valid. Unknown project types retain
+  scalar inference; the codec does not infer their inheritance.
 - `kui.TextInput` directly extends `kui.Component`. It exposes the properties
   forwarded by TextInput itself; typography and prompt styling target its
   appearance parts instead of pretending the control extends Label.

@@ -40,7 +40,7 @@ The manifests are authoritative. Current Kurot package requirements are:
 Third-party tools are separate from this graph. Core's linebreak package is a
 runtime dependency; Atlas's PNG adapter uses pngjs. TypeScript, Vitest, esbuild
 used by tests, and browser test tools are development dependencies. The CLI's
-esbuild is a dependency of the build tool, not a game runtime dependency.
+esbuild and parse5 are dependencies of the build tool, not game runtime dependencies.
 
 Core does not depend on UI, Game, ui-runtime, DragonBones or Atlas. UI does not
 depend directly on bitmap-font. CLI-built skins do not require ui-runtime.

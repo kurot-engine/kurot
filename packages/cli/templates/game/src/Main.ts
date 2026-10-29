@@ -75,7 +75,7 @@ class Main extends UILayer {
 
 	private async _loadTheme(): Promise<void> {
 		// Load the theme and its default UI skin mappings.
-		const theme = new Theme('resource/default.thm.json');
+		const theme = new Theme(new URL('resource/default.thm.json', document.baseURI).href);
 		await new Promise<void>(resolve => theme.addEventListener(Event.COMPLETE, () => resolve()));
 	}
 

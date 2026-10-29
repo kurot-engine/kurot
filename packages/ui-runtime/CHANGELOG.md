@@ -4,6 +4,13 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## Development dependency adoption — 2026-10-28
+
+- Update only the development lock/installation to published ui-document 0.13.2.
+  Keep the supported peer/development range at ^0.13.0 and package version at
+  0.10.0; shipped runtime APIs and output do not change.
+- Build and all 77 tests pass against the new document installation.
+
 ## 0.10.0 — 2026-10-09
 
 Published; verified on npm on 2026-10-09.

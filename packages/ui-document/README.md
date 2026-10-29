@@ -1,8 +1,8 @@
 # @kurot/ui-document
 
 Headless semantic UI documents, canonical Skin KUI XML, validation, reusable
-assets and transactional editing. Package version: **0.13.1**. The semantic
-format is **2**; the package has no Kurot runtime dependency.
+assets and transactional editing. Package version: **0.13.2** (published).
+The semantic format is **2**; the package has no Kurot runtime dependency.
 
 Read [KUI XML](docs/kui-xml.md), [text components](docs/text-components.md),
 [project styles](docs/project-styles.md) and
@@ -13,11 +13,15 @@ authored property/state intent without loading fonts, images or engine code.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.13.1
+pnpm add @kurot/ui-document@^0.13.2
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
 models UI documents but does not instantiate or render runtime components.
+CLI's document dependency and ui-runtime 0.10.0's peer/development requirements
+use `^0.13.0`, which accepts 0.13.2 without dependent SDK releases. Consumers
+adopt through their own installations/locks; exact pins need explicit updates,
+and bundled applications need rebuilding to include a dependency fix.
 
 ## Quick Start
 
@@ -63,6 +67,13 @@ the numeric font size. String properties no longer need backslash type escapes;
 existing synthetic prefixes become literal backslashes. Adopt this contract in
 both Editor and CLI, and remove old prefixes explicitly. XML entities and typed
 collection fields retain their existing rules. See [KUI XML values](docs/kui-xml.md#values).
+
+Button, ToggleButton, RadioButton, CheckBox and ToggleSwitch labels, including
+named-state labels, preserve literal strings such as `"10.00"`, `"false"` and
+reference-looking text. RadioButton `groupName` is also a literal string.
+The XML codec knows the built-in inheritance independently of the partial
+foundation catalog; consumers still register controls beyond that public subset
+for semantic validation. Unknown project types retain scalar inference.
 
 The authored `<Skin>` element is a nonvisual root: root size and layout
 properties are written on it, and visual nodes are direct children. Display
@@ -252,8 +263,8 @@ const registry = createKurotUIFoundationRegistry();
 
 It defines the abstract semantic bases `kurot.DisplayObject`,
 `kui.UIComponent`, and `kui.Component`, plus the concrete `kui.Group`,
-`kui.Label`, `kui.EditableText`, `kui.Image`, `kui.Rect`, `kui.Button`,
-`kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput` nodes. `Group`
+`kui.Label`, `kui.EditableText`, `kui.BitmapLabel`, `kui.RichLabel`, `kui.Image`,
+`kui.Rect`, `kui.Button`, `kui.ToggleButton`, `kui.ProgressBar`, and `kui.TextInput` nodes. `Group`
 accepts ordered children; the other concrete nodes are leaves.
 
 `kui.*` is the canonical Kurot UI namespace. Authored Skin files use the
@@ -262,7 +273,7 @@ semantic document.
 
 The foundation catalog declares the serializable authoring properties inherited
 from Kurot display objects and UI layout elements, then adds the audited direct
-properties of all nine concrete components. Unknown properties are rejected.
+properties of the concrete components. Unknown properties are rejected.
 Skinnable controls inherit the optional `skinName` property, whose value is the
 qualified class name of a generated Skin, for example
 `<Button skinName="game.ButtonSkin" />`.
@@ -373,9 +384,9 @@ never replace it with `preview` or persist the expanded RGB values. Missing
 colors report the semantic path, and other token categories stay unresolved.
 
 Authored palette references use `@style:colors:<key>`; other XML prefixes are
-rejected. Authoring files remain unchanged by resolution. Current CLI 3.6.1 depends on document `^0.13.0` and resolves
-stylesheet colors and Label presets during KUI compilation. Runtime 0.10.0
-requires the same document range;
+rejected. Authoring files remain unchanged by resolution. The CLI compiler
+resolves stylesheet colors and Label presets during KUI compilation. Its
+document `^0.13.0` dependency accepts 0.13.2. Runtime 0.10.0 requires the same range;
 consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
@@ -392,6 +403,7 @@ retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and resolution order.
-Current CLI 3.6.1 and runtime 0.10.0 use document `^0.13.0` without overrides.
+CLI's document `^0.13.0` dependency and runtime 0.10.0's matching requirements
+accept 0.13.2 without overrides.
 Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`; preset expansion
 itself does not introduce a new native rendering requirement.

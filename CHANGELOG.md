@@ -5,6 +5,98 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-10-28 — Published CLI/document dependency adoption
+
+- Verify registry ui-document 0.13.2 (323 files) and CLI 3.7.0 (239 files)
+  by downloading their archives and checking SHA-512 integrity against npm.
+  Synchronize current publication status while preserving dated preparation
+  and older publication snapshots.
+- Adopt the releases in 19 selected installation directories: CLI/ui-runtime
+  development, Tauri Editor, Studio, Reskin, Reskin-Next API, Skia/tooling hosts,
+  the Mobile game example, engine examples, Runaway/Skydive/Tentax/MilfMaster,
+  DemoWorkspace/Test1 and the MilfMaster welcome prototype. Keep CLI and
+  ui-runtime's ^0.13.0 compatibility ranges and SDK versions unchanged.
+- Check compiler-owned document resolution as well as direct dependencies.
+  Correct retained 0.13.1 compiler copies in Mobile/Studio; verify Studio's
+  corrected graph with frozen installation and 11 actual-CLI regressions.
+  Exact fresh-release exceptions name only the selected CLI/document versions,
+  retaining the projects' other release-age policies.
+- Prepare Skia 0.1.6 for its changed dependency metadata: exact CLI 3.7.0 and
+  document 0.13.2, with build, 45 Node tests and a 147-file package/export check.
+  It is not published. The native test host uses this file package; registry
+  Skia Demo keeps 0.1.5, whose internal 3.6.0/0.13.1 compiler chain requires
+  publication and adoption of Skia 0.1.6 before it can be replaced.
+- Tauri passes its build/type checks, 436 unit tests and 12 Rust tests.
+  Four new regressions cover numeric RadioButton labels, other ToggleButton
+  subclasses, states, formatting and native component previews. All 61 Runaway
+  skins pass read-only validation/round trips using the installed kernel.
+  Rebuild an ad-hoc-signed 0.29.0 App separately from the running trial;
+  its code signature verifies. GUI/native-window suites are not rerun here.
+- CLI passes 132 tests, ui-runtime 77, Studio's selected integration suite 76,
+  Reskin 141, and the selected API checks 43. Updated games pass their affected
+  strict development/release builds and existing unit/type checks. MilfMaster's
+  registry CLI passes the previous cache/versioned-resource regression without
+  its retired 3.6.0 patch reference.
+- Electron Editor is explicitly excluded and its repository remains unchanged.
+  Branch/main reorganization, commits and online publication are deferred as
+  requested; this adoption does not publish another SDK or desktop artifact.
+- All 19 selected installations pass frozen-lock verification. All 58 affected
+  build/type/unit/lint steps pass, with Skia's separate build/tests/package and
+  the compiler-resolution/cache rechecks above. `git diff --check` passes in
+  all 13 affected Git repositories; DemoWorkspace/Test1 is a plain directory.
+
+## 2026-10-28 — ui-document 0.13.2 preparation and dependency audit
+
+- Prepare ui-document 0.13.2 for the built-in Button-subclass XML string fix.
+  Public exports, semantic format 2 and foundation catalog membership remain
+  unchanged. Source/docs versions are synchronized; publication is pending.
+  Registry checks still report document 0.13.1 and Skia 0.1.5 as latest.
+- CLI's ^0.13.0 ordinary dependency and ui-runtime 0.10.0's ^0.13.0
+  peer/development ranges accept the patch. Their development locks still use
+  0.13.0 and may adopt independently; neither SDK needs another version or
+  higher compatibility minimum. CLI 3.7.0's existing release preparation is
+  separate from this fix.
+- Published Skia 0.1.5 pins document 0.13.1. Delivering the fix through that
+  SDK requires a dependency change and a Skia patch release, such as 0.1.6.
+  Skia Demo pins Skia 0.1.5 and document 0.13.1; adopting both is explicit.
+  The local Skia native test app also pins document 0.13.1.
+- Tauri Editor 0.29.0, Electron Editor 0.28.6, Studio, Reskin-Next API and
+  Skydive pin document 0.13.1. They need declaration/lock updates when adopting.
+  Bundled products must rebuild; an already released product needs a new
+  artifact version under its own release rules. An unpublished product version
+  can include the dependency change before its first release.
+- Reskin, Runaway, Tentax, MilfMaster, DemoWorkspace/Test1 and the MilfMaster
+  welcome prototype accept the patch through ^0.13.1. Existing 0.13.1 locks
+  remain optional adoption; no blanket application version bumps are needed.
+- demo/game/star-catcher currently install CLI 3.3.1, which depends on document
+  ^0.11.0. To adopt this fix they must update that CLI installation, for example
+  to compatible CLI 3.6.1. demo/game's ^3.3.1 ranges accept it; star-catcher's
+  exact pin needs an explicit declaration change. game additionally installs
+  document 0.13.0 directly, which does not replace the compiler's 0.11.x copy.
+  Verify both direct and transitive parser resolutions after any adoption.
+- The game/empty scaffolds retain latest placeholders and resolve registry
+  versions when creating new projects; no template version change is required.
+  The Mobile game example's CLI 3.6.0 already accepts document ^0.13.0.
+  Core, UI, Game, DragonBones, Atlas, bitmap-font, Spine and Mobile SDKs have no
+  relevant kernel dependency and need no release for this fix.
+- Build and all 319 document tests pass. The packed 0.13.2 artifact has 323
+  files and works with unchanged CLI 3.6.1 for Button-family code generation
+  and state labels. No dependent SDK/application manifest, lock or installation
+  is modified. See [package notes](packages/ui-document/CHANGELOG.md#0132--2026-10-28).
+
+## 2026-10-27 — CLI 3.7.0 preparation
+
+- Prepare CLI 3.7.0 for publication with optional content-addressed release
+  asset directories, the game starter's Theme URL correction and HTML parsing
+  regressions. This is a minor configuration feature; publication is pending.
+- CLI adds build-time parse5 ^7.3.0 and retains ui-document ^0.13.0. Other SDK
+  versions, peer minima and development locks are unchanged.
+- Existing compatible CLI ranges may adopt the release through their own
+  installation/lock and rebuild. Exact pins need declaration updates when
+  adopting the feature; application/template/example installations are unchanged.
+  See [CLI release notes](packages/cli/CHANGELOG.md#370--2026-10-27) and
+  [release assets](packages/cli/docs/release-assets.md).
+
 ## 2026-10-18 — Documentation organization
 
 - Keep API indexes, README files, context maps and guides focused on current

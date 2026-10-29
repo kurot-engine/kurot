@@ -16,7 +16,7 @@
 		"@kurot/core": "2.5.4"
 	},
 	"devDependencies": {
-		"@kurot/cli": "3.3.1",
+		"@kurot/cli": "3.7.0",
 		"@playwright/test": "1.62.1",
 		"@types/node": "22.19.17",
 		"tsx": "4.21.0",

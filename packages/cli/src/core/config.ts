@@ -75,6 +75,11 @@ export interface OutputConfig {
 	 * `bin-release/web/<timestamp>` regardless of this setting.
 	 */
 	readonly dir: string;
+	/**
+	 * Place release assets in `assets/<content-hash>/` and set the entry page's
+	 * base URL to that directory. Defaults to false; ignored in development.
+	 */
+	readonly versionedAssets?: boolean;
 }
 
 export interface HtmlConfig {
@@ -96,7 +101,7 @@ export interface ProjectConfig {
 	 */
 	readonly entry: string;
 	/**
-	 * Development build output settings.
+	 * Build output settings.
 	 */
 	readonly output: OutputConfig;
 	/**
@@ -159,6 +164,10 @@ export async function loadConfig(): Promise<ProjectConfig> {
 		config = { ...DEFAULTS, ...userConfig, stage: { ...DEFAULTS.stage, ...userConfig.stage } };
 	} else {
 		config = DEFAULTS;
+	}
+
+	if (config.output.versionedAssets !== undefined && typeof config.output.versionedAssets !== 'boolean') {
+		throw new ConfigError('Invalid config: output.versionedAssets must be a boolean');
 	}
 
 	if (!Number.isInteger(config.stage.frameRate) || config.stage.frameRate <= 0) {

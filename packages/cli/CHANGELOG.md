@@ -7,6 +7,83 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.7.0 — 2026-10-27
+
+Published on npm; registry version, downloaded archive and integrity verified on 2026-10-28.
+
+### Registry adoption — 2026-10-28
+
+- Verify the published 239-file archive and its SHA-512 integrity. Adopt
+  ui-document 0.13.2 in the development lock without changing the ^0.13.0
+  compatibility range; build and all 132 tests pass.
+- Selected SDK/application/example installations adopt registry CLI 3.7.0.
+  MilfMaster no longer applies its earlier 3.6.0 patch; the published feature
+  passes its existing same-name-resource/cache verification. Electron Editor
+  retains its current installation at the user's explicit request.
+
+### Added
+
+- Optional `output.versionedAssets` release packaging: place runtime files in
+  `assets/<content-hash>/` and emit an HTML base URL, covering same-name resource
+  updates, generated themes, atlas/font pages and page-shell assets. Identical
+  output reuses the version; development and existing configurations keep their
+  paths. Root manifest and reported script paths use the version prefix.
+- Validate the option and reject conflicting HTML base elements before moving
+  output. Add regressions for same-name replacements, deterministic versions,
+  generated KUI, shell/script changes and disabled/development builds.
+
+### Changed
+
+- The game starter resolves its Theme URL against document.baseURI so compiled
+  skin imports follow the selected release directory with existing UI runtimes.
+
+### Fixed
+
+- Parse release HTML with parse5 before inserting the versioned base URL.
+  Preserve quoted attribute values containing greater-than signs and ignore
+  base-like text in scripts/styles. Keep the authored template intact, require
+  an explicit head and reject actual conflicting base elements.
+
+### Compatibility and adoption
+
+- This minor release adds an opt-in configuration field. The default paths,
+  development/watch behavior, commands and KUI/resource formats retain their
+  existing contracts. ui-document remains ^0.13.0; Core/UI and other SDKs need
+  no new release or higher peer minima.
+- Add parse5 ^7.3.0 as a CLI dependency for HTML parsing. Its entities dependency
+  supports the CLI's Node.js >= 20 baseline; it is not shipped in game bundles.
+- Projects enabling versioning need CLI >= 3.7.0 within 3.x, an absolute Theme
+  config URL based on document.baseURI and the deployment rules in
+  docs/release-assets.md. Existing projects may keep versioning disabled.
+- demo/game use ^3.3.1, and the selected Tentax/MilfMaster templates use ^3.6.0;
+  these ranges accept 3.7.0 as optional installation/lock adoption. Star Catcher
+  pins 3.3.1, and Editor/Studio pin 3.6.1; adopting this feature requires explicit
+  declaration updates. Their installations/locks are unchanged by preparation.
+- Bundled template latest placeholders remain; create records the running CLI's
+  version range. New scaffolds from 3.7.0 receive the Theme URL correction.
+  Other SDK peers/development locks and unrelated applications are unaffected.
+
+### Adoption
+
+- MilfMaster enables versioning using a committed pnpm patch to its installed
+  registry CLI 3.6.0. The patch carries the release feature without upgrading
+  runtime SDKs or depending on another checkout. No npm publication is claimed.
+
+### Verification — 2026-10-27
+
+- Clean CLI build and all 25 test files / 132 tests pass with maxWorkers=1,
+  including quoted HTML attributes, script/style text, release process
+  configuration and generated KUI output. git diff --check passes. An earlier
+  parallel run hit a resource-watch batch-reason assertion; its isolated rerun
+  and subsequent full runs passed.
+- The packed 3.7.0 archive contains 239 entries, including the compiled version
+  plugin, release deployment guide and corrected game starter. Its metadata
+  declares parse5 ^7.3.0 and the unchanged ui-document ^0.13.0 requirement.
+- MilfMaster's same-browser-cache fixture keeps its old immutable response
+  cached while the next deployment loads the changed resource, atlas page and
+  font through a new version directory; uncached old-version lazy loads remain
+  available. Actual minified game startup passes on WebGL and Canvas.
+
 ## 3.6.1 — 2026-10-18
 
 Published; verified on npm on 2026-10-18, including latest, downloaded tarball

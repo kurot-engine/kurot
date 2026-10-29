@@ -13,8 +13,8 @@ importers:
         version: 2.5.4
     devDependencies:
       '@kurot/cli':
-        specifier: ^3.3.1
-        version: 3.3.1
+        specifier: ^3.7.0
+        version: 3.7.0
 
 packages:
 
@@ -186,19 +186,23 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@3.3.1':
-    resolution: {integrity: sha512-j1RX+o91SaJHyfGEgotQdJnTdwFirrtU6vuX5j6WucLl3myqc7BeP7AMSM8vmel+mxwOv/hk2ywkhx+8loOP2g==}
+  '@kurot/cli@3.7.0':
+    resolution: {integrity: sha512-LF/cmCc0TvJzx5+yh4JhII5f9uuqhcXMibDfhrihA5e2gLuy/VcdIaVbMQELx1n0XZN180Hlcob/rE0p2jv/eg==}
     hasBin: true
 
   '@kurot/core@2.5.4':
     resolution: {integrity: sha512-XBlGKlohioJEIy/Nf8Gkl7mr7PSoK/uQkugM6lLyuKdzPSq01a+X+p89anOzQrUCfXmBp7sUCrkV2U0hnd1nFA==}
 
-  '@kurot/ui-document@0.11.0':
-    resolution: {integrity: sha512-YuumsJA87si4XDcI9QfEligHHzH2Rua0N+bYKhuxBW1uwRzpizimrk2qSvfM/WaPwtaVFI5THcLy+tLvDszf8g==}
+  '@kurot/ui-document@0.13.2':
+    resolution: {integrity: sha512-8oY67ukqw0PDoRPQMNzaryTEr+aPJej6E6nkkzs4rrsPeon8plY/p6NVJm6jpxYkImTYz+d+H/Y8C0joVnuJrQ==}
 
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
+
+  entities@6.0.1:
+    resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
+    engines: {node: '>=0.12'}
 
   esbuild@0.25.12:
     resolution: {integrity: sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==}
@@ -207,6 +211,9 @@ packages:
 
   fflate@0.8.3:
     resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
+
+  parse5@7.3.0:
+    resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
 
 snapshots:
 
@@ -298,20 +305,23 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@3.3.1':
+  '@kurot/cli@3.7.0':
     dependencies:
-      '@kurot/ui-document': 0.11.0
+      '@kurot/ui-document': 0.13.2
       commander: 13.1.0
       esbuild: 0.25.12
+      parse5: 7.3.0
 
   '@kurot/core@2.5.4':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/ui-document@0.11.0': {}
+  '@kurot/ui-document@0.13.2': {}
 
   commander@13.1.0: {}
+
+  entities@6.0.1: {}
 
   esbuild@0.25.12:
     optionalDependencies:
@@ -343,3 +353,7 @@ snapshots:
       '@esbuild/win32-x64': 0.25.12
 
   fflate@0.8.3: {}
+
+  parse5@7.3.0:
+    dependencies:
+      entities: 6.0.1
