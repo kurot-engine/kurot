@@ -1,5 +1,4 @@
 import { createPlayer, Sprite, ticker } from '@kurot/core';
-import { GAME_HEIGHT, GAME_WIDTH } from './GameModel.js';
 import type { GameSnapshot } from './GameModel.js';
 import { GameSession } from './GameSession.js';
 
@@ -24,7 +23,7 @@ const start = button('start');
 const pause = button('pause');
 const restart = button('restart');
 const close = button('close');
-const app = createPlayer({ canvas, contentWidth: GAME_WIDTH, contentHeight: GAME_HEIGHT, frameRate: 60 });
+const app = createPlayer({ canvas });
 const root = new Sprite();
 const controls = new AbortController();
 let disposed = false;

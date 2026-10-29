@@ -165,13 +165,11 @@ class Main extends UILayer {
 }
 
 // ── 启动 ──────────────────────────────────────────────────────────────────
-export const app = createPlayer({
-	canvas: document.getElementById('gameCanvas') as HTMLCanvasElement,
-	contentWidth: 640,
-	contentHeight: 1136,
-	scaleMode: 'showAll',
-	frameRate: 60,
-});
+const canvas = document.getElementById('gameCanvas');
+if (!(canvas instanceof HTMLCanvasElement)) {
+	throw new Error('Missing gameCanvas.');
+}
+export const app = createPlayer({ canvas });
 
 void StyleManager.init().then(() => {
 	TextField.default_fontFamily = StyleManager.fontFamily;

@@ -20,11 +20,20 @@ Left/Right or A/D; tap/drag the playfield on touch. Refresh manually after a bui
 Window blur or backgrounding pauses gameplay; Resume is explicit. Close disposes
 the application; reload to play again.
 
-The runtime is exact registry Core 2.5.4. CLI 3.3.1 matches the existing demo;
-TypeScript, Vitest, Playwright and tsx use versions already present in the
-repository. This example owns its new lock; existing SDK/example dependencies
-and locks are unchanged. The tsx launcher handles the TypeScript CLI config
+The runtime is exact registry Core 2.6.0 with CLI 3.8.0. TypeScript, Vitest,
+Playwright and tsx retain their pinned versions. This example owns its registry
+installation and lockfile. The tsx launcher handles the TypeScript CLI config
 without requiring Node's newer built-in type stripping.
+
+## Stage configuration
+
+Main uses `createPlayer({ canvas })`; `kurot.config.ts` provides the 640 × 800
+stage, scale mode and frame rate through CLI-generated canvas attributes.
+With CLI 3.8.0 dev, save stage settings, wait for the successful update and
+manually refresh the browser without restarting dev. Structural configuration
+or imported configuration helper changes still require a restart.
+GameModel's dimensions define the authored playfield and collision bounds;
+changing the gameplay area also requires updating those rules and visuals.
 
 ## Verify
 
@@ -71,7 +80,5 @@ creating a new one on the same Player. Final Close/pagehide also aborts DOM
 controls, destroys app adapters and stops the shared ticker because this page
 owns all its consumers. Removing a display child alone is not teardown.
 
-The quick guide ships in Core 2.5.5. This example keeps its exact published
-Core 2.5.4 pin, which does not contain that file; read the repository guide.
-Installed public API declarations still come from
-the exact registry package. No local engine-source binding is needed.
+The installed Core package includes the game-authoring quick guide and public
+API declarations. No local engine-source binding is needed.

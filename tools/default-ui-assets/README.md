@@ -35,8 +35,8 @@ colors compile separately, without a runtime palette switch.
 
 ## Isolated source preview
 
-Published Core 2.5.0 supports source density, but the example lock is older.
-Build the checkout Core
+The example's registry installation supports source density and runs the native
+gallery directly. To test unpublished engine changes, build the checkout Core
 and CLI first, then `pnpm --dir tools/default-ui-assets preview` prepares an
 isolated example under docs-internal, with both strict dev and minified release
 output. The trial links the checkout Core and installed example UI/Game/document

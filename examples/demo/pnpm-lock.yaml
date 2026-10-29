@@ -9,12 +9,12 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^2.5.4
-        version: 2.5.4
+        specifier: ^2.6.0
+        version: 2.6.0
     devDependencies:
       '@kurot/cli':
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.8.0
+        version: 3.8.0
 
 packages:
 
@@ -186,12 +186,12 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@3.7.0':
-    resolution: {integrity: sha512-LF/cmCc0TvJzx5+yh4JhII5f9uuqhcXMibDfhrihA5e2gLuy/VcdIaVbMQELx1n0XZN180Hlcob/rE0p2jv/eg==}
+  '@kurot/cli@3.8.0':
+    resolution: {integrity: sha512-Xn5luLiTBbhS3g4T86zWobT4wyDcgdl+qpcd5wMn4PoNHEc3rh+9T81An0eGR9tjrdYaxehFzIbYU+zHYPFp1A==}
     hasBin: true
 
-  '@kurot/core@2.5.4':
-    resolution: {integrity: sha512-XBlGKlohioJEIy/Nf8Gkl7mr7PSoK/uQkugM6lLyuKdzPSq01a+X+p89anOzQrUCfXmBp7sUCrkV2U0hnd1nFA==}
+  '@kurot/core@2.6.0':
+    resolution: {integrity: sha512-DtmK6EqA3nyf1uuxNtGE7kgE4atFNQWTS/BBVv2dIxE7PcDbB2iXNJqTZfO6P8YU2DC/OWY8GBLo9+pnpyWdIw==}
 
   '@kurot/ui-document@0.13.2':
     resolution: {integrity: sha512-8oY67ukqw0PDoRPQMNzaryTEr+aPJej6E6nkkzs4rrsPeon8plY/p6NVJm6jpxYkImTYz+d+H/Y8C0joVnuJrQ==}
@@ -305,14 +305,14 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@3.7.0':
+  '@kurot/cli@3.8.0':
     dependencies:
       '@kurot/ui-document': 0.13.2
       commander: 13.1.0
       esbuild: 0.25.12
       parse5: 7.3.0
 
-  '@kurot/core@2.5.4':
+  '@kurot/core@2.6.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0

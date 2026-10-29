@@ -5,6 +5,32 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-10-30 — Example stage-configuration adoption
+
+- Adopt registry Core 2.6.0 and CLI 3.8.0 in demo, game and Star Catcher,
+  updating their independent manifests, installations and pnpm locks. Preserve
+  Star Catcher's exact pins and the other examples' compatible ranges.
+- Game also adopts UI 3.6.2 and Game 2.0.1, retaining ui-document 0.13.2.
+  Verify that UI and Game resolve the application's same Core instance.
+- All three entries use `createPlayer({ canvas })`; existing kurot.config.ts
+  stage settings supply the generated canvas defaults. Validate the demo/game
+  canvas before creating Player and remove Star Catcher's unused size imports.
+- Synchronize example READMEs and native-gallery maintenance instructions with
+  the registry installation. Checkout source bindings are optional maintenance
+  tools, not prerequisites for the ordinary gallery.
+- Frozen installation, strict development/minified release builds and full
+  declaration type checks pass for all three. Star Catcher's four model tests
+  and six development/release browser tests pass, including input, scoring,
+  ending, restart, narrow layout and teardown.
+- Development and release browser checks pass for demo startup and both game
+  routes. The gallery checks native buttons, text input, toggles, animated
+  slider/progress synchronization, panel close/reopen and mobile pointer mapping,
+  with no application script, console or resource errors in the completed runs.
+- All three actual dev processes accept saved width/frame-rate changes and
+  restoration through generated HTTP canvas attributes without restarting.
+  Original stage configurations are restored. No SDK implementation, version,
+  compatibility minimum or development lock changes are included.
+
 ## 2026-10-30 — CLI 3.8.0 publication
 
 - Verify npm exact version and latest as CLI 3.8.0, with Core latest 2.6.0.

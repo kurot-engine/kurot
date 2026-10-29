@@ -81,19 +81,18 @@ and wrap the node with Group/Image/Scroller for its surface and viewport.
 `src/DefaultUI.ts` only connects data and events. The example installs its own
 project font loader and document dependency; other projects are unchanged.
 
-Use the checkout CLI with the example's installed SDKs. From the repository root:
+Use the example's installed registry CLI and SDKs. From the repository root:
 
 ```sh
-pnpm --dir packages/cli build
-cd examples/game
-node ../../packages/cli/dist/index.js dev
+pnpm --dir examples/game install --frozen-lockfile
+pnpm --dir examples/game dev
 ```
 
 Open the server URL with `?ui=1`; the ordinary scene remains available without
 that parameter. Try the inputs, switches, ComboBox, tabs, sliders, panel close
 button and draggable List. The gallery uses the example's installed Core/UI
 with compiled KUI XML, without modifying dependencies or locks. In that example
-directory, the same CLI accepts `build` and `build --release` for one-shot builds.
+directory, `pnpm build --strict` and `pnpm release --strict` run one-shot builds.
 The private asset tool's isolated source preview remains an optional maintenance
 tool for testing checkout engine changes; it is not required by the installed Core.
 
