@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **3.8.0** (published).
+resource watching. Package version: **3.8.1** (published).
 Requires Node.js >= 20 and
 ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
 
@@ -12,11 +12,11 @@ the separate CLI 1.3.x line. KUI configuration and resource files are project-ow
 ## Usage
 
 The CLI does not require a global install. Install it as a project development
-dependency. Both new scaffolds need Core ^2.6.0 for canvas stage-attribute
-startup. Existing projects keep their own installed SDKs and resources.
+dependency. New scaffolds use Core ^2.7.0 for release resource versioning and canvas
+stage-attribute startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@3.8.0 create my-game
+npx @kurot/cli@3.8.1 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -24,7 +24,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.8.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.8.1`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -60,12 +60,12 @@ Development output is written to `bin-debug/`. Release output is written to
 project namespace, theme, and application code are separate ESM chunks joined
 by the generated HTML import map.
 
-Set `output: { dir: 'bin-debug', versionedAssets: true }` to place release
-resources and scripts in `assets/<content-hash>/`. A generated HTML base URL
-versions relative requests, including atlas pages, fonts and startup images.
-Identical builds reuse the same path; development output is unchanged.
-See [release assets and deployment](docs/release-assets.md) for theme loading,
-cache headers and upload order. This option requires CLI >= 3.7.0 within 3.x.
+CLI >= 3.8.1 within 3.x with Core >= 2.7.0 within 2.x uses
+`output: { dir: 'bin-debug', versionedAssets: true }` to append the release build
+number to local resources as `?v=<timestamp>`. JS keeps its existing content-hashed
+filename and `js/` path. New starters enable the option explicitly; development
+output is unchanged. See [release resources and deployment](docs/release-assets.md)
+for matching Core support, native font/fetch/Theme calls and cache settings.
 
 Asset copying omits empty runtime directory trees. With KUI enabled, authored
 `.kui.xml` files are compiled into the theme chunk and excluded from `resource/`;

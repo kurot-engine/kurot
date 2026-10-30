@@ -7,6 +7,33 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.8.1 — 2026-10-30
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-10-30. All 251 archived files match the prepared artifact.
+
+### Changed
+
+- Replace output.versionedAssets directory relocation with release build-number
+  queries. Preserve the original JS content hashes, import map, manifest and
+  output paths; remove the complete-build digest, assets/<hash>/ and HTML base.
+  Replace the unused packaging approach before project deployment adoption.
+- Stamp every HTML entry with kurot-resource-version metadata. Version static
+  HTML/CSS assets using parsed URL references, including page-shell files outside
+  resource/. Keep navigation, script contents, remote URLs and generated js/ paths.
+  Reject ambiguous authored metadata/base or missing head before rewriting pages.
+- Enable the option explicitly in new game/empty starters and resolve the game
+  starter's native style/font/Theme requests through the new Core helper. Existing
+  configurations retain the false default; Core >= 2.7.0 within 2.x is required
+  for the resource protocol and the game starter's native helper calls.
+- Add postcss-value-parser for CSS references, plus release-output and startup
+  font regressions. Document CDN query keys and the limits of cache busting.
+
+### Verification
+
+- Build and all 144 tests pass. Both starters pass strict development/release,
+  full declaration checks and browser startup; API documentation checks pass.
+
 ## 3.8.0 — 2026-10-30
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

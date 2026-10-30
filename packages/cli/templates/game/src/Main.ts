@@ -5,7 +5,7 @@
  *
  * Lifecycle: constructor → ADDED_TO_STAGE → $onAddToStage → runGame → load → createGameScene → startAnimation
  */
-import { createPlayer, Event, resource, TextField } from '@kurot/core';
+import { resolveResourceUrl, createPlayer, Event, resource, TextField } from '@kurot/core';
 import { Button, Label, Rect, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
 import { Tween } from '@kurot/game';
 import { AssetAdapter } from '@/AssetAdapter';
@@ -75,7 +75,7 @@ class Main extends UILayer {
 
 	private async _loadTheme(): Promise<void> {
 		// Load the theme and its default UI skin mappings.
-		const theme = new Theme(new URL('resource/default.thm.json', document.baseURI).href);
+		const theme = new Theme(resolveResourceUrl(new URL('resource/default.thm.json', document.baseURI)));
 		await new Promise<void>(resolve => theme.addEventListener(Event.COMPLETE, () => resolve()));
 	}
 

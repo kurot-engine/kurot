@@ -4,6 +4,31 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.7.0] — 2026-10-30
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-10-30. All 3205 archived files match the prepared artifact.
+
+### Added
+
+- Export resolveResourceUrl for CLI release metadata. Append the automatic build
+  number to same-origin resource/ files while preserving queries/fragments and
+  keeping development, remote, JS and API URLs unchanged. Available before Player.
+- Apply the resolver to GET HttpRequest, ImageLoader, Sound/Video and resource
+  audio, including secondary atlas and bitmap-font pages. Native fetch/FontFace
+  and UI Theme callers use the public helper explicitly.
+- Add URL/transport regressions and document the CLI >= 3.8.1 within 3.x
+  protocol. Native font/fetch/Theme adoption requires Core >= 2.7.0 within 2.x.
+
+### Fixed
+
+- Synchronize Capabilities.engineVersion with the 2.7.0 package identity.
+
+### Verification
+
+- Build and all 986 tests pass; browser cache verification covers real manifest,
+  atlas/font descriptor pages and native font requests across two deployments.
+
 ## [2.6.0] — 2026-10-30
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

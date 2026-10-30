@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **2.6.0** (published).
+for browser games. Package version: **2.7.0** (published).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -23,7 +23,7 @@ The package includes the generated API reference and game authoring guide.
 Canvas stage-attribute startup requires Core >= 2.6.0 within 2.x.
 
 ```bash
-pnpm add @kurot/core@^2.6.0
+pnpm add @kurot/core@^2.7.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -310,3 +310,10 @@ of `font.data.spaceAdvance`. See the linked contracts before migrating custom
 bitmap-text measurements.
 UI BitmapLabel, document font references and CLI/runtime font adapters use
 this contract; project resource ownership remains explicit.
+
+## Release resource versions
+
+Core >= 2.7.0 within 2.x and CLI >= 3.8.1 within 3.x add automatic release
+queries to local resource requests when output.versionedAssets is enabled. JS retains its content hash. Native
+fetch/FontFace/Theme callers use `resolveResourceUrl`; Core transports call it
+internally. See [resource URL resolution](docs/resource.md#url-resolution).

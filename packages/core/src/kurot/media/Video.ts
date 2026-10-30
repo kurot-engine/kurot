@@ -4,6 +4,7 @@ import { Texture } from '../display/texture/Texture.js';
 import { Event } from '../events/Event.js';
 import { IOErrorEvent } from '../events/IOErrorEvent.js';
 import { ImageLoader } from '../net/ImageLoader.js';
+import { resolveResourceUrl } from '../net/resource-url.js';
 
 /**
  * Renderable Bitmap whose texture follows a video element or poster.
@@ -53,7 +54,7 @@ export class Video extends Bitmap {
 	}
 	public set src(value: string) {
 		this._src = value;
-		this._video.src = value;
+		this._video.src = resolveResourceUrl(value);
 	}
 
 	public get poster(): string {
@@ -124,7 +125,7 @@ export class Video extends Bitmap {
 		if (url.startsWith('http://') || url.startsWith('https://')) {
 			this._video.crossOrigin = 'anonymous';
 		}
-		this._video.src = url;
+		this._video.src = resolveResourceUrl(url);
 		this._video.load();
 	}
 

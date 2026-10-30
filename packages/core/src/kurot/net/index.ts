@@ -4,3 +4,4 @@ export { HttpResponseType } from './HttpResponseType.js';
 export type { HttpResponseType as HttpResponseTypeType } from './HttpResponseType.js';
 export { HttpRequest, type HttpRequestEvents } from './HttpRequest.js';
 export { ImageLoader, type ImageLoaderEvents } from './ImageLoader.js';
+export { resolveResourceUrl } from './resource-url.js';

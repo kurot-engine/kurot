@@ -77,8 +77,9 @@ export interface OutputConfig {
 	 */
 	readonly dir: string;
 	/**
-	 * Place release assets in `assets/<content-hash>/` and set the entry page's
-	 * base URL to that directory. Defaults to false; ignored in development.
+	 * Append the release build number as v to resource requests and static page
+	 * assets. Generated JS keeps its content hash and path. Ignored in development.
+	 * Defaults to false.
 	 */
 	readonly versionedAssets?: boolean;
 }

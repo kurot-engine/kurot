@@ -91,3 +91,12 @@ The 2× default atlas needs Core >= 2.5.0 within 2.x; also satisfy the installed
 UI's Core peer. ui-document supports this starter's stylesheet parsing.
 CLI-compiled skins run through UI; add ui-runtime only for its materialization
 features. Existing project dependencies remain project-owned.
+
+## Release resource cache
+
+This starter explicitly enables output.versionedAssets. Core >= 2.7.0 within
+2.x and CLI >= 3.8.1 within 3.x version local resources with the release
+build number; generated JS retains its filename hash. Development URLs are
+unchanged. For native fetch/FontFace or Theme loading, use Core's
+resolveResourceUrl. CDN cache keys must include v. See the installed CLI
+[release guide](node_modules/@kurot/cli/docs/release-assets.md).

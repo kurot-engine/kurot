@@ -2,6 +2,7 @@ import { EventDispatcher } from '../events/EventDispatcher.js';
 import { Event, type EventMap } from '../events/Event.js';
 import { IOErrorEvent } from '../events/IOErrorEvent.js';
 import { BitmapData } from '../display/texture/BitmapData.js';
+import { resolveResourceUrl } from './resource-url.js';
 
 export interface ImageLoaderEvents extends EventMap {
 	[Event.COMPLETE]: Event;
@@ -63,7 +64,7 @@ export class ImageLoader extends EventDispatcher<ImageLoaderEvents> {
 			IOErrorEvent.dispatchIOErrorEvent(this);
 		};
 
-		img.src = url;
+		img.src = resolveResourceUrl(url);
 	}
 
 	/**

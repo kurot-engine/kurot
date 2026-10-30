@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -8350,6 +8350,13 @@
       "kind": "Variable",
       "file": "requestRenderingFlag-variable.md",
       "topic": "player",
+      "members": []
+    },
+    {
+      "name": "resolveResourceUrl",
+      "kind": "Function",
+      "file": "resolveResourceUrl-function.md",
+      "topic": "net",
       "members": []
     },
     {

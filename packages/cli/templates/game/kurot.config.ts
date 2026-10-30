@@ -1,7 +1,7 @@
 export default {
 	target: 'html5',
 	entry: 'src/Main.ts',
-	output: { dir: 'bin-debug' },
+	output: { dir: 'bin-debug', versionedAssets: true },
 	html: { template: 'template/web/index.html' },
 	stage: {
 		width: 640,

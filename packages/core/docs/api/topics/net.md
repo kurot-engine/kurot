@@ -10,3 +10,4 @@
 - [HttpResponseTypeType](../HttpResponseTypeType-reference.md) — Reference
 - [ImageLoader](../ImageLoader-class.md) — Class
 - [ImageLoaderEvents](../ImageLoaderEvents-interface.md) — Interface
+- [resolveResourceUrl](../resolveResourceUrl-function.md) — Function

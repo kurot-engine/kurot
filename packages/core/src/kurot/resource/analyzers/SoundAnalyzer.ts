@@ -1,5 +1,6 @@
 import { ResourceItem } from '../ResourceItem.js';
 import { AnalyzerBase } from './AnalyzerBase.js';
+import { resolveResourceUrl } from '../../net/resource-url.js';
 
 /**
  * Sound analyzer — loads audio files and caches HTMLAudioElement objects.
@@ -38,7 +39,7 @@ export class SoundAnalyzer extends AnalyzerBase {
 
 			audio.addEventListener('canplaythrough', onCanPlayThrough);
 			audio.addEventListener('error', onError);
-			audio.src = item.url;
+			audio.src = resolveResourceUrl(item.url);
 		});
 	}
 

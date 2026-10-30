@@ -8,7 +8,7 @@ import { compileSource } from './compile-source.js';
 import { generateHtml } from './generate-html.js';
 import { writeManifest } from './manifest.js';
 import { copyAssets } from './copy-assets.js';
-import { versionAssets } from './version-assets.js';
+import { versionResources } from './version-resources.js';
 
 export { cleanOutput } from './clean-output.js';
 export { compileKUI } from './compile-kui.js';
@@ -19,7 +19,7 @@ export { compileSource } from './compile-source.js';
 export { generateHtml } from './generate-html.js';
 export { writeManifest } from './manifest.js';
 export { copyAssets } from './copy-assets.js';
-export { versionAssets } from './version-assets.js';
+export { versionResources } from './version-resources.js';
 
 /**
  * The standard build sequence.
@@ -42,6 +42,6 @@ export function defaultPlugins(): BuildPlugin[] {
 		generateHtml(),
 		writeManifest(),
 		copyAssets(),
-		versionAssets(),
+		versionResources(),
 	];
 }

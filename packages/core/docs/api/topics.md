@@ -9,7 +9,7 @@ Read one capability list, then only the required symbol/member pages.
 - [geom](topics/geom.md) — 6 declarations
 - [localStorage](topics/localStorage.md) — 1 declarations
 - [media](topics/media.md) — 6 declarations
-- [net](topics/net.md) — 10 declarations
+- [net](topics/net.md) — 11 declarations
 - [player](topics/player.md) — 34 declarations
 - [resource](topics/resource.md) — 22 declarations
 - [system](topics/system.md) — 1 declarations

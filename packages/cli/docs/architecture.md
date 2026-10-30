@@ -40,7 +40,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.8.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 3.8.1 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
@@ -72,12 +72,13 @@ Development builds preserve application source module structure under
 `manifest.json`. Static resources retain stable paths because application code
 addresses them by key or URL.
 
-With `output.versionedAssets: true`, the final stage hashes the complete output
-and moves runtime files into `assets/<hash>/`. The entry HTML receives a base URL;
-the root release manifest and BuildContext script paths receive the same prefix.
-Relative references inside resources and ESM modules remain intact. This is one
-version for the complete build, rather than independent hashes per resource.
-See [release deployment](release-assets.md) for URL and hosting requirements.
+With CLI >= 3.8.1 within 3.x and Core >= 2.7.0 within 2.x,
+`output.versionedAssets: true` writes the release directory timestamp to HTML
+metadata and appends it as `v` to static HTML/CSS assets. Core transports use that
+metadata for local resource/ files, including secondary atlas/font pages. Native
+fetch/FontFace/Theme callers use Core's resolveResourceUrl. Generated JS hashes,
+manifest paths and BuildContext outputs remain unchanged. No files move and no
+HTML base is inserted. See [release resources](release-assets.md).
 
 Asset copying creates directories only when an accepted runtime file needs them.
 KUI source files and source theme JSON are excluded when UI compilation is enabled,

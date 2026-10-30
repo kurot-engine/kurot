@@ -1,5 +1,8 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 
+// Exercise the browser helper without making Core a build-time CLI dependency.
+vi.mock('@kurot/core', () => import('../../core/src/kurot/net/resource-url.js'));
+
 const style = {
 	schemaVersion: 1,
 	fonts: {
@@ -39,7 +42,10 @@ beforeEach(() => {
 	registered.mockClear();
 	faces.length = 0;
 	loadFace.mockReset().mockImplementation(async face => face);
-	vi.stubGlobal('document', { baseURI: 'https://game.test/project/', fonts: { add: registered } });
+	vi.stubGlobal('document', {
+		baseURI: 'https://game.test/project/', URL: 'https://game.test/project/',
+		querySelector: () => undefined, fonts: { add: registered },
+	});
 	vi.stubGlobal('FontFace', FakeFontFace);
 	vi.stubGlobal(
 		'fetch',
@@ -52,6 +58,17 @@ afterEach(() => {
 });
 
 describe('game template project styles', () => {
+	it('versions startup styles and font files before Player exists', async () => {
+		vi.stubGlobal('document', {
+			baseURI: 'https://game.test/project/', URL: 'https://game.test/project/',
+			querySelector: () => ({ content: '261030123456' }), fonts: { add: registered },
+		});
+		const { StyleManager } = await import('../templates/game/src/StyleManager.js');
+		await StyleManager.init();
+		expect(fetch).toHaveBeenCalledWith('https://game.test/project/resource/config/style.json?v=261030123456');
+		expect(faces[0]?.source).toBe('url("https://game.test/project/resource/fonts/Regular%20font.ttf?v=261030123456")');
+	});
+
 	it('waits for every font before publishing aliases, default family and numeric colors', async () => {
 		const { StyleManager } = await import('../templates/game/src/StyleManager.js');
 		const regular = deferred<FakeFontFace>();

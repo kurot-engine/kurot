@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@2.6.0` (published). It provides Kurot's
+Package identity: `@kurot/core@2.7.0` (published). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -51,7 +51,7 @@ src/kurot/
 │                   LineBreaks, TextLineLayout, TextBlockBounds, TextVerticalLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
 │                   (Image/Json/Text/Sound/Sheet/Font). Async, resource.json-driven (RES-compatible).
-├── net/            HttpRequest, ImageLoader. Low-level; resource/analyzers build on these.
+├── net/            HttpRequest, ImageLoader, resolveResourceUrl. Low-level; resource/analyzers build on these.
 ├── media/          Sound (+SoundChannel), Video. Web Audio + HTMLAudioElement fallback.
 ├── system/         Capabilities (static). Must be _init()'d — createPlayer() does this for you.
 ├── utils/          ByteArray, Timer, Logger, FontManager, DebugLog, Base64Util, NumberUtils.
@@ -315,3 +315,13 @@ The dependency is published @kurot/bitmap-font ^0.1.0, with no local override.
 BitmapText.measureText() leaves rendered constraints and layout caches unchanged;
 text borrows the font and the resource/caller retains ownership. Font pages are
 full, unrotated textures at scale factor 1.
+
+## Release resource URLs
+
+Core >= 2.7.0 within 2.x with CLI >= 3.8.1 within 3.x supports release resource
+queries. `net/resource-url.ts` reads CLI-generated kurot-resource-version metadata and
+versions same-origin files under the page's resource/ directory. GET HttpRequest,
+ImageLoader and media/resource audio use it; keys/descriptors stay logical.
+Native fetch/FontFace and Theme config need an explicit resolveResourceUrl call.
+No metadata means unchanged development URLs; JS, remote URLs, POST and APIs
+outside resource/ are preserved. See [resource URL resolution](resource.md#url-resolution).

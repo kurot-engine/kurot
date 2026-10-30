@@ -16,14 +16,16 @@ describe('versioned assets CLI configuration', () => {
 		expect(result.exitCode, result.stderr).toBe(0);
 		const output = JSON.parse(result.stdout) as { outputDir: string };
 		const html = await fs.readFile(path.join(output.outputDir, 'index.html'), 'utf8');
-		const base = /<base href="\.\/([^"]+)"/.exec(html)?.[1];
-		expect(base).toMatch(/^assets\/[a-f0-9]{32}\/$/);
-		const resourceDir = path.join(output.outputDir, base!, 'resource');
+		expect(html).toContain(`name="kurot-resource-version" content="${path.basename(output.outputDir)}"`);
+		expect(html).not.toContain('<base');
+		const resourceDir = path.join(output.outputDir, 'resource');
 		expect(await fs.readFile(path.join(resourceDir, 'test.txt'), 'utf8')).toBe('resource content');
 		const theme = JSON.parse(await fs.readFile(path.join(resourceDir, 'default.thm.json'), 'utf8')) as {
 			skinsJs: string;
 		};
 		expect((await fs.stat(path.resolve(resourceDir, theme.skinsJs))).isFile()).toBe(true);
+		const manifest = JSON.parse(await fs.readFile(path.join(output.outputDir, 'manifest.json'), 'utf8')) as { initial: string[]; game: string[] };
+		expect([...manifest.initial, ...manifest.game].every(file => file.startsWith('js/') && !file.includes('?'))).toBe(true);
 	});
 
 	it('rejects non-boolean configuration instead of silently enabling versioning', async () => {

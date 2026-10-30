@@ -1,6 +1,6 @@
 # @kurot/core API
 
-Version: **2.6.0**. Read the installed package's matching documentation.
+Version: **2.7.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).
@@ -126,6 +126,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `RenderPipe` | Interface | [open](RenderPipe-interface.md) |
 | `RenderTexture` | Class | [open](RenderTexture-class.md) |
 | `requestRenderingFlag` | Variable | [open](requestRenderingFlag-variable.md) |
+| `resolveResourceUrl` | Function | [open](resolveResourceUrl-function.md) |
 | `Resource` | Class | [open](Resource-class.md) |
 | `resource` | Variable | [open](resource-variable.md) |
 | `ResourceConfig` | Class | [open](ResourceConfig-class.md) |

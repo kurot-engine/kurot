@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@3.8.0` (published) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@3.8.1` (published) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -150,12 +150,15 @@ manual prefix cannot conflict with `ui.components.namespace`.
 Do not reorder namespace or source compilation without reviewing externalization
 in `namespace-external-plugin.ts`.
 
-Release versioning runs last so the digest covers generated themes, scripts,
-resource bytes and template assets. It keeps index.html/manifest.json at the
-output root and moves all other files under assets/<hash>/. The HTML base URL
-versions document-relative requests; callers that explicitly resolve URLs must
-use document.baseURI. Existing UI Theme must receive an absolute config URL.
-See [release assets](release-assets.md). This option requires CLI >= 3.7.0 within 3.x.
+CLI >= 3.8.1 within 3.x with Core >= 2.7.0 within 2.x supports resource
+queries. `version-resources.ts` runs last and
+stamps each HTML page with the release directory's timestamp. HTML/CSS local
+assets receive a `v` query; Core transports version local resource/ requests.
+Generated JS, import maps, manifest paths and output directories stay unchanged.
+`resource-version-html.ts` preserves script bytes and owns metadata validation;
+`resource-version-css.ts` owns CSS URL parsing. Native fetch/FontFace/Theme calls
+use Core's resolveResourceUrl; new starters enable the flag explicitly. See
+[release resources](release-assets.md) for the protocol and deployment limits.
 
 Since CLI 3.8.0, root ESM config stage changes regenerate HTML in `kurot dev` without
 restarting dev; `core/config-watcher.ts` owns this path. See

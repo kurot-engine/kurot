@@ -2,6 +2,7 @@ import { Event, type EventMap } from '../events/Event.js';
 import { EventDispatcher } from '../events/EventDispatcher.js';
 import { IOErrorEvent } from '../events/IOErrorEvent.js';
 import { SoundChannel } from './SoundChannel.js';
+import { resolveResourceUrl } from '../net/resource-url.js';
 
 export interface SoundEvents extends EventMap {
 	[Event.COMPLETE]: Event;
@@ -105,6 +106,7 @@ export class Sound extends EventDispatcher<SoundEvents> {
 	 * supersedes earlier callbacks but does not stop channels already playing.
 	 */
 	public load(url: string): void {
+		url = resolveResourceUrl(url);
 		this._url = url;
 		this._loaded = false;
 		const generation = ++this._generation;

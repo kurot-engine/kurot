@@ -61,3 +61,12 @@ source if needed. Repository `src/` paths are not guaranteed inside npm packages
 
 The project starts with Core only. Add further SDKs explicitly when gameplay
 requires them; keep dependency adoption separate from ordinary feature work.
+
+## Release resource cache
+
+This starter explicitly enables output.versionedAssets. Core >= 2.7.0 within
+2.x and CLI >= 3.8.1 within 3.x version local resources with the release
+build number; generated JS retains its filename hash. Development URLs are
+unchanged. For native fetch/FontFace or Theme loading, use Core's
+resolveResourceUrl. CDN cache keys must include v. See the installed CLI
+[release guide](node_modules/@kurot/cli/docs/release-assets.md).

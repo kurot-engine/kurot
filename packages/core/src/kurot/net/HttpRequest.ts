@@ -5,6 +5,7 @@ import { IOErrorEvent } from '../events/IOErrorEvent.js';
 import { ProgressEvent } from '../events/ProgressEvent.js';
 import { HttpMethod } from './HttpMethod.js';
 import { HttpResponseType } from './HttpResponseType.js';
+import { resolveResourceUrl } from './resource-url.js';
 
 export interface HttpRequestEvents extends EventMap {
 	[HTTPStatusEvent.HTTP_STATUS]: HTTPStatusEvent;
@@ -72,7 +73,7 @@ export class HttpRequest extends EventDispatcher<HttpRequestEvents> {
 	 */
 	public open(url: string, method: HttpMethod = HttpMethod.GET): void {
 		this.abort();
-		this._url = url;
+		this._url = method === HttpMethod.GET ? resolveResourceUrl(url) : url;
 		this._method = method;
 		this._pendingHeaders = [];
 	}

@@ -1,7 +1,7 @@
 {
   "package": "@kurot/core",
-  "version": "2.6.0",
-  "exports": 167,
+  "version": "2.7.0",
+  "exports": 168,
   "members": 2152,
   "missing": [],
   "withoutComment": [

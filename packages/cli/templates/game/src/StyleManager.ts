@@ -1,3 +1,4 @@
+import { resolveResourceUrl } from '@kurot/core';
 import { getUIStyleColor, getUIStyleFontAlias, getUIStyleFontFamily, parseUIStyleSheet } from '@kurot/ui-document';
 import type { UIStyleFontFace } from '@kurot/ui-document';
 
@@ -18,7 +19,7 @@ export class StyleManager {
 
 	public static async init(): Promise<void> {
 		const resourceRoot = new URL('resource/', document.baseURI);
-		const response = await fetch(new URL('config/style.json', resourceRoot));
+		const response = await fetch(resolveResourceUrl(new URL('config/style.json', resourceRoot)));
 		if (!response.ok) {
 			throw new Error(`Unable to load resource/config/style.json: HTTP ${response.status}.`);
 		}
@@ -45,7 +46,7 @@ export class StyleManager {
 
 	private static async _loadFace(key: string, definition: UIStyleFontFace, resourceRoot: URL): Promise<FontFace> {
 		const url = new URL(definition.url.split('/').map(encodeURIComponent).join('/'), resourceRoot);
-		const face = new FontFace(getUIStyleFontAlias(key), `url("${url.href}")`, {
+		const face = new FontFace(getUIStyleFontAlias(key), `url("${resolveResourceUrl(url)}")`, {
 			weight: String(definition.weight),
 		});
 		try {

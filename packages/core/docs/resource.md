@@ -322,6 +322,16 @@ Core does not apply it automatically to arbitrary Bitmap objects. See the
 - URLs containing `://` are treated as absolute and left unchanged.
 - Other URLs receive the `folder` prefix passed to `loadConfig()`.
 
+Core >= 2.7.0 within 2.x with CLI >= 3.8.1 within 3.x uses release metadata that Core
+transports use to append `?v=<release-build-number>` to same-origin resource/
+files. Resource keys and authored descriptors stay unchanged; atlas/font pages
+are versioned independently when loaded. JS retains its filename hash.
+Use `resolveResourceUrl` for native fetch/FontFace and UI Theme config URLs before
+Player startup. Without metadata, URLs stay unchanged. Remote URLs and APIs
+outside resource/ retain their original URLs. See the
+[CLI release protocol](../../cli/docs/release-assets.md) for examples and caching
+requirements.
+
 ### Creating groups dynamically
 
 ```typescript
@@ -339,7 +349,7 @@ import { resource, ResourceConfig } from '@kurot/core';
 | Modules              | Global `RES.xxx`          | ES module imports                    |
 | Events               | `egret.EventDispatcher`   | Lightweight `on/off` API             |
 | Type safety          | Extensive `any`           | Generic `get<T>()`                   |
-| Versioning           | `VersionController`       | Handled by build tools               |
+| Versioning           | `VersionController`       | CLI build metadata + Core URL resolution |
 | XML parsing          | Built in                  | Handled by the KUI XML compiler      |
 | Internationalization | Built in                  | Outside the resource loader's scope  |
 | Analyzer types       | 8                         | 6 (Image/Json/Text/Sound/Sheet/Font) |
@@ -349,8 +359,8 @@ import { resource, ResourceConfig } from '@kurot/core';
 
 The following legacy features are intentionally omitted:
 
-- **VersionController** — modern build tools such as Vite/Webpack handle CDN
-  versioning.
+- **VersionController class** — release metadata and `resolveResourceUrl` provide
+  resource query versioning without an application-supplied controller.
 - **i18n** — internationalization is outside the resource loader's scope.
 - **XML/Bin analyzers** — the compiler preprocesses KUI XML; a built-in binary
   analyzer is not included.

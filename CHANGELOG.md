@@ -5,6 +5,56 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-10-30 — Core 2.7.0 / CLI 3.8.1 publication and Templates adoption
+
+- Verify both exact versions and npm latest tags, download the registry archives
+  and verify their SHA-512 integrity. Core's 3205 files and CLI's 251 files match
+  the prepared archives byte for byte, including the new resource protocol.
+- Synchronize repository README/context publication status; immutable published
+  archives retain their preparation-time documentation.
+- Adopt the registry releases in card-booster, milf-master, runaway, skydive and
+  tentax manifests, independent pnpm locks and installations. Preserve exact pins
+  versus compatible ranges and unrelated direct dependency versions. Update
+  Skydive's exact release-age exceptions to the two selected versions.
+- Synchronize current Template READMEs, agent baseline and release instructions
+  with ordinary registry usage; local SDK substitutions are no longer required.
+- All five frozen installs, strict development/minified release builds and full
+  declaration checks pass, with 743 combined unit tests. Required architecture
+  and Skydive tool checks pass. Each installed UI/Game/animation adapter resolves
+  the application's same Core 2.7.0 instance.
+- Registry-based release browser checks pass for all five: Card Booster opening /
+  controls / startup, MilfMaster Welcome / locales and cache, Skydive lifecycle,
+  Runaway game / independent entrance, and Tentax native entrance / real Spine.
+  Output audits retain root js/resource paths, generated JS hashes and automatic
+  release metadata. These checks use local fixtures rather than live backends.
+
+## 2026-10-30 — Core 2.7.0 and CLI 3.8.1 preparation
+
+- Replace the whole-build directory scheme with matching Core/CLI source
+  changes: CLI publishes its existing release timestamp as HTML metadata, Core
+  versions local resource requests, and generated JS retains its current hashes
+  and paths. No generated base or asset-directory relocation remains.
+- New CLI starters enable resource versioning. Adopt the helper for native
+  font/config/Theme/video requests in all five Templates; remove Runaway's
+  directory-copy release wrapper and update cache/deployment documentation.
+- Prepare Core 2.7.0 and CLI 3.8.1 for user-managed publication, with dated
+  package entries, current README/context versions and regenerated API indexes.
+  These versions are not yet published. Publish Core first, then CLI.
+- Native helper adoption requires Core >= 2.7.0 within 2.x and release query
+  metadata requires CLI >= 3.8.1 within 3.x. Other SDK peers already accept Core
+  2.7.0; their versions, real API minima and development locks remain unchanged.
+  Demo/game ranges accept both releases as optional adoption. Star Catcher
+  retains exact older pins and needs explicit manifest/lock adoption if selected.
+  Templates require explicit adoption of both releases after publication; their
+  manifests/installations and locks retain the registry baseline in this change.
+- Core/CLI builds and 986/144 tests pass. All five Templates pass strict dev/
+  release, full declaration checks, 743 combined unit tests and release browser
+  regressions. The two-publish cache fixture and both CLI starter browser checks
+  pass, including resource queries and unchanged generated JS URL structure.
+- Verify local npm archives include the new public helper, plugins and starter
+  wiring, exclude the removed legacy plugin, and pass packed-package cache /
+  starter build, type and browser integration checks.
+
 ## 2026-10-30 — Example stage-configuration adoption
 
 - Adopt registry Core 2.6.0 and CLI 3.8.0 in demo, game and Star Catcher,

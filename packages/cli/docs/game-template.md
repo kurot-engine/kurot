@@ -41,6 +41,13 @@ remain available for intentional overrides. In dev, save stage settings, wait
 for the configuration update and refresh the browser with CLI >= 3.8.0 within
 3.x; no dev restart is needed.
 
+## Release resources
+
+Both starters enable output.versionedAssets. Resource queries use the release
+build number with Core >= 2.7.0 within 2.x and CLI >= 3.8.1 within 3.x. The game
+starter resolves native style/font and Theme requests through resolveResourceUrl
+before Player creation. See [release resources](release-assets.md).
+
 ## HTML brand splash
 
 The game template's `web/index.html` presents `web/logo.png` beneath a small
