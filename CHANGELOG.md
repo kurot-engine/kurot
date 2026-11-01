@@ -5,6 +5,22 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-01 — Example SDK adoption
+
+- Adopt registry Core 2.8.0 and CLI 3.9.0 in demo, game and Star Catcher, plus
+  UI 3.7.0 in game. Preserve compatible ranges in demo/game and exact pins in
+  Star Catcher. Core-only examples acquire no UI/Game runtime dependency.
+- Synchronize manifests, installations, pnpm locks and current README baselines.
+  Keep Game 2.0.1, ui-document 0.13.2 and unrelated tooling unchanged; game/UI
+  resolve one Core instance. Lock changes include CLI's required CSS parser.
+- Frozen installation, strict development/minified-release builds and full
+  declaration checking pass for all three examples. Star Catcher's model tests
+  and all six development/release browser tests pass for gameplay, input,
+  pause/restart, narrow layout and final teardown.
+- Development and release browser checks pass for demo startup and game's
+  ordinary scene/native UI gallery, including default skins, list data and a
+  real pointer click on the gallery button. No script or HTTP resource errors.
+
 ## 2026-11-01 — Core 2.8.0 / UI 3.7.0 / CLI 3.9.0 publication
 
 - Verify all three exact npm versions and latest tags, download their registry

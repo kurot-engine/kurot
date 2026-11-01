@@ -8,8 +8,8 @@ sliders, progress, panel closing and hidden-bar list scrolling are interactive.
 
 ## Run the example
 
-The lock installs registry Core 2.6.0, UI 3.6.2, Game 2.0.1, ui-document 0.13.2
-and CLI 3.8.0. UI and Game resolve the same Core instance. Each example owns its
+The lock installs registry Core 2.8.0, UI 3.7.0, Game 2.0.1, ui-document 0.13.2
+and CLI 3.9.0. UI and Game resolve the same Core instance. Each example owns its
 installation and lockfile independently.
 
 For the ordinary scene, run from this directory:
