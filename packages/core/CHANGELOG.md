@@ -6,7 +6,8 @@ All notable changes to `@kurot/core` are documented here.
 
 ## [2.8.0] — 2026-11-01
 
-Prepared for user-managed publication; publication has not been verified.
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-01. All 3209 archived files match the locally prepared release.
 
 ### Added
 

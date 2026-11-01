@@ -16,6 +16,7 @@ export class Image extends Component {
 
 	private _source?: string | Texture;
 	private _sourceChanged = false;
+	private _sourceRequest = 0;
 	private _bitmap?: Bitmap;
 	private _scale9Grid?: Rectangle;
 	private _fillMode: BitmapFillMode = BitmapFillMode.SCALE;
@@ -36,8 +37,9 @@ export class Image extends Component {
 	 * on success. Adapter callbacks with undefined clear the image. Image does not
 	 * forward IO_ERROR, and the default adapter does not report image-load failure
 	 * to the component; load through Resource first when failure handling is needed.
-	 * Stage removal does not cancel requests; clear/change source to prevent a late
-	 * result for the old string from applying. Textures are never disposed by Image;
+	 * Only replies for the latest source assignment apply, including when a name
+	 * is reused. Stage removal does not cancel requests; clear/change source to
+	 * invalidate pending replies. Textures are never disposed by Image;
 	 * the asset provider/application must manage their lifetime.
 	 */
 	public get source(): string | Texture | undefined {
@@ -45,7 +47,11 @@ export class Image extends Component {
 	}
 
 	public set source(value: string | Texture | undefined) {
-		if (this._source === value) return;
+		if (this._source === value) {
+			return;
+		}
+		// Revoke old replies immediately, before the next deferred property commit.
+		this._sourceRequest++;
 		this._source = value;
 		if (value && typeof value === 'string') {
 			this._sourceChanged = true;
@@ -150,16 +156,19 @@ export class Image extends Component {
 		const source = this._source;
 		if (source && typeof source === 'string') {
 			const capturedSource = source;
+			const request = this._sourceRequest;
 			const context = getUIContext(this);
 			if (context?.disposed) {
 				return;
 			}
 			const adapter = context ? context.options.assetAdapter : getAssetAdapter();
 			adapter.getAsset(capturedSource, content => {
-				if (context?.disposed) {
+				if (request !== this._sourceRequest || context?.disposed) {
 					return;
 				}
-				if (this._source !== capturedSource) return;
+				if (this._source !== capturedSource) {
+					return;
+				}
 				this._applyTexture(content ?? undefined);
 				if (content) {
 					this.dispatchEventWith(Event.COMPLETE);

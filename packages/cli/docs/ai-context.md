@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@3.9.0` (prepared for publication) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@3.9.0` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.

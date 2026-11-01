@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **3.7.0** (prepared for publication).
+Kurot games. Package version: **3.7.0** (published on npm).
 Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and

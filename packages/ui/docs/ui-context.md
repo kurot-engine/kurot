@@ -70,7 +70,10 @@ run: establish the context before setting string skinName on detached views.
 
 Contexts borrow their adapters/resources/fonts; the application owns their
 loading and release. `context.dispose()` revokes new construction and ignores
-late Image/font-resource replies. Release views and their subscriptions/tweens,
+late Image/font-resource replies, including font failures that would otherwise
+dispatch IO_ERROR. Image also ignores superseded source replies when a name is
+reused; source changes revoke pending replies before deferred property commits.
+Release views and their subscriptions/tweens,
 then dispose the context and the owned resource/font providers. A Resource
 `destroyAll()` does not abort pending loads; owners must reclaim late results.
 The context does not stop a global ticker, destroy the Player or unload ESM code.

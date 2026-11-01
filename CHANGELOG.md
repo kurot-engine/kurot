@@ -5,6 +5,22 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-01 — Core 2.8.0 / UI 3.7.0 / CLI 3.9.0 publication
+
+- Verify all three exact npm versions and latest tags, download their registry
+  archives, and validate SHA-512 integrity and SHA-1 checksums. Core's 3209,
+  UI's 5542 and CLI's 252 archived files match the locally prepared releases
+  byte for byte, including expected package paths and source-free declarations.
+- Confirm UI 3.7.0 contains the final Image source-revision and BitmapLabel
+  disposed-context error fixes, their updated API contracts and lifecycle guide.
+- Run all 24 async regressions against downloaded Core/UI public entry points;
+  compile 19 API examples against source-free declarations. Downloaded CLI passes
+  six strict module/global development/release builds and native context/Theme
+  execution; unchanged Game/DragonBones/ui-runtime share the published Core/UI.
+- Synchronize repository README/context publication status and package release
+  entries. Immutable npm archives retain their preparation-time status text.
+  Preserve versions, dependency/peer ranges and application/development locks.
+
 ## 2026-11-01 — Core 2.8.0 / UI 3.7.0 / CLI 3.9.0 preparation
 
 - Prepare independent feature releases for decoded ImageBitmap sources and
@@ -23,7 +39,7 @@ package's CHANGELOG.md.
   Star Catcher/Core/CLI and Card Booster/Skydive Core/CLI pins need an explicit
   adoption change if selected. Templates and examples keep their current locks;
   starter latest placeholders and default global registration remain.
-- Clean builds and 1001 Core / 386 UI / 161 CLI unit tests pass. Two browser
+- Clean builds and 1001 Core / 410 UI / 161 CLI unit tests pass. Two browser
   WebGL 1/2 regressions verify actual ImageBitmap pixels, updates, ownership and
   context restoration. Generated Core/UI APIs report zero missing entries;
   19 extracted examples compile against built and source-free packed declarations.
@@ -34,6 +50,13 @@ package's CHANGELOG.md.
   the target Core/UI, and the complete loader passes skipLibCheck=false.
 - Checked local archives include current declarations, compiled helpers, guides
   and generated API files; whitespace and version/dependency audits pass.
+- Fix follow-up UI async boundaries: Image revokes superseded same-name replies
+  at source assignment; BitmapLabel checks context disposal on both success and
+  error. Add 24 regressions and verify the external three-case reproducer passes.
+- Check the public npm registry on 2026-11-01 before publication: Core 2.8.0,
+  UI 3.7.0 and CLI 3.9.0 are absent (exact-version requests return 404); latest
+  remains 2.7.0 / 3.6.2 / 3.8.1 respectively. Keep the prepared versions and
+  include the follow-up UI fixes in 3.7.0.
 
 ## 2026-11-01 — CLI 3.9.0 preparation
 

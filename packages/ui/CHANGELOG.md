@@ -6,7 +6,9 @@ All notable changes to `@kurot/ui` are documented here.
 
 ## [3.7.0] — 2026-11-01
 
-Prepared for user-managed publication; publication has not been verified.
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-01. All 5542 archived files match the locally prepared release,
+including the Image request-revision and BitmapLabel late-error fixes.
 
 ### Added
 
@@ -18,6 +20,13 @@ Prepared for user-managed publication; publication has not been verified.
 
 ### Fixed
 
+- Reject obsolete Image replies with a source-assignment revision, including
+  A-to-B-to-A changes before property validation. Late replies cannot replace or
+  clear the current texture or emit an extra COMPLETE; asset ownership stays
+  with the provider.
+- Apply the same request/context validity check to BitmapLabel success and error
+  callbacks. A disposed UIContext suppresses late IO_ERROR as well as COMPLETE,
+  including disposal between font validation and queued error reporting.
 - Migrate automatic RadioButton groups immediately on late context binding and
   subtree insertion, including plain Core containers. Remove previous global
   membership while preserving selected state, nested captured owners, explicit
@@ -40,9 +49,15 @@ Prepared for user-managed publication; publication has not been verified.
 
 ### Verification
 
-- Clean build and all 386 unit tests pass (40 files) with the unchanged registry
+- Clean build and all 410 unit tests pass (42 files) with the unchanged registry
   Core 2.5.3 lock, including late binding, plain Core ancestors, creation-complete
   ordering, captured owners and explicit radio groups.
+- Add 24 asynchronous Image/BitmapLabel regressions covering same-name request
+  races, changes before property commit, direct/cleared sources, active/disposed
+  contexts, wrong font types, success/error events and unscoped providers. The
+  original external reproducer also passes all three cases after these fixes.
+- After publication, all 24 regressions also pass against the downloaded npm
+  Core 2.8.0 / UI 3.7.0 public entry points without implementation source.
 - Packed UI 3.7.0 / CLI 3.9.0 integration passes strict development/release
   compilation with Core 2.8.0. Native execution verifies same-name local/default/
   nested skins, fonts, radio isolation, disposal and existing global Theme loading.

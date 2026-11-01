@@ -6,7 +6,7 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@3.7.0` (prepared for publication), with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@3.7.0` (published on npm), with Core peer **^2.5.2**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 

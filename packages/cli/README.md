@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **3.9.0** (prepared for publication).
+resource watching. Package version: **3.9.0** (published on npm).
 Requires Node.js >= 20 and
 ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
 

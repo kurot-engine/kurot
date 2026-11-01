@@ -51,7 +51,8 @@ export class BitmapLabel extends Component implements IDisplayText {
 	 * Borrowed BitmapFont or configured font-resource name, initially undefined.
 	 * Strings are resource keys, not arbitrary URLs. Loading success dispatches
 	 * COMPLETE; failed loads or wrong resource types dispatch IO_ERROR with source
-	 * and error data. New assignments invalidate old requests' results. Stage removal
+	 * and error data. New assignments invalidate old requests' results. Disposed UI
+	 * contexts ignore both successful and failed replies. Stage removal
 	 * does not cancel shared resource loading; clear/change font on permanent closure
 	 * and let the resource owner release it after pending work completes.
 	 */
@@ -195,25 +196,34 @@ export class BitmapLabel extends Component implements IDisplayText {
 	}
 	private _resolveFont(): void {
 		const name = this._font;
-		if (typeof name !== 'string') return;
-		const request = this._fontRequest;
-		const apply = (font: unknown): void => {
-			if (request !== this._fontRequest) return;
-			if (!(font instanceof BitmapFont)) throw new TypeError(`Resource ${name} is not a bitmap font.`);
-			this._bitmapText.font = font;
-			this._invalidateText();
-			this.dispatchEventWith(Event.COMPLETE);
-		};
+		if (typeof name !== 'string') {
+			return;
+		}
 		const context = getUIContext(this);
 		const resources = context ? context.options.resource : resource;
 		if (context?.disposed || !resources) {
 			return;
 		}
-		const cached = resources.get(name);
+		const request = this._fontRequest;
+		const isCurrentRequest = (): boolean => request === this._fontRequest && !context?.disposed;
+		const apply = (font: unknown): void => {
+			if (!isCurrentRequest()) {
+				return;
+			}
+			if (!(font instanceof BitmapFont)) {
+				throw new TypeError(`Resource ${name} is not a bitmap font.`);
+			}
+			this._bitmapText.font = font;
+			this._invalidateText();
+			this.dispatchEventWith(Event.COMPLETE);
+		};
 		const report = (error: unknown): void => {
-			if (request !== this._fontRequest) return;
+			if (!isCurrentRequest()) {
+				return;
+			}
 			this.dispatchEventWith(IOErrorEvent.IO_ERROR, false, { source: name, error });
 		};
+		const cached = resources.get(name);
 		if (cached !== undefined) {
 			try {
 				apply(cached);
@@ -222,10 +232,6 @@ export class BitmapLabel extends Component implements IDisplayText {
 			}
 			return;
 		}
-		void resources.load(name).then(value => {
-			if (!context?.disposed) {
-				apply(value);
-			}
-		}).catch(report);
+		void resources.load(name).then(apply).catch(report);
 	}
 }

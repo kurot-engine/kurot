@@ -9,7 +9,8 @@ format changes are documented explicitly in each release.
 
 ## 3.9.0 — 2026-11-01
 
-Prepared for user-managed publication; publication has not been verified.
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-01. All 252 archived files match the locally prepared release.
 
 ### Added
 
@@ -26,7 +27,7 @@ Prepared for user-managed publication; publication has not been verified.
 - ui-document remains ^0.13.0 with the unchanged 0.13.2 development lock.
   CLI acquires no Core/UI runtime dependency. Default global applications,
   starter configurations and existing resource-versioning requirements remain.
-- Local UIContext integration requires UI >= 3.7.0 within 3.x, prepared as a
+- Local UIContext integration requires UI >= 3.7.0 within 3.x, released as a
   separate package in this release batch; global applications need no UI upgrade.
   Existing CLI ^3.x consumers can adopt this release optionally; exact pins
   require explicit adoption. CLI dependency fields and application dependencies
@@ -45,6 +46,8 @@ Prepared for user-managed publication; publication has not been verified.
   verifies generated factories, default/nested skins, fonts, late radio binding,
   disposal and unchanged global Theme loading. Public configuration and the
   complete documented loader pass strict types with skipLibCheck=false.
+- After publication, downloaded npm Core/UI/CLI packages pass the same six
+  strict builds and native execution checks without SDK implementation source.
 
 ## 3.8.1 — 2026-10-30
 
