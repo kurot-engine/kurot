@@ -8,4 +8,6 @@ bitmapOffsetY: number;
 
 Inherited from `Bitmap.bitmapOffsetY`; shown with this receiver's substituted types.
 
+Trimmed content's vertical offset within the logical untrimmed frame.
+
 **Default/initializer:** `0`

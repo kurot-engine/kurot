@@ -1,13 +1,13 @@
 # setBitmapData
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 setBitmapData(value: BitmapData): void;
 ```
 
-Borrows the given BitmapData as a full-image frame and recomputes dimensions
-using this texture's immutable resolution. Does not dispose a previous source;
-coordinate ownership before replacing shared image data.
+Assigns BitmapData as a full-image frame and recomputes dimensions using this
+texture's immutable resolution. Does not dispose a previous source. Later
+dispose() follows disposeBitmapData, which defaults to owning the source.
 
 Related types: [BitmapData](../BitmapData-class.md).

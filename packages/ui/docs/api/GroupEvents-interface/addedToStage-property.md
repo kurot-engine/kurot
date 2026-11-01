@@ -1,6 +1,6 @@
 # addedToStage
 
-Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
 
 ```ts
 addedToStage: Event;

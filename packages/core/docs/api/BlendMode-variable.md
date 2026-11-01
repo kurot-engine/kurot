@@ -1,12 +1,13 @@
 # BlendMode
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 BlendMode: { ADD: "lighter"; COLOR: "color"; COLOR_BURN: "color-burn"; COLOR_DODGE: "color-dodge"; DARKEN: "darken"; DIFFERENCE: "difference"; ERASE: "destination-out"; EXCLUSION: "exclusion"; HARD_LIGHT: "hard-light"; HUE: "hue"; LIGHTEN: "lighten"; LUMINOSITY: "luminosity"; MULTIPLY: "multiply"; NORMAL: "source-over"; OVERLAY: "overlay"; SATURATION: "saturation"; SCREEN: "screen"; SOFT_LIGHT: "soft-light" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Compositing names accepted by DisplayObject.blendMode. Values use Canvas 2D
+operation names; available effects depend on the rendering backend.
 
 ## Members
 

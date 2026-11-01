@@ -1,11 +1,12 @@
 # targetDisplay
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 targetDisplay?: DisplayObject;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Node notified when drawing changes; this reference does not transfer resource
+ownership. Shape and Sprite attach their own instance during construction.
 
 Related types: [DisplayObject](../DisplayObject-class.md).

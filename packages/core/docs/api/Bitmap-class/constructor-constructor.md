@@ -1,11 +1,11 @@
 # constructor
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 constructor(value?: Texture);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Creates an image node with an optional borrowed texture; performs no loading.
 
 Related types: [Bitmap](../Bitmap-class.md), [Texture](../Texture-class.md).

@@ -1,14 +1,14 @@
 # Sprite
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Sprite extends DisplayObjectContainer
 ```
 
 A display container that also owns retained Graphics.
-Use Shape when child parenting is unnecessary. Neither type owns the
-lifetime of resources referenced by its children.
+Use Shape when child parenting is unnecessary. Removing the Sprite does not
+dispose resources referenced by its descendants or clear its drawing buffer.
 
 Related types: [DisplayObjectContainer](DisplayObjectContainer-class.md).
 

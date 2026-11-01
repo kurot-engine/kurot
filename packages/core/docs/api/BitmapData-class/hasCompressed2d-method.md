@@ -1,9 +1,9 @@
 # hasCompressed2d
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 hasCompressed2d(): boolean;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Whether the first compressed group contains a base entry.

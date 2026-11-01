@@ -1,6 +1,6 @@
 # ResourceEventType
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 ResourceEventType: { CONFIG_COMPLETE: "configComplete"; CONFIG_LOAD_ERROR: "configLoadError"; GROUP_COMPLETE: "groupComplete"; GROUP_LOAD_ERROR: "groupLoadError"; GROUP_PROGRESS: "groupProgress"; ITEM_LOAD_ERROR: "itemLoadError" };

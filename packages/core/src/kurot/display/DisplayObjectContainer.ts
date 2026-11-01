@@ -9,7 +9,7 @@ import type { Stage } from './Stage.js';
  * resource disposal. WebGL render groups affect batching, not Canvas pixels.
  */
 export class DisplayObjectContainer extends DisplayObject {
-	// ── Declare fields ─────────────────────────────────────────────────────────
+	// ── Inherited field declarations ──────────────────────────────────────────
 
 	declare $children: DisplayObject[];
 
@@ -17,12 +17,10 @@ export class DisplayObjectContainer extends DisplayObject {
 
 	private _touchChildren = true;
 	/**
-	 * When true this container owns an independent InstructionSet.
-	 * The renderer will build and execute its subtree separately, so changes
-	 * inside this container never trigger a rebuild of the parent set.
-	 *
-	 * Typical use: mark a static background layer or a rarely-changing UI panel
-	 * as a RenderGroup so the parent scene graph traversal skips it entirely.
+	 * Whether WebGL isolates this subtree in its own reusable InstructionSet,
+	 * false by default. This limits structural rebuilds across group boundaries;
+	 * children still update normally. It does not rasterize or freeze the subtree
+	 * and has no visual effect on the Canvas rendering path.
 	 */
 	public isRenderGroup = false;
 
@@ -44,7 +42,8 @@ export class DisplayObjectContainer extends DisplayObject {
 
 	/**
 	 * Whether a hit child remains the input target, true by default. When false,
-	 * child hits are retargeted to this container; they are not individually disposed.
+	 * child hits are retargeted to this container. Descendant geometry is still
+	 * tested; this does not change the children's touchEnabled values.
 	 */
 	public get touchChildren(): boolean {
 		return this._touchChildren;
@@ -305,7 +304,15 @@ export class DisplayObjectContainer extends DisplayObject {
 		return super.$hitTest(stageX, stageY);
 	}
 
+	/**
+	 * Extension hook after insertion, or after moving a child to a new index.
+	 * A new insertion has already set the parent and dispatched its add events.
+	 */
 	childAdded(_child: DisplayObject, _index: number): void {}
+	/**
+	 * Extension hook before removal or reordering, while the child remains parented
+	 * at the supplied index. Actual removal dispatches its events after this hook.
+	 */
 	childRemoved(_child: DisplayObject, _index: number): void {}
 
 	// ── Private methods ───────────────────────────────────────────────────────
@@ -327,6 +334,7 @@ export class DisplayObjectContainer extends DisplayObject {
 			child.$onAddToStage(this.$stage, this.$nestLevel + 1);
 		}
 
+		// Establish recursive stage membership before bubbling ADDED or draining stage events.
 		child.dispatchEventWith(Event.ADDED, true);
 
 		if (this.$stage) {
@@ -350,6 +358,7 @@ export class DisplayObjectContainer extends DisplayObject {
 	private doRemoveChild(index: number): DisplayObject {
 		const $children = this.$children;
 		const child = $children[index];
+		// Keep ancestry available through hooks and removal events for propagation.
 		this.childRemoved(child, index);
 		child.dispatchEventWith(Event.REMOVED, true);
 
@@ -366,6 +375,7 @@ export class DisplayObjectContainer extends DisplayObject {
 		}
 
 		child.$setParent(undefined);
+		// Removal listeners may have changed sibling indices while events were dispatched.
 		const indexNow = $children.indexOf(child);
 		if (indexNow !== -1) {
 			$children.splice(indexNow, 1);

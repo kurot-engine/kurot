@@ -5,6 +5,9 @@ This page does not imply that the name is importable from the package root.
 Use the owning API parameter/result type or an exported public alias when writing application code.
 
 ```ts
+/**
+ * Quadratic segment: (cx, cy) is the control point and (ax, ay) the endpoint.
+ */
 export interface CurveToCommand {
     type: PathCommandType.CurveTo;
     cx: number;

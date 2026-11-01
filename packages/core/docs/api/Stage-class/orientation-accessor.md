@@ -1,12 +1,13 @@
 # orientation
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get orientation(): OrientationMode;
 set orientation(value: OrientationMode);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Stored orientation preference, AUTO by default. Changes request screen-size
+recalculation; this property alone does not rotate the Canvas or lock the device.
 
 Related types: [OrientationMode](../OrientationMode-typealias.md).

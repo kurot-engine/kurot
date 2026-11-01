@@ -1,11 +1,12 @@
 # childAdded
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 childAdded(_child: DisplayObject, _index: number): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Extension hook after insertion, or after moving a child to a new index.
+A new insertion has already set the parent and dispatched its add events.
 
 Related types: [DisplayObject](../DisplayObject-class.md).

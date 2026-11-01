@@ -8,4 +8,6 @@ textureWidth: number;
 
 Inherited from `Bitmap.textureWidth`; shown with this receiver's substituted types.
 
+Untrimmed logical frame width, including transparent trim margins.
+
 **Default/initializer:** `0`

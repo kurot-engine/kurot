@@ -2,6 +2,7 @@ import { BitmapFont, BitmapText, Event, IOErrorEvent, resource } from '@kurot/co
 import { Component } from './Component.js';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
+import { getUIContext } from '../core/UIContext.js';
 
 /**
  * UI layout wrapper around BitmapText. String fonts are configured resource
@@ -203,7 +204,12 @@ export class BitmapLabel extends Component implements IDisplayText {
 			this._invalidateText();
 			this.dispatchEventWith(Event.COMPLETE);
 		};
-		const cached = resource.get(name);
+		const context = getUIContext(this);
+		const resources = context ? context.options.resource : resource;
+		if (context?.disposed || !resources) {
+			return;
+		}
+		const cached = resources.get(name);
 		const report = (error: unknown): void => {
 			if (request !== this._fontRequest) return;
 			this.dispatchEventWith(IOErrorEvent.IO_ERROR, false, { source: name, error });
@@ -216,6 +222,10 @@ export class BitmapLabel extends Component implements IDisplayText {
 			}
 			return;
 		}
-		void resource.load(name).then(apply).catch(report);
+		void resources.load(name).then(value => {
+			if (!context?.disposed) {
+				apply(value);
+			}
+		}).catch(report);
 	}
 }

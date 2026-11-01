@@ -1,11 +1,12 @@
 # constructor
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 constructor(texture: Texture);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Uses an existing page texture without copying its pixels. The sheet records
+its sampling origin; page mutations do not rebuild previously created views.
 
 Related types: [SpriteSheet](../SpriteSheet-class.md), [Texture](../Texture-class.md).

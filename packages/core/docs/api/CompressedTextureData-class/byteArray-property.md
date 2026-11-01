@@ -1,9 +1,9 @@
 # byteArray
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 byteArray: Uint8Array;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Encoded block payload retained by reference, not decoded RGBA pixels.

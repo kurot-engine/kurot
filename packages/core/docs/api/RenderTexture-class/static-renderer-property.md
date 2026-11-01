@@ -1,11 +1,12 @@
 # static renderer
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static renderer?: RenderFunction;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Shared Canvas capture hook installed by Player. drawToTexture() returns
+false until a renderer is installed; it does not capture directly from WebGL.
 
 Related types: [RenderFunction](../supporting/core-RenderFunction.md).

@@ -5,6 +5,57 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-01 — Core 2.8.0 / UI 3.7.0 / CLI 3.9.0 preparation
+
+- Prepare independent feature releases for decoded ImageBitmap sources and
+  explicit upload cleanup in Core, local UIContext/radio-group ownership in UI,
+  and module Skin exports in CLI. Synchronize runtime engineVersion, package/root
+  READMEs, current contracts, context/version tables and generated API references.
+  These are local release candidates; no npm publication is performed here.
+- Preserve every dependency range, peer minimum, installation and lock. UIContext
+  works on the existing Core ^2.5.2 contract; only ImageBitmap adoption needs Core
+  >= 2.8.0. Module compilation needs CLI >= 3.9.0 and local UIContext needs UI
+  >= 3.7.0, within their current majors. Core's bitmap-font and CLI's ui-document
+  dependencies remain unchanged.
+- UI, Game, DragonBones and ui-runtime Core peers accept 2.8.0; ui-runtime's UI
+  peer accepts 3.7.0. No dependent SDK needs a compatibility migration/release.
+  Compatible example/application ranges can opt in after publication. Exact
+  Star Catcher/Core/CLI and Card Booster/Skydive Core/CLI pins need an explicit
+  adoption change if selected. Templates and examples keep their current locks;
+  starter latest placeholders and default global registration remain.
+- Clean builds and 1001 Core / 386 UI / 161 CLI unit tests pass. Two browser
+  WebGL 1/2 regressions verify actual ImageBitmap pixels, updates, ownership and
+  context restoration. Generated Core/UI APIs report zero missing entries;
+  19 extracted examples compile against built and source-free packed declarations.
+- Source-free Core/UI/CLI packages pass strict module/global development/release
+  builds, local/default/nested Skin execution, fonts, late radio binding,
+  disposal and global Theme loading. Exact registry Core 2.5.2 passes UI's peer
+  minimum runtime/type checks. Unchanged packed Game/DragonBones/ui-runtime share
+  the target Core/UI, and the complete loader passes skipLibCheck=false.
+- Checked local archives include current declarations, compiled helpers, guides
+  and generated API files; whitespace and version/dependency audits pass.
+
+## 2026-11-01 — CLI 3.9.0 preparation
+
+- Prepare CLI 3.9.0 for user-managed publication with optional module Skin
+  registration, frozen factory exports in both modes, and documentation for
+  resolving the generated theme's development/hashed release module URL.
+  Synchronize package/root README, architecture/context and source version table.
+- Preserve ui-document ^0.13.0 and the existing 0.13.2 development lock. No
+  SDK depends on CLI at runtime. UIContext integration uses separate unreleased
+  UI source; UI remains 3.6.2 and is not prepared/published by this CLI change.
+- Consumer adoption is optional: demo/game and MilfMaster/Runaway/Tentax ranges
+  accept 3.9.0. Star Catcher, Card Booster and Skydive exact pins require an
+  explicit manifest update if selected. Starters retain latest placeholders;
+  application manifests, installations and locks are unchanged here.
+- Clean CLI build and all 161 tests pass (29 files), including six native ESM
+  development/release registration cases and accepted/invalid configuration.
+  Packed CLI/local UI source integration passes with registry Core 2.5.3 and
+  2.7.0 for simultaneous contexts, defaults, nested factories, fonts and disposal.
+  The complete loader example and public config compile with strict types and
+  skipLibCheck=false. Archive contents/version and diff whitespace checks pass.
+- These are local preparation checks, not npm publication verification.
+
 ## 2026-10-30 — Core 2.7.0 / CLI 3.8.1 publication and Templates adoption
 
 - Verify both exact versions and npm latest tags, download the registry archives

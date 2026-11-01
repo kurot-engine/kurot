@@ -8,4 +8,6 @@ sourceHeight: number;
 
 Inherited from `Bitmap.sourceHeight`; shown with this receiver's substituted types.
 
+Full atlas/page height in physical source pixels.
+
 **Default/initializer:** `0`

@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **3.8.1** (published).
+resource watching. Package version: **3.9.0** (prepared for publication).
 Requires Node.js >= 20 and
 ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
 
@@ -16,7 +16,7 @@ dependency. New scaffolds use Core ^2.7.0 for release resource versioning and ca
 stage-attribute startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@3.8.1 create my-game
+npx @kurot/cli@3.9.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -24,7 +24,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.8.1`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^3.9.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -136,6 +136,27 @@ export default {
 `ui.sourceDir` contains `.kui.xml` documents. The build always generates the
 runtime theme manifest at `resource/default.thm.json`; it is not an authored
 input. `ui.namespaces` can map additional XML prefixes to project barrel files.
+
+`ui.skinRegistration` accepts `'global'` (the default) or `'module'`. Both modes
+export a frozen `skinFactories` map keyed by complete Skin class names. Global
+mode also registers factories on `globalThis` for the existing Theme loader.
+Module mode leaves registration to the application:
+
+```ts
+ui: {
+	sourceDir: 'resource/ui',
+	skinRegistration: 'module',
+},
+```
+
+Load `resource/default.thm.json`, resolve its `skinsJs` relative to that JSON URL,
+and dynamically import `skinFactories`. This also locates the hashed release
+module; avoid hardcoding `default.thm.js`. Use the JSON's `skins` as local default
+mappings. See [module skins](docs/module-skins.md) for a complete UIContext loader
+and resource/lifecycle ownership. That integration requires UI >= 3.7.0 within
+3.x for UIContext. Default global applications retain their
+existing UI requirements. Changing registration during dev requires restarting
+the dev server.
 
 `stage` supplies the generated canvas defaults. With Core >= 2.6.0 within 2.x,
 entry code can use `createPlayer({ canvas })`. Explicit options override the corresponding defaults;

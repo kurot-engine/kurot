@@ -1,9 +1,10 @@
 # setBitmapPixelHitTest
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 setBitmapPixelHitTest(fn: (bitmap: Bitmap, localX: number, localY: number) => boolean): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Replaces the shared renderer pixel-test hook for all Bitmap instances.
+Installing a hook does not enable pixelHitTest on individual bitmaps.

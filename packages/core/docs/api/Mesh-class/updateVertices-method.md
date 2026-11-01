@@ -1,10 +1,10 @@
 # updateVertices
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 updateVertices(): void;
 ```
 
-Marks vertices as dirty and triggers a re-render.
+Invalidates cached local bounds and render geometry.
 Call this after modifying `vertices`, `indices`, or `uvs`.

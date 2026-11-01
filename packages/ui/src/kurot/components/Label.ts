@@ -5,6 +5,7 @@ import { getLabelOutlinePadding, getLabelTextHeight } from '../text/label-text-b
 import type { HorizontalAlign, VerticalAlign } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
+import { getUIContext } from '../core/UIContext.js';
 
 /**
  * Optional font fitting policy, independent of line generation.
@@ -29,12 +30,17 @@ export class Label extends Component implements IDisplayText {
 	private _minFontSize = 12;
 	private _textFitOverflow = false;
 	private _fitKey?: string;
+	private _fontFamilyExplicit = false;
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
 	public constructor(text?: string) {
 		super();
 		this._textField = new TextField();
+		const family = getUIContext(this)?.options.fontFamily;
+		if (family) {
+			this._textField.fontFamily = family;
+		}
 		this._baseSize = this._textField.size;
 		this.touchChildren = false;
 		if (text) this.text = text;
@@ -88,6 +94,7 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	public set fontFamily(value: string) {
+		this._fontFamilyExplicit = true;
 		if (this._textField.fontFamily !== value) {
 			this._textField.fontFamily = value;
 			this.invalidateSize();
@@ -359,6 +366,10 @@ export class Label extends Component implements IDisplayText {
 
 	public override createChildren(): void {
 		super.createChildren();
+		const family = getUIContext(this)?.options.fontFamily;
+		if (family && !this._fontFamilyExplicit) {
+			this.fontFamily = family;
+		}
 		this.addChild(this._textField);
 	}
 

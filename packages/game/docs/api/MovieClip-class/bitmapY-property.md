@@ -8,4 +8,6 @@ bitmapY: number;
 
 Inherited from `Bitmap.bitmapY`; shown with this receiver's substituted types.
 
+Atlas sampling origin copied from Texture.bitmapY, independent of density.
+
 **Default/initializer:** `0`

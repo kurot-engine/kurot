@@ -1,12 +1,12 @@
 # BitmapFillMode
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 BitmapFillMode: { CLIP: "clip"; REPEAT: "repeat"; SCALE: "scale" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Texture filling policy for Bitmap's explicit logical dimensions.
 
 ## Members
 

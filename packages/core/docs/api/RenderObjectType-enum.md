@@ -1,12 +1,13 @@
 # RenderObjectType
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 enum RenderObjectType
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Geometry category used to select a render pipe; independent of RenderMode's
+visibility and compositing classification.
 
 ## Members
 

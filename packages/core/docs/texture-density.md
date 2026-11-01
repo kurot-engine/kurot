@@ -75,3 +75,39 @@ clip/repeat and rotated edge crops. Browser fill tests compare Canvas/WebGL 1/2
 at different output resolutions and source densities, including tint, texture
 swaps, cache refresh and nine-slice invariance. Use the package's existing build,
 unit and visual-regression commands when changing this contract.
+
+## Decoded pixel ownership
+
+Core >= 2.8.0 within 2.x accepts ImageBitmap sources through the BitmapData
+constructor or source setter.
+With premultipliedAlpha=false (the default), WebGL uploads normalize these pixels
+through a temporary Canvas 2D surface before uploading premultiplied pixels. This
+works for both native ImageBitmap alpha modes; the browser does not expose that
+mode and ignores WebGL's unpack-premultiply switch for ImageBitmap. The scratch
+surface is reset immediately after upload, including failures, and the source is
+neither mutated nor closed by normalization. This path adds conversion work at
+upload time; it is not an asynchronous decoding API.
+
+To avoid that extra conversion, create decoded sources with
+`createImageBitmap(image, { premultiplyAlpha: 'premultiply' })` and set
+`bitmapData.premultipliedAlpha = true`. That flag is a caller declaration of
+already-premultiplied pixels, not an instruction to change an ImageBitmap's alpha
+mode. Incorrect declarations cannot be detected from native ImageBitmap metadata.
+Density and atlas coordinates retain their normal source-pixel units.
+
+BitmapData.dispose() releases an owned ImageBitmap with close() exactly once
+and immediately deletes its current WebGL upload. Set deleteSource to false for
+a borrowed decoded source; its owner must close it. Texture views sharing the
+BitmapData must coordinate disposal. Removing a display node does not dispose
+shared pixels. Cleanup continues if upload deletion throws and surfaces the
+collected error afterwards. A context-restored upload replaces the old cleanup
+hook; disposing then releases the new upload.
+
+Restoration tracking uses a weak BitmapData index plus an iterable set of weak
+references. New registration inspects at most eight references with a persistent
+cleanup cursor; cached uploads and indexed reuploads do not scan the set. A
+context restoration invalidates live uploads and prunes dead entries in one pass,
+retaining the index for reupload. Explicit disposal immediately removes the set
+entry and index and clears an idle cleanup cursor when the set becomes empty.
+Uncollected metadata for naturally abandoned sources is pruned by later
+registration sweeps or restoration; these weak entries do not own the pixels.

@@ -1,14 +1,15 @@
 # BitmapData
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class BitmapData
 ```
 
-Shared image/canvas/video pixel source used by Texture views.
-After editing a mutable source, call BitmapData.invalidate() to refresh
-render uploads. Coordinate disposal with every texture using the source.
+Pixel source shared by Texture views, with source-pixel dimensions and an
+optional renderer upload. Canvas/video edits require invalidate() to refresh
+uploads. Sharing does not coordinate ownership: dispose only after all users
+have released the source.
 
 ## Members
 

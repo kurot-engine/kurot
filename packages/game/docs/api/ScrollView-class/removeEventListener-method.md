@@ -9,6 +9,7 @@ removeEventListener(type: string, listener: (event: Event) => void, useCapture?:
 
 Inherited from `Sprite.removeEventListener`; shown with this receiver's substituted types.
 
-Removes the matching event type, function identity and capture phase.
-Missing listeners are harmless; a newly created bound function does not
-match the original callback.
+Removes the matching listener and capture mode. Removing the last listener
+for ENTER_FRAME or RENDER also removes this node from that ticker registry.
+
+Removes a custom event listener with the matching callback and capture mode.

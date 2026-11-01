@@ -1,11 +1,11 @@
 # etcAlphaMask
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 etcAlphaMask?: BitmapData;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Optional ETC alpha data. Disposal detaches this reference without disposing it.
 
 Related types: [BitmapData](../BitmapData-class.md).

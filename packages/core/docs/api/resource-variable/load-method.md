@@ -1,6 +1,6 @@
 # load
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 load<T = unknown>(name: string): Promise<T>;

@@ -1,12 +1,12 @@
 # graphics
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get graphics(): Graphics;
 ```
 
-Retained drawing commands when the subclass provides Graphics. Base nodes
-return undefined; use Shape or Sprite for vector drawing.
+This node's retained drawing buffer. Drawing and clear() invalidate the node;
+removing it from the stage does not clear its commands.
 
 Related types: [Graphics](../Graphics-class.md).

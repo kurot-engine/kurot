@@ -1,11 +1,11 @@
 # bitmapData
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 bitmapData?: BitmapData;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Shared pixel source copied from texture; the Bitmap does not dispose it.
 
 Related types: [BitmapData](../BitmapData-class.md).

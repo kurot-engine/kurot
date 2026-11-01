@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@3.8.1` (published) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@3.9.0` (prepared for publication) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -42,6 +42,13 @@ See [text-components.md](text-components.md). Apps need Core ^2.3.0/UI ^3.3.0
 when using the new tags; other controls need no incidental engine upgrade.
 
 ## KUI compilation
+
+`ui.skinRegistration: "module"` exports `skinFactories` without global writes.
+Both modes export the map; the default global mode retains Theme registration.
+Read [module skins](module-skins.md) for loading the generated defaults and hashed
+module into a local UIContext. That integration needs UI >= 3.7.0 within 3.x.
+The CLI mode does not require
+upgrading existing global applications or add a Core/UI dependency to CLI.
 
 `.kui.xml` is the only authored UI format. `compile-kui.ts` recursively scans
 `ui.sourceDir` and parses every document with `@kurot/ui-document`. Appearance

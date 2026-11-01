@@ -8,4 +8,6 @@ textureHeight: number;
 
 Inherited from `Bitmap.textureHeight`; shown with this receiver's substituted types.
 
+Untrimmed logical frame height, including transparent trim margins.
+
 **Default/initializer:** `0`

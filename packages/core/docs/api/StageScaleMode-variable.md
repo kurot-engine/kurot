@@ -1,12 +1,13 @@
 # StageScaleMode
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 StageScaleMode: { EXACT_FIT: "exactFit"; FIXED_HEIGHT: "fixedHeight"; FIXED_NARROW: "fixedNarrow"; FIXED_WIDE: "fixedWide"; FIXED_WIDTH: "fixedWidth"; NO_BORDER: "noBorder"; NO_SCALE: "noScale"; SHOW_ALL: "showAll" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+ScreenAdapter policies for mapping design dimensions to the available CSS
+viewport. Canvas backing-store resolution is configured separately.
 
 ## Members
 

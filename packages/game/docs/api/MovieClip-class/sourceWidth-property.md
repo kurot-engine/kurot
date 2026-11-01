@@ -8,4 +8,6 @@ sourceWidth: number;
 
 Inherited from `Bitmap.sourceWidth`; shown with this receiver's substituted types.
 
+Full atlas/page width in physical source pixels.
+
 **Default/initializer:** `0`

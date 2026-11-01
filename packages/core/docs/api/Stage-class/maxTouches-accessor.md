@@ -1,10 +1,11 @@
 # maxTouches
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get maxTouches(): number;
 set maxTouches(value: number);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Touch limit read when TouchHandler is created, initially 99. Later changes
+notify onMaxTouchesChanged(); the base hook does not update an existing handler.

@@ -5,8 +5,8 @@ import { Graphics } from './Graphics.js';
 
 /**
  * A display container that also owns retained Graphics.
- * Use Shape when child parenting is unnecessary. Neither type owns the
- * lifetime of resources referenced by its children.
+ * Use Shape when child parenting is unnecessary. Removing the Sprite does not
+ * dispose resources referenced by its descendants or clear its drawing buffer.
  */
 export class Sprite extends DisplayObjectContainer {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -24,6 +24,10 @@ export class Sprite extends DisplayObjectContainer {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/**
+	 * This container's own retained drawing buffer, separate from its children.
+	 * Drawing and clear() invalidate its bounds and cached rendering.
+	 */
 	public override get graphics(): Graphics {
 		return this._graphics;
 	}
@@ -36,6 +40,7 @@ export class Sprite extends DisplayObjectContainer {
 
 	override $hitTest(stageX: number, stageY: number): DisplayObject | undefined {
 		const target = super.$hitTest(stageX, stageY);
+		// Preserve a descendant target before testing this Sprite's own paths.
 		if (target !== this) return target;
 		if (this.graphics.commands.length === 0) {
 			return this;

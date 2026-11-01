@@ -19,6 +19,10 @@ type RenderFunction = (
 export class RenderTexture extends Texture {
 	// ── Static fields ─────────────────────────────────────────────────────────
 
+	/**
+	 * Shared Canvas capture hook installed by Player. drawToTexture() returns
+	 * false until a renderer is installed; it does not capture directly from WebGL.
+	 */
 	static renderer?: RenderFunction;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -34,6 +38,14 @@ export class RenderTexture extends Texture {
 
 	// ── Public methods ────────────────────────────────────────────────────────
 
+	/**
+	 * Captures the subtree using an optional local logical clip rectangle and a
+	 * raster scale, defaulting to 1. Without a clip, the capture retains the local
+	 * origin rather than tightly cropping to the content's top-left corner.
+	 * Returns false for empty bounds or a missing renderer, preserving an earlier
+	 * capture. A successful capture replaces bitmapData without disposing the old
+	 * source; coordinate any retained references before capturing again.
+	 */
 	public drawToTexture(displayObject: DisplayObject, clipBounds?: Rectangle, scale = 1): boolean {
 		if (clipBounds && (clipBounds.width === 0 || clipBounds.height === 0)) {
 			return false;
@@ -65,6 +77,11 @@ export class RenderTexture extends Texture {
 		return true;
 	}
 
+	/**
+	 * Reads one RGBA pixel as four values in [0, 255]. Coordinates are divided by
+	 * textureScaleFactor and rounded to capture pixels. Returns [] without a usable
+	 * capture; Canvas security/readback errors propagate to the caller.
+	 */
 	public override getPixel32(x: number, y: number): number[] {
 		if (!this._canvas) {
 			return [];
@@ -78,6 +95,10 @@ export class RenderTexture extends Texture {
 		return [data[0], data[1], data[2], data[3]];
 	}
 
+	/**
+	 * Disposes the current pixel source according to disposeBitmapData and releases
+	 * this object's Canvas references. Captures replaced earlier are not disposed here.
+	 */
 	public override dispose(): void {
 		super.dispose();
 		this._canvas = undefined;

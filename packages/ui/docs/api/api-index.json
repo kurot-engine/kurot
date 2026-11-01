@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "3.6.2",
+  "version": "3.7.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -6635,6 +6635,13 @@
       "name": "getTheme",
       "kind": "Function",
       "file": "getTheme-function.md",
+      "topic": "core",
+      "members": []
+    },
+    {
+      "name": "getUIContext",
+      "kind": "Function",
+      "file": "getUIContext-function.md",
       "topic": "core",
       "members": []
     },
@@ -22600,6 +22607,13 @@
       ]
     },
     {
+      "name": "SkinFactory",
+      "kind": "TypeAlias",
+      "file": "SkinFactory-typealias.md",
+      "topic": "core",
+      "members": []
+    },
+    {
       "name": "SkinPartsMap",
       "kind": "Interface",
       "file": "SkinPartsMap-interface.md",
@@ -27033,6 +27047,100 @@
         {
           "name": "update",
           "file": "TouchScroll-class/update-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "UIContext",
+      "kind": "Class",
+      "file": "UIContext-class.md",
+      "topic": "core",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "UIContext-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "options",
+          "file": "UIContext-class/options-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "disposed",
+          "file": "UIContext-class/disposed-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bind",
+          "file": "UIContext-class/bind-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dispose",
+          "file": "UIContext-class/dispose-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getSkinName",
+          "file": "UIContext-class/getSkinName-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resolveSkin",
+          "file": "UIContext-class/resolveSkin-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "run",
+          "file": "UIContext-class/run-method.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "UIContextOptions",
+      "kind": "Interface",
+      "file": "UIContextOptions-interface.md",
+      "topic": "core",
+      "members": [
+        {
+          "name": "assetAdapter",
+          "file": "UIContextOptions-interface/assetAdapter-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "defaults",
+          "file": "UIContextOptions-interface/defaults-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "fontFamily",
+          "file": "UIContextOptions-interface/fontFamily-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resource",
+          "file": "UIContextOptions-interface/resource-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "skins",
+          "file": "UIContextOptions-interface/skins-property.md",
           "protected": false,
           "inherited": false
         }

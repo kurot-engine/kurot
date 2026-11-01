@@ -1,11 +1,11 @@
 # getPixel32
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 getPixel32(x: number, y: number): number[];
 ```
 
-**deprecated**
-
-Use setBitmapData instead.
+Reads one RGBA pixel as four values in [0, 255]. Coordinates are divided by
+textureScaleFactor and rounded to capture pixels. Returns [] without a usable
+capture; Canvas security/readback errors propagate to the caller.

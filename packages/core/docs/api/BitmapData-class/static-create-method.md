@@ -1,12 +1,14 @@
 # static create
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static create(type: "arraybuffer", data: ArrayBuffer, callback?: (bitmapData: BitmapData) => void): BitmapData;
 static create(type: "base64", data: string, callback?: (bitmapData: BitmapData) => void): BitmapData;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Starts decoding encoded image bytes or bare base64 through a browser Image.
+Returns before loading completes; the callback receives initialized dimensions
+after a successful load. Load errors have no callback on this helper.
 
 Related types: [BitmapData](../BitmapData-class.md).

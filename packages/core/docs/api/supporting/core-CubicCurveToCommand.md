@@ -5,6 +5,9 @@ This page does not imply that the name is importable from the package root.
 Use the owning API parameter/result type or an exported public alias when writing application code.
 
 ```ts
+/**
+ * Cubic segment with two control points and endpoint (ax, ay).
+ */
 export interface CubicCurveToCommand {
     type: PathCommandType.CubicCurveTo;
     cx1: number;

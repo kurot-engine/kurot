@@ -1,6 +1,6 @@
 # vertices
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 vertices: number[];
@@ -8,6 +8,7 @@ vertices: number[];
 
 Vertex positions stored as x/y pairs in local display coordinates.
 Atlas trim offsets do not move this geometry; positions already define
-the rendered shape. Use scaleX/scaleY to resize it.
+the rendered shape. Arrays are retained directly; call updateVertices()
+after replacing or editing geometry so bounds and rendering are invalidated.
 
 **Default/initializer:** `[]`

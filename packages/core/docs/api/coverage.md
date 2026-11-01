@@ -1,10 +1,10 @@
 # @kurot/core API coverage
 
-Version: 2.7.0. Public export names: 168. Public/protected member entries: 2152.
+Version: 2.8.0. Public export names: 168. Public/protected member entries: 2152.
 
 Missing declaration references: **0**. Inventory is independently read through the TypeScript checker.
 
-Entries without additional behavioral JSDoc: **897** (see [machine report](coverage.json)).
+Entries without additional behavioral JSDoc: **817** (see [machine report](coverage.json)).
 
 Complete declaration coverage does not imply every behavior has prose documentation.
 Simple declarations may be self-explanatory; the comment inventory keeps remaining gaps explicit.

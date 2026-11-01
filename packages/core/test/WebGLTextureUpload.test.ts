@@ -1,48 +1,103 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
-import { WebGLRenderContext } from '../src/kurot/player/webgl/WebGLRenderContext.js';
+import { createTextureUploadHarness as createHarness } from './helpers/texture-upload-harness.js';
 
-interface TextureUploadHarness {
-	gl: WebGLRenderingContext;
-	_trackedBitmapDatas: Set<WeakRef<BitmapData>>;
-	_uploadedVersions: WeakMap<BitmapData, number>;
-	createTexture(
-		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
-		sourcePremultipliedAlpha?: boolean,
-	): WebGLTexture;
-	getWebGLTexture(bitmapData: BitmapData): WebGLTexture | undefined;
-	updateTexture(
-		texture: WebGLTexture,
-		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
-		sourcePremultipliedAlpha?: boolean,
-	): void;
+class DecodedBitmap {
+	public readonly width = 4;
+	public readonly height = 2;
+	public readonly close = vi.fn();
 }
 
-function createHarness(): TextureUploadHarness {
-	const context = Object.create(WebGLRenderContext.prototype) as TextureUploadHarness;
-	context.gl = {
-		TEXTURE_2D: 0x0de1,
-		RGBA: 0x1908,
-		UNSIGNED_BYTE: 0x1401,
-		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 0x9241,
-		TEXTURE_MAG_FILTER: 0x2800,
-		TEXTURE_MIN_FILTER: 0x2801,
-		TEXTURE_WRAP_S: 0x2802,
-		TEXTURE_WRAP_T: 0x2803,
-		LINEAR: 0x2601,
-		CLAMP_TO_EDGE: 0x812f,
-		createTexture: vi.fn(() => ({} as WebGLTexture)),
-		bindTexture: vi.fn(),
-		pixelStorei: vi.fn(),
-		texImage2D: vi.fn(),
-		texParameteri: vi.fn(),
-	} as unknown as WebGLRenderingContext;
-	context._trackedBitmapDatas = new Set();
-	context._uploadedVersions = new WeakMap();
-	return context;
-}
+afterEach(() => {
+	vi.restoreAllMocks();
+	vi.unstubAllGlobals();
+});
 
 describe('WebGL texture upload alpha mode', () => {
+	it('normalizes undeclared ImageBitmap uploads and releases scratch pixels without closing the source', () => {
+		vi.stubGlobal('ImageBitmap', DecodedBitmap);
+		const context = createHarness();
+		const source = new DecodedBitmap() as ImageBitmap;
+		const canvas = document.createElement('canvas');
+		const drawImage = vi.fn();
+		vi.spyOn(canvas, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D);
+		vi.spyOn(document, 'createElement').mockReturnValue(canvas);
+		let uploadedSize: number[] = [];
+		vi.mocked(context.gl.texImage2D).mockImplementation(() => {
+			uploadedSize = [canvas.width, canvas.height];
+		});
+
+		context.createTexture(source);
+		context.updateTexture({} as WebGLTexture, source);
+
+		expect(drawImage).toHaveBeenCalledTimes(2);
+		expect(drawImage).toHaveBeenCalledWith(source, 0, 0);
+		expect(context.gl.texImage2D).toHaveBeenLastCalledWith(0x0de1, 0, 0x1908, 0x1908, 0x1401, canvas);
+		expect(uploadedSize).toEqual([4, 2]);
+		expect([canvas.width, canvas.height]).toEqual([0, 0]);
+		expect(source.close).not.toHaveBeenCalled();
+	});
+
+	it('keeps explicitly premultiplied ImageBitmap pixels on the direct path', () => {
+		vi.stubGlobal('ImageBitmap', DecodedBitmap);
+		const context = createHarness();
+		const source = new DecodedBitmap() as ImageBitmap;
+		const scratch = vi.spyOn(document, 'createElement');
+
+		context.createTexture(source, true);
+		context.updateTexture({} as WebGLTexture, source, true);
+
+		expect(scratch).not.toHaveBeenCalled();
+		expect(context.gl.texImage2D).toHaveBeenLastCalledWith(0x0de1, 0, 0x1908, 0x1908, 0x1401, source);
+	});
+
+	it('reclaims the failed upload and scratch buffer when ImageBitmap conversion throws', () => {
+		vi.stubGlobal('ImageBitmap', DecodedBitmap);
+		const context = createHarness();
+		const source = new DecodedBitmap() as ImageBitmap;
+		const canvas = document.createElement('canvas');
+		vi.spyOn(canvas, 'getContext').mockReturnValue({
+			drawImage: () => {
+				throw new Error('decode failure');
+			},
+		} as unknown as CanvasRenderingContext2D);
+		vi.spyOn(document, 'createElement').mockReturnValue(canvas);
+
+		expect(() => context.createTexture(source)).toThrow('decode failure');
+		expect(context.gl.deleteTexture).toHaveBeenCalledOnce();
+		expect(context.gl.texImage2D).not.toHaveBeenCalled();
+		expect([canvas.width, canvas.height]).toEqual([0, 0]);
+	});
+	it('prunes dead weak registrations on the next upload', () => {
+		const context = createHarness();
+		context._trackedBitmapDatas.add({ deref: () => undefined, [Symbol.toStringTag]: 'WeakRef' });
+		context.getWebGLTexture(new BitmapData(document.createElement('canvas')));
+		expect(context._trackedBitmapDatas.size).toBe(1);
+	});
+
+	it('explicit pixel disposal releases its upload once and clears bookkeeping', () => {
+		const context = createHarness();
+		const data = new BitmapData(document.createElement('canvas'));
+		const texture = context.getWebGLTexture(data);
+		data.dispose();
+		data.dispose();
+		expect(context.gl.deleteTexture).toHaveBeenCalledExactlyOnceWith(texture);
+		expect(context._uploadedVersions.has(data)).toBe(false);
+		expect(context._trackedBitmapDatas.size).toBe(0);
+		expect(data.webGLTexture).toBeUndefined();
+	});
+
+	it('disposes the current upload after context restoration replaces its handle', () => {
+		const context = createHarness();
+		const data = new BitmapData(document.createElement('canvas'));
+		const old = context.getWebGLTexture(data);
+		data.webGLTexture = undefined;
+		const restored = context.getWebGLTexture(data);
+		expect(context._trackedBitmapDatas.size).toBe(1);
+		data.dispose();
+		expect(restored).not.toBe(old);
+		expect(context.gl.deleteTexture).toHaveBeenCalledExactlyOnceWith(restored);
+	});
 	it('premultiplies straight-alpha sources by default', () => {
 		const context = createHarness();
 

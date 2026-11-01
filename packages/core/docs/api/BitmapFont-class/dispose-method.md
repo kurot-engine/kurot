@@ -1,10 +1,11 @@
 # dispose
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 dispose(): void;
 ```
 
 Disposes the underlying page texture. Child views are non-owning and
-must no longer be rendered once the shared page source is released.
+must no longer be rendered once the shared page source is released. The view
+map is retained; this does not individually detach or dispose child views.

@@ -1,6 +1,6 @@
 # childAdded
 
-Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
 
 ```ts
 childAdded(_child: unknown, _index: number): void;
@@ -8,4 +8,5 @@ childAdded(_child: unknown, _index: number): void;
 
 Inherited from `childAdded`; shown with this receiver's substituted types.
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Extension hook after insertion, or after moving a child to a new index.
+A new insertion has already set the parent and dispatched its add events.

@@ -3,6 +3,7 @@ import { UIState, isUIComponent } from '../core/UIState.js';
 import type { IUIOwner } from '../core/UIState.js';
 import { BasicLayout } from '../layouts/BasicLayout.js';
 import { getTheme } from '../core/Theme.js';
+import { captureUIContext, getUIContext } from '../core/UIContext.js';
 import type { IUIComponent } from '../core/IUIComponent.js';
 import type { ILayoutTarget } from '../layouts/ILayoutTarget.js';
 import type { Skin } from './Skin.js';
@@ -68,6 +69,7 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 
 	public constructor() {
 		super();
+		captureUIContext(this);
 		this.ui = new UIState(this);
 		this.touchEnabled = true;
 	}
@@ -87,8 +89,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	}
 
 	/**
-	 * Skin constructor, instance or global class-name string, initially undefined.
-	 * A missing global name clears the attached skin rather than throwing; exceptions
+	 * Skin constructor, instance or class-name string, initially undefined. Names
+	 * resolve in the node's UIContext when present, otherwise in the global registry.
+	 * A missing name clears the attached skin rather than throwing; exceptions
 	 * from a supplied factory propagate. Assigning undefined detaches the skin.
 	 * Replacement invokes skin cleanup hooks, but stage removal alone retains the skin.
 	 */
@@ -637,7 +640,7 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	 */
 	public createChildren(): void {
 		if (!this._skinName) {
-			const theme = getTheme();
+			const theme = getUIContext(this) ?? getTheme();
 			if (theme) {
 				const skinName = theme.getSkinName(this);
 				if (skinName) this._applySkinName(skinName);
@@ -733,7 +736,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 			if (typeof skinName === 'function') {
 				skin = this._invokeSkinFactory(skinName as new () => Skin);
 			} else if (typeof skinName === 'string') {
-				const clazz = (globalThis as Record<string, unknown>)[skinName] as ((new () => Skin) | ((thisArg: unknown) => Skin)) | undefined;
+				const context = getUIContext(this);
+				const clazz = context ? context.resolveSkin(skinName) :
+					(globalThis as Record<string, unknown>)[skinName] as ((new () => Skin) | ((thisArg: unknown) => Skin)) | undefined;
 				if (clazz) skin = this._invokeSkinFactory(clazz);
 			} else {
 				skin = skinName as Skin;
@@ -762,7 +767,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		// a string starting with "class" for ES classes. Plain functions never do.
 		const isClass = typeof fn === 'function' && /^class\s/.test(Function.prototype.toString.call(fn));
 
-		const result = isClass ? new (factory as new () => Skin)() : fn.call(this);
+		const create = (): unknown => isClass ? new (factory as new () => Skin)() : fn.call(this);
+		const context = getUIContext(this);
+		const result = context ? context.run(create) : create();
 		return (result && typeof result === 'object' && 'skinParts' in result) ? (result as Skin) : undefined;
 	}
 

@@ -4,6 +4,61 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## [2.8.0] — 2026-11-01
+
+Prepared for user-managed publication; publication has not been verified.
+
+### Added
+
+- Accept decoded ImageBitmap pixel sources and close owned bitmaps exactly once
+  on BitmapData.dispose(). Borrowed sources retain their owner's lifetime.
+- Synchronize Capabilities.engineVersion with the 2.8.0 package identity and
+  document alpha declarations, shared pixel ownership and restoration tracking.
+
+### Documentation
+
+- Clarify BitmapData loading callbacks, source dimensions/replacement, display
+  invalidation and pixel/upload ownership. Group public and internal methods,
+  preserve implementations, and synchronize generated API documentation.
+- Clarify display-tree event ordering, borrowed matrix/bounds lifetimes, retained
+  drawing commands, texture coordinate units and stage adaptation settings across
+  the display directory. Keep runtime logic and public signatures unchanged.
+
+### Fixed
+
+- Normalize ImageBitmap sources with the default alpha declaration through a
+  temporary Canvas 2D upload surface; preserve explicitly premultiplied direct
+  uploads. Reclaim scratch pixels and failed texture allocations on exceptions.
+- Release explicitly disposed BitmapData uploads immediately; continue pixel
+  cleanup if upload cleanup throws. Context restoration replaces the release hook.
+- Index BitmapData restoration registrations with a WeakMap, reuse their weak
+  entries on reupload and incrementally inspect at most eight entries per new
+  registration. Explicit disposal removes both entries; restoration performs
+  one full invalidation/pruning pass instead of a scan per reupload.
+
+### Compatibility
+
+- This feature release adds an optional source type; ImageLoader retains its
+  existing HTML image path. Direct ImageBitmap uploads require already-premultiplied
+  pixels and an explicit declaration; default input is normalized on upload.
+- Existing dependency ranges and locks remain unchanged. UI, Game, ui-runtime,
+  DragonBones and compatible Spine Core peers accept 2.8.0 without a peer bump.
+  UIContext itself does not require the new Core API; applications adopting
+  ImageBitmap must explicitly select Core >= 2.8.0 within 2.x.
+
+### Verification
+
+- Clean build and all 1001 unit tests pass (84 files), including bounded
+  registration work for 100/1000/2000 live sources, indexed reuploads, disposal,
+  alpha conversion and exception cleanup.
+- Browser WebGL 1/2 pixel tests pass for none/default/premultiply ImageBitmap
+  modes, explicit premultiplied input, texture updates, owned/borrowed disposal
+  and real context-loss/restoration reuploads. No page or GL errors remain.
+- API references match 2.8.0 with 168 exports, 2152 members and zero missing
+  entries. All 19 Core/Game/UI API examples compile against built and source-free
+  packed declarations. The packed Core works with UI 3.7.0 / CLI 3.9.0 and
+  unchanged Game/DragonBones/ui-runtime consumers using one shared Core.
+
 ## [2.7.0] — 2026-10-30
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

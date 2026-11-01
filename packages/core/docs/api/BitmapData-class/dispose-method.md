@@ -1,9 +1,12 @@
 # dispose
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 dispose(): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Releases the current upload and owned decoded pixels, then invalidates users.
+Coordinate disposal with every Texture sharing this BitmapData. Repeated
+calls do not repeat upload deletion or close the same ImageBitmap again.
+Cleanup continues after individual failures and throws an AggregateError.

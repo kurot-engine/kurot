@@ -1,6 +1,10 @@
 import { Rectangle } from '../../geom/Rectangle.js';
 import { BitmapData } from './BitmapData.js';
 
+/**
+ * Global frame-coordinate conversion factor, initially 1. Existing frame metadata
+ * is not recomputed when it changes; per-source density belongs to Texture.resolution.
+ */
 export let textureScaleFactor = 1;
 
 /**
@@ -32,9 +36,22 @@ export class Texture {
 	 */
 	public readonly resolution: number;
 
+	/**
+	 * Sampling rectangle x in source pixels divided by textureScaleFactor.
+	 * Independent of resolution; with the default global factor this is physical pixels.
+	 */
 	bitmapX = 0;
+	/**
+	 * Sampling rectangle y in source pixels divided by textureScaleFactor.
+	 */
 	bitmapY = 0;
+	/**
+	 * Sampled source width divided by textureScaleFactor, before density scaling.
+	 */
 	bitmapWidth = 0;
+	/**
+	 * Sampled source height divided by textureScaleFactor, before density scaling.
+	 */
 	bitmapHeight = 0;
 	/**
 	 * Trimmed content's horizontal offset in logical frame units, initially 0.
@@ -56,6 +73,10 @@ export class Texture {
 	 * Unlike textureHeight, this does not describe a logical display dimension.
 	 */
 	sourceHeight = 0;
+	/**
+	 * Whether the atlas stores the region rotated clockwise; the logical frame
+	 * remains upright. Initially false.
+	 */
 	rotated = false;
 	/**
 	 * Shared pixel source, initially undefined. Prefer setBitmapData() when
@@ -110,9 +131,15 @@ export class Texture {
 		return this._textureHeight;
 	}
 
+	/**
+	 * Sampled trimmed width in logical units, excluding transparent trim margins.
+	 */
 	public get scaleBitmapWidth(): number {
 		return this.bitmapWidth * this.pixelScale;
 	}
+	/**
+	 * Sampled trimmed height in logical units, excluding transparent trim margins.
+	 */
 	public get scaleBitmapHeight(): number {
 		return this.bitmapHeight * this.pixelScale;
 	}
@@ -120,9 +147,9 @@ export class Texture {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Borrows the given BitmapData as a full-image frame and recomputes dimensions
-	 * using this texture's immutable resolution. Does not dispose a previous source;
-	 * coordinate ownership before replacing shared image data.
+	 * Assigns BitmapData as a full-image frame and recomputes dimensions using this
+	 * texture's immutable resolution. Does not dispose a previous source. Later
+	 * dispose() follows disposeBitmapData, which defaults to owning the source.
 	 */
 	public setBitmapData(value: BitmapData): void {
 		this.bitmapData = value;
@@ -134,7 +161,8 @@ export class Texture {
 
 	/**
 	 * Detaches bitmapData and disposes it when disposeBitmapData is true (default).
-	 * Set that flag to false for a non-owning view of a shared source.
+	 * Set that flag to false for a non-owning view of a shared source. Stored frame
+	 * dimensions remain available after detachment; no pixels can be drawn from them.
 	 */
 	public dispose(): void {
 		if (this.bitmapData) {
@@ -146,7 +174,8 @@ export class Texture {
 	}
 
 	/**
-	 * @deprecated Use setBitmapData instead.
+	 * @deprecated Base Texture does not support pixel reads and always throws.
+	 * Use RenderTexture.getPixel32() for a Canvas capture.
 	 */
 	public getPixel32(_x: number, _y: number): number[] {
 		throw new Error('getPixel32 is not supported');

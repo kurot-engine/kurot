@@ -5,6 +5,9 @@ This page does not imply that the name is importable from the package root.
 Use the owning API parameter/result type or an exported public alias when writing application code.
 
 ```ts
+/**
+ * Solid fill state for subsequent paths: RGB color and alpha in [0, 1].
+ */
 export interface BeginFillCommand {
     type: PathCommandType.BeginFill;
     color: number;

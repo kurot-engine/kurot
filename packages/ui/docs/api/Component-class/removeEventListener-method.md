@@ -1,12 +1,13 @@
 # removeEventListener
 
-Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
 
 ```ts
 removeEventListener<K extends string>(type: K, listener: (event: ComponentEvents[K]) => void, useCapture?: boolean): void;
 removeEventListener(type: string, listener: (event: Event) => void, useCapture?: boolean): void;
 ```
 
-Removes the matching event type, function identity and capture phase.
-Missing listeners are harmless; a newly created bound function does not
-match the original callback.
+Removes the matching listener and capture mode. Removing the last listener
+for ENTER_FRAME or RENDER also removes this node from that ticker registry.
+
+Removes a custom event listener with the matching callback and capture mode.

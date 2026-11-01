@@ -1,13 +1,14 @@
 # SpriteSheet
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class SpriteSheet
 ```
 
 Named Texture views sharing one page's BitmapData and resolution.
-Disposing the sheet disposes the page; coordinate shared users beforehand.
+Disposing the sheet calls the page texture's dispose(); pixel ownership is
+governed by that texture's disposeBitmapData flag.
 
 ## Members
 

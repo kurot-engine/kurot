@@ -8,6 +8,6 @@ bitmapData?: BitmapData;
 
 Inherited from `Bitmap.bitmapData`; shown with this receiver's substituted types.
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Shared pixel source copied from texture; the Bitmap does not dispose it.
 
 Related types: [BitmapData](../../../../core/docs/api/BitmapData-class.md).

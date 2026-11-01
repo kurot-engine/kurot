@@ -1,6 +1,6 @@
 # scaleBitmapWidth
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get scaleBitmapWidth(): number;
@@ -8,4 +8,4 @@ get scaleBitmapWidth(): number;
 
 Inherited from `scaleBitmapWidth`; shown with this receiver's substituted types.
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Sampled trimmed width in logical units, excluding transparent trim margins.

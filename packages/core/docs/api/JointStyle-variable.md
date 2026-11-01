@@ -1,12 +1,13 @@
 # JointStyle
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 JointStyle: { BEVEL: "bevel"; MITER: "miter"; ROUND: "round" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Stroke corner styles for Graphics.lineStyle(). MITER uses miterLimit to bound
+sharp extensions; Canvas falls back to a bevel when that limit is exceeded.
 
 ## Members
 

@@ -1,9 +1,11 @@
 # NO_SCALE
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 readonly NO_SCALE: "noScale";
 ```
+
+Uses the CSS viewport size as logical stage size, subject to size rounding.
 
 **Default/initializer:** `'noScale'`

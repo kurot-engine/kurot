@@ -1,11 +1,13 @@
 # sourceWidth
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 sourceWidth: number;
 ```
 
 Inherited from `sourceWidth`; shown with this receiver's substituted types.
+
+Full atlas/page width in physical source pixels.
 
 **Default/initializer:** `0`

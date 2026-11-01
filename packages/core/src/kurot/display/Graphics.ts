@@ -4,8 +4,15 @@ import { Rectangle } from '../geom/Rectangle.js';
 import { PathCommandType, type GraphicsCommand } from './GraphicsPath.js';
 import type { DisplayObject } from './DisplayObject.js';
 
+/**
+ * Renderer-installed path hit test in local logical coordinates. Graphics
+ * report no hit until this hook is installed, or when their commands are empty.
+ */
 export let graphicsHitTest: ((graphics: Graphics, localX: number, localY: number) => boolean) | undefined;
 
+/**
+ * Replaces the shared path hit-test hook used by Shape and Sprite graphics.
+ */
 export function setGraphicsHitTest(fn: (graphics: Graphics, localX: number, localY: number) => boolean): void {
 	graphicsHitTest = fn;
 }
@@ -52,12 +59,24 @@ function createBezierPoints(data: number[], count: number): Point[] {
 export class Graphics {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	/**
+	 * Node notified when drawing changes; this reference does not transfer resource
+	 * ownership. Shape and Sprite attach their own instance during construction.
+	 */
 	targetDisplay?: DisplayObject;
 
+	/**
+	 * Retained commands in drawing order. Use drawing methods to modify them;
+	 * direct array edits bypass bounds calculation and cache invalidation.
+	 */
 	readonly commands: GraphicsCommand[] = [];
 
+	/**
+	 * Whether the renderer must replay commands into its Canvas raster cache.
+	 */
 	canvasCacheDirty = true;
 
+	// Renderer-managed raster surface and its origin in local logical units.
 	offscreenCanvas?: HTMLCanvasElement;
 	offscreenCtx?: CanvasRenderingContext2D;
 	offscreenBoundsX = 0;
@@ -114,6 +133,7 @@ export class Graphics {
 	 * Defaults: thickness NaN (no new stroke command), black, alpha 1, miterLimit 3.
 	 * Zero/non-positive thickness adds no LineStyle command; it does not erase an
 	 * already recorded stroke. pixelHinting and scaleMode are currently ignored.
+	 * lineDash lengths are logical units; the array is retained by reference.
 	 */
 	public lineStyle(
 		thickness: number = NaN,
@@ -364,6 +384,7 @@ export class Graphics {
 	}
 
 	$onRemoveFromStage(): void {
+		// Stage removal may be temporary; retain commands and their raster cache.
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────

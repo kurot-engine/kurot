@@ -1,12 +1,13 @@
 # CapsStyle
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 CapsStyle: { NONE: "none"; ROUND: "round"; SQUARE: "square" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Line endpoint styles for Graphics.lineStyle(). NONE maps to Canvas 'butt';
+ROUND and SQUARE extend beyond the segment endpoint by half the stroke width.
 
 ## Members
 

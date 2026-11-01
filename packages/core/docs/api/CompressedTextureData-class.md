@@ -1,12 +1,12 @@
 # CompressedTextureData
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class CompressedTextureData
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Compressed pixel payload and upload metadata. Dimensions are source pixels.
 
 ## Members
 

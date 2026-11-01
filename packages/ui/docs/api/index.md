@@ -1,6 +1,6 @@
 # @kurot/ui API
 
-Version: **3.6.2**. Read the installed package's matching documentation.
+Version: **3.7.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).
@@ -34,6 +34,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `EditableText` | Class | [open](EditableText-class.md) |
 | `getAssetAdapter` | Function | [open](getAssetAdapter-function.md) |
 | `getTheme` | Function | [open](getTheme-function.md) |
+| `getUIContext` | Function | [open](getUIContext-function.md) |
 | `Group` | Class | [open](Group-class.md) |
 | `GroupEvents` | Interface | [open](GroupEvents-interface.md) |
 | `HorizontalLayout` | Class | [open](HorizontalLayout-class.md) |
@@ -78,6 +79,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `setTheme` | Function | [open](setTheme-function.md) |
 | `Skin` | Class | [open](Skin-class.md) |
 | `SkinEvents` | Interface | [open](SkinEvents-interface.md) |
+| `SkinFactory` | TypeAlias | [open](SkinFactory-typealias.md) |
 | `SkinPartsMap` | Interface | [open](SkinPartsMap-interface.md) |
 | `SkinPartsOf` | TypeAlias | [open](SkinPartsOf-typealias.md) |
 | `SliderBase` | Class | [open](SliderBase-class.md) |
@@ -91,6 +93,8 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `ToggleButton` | Class | [open](ToggleButton-class.md) |
 | `ToggleSwitch` | Class | [open](ToggleSwitch-class.md) |
 | `TouchScroll` | Class | [open](TouchScroll-class.md) |
+| `UIContext` | Class | [open](UIContext-class.md) |
+| `UIContextOptions` | Interface | [open](UIContextOptions-interface.md) |
 | `UIEvent` | Class | [open](UIEvent-class.md) |
 | `UILayer` | Class | [open](UILayer-class.md) |
 | `UIState` | Class | [open](UIState-class.md) |

@@ -29,6 +29,9 @@ import {
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
 import type { RenderContext } from '../RenderContext.js';
+import { uploadTextureSource } from './upload-texture-source.js';
+
+const BITMAP_DATA_SWEEP_BUDGET = 8;
 
 const _gcRegistry = new FinalizationRegistry<{ gl: GL; texture: WebGLTexture }>(({ gl, texture }) => {
 	gl.deleteTexture(texture);
@@ -79,6 +82,8 @@ export class WebGLRenderContext implements RenderContext {
 	private _filterResolution = 1;
 	private readonly _contextRestoredCallbacks: Array<() => void> = [];
 	private readonly _trackedBitmapDatas: Set<WeakRef<BitmapData>> = new Set();
+	private readonly _bitmapDataRefs = new WeakMap<BitmapData, WeakRef<BitmapData>>();
+	private _bitmapDataSweep?: Iterator<WeakRef<BitmapData>, undefined>;
 	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
 
 	public constructor(canvas: HTMLCanvasElement) {
@@ -297,16 +302,20 @@ export class WebGLRenderContext implements RenderContext {
 	// ── Texture ───────────────────────────────────────────────────────────────
 
 	public createTexture(
-		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ImageBitmap,
 		sourcePremultipliedAlpha = false,
 	): WebGLTexture {
 		const gl = this.gl;
 		const texture = gl.createTexture()!;
 		(texture as Record<string, unknown>)[SYM_GL_CONTEXT] = gl;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, sourcePremultipliedAlpha ? 0 : 1);
+		try {
+			uploadTextureSource(gl, source, sourcePremultipliedAlpha);
+		} catch (error) {
+			gl.deleteTexture(texture);
+			throw error;
+		}
 		(texture as Record<string, unknown>)[SYM_PREMULTIPLIED] = true;
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -316,13 +325,12 @@ export class WebGLRenderContext implements RenderContext {
 
 	public updateTexture(
 		texture: WebGLTexture,
-		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
+		source: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ImageBitmap,
 		sourcePremultipliedAlpha = false,
 	): void {
 		const gl = this.gl;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, sourcePremultipliedAlpha ? 0 : 1);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+		uploadTextureSource(gl, source, sourcePremultipliedAlpha);
 	}
 
 	/**
@@ -349,11 +357,29 @@ export class WebGLRenderContext implements RenderContext {
 		const source = bitmapData.source;
 		if (!source) return undefined;
 		if (!bitmapData.webGLTexture) {
-			const tex = this.createTexture(source as HTMLImageElement, bitmapData.premultipliedAlpha);
+			const tex = this.createTexture(source as HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ImageBitmap, bitmapData.premultipliedAlpha);
+			let ref = this._bitmapDataRefs.get(bitmapData);
+			if (!ref) {
+				this._pruneBitmapDataRegistrations();
+				ref = new WeakRef(bitmapData);
+				this._bitmapDataRefs.set(bitmapData, ref);
+				this._trackedBitmapDatas.add(ref);
+			}
 			bitmapData.webGLTexture = tex;
+			bitmapData.$setTextureDisposer(() => {
+				this._trackedBitmapDatas.delete(ref);
+				this._bitmapDataRefs.delete(bitmapData);
+				if (this._trackedBitmapDatas.size === 0) {
+					this._bitmapDataSweep = undefined;
+				}
+				if (bitmapData.webGLTexture === tex) {
+					bitmapData.webGLTexture = undefined;
+				}
+				this._uploadedVersions.delete(bitmapData);
+				this.deleteTexture(tex);
+			});
 			this._uploadedVersions.set(bitmapData, bitmapData.contentVersion);
 			(tex as Record<string, unknown>)[SYM_SMOOTHING] = true;
-			this._trackedBitmapDatas.add(new WeakRef(bitmapData));
 		} else if (
 			(source instanceof HTMLCanvasElement || source instanceof HTMLVideoElement) &&
 			this._uploadedVersions.get(bitmapData) !== bitmapData.contentVersion
@@ -880,6 +906,27 @@ export class WebGLRenderContext implements RenderContext {
 
 	// ── Private — flush & dispatch ────────────────────────────────────────────
 
+	private _pruneBitmapDataRegistrations(): void {
+		const limit = Math.min(BITMAP_DATA_SWEEP_BUDGET, this._trackedBitmapDatas.size);
+		if (limit === 0) {
+			this._bitmapDataSweep = undefined;
+			return;
+		}
+		// Keep a cursor across uploads: restarting at the live prefix would
+		// starve dead entries, while scanning the full set makes a batch quadratic.
+		const cursor = this._bitmapDataSweep ??= this._trackedBitmapDatas.values();
+		for (let i = 0; i < limit; i++) {
+			const next = cursor.next();
+			if (next.done) {
+				this._bitmapDataSweep = undefined;
+				break;
+			}
+			if (!next.value.deref()) {
+				this._trackedBitmapDatas.delete(next.value);
+			}
+		}
+	}
+
 	private _onContextRestored(): void {
 		const gl = this.gl;
 		this.contextVersion++;
@@ -918,6 +965,7 @@ export class WebGLRenderContext implements RenderContext {
 				this._trackedBitmapDatas.delete(ref);
 			}
 		}
+		this._bitmapDataSweep = undefined;
 
 		this.onResize();
 

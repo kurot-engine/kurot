@@ -13,6 +13,7 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
 import { CollectionEvent } from '../events/CollectionEvent.js';
 import { ItemTapEvent } from '../events/ItemTapEvent.js';
 import { BasicLayout } from '../layouts/BasicLayout.js';
+import { captureUIContext } from '../core/UIContext.js';
 
 /**
  * EventMap for Group and all its subclasses (DataGroup, ListBase, List, TabBar…).
@@ -52,6 +53,7 @@ export class Group extends Sprite implements IUIComponent, IViewport, ILayoutTar
 
 	public constructor() {
 		super();
+		captureUIContext(this);
 		this.ui = new UIState(this);
 		this.touchEnabled = true;
 	}

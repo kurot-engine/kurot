@@ -5,6 +5,9 @@ This page does not imply that the name is importable from the package root.
 Use the owning API parameter/result type or an exported public alias when writing application code.
 
 ```ts
+/**
+ * Ellipse inscribed in the rectangle (x, y, w, h), not centered at (x, y).
+ */
 export interface DrawEllipseCommand {
     type: PathCommandType.DrawEllipse;
     x: number;

@@ -31,13 +31,25 @@ export class Stage extends DisplayObjectContainer {
 
 	// ── Getters / Setters ─────────────────────────────────────────────────────
 
+	/**
+	 * Current viewport width in logical stage units, initially 0 until sizing.
+	 * It may differ from the configured design width and Canvas backing pixels.
+	 */
 	public get stageWidth(): number {
 		return this._stageWidth;
 	}
+	/**
+	 * Current viewport height in logical stage units, initially 0 until sizing.
+	 * Input coordinates use these logical dimensions rather than CSS pixels.
+	 */
 	public get stageHeight(): number {
 		return this._stageHeight;
 	}
 
+	/**
+	 * Frame-rate preference of the shared ticker, not a per-stage timer.
+	 * Explicit render requests can cause additional renders between scheduled frames.
+	 */
 	public get frameRate(): number {
 		return ticker.frameRate;
 	}
@@ -45,6 +57,10 @@ export class Stage extends DisplayObjectContainer {
 		ticker.setFrameRate(value);
 	}
 
+	/**
+	 * Screen adaptation policy, SHOW_ALL by default. Changing it asks the attached
+	 * ScreenAdapter to recalculate logical stage and CSS display dimensions.
+	 */
 	public get scaleMode(): StageScaleMode {
 		return this._scaleMode;
 	}
@@ -56,6 +72,10 @@ export class Stage extends DisplayObjectContainer {
 		this.onScreenSizeChanged();
 	}
 
+	/**
+	 * Stored orientation preference, AUTO by default. Changes request screen-size
+	 * recalculation; this property alone does not rotate the Canvas or lock the device.
+	 */
 	public get orientation(): OrientationMode {
 		return this._orientation;
 	}
@@ -67,6 +87,10 @@ export class Stage extends DisplayObjectContainer {
 		this.onScreenSizeChanged();
 	}
 
+	/**
+	 * Touch limit read when TouchHandler is created, initially 99. Later changes
+	 * notify onMaxTouchesChanged(); the base hook does not update an existing handler.
+	 */
 	public get maxTouches(): number {
 		return this._maxTouches;
 	}
@@ -78,6 +102,10 @@ export class Stage extends DisplayObjectContainer {
 		this.onMaxTouchesChanged();
 	}
 
+	/**
+	 * Stage-local scale metadata, initially 1. Assignment does not change the
+	 * Texture module's textureScaleFactor or existing textures' source density.
+	 */
 	public get textureScaleFactor(): number {
 		return this._textureScaleFactor;
 	}
@@ -88,26 +116,27 @@ export class Stage extends DisplayObjectContainer {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Marks the display list as needing a re-render.
-	 * Triggers Event.RENDER to be dispatched on the next frame.
+	 * Requests Event.RENDER dispatch on the next ticker frame. Repeated calls
+	 * before that frame coalesce through the shared invalidation flag.
 	 */
 	public invalidate(): void {
 		setInvalidateRenderFlag(true);
 	}
 
 	/**
-	 * Sets the logical content size of the stage.
-	 * Called by the player/screen adapter when the viewport changes.
+	 * Requests an adapter size refresh, then stores the supplied logical dimensions
+	 * through resize(). Does not change the adapter's configured design size.
 	 */
 	public setContentSize(width: number, height: number): void {
 		this.onScreenSizeChanged();
 		this.resize(width, height);
 	}
 
-	// ── Internal methods (called by player/renderer) ──────────────────────────
+	// ── Adapter integration ───────────────────────────────────────────────────
 
 	/**
-	 * Called by the renderer when the canvas/viewport is resized.
+	 * Stores logical viewport dimensions and dispatches Event.RESIZE, even if
+	 * the dimensions are unchanged. Used by screen adaptation after layout.
 	 */
 	resize(width: number, height: number): void {
 		this._stageWidth = width;
@@ -115,16 +144,21 @@ export class Stage extends DisplayObjectContainer {
 		this.dispatchEventWith(Event.RESIZE);
 	}
 
-	// ── Protected hooks (override in platform adapters) ───────────────────────
-
+	/**
+	 * Attaches the screen adapter used by scale/orientation changes. Replacing it
+	 * does not dispose the previous adapter or trigger an immediate size refresh.
+	 */
 	setScreenAdapter(adapter: ScreenAdapter): void {
 		this._screenAdapter = adapter;
 	}
+
+	// ── Protected hooks ───────────────────────────────────────────────────────
 
 	protected onScreenSizeChanged(): void {
 		this._screenAdapter?.updateScreenSize();
 	}
 
+	// Platform subclasses may propagate the stored preference to their input handler.
 	protected onMaxTouchesChanged(): void {
 	}
 }

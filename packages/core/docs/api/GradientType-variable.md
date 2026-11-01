@@ -1,12 +1,13 @@
 # GradientType
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 GradientType: { LINEAR: "linear"; RADIAL: "radial" };
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Gradient geometry for Graphics.beginGradientFill(); the optional gradient
+matrix positions and scales it in the object's local coordinate space.
 
 ## Members
 

@@ -48,7 +48,7 @@ export interface CacheAsTextureOptions {
 	 */
 	resolution?: number;
 	/**
-	 * Sampling mode used when the cached texture is scaled.
+	 * Sampling mode used when the cached texture is scaled, 'linear' by default.
 	 */
 	scaleMode?: 'linear' | 'nearest';
 }
@@ -63,6 +63,10 @@ function clampRotation(value: number): number {
 	return value;
 }
 
+/**
+ * Renderer traversal classification derived from visibility, filters and masks.
+ * Values are mutually exclusive categories, not combinable flags.
+ */
 export const enum RenderMode {
 	NONE = 1,
 	FILTER = 2,
@@ -70,6 +74,10 @@ export const enum RenderMode {
 	SCROLLRECT = 4,
 }
 
+/**
+ * Geometry category used to select a render pipe; independent of RenderMode's
+ * visibility and compositing classification.
+ */
 export const enum RenderObjectType {
 	NONE = 0,
 	BITMAP = 1,
@@ -94,23 +102,28 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	 * default. Changing this value does not update existing objects.
 	 */
 	static defaultTouchEnabled = false;
+	// Frame listener registries include detached nodes; removal requires unsubscription.
 	static $enterFrameCallBackList: DisplayObject[] = [];
 	static $renderCallBackList: DisplayObject[] = [];
+	// Queues defer stage events until recursive stage membership updates complete.
 	static $eventAddToStageList: DisplayObject[] = [];
 	static $eventRemoveFromStageList: DisplayObject[] = [];
 
+	// Single-Player integration hooks, not application event listener registries.
 	static $onStructureChange?: () => void;
 
 	static $onRenderableDirty?: (obj: DisplayObject) => void;
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	// Tree membership is maintained by container add/remove operations.
 	$hasAddToStage = false;
 	$children?: DisplayObject[];
 	$parent?: DisplayObjectContainer;
 	$stage?: Stage;
 	$nestLevel = 0;
 
+	// Authored local values; anchor and scroll offsets are applied during composition.
 	$x = 0;
 	$y = 0;
 	$anchorOffsetX = 0;
@@ -126,11 +139,13 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	$cacheAsBitmap = false;
 	$touchEnabled: boolean = DisplayObject.defaultTouchEnabled;
 
+	// A display mask has one masked owner; rectangle masks are copied on assignment.
 	$mask?: DisplayObject;
 	$maskRect?: Rectangle;
 	$scrollRect?: Rectangle;
 	$maskedObject?: DisplayObject;
 
+	// Geometry changes, subtree raster invalidation and traversal mode are separate.
 	$renderMode?: RenderMode;
 	$renderObjectType: RenderObjectType = RenderObjectType.NONE;
 	$renderDirty = false;
@@ -148,6 +163,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	private readonly _cachedBounds = new Rectangle();
 
 	private _name = '';
+	// Authored transform excludes centered flips, anchors and scrolling.
 	private _matrix: Matrix = new Matrix();
 	private _matrixDirty = false;
 	private _concatenatedMatrix?: Matrix;
@@ -683,12 +699,20 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return false;
 	}
 
+	/**
+	 * Registers a listener on this node. ENTER_FRAME and RENDER also register it
+	 * with the shared ticker, including while detached; remove those listeners
+	 * explicitly when their owning view is released.
+	 */
 	public override addEventListener<K extends keyof DisplayObjectEvents & string>(
 		type: K,
 		listener: (event: DisplayObjectEvents[K]) => void,
 		useCapture?: boolean,
 		priority?: number,
 	): void;
+	/**
+	 * Registers a custom event listener with the same capture and priority rules.
+	 */
 	public override addEventListener(
 		type: string,
 		listener: (event: Event) => void,
@@ -712,11 +736,18 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		}
 	}
 
+	/**
+	 * Removes the matching listener and capture mode. Removing the last listener
+	 * for ENTER_FRAME or RENDER also removes this node from that ticker registry.
+	 */
 	public override removeEventListener<K extends keyof DisplayObjectEvents & string>(
 		type: K,
 		listener: (event: DisplayObjectEvents[K]) => void,
 		useCapture?: boolean,
 	): void;
+	/**
+	 * Removes a custom event listener with the matching callback and capture mode.
+	 */
 	public override removeEventListener(type: string, listener: (event: Event) => void, useCapture?: boolean): void;
 	public override removeEventListener(
 		type: string,
@@ -754,6 +785,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		DisplayObject.$eventRemoveFromStageList.push(this);
 	}
 
+	// Borrowed effective local transform, including flips but excluding anchor/scroll offsets.
 	$getMatrix(): Matrix {
 		const base = this._getBaseMatrix();
 		if (!this._flipX && !this._flipY) return base;
@@ -809,6 +841,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		this.$markTransformDirty();
 	}
 
+	// Borrowed, reusable matrix. Clone before retaining it or modifying its entries.
 	$getConcatenatedMatrix(): Matrix {
 		if (!this._concatenatedMatrix) {
 			this._concatenatedMatrix = new Matrix();
@@ -823,6 +856,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		const oy = this.$anchorOffsetY;
 		const rect = this.$scrollRect;
 		if (rect) {
+			// Content moves by -rect.x/y; the scroll viewport itself stays at local 0,0.
 			matrix.preMultiplyInto(sharedMatrix.setTo(1, 0, 0, 1, -rect.x - ox, -rect.y - oy), matrix);
 		} else if (ox !== 0 || oy !== 0) {
 			matrix.preMultiplyInto(sharedMatrix.setTo(1, 0, 0, 1, -ox, -oy), matrix);
@@ -830,6 +864,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		return matrix;
 	}
 
+	// Borrowed inverse, overwritten by the next call on this node.
 	$getInvertedConcatenatedMatrix(): Matrix {
 		if (!this._invertedConcatenatedMatrix) {
 			this._invertedConcatenatedMatrix = new Matrix();
@@ -1022,6 +1057,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		DisplayObject.$onStructureChange?.();
 	}
 
+	// Borrowed local content-plus-children bounds; do not mutate the cached rectangle.
 	$getOriginalBounds(): Rectangle {
 		if (!this._boundsDirty) {
 			return this._cachedBounds;
@@ -1035,6 +1071,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 
 	$measureChildBounds(_bounds: Rectangle): void {}
 
+	// Global scratch rectangle: even measuring another node overwrites the result.
 	$getContentBounds(): Rectangle {
 		const bounds = sharedRectangle;
 		bounds.setEmpty();
@@ -1062,6 +1099,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	$getConcatenatedMatrixAt(root: DisplayObject, matrix: Matrix): void {
 		const invertMatrix = root.$getInvertedConcatenatedMatrix();
 		if ((invertMatrix.a === 0 || invertMatrix.d === 0) && (invertMatrix.b === 0 || invertMatrix.c === 0)) {
+			// A singular ancestor cannot be inverted; compose along the local ancestry.
 			let target: DisplayObject = this;
 			const rootLevel = root.$nestLevel;
 			matrix.identity();
@@ -1140,7 +1178,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		}
 	}
 
-	// ── Private methods ───────────────────────────────────────────────────────
+	// ── Mask ownership and invalidation ───────────────────────────────────────
 
 	$setMask(value: DisplayObject | Rectangle | undefined): void {
 		if (value === this) {
@@ -1194,6 +1232,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 		let p = this.$parent;
 		while (p) {
 			if (p._flipX || p._flipY) {
+				// A descendant's geometry can move an ancestor's centered reflection axis.
 				p._boundsDirty = true;
 				DisplayObject.$onRenderableDirty?.(p);
 			}

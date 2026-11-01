@@ -7,6 +7,45 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 3.9.0 — 2026-11-01
+
+Prepared for user-managed publication; publication has not been verified.
+
+### Added
+
+- Add optional `ui.skinRegistration: 'module'` to export a frozen Skin factory
+  map without global registration. Keep generated default mappings and part
+  declarations, and reject registration values other than global/module.
+- Export `skinFactories` in default global mode while retaining registration
+  for the existing Theme loader. Keys preserve complete authored Skin names.
+- Document loading through the generated theme's skinsJs path in development
+  and hashed releases, UIContext prerequisites, and caller-owned cleanup.
+
+### Compatibility
+
+- ui-document remains ^0.13.0 with the unchanged 0.13.2 development lock.
+  CLI acquires no Core/UI runtime dependency. Default global applications,
+  starter configurations and existing resource-versioning requirements remain.
+- Local UIContext integration requires UI >= 3.7.0 within 3.x, prepared as a
+  separate package in this release batch; global applications need no UI upgrade.
+  Existing CLI ^3.x consumers can adopt this release optionally; exact pins
+  require explicit adoption. CLI dependency fields and application dependencies
+  remain unchanged.
+
+### Verification
+
+- Clean build and all 161 tests pass across 29 files. Native ESM execution
+  covers development/release output with omitted, global and module settings;
+  configuration tests cover accepted modes and invalid strings/types.
+- Previous preparation verified packed CLI/local UI source integration with
+  registry Core 2.5.3 / 2.7.0, including strict configuration/loader types and
+  development/release output. Final batch validation is recorded below.
+- Packed CLI 3.9.0 compiles module/global applications in strict development and
+  minified release modes with packed Core 2.8.0 / UI 3.7.0. Native execution
+  verifies generated factories, default/nested skins, fonts, late radio binding,
+  disposal and unchanged global Theme loading. Public configuration and the
+  complete documented loader pass strict types with skipLibCheck=false.
+
 ## 3.8.1 — 2026-10-30
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

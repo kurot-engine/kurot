@@ -1,6 +1,6 @@
 # static MAX_MULTI_VERTEX_BYTES
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static readonly MAX_MULTI_VERTEX_BYTES: number;

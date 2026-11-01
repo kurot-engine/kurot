@@ -1,11 +1,11 @@
 # static addDisplayObject
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static addDisplayObject(displayObject: DisplayObject, bitmapData: BitmapData | undefined): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Registers a display user for pixel invalidation. Undefined data is ignored.
 
 Related types: [DisplayObject](../DisplayObject-class.md), [BitmapData](../BitmapData-class.md).

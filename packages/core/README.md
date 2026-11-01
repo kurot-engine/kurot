@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **2.7.0** (published).
+for browser games. Package version: **2.8.0** (prepared for publication).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -23,7 +23,7 @@ The package includes the generated API reference and game authoring guide.
 Canvas stage-attribute startup requires Core >= 2.6.0 within 2.x.
 
 ```bash
-pnpm add @kurot/core@^2.7.0
+pnpm add @kurot/core@^2.8.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -44,6 +44,8 @@ UI provides BitmapLabel when the application needs native bitmap-font UI layout.
 - Masks: automatic selection between scissor / stencil / offscreen compositing, including nested scroll clips
 - PixiJS-style `cacheAsTexture()` plus Egret-compatible `cacheAsBitmap`
 - WebGL Context Lost recovery
+- ImageBitmap pixel sources, explicit pixel/upload disposal and bounded weak
+  registration cleanup; see [decoded pixel ownership](docs/texture-density.md#decoded-pixel-ownership).
 
 **Display Objects**
 

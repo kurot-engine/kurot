@@ -14,3 +14,5 @@ export type { IItemRenderer } from './IItemRenderer.js';
 export { Theme, setTheme, getTheme } from './Theme.js';
 export { DefaultAssetAdapter } from './DefaultAssetAdapter.js';
 export { DefaultThemeAdapter } from './DefaultThemeAdapter.js';
+export { UIContext, getUIContext } from './UIContext.js';
+export type { UIContextOptions, SkinFactory } from './UIContext.js';

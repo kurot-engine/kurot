@@ -1,9 +1,12 @@
 # @kurot/ui — AI context map
 
+For local Skin/asset/font resolution or automatic radio-group isolation, read
+[UI contexts](ui-context.md). Compiled module factories require CLI >= 3.9.0.
+
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@3.6.2`, with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@3.7.0` (prepared for publication), with Core peer **^2.5.2**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -148,7 +151,7 @@ skin)` signature, but `Group._commitCurrentState()` passes `this` cast
 Flat re-export of 7 barrels, in this order: `core`, `layouts`, `components`,
 `events`, `states`, `collections`, `binding`.
 
-- **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
+- **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `UIContext`/`UIContextOptions`/`SkinFactory`/`getUIContext`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
 - **layouts**: `ILayoutTarget`, `LayoutBase`, `BasicLayout`, `LinearLayoutBase`, `VerticalLayout`, `HorizontalLayout`, `TileLayout`, `ColumnAlign`, `RowAlign`, `JustifyAlign`, `TileOrientation`.
 - **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `RichLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
 - **events**: `UIEvent`, `ItemTapEvent`, `CollectionEvent`/`CollectionEventKind`, `PropertyEvent`, `ScrollerThrowEvent`.

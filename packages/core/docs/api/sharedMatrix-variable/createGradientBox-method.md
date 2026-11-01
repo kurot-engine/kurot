@@ -1,6 +1,6 @@
 # createGradientBox
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 createGradientBox(width: number, height: number, rotation: number, tx: number, ty: number): void;

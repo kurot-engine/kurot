@@ -1,11 +1,13 @@
 # textureHeight
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 textureHeight: number;
 ```
 
 Inherited from `textureHeight`; shown with this receiver's substituted types.
+
+Untrimmed logical frame height, including transparent trim margins.
 
 **Default/initializer:** `0`

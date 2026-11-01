@@ -8,6 +8,7 @@ childAdded(_child: DisplayObject, _index: number): void;
 
 Inherited from `Sprite.childAdded`; shown with this receiver's substituted types.
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Extension hook after insertion, or after moving a child to a new index.
+A new insertion has already set the parent and dispatched its add events.
 
 Related types: [DisplayObject](../../../../core/docs/api/DisplayObject-class.md).

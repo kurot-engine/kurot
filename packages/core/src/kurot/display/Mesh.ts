@@ -13,18 +13,21 @@ export class Mesh extends Bitmap {
 	/**
 	 * Vertex positions stored as x/y pairs in local display coordinates.
 	 * Atlas trim offsets do not move this geometry; positions already define
-	 * the rendered shape. Use scaleX/scaleY to resize it.
+	 * the rendered shape. Arrays are retained directly; call updateVertices()
+	 * after replacing or editing geometry so bounds and rendering are invalidated.
 	 */
 	public vertices: number[] = [];
 
 	/**
-	 * Triangle indices into the vertices array.
+	 * Triangle vertex indices, not offsets into the interleaved x/y array.
+	 * Call updateVertices() after replacement or in-place edits.
 	 */
 	public indices: number[] = [];
 
 	/**
-	 * Texture coordinates stored as u/v pairs relative to the unrotated atlas
-	 * region. The renderer applies atlas rotation and source rectangle mapping.
+	 * Normalized u/v pairs relative to the unrotated texture region, without atlas
+	 * page offsets. The renderer applies atlas rotation and source mapping.
+	 * Call updateVertices() after replacement or in-place edits.
 	 */
 	public uvs: number[] = [];
 
@@ -41,7 +44,7 @@ export class Mesh extends Bitmap {
 	// ── Public methods ────────────────────────────────────────────────────────
 
 	/**
-	 * Marks vertices as dirty and triggers a re-render.
+	 * Invalidates cached local bounds and render geometry.
 	 * Call this after modifying `vertices`, `indices`, or `uvs`.
 	 */
 	public updateVertices(): void {

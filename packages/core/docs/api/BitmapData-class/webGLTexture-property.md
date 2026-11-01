@@ -1,9 +1,9 @@
 # webGLTexture
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 webGLTexture?: WebGLTexture;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Renderer-managed upload shared by every Texture view using these pixels.

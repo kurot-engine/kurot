@@ -22,6 +22,10 @@ export class Shape extends DisplayObject {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/**
+	 * This node's retained drawing buffer. Drawing and clear() invalidate the node;
+	 * removing it from the stage does not clear its commands.
+	 */
 	public override get graphics(): Graphics {
 		return this._graphics;
 	}

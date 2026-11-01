@@ -1,6 +1,9 @@
 import { EventDispatcher, Event } from '@kurot/core';
+import type { DisplayObjectContainer } from '@kurot/core';
 import { ToggleButton } from './ToggleButton.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
+import { getUIContext, observeUIContext } from '../core/UIContext.js';
+import type { UIContext } from '../core/UIContext.js';
 
 /**
  * Manages a group of mutually exclusive RadioButtons.
@@ -140,8 +143,24 @@ export class RadioButtonGroup extends EventDispatcher {
 // ── Global registry for named groups ─────────────────────────────────────
 
 const _groups: Record<string, RadioButtonGroup> = {};
+// A context and its members may form a cycle. Weak keys keep that cycle local
+// to its owner instead of rooting every detached radio in the global registry.
+const contextGroups = new WeakMap<UIContext, Map<string, RadioButtonGroup>>();
 
-function getGroup(name: string): RadioButtonGroup {
+function getGroup(name: string, context?: UIContext): RadioButtonGroup {
+	if (context) {
+		let groups = contextGroups.get(context);
+		if (!groups) {
+			groups = new Map();
+			contextGroups.set(context, groups);
+		}
+		let group = groups.get(name);
+		if (!group) {
+			group = new RadioButtonGroup(name);
+			groups.set(name, group);
+		}
+		return group;
+	}
 	if (!_groups[name]) {
 		_groups[name] = new RadioButtonGroup(name);
 	}
@@ -164,6 +183,7 @@ export class RadioButton extends ToggleButton {
 
 	private _groupName = '';
 	private _group?: RadioButtonGroup;
+	private _explicitGroup = false;
 	private _value: string | number = '';
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -171,6 +191,7 @@ export class RadioButton extends ToggleButton {
 	public constructor() {
 		super();
 		this.groupName = 'radioGroup';
+		observeUIContext(this, () => this.synchronizeNamedGroup());
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
@@ -192,10 +213,8 @@ export class RadioButton extends ToggleButton {
 	}
 
 	public set group(value: RadioButtonGroup | undefined) {
-		if (this._group === value) return;
-		this._group?.removeInstance(this);
-		this._group = value;
-		this._group?.addInstance(this);
+		this._explicitGroup = true;
+		this.setGroup(value);
 	}
 
 	public get groupName(): string {
@@ -203,9 +222,13 @@ export class RadioButton extends ToggleButton {
 	}
 
 	public set groupName(value: string) {
-		if (this._groupName === value) return;
+		if (this._groupName === value) {
+			this.synchronizeNamedGroup();
+			return;
+		}
 		this._groupName = value;
-		this.group = value ? getGroup(value) : undefined;
+		this._explicitGroup = false;
+		this.synchronizeNamedGroup();
 	}
 
 	public get value(): string | number {
@@ -250,6 +273,20 @@ export class RadioButton extends ToggleButton {
 		super.selected = value;
 	}
 
+	public override $setParent(parent: DisplayObjectContainer | undefined): void {
+		super.$setParent(parent);
+		if (parent) {
+			this.synchronizeNamedGroup();
+		}
+	}
+
+	public override $onAddToStage(stage: unknown, $nestLevel: number): void {
+		// A plain ancestor can be attached without changing this button's parent.
+		// Resolve before Component creates children and emits CREATION_COMPLETE.
+		this.synchronizeNamedGroup();
+		super.$onAddToStage(stage, $nestLevel);
+	}
+
 	/**
 	 * Interactive tap: toggle `selected` (syncs the group with no Change via
 	 * the setter), then dispatch `Event.CHANGE` on the group — reserved for
@@ -263,5 +300,24 @@ export class RadioButton extends ToggleButton {
 		}
 		super.buttonReleased();
 		this._group.dispatchEventWith(Event.CHANGE);
+	}
+
+	// ── Private methods ────────────────────────────────────────────────────
+
+	private synchronizeNamedGroup(): void {
+		if (this._explicitGroup) {
+			return;
+		}
+		this.setGroup(this._groupName ? getGroup(this._groupName, getUIContext(this)) : undefined);
+	}
+
+	private setGroup(value: RadioButtonGroup | undefined): void {
+		if (this._group === value) {
+			return;
+		}
+		this._group?.removeInstance(this);
+		this._group = value;
+		this._group?.addInstance(this);
+		this.invalidateState();
 	}
 }

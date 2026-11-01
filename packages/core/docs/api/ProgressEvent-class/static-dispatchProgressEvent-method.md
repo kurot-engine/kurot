@@ -1,6 +1,6 @@
 # static dispatchProgressEvent
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static dispatchProgressEvent(target: IEventDispatcher, type: string, bytesLoaded: number, bytesTotal: number): boolean;

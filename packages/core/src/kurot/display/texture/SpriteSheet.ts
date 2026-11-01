@@ -2,7 +2,8 @@ import { Texture } from './Texture.js';
 
 /**
  * Named Texture views sharing one page's BitmapData and resolution.
- * Disposing the sheet disposes the page; coordinate shared users beforehand.
+ * Disposing the sheet calls the page texture's dispose(); pixel ownership is
+ * governed by that texture's disposeBitmapData flag.
  */
 export class SpriteSheet {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -14,6 +15,10 @@ export class SpriteSheet {
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
+	/**
+	 * Uses an existing page texture without copying its pixels. The sheet records
+	 * its sampling origin; page mutations do not rebuild previously created views.
+	 */
 	public constructor(texture: Texture) {
 		this._texture = texture;
 		this._bitmapX = texture.bitmapX - texture.offsetX / texture.pixelScale;
@@ -33,6 +38,8 @@ export class SpriteSheet {
 	/**
 	 * Creates a view using source-pixel coordinates, trim offsets and original
 	 * frame dimensions. Logical dimensions inherit the page's resolution.
+	 * Omitted original sizes default to trim offset plus sampled size. Reusing a
+	 * name replaces its lookup entry without disposing the previous non-owning view.
 	 */
 	public createTexture(
 		name: string,
@@ -68,7 +75,8 @@ export class SpriteSheet {
 
 	/**
 	 * Disposes the underlying page texture. Child views are non-owning and
-	 * must no longer be rendered once the shared page source is released.
+	 * must no longer be rendered once the shared page source is released. The view
+	 * map is retained; this does not individually detach or dispose child views.
 	 */
 	public dispose(): void {
 		this._texture.dispose();

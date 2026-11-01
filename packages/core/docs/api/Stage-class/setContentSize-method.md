@@ -1,10 +1,10 @@
 # setContentSize
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 setContentSize(width: number, height: number): void;
 ```
 
-Sets the logical content size of the stage.
-Called by the player/screen adapter when the viewport changes.
+Requests an adapter size refresh, then stores the supplied logical dimensions
+through resize(). Does not change the adapter's configured design size.

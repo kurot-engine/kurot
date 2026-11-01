@@ -38,7 +38,7 @@ export interface KUIFile {
 export interface CompiledSkin {
 	readonly file: KUIFile;
 	/**
-	 * Complete class name used for global factory registration.
+	 * Complete class name used as the factory map key and global registration name.
 	 */
 	readonly className: string;
 }
@@ -95,7 +95,8 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 		await Promise.all(
 			compiledModules.map((module, index) => fs.writeFile(path.join(stubDir, `skin${index}.ts`), module.source)),
 		);
-		await fs.writeFile(path.join(stubDir, 'index.ts'), createIndex(skins) + '\n');
+		const registration = ctx.project.config.ui?.skinRegistration ?? 'global';
+		await fs.writeFile(path.join(stubDir, 'index.ts'), createIndex(skins, registration) + '\n');
 
 		const outputName = await bundleSkins(ctx, stubDir, bundleDir);
 		await installBundle(bundleDir, outputName, path.join(ctx.project.outputDir, 'js'));
@@ -160,18 +161,20 @@ async function generateSkinModule(
 }
 
 /**
- * Registers generated Skin factories under their complete class names.
+ * Exports factories by full Skin name, with optional global registration.
  */
-function createIndex(skins: readonly CompiledSkin[]): string {
-	return skins
+function createIndex(skins: readonly CompiledSkin[], registration: 'global' | 'module'): string {
+	const imports = skins
 		.map((skin, index) => {
 			const functionName = factoryName(skin.className);
 			return (
 				`import { ${functionName} as s${index} } from './skin${index}.js';\n` +
-				`globalThis[${JSON.stringify(skin.className)}] = s${index};`
+				(registration === 'global' ? `globalThis[${JSON.stringify(skin.className)}] = s${index};` : '')
 			);
 		})
 		.join('\n\n');
+	const entries = skins.map((skin, index) => `${JSON.stringify(skin.className)}: s${index}`).join(',\n');
+	return `${imports}\nexport const skinFactories = Object.freeze({${entries}});`;
 }
 
 /**

@@ -5,6 +5,9 @@ This page does not imply that the name is importable from the package root.
 Use the owning API parameter/result type or an exported public alias when writing application code.
 
 ```ts
+/**
+ * Rounded rectangle; ew/eh are corner ellipse diameters, not radii.
+ */
 export interface DrawRoundRectCommand {
     type: PathCommandType.DrawRoundRect;
     x: number;

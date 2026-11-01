@@ -5,8 +5,16 @@ import { Texture } from './texture/Texture.js';
 import { BitmapFillMode } from './enums/BitmapFillMode.js';
 import type { Stage } from './Stage.js';
 
+/**
+ * Renderer-installed pixel test in local logical coordinates. Used only when
+ * pixelHitTest is enabled; an absent callback leaves bounds hits accepted.
+ */
 export let bitmapPixelHitTest: ((bitmap: Bitmap, localX: number, localY: number) => boolean) | undefined;
 
+/**
+ * Replaces the shared renderer pixel-test hook for all Bitmap instances.
+ * Installing a hook does not enable pixelHitTest on individual bitmaps.
+ */
 export function setBitmapPixelHitTest(fn: (bitmap: Bitmap, localX: number, localY: number) => boolean): void {
 	bitmapPixelHitTest = fn;
 }
@@ -35,20 +43,57 @@ export class Bitmap extends DisplayObject {
 	private _explicitBitmapWidth = NaN;
 	private _explicitBitmapHeight = NaN;
 
+	// Renderer snapshots copied from the assigned Texture; these are not setters.
+	/**
+	 * Shared pixel source copied from texture; the Bitmap does not dispose it.
+	 */
 	bitmapData?: BitmapData;
+	/**
+	 * Atlas sampling origin copied from Texture.bitmapX, independent of density.
+	 */
 	bitmapX = 0;
+	/**
+	 * Atlas sampling origin copied from Texture.bitmapY, independent of density.
+	 */
 	bitmapY = 0;
+	/**
+	 * Sampled width copied from Texture.bitmapWidth, before logical density scaling.
+	 */
 	bitmapWidth = 0;
+	/**
+	 * Sampled height copied from Texture.bitmapHeight, before logical density scaling.
+	 */
 	bitmapHeight = 0;
+	/**
+	 * Trimmed content's horizontal offset within the logical untrimmed frame.
+	 */
 	bitmapOffsetX = 0;
+	/**
+	 * Trimmed content's vertical offset within the logical untrimmed frame.
+	 */
 	bitmapOffsetY = 0;
+	/**
+	 * Untrimmed logical frame width, including transparent trim margins.
+	 */
 	textureWidth = 0;
+	/**
+	 * Untrimmed logical frame height, including transparent trim margins.
+	 */
 	textureHeight = 0;
+	/**
+	 * Full atlas/page width in physical source pixels.
+	 */
 	sourceWidth = 0;
+	/**
+	 * Full atlas/page height in physical source pixels.
+	 */
 	sourceHeight = 0;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
+	/**
+	 * Creates an image node with an optional borrowed texture; performs no loading.
+	 */
 	public constructor(value?: Texture) {
 		super();
 		this.$renderObjectType = RenderObjectType.BITMAP;
@@ -173,6 +218,7 @@ export class Bitmap extends DisplayObject {
 
 	override $onRemoveFromStage(): void {
 		super.$onRemoveFromStage();
+		// Detachment stops source invalidation notifications without releasing pixels.
 		if (this._texture?.bitmapData) {
 			BitmapData.removeDisplayObject(this, this._texture.bitmapData);
 		}

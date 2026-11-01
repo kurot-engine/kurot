@@ -1,10 +1,10 @@
 # invalidate
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 invalidate(): void;
 ```
 
-Marks the display list as needing a re-render.
-Triggers Event.RENDER to be dispatched on the next frame.
+Requests Event.RENDER dispatch on the next ticker frame. Repeated calls
+before that frame coalesce through the shared invalidation flag.

@@ -1,9 +1,10 @@
 # childRemoved
 
-Package: `@kurot/ui@3.6.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
 
 ```ts
 childRemoved(_child: unknown, _index: number): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Extension hook before removal or reordering, while the child remains parented
+at the supplied index. Actual removal dispatches its events after this hook.

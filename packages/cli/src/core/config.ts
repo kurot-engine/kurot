@@ -34,6 +34,12 @@ export interface StageConfig {
 
 export interface KUIConfig {
 	/**
+	 * Both modes export skinFactories by full Skin name. Defaults to global,
+	 * which also registers factories for standalone Theme loading. Module mode
+	 * leaves registration to the application, for example through a local UIContext.
+	 */
+	readonly skinRegistration?: 'global' | 'module';
+	/**
 	 * Directory containing `.kui.xml` sources, relative to the project root.
 	 */
 	readonly sourceDir: string;
@@ -188,11 +194,15 @@ export async function loadConfig(options: { root?: string; fresh?: boolean } = {
 	}
 	for (const key of ['width', 'height'] as const) {
 		if (!Number.isFinite(config.stage[key]) || config.stage[key] <= 0) {
-			throw new ConfigError(`Invalid config: stage.${key} must be a positive finite number, got ${config.stage[key]}`);
+			throw new ConfigError(
+				`Invalid config: stage.${key} must be a positive finite number, got ${config.stage[key]}`,
+			);
 		}
 	}
 	if (!['auto', 'portrait', 'landscape', 'landscapeFlipped'].includes(config.stage.orientation)) {
-		throw new ConfigError(`Invalid config: stage.orientation must be auto, portrait, landscape or landscapeFlipped, got '${config.stage.orientation}'`);
+		throw new ConfigError(
+			`Invalid config: stage.orientation must be auto, portrait, landscape or landscapeFlipped, got '${config.stage.orientation}'`,
+		);
 	}
 
 	if (!VALID_SCALE_MODES.includes(config.stage.scaleMode as (typeof VALID_SCALE_MODES)[number])) {
@@ -223,7 +233,12 @@ export async function loadConfig(options: { root?: string; fresh?: boolean } = {
  * Validates UI source and optional component configuration.
  */
 function validateUIConfig(ui: KUIConfig | undefined): void {
-	if (!ui) return;
+	if (!ui) {
+		return;
+	}
+	if (ui.skinRegistration !== undefined && ui.skinRegistration !== 'global' && ui.skinRegistration !== 'module') {
+		throw new ConfigError('Invalid config: ui.skinRegistration must be global or module');
+	}
 	if (!ui.sourceDir.trim()) {
 		throw new ConfigError('Invalid config: ui.sourceDir must not be empty');
 	}

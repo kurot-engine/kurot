@@ -9,6 +9,8 @@ addEventListener(type: string, listener: (event: Event) => void, useCapture?: bo
 
 Inherited from `DisplayObject.addEventListener`; shown with this receiver's substituted types.
 
-Adds a listener with this dispatcher as its event source. The same
-function/capture pair is registered once; larger priorities run first.
-Preserve the function identity to remove it when its owner is disposed.
+Registers a listener on this node. ENTER_FRAME and RENDER also register it
+with the shared ticker, including while detached; remove those listeners
+explicitly when their owning view is released.
+
+Registers a custom event listener with the same capture and priority rules.

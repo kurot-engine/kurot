@@ -1,3 +1,4 @@
+// Pixel storage and texture views have separate, explicit disposal ownership.
 export { BitmapData, CompressedTextureData } from './BitmapData.js';
 export { Texture, textureScaleFactor } from './Texture.js';
 export { RenderTexture } from './RenderTexture.js';

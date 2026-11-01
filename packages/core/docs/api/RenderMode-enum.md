@@ -1,12 +1,13 @@
 # RenderMode
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 enum RenderMode
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Renderer traversal classification derived from visibility, filters and masks.
+Values are mutually exclusive categories, not combinable flags.
 
 ## Members
 

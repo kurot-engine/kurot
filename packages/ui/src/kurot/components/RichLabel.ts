@@ -1,6 +1,7 @@
 import { TextField } from '@kurot/core';
 import type { HorizontalAlign, ITextElement, VerticalAlign } from '@kurot/core';
 import { Component } from './Component.js';
+import { getUIContext } from '../core/UIContext.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**
@@ -20,6 +21,10 @@ export class RichLabel extends Component {
 
 	public constructor(textFlow: readonly ITextElement[] = []) {
 		super();
+		const family = getUIContext(this)?.options.fontFamily;
+		if (family) {
+			this._textField.fontFamily = family;
+		}
 		this.touchChildren = false;
 		this._textField.wordWrap = true;
 		this.textFlow = textFlow;

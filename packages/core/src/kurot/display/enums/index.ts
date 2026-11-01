@@ -1,3 +1,4 @@
+// Runtime string policies shared by display objects, Graphics and screen adaptation.
 export { BitmapFillMode } from './BitmapFillMode.js';
 export { BlendMode, blendModeToNumber, numberToBlendMode } from './BlendMode.js';
 export { CapsStyle } from './CapsStyle.js';

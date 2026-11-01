@@ -1,6 +1,7 @@
 import { Component } from './Component.js';
 import { Texture, Event, Bitmap, BitmapFillMode, Rectangle } from '@kurot/core';
 import { getAssetAdapter } from '../core/AssetAdapterRegistry.js';
+import { getUIContext } from '../core/UIContext.js';
 
 /**
  * Image component that displays bitmap data.
@@ -149,7 +150,15 @@ export class Image extends Component {
 		const source = this._source;
 		if (source && typeof source === 'string') {
 			const capturedSource = source;
-			getAssetAdapter().getAsset(capturedSource, content => {
+			const context = getUIContext(this);
+			if (context?.disposed) {
+				return;
+			}
+			const adapter = context ? context.options.assetAdapter : getAssetAdapter();
+			adapter.getAsset(capturedSource, content => {
+				if (context?.disposed) {
+					return;
+				}
 				if (this._source !== capturedSource) return;
 				this._applyTexture(content ?? undefined);
 				if (content) {

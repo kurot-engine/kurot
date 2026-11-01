@@ -4,6 +4,55 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.7.0] — 2026-11-01
+
+Prepared for user-managed publication; publication has not been verified.
+
+### Added
+
+- Add opt-in UIContext for local Skin/default/asset resolution and UI fonts;
+  propagate context through factories and delayed DataGroup renderers, with
+  disposal guards for late Image and bitmap-font results. Global mode remains.
+- Export UIContext, UIContextOptions, SkinFactory and getUIContext. Document
+  synchronous construction scope, borrowed providers and explicit teardown.
+
+### Fixed
+
+- Migrate automatic RadioButton groups immediately on late context binding and
+  subtree insertion, including plain Core containers. Remove previous global
+  membership while preserving selected state, nested captured owners, explicit
+  groups and explicit opt-out. Binding notifications use weak node observations.
+- Resolve automatic groups before add-to-stage initialization, so child creation
+  and CREATION_COMPLETE callbacks see the destination group, including inherited
+  context changes through a plain Core ancestor.
+- Scope named RadioButton groups to UIContext so equal names cannot share
+  selection across games or retain a disposed game's UI/resource owner.
+
+### Compatibility
+
+- Core peer/dev requirements remain ^2.5.2 with the existing registry 2.5.3 lock.
+  UIContext uses existing Core APIs and does not require Core 2.8.0. The latter
+  is needed only when an application adopts ImageBitmap sources.
+- Compiled local factories need CLI >= 3.9.0 within 3.x and module registration;
+  authored Skin instances/constructors and default global applications remain.
+  ui-runtime's existing UI ^3.4.0 already accepts 3.7.0; unchanged SDKs require
+  no dependent release or lock adoption. No application dependencies are changed.
+
+### Verification
+
+- Clean build and all 386 unit tests pass (40 files) with the unchanged registry
+  Core 2.5.3 lock, including late binding, plain Core ancestors, creation-complete
+  ordering, captured owners and explicit radio groups.
+- Packed UI 3.7.0 / CLI 3.9.0 integration passes strict development/release
+  compilation with Core 2.8.0. Native execution verifies same-name local/default/
+  nested skins, fonts, radio isolation, disposal and existing global Theme loading.
+- The exact registry Core 2.5.2 peer minimum passes source-free packed UI runtime
+  and full declaration checks; the ^2.5.2 peer remains justified. Unchanged
+  ui-runtime 0.10.0 materializes native UI using the shared packed Core/UI.
+- API references match 3.7.0 with 92 exports, 4991 members and zero missing
+  entries. All 19 Core/Game/UI API examples compile against built and source-free
+  packed declarations; the complete CLI loader also passes skipLibCheck=false.
+
 ## [3.6.2] — 2026-10-18
 
 Published; verified on npm on 2026-10-18, including latest, downloaded tarball

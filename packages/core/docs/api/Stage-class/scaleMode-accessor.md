@@ -1,12 +1,13 @@
 # scaleMode
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get scaleMode(): StageScaleMode;
 set scaleMode(value: StageScaleMode);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Screen adaptation policy, SHOW_ALL by default. Changing it asks the attached
+ScreenAdapter to recalculate logical stage and CSS display dimensions.
 
 Related types: [StageScaleMode](../StageScaleMode-typealias.md).

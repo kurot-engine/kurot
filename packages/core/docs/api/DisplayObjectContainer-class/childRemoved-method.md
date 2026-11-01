@@ -1,11 +1,12 @@
 # childRemoved
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 childRemoved(_child: DisplayObject, _index: number): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Extension hook before removal or reordering, while the child remains parented
+at the supplied index. Actual removal dispatches its events after this hook.
 
 Related types: [DisplayObject](../DisplayObject-class.md).

@@ -40,7 +40,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.8.1 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 3.9.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
@@ -59,6 +59,14 @@ names. State values live on their target nodes as `property.state`. The compiler
 derives the theme map from built-in naming conventions and configured project
 component pairs, and rejects duplicate conventional mappings. The generated
 theme JSON is an output artifact, never an authored source.
+
+The Skin bundle exports a frozen `skinFactories` map keyed by full class names.
+`ui.skinRegistration` defaults to global registration for Theme loading; module
+mode exports the same factories without registering them. Applications load the
+module through the generated theme's `skinsJs`, then supply factories and default
+mappings to their own runtime registry. See [module skins](module-skins.md) for
+the UIContext integration and its UI prerequisite. Namespace externalization and
+constructor identity are unchanged by this option.
 
 ## Output ownership
 

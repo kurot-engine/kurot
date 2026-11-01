@@ -1,9 +1,10 @@
 # resize
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 resize(width: number, height: number): void;
 ```
 
-Called by the renderer when the canvas/viewport is resized.
+Stores logical viewport dimensions and dispatches Event.RESIZE, even if
+the dimensions are unchanged. Used by screen adaptation after layout.

@@ -1,5 +1,6 @@
 import { Rectangle, Event, DisplayObject } from '@kurot/core';
 import { Group } from './Group.js';
+import { getUIContext } from '../core/UIContext.js';
 import { ItemRenderer } from './ItemRenderer.js';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';
 import type { ICollection } from '../collections/ICollection.js';
@@ -411,7 +412,8 @@ export class DataGroup extends Group {
 	}
 
 	private _createOneRenderer(rendererClass: new () => ItemRenderer): ItemRenderer {
-		const renderer = new rendererClass();
+		const context = getUIContext(this);
+		const renderer = context ? context.run(() => new rendererClass()) : new rendererClass();
 		this._rendererToClass.set(renderer, rendererClass);
 		if (this._itemRendererSkinName) {
 			this._setItemRendererSkinName(renderer, this._itemRendererSkinName);

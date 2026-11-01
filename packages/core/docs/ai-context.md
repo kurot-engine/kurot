@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@2.7.0` (published). It provides Kurot's
+Package identity: `@kurot/core@2.8.0` (prepared for publication). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -64,6 +64,12 @@ The dev-only benchmark page, runtime, adapters, vendor baseline, and tests are
 colocated under `examples/benchmark/`; none are exported from `index.ts`.
 
 ## 2. Non-obvious current behavior
+
+- BitmapData accepts ImageBitmap. Default alpha handling normalizes through a
+  temporary Canvas; premultipliedAlpha=true declares already-premultiplied input
+  and retains direct upload. Explicit disposal closes owned decoded pixels and
+  deletes its current upload. Restoration tracking uses a WeakMap index and
+  incremental weak-reference cleanup. Read [pixel ownership](texture-density.md#decoded-pixel-ownership).
 
 - `DisplayObject.matrix` getter returns a **clone of the authored transform**,
   excluding centered flips and anchor/scroll offsets. Assigning it preserves

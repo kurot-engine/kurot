@@ -1,7 +1,8 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **3.6.2**. Requires Core **^2.5.2**.
+Kurot games. Package version: **3.7.0** (prepared for publication).
+Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
 the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
@@ -11,7 +12,7 @@ exact member contracts. Build-time KUI skins run through UI without ui-runtime.
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^3.6.2 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^3.7.0 @kurot/core@^2.5.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -29,6 +30,24 @@ reports renderedSize/textFitOverflow without rewriting authored size.
 Appearance, default artwork, fonts and translations belong to the project.
 CLI resolves [project styles](../ui-document/docs/project-styles.md) into native
 properties; UI does not read style.json or switch live themes automatically.
+
+## Local UI contexts
+
+UIContext scopes Skin names/default mappings, image adapters, bitmap-font
+resources, UI default fonts and automatic RadioButton groups to one application.
+Use `context.run()` for synchronous construction, or bind a root before stage
+attachment. Later asynchronous callbacks that construct views need their own
+run call. Missing local names never fall back to a global Theme or asset registry.
+
+CLI >= 3.9.0 within 3.x can export local Skin factories with
+`ui.skinRegistration: 'module'`. Load them through the generated theme's skinsJs
+path, then pass the factories and default mappings to UIContext. See the
+[context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
+
+Existing global applications keep their Theme/asset behavior. UIContext needs
+no new Core API beyond the existing ^2.5.2 peer; Core 2.8.0 is required only when
+adopting its new ImageBitmap support. Dispose views and their activity before
+the context, then release borrowed resources/fonts through their owners.
 
 ## Quick Start
 

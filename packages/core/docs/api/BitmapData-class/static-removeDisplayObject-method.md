@@ -1,11 +1,11 @@
 # static removeDisplayObject
 
-Package: `@kurot/core@2.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static removeDisplayObject(displayObject: DisplayObject, bitmapData: BitmapData | undefined): void;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Removes an invalidation registration without disposing the shared source.
 
 Related types: [DisplayObject](../DisplayObject-class.md), [BitmapData](../BitmapData-class.md).
