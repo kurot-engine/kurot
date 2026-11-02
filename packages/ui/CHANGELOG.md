@@ -4,6 +4,46 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [3.7.1] — 2026-11-02
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-02. All 5542 archived files match the locally prepared release,
+including the UILayer resize and listener-lifecycle fixes.
+
+### Fixed
+
+- Keep UILayer's resize callback bound to its own instance so logical viewport
+  changes resize the layer and its child layout instead of writing Stage bounds.
+- Retain the subscribed Stage for listener cleanup after removal, including
+  ancestor removal, repeated attachment, stage changes and multiple UI roots.
+
+### Tests
+
+- Add eight UILayer regressions covering initial sizing, growing/shrinking
+  viewports, percentage/centered child layout and Stage listener ownership.
+
+### Compatibility
+
+- Core peer/dev requirements remain ^2.5.2 with the existing registry 2.5.3 lock.
+  Public APIs, KUI/resource formats and all dependency ranges are unchanged.
+- ui-runtime's existing UI ^3.4.0 accepts this patch and needs no release or
+  peer update. Consumer installation/lock adoption is optional; exact UI pins
+  need an explicit update to adopt the fix. Application dependencies stay unchanged.
+
+### Verification
+
+- Clean build and all 418 unit tests pass (43 files) with the unchanged registry
+  Core 2.5.3 development lock. Seven new regressions fail before the fix; all
+  eight UILayer cases pass after it. Strict test declaration checking also passes.
+- Generated API references match 3.7.1 with 92 exports, 4991 members and zero
+  missing entries. All 19 Core/Game/UI API examples compile against built and
+  source-free packed declarations.
+- Packed UI 3.7.1 with Core 2.8.0 passes resize/child-layout, Stage-bound
+  preservation, removal and stage-change checks without implementation source.
+- After publication, all eight regressions also pass against downloaded npm
+  UI 3.7.1 / Core 2.8.0 public entry points. All 19 API examples and the
+  regression fixture pass strict declaration checks with skipLibCheck=false.
+
 ## [3.7.0] — 2026-11-01
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

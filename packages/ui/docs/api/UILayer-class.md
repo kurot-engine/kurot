@@ -1,6 +1,6 @@
 # UILayer
 
-Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
 
 ```ts
 class UILayer extends Group
@@ -9,7 +9,8 @@ class UILayer extends Group
 UILayer — a top-level UI container that automatically sizes to the stage.
 
 Use as the root of the UI display list. When added to the stage, UILayer
-listens to RESIZE events and keeps its size synced with the stage dimensions.
+immediately adopts its logical dimensions and follows subsequent RESIZE events.
+Removal stops listening; reattachment synchronizes to the current stage again.
 
 Related types: [Group](Group-class.md).
 

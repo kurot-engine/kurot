@@ -32,7 +32,7 @@ installation establish its baseline. Package versions are independent.
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
 | `@kurot/core` | 2.8.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
-| `@kurot/ui` | 3.7.0 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
+| `@kurot/ui` | 3.7.1 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 2.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
 | `@kurot/cli` | 3.9.0 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.13.2 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |

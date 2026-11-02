@@ -5,6 +5,37 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-02 — UI 3.7.1 publication
+
+- Verify the exact npm version and latest tag, download the registry archive,
+  and validate SHA-512 integrity and SHA-1 checksum. All 5542 archived files
+  match the prepared release byte for byte, including 348 dist and 5190 docs
+  files, the UILayer implementation, declarations and versioned API references.
+- Run all eight UILayer regressions against downloaded UI 3.7.1 / Core 2.8.0
+  public entry points. All 19 API examples and the regression fixture pass
+  strict declaration checks without engine source. Local build and all
+  418 UI unit tests pass with the existing Core 2.5.3 development installation.
+- Synchronize README/context publication status and the package release entry.
+  Immutable npm archives retain their preparation-time status text. Keep all
+  versions, dependency/peer ranges and application/development locks unchanged.
+
+## 2026-11-02 — UI 3.7.1 preparation
+
+- Prepare the UILayer resize/listener-lifecycle fix as a compatible UI patch.
+  Synchronize the manifest, package/root README, context/version table and
+  generated API references. This is a local candidate for user-managed publication.
+- Keep Core ^2.5.2 peer/dev requirements and the registry 2.5.3 development lock.
+  ui-runtime's UI ^3.4.0 peer/dev ranges accept this patch; its older lock is
+  optional adoption. No other SDK requires a compatibility change or release.
+- Keep CLI starter latest placeholders and all application dependencies/locks.
+  examples/game and MilfMaster/Runaway/Tentax accept the patch through ^3.7.0;
+  Card Booster/Skydive/Editor/SAO and native Skia projects have exact UI pins
+  and need a deliberate manifest/installation update when adopting it.
+- Clean UI build and all 418 tests pass. Generated API/version checks and all
+  19 strict examples pass against built and packed declarations. Source-free
+  packed UI 3.7.1/Core 2.8.0 verifies resize-driven child layout, Stage-bound
+  preservation and listener cleanup across removal and stage changes.
+
 ## 2026-11-01 — Example SDK adoption
 
 - Adopt registry Core 2.8.0 and CLI 3.9.0 in demo, game and Star Catcher, plus

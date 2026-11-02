@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **3.7.0** (published on npm).
+Kurot games. Package version: **3.7.1** (published on npm).
 Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -12,7 +12,7 @@ exact member contracts. Build-time KUI skins run through UI without ui-runtime.
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^3.7.0 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^3.7.1 @kurot/core@^2.5.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -48,6 +48,12 @@ Existing global applications keep their Theme/asset behavior. UIContext needs
 no new Core API beyond the existing ^2.5.2 peer; Core 2.8.0 is required only when
 adopting its new ImageBitmap support. Dispose views and their activity before
 the context, then release borrowed resources/fonts through their owners.
+
+## Stage-sized UI roots
+
+UILayer adopts the stage's logical dimensions on attachment and follows later
+size changes, including noScale viewports. It removes its Stage listener when
+detached and resynchronizes on reattachment. See [UILayer](docs/api/UILayer-class.md).
 
 ## Quick Start
 

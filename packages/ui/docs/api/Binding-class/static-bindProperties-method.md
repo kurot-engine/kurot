@@ -1,6 +1,6 @@
 # static bindProperties
 
-Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
 
 ```ts
 static bindProperties(host: unknown, templates: unknown[], chainIndex: number[], target: unknown, prop: string): Watcher | undefined;

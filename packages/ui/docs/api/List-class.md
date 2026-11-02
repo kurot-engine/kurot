@@ -1,6 +1,6 @@
 # List
 
-Package: `@kurot/ui@3.7.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
 
 ```ts
 class List extends ListBase

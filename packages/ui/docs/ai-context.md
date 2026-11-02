@@ -6,7 +6,7 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@3.7.0` (published on npm), with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@3.7.1` (published on npm), with Core peer **^2.5.2**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -45,6 +45,10 @@ src/kurot/
 ```
 
 ## 2. Non-obvious current behavior
+
+- UILayer follows logical Stage dimensions on attachment and RESIZE. Its callback
+  retains the layer instance, and cleanup uses the subscribed Stage because
+  REMOVED_FROM_STAGE arrives after the layer's stage reference has been cleared.
 
 - `flipX`/`flipY` are native Core booleans inherited by every UI display
   component. Group and Component provide their validated, unscaled actual frame
