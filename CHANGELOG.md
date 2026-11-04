@@ -5,6 +5,27 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-04 — Examples and Templates adopt UI 4 / CLI 4
+
+- Update registry UI/CLI declarations and pnpm locks in game, demo and
+  star-catcher examples; retain Core 2.8.0 and other SDK dependencies.
+- The game gallery uses declared fields and named handlers, removing skin-part
+  casts and releasing handlers on replacement. Strict development/release builds,
+  full declarations and browser clicks, Slider/progress updates, panel reopening,
+  replacement and field cleanup pass. Core-only demo startup also passes in both modes.
+- Star Catcher retains Core-only gameplay; four unit tests and all three browser
+  cases pass in both development and minified release output. One initial browser
+  run timed out; a complete rerun passed without source or test changes.
+- Separately update the five external Templates projects to registry UI/CLI 4.
+  Business KUI views and their concrete-view consumers adopt declared fields;
+  generic framework enumeration and Skin metadata retain their intended APIs.
+  Application changes and validation are recorded in each project's CHANGELOG.
+- All eight selected consumers pass frozen installation, strict development/release
+  builds and complete declarations. The six projects with unit suites pass 750
+  tests. All five Templates pass development browser interaction; release checks
+  pass for Card Booster, Skydive, Runaway and focused MilfMaster presentation paths.
+  Tentax's existing compiled-field/auto-bet smoke harness covers development.
+
 ## 2026-11-04 — UI 4.0.0 / CLI 4.0.0 publication
 
 - Verify both exact npm versions and latest tags as 4.0.0. Download the registry

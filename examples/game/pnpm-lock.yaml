@@ -15,15 +15,15 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1(@kurot/core@2.8.0)
       '@kurot/ui':
-        specifier: ^3.7.0
-        version: 3.7.0(@kurot/core@2.8.0)
+        specifier: ^4.0.0
+        version: 4.0.0(@kurot/core@2.8.0)
       '@kurot/ui-document':
         specifier: ^0.13.2
         version: 0.13.2
     devDependencies:
       '@kurot/cli':
-        specifier: ^3.9.0
-        version: 3.9.0
+        specifier: ^4.0.0
+        version: 4.0.0
 
 packages:
 
@@ -195,8 +195,8 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@3.9.0':
-    resolution: {integrity: sha512-/0c/sbdYEQ7Cj0Qyz8JcJTAcfr0RGkuB8MF8K5rQ/7/VdSq1Js150wQk8nCZEsEIGy4VjrDwGEWTHYajpwnTmQ==}
+  '@kurot/cli@4.0.0':
+    resolution: {integrity: sha512-JpZ0IdMbx0fakQN6U2savjWFGm6poAKmlqji/ABXUmrgB79QjyAnX2RtykDkIOpGnogWS3W8cmafksELtUAYrw==}
     hasBin: true
 
   '@kurot/core@2.8.0':
@@ -210,8 +210,8 @@ packages:
   '@kurot/ui-document@0.13.2':
     resolution: {integrity: sha512-8oY67ukqw0PDoRPQMNzaryTEr+aPJej6E6nkkzs4rrsPeon8plY/p6NVJm6jpxYkImTYz+d+H/Y8C0joVnuJrQ==}
 
-  '@kurot/ui@3.7.0':
-    resolution: {integrity: sha512-eDqpCYh+/P4+XTHI0Vihx5m50tb5YKJKkymCCfOmT2KpH8opfCTPrXgs9O3TZ7Hc7i3cyHU/ksiU9RBnxuu9UA==}
+  '@kurot/ui@4.0.0':
+    resolution: {integrity: sha512-u/6j7YpK5Fzm7YICCCoIuE6K+y0zueUmGdoKzIg7saJsUxlDT9BRgk2bzf/cYa6APzIHNgvLQNaXXw7UYZtEyA==}
     peerDependencies:
       '@kurot/core': ^2.5.2
 
@@ -236,6 +236,11 @@ packages:
 
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
+
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
 
 snapshots:
 
@@ -327,13 +332,14 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@3.9.0':
+  '@kurot/cli@4.0.0':
     dependencies:
       '@kurot/ui-document': 0.13.2
       commander: 13.1.0
       esbuild: 0.25.12
       parse5: 7.3.0
       postcss-value-parser: 4.2.0
+      typescript: 5.9.3
 
   '@kurot/core@2.8.0':
     dependencies:
@@ -346,7 +352,7 @@ snapshots:
 
   '@kurot/ui-document@0.13.2': {}
 
-  '@kurot/ui@3.7.0(@kurot/core@2.8.0)':
+  '@kurot/ui@4.0.0(@kurot/core@2.8.0)':
     dependencies:
       '@kurot/core': 2.8.0
 
@@ -390,3 +396,5 @@ snapshots:
       entities: 6.0.1
 
   postcss-value-parser@4.2.0: {}
+
+  typescript@5.9.3: {}

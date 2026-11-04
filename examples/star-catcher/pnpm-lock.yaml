@@ -13,8 +13,8 @@ importers:
         version: 2.8.0
     devDependencies:
       '@kurot/cli':
-        specifier: 3.9.0
-        version: 3.9.0
+        specifier: 4.0.0
+        version: 4.0.0
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -360,8 +360,8 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@3.9.0':
-    resolution: {integrity: sha512-/0c/sbdYEQ7Cj0Qyz8JcJTAcfr0RGkuB8MF8K5rQ/7/VdSq1Js150wQk8nCZEsEIGy4VjrDwGEWTHYajpwnTmQ==}
+  '@kurot/cli@4.0.0':
+    resolution: {integrity: sha512-JpZ0IdMbx0fakQN6U2savjWFGm6poAKmlqji/ABXUmrgB79QjyAnX2RtykDkIOpGnogWS3W8cmafksELtUAYrw==}
     hasBin: true
 
   '@kurot/core@2.8.0':
@@ -1013,13 +1013,14 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@3.9.0':
+  '@kurot/cli@4.0.0':
     dependencies:
       '@kurot/ui-document': 0.13.2
       commander: 13.1.0
       esbuild: 0.25.12
       parse5: 7.3.0
       postcss-value-parser: 4.2.0
+      typescript: 5.9.3
 
   '@kurot/core@2.8.0':
     dependencies:
