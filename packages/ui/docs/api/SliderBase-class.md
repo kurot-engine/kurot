@@ -1,6 +1,6 @@
 # SliderBase
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class SliderBase extends Range
@@ -118,6 +118,7 @@ Related types: [Range](Range-class.md).
 | `getElementAt` | public, inherited | [open](SliderBase-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](SliderBase-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](SliderBase-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](SliderBase-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](SliderBase-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](SliderBase-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](SliderBase-class/globalToLocal-method.md) |
@@ -132,8 +133,8 @@ Related types: [Range](Range-class.md).
 | `nearestValidValue` | protected, inherited | [open](SliderBase-class/nearestValidValue-method.md) |
 | `notifyListener` | protected, inherited | [open](SliderBase-class/notifyListener-method.md) |
 | `once` | public, inherited | [open](SliderBase-class/once-method.md) |
-| `onSkinReady` | protected | [open](SliderBase-class/onSkinReady-method.md) |
-| `onSkinRemoved` | protected | [open](SliderBase-class/onSkinRemoved-method.md) |
+| `onSkinReady` | protected, inherited | [open](SliderBase-class/onSkinReady-method.md) |
+| `onSkinRemoved` | protected, inherited | [open](SliderBase-class/onSkinRemoved-method.md) |
 | `pointToValue` | protected | [open](SliderBase-class/pointToValue-method.md) |
 | `removeChild` | public, inherited | [open](SliderBase-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](SliderBase-class/removeChildAt-method.md) |

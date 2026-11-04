@@ -1,6 +1,6 @@
 # Panel
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Panel extends Component
@@ -116,6 +116,7 @@ Related types: [Component](Component-class.md).
 | `getElementAt` | public, inherited | [open](Panel-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Panel-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Panel-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](Panel-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Panel-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Panel-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Panel-class/globalToLocal-method.md) |

@@ -1,6 +1,6 @@
 # rendererRemoved
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 protected rendererRemoved(renderer: ItemRenderer, _index: number, _item: unknown): void;

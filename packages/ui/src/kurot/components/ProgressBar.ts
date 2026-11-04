@@ -15,7 +15,13 @@ import { Label } from './Label.js';
 export class ProgressBar extends Component {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public thumb?: Component;
+	/**
+	 * @skinPart
+	 */
 	public labelDisplay?: Label;
 
 	private _minimum = 0;
@@ -163,17 +169,14 @@ export class ProgressBar extends Component {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		const { thumb, labelDisplay } = this.skinParts;
-		if (thumb instanceof Component) this.thumb = thumb;
-		if (labelDisplay instanceof Label) this.labelDisplay = labelDisplay;
-	}
-
-	protected override onSkinRemoved(): void {
-		this.thumb = undefined;
-		this.labelDisplay = undefined;
-		super.onSkinRemoved();
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'thumb') {
+			return value => value instanceof Component;
+		}
+		if (name === 'labelDisplay') {
+			return value => value instanceof Label;
+		}
+		return super.getSkinPartValidator(name);
 	}
 
 	/**

@@ -16,6 +16,9 @@ import { isUIComponent } from '../core/UIComponent.js';
 export class ScrollBarBase extends Component {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public thumb?: IUIComponent;
 	public autoVisibility = true;
 
@@ -44,15 +47,11 @@ export class ScrollBarBase extends Component {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		const { thumb } = this.skinParts;
-		if (isUIComponent(thumb)) this.thumb = thumb;
-	}
-
-	protected override onSkinRemoved(): void {
-		this.thumb = undefined;
-		super.onSkinRemoved();
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'thumb') {
+			return isUIComponent;
+		}
+		return super.getSkinPartValidator(name);
 	}
 
 	/**

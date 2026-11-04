@@ -1,6 +1,6 @@
 # Label
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Label extends Component implements IDisplayText
@@ -120,6 +120,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `getElementAt` | public, inherited | [open](Label-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Label-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Label-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](Label-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Label-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Label-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Label-class/globalToLocal-method.md) |

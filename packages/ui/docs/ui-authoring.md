@@ -5,6 +5,8 @@ native `@kurot/ui`, CLI-compiled Skin XML and project TypeScript. It requires
 no engine source and no `ui-runtime` dependency. For API details, read only the
 relevant [capability](api/topics.md) and member page.
 
+This authoring workflow uses UI 4 and CLI 4 for direct, validated part fields.
+
 Use this guide with the installed SDK declarations and the
 [ScoreHUD recipe](recipes/score-hud.md). Existing projects retain their own
 compatible versions and directory conventions.
@@ -104,9 +106,10 @@ class string and XML tag namespace are different identifiers.
    skin part; ordinary visual nodes can omit it. Keep IDs stable across edits.
 4. Run a CLI build to generate `.kurot/skin-parts.d.ts`. Include
    `.kurot/**/*.d.ts` in the project's TypeScript config, as the game template does.
-5. Extend `Component<'components.hud.ScoreHUDSkin'>`; access `this.skinParts`
-   inside `onSkinReady()`, after calling the superclass hook. Use generated
-   types rather than casts or guessed fields.
+5. Extend Component and declare fields such as `declare scoreLabel: Label`.
+   Access `this.scoreLabel` inside `onSkinReady()`, after calling the superclass
+   hook. CLI checks the declarations against the matching Skin; see
+   [part fields](skin-part-fields.md).
 6. Detach part listeners/bindings in `onSkinRemoved()` while old parts remain
    available. This hook runs on skin replacement/detachment, not on stage removal.
 
@@ -115,7 +118,7 @@ open/restart hook. Store data set before skin readiness, then render it in
 `onSkinReady()`. Expose small properties/methods and semantic events such as
 `restartRequested`; the controller handles the actual game restart.
 
-`skinParts` throws before attachment. Missing parts after a build usually mean
+Part fields are available after skin readiness. Missing parts after a build usually mean
 the wrong `class`, unmatched file pair, omitted `id`, unavailable theme or stale
 generated declarations. Correct those inputs instead of editing `.kurot/`.
 
@@ -172,14 +175,9 @@ pnpm exec tsc --noEmit --skipLibCheck false
 pnpm release
 ```
 
-The build first creates skin-part declarations. The project must have a
-TypeScript compiler installed for the second command; do not install/upgrade
-dependencies implicitly. esbuild compilation alone is not a type check.
-
-Published CLI 3.6.0 can report TS2610 for skinParts when skipLibCheck=false.
-CLI 3.6.1 preserves its getter signature and passes that check. After adopting
-the fixed CLI, rebuild to regenerate declarations; no Core/UI change, cast or
-handwritten generated declaration is needed.
+The build validates part fields and generates tooling declarations. A complete
+project type check remains separate; have TypeScript installed for the second
+command. The targeted part checks do not validate every application expression.
 
 Serve development and release outputs. Check theme/resource/font failures,
 portrait/landscape bounds, pointer targets, long localized text and scroll

@@ -1,6 +1,6 @@
 # EditableText
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class EditableText extends Label implements IDisplayText
@@ -130,6 +130,7 @@ Related types: [Label](Label-class.md), [IDisplayText](IDisplayText-interface.md
 | `getElementAt` | public, inherited | [open](EditableText-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](EditableText-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](EditableText-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](EditableText-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](EditableText-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](EditableText-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](EditableText-class/globalToLocal-method.md) |

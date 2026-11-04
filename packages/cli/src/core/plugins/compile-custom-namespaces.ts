@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { ensureDir } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
 import { namespaceModuleExternalPlugin, normalizeModuleKey } from '../namespace-external-plugin.js';
+import { skinPartValidationPlugin } from '../kui/skin-part-watch.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { CustomNamespace, Project } from '../project.js';
 
@@ -124,11 +125,11 @@ async function bundleNamespace(
 		// yet. Supported namespace barrels are independent, and self-references are
 		// excluded by construction (a namespace's own files aren't in the map when
 		// bundling that same namespace — see the loop in `compileCustomNamespaces`).
-		plugins: [namespaceModuleExternalPlugin(ctx.outputs.namespaceModules)],
+		plugins: [namespaceModuleExternalPlugin(ctx.outputs.namespaceModules), ...(ctx.watch ? [skinPartValidationPlugin(ctx)] : [])],
 	};
 
 	if (ctx.watch) {
-		const context = await esbuild.context(options);
+		const context = await esbuild.context({ ...options, write: false });
 		const result = await context.rebuild();
 		await context.watch();
 		ctx.outputs.namespaceRebuilders.set(ns.specifier, async () => {
@@ -169,13 +170,15 @@ async function createNamespaceEntry(namespace: CustomNamespace): Promise<Namespa
  * Rewrites generated namespace entries and rebuilds their esbuild contexts
  * after components are added, removed, or renamed.
  */
-export async function refreshGeneratedNamespaceEntries(ctx: BuildContext): Promise<void> {
+export async function refreshGeneratedNamespaceEntries(ctx: BuildContext, rebuild = true): Promise<void> {
 	for (const namespace of ctx.project.customNamespaces) {
 		if (namespace.entry) continue;
 		const entry = ctx.outputs.namespaceEntries.get(namespace.specifier);
 		if (!entry) continue;
 		await fs.writeFile(entry, namespaceEntrySource(namespace));
-		await ctx.outputs.namespaceRebuilders.get(namespace.specifier)?.();
+		if (rebuild) {
+			await ctx.outputs.namespaceRebuilders.get(namespace.specifier)?.();
+		}
 	}
 }
 

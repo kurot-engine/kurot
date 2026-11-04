@@ -1,6 +1,6 @@
 # ItemRenderer
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ItemRenderer<TSkin extends string = string> extends Component<TSkin> implements IItemRenderer
@@ -110,6 +110,7 @@ Related types: [Component](Component-class.md), [IItemRenderer](IItemRenderer-in
 | `getElementAt` | public, inherited | [open](ItemRenderer-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](ItemRenderer-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](ItemRenderer-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](ItemRenderer-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](ItemRenderer-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](ItemRenderer-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](ItemRenderer-class/globalToLocal-method.md) |
@@ -124,7 +125,7 @@ Related types: [Component](Component-class.md), [IItemRenderer](IItemRenderer-in
 | `notifyListener` | protected, inherited | [open](ItemRenderer-class/notifyListener-method.md) |
 | `once` | public, inherited | [open](ItemRenderer-class/once-method.md) |
 | `onSkinReady` | protected | [open](ItemRenderer-class/onSkinReady-method.md) |
-| `onSkinRemoved` | protected | [open](ItemRenderer-class/onSkinRemoved-method.md) |
+| `onSkinRemoved` | protected, inherited | [open](ItemRenderer-class/onSkinRemoved-method.md) |
 | `removeChild` | public, inherited | [open](ItemRenderer-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](ItemRenderer-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](ItemRenderer-class/removeChildren-method.md) |

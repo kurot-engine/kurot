@@ -4,6 +4,57 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## [4.0.0] — 2026-11-04
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-04. All 5572 archived files match the locally prepared release.
+
+### Breaking
+
+- Bind every named Skin part directly to its Component host before onSkinReady.
+  Views declare their types and use this.btnClose; framework skinParts enumeration
+  remains available. No binding mode, decorator or per-view copy helper is needed.
+- Reject parts that overwrite host methods, arbitrary accessors, initialized
+  business fields or non-writable targets. Native controls explicitly validate
+  their slots; malformed native part types now fail instead of being ignored.
+- Keep old fields available throughout onSkinRemoved, then release only installed
+  references still owned by the skin. A new skin clears omitted parts. Application
+  reassignment is preserved and conflicts with a later binding of the same name.
+
+### Implementation
+
+- Centralize preflight, data-field ownership and native setter binding in Component.
+  Preserve Slider touch setters, Panel title propagation, input state and existing
+  native event/listener setup. Stage removal retains the attached skin and fields.
+- Validate candidates before committing skinName or detaching the old skin.
+  Recheck business-field changes made during cleanup. Existing KUI, Skin factories,
+  resource formats and Core APIs are unchanged.
+- Update current authoring, ScoreHUD, context and architecture guides for declare
+  fields and direct view access. View-specific helpers receive their concrete view.
+
+### Compatibility
+
+- Keep Core peer/dev ^2.5.2 and its existing 2.5.3 development lock. CLI 4 supplies
+  build-time declaration validation; the UI runtime itself uses existing Skin metadata.
+- ui-runtime 0.10.0's UI ^3.4.0 peer excludes UI 4. Its adoption requires separate
+  validation and release; this preparation changes only UI and CLI packages.
+- Existing application UI 3 ranges/pins require explicit adoption of this major.
+  Templates, CLI starters and engine example dependencies are deferred to publication.
+
+### Verification
+
+- Build and all 442 tests pass across 45 files. The 24 new cases cover field
+  binding, conflicts, replacement, inherited construction, native setters,
+  cleanup-hook access, cached title ordering and reassigned native parts.
+  The new test files also pass strict declaration checking.
+- Generated API checks pass with 92 exports, 5016 members and zero missing
+  entries. All 19 Core/Game/UI examples compile against built and source-free
+  packed declarations.
+- Packed UI 4 / CLI 4 with downloaded, integrity-verified Core 2.8.0 pass strict
+  development/release builds and complete declaration checks without SDK source.
+  Module and global Theme modes both pass browser clicks, Slider dragging,
+  base-constructor binding, skin replacement/listener cleanup and field release.
+
 ## [3.7.1] — 2026-11-02
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

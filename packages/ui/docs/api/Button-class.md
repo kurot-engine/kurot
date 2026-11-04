@@ -1,6 +1,6 @@
 # Button
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Button extends Component implements IDisplayText
@@ -112,6 +112,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `getElementAt` | public, inherited | [open](Button-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Button-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Button-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](Button-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Button-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Button-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Button-class/globalToLocal-method.md) |
@@ -126,7 +127,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `notifyListener` | protected, inherited | [open](Button-class/notifyListener-method.md) |
 | `once` | public, inherited | [open](Button-class/once-method.md) |
 | `onSkinReady` | protected | [open](Button-class/onSkinReady-method.md) |
-| `onSkinRemoved` | protected | [open](Button-class/onSkinRemoved-method.md) |
+| `onSkinRemoved` | protected, inherited | [open](Button-class/onSkinRemoved-method.md) |
 | `removeChild` | public, inherited | [open](Button-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](Button-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](Button-class/removeChildren-method.md) |

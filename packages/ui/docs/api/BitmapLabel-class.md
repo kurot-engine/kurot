@@ -1,6 +1,6 @@
 # BitmapLabel
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class BitmapLabel extends Component implements IDisplayText
@@ -110,6 +110,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `getElementAt` | public, inherited | [open](BitmapLabel-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](BitmapLabel-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](BitmapLabel-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](BitmapLabel-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](BitmapLabel-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](BitmapLabel-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](BitmapLabel-class/globalToLocal-method.md) |

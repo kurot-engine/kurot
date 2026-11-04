@@ -1,6 +1,6 @@
 # VSlider
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class VSlider extends SliderBase
@@ -110,6 +110,7 @@ Related types: [SliderBase](SliderBase-class.md).
 | `getElementAt` | public, inherited | [open](VSlider-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](VSlider-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](VSlider-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](VSlider-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](VSlider-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](VSlider-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](VSlider-class/globalToLocal-method.md) |

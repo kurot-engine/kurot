@@ -5,6 +5,43 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-04 — UI 4.0.0 / CLI 4.0.0 publication
+
+- Verify both exact npm versions and latest tags as 4.0.0. Download the registry
+  archives and verify SHA-512 integrity; all 5572 UI and 277 CLI archived files
+  match the prepared release, including runtime fields and build-time checks.
+- Synchronize repository README/context publication status and release entries.
+  Published archives retain their preparation-time documentation.
+- Commit the SDK release before adopting it in engine examples and external
+  Templates. Core, Game, ui-document and ui-runtime versions remain unchanged.
+
+## 2026-11-04 — UI 4.0.0 / CLI 4.0.0 preparation
+
+- Prepare default host-field Skin binding in UI and semantic declaration checks
+  in CLI as independent major releases. Views use declare fields and direct access;
+  view-specific helpers receive the concrete view. Keep framework part enumeration.
+- Centralize field ownership, native validators/setters, conflict preflight and
+  cleanup in Component. Validate before installing KUI outputs and on source watch
+  rebuilds; retain last good outputs and retry after corrected Skin input.
+- Synchronize manifests, current READMEs/guides, architecture/context/version tables
+  and generated UI references. These are local candidates for user publication.
+- Preserve Core peer/dev ^2.5.2 and UI's registry 2.5.3 lock; preserve CLI's
+  ui-document ^0.13.0 and registry 0.13.2 lock. Move TypeScript to CLI's ordinary
+  dependencies without changing its locked 5.9.3 version or unrelated tooling.
+- ui-runtime 0.10.0's UI ^3.4.0 peer excludes UI 4. Its adoption needs separate
+  validation and release; no dependent SDK version/peer is silently changed.
+  Existing application UI 3 / CLI 3 ranges and exact pins need explicit adoption.
+- Defer CLI starter files, engine example consumers and all external Templates
+  until publication, as requested. Publish UI 4 first, then CLI 4; consumers can
+  adopt both after registry verification.
+- UI build/442 tests and CLI build/176 tests pass. Generated API checks report
+  no missing entries; all 19 examples compile against built and source-free
+  packed declarations. New UI tests also pass strict declaration checking.
+- Packed UI/CLI with downloaded, integrity-verified Core 2.8.0 pass module/global
+  development/release builds, full consumer type checks and browser interaction:
+  direct fields, base-constructor binding, concrete-view helpers, clicks, Slider
+  dragging, skin replacement, old listener cleanup and field release.
+
 ## 2026-11-02 — UI 3.7.1 publication
 
 - Verify the exact npm version and latest tag, download the registry archive,

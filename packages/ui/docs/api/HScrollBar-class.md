@@ -1,6 +1,6 @@
 # HScrollBar
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class HScrollBar extends ScrollBarBase
@@ -104,6 +104,7 @@ Related types: [ScrollBarBase](ScrollBarBase-class.md).
 | `getElementAt` | public, inherited | [open](HScrollBar-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](HScrollBar-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](HScrollBar-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](HScrollBar-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](HScrollBar-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](HScrollBar-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](HScrollBar-class/globalToLocal-method.md) |

@@ -1,7 +1,8 @@
 # CLI architecture
 
 `@kurot/cli` is a project-local Node.js tool. Commander owns the command layer,
-esbuild owns TypeScript and bundle output, and ordered `BuildPlugin` instances
+esbuild owns transpilation and bundle output, TypeScript checks Skin field contracts,
+and ordered `BuildPlugin` instances
 share a `BuildContext` through `core/pipeline.ts`.
 
 ## Build pipeline
@@ -40,11 +41,17 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 3.9.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 4.0.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
-3.1.x and Core 2.1.x or later within their respective majors.
+4.x and its compatible Core. Core ^2.5.2 remains UI's peer minimum.
+
+Host-field validation uses compiler syntax and installed declarations before
+installing the Skin bundle or tooling declarations. Application and namespace
+watch contexts repeat the checks and write successful in-memory build outputs
+only. Failed source builds retain their last good output. See
+[declared fields](skin-part-fields.md).
 
 Each build also reads optional `resource/config/style.json` through the shared
 parser. Resource nine-slice defaults, Label presets and named color references

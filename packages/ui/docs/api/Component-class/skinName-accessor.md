@@ -1,6 +1,6 @@
 # skinName
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get skinName(): string | Skin | (() => Skin) | undefined;
@@ -12,5 +12,6 @@ resolve in the node's UIContext when present, otherwise in the global registry.
 A missing name clears the attached skin rather than throwing; exceptions
 from a supplied factory propagate. Assigning undefined detaches the skin.
 Replacement invokes skin cleanup hooks, but stage removal alone retains the skin.
+Part-name/type preflight failures leave the attached skin and name unchanged.
 
 Related types: [Skin](../Skin-class.md).

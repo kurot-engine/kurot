@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import { ensureDir } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
 import { namespaceModuleExternalPlugin, normalizeModuleKey } from '../namespace-external-plugin.js';
+import { skinPartValidationPlugin } from '../kui/skin-part-watch.js';
 import type { Dirent } from 'node:fs';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 import type { Project } from '../project.js';
@@ -66,14 +67,17 @@ async function buildDevelopment(ctx: BuildContext): Promise<void> {
 		splitting: true,
 		sourcemap: ctx.sourcemap,
 		external: [...project.enginePackages, ...project.customNamespaces.map(ns => ns.specifier)],
-		plugins: [namespaceModuleExternalPlugin(ctx.outputs.namespaceModules)],
+		plugins: [namespaceModuleExternalPlugin(ctx.outputs.namespaceModules), ...(ctx.watch ? [skinPartValidationPlugin(ctx)] : [])],
 		define: defines(false),
 	};
 
 	ctx.outputs.entryScript = toOutputPath(project, project.entry);
 
 	if (ctx.watch) {
-		const context = await esbuild.context(options);
+		const context = await esbuild.context({ ...options, write: false });
+		ctx.outputs.sourceRebuilder = async () => {
+			await context.rebuild();
+		};
 		await context.watch();
 		ctx.disposers.push(() => context.dispose());
 		return;

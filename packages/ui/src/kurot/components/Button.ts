@@ -17,7 +17,13 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
 export class Button extends Component implements IDisplayText {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public labelDisplay?: Label;
+	/**
+	 * @skinPart
+	 */
 	public iconDisplay?: Image;
 
 	private _label = '';
@@ -127,23 +133,25 @@ export class Button extends Component implements IDisplayText {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'labelDisplay') {
+			return value => value instanceof Label;
+		}
+		if (name === 'iconDisplay') {
+			return value => value instanceof Image;
+		}
+		return super.getSkinPartValidator(name);
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { labelDisplay, iconDisplay } = this.skinParts;
+		const { labelDisplay, iconDisplay } = this;
 		if (labelDisplay instanceof Label) {
-			this.labelDisplay = labelDisplay;
 			labelDisplay.text = this._label;
 		}
 		if (iconDisplay instanceof Image) {
-			this.iconDisplay = iconDisplay;
 			iconDisplay.source = this._icon;
 		}
-	}
-
-	protected override onSkinRemoved(): void {
-		this.labelDisplay = undefined;
-		this.iconDisplay = undefined;
-		super.onSkinRemoved();
 	}
 
 	/**

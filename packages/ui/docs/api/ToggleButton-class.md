@@ -1,6 +1,6 @@
 # ToggleButton
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ToggleButton extends Button
@@ -110,6 +110,7 @@ Related types: [Button](Button-class.md).
 | `getElementAt` | public, inherited | [open](ToggleButton-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](ToggleButton-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](ToggleButton-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](ToggleButton-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](ToggleButton-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](ToggleButton-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](ToggleButton-class/globalToLocal-method.md) |

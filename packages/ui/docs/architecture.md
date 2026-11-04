@@ -207,15 +207,18 @@ factories, invoked with fn.call(this) to supply the host context.
 
 _setSkin(skin) follows this lifecycle:
 
-1. Detach the old skin: call onSkinRemoved() while its complete skinParts map
-   remains available, mark it unready and clear the map, set
-   oldSkin.hostComponent=undefined to exit its state, call oldSkin.unwatchAll()
-   to remove Watchers, and detach elementsContent from the host.
-2. Attach the new skin: collect declared parts through skin.getPart(name) into
-   the internal map, add elementsContent to the host in declaration order,
-   set currentState and hostComponent, mark the skin ready and call onSkinReady().
-   The Component instance does not acquire dynamic properties for those part names.
-3. Invalidate size and display list, then dispatch Event.COMPLETE on the Component.
+1. Collect and preflight all candidate parts before committing skinName or
+   detaching the current skin. Check host conflicts and registered native slots.
+2. Call onSkinRemoved() while all old host fields and the complete part map remain
+   available. Exit old state, release Watchers, detach visuals and clear owned
+   field references. Recheck fields changed by application cleanup.
+3. Bind the new complete field set and map, retaining registered native setters.
+   Add visuals, set currentState/hostComponent, mark ready and call onSkinReady().
+4. Invalidate size and display list, then dispatch Event.COMPLETE on the Component.
+
+Application views use type-only declare fields and direct access. The part map
+remains the enumeration interface for frameworks and tooling. See
+[field ownership and validation](skin-part-fields.md).
 
 ---
 

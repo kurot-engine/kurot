@@ -47,6 +47,9 @@ export class SliderBase extends Range {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * @skinPart
+	 */
 	public get thumb(): DisplayObject | undefined {
 		return this._thumb;
 	}
@@ -59,6 +62,9 @@ export class SliderBase extends Range {
 		this._addThumbListeners();
 	}
 
+	/**
+	 * @skinPart
+	 */
 	public get track(): DisplayObject | undefined {
 		return this._track;
 	}
@@ -101,17 +107,14 @@ export class SliderBase extends Range {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		const { thumb, track } = this.skinParts;
-		if (thumb instanceof DisplayObject) this.thumb = thumb;
-		if (track instanceof DisplayObject) this.track = track;
-	}
-
-	protected override onSkinRemoved(): void {
-		this.thumb = undefined;
-		this.track = undefined;
-		super.onSkinRemoved();
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'thumb') {
+			return value => value instanceof DisplayObject;
+		}
+		if (name === 'track') {
+			return value => value instanceof DisplayObject;
+		}
+		return super.getSkinPartValidator(name);
 	}
 
 	protected pointToValue(_x: number, _y: number): number {

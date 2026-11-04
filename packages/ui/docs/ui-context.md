@@ -1,7 +1,7 @@
 # Local UI contexts
 
-UIContext requires UI >= 3.7.0 within 3.x. CLI >= 3.9.0 within 3.x provides
-the matching module output. See
+Use UI 4 and CLI 4 for this workflow, including validated direct part fields.
+The CLI provides the matching module output. See
 [module Skin loading](../../cli/docs/module-skins.md) for configuration and a
 loader that resolves both development and hashed release module URLs.
 

@@ -9,6 +9,7 @@ import type { ILayoutTarget } from '../layouts/ILayoutTarget.js';
 import type { Skin } from './Skin.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
 import { UIEvent } from '../events/UIEvent.js';
+import { SkinPartBindings } from './skin-part-bindings.js';
 
 /**
  * EventMap for Component and all its subclasses.
@@ -64,6 +65,7 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	private _stateIsDirty = false;
 	private _skinReady = false;
 	private _skinParts: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
+	private readonly _partBindings = new SkinPartBindings(this, name => this.getSkinPartValidator(name));
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
@@ -94,16 +96,21 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	 * A missing name clears the attached skin rather than throwing; exceptions
 	 * from a supplied factory propagate. Assigning undefined detaches the skin.
 	 * Replacement invokes skin cleanup hooks, but stage removal alone retains the skin.
+	 * Part-name/type preflight failures leave the attached skin and name unchanged.
 	 */
 	public get skinName(): string | (new () => Skin) | Skin | undefined {
 		return this._skinName;
 	}
 
 	public set skinName(value: string | (new () => Skin) | Skin | undefined) {
-		this.skinNameExplicitlySet = true;
-		if (this._skinName === value) return;
-		this._skinName = value;
-		this._parseSkinName();
+		if (this._skinName === value) {
+			this.skinNameExplicitlySet = true;
+			return;
+		}
+		this._parseSkinName(value, () => {
+			this._skinName = value;
+			this.skinNameExplicitlySet = true;
+		});
 	}
 
 	/**
@@ -428,6 +435,8 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	 * skin attachment throws Error; use onSkinReady() to access the full part set.
 	 * Old parts remain available inside onSkinRemoved(), before detachment. Generated
 	 * declarations provide exact names/types for known skins.
+	 * Frameworks can enumerate this view; ordinary application code declares and
+	 * accesses the corresponding host fields directly.
 	 */
 	public get skinParts(): Readonly<SkinPartsOf<TSkin>> {
 		if (!this._skinReady) {
@@ -439,8 +448,9 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	// ── Public methods ────────────────────────────────────────────────────
 
 	public _applySkinName(skinName: string): void {
-		this._skinName = skinName;
-		this._parseSkinName();
+		this._parseSkinName(skinName, () => {
+			this._skinName = skinName;
+		});
 		this.invalidateProperties();
 	}
 
@@ -708,12 +718,22 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	}
 
 	/**
-	 * Called after the complete skin and all of its parts have been attached.
+	 * Registers an engine-owned part field or accessor and its accepted values.
+	 * Registered accessors retain setter behavior during binding and cleanup.
+	 * Ordinary authored parts need only a type-only declare field on the host.
+	 */
+	protected getSkinPartValidator(_name: string): ((value: unknown) => boolean) | undefined {
+		return undefined;
+	}
+
+	/**
+	 * Called after the complete skin, host part fields and visuals are attached.
 	 */
 	protected onSkinReady(): void {}
 
 	/**
 	 * Called before the current skin and complete part set are detached/replaced.
+	 * Old host part fields remain available throughout this hook, including super calls.
 	 * Release listeners/bindings installed by onSkinReady() here. Merely removing the
 	 * component from the stage does not call this hook; application round resources
 	 * need their own cleanup path.
@@ -729,8 +749,10 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 
 	// ── Private methods ───────────────────────────────────────────────────
 
-	private _parseSkinName(): void {
-		const skinName = this._skinName;
+	private _parseSkinName(
+		skinName: string | (new () => Skin) | Skin | undefined,
+		commitName: () => void,
+	): void {
 		let skin: Skin | undefined;
 		if (skinName) {
 			if (typeof skinName === 'function') {
@@ -744,7 +766,7 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 				skin = skinName as Skin;
 			}
 		}
-		this._setSkin(skin);
+		this._setSkin(skin, commitName);
 		// Generated factories run with the component as their receiver so future
 		// host-aware skin setup can use the same stable invocation contract.
 	}
@@ -773,7 +795,15 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 		return (result && typeof result === 'object' && 'skinParts' in result) ? (result as Skin) : undefined;
 	}
 
-	private _setSkin(skin: Skin | undefined): void {
+	private _setSkin(skin: Skin | undefined, commitName?: () => void): void {
+		const parts = Object.create(null) as Record<string, unknown>;
+		for (const name of skin?.skinParts ?? []) {
+			const instance = skin?.getPart(name);
+			if (instance !== undefined) {
+				parts[name] = instance;
+			}
+		}
+		let bindings = this._partBindings.prepare(parts);
 		const oldSkin = this._skin;
 		if (oldSkin) {
 			// Exit the active state while its host and display hierarchy are still
@@ -782,21 +812,22 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 				this.onSkinRemoved();
 				this._skinReady = false;
 			}
-			this._skinParts = Object.create(null) as Record<string, unknown>;
 			oldSkin.hostComponent = undefined;
 			oldSkin.unwatchAll();
 			for (const child of oldSkin.elementsContent) {
 				if (child.parent === this) this.removeChild(child);
 			}
+			this._partBindings.clear();
+			this._skinParts = Object.create(null) as Record<string, unknown>;
+			this._skin = undefined;
+			// Cleanup hooks may have changed business fields after the preflight.
+			bindings = this._partBindings.prepare(parts);
 		}
+		commitName?.();
 		this._skin = skin;
 		if (skin) {
-			const parts = Object.create(null) as Record<string, unknown>;
-			for (const partName of skin.skinParts) {
-				const instance = skin.getPart(partName);
-				if (instance !== undefined) parts[partName] = instance;
-			}
 			this._skinParts = parts;
+			this._partBindings.bind(bindings);
 			for (let i = skin.elementsContent.length - 1; i >= 0; i--) {
 				this.addChildAt(skin.elementsContent[i], 0);
 			}

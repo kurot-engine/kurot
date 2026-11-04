@@ -25,9 +25,21 @@ import { Label } from './Label.js';
 export class ComboBox extends Component implements IDisplayText {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public labelDisplay?: Label;
+	/**
+	 * @skinPart
+	 */
 	public button?: Button;
+	/**
+	 * @skinPart
+	 */
 	public dropDown?: Scroller;
+	/**
+	 * @skinPart
+	 */
 	public list?: List;
 
 	private _dataProvider?: ArrayCollection;
@@ -225,36 +237,48 @@ export class ComboBox extends Component implements IDisplayText {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'labelDisplay') {
+			return value => value instanceof Label;
+		}
+		if (name === 'button') {
+			return value => value instanceof Button;
+		}
+		if (name === 'list') {
+			return value => value instanceof List;
+		}
+		if (name === 'dropDown') {
+			return value => value instanceof Scroller;
+		}
+		return super.getSkinPartValidator(name);
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { labelDisplay, button, list, dropDown } = this.skinParts;
+		const { labelDisplay, button, list, dropDown } = this;
 		if (labelDisplay instanceof Label) {
-			this.labelDisplay = labelDisplay;
 			this._updateLabel();
 		}
-		if (button instanceof Button) {
-			this.button = button;
-		}
 		if (list instanceof List) {
-			this.list = list;
 			list.dataProvider = this._dataProvider;
 			list.addEventListener(Event.CHANGE, this._onListChange);
 		}
 		if (dropDown instanceof Scroller) {
-			this.dropDown = dropDown;
 			dropDown.visible = this._isOpen;
 		}
 	}
 
 	protected override onSkinRemoved(): void {
-		if (this.dropDown) {
-			this.close();
+		const { dropDown, list } = this.skinParts;
+		if (dropDown instanceof Scroller) {
+			this._isOpen = false;
+			this._updateDisplayOrder(false, dropDown);
+			dropDown.visible = false;
+			this.invalidateState();
 		}
-		this.list?.removeEventListener(Event.CHANGE, this._onListChange);
-		this.labelDisplay = undefined;
-		this.button = undefined;
-		this.list = undefined;
-		this.dropDown = undefined;
+		if (list instanceof List) {
+			list.removeEventListener(Event.CHANGE, this._onListChange);
+		}
 		super.onSkinRemoved();
 	}
 
@@ -285,9 +309,13 @@ export class ComboBox extends Component implements IDisplayText {
 		}
 	}
 
-	private _updateDisplayOrder(isOpen: boolean): void {
-		if (isOpen && this._moveDropDownToStage()) return;
-		if (!isOpen && this._restoreDropDownParent()) return;
+	private _updateDisplayOrder(isOpen: boolean, dropDown = this.dropDown): void {
+		if (isOpen && this._moveDropDownToStage()) {
+			return;
+		}
+		if (!isOpen && this._restoreDropDownParent(dropDown)) {
+			return;
+		}
 		const parent = this.parent;
 		if (!parent) return;
 		// A Group layout uses child index as layout order. Moving the ComboBox to
@@ -325,8 +353,7 @@ export class ComboBox extends Component implements IDisplayText {
 		return true;
 	}
 
-	private _restoreDropDownParent(): boolean {
-		const dropDown = this.dropDown;
+	private _restoreDropDownParent(dropDown = this.dropDown): boolean {
 		const parent = this._dropDownParent;
 		const matrix = this._dropDownLocalMatrix;
 		if (!dropDown || !parent || !matrix) return false;

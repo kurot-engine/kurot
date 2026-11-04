@@ -1,12 +1,14 @@
 # track
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get track(): DisplayObject | undefined;
 set track(value: DisplayObject | undefined);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+**skinPart**
+
+
 
 Related types: [DisplayObject](../../../../core/docs/api/DisplayObject-class.md).

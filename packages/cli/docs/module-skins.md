@@ -1,6 +1,6 @@
 # Module Skin factories
 
-CLI 3.9.0 adds `ui.skinRegistration: 'module'` for applications that own their
+Use `ui.skinRegistration: 'module'` for applications that own their
 Skin registry. The CLI remains build-time tooling over ui-document ^0.13.0;
 it does not acquire Core/UI runtime dependencies.
 
@@ -25,11 +25,10 @@ hardcoding a development filename or adding the resource version query to JS.
 
 ## Loading into UIContext
 
-This example requires UI >= 3.7.0 within 3.x for `UIContext` and `SkinFactory`.
+This workflow uses UI 4 with CLI 4 for `UIContext`, `SkinFactory` and validated fields.
 See the
 [UI context contract](../../ui/docs/ui-context.md) for local resolution rules.
 The module output can also be consumed by an application's own factory registry.
-Existing global applications need no UI upgrade for CLI 3.9.0.
 
 Load fonts and resources before calling this function. Core's resolveResourceUrl
 in this example requires Core >= 2.7.0 within 2.x and applies optional release

@@ -1,6 +1,6 @@
 # ScrollBarBase
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ScrollBarBase extends Component
@@ -108,6 +108,7 @@ Related types: [Component](Component-class.md).
 | `getElementAt` | public, inherited | [open](ScrollBarBase-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](ScrollBarBase-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](ScrollBarBase-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](ScrollBarBase-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](ScrollBarBase-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](ScrollBarBase-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](ScrollBarBase-class/globalToLocal-method.md) |
@@ -122,8 +123,8 @@ Related types: [Component](Component-class.md).
 | `notifyListener` | protected, inherited | [open](ScrollBarBase-class/notifyListener-method.md) |
 | `once` | public, inherited | [open](ScrollBarBase-class/once-method.md) |
 | `onPropertyChanged` | protected | [open](ScrollBarBase-class/onPropertyChanged-method.md) |
-| `onSkinReady` | protected | [open](ScrollBarBase-class/onSkinReady-method.md) |
-| `onSkinRemoved` | protected | [open](ScrollBarBase-class/onSkinRemoved-method.md) |
+| `onSkinReady` | protected, inherited | [open](ScrollBarBase-class/onSkinReady-method.md) |
+| `onSkinRemoved` | protected, inherited | [open](ScrollBarBase-class/onSkinRemoved-method.md) |
 | `removeChild` | public, inherited | [open](ScrollBarBase-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](ScrollBarBase-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](ScrollBarBase-class/removeChildren-method.md) |

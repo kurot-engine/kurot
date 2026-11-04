@@ -1,6 +1,6 @@
 # TextInput
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class TextInput extends Component implements IDisplayText
@@ -115,6 +115,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `getElementAt` | public, inherited | [open](TextInput-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](TextInput-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](TextInput-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](TextInput-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](TextInput-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](TextInput-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](TextInput-class/globalToLocal-method.md) |

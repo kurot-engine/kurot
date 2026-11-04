@@ -15,6 +15,7 @@ import {
 import { refreshGeneratedNamespaceEntries } from './plugins/compile-custom-namespaces.js';
 import { refreshProjectComponents } from './components/discover-components.js';
 import { createResourceAssetSync } from './resource-asset-sync.js';
+import { rebuildSkinPartSources } from './kui/skin-part-watch.js';
 import { watchResourceDirectory } from './resource-watcher.js';
 import { KUI_THEME_OUTPUT_PATH } from './project.js';
 import { watchStageConfiguration } from './config-watcher.js';
@@ -162,6 +163,7 @@ function watchResources(
 						try {
 							if (compile) {
 								await compileKUI().apply(ctx);
+								await rebuildSkinPartSources(ctx);
 								await writeComponentCatalog().apply(ctx);
 							}
 							await syncAssets();
@@ -231,8 +233,9 @@ function watchComponents(
 
 					try {
 						await refreshProjectComponents(project);
-						await refreshGeneratedNamespaceEntries(ctx);
 						await compileKUI().apply(ctx);
+						await refreshGeneratedNamespaceEntries(ctx, false);
+						await rebuildSkinPartSources(ctx);
 						await writeComponentCatalog().apply(ctx);
 						await syncAssets();
 						emitDiagnostics(ctx, options);

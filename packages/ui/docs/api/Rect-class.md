@@ -1,6 +1,6 @@
 # Rect
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Rect extends Component
@@ -108,6 +108,7 @@ Related types: [Component](Component-class.md).
 | `getElementAt` | public, inherited | [open](Rect-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Rect-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Rect-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](Rect-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Rect-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Rect-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Rect-class/globalToLocal-method.md) |

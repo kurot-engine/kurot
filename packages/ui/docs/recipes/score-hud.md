@@ -34,8 +34,12 @@ Save as `src/components/hud/ScoreHUD.ts`:
 ```ts
 import { TouchEvent } from '@kurot/core';
 import { Component } from '@kurot/ui';
+import type { Button, Label } from '@kurot/ui';
 
 export class ScoreHUD extends Component<'components.hud.ScoreHUDSkin'> {
+  declare scoreLabel: Label;
+  declare restartButton: Button;
+
   private _score = 0;
   private readonly _onRestart = (): void => {
     this.dispatchEventWith('restartRequested');
@@ -48,20 +52,20 @@ export class ScoreHUD extends Component<'components.hud.ScoreHUDSkin'> {
   public set score(value: number) {
     this._score = value;
     if (this.skinReady) {
-      this.skinParts.scoreLabel.text = `Score: ${value}`;
+      this.scoreLabel.text = `Score: ${value}`;
     }
   }
 
   protected override onSkinReady(): void {
     super.onSkinReady();
-    this.skinParts.scoreLabel.text = `Score: ${this._score}`;
-    this.skinParts.restartButton.addEventListener(
+    this.scoreLabel.text = `Score: ${this._score}`;
+    this.restartButton.addEventListener(
       TouchEvent.TOUCH_TAP, this._onRestart,
     );
   }
 
   protected override onSkinRemoved(): void {
-    this.skinParts.restartButton.removeEventListener(
+    this.restartButton.removeEventListener(
       TouchEvent.TOUCH_TAP, this._onRestart,
     );
     super.onSkinRemoved();
@@ -69,9 +73,9 @@ export class ScoreHUD extends Component<'components.hud.ScoreHUDSkin'> {
 }
 ```
 
-The generated theme pairs ScoreHUD with its Skin. No constructor skinParts
-access, dynamic field injection or hand-authored declaration is needed. Setting
-score before attachment is safe because onSkinReady renders the saved value.
+The generated theme pairs ScoreHUD with its Skin. Component binds the declared
+fields before onSkinReady and clears them after onSkinRemoved. Setting score
+before attachment is safe because onSkinReady renders the saved value.
 
 ## Scene-owned attachment and cleanup
 
@@ -154,7 +158,7 @@ generated theme JSON maps ScoreHUD to components.hud.ScoreHUDSkin and that the
 part declarations type scoreLabel as Label and restartButton as Button.
 
 Run development and release builds followed by strict TypeScript checking with
-skipLibCheck=false. Use the generated getter declaration for skinParts; rebuild
-it from the authored Skin rather than adding casts or editing declarations.
+skipLibCheck=false. CLI validates the declare fields against authored Skin types;
+rebuild tooling declarations from the inputs rather than adding casts.
 Serve the host game and verify startup, visual bounds and repeated open/restart/
 close with its actual fonts, resources and theme readiness.

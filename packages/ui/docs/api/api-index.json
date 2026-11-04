@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "3.7.1",
+  "version": "4.0.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -1010,6 +1010,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "BitmapLabel-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "BitmapLabel-class/getTransformedBounds-method.md",
           "protected": false,
@@ -1792,6 +1798,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "Button-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "Button-class/getTransformedBounds-method.md",
           "protected": false,
@@ -1879,7 +1891,7 @@
           "name": "onSkinRemoved",
           "file": "Button-class/onSkinRemoved-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "removeChild",
@@ -2571,6 +2583,12 @@
           "name": "getPreferredBounds",
           "file": "CheckBox-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "CheckBox-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -3771,6 +3789,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "ComboBox-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "ComboBox-class/getTransformedBounds-method.md",
           "protected": false,
@@ -4508,6 +4532,12 @@
           "name": "getPreferredBounds",
           "file": "Component-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "Component-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": false
         },
         {
@@ -6392,6 +6422,12 @@
           "name": "getPreferredBounds",
           "file": "EditableText-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "EditableText-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -8302,6 +8338,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "HScrollBar-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "HScrollBar-class/getTransformedBounds-method.md",
           "protected": false,
@@ -9087,6 +9129,12 @@
           "name": "getPreferredBounds",
           "file": "HSlider-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "HSlider-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -10452,6 +10500,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "Image-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "Image-class/getTransformedBounds-method.md",
           "protected": false,
@@ -11237,6 +11291,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "ItemRenderer-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "ItemRenderer-class/getTransformedBounds-method.md",
           "protected": false,
@@ -11324,7 +11384,7 @@
           "name": "onSkinRemoved",
           "file": "ItemRenderer-class/onSkinRemoved-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "removeChild",
@@ -13144,6 +13204,12 @@
           "name": "getPreferredBounds",
           "file": "Label-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "Label-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -15971,6 +16037,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "Panel-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "Panel-class/getTransformedBounds-method.md",
           "protected": false,
@@ -16753,6 +16825,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "ProgressBar-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "ProgressBar-class/getTransformedBounds-method.md",
           "protected": false,
@@ -16834,13 +16912,13 @@
           "name": "onSkinReady",
           "file": "ProgressBar-class/onSkinReady-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "onSkinRemoved",
           "file": "ProgressBar-class/onSkinRemoved-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "removeChild",
@@ -17825,6 +17903,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "RadioButton-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "RadioButton-class/getTransformedBounds-method.md",
           "protected": false,
@@ -18681,6 +18765,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "Range-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "Range-class/getTransformedBounds-method.md",
           "protected": false,
@@ -19475,6 +19565,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "Rect-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "Rect-class/getTransformedBounds-method.md",
           "protected": false,
@@ -20248,6 +20344,12 @@
           "name": "getPreferredBounds",
           "file": "RichLabel-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "RichLabel-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -21029,6 +21131,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "ScrollBarBase-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "ScrollBarBase-class/getTransformedBounds-method.md",
           "protected": false,
@@ -21116,13 +21224,13 @@
           "name": "onSkinReady",
           "file": "ScrollBarBase-class/onSkinReady-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "onSkinRemoved",
           "file": "ScrollBarBase-class/onSkinRemoved-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "removeChild",
@@ -21815,6 +21923,12 @@
           "file": "Scroller-class/getPreferredBounds-method.md",
           "protected": false,
           "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "Scroller-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
         },
         {
           "name": "getTransformedBounds",
@@ -23192,6 +23306,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "SliderBase-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "SliderBase-class/getTransformedBounds-method.md",
           "protected": false,
@@ -23279,13 +23399,13 @@
           "name": "onSkinReady",
           "file": "SliderBase-class/onSkinReady-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "onSkinRemoved",
           "file": "SliderBase-class/onSkinRemoved-method.md",
           "protected": true,
-          "inherited": false
+          "inherited": true
         },
         {
           "name": "pointToValue",
@@ -24867,6 +24987,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "TextInput-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": false
+        },
+        {
           "name": "getTransformedBounds",
           "file": "TextInput-class/getTransformedBounds-method.md",
           "protected": false,
@@ -25991,6 +26117,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "ToggleButton-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "ToggleButton-class/getTransformedBounds-method.md",
           "protected": false,
@@ -26770,6 +26902,12 @@
           "name": "getPreferredBounds",
           "file": "ToggleSwitch-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "ToggleSwitch-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {
@@ -30041,6 +30179,12 @@
           "inherited": true
         },
         {
+          "name": "getSkinPartValidator",
+          "file": "VScrollBar-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
           "name": "getTransformedBounds",
           "file": "VScrollBar-class/getTransformedBounds-method.md",
           "protected": false,
@@ -30826,6 +30970,12 @@
           "name": "getPreferredBounds",
           "file": "VSlider-class/getPreferredBounds-method.md",
           "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "VSlider-class/getSkinPartValidator-method.md",
+          "protected": true,
           "inherited": true
         },
         {

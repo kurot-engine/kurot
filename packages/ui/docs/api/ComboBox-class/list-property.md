@@ -1,11 +1,13 @@
 # list
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 list?: List;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+**skinPart**
+
+
 
 Related types: [List](../List-class.md).

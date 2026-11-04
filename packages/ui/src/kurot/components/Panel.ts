@@ -20,7 +20,13 @@ import { Label } from './Label.js';
 export class Panel extends Component {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public closeButton?: Button;
+	/**
+	 * @skinPart
+	 */
 	public moveArea?: DisplayObject;
 
 	private _title = '';
@@ -58,6 +64,9 @@ export class Panel extends Component {
 		this.invalidateProperties();
 	}
 
+	/**
+	 * @skinPart
+	 */
 	public get titleDisplay(): Label | undefined {
 		return this._titleDisplay;
 	}
@@ -95,29 +104,42 @@ export class Panel extends Component {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'titleDisplay') {
+			return value => value instanceof Label;
+		}
+		if (name === 'closeButton') {
+			return value => value instanceof Button;
+		}
+		if (name === 'moveArea') {
+			return value => value instanceof DisplayObject;
+		}
+		return super.getSkinPartValidator(name);
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { titleDisplay, closeButton, moveArea } = this.skinParts;
-		if (titleDisplay instanceof Label) {
-			this.titleDisplay = titleDisplay;
+		if (this.titleDisplay && this._title) {
+			this.titleDisplay.text = this._title;
 		}
+		const { closeButton, moveArea } = this;
 		if (closeButton instanceof Button) {
-			this.closeButton = closeButton;
 			closeButton.addEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
 		}
 		if (moveArea instanceof DisplayObject) {
-			this.moveArea = moveArea;
 			moveArea.addEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
 		}
 	}
 
 	protected override onSkinRemoved(): void {
-		this.closeButton?.removeEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
+		const { closeButton, moveArea } = this.skinParts;
+		if (closeButton instanceof Button) {
+			closeButton.removeEventListener(TouchEvent.TOUCH_TAP, this._onCloseButtonTap);
+		}
 		this._removeDragListeners();
-		this.moveArea?.removeEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
-		this.titleDisplay = undefined;
-		this.closeButton = undefined;
-		this.moveArea = undefined;
+		if (moveArea instanceof DisplayObject) {
+			moveArea.removeEventListener(TouchEvent.TOUCH_BEGIN, this._onMoveAreaTouchBegin);
+		}
 		super.onSkinRemoved();
 	}
 

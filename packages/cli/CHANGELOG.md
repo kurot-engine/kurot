@@ -7,6 +7,52 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 4.0.0 — 2026-11-04
+
+Published; exact version, npm latest and downloaded archive SHA-512 integrity
+verified on 2026-11-04. All 277 archived files match the locally prepared release.
+
+### Breaking
+
+- Validate direct Skin fields against actual project/SDK types before installing
+  Skin output. New declare fields on associated views describe required or optional
+  parts; reject missing required parts, incompatible types, emitted initializers
+  and host-member conflicts. Native slots retain their SDK type contracts.
+- Require UI 4's runtime binding contract for declared fields. Report stable
+  KUROT_KUI_PART_BINDING_INVALID diagnostics with source positions. This tightens
+  builds that previously passed through esbuild without part-contract checking.
+
+### Added
+
+- Resolve component pairs, literal skinName assignments, generic literal/unions
+  and naming conventions through TypeScript syntax instead of source regex.
+  Read SDK/project declarations without executing application modules.
+- Revalidate application and namespace watch rebuilds, retain last good JavaScript
+  and declaration output on failure, and retry source contexts after corrected KUI.
+- Move the existing TypeScript ^5.6.0 dependency into CLI runtime dependencies,
+  preserving the locked 5.9.3 version. Update current guides for declare fields
+  and concrete-view access in Presenters and view-specific helpers.
+
+### Compatibility
+
+- Keep ui-document ^0.13.0 and the existing 0.13.2 lock. KUI XML, resource and
+  generated Skin factory formats are unchanged; CLI adds no Core/UI dependency.
+- Core and ui-document require no release. Existing CLI 3 ranges/pins require
+  deliberate adoption of this major. CLI starters, engine example dependencies
+  and external Templates remain unchanged pending publication.
+
+### Verification
+
+- Build and all 176 tests pass across 32 files; frozen offline installation
+  accepts the updated manifest/lock. New declaration, pipeline and watch cases
+  cover diagnostics, inherited/optional fields, native types, rejected output
+  installation and recovery while preserving the last good output.
+- Packed CLI 4 / UI 4 with downloaded, integrity-verified Core 2.8.0 pass four
+  strict builds: development and minified release, each with module/global
+  registration. Complete consumer declarations pass with skipLibCheck=false.
+  Browser interaction verifies direct fields, concrete-view helpers, early
+  construction, clicks, Slider dragging, replacement and listener/field cleanup.
+
 ## 3.9.0 — 2026-11-01
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

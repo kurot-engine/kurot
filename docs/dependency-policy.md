@@ -38,8 +38,9 @@ The manifests are authoritative. Current Kurot package requirements are:
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
 
 Third-party tools are separate from this graph. Core's linebreak package is a
-runtime dependency; Atlas's PNG adapter uses pngjs. TypeScript, Vitest, esbuild
-used by tests, and browser test tools are development dependencies. The CLI's
+runtime dependency; Atlas's PNG adapter uses pngjs. SDK build compilers, Vitest,
+test-only esbuild and browser tools are development dependencies. TypeScript is
+an ordinary CLI dependency for semantic Skin-field checks. The CLI's
 esbuild, parse5 and postcss-value-parser are dependencies of the build tool,
 not game runtime dependencies.
 

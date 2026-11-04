@@ -1,6 +1,6 @@
 # ToggleSwitch
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ToggleSwitch extends ToggleButton
@@ -110,6 +110,7 @@ Related types: [ToggleButton](ToggleButton-class.md).
 | `getElementAt` | public, inherited | [open](ToggleSwitch-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](ToggleSwitch-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](ToggleSwitch-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](ToggleSwitch-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](ToggleSwitch-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](ToggleSwitch-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](ToggleSwitch-class/globalToLocal-method.md) |

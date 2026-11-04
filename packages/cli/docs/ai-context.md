@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@3.9.0` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@4.0.0` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -46,7 +46,7 @@ when using the new tags; other controls need no incidental engine upgrade.
 `ui.skinRegistration: "module"` exports `skinFactories` without global writes.
 Both modes export the map; the default global mode retains Theme registration.
 Read [module skins](module-skins.md) for loading the generated defaults and hashed
-module into a local UIContext. That integration needs UI >= 3.7.0 within 3.x.
+module into a local UIContext. The current field-binding workflow uses UI 4.
 The CLI mode does not require
 upgrading existing global applications or add a Core/UI dependency to CLI.
 
@@ -90,9 +90,17 @@ as the part name. Internal nodes can omit `id`; the declaration augments
 component classes. The file is development metadata and is excluded from
 runtime output.
 
-The generator narrows host `skinParts` through a getter signature,
-preserving Component's accessor kind under `skipLibCheck=false`. Regenerate after
+The generator narrows otherwise untyped host `skinParts` through a getter signature,
+preserving explicit generic Skin types and Component's accessor kind under `skipLibCheck=false`. Regenerate after
 authored Skin changes; keep generated declarations out of manual edits.
+
+Application classes use type-only `declare` fields and direct access. The CLI
+uses TypeScript as a Node-side runtime dependency to resolve actual SDK/project
+types, inherited fields, optional variants and native `@skinPart` slots. Syntax
+analysis discovers host associations without regex or project execution. Validation
+runs before output installation and on application/namespace watch rebuilds.
+Failed watch builds retain last good JS/declarations; corrected KUI retries them.
+See [field checks](skin-part-fields.md).
 
 ## Reusable components
 

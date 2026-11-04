@@ -18,7 +18,13 @@ import type { IDisplayText } from '../core/IDisplayText.js';
 export class TextInput extends Component implements IDisplayText {
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public textDisplay?: EditableText;
+	/**
+	 * @skinPart
+	 */
 	public promptDisplay?: Label;
 
 	private _prompt = '';
@@ -115,11 +121,20 @@ export class TextInput extends Component implements IDisplayText {
 		return hasPrompt && this.skin?.hasState('normalWithPrompt') ? 'normalWithPrompt' : 'normal';
 	}
 
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'textDisplay') {
+			return value => value instanceof EditableText;
+		}
+		if (name === 'promptDisplay') {
+			return value => value instanceof Label;
+		}
+		return super.getSkinPartValidator(name);
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { textDisplay, promptDisplay } = this.skinParts;
+		const { textDisplay, promptDisplay } = this;
 		if (textDisplay instanceof EditableText) {
-			this.textDisplay = textDisplay;
 			if (this._text) textDisplay.text = this._text;
 			if (this._textColor != null) textDisplay.textColor = this._textColor;
 			if (this._displayAsPassword) textDisplay.displayAsPassword = true;
@@ -130,7 +145,6 @@ export class TextInput extends Component implements IDisplayText {
 			textDisplay.addEventListener(Event.FOCUS_OUT, this._onFocusOut);
 		}
 		if (promptDisplay instanceof Label) {
-			this.promptDisplay = promptDisplay;
 			promptDisplay.touchEnabled = false;
 			if (this._prompt) promptDisplay.text = this._prompt;
 		}
@@ -143,12 +157,13 @@ export class TextInput extends Component implements IDisplayText {
 			this._displayAsPassword = this.textDisplay.displayAsPassword;
 			this._maxChars = this.textDisplay.maxChars;
 			this._restrict = this.textDisplay.restrict ?? '';
-			this.textDisplay.removeEventListener(Event.FOCUS_IN, this._onFocusIn);
-			this.textDisplay.removeEventListener(Event.FOCUS_OUT, this._onFocusOut);
+		}
+		const { textDisplay } = this.skinParts;
+		if (textDisplay instanceof EditableText) {
+			textDisplay.removeEventListener(Event.FOCUS_IN, this._onFocusIn);
+			textDisplay.removeEventListener(Event.FOCUS_OUT, this._onFocusOut);
 		}
 		if (this.promptDisplay) this._prompt = this.promptDisplay.text;
-		this.textDisplay = undefined;
-		this.promptDisplay = undefined;
 		super.onSkinRemoved();
 	}
 

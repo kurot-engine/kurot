@@ -1,6 +1,6 @@
 # iconDisplay
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 iconDisplay?: Image;
@@ -8,6 +8,8 @@ iconDisplay?: Image;
 
 Inherited from `iconDisplay`; shown with this receiver's substituted types.
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+**skinPart**
+
+
 
 Related types: [Image](../Image-class.md).

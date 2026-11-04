@@ -38,7 +38,13 @@ export class Scroller extends Component {
 
 	// ── Instance fields ───────────────────────────────────────────────────
 
+	/**
+	 * @skinPart
+	 */
 	public horizontalScrollBar?: HScrollBar;
+	/**
+	 * @skinPart
+	 */
 	public verticalScrollBar?: VScrollBar;
 	/**
 	 * Throw/inertia speed multiplier, defaulting to 1. Prefer throwSpeed when
@@ -196,18 +202,26 @@ export class Scroller extends Component {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'horizontalScrollBar') {
+			return value => value instanceof HScrollBar;
+		}
+		if (name === 'verticalScrollBar') {
+			return value => value instanceof VScrollBar;
+		}
+		return super.getSkinPartValidator(name);
+	}
+
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		const { horizontalScrollBar, verticalScrollBar } = this.skinParts;
+		const { horizontalScrollBar, verticalScrollBar } = this;
 		if (horizontalScrollBar instanceof HScrollBar) {
-			this.horizontalScrollBar = horizontalScrollBar;
 			horizontalScrollBar.touchChildren = false;
 			horizontalScrollBar.touchEnabled = false;
 			horizontalScrollBar.viewport = this._viewport;
 			if (horizontalScrollBar.autoVisibility) horizontalScrollBar.visible = false;
 		}
 		if (verticalScrollBar instanceof VScrollBar) {
-			this.verticalScrollBar = verticalScrollBar;
 			verticalScrollBar.touchChildren = false;
 			verticalScrollBar.touchEnabled = false;
 			verticalScrollBar.viewport = this._viewport;
@@ -216,10 +230,13 @@ export class Scroller extends Component {
 	}
 
 	protected override onSkinRemoved(): void {
-		if (this.horizontalScrollBar) this.horizontalScrollBar.viewport = undefined;
-		if (this.verticalScrollBar) this.verticalScrollBar.viewport = undefined;
-		this.horizontalScrollBar = undefined;
-		this.verticalScrollBar = undefined;
+		const { horizontalScrollBar, verticalScrollBar } = this.skinParts;
+		if (horizontalScrollBar instanceof HScrollBar) {
+			horizontalScrollBar.viewport = undefined;
+		}
+		if (verticalScrollBar instanceof VScrollBar) {
+			verticalScrollBar.viewport = undefined;
+		}
 		super.onSkinRemoved();
 	}
 

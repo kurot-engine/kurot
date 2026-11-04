@@ -69,7 +69,7 @@ an exact node and property path.
 The future model must not inherit EXML namespaces, reflection rules, global
 component exports, stringly typed attributes, or EUI-specific skin lookup merely
 for compatibility. Legacy EXML projects remain on the independent CLI 1.3.x
-line. Current CLI 3.6.1 compiles KUI XML.
+line. Current CLI 4.0.0 compiles KUI XML and validates declared part fields.
 
 ### 1.5 Serialization syntax is not the semantic model
 

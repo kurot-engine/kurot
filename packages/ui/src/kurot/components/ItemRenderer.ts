@@ -20,6 +20,7 @@ export class ItemRenderer<TSkin extends string = string> extends Component<TSkin
 	/**
 	 * Skin part that displays the item label.
 	 * When present, `data` is automatically synchronized to its text.
+	 * @skinPart
 	 */
 	public labelDisplay?: Label;
 
@@ -65,18 +66,19 @@ export class ItemRenderer<TSkin extends string = string> extends Component<TSkin
 		super.$onRemoveFromStage();
 	}
 
-	protected override onSkinReady(): void {
-		super.onSkinReady();
-		const { labelDisplay } = this.skinParts as Readonly<{ labelDisplay?: unknown }>;
-		if (labelDisplay instanceof Label) {
-			this.labelDisplay = labelDisplay;
-			this._syncLabel();
+	protected override getSkinPartValidator(name: string): ((value: unknown) => boolean) | undefined {
+		if (name === 'labelDisplay') {
+			return value => value instanceof Label;
 		}
+		return super.getSkinPartValidator(name);
 	}
 
-	protected override onSkinRemoved(): void {
-		this.labelDisplay = undefined;
-		super.onSkinRemoved();
+	protected override onSkinReady(): void {
+		super.onSkinReady();
+		const { labelDisplay } = this;
+		if (labelDisplay instanceof Label) {
+			this._syncLabel();
+		}
 	}
 
 	protected override getCurrentState(): string {

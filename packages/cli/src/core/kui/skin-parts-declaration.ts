@@ -1,6 +1,5 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import type { Dirent } from 'node:fs';
+import { collectSkinHosts } from './skin-hosts.js';
 import type { SkinIR, SkinNode } from './ast.js';
 import type { Project } from '../project.js';
 
@@ -13,12 +12,6 @@ interface SkinPartType {
 	readonly name: string;
 	readonly className: string;
 	readonly module: string;
-}
-
-interface SkinHostType {
-	readonly className: string;
-	readonly module: string;
-	readonly skinName: string;
 }
 
 /**
@@ -59,11 +52,14 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 	lines.push('\t}', '}', '');
 
 	for (const host of hosts) {
+		if (host.explicitSkinType) {
+			continue;
+		}
 		// Preserve Component's accessor kind when narrowing the inherited member.
 		lines.push(
 			`declare module ${JSON.stringify(host.module)} {`,
 			`\tinterface ${host.className} {`,
-			`\t\tget skinParts(): import("@kurot/ui").SkinPartsOf<${JSON.stringify(host.skinName)}>;`,
+			`\t\tget skinParts(): import("@kurot/ui").SkinPartsOf<${host.skinNames.map(name => JSON.stringify(name)).join(' | ')}>;`,
 			'\t}',
 			'}',
 			'',
@@ -73,143 +69,6 @@ export async function generateSkinPartsDeclaration(project: Project, skins: read
 	lines.push('export {};', '');
 
 	return lines.join('\n');
-}
-
-/**
- * Finds project classes whose skin is selected explicitly, by reusable-component
- * configuration, or by an unambiguous `<ClassName>Skin` naming convention.
- */
-async function collectSkinHosts(
-	project: Project,
-	declarationFile: string,
-	skinNames: readonly string[],
-): Promise<SkinHostType[]> {
-	const files = await collectTypeScriptFiles(project.srcDir);
-	const hosts = new Map<string, SkinHostType>();
-	const skinNameSet = new Set(skinNames);
-
-	for (const component of project.components) {
-		if (!skinNameSet.has(component.skinClass)) {
-			continue;
-		}
-
-		const relative = path.relative(path.dirname(declarationFile), component.source).replace(/\.tsx?$/, '.js');
-		const module = toModuleSpecifier(relative);
-		hosts.set(module, {
-			className: component.name,
-			module,
-			skinName: component.skinClass,
-		});
-	}
-
-	for (const file of files) {
-		const className = path.basename(file).replace(/\.tsx?$/, '');
-		if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(className)) {
-			continue;
-		}
-
-		const source = stripComments(await fs.readFile(file, 'utf-8'));
-		if (!hasNamedClassExport(source, className)) {
-			continue;
-		}
-
-		const match = /\bthis\.skinName\s*=\s*(['"])([^'"]+)\1/.exec(source);
-		const explicitSkinName = match?.[2];
-		if (explicitSkinName && !skinNameSet.has(explicitSkinName)) {
-			continue;
-		}
-		const conventionalSkinNames = skinNames.filter(
-			skinName => getSkinShortName(skinName) === `${className}Skin`,
-		);
-		const skinName = explicitSkinName ?? (conventionalSkinNames.length === 1 ? conventionalSkinNames[0] : undefined);
-		if (!skinName) {
-			continue;
-		}
-
-		const relative = path.relative(path.dirname(declarationFile), file).replace(/\.tsx?$/, '.js');
-		const module = toModuleSpecifier(relative);
-		hosts.set(module, {
-			className,
-			module,
-			skinName,
-		});
-	}
-
-	return [...hosts.values()].sort((a, b) => a.module.localeCompare(b.module));
-}
-
-/**
- * Extracts the final segment of a qualified Skin name.
- */
-function getSkinShortName(skinName: string): string {
-	return skinName.slice(skinName.lastIndexOf('.') + 1);
-}
-
-/**
- * Collects project TypeScript files while excluding declaration files.
- */
-async function collectTypeScriptFiles(directory: string): Promise<string[]> {
-	const files: string[] = [];
-
-	/**
-	 * Traverses source directories while tolerating missing directories.
-	 */
-	async function walk(current: string): Promise<void> {
-		let entries: Dirent[];
-
-		try {
-			entries = await fs.readdir(current, { withFileTypes: true });
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-				return;
-			}
-			throw error;
-		}
-
-		for (const entry of entries) {
-			const absolute = path.join(current, entry.name);
-			if (entry.isDirectory()) {
-				await walk(absolute);
-			} else if (entry.isFile() && /\.tsx?$/.test(entry.name) && !entry.name.endsWith('.d.ts')) {
-				files.push(absolute);
-			}
-		}
-	}
-
-	await walk(directory);
-
-	return files.sort();
-}
-
-/**
- * Removes comments before inspecting class and Skin declarations.
- */
-function stripComments(source: string): string {
-	return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-}
-
-/**
- * Checks whether the source exports the expected host class.
- */
-function hasNamedClassExport(source: string, className: string): boolean {
-	const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-	if (new RegExp(`\\bexport\\s+(?:default\\s+)?class\\s+${escaped}\\b`).test(source)) {
-		return true;
-	}
-
-	const declared = new RegExp(`\\bclass\\s+${escaped}\\b`).test(source);
-	const exported = new RegExp(`\\bexport\\s*\\{[^}]*\\b${escaped}\\b[^}]*\\}`, 's').test(source);
-
-	return declared && exported;
-}
-
-/**
- * Formats a relative ESM module specifier with normalized separators.
- */
-function toModuleSpecifier(value: string): string {
-	const normalized = value.split(path.sep).join('/');
-	return normalized.startsWith('.') ? normalized : `./${normalized}`;
 }
 
 /**

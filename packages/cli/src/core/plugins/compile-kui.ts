@@ -5,7 +5,9 @@ import { writeFile } from '../../utils/fs.js';
 import { logger } from '../../utils/logger.js';
 import { DIAGNOSTIC_CODES } from '../diagnostics/index.js';
 import { buildSkinsModule } from '../kui/skin-module-builder.js';
-import { generateSkinPartsDeclaration, SKIN_PARTS_DECLARATION_PATH } from '../kui/skin-parts-declaration.js';
+import { SKIN_PARTS_DECLARATION_PATH } from '../kui/skin-parts-declaration.js';
+import { builtinSkinHost } from '../kui/builtin-skin-hosts.js';
+import { validatePartDeclarations } from '../kui/skin-part-validation.js';
 import { BuildError } from '../errors.js';
 import { KUI_THEME_OUTPUT_PATH } from '../project.js';
 import type { Dirent } from 'node:fs';
@@ -17,24 +19,6 @@ import type { ProjectComponent } from '../project.js';
 interface ParsedSkin {
 	readonly skin: CompiledSkin;
 }
-
-const DEFAULT_BUILTIN_COMPONENTS = new Set([
-	'Button',
-	'CheckBox',
-	'ComboBox',
-	'HScrollBar',
-	'HSlider',
-	'ItemRenderer',
-	'Panel',
-	'ProgressBar',
-	'RadioButton',
-	'Scroller',
-	'TextInput',
-	'ToggleButton',
-	'ToggleSwitch',
-	'VScrollBar',
-	'VSlider',
-]);
 
 interface GeneratedTheme {
 	readonly skins: Readonly<Record<string, string>>;
@@ -60,6 +44,7 @@ export function compileKUI(): BuildPlugin {
 				DIAGNOSTIC_CODES.KUI_UNKNOWN_TAG,
 				DIAGNOSTIC_CODES.KUI_COMPILE_FAILED,
 				DIAGNOSTIC_CODES.KUI_DUPLICATE_DEFAULT,
+				DIAGNOSTIC_CODES.KUI_PART_BINDING_INVALID,
 			]);
 
 			const files = await collectKUIFiles(project.uiSourceDir, project.resourceDir);
@@ -70,6 +55,7 @@ export function compileKUI(): BuildPlugin {
 			if (parsed.length === 0) {
 				await fs.rm(path.join(project.root, SKIN_PARTS_DECLARATION_PATH), { force: true });
 				delete ctx.outputs.skinPartsDeclaration;
+				delete ctx.outputs.validateSkinParts;
 				logger.step('no KUI Skin files found, skipping');
 				return;
 			}
@@ -78,13 +64,22 @@ export function compileKUI(): BuildPlugin {
 
 			throwIfInputInvalid(ctx);
 
-			const built = await buildSkinsModule(ctx, parsed.map(item => item.skin));
+			let declaration = '';
+			const skinFiles = new Map(parsed.map(item => [item.skin.className, item.skin.file.relPath]));
+			const built = await buildSkinsModule(ctx, parsed.map(item => item.skin), async skins => {
+				const result = await validatePartDeclarations(project, skins, skinFiles);
+				declaration = result.declaration;
+				for (const diagnostic of result.diagnostics) {
+					reportDiagnostic(ctx, diagnostic);
+				}
+				throwIfInputInvalid(ctx);
+			});
 
 			ctx.outputs.skinsScript = `js/${built.filename}`;
 			ctx.outputs.skinPartsDeclaration = SKIN_PARTS_DECLARATION_PATH;
 			await writeFile(
 				path.join(project.root, SKIN_PARTS_DECLARATION_PATH),
-				await generateSkinPartsDeclaration(project, built.skins),
+				declaration,
 			);
 
 			const relativeScript = toPosix(path.relative(
@@ -97,6 +92,22 @@ export function compileKUI(): BuildPlugin {
 				path.join(project.outputDir, KUI_THEME_OUTPUT_PATH),
 				JSON.stringify(theme, undefined, '\t'),
 			);
+			let pending: Promise<{ declaration: string; diagnostics: readonly Diagnostic[] }> | undefined;
+			const revalidate = (): Promise<{ declaration: string; diagnostics: readonly Diagnostic[] }> => {
+				pending ??= (async () => {
+					const result = await validatePartDeclarations(project, built.skins, skinFiles);
+					if (ctx.outputs.validateSkinParts !== revalidate) {
+						return ctx.outputs.validateSkinParts?.() ?? { declaration: '', diagnostics: [] };
+					}
+					ctx.diagnostics.removeByCodes([DIAGNOSTIC_CODES.KUI_PART_BINDING_INVALID]);
+					for (const diagnostic of result.diagnostics) {
+						ctx.diagnostics.report(diagnostic);
+					}
+					return result;
+				})().finally(() => { pending = undefined; });
+				return pending;
+			};
+			ctx.outputs.validateSkinParts = revalidate;
 			logger.step(`compiled ${parsed.length} KUI skin(s) → ${ctx.outputs.skinsScript}`);
 		},
 	};
@@ -173,15 +184,7 @@ function defaultComponentName(
 		return projectComponent.name;
 	}
 
-	const shortName = skinClass.split('.').pop();
-
-	if (!shortName?.endsWith('Skin')) {
-		return undefined;
-	}
-
-	const componentName = shortName.slice(0, -'Skin'.length);
-
-	return DEFAULT_BUILTIN_COMPONENTS.has(componentName) ? componentName : undefined;
+	return builtinSkinHost(skinClass);
 }
 
 /**

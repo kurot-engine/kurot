@@ -1,9 +1,10 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **3.9.0** (published on npm).
+resource watching. Package version: **4.0.0** (published on npm).
 Requires Node.js >= 20 and
 ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
+UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
 
 For UI production use the installed UI [authoring guide](../ui/docs/ui-authoring.md)
 and [ScoreHUD recipe](../ui/docs/recipes/score-hud.md). Legacy EXML projects use
@@ -16,7 +17,7 @@ dependency. New scaffolds use Core ^2.7.0 for release resource versioning and ca
 stage-attribute startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@3.9.0 create my-game
+npx @kurot/cli@4.0.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -24,7 +25,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^3.9.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^4.0.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -153,9 +154,8 @@ Load `resource/default.thm.json`, resolve its `skinsJs` relative to that JSON UR
 and dynamically import `skinFactories`. This also locates the hashed release
 module; avoid hardcoding `default.thm.js`. Use the JSON's `skins` as local default
 mappings. See [module skins](docs/module-skins.md) for a complete UIContext loader
-and resource/lifecycle ownership. That integration requires UI >= 3.7.0 within
-3.x for UIContext. Default global applications retain their
-existing UI requirements. Changing registration during dev requires restarting
+and resource/lifecycle ownership. Use UI 4 for the current field-binding and
+UIContext workflow. Changing registration during dev requires restarting
 the dev server.
 
 `stage` supplies the generated canvas defaults. With Core >= 2.6.0 within 2.x,
@@ -219,8 +219,12 @@ node inside the Skin is inferred as a skin part; its `id` is the part
 name. The declaration augments the UI runtime with those exact names and types.
 This file is editor-only, ignored by git, and never enters browser bundles.
 
-Generated host skinParts use getter signatures matching Component's accessor.
-After changing authored Skin inputs, rebuild the declarations and run
+Views declare fields such as `declare btnClose: Button` and use `this.btnClose`.
+The CLI validates required, optional and inherited parts, node types and host
+member collisions. It also rejects emitted fields that could overwrite a binding.
+Generated metadata retains the framework part map without adding business fields.
+See [declared field checks](docs/skin-part-fields.md).
+After changing authored Skin inputs or declarations, rebuild and run
 `tsc --noEmit --skipLibCheck false`. Edit authored inputs rather than generated
 `.kurot/` files. Runtime Skin factories are separate from editor declarations.
 
@@ -240,8 +244,8 @@ KUI XML, refreshes the namespace bundle, and emits development catalog data at
 `.kurot/component-catalog.json`.
 
 Use `onSkinReady()` for logic that needs skin parts and `onSkinRemoved()` for
-cleanup before a skin replacement. Access generated parts through
-`this.skinParts`.
+cleanup before a skin replacement. Declare fields on the view and access them
+directly; a Presenter or view-specific helper receives that concrete view.
 
 ## Generated project shape
 

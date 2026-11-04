@@ -1,6 +1,6 @@
 # CheckBox
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class CheckBox extends ToggleButton
@@ -110,6 +110,7 @@ Related types: [ToggleButton](ToggleButton-class.md).
 | `getElementAt` | public, inherited | [open](CheckBox-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](CheckBox-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](CheckBox-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](CheckBox-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](CheckBox-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](CheckBox-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](CheckBox-class/globalToLocal-method.md) |

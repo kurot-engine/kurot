@@ -1,6 +1,6 @@
 # RadioButton
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class RadioButton extends ToggleButton
@@ -116,6 +116,7 @@ Related types: [ToggleButton](ToggleButton-class.md).
 | `getElementAt` | public, inherited | [open](RadioButton-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](RadioButton-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](RadioButton-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](RadioButton-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](RadioButton-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](RadioButton-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](RadioButton-class/globalToLocal-method.md) |

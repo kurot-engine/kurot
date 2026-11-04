@@ -1,6 +1,6 @@
 # ComboBox
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ComboBox extends Component implements IDisplayText
@@ -137,6 +137,7 @@ Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-inte
 | `getElementAt` | public, inherited | [open](ComboBox-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](ComboBox-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](ComboBox-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](ComboBox-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](ComboBox-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](ComboBox-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](ComboBox-class/globalToLocal-method.md) |

@@ -1,6 +1,6 @@
 # Component
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Component<TSkin extends string = string> extends Sprite implements IUIComponent, ILayoutTarget, IUIOwner
@@ -104,6 +104,7 @@ Related types: [Sprite](../../../core/docs/api/Sprite-class.md), [IUIComponent](
 | `getElementAt` | public | [open](Component-class/getElementAt-method.md) |
 | `getLayoutBounds` | public | [open](Component-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public | [open](Component-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected | [open](Component-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Component-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public | [open](Component-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Component-class/globalToLocal-method.md) |

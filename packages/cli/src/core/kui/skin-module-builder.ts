@@ -56,7 +56,11 @@ export interface BuiltSkinsModule {
  *
  * @returns The installed bundle filename and the parsed skins used to build it.
  */
-export async function buildSkinsModule(ctx: BuildContext, skins: readonly CompiledSkin[]): Promise<BuiltSkinsModule> {
+export async function buildSkinsModule(
+	ctx: BuildContext,
+	skins: readonly CompiledSkin[],
+	validate?: (skins: readonly SkinIR[]) => Promise<void>,
+): Promise<BuiltSkinsModule> {
 	const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-skins-'));
 	try {
 		const manifestPath = path.join(ctx.project.resourceDir, 'default.res.json');
@@ -89,6 +93,7 @@ export async function buildSkinsModule(ctx: BuildContext, skins: readonly Compil
 		const compiledModules = modules.filter(
 			(module): module is { source: string; skin: SkinIR } => module !== undefined,
 		);
+		await validate?.(compiledModules.map(module => module.skin));
 		const stubDir = path.join(temporaryRoot, 'stubs');
 		const bundleDir = path.join(temporaryRoot, 'bundle');
 		await Promise.all([ensureDir(stubDir), ensureDir(bundleDir)]);

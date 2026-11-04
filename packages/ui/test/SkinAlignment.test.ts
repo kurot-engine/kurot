@@ -96,7 +96,7 @@ function makePanelSkin(): Skin {
 }
 
 describe('skin alignment (game example / cli template)', () => {
-	it('keeps parts in the centralized skin map and runs batch lifecycle hooks in order', () => {
+	it('binds fields from the centralized skin map and runs batch lifecycle hooks in order', () => {
 		class LifecycleComponent extends Component {
 			public readonly calls: string[] = [];
 
@@ -131,7 +131,7 @@ describe('skin alignment (game example / cli template)', () => {
 		expect(component.ready).toBe(true);
 		expect(component.getPart('content')).toBe(content);
 		expect(component.skinParts.content).toBe(content);
-		expect(Object.hasOwn(component, 'content')).toBe(false);
+		expect(Object.hasOwn(component, 'content')).toBe(true);
 		expect('setSkinPart' in component).toBe(false);
 		expect(component.calls).toEqual(['skinReady:[object Object]']);
 

@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **3.7.1** (published on npm).
+Kurot games. Package version: **4.0.0** (published on npm).
 Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -12,7 +12,7 @@ exact member contracts. Build-time KUI skins run through UI without ui-runtime.
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^3.7.1 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^4.0.0 @kurot/core@^2.5.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -39,7 +39,7 @@ Use `context.run()` for synchronous construction, or bind a root before stage
 attachment. Later asynchronous callbacks that construct views need their own
 run call. Missing local names never fall back to a global Theme or asset registry.
 
-CLI >= 3.9.0 within 3.x can export local Skin factories with
+CLI 4 exports local Skin factories with
 `ui.skinRegistration: 'module'`. Load them through the generated theme's skinsJs
 path, then pass the factories and default mappings to UIContext. See the
 [context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
@@ -155,22 +155,23 @@ btn.skinName = MyButtonSkin;
 
 ### Typed skin parts and lifecycle
 
-UI 2.0 attaches a skin atomically. The complete part set is available in
-`onSkinReady()` and remains available through `onSkinRemoved()`. Accessing
-`skinParts` outside that interval throws, which prevents code from silently
-using a partial or stale skin.
-
-The Kurot CLI generates `SkinPartsMap` entries and narrows the public
-`skinParts` accessor on project classes. It resolves explicit string-literal
-`skinName` assignments, configured reusable-component pairs, and unambiguous
-`<ClassName>Skin` naming conventions. The runtime skin name remains the source
-of truth whenever it is assigned explicitly:
+Component binds named parts directly to host fields before `onSkinReady()`.
+Old fields remain available throughout `onSkinRemoved()`, then owned references
+are cleared. Declare the fields used by a view and access them directly:
 
 ```ts
 import { TouchEvent } from '@kurot/core';
 import { Component } from '@kurot/ui';
+import type { Button, Label } from '@kurot/ui';
 
 export class ConfirmPanel extends Component {
+	declare btnConfirm: Button;
+	declare lblMessage: Label;
+
+	private readonly _onConfirm = (): void => {
+		this.dispatchEventWith('confirmRequested');
+	};
+
 	public constructor() {
 		super();
 		this.skinName = 'game.ui.ConfirmPanelSkin';
@@ -178,40 +179,31 @@ export class ConfirmPanel extends Component {
 
 	protected override onSkinReady(): void {
 		super.onSkinReady();
-		this.skinParts.btnConfirm.addEventListener(TouchEvent.TOUCH_TAP, this.onConfirm);
-		this.skinParts.lblMessage.text = 'Continue?';
+		this.btnConfirm.addEventListener(TouchEvent.TOUCH_TAP, this._onConfirm);
+		this.lblMessage.text = 'Continue?';
 	}
 
 	protected override onSkinRemoved(): void {
-		this.skinParts.btnConfirm.removeEventListener(TouchEvent.TOUCH_TAP, this.onConfirm);
+		this.btnConfirm.removeEventListener(TouchEvent.TOUCH_TAP, this._onConfirm);
 		super.onSkinRemoved();
 	}
-
-	private onConfirm = (): void => {
-		// Handle confirmation.
-	};
 }
 ```
 
-Library code without CLI-generated host declarations can still select a shape
-explicitly with `Component<'game.ui.ConfirmPanelSkin'>` or
-`ItemRenderer<'game.ui.ConfirmItemSkin'>`. `skinParts` is the only public,
-read-only part view, so component subclasses, mediators, and composition code
-use the same API.
-
-When a CLI project has exactly one compiled `<ClassName>Skin` candidate, the
-generated host declaration also covers skins supplied externally by a Theme or
-List. An `ItemRenderer` named `MultiplierIR` can therefore use
-`this.skinParts` without repeating `ui.MultiplierIRSkin` in its base type.
+Presenters and view-specific helpers receive the concrete view and use
+`panel.btnConfirm`. CLI 4 validates declarations and inherited parts against
+associated KUI types before installing outputs. The existing `skinParts` lookup
+remains a read-only enumeration interface for framework/tooling code.
 
 Use `onSkinReady()` only for work that requires skin parts. Keep ordinary
 one-time component initialization in `createChildren()`. Remove listeners and
 other bindings created for a skin in `onSkinRemoved()` so replacing a skin
 cannot retain stale objects.
 
-The old incremental APIs `setSkinPart()`, `partAdded()`, and `partRemoved()`
-were removed in 2.0. Skin part names are no longer copied onto the component as
-dynamic properties; use `this.skinParts.<name>` during the ready lifecycle.
+Native slots preserve their setters and accepted types. Host methods, arbitrary
+accessors and initialized business fields cannot be overwritten by Skin IDs.
+See [field binding and ownership](docs/skin-part-fields.md) for declaration,
+conflict, optional-part and lifecycle rules.
 
 ## Components
 
@@ -413,7 +405,7 @@ comparing results. These are UI self-comparisons rather than framework rankings.
 | Component base | `namespace` + `mixin`       | Standard class inheritance                                  |
 | Layout state   | Prototype-injected          | `UIState` delegation                                        |
 | Authored skins | EXML runtime parser         | KUI XML compiled by `@kurot/cli`                            |
-| Skin parts     | Incremental dynamic fields  | Atomic typed `skinParts`                                    |
+| Skin parts     | Incremental dynamic fields  | Complete typed host fields and a framework part map         |
 | Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`                             |
 | `thisObject`   | Required in event listeners | Not needed — use arrow functions                            |
 | Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true`                        |

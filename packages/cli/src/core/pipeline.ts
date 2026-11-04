@@ -2,6 +2,7 @@ import { logger } from '../utils/logger.js';
 import { DiagnosticCollector } from './diagnostics/index.js';
 import { BuildError } from './errors.js';
 import type { Project } from './project.js';
+import type { Diagnostic } from './diagnostics/index.js';
 
 /**
  * Artifacts and namespace state populated incrementally by build plugins.
@@ -19,6 +20,14 @@ export interface BuildOutputs {
 	 * Generated skin-part declaration path relative to the project root.
 	 */
 	skinPartsDeclaration?: string;
+	/**
+	 * Revalidates changed source declarations against the last installed Skin set.
+	 */
+	validateSkinParts?: () => Promise<{ declaration: string; diagnostics: readonly Diagnostic[] }>;
+	/**
+	 * Retries application compilation after a corrected Skin contract.
+	 */
+	sourceRebuilder?: () => Promise<void>;
 	/**
 	 * Component catalog path relative to the development output directory.
 	 */

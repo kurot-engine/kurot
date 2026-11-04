@@ -1,6 +1,6 @@
 # Range
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Range extends Component
@@ -105,6 +105,7 @@ Related types: [Component](Component-class.md).
 | `getElementAt` | public, inherited | [open](Range-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Range-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Range-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](Range-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Range-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Range-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Range-class/globalToLocal-method.md) |

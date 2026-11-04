@@ -1,6 +1,6 @@
 # Image
 
-Package: `@kurot/ui@3.7.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Image extends Component
@@ -108,6 +108,7 @@ Related types: [Component](Component-class.md).
 | `getElementAt` | public, inherited | [open](Image-class/getElementAt-method.md) |
 | `getLayoutBounds` | public, inherited | [open](Image-class/getLayoutBounds-method.md) |
 | `getPreferredBounds` | public, inherited | [open](Image-class/getPreferredBounds-method.md) |
+| `getSkinPartValidator` | protected, inherited | [open](Image-class/getSkinPartValidator-method.md) |
 | `getTransformedBounds` | public, inherited | [open](Image-class/getTransformedBounds-method.md) |
 | `getVirtualElementAt` | public, inherited | [open](Image-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](Image-class/globalToLocal-method.md) |
