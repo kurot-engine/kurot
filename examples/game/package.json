@@ -11,10 +11,10 @@
 	"dependencies": {
 		"@kurot/core": "^2.8.0",
 		"@kurot/game": "^2.0.1",
-		"@kurot/ui": "^4.1.0",
+		"@kurot/ui": "^4.2.0",
 		"@kurot/ui-document": "^0.14.0"
 	},
 	"devDependencies": {
-		"@kurot/cli": "^4.1.0"
+		"@kurot/cli": "^4.1.1"
 	}
 }

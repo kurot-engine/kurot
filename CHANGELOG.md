@@ -5,6 +5,29 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — Examples and Templates adopt UI 4.2 / CLI 4.1.1
+
+- Update CLI to 4.1.1 in demo, game, star-catcher and all five external Templates
+  projects; existing UI consumers adopt UI 4.2.0. Core-only examples stay Core-only.
+  Preserve each project's exact/ranged dependency style and refresh its independent
+  registry installation and pnpm lock.
+- Retain Core 2.8.0, Game, ui-document 0.14.0, animation adapters and other direct
+  dependencies. Native packages resolve one shared Core instance, and each UI
+  application shares document 0.14.0 with CLI. Application source and authored
+  skins are unchanged; synchronize current README/context version baselines.
+- All eight offline frozen installs, complete declaration checks and strict
+  development/release builds pass. All 753 existing unit tests pass, alongside
+  both architecture checks, Skydive tool types and Runaway resource verification.
+- Development and minified-release browser checks pass for demo startup, game
+  scene/gallery and Star Catcher gameplay/lifecycle; the gallery covers List
+  selection/itemTap, ComboBox selection and Skin listener replacement.
+- Card Booster, Runaway and Skydive pass their development/release browser
+  regressions. MilfMaster's focused native condition-list checks cover changed
+  data, account refresh, Skin replacement and reopening in both builds. Tentax's
+  existing development smoke fixture covers compiled controls, betting, dialogs,
+  history and disposal. Browser checks use local macOS Chromium and test-only
+  protocol fixtures for networked applications.
+
 ## 2026-11-06 — UI 4.2.0 / CLI 4.1.1 publication verified
 
 - Verify exact npm versions and latest tags as UI 4.2.0 and CLI 4.1.1. Download
