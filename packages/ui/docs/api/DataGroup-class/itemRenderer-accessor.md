@@ -1,10 +1,10 @@
 # itemRenderer
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get itemRenderer(): (() => ItemRenderer) | undefined;
-set itemRenderer(value: (() => ItemRenderer) | undefined);
+get itemRenderer(): (() => ItemRenderer<string, T>) | undefined;
+set itemRenderer(value: (() => ItemRenderer<string, T>) | undefined);
 ```
 
 Renderer constructor, initially undefined (fallback: ItemRenderer). The group

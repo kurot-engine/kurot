@@ -1,6 +1,6 @@
 # setContentSize
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 setContentSize(_w: number, _h: number): void;

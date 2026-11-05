@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import ts from 'typescript';
+import { heritageSkinNames } from './skin-host-generic-names.js';
 import type { Dirent } from 'node:fs';
 import type { Project } from '../project.js';
 
@@ -53,7 +54,7 @@ export async function collectSkinHosts(
 			const className = node.name.text;
 			const explicit = assignedSkins(node);
 			const generic = (node.heritageClauses ?? []).flatMap(clause => clause.types.flatMap(type =>
-				(type.typeArguments ?? []).flatMap(literalSkinNames),
+				heritageSkinNames(type, source),
 			));
 			const paired = hosts.get(`${file}:${className}`)?.skinNames ?? [];
 			const candidates = [...paired, ...explicit, ...generic].filter(name => known.has(name));
@@ -122,11 +123,4 @@ async function collectSourceFiles(directory: string): Promise<string[]> {
 		}
 	}
 	return result.sort();
-}
-
-function literalSkinNames(node: ts.TypeNode): string[] {
-	if (ts.isUnionTypeNode(node)) {
-		return node.types.flatMap(literalSkinNames);
-	}
-	return ts.isLiteralTypeNode(node) && ts.isStringLiteral(node.literal) ? [node.literal.text] : [];
 }

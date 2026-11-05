@@ -1,9 +1,10 @@
 # constructor
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-constructor(source?: unknown[]);
+constructor(source: never[]);
+constructor(source?: T[]);
 ```
 
 Wrap an existing array without copying; omitted source creates an empty array.

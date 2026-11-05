@@ -1,9 +1,9 @@
 # itemRemoved
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-protected itemRemoved(item: unknown, index: number): void;
+protected itemRemoved(item: T | undefined, index: number): void;
 ```
 
 Extension hook: protected; available to subclasses.

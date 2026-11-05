@@ -1,13 +1,19 @@
-import { EventDispatcher, type EventMap } from '@kurot/core';
+import { EventDispatcher } from '@kurot/core';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';
-import type { ICollection } from './ICollection.js';
+import type { ICollection, ICollectionEvents } from './ICollection.js';
 
-export interface ArrayCollectionEvents extends EventMap {
-	[CollectionEvent.COLLECTION_CHANGE]: CollectionEvent;
+/**
+ * Typed mutation payloads dispatched by an ArrayCollection.
+ */
+export interface ArrayCollectionEvents<T = unknown> extends ICollectionEvents<T> {
+	/**
+	 * Synchronous notification after a collection mutation or explicit refresh.
+	 */
+	[CollectionEvent.COLLECTION_CHANGE]: CollectionEvent<T>;
 }
 
 /**
- * A wrapper around a plain `unknown[]` that implements {@link ICollection}.
+ * A wrapper around a plain `T[]` that implements {@link ICollection}.
  *
  * Dispatches {@link CollectionEvent.COLLECTION_CHANGE} whenever items are
  * added, removed, replaced, or the entire source is reset — allowing
@@ -15,10 +21,10 @@ export interface ArrayCollectionEvents extends EventMap {
  *
  * @defaultProperty source
  */
-export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> implements ICollection {
+export class ArrayCollection<T = unknown> extends EventDispatcher<ArrayCollectionEvents<T>> implements ICollection<T> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
-	private _source: unknown[];
+	private _source: T[];
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
@@ -26,7 +32,9 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * Wrap an existing array without copying; omitted source creates an empty array.
 	 * Items are borrowed data and are never disposed by collection mutations.
 	 */
-	public constructor(source?: unknown[]) {
+	public constructor(source: never[]);
+	public constructor(source?: T[]);
+	public constructor(source?: T[]) {
 		super();
 		this._source = source ?? [];
 	}
@@ -38,11 +46,11 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * retains the array and dispatches RESET. Direct array mutation sends no events;
 	 * use collection methods or refresh() to notify views.
 	 */
-	public get source(): unknown[] {
+	public get source(): T[] {
 		return this._source;
 	}
 
-	public set source(value: unknown[]) {
+	public set source(value: T[]) {
 		this._source = value ?? [];
 		this._dispatchCoEvent(CollectionEventKind.RESET);
 	}
@@ -59,21 +67,21 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	/**
 	 * Read a 0-based item index; absent indices return undefined rather than throwing.
 	 */
-	public getItemAt(index: number): unknown {
+	public getItemAt(index: number): T | undefined {
 		return this._source[index];
 	}
 
 	/**
 	 * Return the first identity/equality match index, or -1 when the item is absent.
 	 */
-	public getItemIndex(item: unknown): number {
-		return this._source.indexOf(item);
+	public getItemIndex(item: T | undefined): number {
+		return this._source.indexOf(item as T);
 	}
 
 	/**
 	 * Append a borrowed item and synchronously dispatch ADD. Does not clone the item.
 	 */
-	public addItem(item: unknown): void {
+	public addItem(item: T): void {
 		this._source.push(item);
 		this._dispatchCoEvent(CollectionEventKind.ADD, this._source.length - 1, -1, [item]);
 	}
@@ -83,7 +91,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * length (inclusive). Bounds below 0 or above length throw RangeError; there is
 	 * no separate integer validation.
 	 */
-	public addItemAt(item: unknown, index: number): void {
+	public addItemAt(item: T, index: number): void {
 		if (index < 0 || index > this._source.length) {
 			throw new RangeError(`ArrayCollection.addItemAt: index ${index} out of range`);
 		}
@@ -96,7 +104,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * integer index from 0 through length-1. Out-of-bounds values throw RangeError;
 	 * there is no separate integer validation.
 	 */
-	public removeItemAt(index: number): unknown {
+	public removeItemAt(index: number): T | undefined {
 		if (index < 0 || index >= this._source.length) {
 			throw new RangeError(`ArrayCollection.removeItemAt: index ${index} out of range`);
 		}
@@ -110,7 +118,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * is disposed. Pass an integer index within 0..length-1; bounds violations throw
 	 * RangeError, without separate integer validation.
 	 */
-	public replaceItemAt(item: unknown, index: number): unknown {
+	public replaceItemAt(item: T, index: number): T | undefined {
 		if (index < 0 || index >= this._source.length) {
 			throw new RangeError(`ArrayCollection.replaceItemAt: index ${index} out of range`);
 		}
@@ -123,7 +131,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * Dispatch UPDATE for an existing item's first matching index. Missing items are
 	 * ignored; changing an object's fields alone does not notify collection views.
 	 */
-	public itemUpdated(item: unknown): void {
+	public itemUpdated(item: T): void {
 		const index = this.getItemIndex(item);
 		if (index !== -1) {
 			this._dispatchCoEvent(CollectionEventKind.UPDATE, index, -1, [item]);
@@ -145,7 +153,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * **not** reset scroll position in the view — individual add/remove events
 	 * are dispatched instead.
 	 */
-	public replaceAll(newSource: unknown[]): void {
+	public replaceAll(newSource: T[]): void {
 		const src = newSource ?? [];
 		const newLen = src.length;
 		const oldLen = this._source.length;
@@ -171,7 +179,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * Sort the collection in place using a comparator function.
 	 * Dispatches REFRESH after sorting.
 	 */
-	public sort(compareFunction: (a: unknown, b: unknown) => number): void {
+	public sort(compareFunction: (a: T, b: T) => number): void {
 		this._source.sort(compareFunction);
 		this._dispatchCoEvent(CollectionEventKind.REFRESH);
 	}
@@ -203,7 +211,7 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 	 * Dispatches REFRESH after filtering.
 	 * Note: items that are filtered out are removed from the source array.
 	 */
-	public filterFunction(testFn: (item: unknown) => boolean): void {
+	public filterFunction(testFn: (item: T) => boolean): void {
 		this._source = this._source.filter(testFn);
 		this._dispatchCoEvent(CollectionEventKind.REFRESH);
 	}
@@ -214,8 +222,8 @@ export class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> impl
 		kind: CollectionEventKind,
 		location = -1,
 		oldLocation = -1,
-		items: unknown[] = [],
-		oldItems: unknown[] = [],
+		items: (T | undefined)[] = [],
+		oldItems: (T | undefined)[] = [],
 	): void {
 		CollectionEvent.dispatchCollectionEvent(this, kind, location, oldLocation, items, oldItems);
 	}

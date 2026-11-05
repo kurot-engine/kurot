@@ -19,9 +19,9 @@ import { captureUIContext } from '../core/UIContext.js';
  * EventMap for Group and all its subclasses (DataGroup, ListBase, List, TabBar…).
  * Adds CollectionEvent and ItemTapEvent on top of {@link ComponentEvents}.
  */
-export interface GroupEvents extends ComponentEvents {
-	[CollectionEvent.COLLECTION_CHANGE]: CollectionEvent;
-	[ItemTapEvent.ITEM_TAP]: ItemTapEvent;
+export interface GroupEvents<T = unknown> extends ComponentEvents {
+	[CollectionEvent.COLLECTION_CHANGE]: CollectionEvent<T>;
+	[ItemTapEvent.ITEM_TAP]: ItemTapEvent<T>;
 }
 
 /**

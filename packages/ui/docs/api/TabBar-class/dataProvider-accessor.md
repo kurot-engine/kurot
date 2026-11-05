@@ -1,10 +1,10 @@
 # dataProvider
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get dataProvider(): ICollection | undefined;
-set dataProvider(value: ICollection | undefined);
+get dataProvider(): ICollection<T> | undefined;
+set dataProvider(value: ICollection<T> | undefined);
 ```
 
 Override dataProvider to detect ViewStack and set up bidirectional binding:

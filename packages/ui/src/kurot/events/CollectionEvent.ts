@@ -18,7 +18,7 @@ export type CollectionEventKind = (typeof CollectionEventKind)[keyof typeof Coll
 /**
  * Describes a change to an observable collection.
  */
-export class CollectionEvent extends Event {
+export class CollectionEvent<T = unknown> extends Event {
 	// ── Static fields ─────────────────────────────────────────────────────
 
 	public static readonly COLLECTION_CHANGE = 'collectionChange';
@@ -32,11 +32,11 @@ export class CollectionEvent extends Event {
 	/**
 	 * Items added, updated, or moved by the operation.
 	 */
-	public items: unknown[] = [];
+	public items: (T | undefined)[] = [];
 	/**
 	 * Items removed or replaced by the operation.
 	 */
-	public oldItems: unknown[] = [];
+	public oldItems: (T | undefined)[] = [];
 	/**
 	 * Resulting collection index, or `-1` when the operation has no index.
 	 */
@@ -58,16 +58,16 @@ export class CollectionEvent extends Event {
 	 * Dispatches a collection-change event when the target has a listener.
 	 * Returns `true` without allocating an event when no listener is registered.
 	 */
-	public static dispatchCollectionEvent(
+	public static dispatchCollectionEvent<T = unknown>(
 		target: IEventDispatcher,
 		kind: CollectionEventKind,
 		location = -1,
 		oldLocation = -1,
-		items: unknown[] = [],
-		oldItems: unknown[] = [],
+		items: (T | undefined)[] = [],
+		oldItems: (T | undefined)[] = [],
 	): boolean {
 		if (!target.hasEventListener(CollectionEvent.COLLECTION_CHANGE)) return true;
-		const e = new CollectionEvent(CollectionEvent.COLLECTION_CHANGE);
+		const e = new CollectionEvent<T>(CollectionEvent.COLLECTION_CHANGE);
 		e.kind = kind;
 		e.location = location;
 		e.oldLocation = oldLocation;

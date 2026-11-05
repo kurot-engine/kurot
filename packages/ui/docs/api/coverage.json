@@ -1,8 +1,8 @@
 {
   "package": "@kurot/ui",
-  "version": "4.1.0",
-  "exports": 92,
-  "members": 5023,
+  "version": "4.2.0",
+  "exports": 94,
+  "members": 5025,
   "missing": [],
   "withoutComment": [
     "AddItems.apply",

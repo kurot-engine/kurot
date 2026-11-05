@@ -1,9 +1,9 @@
 # getRendererAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-protected getRendererAt(index: number): ItemRenderer<string> | undefined;
+protected getRendererAt(index: number): ItemRenderer<string, T> | undefined;
 ```
 
 Extension hook: protected; available to subclasses.

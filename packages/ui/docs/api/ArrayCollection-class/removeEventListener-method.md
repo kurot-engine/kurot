@@ -1,13 +1,15 @@
 # removeEventListener
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-removeEventListener<K extends string>(type: K, listener: (event: ArrayCollectionEvents[K]) => void, useCapture?: boolean): void;
+removeEventListener<K extends string>(type: K, listener: (event: ArrayCollectionEvents<T>[K]) => void, useCapture?: boolean): void;
 removeEventListener(type: string, listener: (event: Event) => void, useCapture?: boolean): void;
 ```
 
 Inherited from `EventDispatcher.removeEventListener`; shown with this receiver's substituted types.
+
+Removes the matching listener and capture phase without dispatching events.
 
 Removes the matching event type, function identity and capture phase.
 Missing listeners are harmless; a newly created bound function does not

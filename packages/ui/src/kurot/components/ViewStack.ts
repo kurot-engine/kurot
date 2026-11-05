@@ -18,7 +18,7 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
  *
  * States: none (container component).
  */
-export class ViewStack extends Group implements ICollection {
+export class ViewStack extends Group implements ICollection<string> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	private _selectedIndex = -1;
@@ -73,7 +73,7 @@ export class ViewStack extends Group implements ICollection {
 	/**
 	 * Returns the child's `name` at the given index (used by TabBar as tab label).
 	 */
-	public getItemAt(index: number): unknown {
+	public getItemAt(index: number): string {
 		const child = this.getChildAt(index);
 		return child ? child.name : '';
 	}

@@ -1,9 +1,9 @@
 # ListBase
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-class ListBase extends DataGroup
+class ListBase<T = unknown> extends DataGroup<T>
 ```
 
 ListBase extends DataGroup with selection support.
@@ -18,7 +18,10 @@ Related types: [DataGroup](DataGroup-class.md).
 | Member | Scope | Reference |
 | --- | --- | --- |
 | `constructor` | public, inherited | [open](ListBase-class/constructor-constructor.md) |
+| `addEventListener` | public, inherited | [open](ListBase-class/addEventListener-property.md) |
 | `isRenderGroup` | public, inherited | [open](ListBase-class/isRenderGroup-property.md) |
+| `once` | public, inherited | [open](ListBase-class/once-property.md) |
+| `removeEventListener` | public, inherited | [open](ListBase-class/removeEventListener-property.md) |
 | `ui` | public, inherited | [open](ListBase-class/ui-property.md) |
 | `static defaultTouchEnabled` | public, inherited | [open](ListBase-class/static-defaultTouchEnabled-property.md) |
 | `static NO_SELECTION` | protected | [open](ListBase-class/static-NO_SELECTION-property.md) |
@@ -90,7 +93,6 @@ Related types: [DataGroup](DataGroup-class.md).
 | `zIndex` | public, inherited | [open](ListBase-class/zIndex-accessor.md) |
 | `addChild` | public, inherited | [open](ListBase-class/addChild-method.md) |
 | `addChildAt` | public, inherited | [open](ListBase-class/addChildAt-method.md) |
-| `addEventListener` | public, inherited | [open](ListBase-class/addEventListener-method.md) |
 | `adjustSelection` | protected | [open](ListBase-class/adjustSelection-method.md) |
 | `cacheAsTexture` | public, inherited | [open](ListBase-class/cacheAsTexture-method.md) |
 | `childAdded` | public, inherited | [open](ListBase-class/childAdded-method.md) |
@@ -128,12 +130,10 @@ Related types: [DataGroup](DataGroup-class.md).
 | `localToGlobal` | public, inherited | [open](ListBase-class/localToGlobal-method.md) |
 | `measure` | public, inherited | [open](ListBase-class/measure-method.md) |
 | `notifyListener` | protected, inherited | [open](ListBase-class/notifyListener-method.md) |
-| `once` | public, inherited | [open](ListBase-class/once-method.md) |
 | `onCollectionChange` | protected | [open](ListBase-class/onCollectionChange-method.md) |
 | `removeChild` | public, inherited | [open](ListBase-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](ListBase-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](ListBase-class/removeChildren-method.md) |
-| `removeEventListener` | public, inherited | [open](ListBase-class/removeEventListener-method.md) |
 | `rendererAdded` | protected, inherited | [open](ListBase-class/rendererAdded-method.md) |
 | `rendererRemoved` | protected, inherited | [open](ListBase-class/rendererRemoved-method.md) |
 | `setChildIndex` | public, inherited | [open](ListBase-class/setChildIndex-method.md) |

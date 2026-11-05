@@ -6,7 +6,7 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@4.1.0` (published on npm), with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@4.2.0` (published on npm), with Core peer **^2.5.2**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -122,6 +122,11 @@ skin)` signature, but `Group._commitCurrentState()` passes `this` cast
   Also: `source =` setter dispatches `RESET` (resets scroll position
   downstream in `DataGroup`); `replaceAll()` deliberately avoids that to
   preserve scroll position — called out in its own doc comment.
+- UI 4.2 adds item-data generics (default unknown) through collections,
+  lists and events. ItemRenderer keeps `TSkin` first, data second. Empty/sparse
+  values retain their native null/undefined behavior. Read
+  [typed list data](list-data-types.md) for null/undefined behavior. Declared typed
+  list fields in KUI hosts require CLI >= 4.1.1 within 4.x.
 - `Watcher`/`Binding` are **not automatically reactive**. They depend on the
   host manually dispatching `PropertyEvent.PROPERTY_CHANGE` in its setters
   (`PropertyEvent.dispatchPropertyEvent(this, 'propName')`). A property whose

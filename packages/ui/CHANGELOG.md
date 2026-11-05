@@ -4,6 +4,34 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 4.2.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 5,587 files and the compressed archive
+are byte-identical to the tested release artifact.
+
+### Added
+
+- Add unknown-defaulted item generics across collections, data groups, lists,
+  TabBar/ComboBox and collection/item-tap event payloads. Infer ArrayCollection
+  elements from supplied arrays while preserving unknown for an untyped empty
+  collection. Keep ItemRenderer's existing TSkin argument first, data second.
+- Preserve null data and type sparse/missing reads, mutation results, empty
+  selection and uninitialized renderer/event data with undefined. Refine native
+  listener declarations without replacing runtime event methods.
+- Add strict positive/negative compiler fixtures and runtime regressions for
+  nullable data, mutations, virtual reuse, selection, cancellation and events.
+  No Core/resource/KUI-format change or application migration is included.
+
+### Compatibility and verification
+
+- Generic arguments default to unknown; ItemRenderer retains TSkin first.
+  Typed list Skin fields require CLI >= 4.1.1 within 4.x. Core peer remains
+  ^2.5.2; no other SDK release or consumer dependency update is required.
+- UI build and all 465 tests pass. Strict source and packed-declaration consumers
+  cover inference, nullable values, legacy Skin arguments and invalid data.
+  Existing runtime JS ASTs match all 88 published modules after comment removal.
+
 ## 4.1.0 — 2026-11-05
 
 Published; exact version and npm latest verified on 2026-11-05. Downloaded

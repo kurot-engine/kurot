@@ -1,3 +1,4 @@
+import { isSkinPartAssignable } from './skin-part-data-types.js';
 import type { SkinIR } from './ast.js';
 import type { Project } from '../project.js';
 
@@ -20,7 +21,7 @@ export async function validateSkinPartFields(
 	skins: readonly SkinIR[],
 	declaration: string,
 ): Promise<readonly SkinPartFieldIssue[]> {
-	const { checker, hosts } = await createSkinPartProgram(project, skins, declaration);
+	const { checker, hosts, uiExports } = await createSkinPartProgram(project, skins, declaration);
 	const issues: SkinPartFieldIssue[] = [];
 	for (const host of hosts) {
 		const declared = host.host.getProperties().filter(isDeclaredField);
@@ -72,12 +73,12 @@ export async function validateSkinPartFields(
 			}
 			const expected = propertyType(checker, host.parts, part.name);
 			const actual = propertyType(checker, host.host, part.name);
-			if (expected && actual && !checker.isTypeAssignableTo(expected, actual)) {
+			if (expected && actual && !isSkinPartAssignable(checker, uiExports, expected, actual)) {
 				report(part.name, `type ${checker.typeToString(expected)} is not assignable to ${checker.typeToString(actual)}`, member);
 				continue;
 			}
 			const nativeType = native ? nativePartType(checker, host.host, part.name) : undefined;
-			if (expected && nativeType && !checker.isTypeAssignableTo(expected, nativeType)) {
+			if (expected && nativeType && !isSkinPartAssignable(checker, uiExports, expected, nativeType)) {
 				report(part.name, `type ${checker.typeToString(expected)} is not assignable to native slot ${checker.typeToString(nativeType)}`, member);
 			}
 		}

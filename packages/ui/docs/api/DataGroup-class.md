@@ -1,9 +1,9 @@
 # DataGroup
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-class DataGroup extends Group
+class DataGroup<T = unknown> extends Group
 ```
 
 DataGroup converts data items into visual elements (item renderers).
@@ -25,7 +25,10 @@ Related types: [Group](Group-class.md).
 | Member | Scope | Reference |
 | --- | --- | --- |
 | `constructor` | public, inherited | [open](DataGroup-class/constructor-constructor.md) |
+| `addEventListener` | public | [open](DataGroup-class/addEventListener-property.md) |
 | `isRenderGroup` | public, inherited | [open](DataGroup-class/isRenderGroup-property.md) |
+| `once` | public | [open](DataGroup-class/once-property.md) |
+| `removeEventListener` | public | [open](DataGroup-class/removeEventListener-property.md) |
 | `ui` | public, inherited | [open](DataGroup-class/ui-property.md) |
 | `static defaultTouchEnabled` | public, inherited | [open](DataGroup-class/static-defaultTouchEnabled-property.md) |
 | `alpha` | public, inherited | [open](DataGroup-class/alpha-accessor.md) |
@@ -93,7 +96,6 @@ Related types: [Group](Group-class.md).
 | `zIndex` | public, inherited | [open](DataGroup-class/zIndex-accessor.md) |
 | `addChild` | public, inherited | [open](DataGroup-class/addChild-method.md) |
 | `addChildAt` | public, inherited | [open](DataGroup-class/addChildAt-method.md) |
-| `addEventListener` | public, inherited | [open](DataGroup-class/addEventListener-method.md) |
 | `cacheAsTexture` | public, inherited | [open](DataGroup-class/cacheAsTexture-method.md) |
 | `childAdded` | public, inherited | [open](DataGroup-class/childAdded-method.md) |
 | `childRemoved` | public, inherited | [open](DataGroup-class/childRemoved-method.md) |
@@ -127,12 +129,10 @@ Related types: [Group](Group-class.md).
 | `localToGlobal` | public, inherited | [open](DataGroup-class/localToGlobal-method.md) |
 | `measure` | public | [open](DataGroup-class/measure-method.md) |
 | `notifyListener` | protected, inherited | [open](DataGroup-class/notifyListener-method.md) |
-| `once` | public, inherited | [open](DataGroup-class/once-method.md) |
 | `onCollectionChange` | protected | [open](DataGroup-class/onCollectionChange-method.md) |
 | `removeChild` | public, inherited | [open](DataGroup-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](DataGroup-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](DataGroup-class/removeChildren-method.md) |
-| `removeEventListener` | public, inherited | [open](DataGroup-class/removeEventListener-method.md) |
 | `rendererAdded` | protected | [open](DataGroup-class/rendererAdded-method.md) |
 | `rendererRemoved` | protected | [open](DataGroup-class/rendererRemoved-method.md) |
 | `setChildIndex` | public, inherited | [open](DataGroup-class/setChildIndex-method.md) |

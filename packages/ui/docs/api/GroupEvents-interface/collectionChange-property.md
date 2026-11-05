@@ -1,9 +1,9 @@
 # collectionChange
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-collectionChange: CollectionEvent;
+collectionChange: CollectionEvent<T>;
 ```
 
 The declaration above is the available reference; no additional behavioral JSDoc is present.

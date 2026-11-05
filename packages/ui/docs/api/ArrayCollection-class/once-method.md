@@ -1,13 +1,15 @@
 # once
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-once<K extends string>(type: K, listener: (event: ArrayCollectionEvents[K]) => void, useCapture?: boolean, priority?: number): void;
+once<K extends string>(type: K, listener: (event: ArrayCollectionEvents<T>[K]) => void, useCapture?: boolean, priority?: number): void;
 once(type: string, listener: (event: Event) => void, useCapture?: boolean, priority?: number): void;
 ```
 
 Inherited from `EventDispatcher.once`; shown with this receiver's substituted types.
+
+Observes one mutation using Core's existing once-listener behavior.
 
 Registers a listener that removes itself after notification. If its owner
 closes before the event occurs, remove it explicitly using the same

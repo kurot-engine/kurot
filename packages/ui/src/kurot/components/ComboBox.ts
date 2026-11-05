@@ -22,7 +22,7 @@ import { Label } from './Label.js';
  *
  * @defaultProperty dataProvider
  */
-export class ComboBox extends Component implements IDisplayText {
+export class ComboBox<T = unknown> extends Component implements IDisplayText {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	/**
@@ -40,13 +40,13 @@ export class ComboBox extends Component implements IDisplayText {
 	/**
 	 * @skinPart
 	 */
-	public list?: List;
+	public list?: List<T>;
 
-	private _dataProvider?: ArrayCollection;
+	private _dataProvider?: ArrayCollection<T>;
 	private _selectedIndex = -1;
-	private _selectedItem: unknown;
+	private _selectedItem: T | undefined;
 	private _labelField = 'label';
-	private _labelFunction?: (item: unknown) => string;
+	private _labelFunction?: (item: T) => string;
 	private _isOpen = false;
 	private _prompt = '';
 	private _openParentIndex = -1;
@@ -67,11 +67,11 @@ export class ComboBox extends Component implements IDisplayText {
 	/**
 	 * The data provider for the drop-down list items.
 	 */
-	public get dataProvider(): ArrayCollection | undefined {
+	public get dataProvider(): ArrayCollection<T> | undefined {
 		return this._dataProvider;
 	}
 
-	public set dataProvider(value: ArrayCollection | undefined) {
+	public set dataProvider(value: ArrayCollection<T> | undefined) {
 		if (this._dataProvider === value) return;
 		this._dataProvider = value;
 		if (this.list) {
@@ -97,11 +97,11 @@ export class ComboBox extends Component implements IDisplayText {
 	/**
 	 * The currently selected data item.
 	 */
-	public get selectedItem(): unknown {
+	public get selectedItem(): T | undefined {
 		return this._selectedItem;
 	}
 
-	public set selectedItem(value: unknown) {
+	public set selectedItem(value: T | undefined) {
 		if (this._selectedItem === value) return;
 		if (this._dataProvider) {
 			this.selectedIndex = this._dataProvider.getItemIndex(value);
@@ -147,11 +147,11 @@ export class ComboBox extends Component implements IDisplayText {
 	 * A function that converts a data item to a display string.
 	 * When set, this takes priority over `labelField`.
 	 */
-	public get labelFunction(): ((item: unknown) => string) | undefined {
+	public get labelFunction(): ((item: T) => string) | undefined {
 		return this._labelFunction;
 	}
 
-	public set labelFunction(value: ((item: unknown) => string) | undefined) {
+	public set labelFunction(value: ((item: T) => string) | undefined) {
 		if (this._labelFunction === value) return;
 		this._labelFunction = value;
 		this._updateLabel();
@@ -223,12 +223,12 @@ export class ComboBox extends Component implements IDisplayText {
 	/**
 	 * Convert a data item to a label string using `labelFunction` or `labelField`.
 	 */
-	public itemToLabel(item: unknown): string {
+	public itemToLabel(item: T | undefined): string {
 		if (item == null) return '';
 		if (this._labelFunction) return this._labelFunction(item);
 		if (typeof item === 'string') return item;
 		if (typeof item === 'number' || typeof item === 'boolean') return String(item);
-		const obj = item as Record<string, unknown>;
+		const obj = item as unknown as Record<string, unknown>;
 		if (this._labelField && this._labelField in obj) {
 			return String(obj[this._labelField]);
 		}

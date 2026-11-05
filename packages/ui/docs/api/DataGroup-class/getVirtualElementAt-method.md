@@ -1,13 +1,13 @@
 # getVirtualElementAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-getVirtualElementAt(index: number): DisplayObject | undefined;
+getVirtualElementAt(index: number): ItemRenderer<string, T> | undefined;
 ```
 
 Return or materialize/recycle a renderer for a logical item index. Integer-
 coerces the index; returns undefined without a provider or when out of bounds.
 Renderer construction and data callbacks run synchronously and may throw.
 
-Related types: [DisplayObject](../../../../core/docs/api/DisplayObject-class.md).
+Related types: [ItemRenderer](../ItemRenderer-class.md).

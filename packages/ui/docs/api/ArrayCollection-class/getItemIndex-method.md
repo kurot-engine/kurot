@@ -1,9 +1,9 @@
 # getItemIndex
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-getItemIndex(item: unknown): number;
+getItemIndex(item: T | undefined): number;
 ```
 
 Return the first identity/equality match index, or -1 when the item is absent.

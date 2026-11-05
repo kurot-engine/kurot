@@ -3,11 +3,11 @@ import type { IUIComponent } from './IUIComponent.js';
 /**
  * UI component that renders one item from a data provider.
  */
-export interface IItemRenderer extends IUIComponent {
+export interface IItemRenderer<T = unknown> extends IUIComponent {
 	/**
 	 * The data object to render.
 	 */
-	data: unknown;
+	data: T | undefined;
 	/**
 	 * Whether this item is currently selected.
 	 */

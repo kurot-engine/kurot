@@ -1,9 +1,9 @@
 # rendererRemoved
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-protected rendererRemoved(_renderer: ItemRenderer, _index: number, _item: unknown): void;
+protected rendererRemoved(_renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void;
 ```
 
 Extension hook: protected; available to subclasses.

@@ -1,9 +1,9 @@
 # TabBar
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-class TabBar extends ListBase
+class TabBar<T = unknown> extends ListBase<T>
 ```
 
 TabBar — a horizontal strip of selectable tabs.
@@ -22,7 +22,10 @@ Related types: [ListBase](ListBase-class.md).
 | Member | Scope | Reference |
 | --- | --- | --- |
 | `constructor` | public | [open](TabBar-class/constructor-constructor.md) |
+| `addEventListener` | public, inherited | [open](TabBar-class/addEventListener-property.md) |
 | `isRenderGroup` | public, inherited | [open](TabBar-class/isRenderGroup-property.md) |
+| `once` | public, inherited | [open](TabBar-class/once-property.md) |
+| `removeEventListener` | public, inherited | [open](TabBar-class/removeEventListener-property.md) |
 | `ui` | public, inherited | [open](TabBar-class/ui-property.md) |
 | `static defaultTouchEnabled` | public, inherited | [open](TabBar-class/static-defaultTouchEnabled-property.md) |
 | `static NO_SELECTION` | protected, inherited | [open](TabBar-class/static-NO_SELECTION-property.md) |
@@ -94,7 +97,6 @@ Related types: [ListBase](ListBase-class.md).
 | `zIndex` | public, inherited | [open](TabBar-class/zIndex-accessor.md) |
 | `addChild` | public, inherited | [open](TabBar-class/addChild-method.md) |
 | `addChildAt` | public, inherited | [open](TabBar-class/addChildAt-method.md) |
-| `addEventListener` | public, inherited | [open](TabBar-class/addEventListener-method.md) |
 | `adjustSelection` | protected, inherited | [open](TabBar-class/adjustSelection-method.md) |
 | `cacheAsTexture` | public, inherited | [open](TabBar-class/cacheAsTexture-method.md) |
 | `childAdded` | public, inherited | [open](TabBar-class/childAdded-method.md) |
@@ -132,12 +134,10 @@ Related types: [ListBase](ListBase-class.md).
 | `localToGlobal` | public, inherited | [open](TabBar-class/localToGlobal-method.md) |
 | `measure` | public, inherited | [open](TabBar-class/measure-method.md) |
 | `notifyListener` | protected, inherited | [open](TabBar-class/notifyListener-method.md) |
-| `once` | public, inherited | [open](TabBar-class/once-method.md) |
 | `onCollectionChange` | protected, inherited | [open](TabBar-class/onCollectionChange-method.md) |
 | `removeChild` | public, inherited | [open](TabBar-class/removeChild-method.md) |
 | `removeChildAt` | public, inherited | [open](TabBar-class/removeChildAt-method.md) |
 | `removeChildren` | public, inherited | [open](TabBar-class/removeChildren-method.md) |
-| `removeEventListener` | public, inherited | [open](TabBar-class/removeEventListener-method.md) |
 | `rendererAdded` | protected | [open](TabBar-class/rendererAdded-method.md) |
 | `rendererRemoved` | protected | [open](TabBar-class/rendererRemoved-method.md) |
 | `setChildIndex` | public, inherited | [open](TabBar-class/setChildIndex-method.md) |

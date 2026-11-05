@@ -1,10 +1,10 @@
 # dataProvider
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get dataProvider(): ArrayCollection | undefined;
-set dataProvider(value: ArrayCollection | undefined);
+get dataProvider(): ArrayCollection<T> | undefined;
+set dataProvider(value: ArrayCollection<T> | undefined);
 ```
 
 The data provider for the drop-down list items.

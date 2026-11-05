@@ -1,5 +1,5 @@
-import { Rectangle, Event, DisplayObject } from '@kurot/core';
-import { Group } from './Group.js';
+import { Rectangle, Event } from '@kurot/core';
+import { Group, type GroupEvents } from './Group.js';
 import { getUIContext } from '../core/UIContext.js';
 import { ItemRenderer } from './ItemRenderer.js';
 import { CollectionEvent, CollectionEventKind } from '../events/CollectionEvent.js';
@@ -7,6 +7,7 @@ import type { ICollection } from '../collections/ICollection.js';
 import { VerticalLayout } from '../layouts/VerticalLayout.js';
 import { JustifyAlign } from '../layouts/JustifyAlign.js';
 import type { Skin } from './Skin.js';
+import type { TypedEventListeners } from '../events/TypedEventListeners.js';
 
 type SkinName = string | (new () => Skin) | Skin | undefined;
 
@@ -21,16 +22,29 @@ type SkinName = string | (new () => Skin) | Skin | undefined;
  *
  * @defaultProperty dataProvider
  */
-export class DataGroup extends Group {
+export class DataGroup<T = unknown> extends Group {
+	/**
+	 * Preserve native add/remove/once behavior while specializing list payloads.
+	 */
+	public declare addEventListener: TypedEventListeners<GroupEvents<T>>['addEventListener'];
+	/**
+	 * Observes one typed event through the inherited Core implementation.
+	 */
+	public declare once: TypedEventListeners<GroupEvents<T>>['once'];
+	/**
+	 * Removes a typed listener through the inherited Group implementation.
+	 */
+	public declare removeEventListener: TypedEventListeners<GroupEvents<T>>['removeEventListener'];
+
 	// ── Instance fields ───────────────────────────────────────────────────────
 
-	private _dataProvider?: ICollection;
+	private _dataProvider?: ICollection<T>;
 	private _dataProviderChanged = false;
 
-	private _itemRenderer?: new () => ItemRenderer;
+	private _itemRenderer?: new () => ItemRenderer<string, T>;
 	private _itemRendererChanged = false;
 
-	private _itemRendererFunction?: (item: unknown) => (new () => ItemRenderer) | undefined;
+	private _itemRendererFunction?: (item: T | undefined) => (new () => ItemRenderer<string, T>) | undefined;
 
 	private _itemRendererSkinName: SkinName;
 	private _itemRendererSkinNameChanged = false;
@@ -38,13 +52,13 @@ export class DataGroup extends Group {
 	private _useVirtualLayout = false;
 	private _useVirtualLayoutChanged = false;
 
-	private readonly _rendererToClass = new Map<ItemRenderer, new () => ItemRenderer>();
-	private readonly _freeRenderers = new Map<new () => ItemRenderer, ItemRenderer[]>();
+	private readonly _rendererToClass = new Map<ItemRenderer<string, T>, new () => ItemRenderer<string, T>>();
+	private readonly _freeRenderers = new Map<new () => ItemRenderer<string, T>, ItemRenderer<string, T>[]>();
 	private _renderersBeingUpdated = false;
-	private _indexToRenderer: (ItemRenderer | undefined)[] = [];
+	private _indexToRenderer: (ItemRenderer<string, T> | undefined)[] = [];
 	private _createNewRendererFlag = false;
 	private _typicalLayoutRect?: Rectangle;
-	private _typicalItem: unknown;
+	private _typicalItem: T | undefined;
 	private _typicalItemChanged = false;
 	private _cleanFreeRenderer = false;
 
@@ -56,11 +70,11 @@ export class DataGroup extends Group {
 	 * does not detach this collection subscription; assign undefined when permanently
 	 * closing the view. Data items are never disposed by the group.
 	 */
-	public get dataProvider(): ICollection | undefined {
+	public get dataProvider(): ICollection<T> | undefined {
 		return this._dataProvider;
 	}
 
-	public set dataProvider(value: ICollection | undefined) {
+	public set dataProvider(value: ICollection<T> | undefined) {
 		if (this._dataProvider === value) return;
 		this._removeDataProviderListener();
 		this._dataProvider = value;
@@ -76,11 +90,11 @@ export class DataGroup extends Group {
 	 * creates/recycles instances. Keep per-item listeners/resources in renderer hooks
 	 * so a recycled renderer does not retain the previous item's game state.
 	 */
-	public get itemRenderer(): (new () => ItemRenderer) | undefined {
+	public get itemRenderer(): (new () => ItemRenderer<string, T>) | undefined {
 		return this._itemRenderer;
 	}
 
-	public set itemRenderer(value: (new () => ItemRenderer) | undefined) {
+	public set itemRenderer(value: (new () => ItemRenderer<string, T>) | undefined) {
 		if (this._itemRenderer === value) return;
 		this._itemRenderer = value;
 		this._itemRendererChanged = true;
@@ -94,11 +108,11 @@ export class DataGroup extends Group {
 	 * Optional synchronous per-item renderer-class resolver. An undefined result
 	 * falls back to itemRenderer, then ItemRenderer. Resolver exceptions propagate.
 	 */
-	public get itemRendererFunction(): ((item: unknown) => (new () => ItemRenderer) | undefined) | undefined {
+	public get itemRendererFunction(): ((item: T | undefined) => (new () => ItemRenderer<string, T>) | undefined) | undefined {
 		return this._itemRendererFunction;
 	}
 
-	public set itemRendererFunction(value: ((item: unknown) => (new () => ItemRenderer) | undefined) | undefined) {
+	public set itemRendererFunction(value: ((item: T | undefined) => (new () => ItemRenderer<string, T>) | undefined) | undefined) {
 		if (this._itemRendererFunction === value) return;
 		this._itemRendererFunction = value;
 		this._itemRendererChanged = true;
@@ -145,7 +159,7 @@ export class DataGroup extends Group {
 	/**
 	 * Update a renderer's itemIndex and data. Called by the layout system.
 	 */
-	public updateRenderer(renderer: ItemRenderer, itemIndex: number, data: unknown): ItemRenderer {
+	public updateRenderer(renderer: ItemRenderer<string, T>, itemIndex: number, data: T | undefined): ItemRenderer<string, T> {
 		this._renderersBeingUpdated = true;
 		renderer.itemIndex = itemIndex;
 		if (renderer.parent === this) {
@@ -171,7 +185,7 @@ export class DataGroup extends Group {
 	 * Return an already materialized renderer for a 0-based logical item index.
 	 * Returns undefined for absent/offscreen items; does not create a renderer.
 	 */
-	public override getElementAt(index: number): DisplayObject | undefined {
+	public override getElementAt(index: number): ItemRenderer<string, T> | undefined {
 		return this._indexToRenderer[index] ?? undefined;
 	}
 
@@ -180,7 +194,7 @@ export class DataGroup extends Group {
 	 * coerces the index; returns undefined without a provider or when out of bounds.
 	 * Renderer construction and data callbacks run synchronously and may throw.
 	 */
-	public override getVirtualElementAt(index: number): DisplayObject | undefined {
+	public override getVirtualElementAt(index: number): ItemRenderer<string, T> | undefined {
 		index = index | 0;
 		if (!this._dataProvider || index < 0 || index >= this._dataProvider.length) return undefined;
 		let renderer = this._indexToRenderer[index];
@@ -289,7 +303,7 @@ export class DataGroup extends Group {
 
 	// ── Protected methods (subclass hooks) ────────────────────────────────────
 
-	protected itemAdded(item: unknown, index: number): void {
+	protected itemAdded(item: T | undefined, index: number): void {
 		this.layout?.elementAdded(index);
 		if (this.layout?.useVirtualLayout) {
 			this._indexToRenderer.splice(index, 0, undefined);
@@ -306,7 +320,7 @@ export class DataGroup extends Group {
 		}
 	}
 
-	protected itemRemoved(item: unknown, index: number): void {
+	protected itemRemoved(item: T | undefined, index: number): void {
 		this.layout?.elementRemoved(index);
 		const oldRenderer = this._indexToRenderer[index];
 		if (this._indexToRenderer.length > index) {
@@ -322,7 +336,7 @@ export class DataGroup extends Group {
 		}
 	}
 
-	protected onCollectionChange(event: CollectionEvent): void {
+	protected onCollectionChange(event: CollectionEvent<T>): void {
 		switch (event.kind) {
 			case CollectionEventKind.ADD:
 				this._itemAddedHandler(event.items, event.location);
@@ -352,15 +366,15 @@ export class DataGroup extends Group {
 		this.invalidateDisplayList();
 	}
 
-	protected rendererAdded(_renderer: ItemRenderer, _index: number, _item: unknown): void {}
+	protected rendererAdded(_renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {}
 
-	protected rendererRemoved(_renderer: ItemRenderer, _index: number, _item: unknown): void {}
+	protected rendererRemoved(_renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {}
 
 	/**
 	 * Get the renderer at the given index, if one exists.
 	 * Used by subclasses (e.g. ListBase) to update renderer state.
 	 */
-	protected getRendererAt(index: number): ItemRenderer | undefined {
+	protected getRendererAt(index: number): ItemRenderer<string, T> | undefined {
 		return this._indexToRenderer[index];
 	}
 
@@ -373,24 +387,24 @@ export class DataGroup extends Group {
 	}
 
 	private _onCollectionChange = (e: Event): void => {
-		this.onCollectionChange(e as CollectionEvent);
+		this.onCollectionChange(e as CollectionEvent<T>);
 	};
 
-	private _itemAddedHandler(items: unknown[], index: number): void {
+	private _itemAddedHandler(items: (T | undefined)[], index: number): void {
 		for (let i = 0; i < items.length; i++) {
 			this.itemAdded(items[i], index + i);
 		}
 		this._resetRenderersIndices();
 	}
 
-	private _itemRemovedHandler(items: unknown[], location: number): void {
+	private _itemRemovedHandler(items: (T | undefined)[], location: number): void {
 		for (let i = items.length - 1; i >= 0; i--) {
 			this.itemRemoved(items[i], location + i);
 		}
 		this._resetRenderersIndices();
 	}
 
-	private _itemUpdatedHandler(item: unknown, location: number): void {
+	private _itemUpdatedHandler(item: T | undefined, location: number): void {
 		if (this._renderersBeingUpdated) return;
 		const renderer = this._indexToRenderer[location];
 		if (renderer) {
@@ -398,7 +412,7 @@ export class DataGroup extends Group {
 		}
 	}
 
-	private _createVirtualRenderer(item: unknown): ItemRenderer {
+	private _createVirtualRenderer(item: T | undefined): ItemRenderer<string, T> {
 		const rendererClass = this._itemToRendererClass(item);
 		const pool = this._freeRenderers.get(rendererClass);
 		if (pool && pool.length > 0) {
@@ -411,7 +425,7 @@ export class DataGroup extends Group {
 		return this._createOneRenderer(rendererClass);
 	}
 
-	private _createOneRenderer(rendererClass: new () => ItemRenderer): ItemRenderer {
+	private _createOneRenderer(rendererClass: new () => ItemRenderer<string, T>): ItemRenderer<string, T> {
 		const context = getUIContext(this);
 		const renderer = context ? context.run(() => new rendererClass()) : new rendererClass();
 		this._rendererToClass.set(renderer, rendererClass);
@@ -422,7 +436,7 @@ export class DataGroup extends Group {
 		return renderer;
 	}
 
-	private _doFreeRenderer(renderer: ItemRenderer): void {
+	private _doFreeRenderer(renderer: ItemRenderer<string, T>): void {
 		const cls = this._rendererToClass.get(renderer);
 		if (!cls) return;
 		let pool = this._freeRenderers.get(cls);
@@ -442,8 +456,8 @@ export class DataGroup extends Group {
 		}
 	}
 
-	private _itemToRendererClass(item: unknown): new () => ItemRenderer {
-		let cls: (new () => ItemRenderer) | undefined;
+	private _itemToRendererClass(item: T | undefined): new () => ItemRenderer<string, T> {
+		let cls: (new () => ItemRenderer<string, T>) | undefined;
 		if (this._itemRendererFunction) {
 			cls = this._itemRendererFunction(item);
 		}
@@ -537,7 +551,7 @@ export class DataGroup extends Group {
 		}
 	}
 
-	private _setItemRendererSkinName(renderer: ItemRenderer, skinName: SkinName): void {
+	private _setItemRendererSkinName(renderer: ItemRenderer<string, T>, skinName: SkinName): void {
 		if (!renderer.skinNameExplicitlySet) {
 			renderer.skinName = skinName;
 			renderer.skinNameExplicitlySet = false;

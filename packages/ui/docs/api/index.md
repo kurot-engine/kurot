@@ -1,6 +1,6 @@
 # @kurot/ui API
 
-Version: **4.1.0**. Read the installed package's matching documentation.
+Version: **4.2.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).
@@ -15,6 +15,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `AddItems` | Class | [open](AddItems-class.md) |
 | `Animation` | Class | [open](Animation-class.md) |
 | `ArrayCollection` | Class | [open](ArrayCollection-class.md) |
+| `ArrayCollectionEvents` | Interface | [open](ArrayCollectionEvents-interface.md) |
 | `BasicLayout` | Class | [open](BasicLayout-class.md) |
 | `Binding` | Class | [open](Binding-class.md) |
 | `BitmapLabel` | Class | [open](BitmapLabel-class.md) |
@@ -42,6 +43,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `HSlider` | Class | [open](HSlider-class.md) |
 | `IAssetAdapter` | Interface | [open](IAssetAdapter-interface.md) |
 | `ICollection` | Interface | [open](ICollection-interface.md) |
+| `ICollectionEvents` | Interface | [open](ICollectionEvents-interface.md) |
 | `IDisplayText` | Interface | [open](IDisplayText-interface.md) |
 | `IItemRenderer` | Interface | [open](IItemRenderer-interface.md) |
 | `ILayoutTarget` | Interface | [open](ILayoutTarget-interface.md) |

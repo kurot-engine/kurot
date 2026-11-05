@@ -11,14 +11,14 @@ import { ItemTapEvent } from '../events/ItemTapEvent.js';
  *
  * @defaultProperty dataProvider
  */
-export class List extends ListBase {
+export class List<T = unknown> extends ListBase<T> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
-	private readonly _rendererHandlers = new Map<ItemRenderer, (e: Event) => void>();
+	private readonly _rendererHandlers = new Map<ItemRenderer<string, T>, (e: Event) => void>();
 
 	// ── Override methods ──────────────────────────────────────────────────
 
-	protected override rendererAdded(renderer: ItemRenderer, _index: number, _item: unknown): void {
+	protected override rendererAdded(renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {
 		const handler = (_e: Event): void => {
 			const idx = renderer.itemIndex;
 			if (idx >= 0) this.setSelectedIndex(idx, true);
@@ -28,7 +28,7 @@ export class List extends ListBase {
 		renderer.addEventListener(TouchEvent.TOUCH_TAP, handler);
 	}
 
-	protected override rendererRemoved(renderer: ItemRenderer, _index: number, _item: unknown): void {
+	protected override rendererRemoved(renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {
 		const handler = this._rendererHandlers.get(renderer);
 		if (handler) {
 			this._rendererHandlers.delete(renderer);

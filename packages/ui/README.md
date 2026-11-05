@@ -1,13 +1,22 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **4.1.0** (published on npm).
+Kurot games. Package version: **4.2.0** (published on npm).
 Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
 the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
 [API topics](docs/api/topics.md) and the [symbol index](docs/api/index.md) for
 exact member contracts. Build-time KUI skins run through UI without ui-runtime.
+
+## Typed list data
+
+UI 4.2 adds `List<T>`, inferred `ArrayCollection<T>`, nullable selection and typed
+item-tap listeners. Defaults remain unknown; ItemRenderer retains `TSkin` first
+and adds data second. Sparse/missing reads and empty selection include undefined.
+Declared typed list fields in KUI hosts require CLI **>= 4.1.1 within 4.x**;
+ordinary TypeScript use does not require CLI. See
+[list data types](docs/list-data-types.md) for examples and null/undefined behavior.
 
 ## RichLabel component typography
 
@@ -21,7 +30,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^4.1.0 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^4.2.0 @kurot/core@^2.5.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.

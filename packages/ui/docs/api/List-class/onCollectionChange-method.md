@@ -1,9 +1,9 @@
 # onCollectionChange
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-protected onCollectionChange(event: CollectionEvent): void;
+protected onCollectionChange(event: CollectionEvent<T>): void;
 ```
 
 Extension hook: protected; available to subclasses.

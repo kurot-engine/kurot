@@ -1,9 +1,9 @@
 # replaceAll
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-replaceAll(newSource: unknown[]): void;
+replaceAll(newSource: T[]): void;
 ```
 
 Replace all items with a new source. Unlike setting `source`, this does

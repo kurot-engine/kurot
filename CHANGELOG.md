@@ -5,6 +5,45 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — UI 4.2.0 / CLI 4.1.1 publication verified
+
+- Verify exact npm versions and latest tags as UI 4.2.0 and CLI 4.1.1. Download
+  both registry archives and validate SHA-512 integrity and SHA-1 shasums.
+  The archives are byte-identical to the tested preparation artifacts, including
+  all 5,587 UI files and 285 CLI files.
+- Confirm UI's Core peer ^2.5.2 and CLI's ordinary document dependency ^0.14.0.
+  No new runtime dependency, peer minimum or unrelated SDK version is required.
+- A fresh registry consumer passes strict development/release builds and a
+  complete declaration check with skipLibCheck=false and noUncheckedIndexedAccess.
+  It covers inferred/nullable list data, declared typed Skin fields and legacy
+  renderer Skin arguments, with shared Core 2.8.0 and CLI document 0.14.0.
+- Synchronize repository/package README and maintainer context to published
+  status. Immutable registry archives retain the preparation wording shipped
+  at publication. Examples and external Templates keep their existing manifests
+  and locks pending explicit adoption.
+
+## 2026-11-06 — Typed list data release preparation
+
+- Prepare UI 4.2.0 for item-data generics across collections, list controls,
+  renderers and events; keep unknown defaults and existing TSkin argument order.
+  Nullable/sparse data, empty selection and runtime drawing behavior are preserved.
+- Prepare CLI 4.1.1 to accept typed native list fields and distinguish SDK data
+  parameters from Skin parameters. Keep native type/inheritance checks, concrete
+  source-data constraints and non-data arguments checked; KUI format is unchanged.
+- Keep UI's Core peer ^2.5.2, CLI's document dependency ^0.14.0 and unrelated SDK
+  versions unchanged. ui-runtime's UI ^4.1.0 peer already accepts UI 4.2.0.
+- CLI starter manifests keep latest lookups. Existing examples and external
+  Templates keep their manifests and locks until explicit post-publication adoption;
+  projects using typed KUI host fields need UI >= 4.2.0 and CLI >= 4.1.1 within 4.x.
+- Synchronize package/root README, maintainer context, typed-list contracts and
+  generated API identity. These source versions are not npm publication records.
+- Verification: both package builds, all 465 UI tests and all 208 CLI tests pass.
+  API validation reports zero missing references and compiles all 19 examples
+  against built declarations and source-free packages. Prepared UI/CLI archives
+  contain matching versions, README/CHANGELOG and unchanged dependency minima.
+- One existing CLI style-watch test hit its 5-second timeout on the initial run.
+  A subsequent isolated single-worker full run passes without code or timeout changes.
+
 ## 2026-11-05 — Examples and Templates adopt UI/CLI 4.1
 
 - Update CLI to 4.1.0 in demo, game, star-catcher and all five external Templates

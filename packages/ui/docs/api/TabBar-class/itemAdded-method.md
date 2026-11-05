@@ -1,9 +1,9 @@
 # itemAdded
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-protected itemAdded(item: unknown, index: number): void;
+protected itemAdded(item: T | undefined, index: number): void;
 ```
 
 Extension hook: protected; available to subclasses.

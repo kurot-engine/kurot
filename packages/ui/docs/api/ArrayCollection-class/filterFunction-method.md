@@ -1,9 +1,9 @@
 # filterFunction
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-filterFunction(testFn: (item: unknown) => boolean): void;
+filterFunction(testFn: (item: T) => boolean): void;
 ```
 
 Filter the collection in place, keeping only items that pass the test.

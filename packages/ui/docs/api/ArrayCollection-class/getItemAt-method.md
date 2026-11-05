@@ -1,9 +1,9 @@
 # getItemAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-getItemAt(index: number): unknown;
+getItemAt(index: number): T | undefined;
 ```
 
 Read a 0-based item index; absent indices return undefined rather than throwing.

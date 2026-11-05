@@ -1,12 +1,12 @@
 # getElementAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-getElementAt(index: number): DisplayObject | undefined;
+getElementAt(index: number): ItemRenderer<string, T> | undefined;
 ```
 
 Return an already materialized renderer for a 0-based logical item index.
 Returns undefined for absent/offscreen items; does not create a renderer.
 
-Related types: [DisplayObject](../../../../core/docs/api/DisplayObject-class.md).
+Related types: [ItemRenderer](../ItemRenderer-class.md).

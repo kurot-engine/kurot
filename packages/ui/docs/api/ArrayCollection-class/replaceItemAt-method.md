@@ -1,9 +1,9 @@
 # replaceItemAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-replaceItemAt(item: unknown, index: number): unknown;
+replaceItemAt(item: T, index: number): T | undefined;
 ```
 
 Replace an item, return the previous item and dispatch REPLACE. Neither item

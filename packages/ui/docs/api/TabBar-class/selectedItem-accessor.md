@@ -1,10 +1,10 @@
 # selectedItem
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get selectedItem(): unknown;
-set selectedItem(value: unknown);
+get selectedItem(): T | undefined;
+set selectedItem(value: T | undefined);
 ```
 
 Inherited from `selectedItem`; shown with this receiver's substituted types.

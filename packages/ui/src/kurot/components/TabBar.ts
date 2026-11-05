@@ -16,10 +16,10 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
  *
  * @defaultProperty dataProvider
  */
-export class TabBar extends ListBase {
+export class TabBar<T = unknown> extends ListBase<T> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
-	private readonly _rendererHandlers = new Map<ItemRenderer, (e: Event) => void>();
+	private readonly _rendererHandlers = new Map<ItemRenderer<string, T>, (e: Event) => void>();
 	private _viewStack?: ViewStack;
 	private _indexBeingUpdated = false;
 
@@ -37,11 +37,11 @@ export class TabBar extends ListBase {
 	 * Override dataProvider to detect ViewStack and set up bidirectional binding:
 	 * TabBar CHANGE → ViewStack.selectedIndex, ViewStack PropertyChange → TabBar.selectedIndex.
 	 */
-	public override get dataProvider(): ICollection | undefined {
+	public override get dataProvider(): ICollection<T> | undefined {
 		return super.dataProvider;
 	}
 
-	public override set dataProvider(value: ICollection | undefined) {
+	public override set dataProvider(value: ICollection<T> | undefined) {
 		// Clean up previous ViewStack binding
 		if (this._viewStack) {
 			this._viewStack.removeEventListener(PropertyEvent.PROPERTY_CHANGE, this._onViewStackPropChange);
@@ -69,7 +69,7 @@ export class TabBar extends ListBase {
 
 	// ── Protected methods ─────────────────────────────────────────────────
 
-	protected override rendererAdded(renderer: ItemRenderer, _index: number, _item: unknown): void {
+	protected override rendererAdded(renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {
 		const handler = (_e: Event): void => {
 			const idx = renderer.itemIndex;
 			if (idx >= 0) this.setSelectedIndex(idx, true);
@@ -79,7 +79,7 @@ export class TabBar extends ListBase {
 		renderer.addEventListener(TouchEvent.TOUCH_TAP, handler);
 	}
 
-	protected override rendererRemoved(renderer: ItemRenderer, _index: number, _item: unknown): void {
+	protected override rendererRemoved(renderer: ItemRenderer<string, T>, _index: number, _item: T | undefined): void {
 		const handler = this._rendererHandlers.get(renderer);
 		if (handler) {
 			this._rendererHandlers.delete(renderer);

@@ -1,10 +1,10 @@
 # itemRendererFunction
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get itemRendererFunction(): ((item: unknown) => (() => ItemRenderer) | undefined) | undefined;
-set itemRendererFunction(value: ((item: unknown) => (() => ItemRenderer) | undefined) | undefined);
+get itemRendererFunction(): ((item: T | undefined) => (() => ItemRenderer<string, T>) | undefined) | undefined;
+set itemRendererFunction(value: ((item: T | undefined) => (() => ItemRenderer<string, T>) | undefined) | undefined);
 ```
 
 Optional synchronous per-item renderer-class resolver. An undefined result

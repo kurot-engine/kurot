@@ -1,9 +1,9 @@
 # removeItemAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-removeItemAt(index: number): unknown;
+removeItemAt(index: number): T | undefined;
 ```
 
 Remove and return an item, dispatching REMOVE without disposing it. Pass an

@@ -10,7 +10,7 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
  * Maintains a `selectedIndex` and tracks the currently selected renderer.
  * Subclasses (e.g. List) add touch interaction.
  */
-export class ListBase extends DataGroup {
+export class ListBase<T = unknown> extends DataGroup<T> {
 	// ── Sentinel constants ──────────────────────────────────────────────
 
 	/**
@@ -30,7 +30,7 @@ export class ListBase extends DataGroup {
 	/**
 	 * Item passed to the selected-item setter before a data provider is available.
 	 */
-	private _pendingSelectedItem: unknown;
+	private _pendingSelectedItem: T | undefined;
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
@@ -52,12 +52,12 @@ export class ListBase extends DataGroup {
 	 * uses getItemIndex identity matching. Before a provider is available, stores a
 	 * pending item for the next property commit; no data object is copied or disposed.
 	 */
-	public get selectedItem(): unknown {
+	public get selectedItem(): T | undefined {
 		if (this._selectedIndex < 0 || !this.dataProvider) return undefined;
 		return this.dataProvider.getItemAt(this._selectedIndex);
 	}
 
-	public set selectedItem(value: unknown) {
+	public set selectedItem(value: T | undefined) {
 		if (!this.dataProvider) {
 			this._pendingSelectedItem = value;
 			this.invalidateProperties();
@@ -112,12 +112,12 @@ export class ListBase extends DataGroup {
 	 * Override updateRenderer to sync the renderer's `selected` state when it
 	 * is created/recycled (matching Egret's `itemSelected` call).
 	 */
-	public override updateRenderer(renderer: ItemRenderer, itemIndex: number, data: unknown): ItemRenderer {
+	public override updateRenderer(renderer: ItemRenderer<string, T>, itemIndex: number, data: T | undefined): ItemRenderer<string, T> {
 		this.itemSelected(itemIndex, this._selectedIndex === itemIndex);
 		return super.updateRenderer(renderer, itemIndex, data);
 	}
 
-	protected override onCollectionChange(event: CollectionEvent): void {
+	protected override onCollectionChange(event: CollectionEvent<T>): void {
 		const kind = event.kind;
 		const location = event.location ?? -1;
 

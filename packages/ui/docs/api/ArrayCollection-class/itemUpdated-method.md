@@ -1,9 +1,9 @@
 # itemUpdated
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-itemUpdated(item: unknown): void;
+itemUpdated(item: T): void;
 ```
 
 Dispatch UPDATE for an existing item's first matching index. Missing items are

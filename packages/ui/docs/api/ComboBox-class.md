@@ -1,9 +1,9 @@
 # ComboBox
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-class ComboBox extends Component implements IDisplayText
+class ComboBox<T = unknown> extends Component implements IDisplayText
 ```
 
 ComboBox — a drop-down selection component.

@@ -1,10 +1,10 @@
 # labelFunction
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get labelFunction(): ((item: unknown) => string) | undefined;
-set labelFunction(value: ((item: unknown) => string) | undefined);
+get labelFunction(): ((item: T) => string) | undefined;
+set labelFunction(value: ((item: T) => string) | undefined);
 ```
 
 A function that converts a data item to a display string.

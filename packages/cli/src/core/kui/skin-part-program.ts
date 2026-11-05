@@ -23,7 +23,7 @@ export async function createSkinPartProgram(
 	project: Project,
 	skins: readonly SkinIR[],
 	declaration: string,
-): Promise<{ checker: ts.TypeChecker; hosts: readonly SkinPartHostTypes[] }> {
+): Promise<{ checker: ts.TypeChecker; hosts: readonly SkinPartHostTypes[]; uiExports?: ts.Type }> {
 	const file = path.join(project.root, '.kurot/skin-parts.d.ts');
 	const discovered = await collectSkinHosts(project, file, skins.map(skin => skin.className));
 	const candidates = discovered.flatMap(host => host.skinNames.map(skinName => ({
@@ -42,7 +42,7 @@ export async function createSkinPartProgram(
 		`type __KurotHost${index} = import(${JSON.stringify(host.module)}).${host.className};`,
 		`type __KurotParts${index} = import("@kurot/ui").SkinPartsOf<${JSON.stringify(host.skinName)}>;`,
 	]);
-	const source = `${declaration}\n${aliases.join('\n')}\n`;
+	const source = `${declaration}\n${aliases.join('\n')}\ntype __KurotUIExports = typeof import("@kurot/ui");\n`;
 	const options = projectOptions(project.root);
 	const compilerHost = ts.createCompilerHost(options);
 	const original = compilerHost.getSourceFile.bind(compilerHost);
@@ -70,7 +70,7 @@ export async function createSkinPartProgram(
 			hosts.push({ ...candidate, source: candidate.source || undefined, host, parts });
 		}
 	}
-	return { checker, hosts };
+	return { checker, hosts, uiExports: types.get('__KurotUIExports') };
 }
 
 function projectOptions(root: string): ts.CompilerOptions {

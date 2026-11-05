@@ -1,9 +1,9 @@
 # addItemAt
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-addItemAt(item: unknown, index: number): void;
+addItemAt(item: T, index: number): void;
 ```
 
 Insert a borrowed item and dispatch ADD. Pass an integer index from 0 through

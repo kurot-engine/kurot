@@ -1,12 +1,12 @@
 # ArrayCollection
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-class ArrayCollection extends EventDispatcher<ArrayCollectionEvents> implements ICollection
+class ArrayCollection<T = unknown> extends EventDispatcher<ArrayCollectionEvents<T>> implements ICollection<T>
 ```
 
-A wrapper around a plain `unknown[]` that implements [ICollection](ICollection-interface.md).
+A wrapper around a plain `T[]` that implements [ICollection](ICollection-interface.md).
 
 Dispatches [CollectionEvent.COLLECTION_CHANGE](CollectionEvent-class/static-COLLECTION_CHANGE-property.md) whenever items are
 added, removed, replaced, or the entire source is reset — allowing
@@ -16,7 +16,7 @@ data-driven components (DataGroup, List, TabBar…) to update efficiently.
 
 source
 
-Related types: [EventDispatcher](../../../core/docs/api/EventDispatcher-class.md), [ArrayCollectionEvents](supporting/ui-ArrayCollectionEvents.md), [ICollection](ICollection-interface.md).
+Related types: [EventDispatcher](../../../core/docs/api/EventDispatcher-class.md), [ArrayCollectionEvents](ArrayCollectionEvents-interface.md), [ICollection](ICollection-interface.md).
 
 ## Members
 

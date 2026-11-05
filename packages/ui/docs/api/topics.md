@@ -3,7 +3,7 @@
 Read one capability list, then only the required symbol/member pages.
 
 - [binding](topics/binding.md) — 2 declarations
-- [collections](topics/collections.md) — 2 declarations
+- [collections](topics/collections.md) — 4 declarations
 - [components](topics/components.md) — 42 declarations
 - [core](topics/core.md) — 24 declarations
 - [events](topics/events.md) — 7 declarations

@@ -1,2 +1,2 @@
-export type { ICollection } from './ICollection.js';
-export { ArrayCollection } from './ArrayCollection.js';
+export type { ICollection, ICollectionEvents } from './ICollection.js';
+export { ArrayCollection, type ArrayCollectionEvents } from './ArrayCollection.js';

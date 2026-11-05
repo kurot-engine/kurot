@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -270,6 +270,20 @@
           "file": "ArrayCollection-class/willTrigger-method.md",
           "protected": false,
           "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "ArrayCollectionEvents",
+      "kind": "Interface",
+      "file": "ArrayCollectionEvents-interface.md",
+      "topic": "collections",
+      "members": [
+        {
+          "name": "collectionChange",
+          "file": "ArrayCollectionEvents-interface/collectionChange-property.md",
+          "protected": false,
+          "inherited": false
         }
       ]
     },
@@ -4917,10 +4931,28 @@
           "inherited": true
         },
         {
+          "name": "addEventListener",
+          "file": "DataGroup-class/addEventListener-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "isRenderGroup",
           "file": "DataGroup-class/isRenderGroup-property.md",
           "protected": false,
           "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "DataGroup-class/once-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "removeEventListener",
+          "file": "DataGroup-class/removeEventListener-property.md",
+          "protected": false,
+          "inherited": false
         },
         {
           "name": "ui",
@@ -5325,12 +5357,6 @@
           "inherited": true
         },
         {
-          "name": "addEventListener",
-          "file": "DataGroup-class/addEventListener-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "cacheAsTexture",
           "file": "DataGroup-class/cacheAsTexture-method.md",
           "protected": false,
@@ -5529,12 +5555,6 @@
           "inherited": true
         },
         {
-          "name": "once",
-          "file": "DataGroup-class/once-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "onCollectionChange",
           "file": "DataGroup-class/onCollectionChange-method.md",
           "protected": true,
@@ -5555,12 +5575,6 @@
         {
           "name": "removeChildren",
           "file": "DataGroup-class/removeChildren-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "removeEventListener",
-          "file": "DataGroup-class/removeEventListener-method.md",
           "protected": false,
           "inherited": true
         },
@@ -9406,16 +9420,28 @@
       "topic": "collections",
       "members": [
         {
+          "name": "addEventListener",
+          "file": "ICollection-interface/addEventListener-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "length",
           "file": "ICollection-interface/length-property.md",
           "protected": false,
           "inherited": false
         },
         {
-          "name": "addEventListener",
-          "file": "ICollection-interface/addEventListener-method.md",
+          "name": "once",
+          "file": "ICollection-interface/once-property.md",
           "protected": false,
-          "inherited": true
+          "inherited": false
+        },
+        {
+          "name": "removeEventListener",
+          "file": "ICollection-interface/removeEventListener-property.md",
+          "protected": false,
+          "inherited": false
         },
         {
           "name": "dispatchEvent",
@@ -9442,22 +9468,24 @@
           "inherited": true
         },
         {
-          "name": "once",
-          "file": "ICollection-interface/once-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "removeEventListener",
-          "file": "ICollection-interface/removeEventListener-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "willTrigger",
           "file": "ICollection-interface/willTrigger-method.md",
           "protected": false,
           "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "ICollectionEvents",
+      "kind": "Interface",
+      "file": "ICollectionEvents-interface.md",
+      "topic": "collections",
+      "members": [
+        {
+          "name": "collectionChange",
+          "file": "ICollectionEvents-interface/collectionChange-property.md",
+          "protected": false,
+          "inherited": false
         }
       ]
     },
@@ -13843,8 +13871,26 @@
           "inherited": true
         },
         {
+          "name": "addEventListener",
+          "file": "List-class/addEventListener-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
           "name": "isRenderGroup",
           "file": "List-class/isRenderGroup-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "List-class/once-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "List-class/removeEventListener-property.md",
           "protected": false,
           "inherited": true
         },
@@ -14275,12 +14321,6 @@
           "inherited": true
         },
         {
-          "name": "addEventListener",
-          "file": "List-class/addEventListener-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "adjustSelection",
           "file": "List-class/adjustSelection-method.md",
           "protected": true,
@@ -14503,12 +14543,6 @@
           "inherited": true
         },
         {
-          "name": "once",
-          "file": "List-class/once-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "onCollectionChange",
           "file": "List-class/onCollectionChange-method.md",
           "protected": true,
@@ -14529,12 +14563,6 @@
         {
           "name": "removeChildren",
           "file": "List-class/removeChildren-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "removeEventListener",
-          "file": "List-class/removeEventListener-method.md",
           "protected": false,
           "inherited": true
         },
@@ -14673,8 +14701,26 @@
           "inherited": true
         },
         {
+          "name": "addEventListener",
+          "file": "ListBase-class/addEventListener-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
           "name": "isRenderGroup",
           "file": "ListBase-class/isRenderGroup-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "ListBase-class/once-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "ListBase-class/removeEventListener-property.md",
           "protected": false,
           "inherited": true
         },
@@ -15105,12 +15151,6 @@
           "inherited": true
         },
         {
-          "name": "addEventListener",
-          "file": "ListBase-class/addEventListener-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "adjustSelection",
           "file": "ListBase-class/adjustSelection-method.md",
           "protected": true,
@@ -15333,12 +15373,6 @@
           "inherited": true
         },
         {
-          "name": "once",
-          "file": "ListBase-class/once-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "onCollectionChange",
           "file": "ListBase-class/onCollectionChange-method.md",
           "protected": true,
@@ -15359,12 +15393,6 @@
         {
           "name": "removeChildren",
           "file": "ListBase-class/removeChildren-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "removeEventListener",
-          "file": "ListBase-class/removeEventListener-method.md",
           "protected": false,
           "inherited": true
         },
@@ -23640,8 +23668,26 @@
           "inherited": false
         },
         {
+          "name": "addEventListener",
+          "file": "TabBar-class/addEventListener-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
           "name": "isRenderGroup",
           "file": "TabBar-class/isRenderGroup-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "TabBar-class/once-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "TabBar-class/removeEventListener-property.md",
           "protected": false,
           "inherited": true
         },
@@ -24072,12 +24118,6 @@
           "inherited": true
         },
         {
-          "name": "addEventListener",
-          "file": "TabBar-class/addEventListener-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "adjustSelection",
           "file": "TabBar-class/adjustSelection-method.md",
           "protected": true,
@@ -24300,12 +24340,6 @@
           "inherited": true
         },
         {
-          "name": "once",
-          "file": "TabBar-class/once-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "onCollectionChange",
           "file": "TabBar-class/onCollectionChange-method.md",
           "protected": true,
@@ -24326,12 +24360,6 @@
         {
           "name": "removeChildren",
           "file": "TabBar-class/removeChildren-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "removeEventListener",
-          "file": "TabBar-class/removeEventListener-method.md",
           "protected": false,
           "inherited": true
         },
@@ -31316,7 +31344,6 @@
   "supportingTypes": [
     "supporting/ui-QueueClient.md",
     "supporting/ui-ChildInfo.md",
-    "supporting/ui-SkinName.md",
-    "supporting/ui-ArrayCollectionEvents.md"
+    "supporting/ui-SkinName.md"
   ]
 }

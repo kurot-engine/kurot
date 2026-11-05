@@ -7,6 +7,34 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 4.1.1 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 285 files and the compressed archive
+are byte-identical to the tested release artifact.
+
+### Fixed
+
+- Permit native list/renderer fields to specialize XML's unknown item type while
+  retaining installed SDK symbol identity, generic constructor assignability,
+  non-data arguments and existing required/native-part/member-conflict checks.
+- Exclude SDK data parameters from generic Skin-name discovery, retaining
+  ItemRenderer TSkin first and honoring named/namespace import bindings.
+- Keep concrete source data types and project-specific constraints checked; no
+  Core, resource or KUI-format change and no blanket generic erasure.
+- Add positive and negative regressions for nullable/optional data, inherited
+  native types, wrong controls, Skin types, extra members and source data types.
+
+### Compatibility and verification
+
+- Typed list fields use UI >= 4.2.0 within 4.x. Existing UI 4.0/4.1 projects
+  retain their contracts. CLI's ui-document dependency remains ^0.14.0;
+  no Core/UI runtime dependency or template dependency change is introduced.
+- CLI build and all 208 tests pass. Packed UI/CLI consumers pass strict types
+  and development/release builds on Core 2.8.0; strict types and release builds
+  also pass on the accepted 2.5.2 minimum. In both cases,
+  a wrong native control still fails with KUROT_KUI_PART_BINDING_INVALID.
+
 ## 4.1.0 — 2026-11-05
 
 Published; exact version and npm latest verified on 2026-11-05. Downloaded

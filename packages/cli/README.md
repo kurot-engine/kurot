@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **4.1.0** (published on npm).
+resource watching. Package version: **4.1.1** (published on npm).
 Requires Node.js >= 20 and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
@@ -9,6 +9,14 @@ UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract che
 For UI production use the installed UI [authoring guide](../ui/docs/ui-authoring.md)
 and [ScoreHUD recipe](../ui/docs/recipes/score-hud.md). Legacy EXML projects use
 the separate CLI 1.3.x line. KUI configuration and resource files are project-owned.
+
+## Typed list Skin fields
+
+CLI 4.1.1 supports UI **>= 4.2.0 within 4.x** typed native list fields such as
+`declare items: List<ItemData | null>` without changing KUI syntax. It preserves
+control identity, inheritance and non-data generic checks; see
+[field checks](docs/skin-part-fields.md#typed-list-fields). Existing UI 4.0/4.1
+projects can keep their current runtime packages when not adopting typed lists.
 
 ## RichLabel component typography
 
@@ -26,7 +34,7 @@ dependency. New scaffolds use Core ^2.7.0 for release resource versioning and ca
 stage-attribute startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@4.1.0 create my-game
+npx @kurot/cli@4.1.1 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -34,7 +42,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^4.1.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^4.1.1`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands

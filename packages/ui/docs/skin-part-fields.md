@@ -100,3 +100,15 @@ do not commit a new skinName. Cleanup hooks must not claim a new skin's part nam
 for business state; such changes are rechecked before installation. Exceptions
 from application hooks or setters propagate and do not roll back their external
 side effects.
+
+## Typed list fields
+
+UI >= 4.2.0 within 4.x supports `declare items: List<ItemData | null>` on a host
+component. Its dataProvider, selectedItem and itemTap callbacks retain that item
+type. ItemRenderer uses `ItemRenderer<TSkin, T>` so existing Skin arguments keep
+their meaning. See [list data types](list-data-types.md).
+
+Use CLI >= 4.1.1 within 4.x for matching typed-data field validation. The
+checker resolves native constructors and preserves non-data generic checks
+without adding XML generic syntax. Generated part maps remain XML-derived;
+direct host fields carry business data types.

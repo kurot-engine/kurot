@@ -1,10 +1,10 @@
 # source
 
-Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-get source(): unknown[];
-set source(value: unknown[]);
+get source(): T[];
+set source(value: T[]);
 ```
 
 Live backing array, initially the supplied array or an empty array. Assignment

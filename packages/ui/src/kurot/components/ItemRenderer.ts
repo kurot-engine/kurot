@@ -12,7 +12,7 @@ import type { IItemRenderer } from '../core/IItemRenderer.js';
  *
  * @skinPart labelDisplay — optional Label for the item label
  */
-export class ItemRenderer<TSkin extends string = string> extends Component<TSkin> implements IItemRenderer {
+export class ItemRenderer<TSkin extends string = string, T = unknown> extends Component<TSkin> implements IItemRenderer<T> {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	public itemIndex = -1;
@@ -24,7 +24,7 @@ export class ItemRenderer<TSkin extends string = string> extends Component<TSkin
 	 */
 	public labelDisplay?: Label;
 
-	private _data: unknown;
+	private _data: T | undefined;
 	private _selected = false;
 	private _touchCaptured = false;
 	private _touchStage?: Stage;
@@ -38,11 +38,11 @@ export class ItemRenderer<TSkin extends string = string> extends Component<TSkin
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
-	public get data(): unknown {
+	public get data(): T | undefined {
 		return this._data;
 	}
 
-	public set data(value: unknown) {
+	public set data(value: T | undefined) {
 		if (this._data === value) return;
 		this._data = value;
 		PropertyEvent.dispatchPropertyEvent(this, 'data');
