@@ -1,10 +1,10 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.10.0` (published). This package consumes validated
+Package identity: `@kurot/ui-runtime@0.11.0` (published on npm). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.13.0`, `@kurot/ui@^3.4.0`, and
+It peer-depends on `@kurot/ui-document@^0.14.0`, `@kurot/ui@^4.1.0`, and
 `@kurot/core@^2.4.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
@@ -89,7 +89,7 @@ the `ui-document` appearance naming rule: identifiers that collide with
 `Skin` or inherited runtime members are invalid and should produce a clear
 diagnostic that asks the author or generator to rename them.
 
-Assigning the completed appearance `Skin` to a host uses `@kurot/ui@3`'s
+Assigning the completed appearance `Skin` to a host uses `@kurot/ui@4`'s
 atomic lifecycle: the host receives one complete part map before built-in
 component binding runs. `Skin.setPart()` remains the write-side materializer
 API and is not the removed `Component.setSkinPart()` lifecycle API.
@@ -217,3 +217,11 @@ and only permits `textFit = 'none'` on EditableText. The runtime does not author
 `renderedSize` or `textFitOverflow`; these are native observations after layout.
 See [runtime text layout](label-text-layout.md) for defaults, fit bounds,
 state restoration, font readiness and document-mutation boundaries.
+
+## RichLabel component typography
+
+RichLabel accepts seven component defaults: fontFamily (literal CSS string), size,
+textColor, stroke, strokeColor, bold and italic. Explicit Span fields win; omitted
+fields follow the component. Raw runs remain snapshots. Scalar state restoration
+and XML attribute codecs are reused. No baseStyle, new property format, Label
+presets or fitting is added. Use UI 4.1 / document 0.14 / CLI 4.1 / runtime 0.11.

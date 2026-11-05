@@ -1,7 +1,7 @@
 # Module Skin factories
 
 Use `ui.skinRegistration: 'module'` for applications that own their
-Skin registry. The CLI remains build-time tooling over ui-document ^0.13.0;
+Skin registry. The CLI remains build-time tooling over ui-document ^0.14.0;
 it does not acquire Core/UI runtime dependencies.
 
 Both modes export a frozen `skinFactories` object keyed by full authored Skin

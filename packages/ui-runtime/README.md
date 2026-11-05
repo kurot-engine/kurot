@@ -4,8 +4,8 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current version: 0.10.0 (published).** Requires `@kurot/core@^2.4.0`,
-> `@kurot/ui@^3.4.0`, and `@kurot/ui-document@^0.13.0`. Uses UI's atomic
+> **Current version: 0.11.0 (published on npm).** Requires `@kurot/core@^2.4.0`,
+> `@kurot/ui@^4.1.0`, and `@kurot/ui-document@^0.14.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
@@ -13,15 +13,16 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.10.0 @kurot/ui-document@^0.13.0 @kurot/ui@^3.4.0 @kurot/core@^2.4.0
+pnpm add @kurot/ui-runtime@^0.11.0 @kurot/ui-document@^0.14.0 @kurot/ui@^4.1.0 @kurot/core@^2.5.2
 ```
 
 Install all peers explicitly and satisfy the chosen UI package's Core peer
-as well as runtime's own peers. Semantic format version is 2.
+as well as runtime's own peers. UI 4.1 requires Core ^2.5.2, which also satisfies
+runtime's own ^2.4.0 minimum. Semantic format version is 2.
 
-Current CLI 3.6.1 uses document ^0.13.0 for build-time Label presets/colors and emits
-skins that run directly through UI. That compilation path does not require
-ui-runtime. Runtime 0.10.0 and CLI 3.6.1 use the same document 0.13.x contract.
+CLI 4.1 uses document ^0.14.0 for build-time validation, typography and styles,
+and emits skins that run directly through UI. That compilation path does not
+require ui-runtime. Runtime 0.11 and CLI 4.1 use the same document 0.14.x contract.
 See the [project style contract](../ui-document/docs/project-styles.md).
 
 ## Centered flips
@@ -35,8 +36,10 @@ Reflection geometry and input coordinates remain Core/UI responsibilities.
 ## BitmapLabel and RichLabel
 
 Native BitmapLabel uses typed font resources and glyph metrics. RichLabel uses
-literal textFlow runs, continuous wrapping and automatic sizing. Neither
-inherits Label or accepts Label typography/presets/fitting. Explicit handlers
+literal textFlow runs, continuous wrapping and automatic sizing. RichLabel exposes
+fontFamily, size, textColor, stroke, strokeColor, bold and italic as defaults for
+runs without local values. Both components remain independent of Label; its
+plain-text presets and fitting are not added to RichLabel. Explicit handlers
 validate resolved values; font adapters may return a Core resource key or a
 ready BitmapFont without transferring ownership.
 

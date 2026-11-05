@@ -31,8 +31,8 @@ The manifests are authoritative. Current Kurot package requirements are:
 | ui          | None                      | core `^2.5.2`                                     | Components use the application's Core objects.                  |
 | game        | None                      | core `^2.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
 | dragonbones | None                      | core `^2.1.1`                                     | Animation displays and meshes use the application's Core.       |
-| ui-runtime  | None                      | core `^2.4.0`, ui `^3.4.0`, ui-document `^0.13.0` | Materializes a document into the application's Core/UI objects. |
-| cli         | ui-document `^0.13.0`     | None                                              | Compiles KUI at build time.                                     |
+| ui-runtime  | None                      | core `^2.4.0`, ui `^4.1.0`, ui-document `^0.14.0` | Materializes a document into the application's Core/UI objects. |
+| cli         | ui-document `^0.14.0`     | None                                              | Compiles KUI at build time.                                     |
 | ui-document | None                      | None                                              | Headless authoring, validation and serialization.               |
 | bitmap-font | None                      | None                                              | Headless font data, validation and layout.                      |
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |

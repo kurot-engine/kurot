@@ -5,6 +5,66 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-05 — Examples and Templates adopt UI/CLI 4.1
+
+- Update CLI to 4.1.0 in demo, game, star-catcher and all five external Templates
+  projects. Existing UI/document consumers adopt UI 4.1.0/document 0.14.0.
+  Preserve exact/ranged declaration styles and refresh each independent registry
+  lock/installation; no project adds ui-runtime.
+- Keep Core 2.8.0, Game and animation adapters at their existing versions. Verify
+  shared native Core identity and matching application/compiler document versions.
+  Application code and authored skins retain their existing behavior.
+- All eight frozen installs, complete declaration checks and strict development/
+  release builds pass, along with 753 existing unit tests, the existing architecture
+  checks and Runaway resource validation.
+- Browser checks pass for both development and minified release: demo startup,
+  game scene/default UI gallery, Star Catcher gameplay/lifecycle and the five
+  Templates. MilfMaster coverage focuses on KUI slot geometry, Sticky layers,
+  spin modes, input and skin replacement; networked games use local fixtures.
+- Synchronize example/template README baselines and template CHANGELOG records.
+  Browser verification uses local macOS Chromium, not production backends or
+  Windows/device acceptance.
+
+## 2026-11-05 — RichLabel typography releases published
+
+- Verify npm exact versions and latest tags: UI 4.1.0, ui-document 0.14.0,
+  CLI 4.1.0 and ui-runtime 0.11.0.
+- Download all four registry archives and verify SHA-512 integrity, archived
+  versions and dependency declarations. Every archive is byte-identical to its
+  previously tested release artifact; the prepared SDK locks remain valid.
+- Confirm CLI's ordinary dependency is ui-document ^0.14.0; runtime peers are
+  UI ^4.1.0, ui-document ^0.14.0 and Core ^2.4.0. The host must also satisfy
+  UI's Core ^2.5.2 requirement.
+- A fresh registry consumer install, strict declaration check and CLI release
+  build pass with no diagnostics. CLI/runtime share document 0.14.0; native
+  consumers share one Core 2.8.0/UI 4.1.0 instance.
+- Synchronize repository README and context/architecture publication wording.
+  Immutable npm archives retain the preparation wording shipped at publication.
+  Editor, SAO, examples and external Templates retain their existing versions.
+
+## 2026-11-05 — RichLabel component typography release preparation
+
+- Prepare UI 4.1.0, ui-document 0.14.0, CLI 4.1.0 and ui-runtime 0.11.0.
+  RichLabel component properties supply omitted Span appearance; local fields
+  remain explicit and textFlow snapshots are not rewritten.
+- Reuse Core fallback/rendering and scalar XML/state machinery. Keep Core
+  2.8.0, UI's Core minimum ^2.5.2, semantic format 2 and unrelated SDKs unchanged.
+- CLI adopts document ^0.14.0; runtime adopts UI ^4.1.0/document ^0.14.0 and
+  validates UI 4 materialization with one shared accepted Core instance.
+- Editor, SAO, examples and external Templates keep their existing source,
+  manifests and locks until publication and an explicit adoption task.
+- Publication order: UI/document independently, then CLI/runtime after their
+  respective prerequisites. Source version preparation is not npm publication.
+- Verification: all four clean builds, 1,062 unit tests, 21 native text browser
+  checks and 12 source-free packed browser cases pass. Packed development and
+  release output covers Canvas/WebGL1/WebGL2 on Core 2.5.2 and 2.8.0, with one
+  shared Core/UI instance in each consumer. API generation, declaration examples,
+  frozen offline installs and identical clean-build archives also pass.
+- CLI process/watch tests showed intermittent timeouts during verification;
+  the final single-worker full run passes all 181 tests without timeout changes.
+  CLI/runtime locks record the prepared UI/document archive integrity; these
+  artifacts remain unpublished and are not registry publication verification.
+
 ## 2026-11-04 — Examples and Templates adopt UI 4 / CLI 4
 
 - Update registry UI/CLI declarations and pnpm locks in game, demo and

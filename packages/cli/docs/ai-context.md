@@ -1,7 +1,7 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@4.0.0` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
-ui-document dependency **^0.13.0**. Projects supply their own Core/UI runtime.
+`@kurot/cli@4.1.0` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
+ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
 
@@ -67,7 +67,7 @@ The compiler validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
 nonvisual Skin root fail compilation. Negative scales are preserved.
 
-The CLI requires `@kurot/ui-document@^0.13.0`. Schema-defined strings, including
+The CLI requires `@kurot/ui-document@^0.14.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free
@@ -245,3 +245,11 @@ native emission; retain XML references and local/state precedence. compileKUI
 accepts an optional styleSheet. style.json changes already trigger whole-Skin
 rebuilds. Invalid presets retain the last successful bundle. textStyle is
 Default-only; individual named-state fields can still override preset properties.
+
+## RichLabel component typography
+
+RichLabel accepts seven component defaults: fontFamily (literal CSS string), size,
+textColor, stroke, strokeColor, bold and italic. Explicit Span fields win; omitted
+fields follow the component. Raw runs remain snapshots. Scalar state restoration
+and XML attribute codecs are reused. No baseStyle, new property format, Label
+presets or fitting is added. Use UI 4.1 / document 0.14 / CLI 4.1 / runtime 0.11.

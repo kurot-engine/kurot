@@ -4,6 +4,32 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 4.1.0 — 2026-11-05
+
+Published; exact version and npm latest verified on 2026-11-05. Downloaded
+archive SHA-512 and package manifest match the tested release artifact.
+
+### Added
+
+- Expose RichLabel component fontFamily, size, textColor, stroke, strokeColor,
+  bold and italic. Omitted run fields use the component; explicit values,
+  including false/zero and values equal to current defaults, remain local.
+- Keep raw textFlow snapshots independent of typography. Replacing/clearing
+  content retains component settings. Changed setters notify only their own
+  property; metric changes invalidate wrapping/automatic-height caches.
+- Preserve construction defaults, UIContext fonts, continuous wrapping and
+  render-only outline padding. RichLabel remains independent of Label without
+  plain text, presets, shrinking or a baseStyle object.
+
+### Compatibility and verification
+
+- Core peer remains ^2.5.2. KUI attributes use document 0.14 / CLI 4.1;
+  semantic materialization uses runtime 0.11. Existing applications retain their
+  installations until they deliberately adopt the feature.
+- Native tests and browser checks cover local overrides, zero/false values,
+  snapshot ownership, assignment order, content replacement, state restoration,
+  measurement caching and Canvas/WebGL rendering.
+
 ## [4.0.0] — 2026-11-04
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

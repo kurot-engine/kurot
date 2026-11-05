@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -19849,6 +19849,12 @@
           "inherited": true
         },
         {
+          "name": "bold",
+          "file": "RichLabel-class/bold-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "bottom",
           "file": "RichLabel-class/bottom-accessor.md",
           "protected": false,
@@ -19903,6 +19909,12 @@
           "inherited": true
         },
         {
+          "name": "fontFamily",
+          "file": "RichLabel-class/fontFamily-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "graphics",
           "file": "RichLabel-class/graphics-accessor.md",
           "protected": false,
@@ -19937,6 +19949,12 @@
           "file": "RichLabel-class/isCachedAsTexture-accessor.md",
           "protected": false,
           "inherited": true
+        },
+        {
+          "name": "italic",
+          "file": "RichLabel-class/italic-accessor.md",
+          "protected": false,
+          "inherited": false
         },
         {
           "name": "left",
@@ -20083,6 +20101,12 @@
           "inherited": true
         },
         {
+          "name": "size",
+          "file": "RichLabel-class/size-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "skewX",
           "file": "RichLabel-class/skewX-accessor.md",
           "protected": false,
@@ -20131,8 +20155,26 @@
           "inherited": true
         },
         {
+          "name": "stroke",
+          "file": "RichLabel-class/stroke-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "strokeColor",
+          "file": "RichLabel-class/strokeColor-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "textAlign",
           "file": "RichLabel-class/textAlign-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "textColor",
+          "file": "RichLabel-class/textColor-accessor.md",
           "protected": false,
           "inherited": false
         },

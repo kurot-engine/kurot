@@ -1,6 +1,6 @@
 # static dispatchCollectionEvent
 
-Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static dispatchCollectionEvent(target: IEventDispatcher, kind: CollectionEventKind, location: number, oldLocation: number, items: unknown[], oldItems: unknown[]): boolean;

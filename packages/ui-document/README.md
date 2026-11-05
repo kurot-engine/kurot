@@ -1,7 +1,7 @@
 # @kurot/ui-document
 
 Headless semantic UI documents, canonical Skin KUI XML, validation, reusable
-assets and transactional editing. Package version: **0.13.2** (published).
+assets and transactional editing. Package version: **0.14.0** (published on npm).
 The semantic format is **2**; the package has no Kurot runtime dependency.
 
 Read [KUI XML](docs/kui-xml.md), [text components](docs/text-components.md),
@@ -10,18 +10,27 @@ Read [KUI XML](docs/kui-xml.md), [text components](docs/text-components.md),
 Native components own layout/rendering; this kernel validates data and preserves
 authored property/state intent without loading fonts, images or engine code.
 
+## RichLabel component typography
+
+RichLabel supports component fontFamily, size, textColor, stroke, strokeColor,
+bold and italic. Omitted Span fields follow the component; explicit local values
+remain fixed. Raw textFlow snapshots stay unchanged. Scalar KUI state overrides
+restore independently. The feature uses UI 4.1, document 0.14 and CLI 4.1;
+semantic materialization uses runtime 0.11. See the
+[shared text contract](../ui-document/docs/text-components.md).
+
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.13.2
+pnpm add @kurot/ui-document@^0.14.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
 models UI documents but does not instantiate or render runtime components.
-CLI's document dependency and ui-runtime 0.10.0's peer/development requirements
-use `^0.13.0`, which accepts 0.13.2 without dependent SDK releases. Consumers
-adopt through their own installations/locks; exact pins need explicit updates,
-and bundled applications need rebuilding to include a dependency fix.
+CLI 4.1 and ui-runtime 0.11 adopt document `^0.14.0` for RichLabel component
+typography. Older consumers can retain their accepted document versions until
+they adopt the new attributes. Semantic format 2 and existing authored values
+remain unchanged; no document migration is required.
 
 ## Quick Start
 
@@ -314,7 +323,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.10.0` uses document `^0.13.0` and validates/materializes
+`@kurot/ui-runtime@0.11.0` uses document `^0.14.0` and validates/materializes
 format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
@@ -386,7 +395,7 @@ colors report the semantic path, and other token categories stay unresolved.
 Authored palette references use `@style:colors:<key>`; other XML prefixes are
 rejected. Authoring files remain unchanged by resolution. The CLI compiler
 resolves stylesheet colors and Label presets during KUI compilation. Its
-document `^0.13.0` dependency accepts 0.13.2. Runtime 0.10.0 requires the same range;
+document `^0.14.0` dependency adopts this catalog. Runtime 0.11.0 requires the same range;
 consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
@@ -403,7 +412,7 @@ retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and resolution order.
-CLI's document `^0.13.0` dependency and runtime 0.10.0's matching requirements
-accept 0.13.2 without overrides.
-Runtime 0.10.0 also requires UI `^3.4.0` and Core `^2.4.0`; preset expansion
+CLI's document `^0.14.0` dependency and runtime 0.11.0's matching requirements
+adopt this catalog. Runtime 0.11.0 also requires UI `^4.1.0` and Core `^2.4.0`;
+satisfy the chosen UI's Core ^2.5.2 peer as well. Preset expansion
 itself does not introduce a new native rendering requirement.

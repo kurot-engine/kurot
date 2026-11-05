@@ -6,8 +6,8 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
 
 /**
  * Displays styled text runs in one continuous layout. Content is assigned only
- * through textFlow; ordinary Label text and appearance presets are not exposed.
- * Unspecified run styles use the TextField defaults captured at construction.
+ * through textFlow; seven component typography properties supply omitted run
+ * styles. Label plain text, presets and fitting are not exposed.
  */
 export class RichLabel extends Component {
 	// ── Instance fields ───────────────────────────────────────────────────────
@@ -54,6 +54,130 @@ export class RichLabel extends Component {
 		this.invalidateSize();
 		this.invalidateDisplayList();
 		PropertyEvent.dispatchPropertyEvent(this, 'textFlow');
+	}
+
+	/**
+	 * CSS font family used by runs without an explicit family. Initially captured
+	 * from UIContext or Core at construction. Assignment does not load fonts.
+	 * After late font readiness, call invalidateSize() to refresh measurement.
+	 */
+	public get fontFamily(): string {
+		return this._textField.fontFamily;
+	}
+	public set fontFamily(value: string) {
+		if (typeof value !== 'string') {
+			throw new TypeError('RichLabel.fontFamily must be a CSS font-family string.');
+		}
+		if (this.fontFamily === value) {
+			return;
+		}
+		this._textField.fontFamily = value;
+		this._invalidateText();
+		PropertyEvent.dispatchPropertyEvent(this, 'fontFamily');
+	}
+
+	/**
+	 * Font size in logical pixels for runs without a size. Initially Core's
+	 * construction-time default (normally 30); must be finite and nonnegative.
+	 * An explicitly sized run retains its size, even if it equals this value.
+	 */
+	public get size(): number {
+		return this._textField.size;
+	}
+	public set size(value: number) {
+		this._validateStyleNumber(value, 'size');
+		if (this.size === value) {
+			return;
+		}
+		this._textField.size = value;
+		this._invalidateText();
+		PropertyEvent.dispatchPropertyEvent(this, 'size');
+	}
+
+	/**
+	 * Bold face for runs without an explicit flag, initially false. A local false
+	 * overrides a true component value; omission follows the component.
+	 */
+	public get bold(): boolean {
+		return this._textField.bold;
+	}
+	public set bold(value: boolean) {
+		this._validateStyleBoolean(value, 'bold');
+		if (this.bold === value) {
+			return;
+		}
+		this._textField.bold = value;
+		this._invalidateText();
+		PropertyEvent.dispatchPropertyEvent(this, 'bold');
+	}
+
+	/**
+	 * Italic face for runs without an explicit flag, initially false. A local
+	 * false overrides a true component value.
+	 */
+	public get italic(): boolean {
+		return this._textField.italic;
+	}
+	public set italic(value: boolean) {
+		this._validateStyleBoolean(value, 'italic');
+		if (this.italic === value) {
+			return;
+		}
+		this._textField.italic = value;
+		this._invalidateText();
+		PropertyEvent.dispatchPropertyEvent(this, 'italic');
+	}
+
+	/**
+	 * RGB fill for runs without a textColor, initially Core's construction-time
+	 * default (normally white). Accepts integers from 0 to 0xffffff; zero is black.
+	 */
+	public get textColor(): number {
+		return this._textField.textColor;
+	}
+	public set textColor(value: number) {
+		this._validateStyleNumber(value, 'textColor', true);
+		if (this.textColor === value) {
+			return;
+		}
+		this._textField.textColor = value;
+		this.invalidateDisplayList();
+		PropertyEvent.dispatchPropertyEvent(this, 'textColor');
+	}
+
+	/**
+	 * Outline width in logical pixels for runs without a stroke, initially zero.
+	 * Must be finite and nonnegative. Outlines retain Core's render-only padding;
+	 * they do not add Label's outline insets to RichLabel's measured layout.
+	 */
+	public get stroke(): number {
+		return this._textField.stroke;
+	}
+	public set stroke(value: number) {
+		this._validateStyleNumber(value, 'stroke');
+		if (this.stroke === value) {
+			return;
+		}
+		this._textField.stroke = value;
+		this.invalidateDisplayList();
+		PropertyEvent.dispatchPropertyEvent(this, 'stroke');
+	}
+
+	/**
+	 * RGB outline color for runs without a strokeColor, initially black.
+	 * Accepts integers from 0 to 0xffffff; zero remains an explicit black value.
+	 */
+	public get strokeColor(): number {
+		return this._textField.strokeColor;
+	}
+	public set strokeColor(value: number) {
+		this._validateStyleNumber(value, 'strokeColor', true);
+		if (this.strokeColor === value) {
+			return;
+		}
+		this._textField.strokeColor = value;
+		this.invalidateDisplayList();
+		PropertyEvent.dispatchPropertyEvent(this, 'strokeColor');
 	}
 
 	/**
@@ -179,6 +303,20 @@ export class RichLabel extends Component {
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────
+
+	private _validateStyleNumber(value: number, property: string, color = false): void {
+		if (!Number.isFinite(value) || value < 0 || (color && (!Number.isInteger(value) || value > 0xffffff))) {
+			throw new RangeError(
+				`RichLabel.${property} must be ${color ? 'an RGB integer' : 'finite and nonnegative'}.`,
+			);
+		}
+	}
+
+	private _validateStyleBoolean(value: boolean, property: string): void {
+		if (typeof value !== 'boolean') {
+			throw new TypeError(`RichLabel.${property} must be boolean.`);
+		}
+	}
 
 	private _copyTextFlow(value: readonly ITextElement[]): ITextElement[] {
 		return value.map(element => {

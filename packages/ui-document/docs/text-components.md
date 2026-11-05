@@ -12,11 +12,13 @@ remain authoritative, and omitted fields remain omitted in authored XML.
 | ------------- | -------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
 | `Label`       | Plain `text`                           | Local properties and optional `style.json.labels` preset            | Wrapping, alignment and font shrinking             |
 | `BitmapLabel` | Plain `text` and typed `font` resource | Glyph metrics and colors from the bitmap font; display scaling/tint | Wrapping, spacing and alignment                    |
-| `RichLabel`   | Ordered `textFlow` runs                | Literal per-run font, size, colors, outline, bold and italic        | Continuous Unicode wrapping, spacing and alignment |
+| `RichLabel`   | Ordered `textFlow` runs                | Component typography defaults plus literal per-run overrides        | Continuous Unicode wrapping, spacing and alignment |
 
-BitmapLabel and RichLabel extend Component directly. Neither accepts Label's
-`textStyle`, `textFit`, `minFontSize`, `size`, `fontFamily` or `textColor` as
-whole-component authoring properties. RichLabel also has no plain `text`.
+BitmapLabel and RichLabel extend Component directly. RichLabel exposes
+`fontFamily`, `size`, `textColor`, `stroke`, `strokeColor`, `bold` and `italic` as
+component defaults for omitted Span fields. It has no plain `text`, `baseStyle`,
+Label `textStyle` presets, `textFit` or `minFontSize`. BitmapLabel retains its
+bitmap-font appearance without vector typography properties.
 Ordinary geometry, constraints, visibility and Component properties remain
 available. Content metrics are runtime observations, never authored properties.
 
@@ -49,10 +51,10 @@ there is no independent font-size or automatic text-fit setting.
 ## Literal rich text
 
 ```xml
-<RichLabel id="notice" width="240">
+<RichLabel id="notice" width="240" size="20" stroke="1" textColor="#FFFFFF">
     <textFlow>
-        <Span text="Balance: " size="20" />
-        <Span text="100.80" bold="true" size="20" textColor="#FFCC00" />
+        <Span text="Balance: " />
+        <Span text="100.80" bold="true" textColor="#FFCC00" />
         <Span text="&#10;Available now" italic="true" size="16" />
     </textFlow>
 </RichLabel>
@@ -74,8 +76,10 @@ Every run requires string `text`, including empty strings. Optional `style`
 accepts only `fontFamily`, `size`, `textColor`, `strokeColor`, `stroke`, `bold`
 and `italic`. Font families are literal CSS names; colors are integer RGB values,
 serialized as #RRGGBB. Sizes and outline widths must be finite and nonnegative.
-Boolean false, numeric zero and empty text are retained. Style omission inherits
-native TextField defaults, independently for each run. Empty style objects have
+Boolean false, numeric zero and empty text are retained. Style omission follows the matching
+RichLabel component property, independently for each run. Component omission uses
+native construction defaults. Explicit false/zero values override the component;
+explicit values equal to its defaults remain explicit when those defaults change. Empty style objects have
 the same meaning as omission and canonical XML omits them.
 
 Span elements are data, never display nodes, skin parts or independent lines.
@@ -91,6 +95,13 @@ entities and literal backslashes survive round trips. A backslash followed by
 No HTML, markup parser, hyperlinks, underline or Label presets are authored.
 `textFlow` cannot be put in an attribute or mixed with plain Label text.
 
+Component attributes use ordinary scalar property validation and XML syntax.
+CSS font-family names are literal strings, including numeric/boolean-looking
+names. Component colors accept the same color tokens as Label; Span colors remain
+literal RGB values. Omitted properties stay omitted during XML round trips.
+No new structured property format or semantic document version is introduced.
+The component attributes require native UI 4.1, CLI 4.1 or ui-runtime 0.11.
+
 ## States, clearing and history
 
 ```xml
@@ -105,7 +116,9 @@ No HTML, markup parser, hyperlinks, underline or Label presets are authored.
 `<textFlow.stateName>` overrides the entire array in that declared Skin state.
 An empty property element means `[]`, explicitly clearing the content, while
 omission means inheritance. Duplicate flows and undeclared states are errors.
-Returning to Default restores the base flow. Changes use the normal property/
+Returning to Default restores the base flow. Scalar overrides such as
+`size.disabled="16"` and `bold.disabled="false"` restore independently, while
+explicit Span values continue to win. Scalar overrides never rewrite the flow. Changes use the normal property/
 state operations and atomic history; they do not create a second undo stack.
 Custom RichLabel subclasses may use the same XML property element; validate
 their inheritance against the project's component registry after parsing.

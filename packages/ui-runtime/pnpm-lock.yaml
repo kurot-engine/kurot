@@ -9,14 +9,14 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.4.0
-        version: 2.4.0
+        specifier: ^2.5.2
+        version: 2.5.3
       '@kurot/ui':
-        specifier: ^3.4.0
-        version: 3.4.0(@kurot/core@2.4.0)
+        specifier: ^4.1.0
+        version: 4.1.0(@kurot/core@2.5.3)
       '@kurot/ui-document':
-        specifier: ^0.13.0
-        version: 0.13.2
+        specifier: ^0.14.0
+        version: 0.14.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1
@@ -50,16 +50,16 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/core@2.4.0':
-    resolution: {integrity: sha512-b3B5i1+cCdmRItlpO+h7EkG4QHAdmVivjjgDmidBbARly8rdgQStdxiXNVjt4XaYOBmI2t3SeggJnDeI+ygUKA==}
+  '@kurot/core@2.5.3':
+    resolution: {integrity: sha512-W23Wrx3LJHz4AsEApotzp0jxnwj5luMQ0hfigC9tPCWYbe7HZtU7cN0JRF4H6uF/Szz/MrJRgYBvMJYDs0SCMQ==}
 
-  '@kurot/ui-document@0.13.2':
-    resolution: {integrity: sha512-8oY67ukqw0PDoRPQMNzaryTEr+aPJej6E6nkkzs4rrsPeon8plY/p6NVJm6jpxYkImTYz+d+H/Y8C0joVnuJrQ==}
+  '@kurot/ui-document@0.14.0':
+    resolution: {integrity: sha512-fd7YFhikVxQ1qLgn4k7bcjh4dH4yyfyxvnY97ndSWAUvGgTP9gl4X2swIlFRXnGCXGuuriHU+GGfHN52csXFdQ==}
 
-  '@kurot/ui@3.4.0':
-    resolution: {integrity: sha512-7G1rYHVgAAdpAUCqEKY8UvAYYFRq867qfZjmDDF6UAcgNaepHDnAI005bKkQHnLd+5wbzm793jieO3gHmUKhRQ==}
+  '@kurot/ui@4.1.0':
+    resolution: {integrity: sha512-6E7Za/LBukEPhMk2Ny6GJq6Edxgc/VoGnOoEsOuQU8X4+QbByTPGYx/q2oeE2DMiTrMOaK4D/yfcA3R87sZDWg==}
     peerDependencies:
-      '@kurot/core': ^2.4.0
+      '@kurot/core': ^2.5.2
 
   '@oxc-project/types@0.147.0':
     resolution: {integrity: sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg==}
@@ -527,16 +527,16 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/core@2.4.0':
+  '@kurot/core@2.5.3':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/ui-document@0.13.2': {}
+  '@kurot/ui-document@0.14.0': {}
 
-  '@kurot/ui@3.4.0(@kurot/core@2.4.0)':
+  '@kurot/ui@4.1.0(@kurot/core@2.5.3)':
     dependencies:
-      '@kurot/core': 2.4.0
+      '@kurot/core': 2.5.3
 
   '@oxc-project/types@0.147.0': {}
 

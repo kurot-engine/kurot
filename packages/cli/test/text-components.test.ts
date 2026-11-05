@@ -56,10 +56,11 @@ describe('native text component compilation', () => {
 
 	it.each([
 		'<RichLabel text="wrong" />',
-		'<RichLabel size="20" />',
 		'<RichLabel textFit="shrink" />',
-		'<RichLabel fontFamily="primary" />',
-		'<RichLabel textColor.disabled="#FFFFFF" />',
+		'<RichLabel size="-1" />',
+		'<RichLabel stroke="-1" />',
+		'<RichLabel textColor.disabled="#FFFFFFF" />',
+		'<RichLabel baseStyle="unused" />',
 		'<RichLabel wordWrap="invalid" />',
 		'<RichLabel lineSpacing="-1" />',
 		'<RichLabel textAlign="justify" />',

@@ -1,82 +1,116 @@
 # RichLabel
 
-Native rich textFlow content in an independent Component using Core TextField.
-Use the installed UI/Core peer pair; public declarations define the available API.
+Native rich text in an independent Component using Core TextField. UI 4.1 adds
+component typography while retaining Core peer ^2.5.2. KUI authoring uses CLI 4.1
+and ui-document 0.14; direct TypeScript use needs UI only.
 
 ```ts
 import { RichLabel } from '@kurot/ui';
 
-const label = new RichLabel([
-	{ text: 'Warning: ', style: { size: 20, bold: true, textColor: 0xff9900 } },
-	{ text: 'read this before continuing.', style: { size: 20, italic: true } },
-]);
+const label = new RichLabel();
+label.size = 18;
+label.stroke = 1;
+label.textColor = 0xffffff;
+label.textFlow = [
+    { text: 'Attack increases by ' },
+    { text: '10%', style: { textColor: 0x00ec00 } },
+];
 label.maxWidth = 240;
 group.addChild(label);
 ```
 
 ## Content and ownership
 
-RichLabel extends Component independently, not Label. Its only content interface
-is `textFlow: ITextElement[]`, using Core's text/style records. Whole-component
-`text`, `fontFamily`, `size`, `bold`, `italic`, `textColor`, `textFit`, `minFontSize`
-and `textStyle` are not exposed. Label presets do not apply to this component.
+RichLabel extends Component independently of Label. Content is assigned only
+through `textFlow: ITextElement[]`. Plain `text`, Label `textStyle` presets,
+`textFit` and `minFontSize` are not exposed. No baseStyle object, enable switch,
+HTML/markdown parsing or nested style groups are introduced.
 
-Runs can specify font family, size, bold, italic, text color, stroke color and
-stroke width. Unspecified fields use the native TextField defaults captured at
-construction. In particular, an unstyled run does not inherit the previous run.
-All runs are laid out continuously; a style boundary does not introduce a word
-boundary or a new line. No HTML or markdown parsing is performed.
+Seven component properties supply omitted run fields: `fontFamily`, `size`,
+`textColor`, `stroke`, `strokeColor`, `bold` and `italic`. Each explicit run field
+wins; undefined follows the component. Zero and false are explicit values.
+An unstyled run does not inherit the preceding run. An explicit run size stays
+fixed even when it initially equals the component size. Delete the run field
+and reassign the flow to make it follow the component again.
 
-The component copies runs and their styles on assignment and on reads. Mutating
-an input array or a returned snapshot does not change the component. Reassign
-an edited snapshot to apply it. Assigning [] clears content; assignment dispatches
-PropertyEvent.PROPERTY_CHANGE for `textFlow` after the new content is installed.
+The initial font family comes from the construction UIContext, otherwise Core;
+size and fill color use Core's construction-time defaults (normally 30 and
+white). Bold/italic start false, stroke is zero and strokeColor is black. Omitting
+all component typography preserves the earlier rendering behavior.
+
+Font families are CSS strings, not bitmap-font resource keys or Label presets.
+Assignment does not load fonts. After asynchronous font readiness call
+`invalidateSize()`, including when the family string has not changed. Size and
+stroke accept finite nonnegative numbers; colors accept integer RGB values in
+0..0xffffff. Invalid numeric values throw RangeError before changing the control;
+invalid family/boolean types throw TypeError.
+
+Assignments and reads copy text runs and their styles. Mutating an input or a
+returned snapshot does not change the component; reassign an edited snapshot to
+apply it. Typography does not rewrite or merge values into those snapshots.
+Assigning [] clears content and retains component typography for later content.
+Assigning textFlow dispatches PropertyEvent.PROPERTY_CHANGE for textFlow after
+the copied content is installed, as before.
+
+A changed typography property dispatches PropertyEvent.PROPERTY_CHANGE for its
+own name after installing the value. Assigning the same value does nothing.
+Changing typography does not dispatch a textFlow content-change event.
 
 ## Layout
 
-Ordinary Component geometry, layout constraints, visibility and alpha remain
-available, together with these text-layout properties:
+All runs share continuous wrapping; style boundaries do not introduce a word
+boundary or a new line. Ordinary Component geometry, constraints, visibility
+and alpha remain available.
 
-| Property               | Default   | Contract                                                                  |
-| ---------------------- | --------- | ------------------------------------------------------------------------- |
-| multiline              | true      | False shows the first hard-separated line without width wrapping.         |
-| wordWrap               | true      | Unicode line-break opportunities; false wraps between graphemes.          |
-| lineSpacing            | 0         | Finite, nonnegative distance between lines.                               |
-| textAlign              | left      | left, center or right.                                                    |
-| verticalAlign          | Host Core | top, middle or bottom.                                                    |
-| textWidth / textHeight | Read-only | Complete content metrics under the current width, before height clipping. |
+| Property | Default | Contract |
+| --- | --- | --- |
+| multiline | true | False displays the first hard-separated line without wrapping. |
+| wordWrap | true | Unicode boundaries; false wraps between graphemes. |
+| lineSpacing | 0 | Finite, nonnegative extra distance between rows. |
+| textAlign | left | left, center or right. |
+| verticalAlign | Host Core | top, middle or bottom. |
+| textWidth / textHeight | Read-only | Complete content under the current width constraint, before height clipping. Empty content has zero metrics. |
 
-Vertical alignment inherits TextField's default: middle with Core >= 2.5.3,
-top with the accepted Core 2.5.2 baseline. Explicit alignment remains effective
-in either line mode. The headless catalog records middle; omitted XML values
-still use the native host default.
+Vertical alignment follows the host TextField default: middle with Core >= 2.5.3,
+top with the accepted Core 2.5.2 baseline. Explicit alignment works in either
+line mode. The headless catalog records middle; omitted XML retains the native
+host default.
 
-Measurement uses parent-assigned width first, then explicit width, then a
-configured maxWidth, otherwise unconstrained width. Automatic height includes
-every wrapped line and inter-line spacing. Each line uses the largest font size
-of its runs, rather than imposing the TextField base size. Hard line separators
-and trailing blank lines follow the Core text contract. Unstyled blank runs
-between styled runs use the base size. Empty content measures
-0 × 0; Component minWidth/minHeight can still enlarge its layout bounds.
+Measurement uses parent-assigned width first, then explicit width, then maxWidth,
+otherwise unconstrained width. Each row uses its largest run size; automatic
+height includes all wrapped rows and inter-line spacing. Hard separators and
+trailing blank lines follow the Core text contract. Empty content measures
+0 × 0, while Component minimum dimensions can still enlarge layout bounds.
+Fixed height clips drawing without discarding content metrics. Alignment positions
+the continuous block within the assigned bounds.
 
-Fixed height clips drawing without discarding content. Alignment positions the
-continuous text block within the assigned bounds. One native TextField renders
-through Canvas 2D and WebGL; measurement never temporarily resizes that field.
-Unchanged content metrics are cached until size/content invalidation or a width
-change.
+Explicit/layout width and maxWidth affect wrapping and automatic height. Font,
+size, bold and italic changes clear the component measurement cache. Color and
+outline changes refresh drawing without changing the raw flow. Outlines keep
+Core's render-only padding; RichLabel does not add Label's outline-safe layout
+insets or shrinking behavior.
+One native TextField renders through Canvas 2D and WebGL; measurement does not
+temporarily resize it. Unchanged metrics are cached until content, size or width
+invalidation. See [Core text layout](../../core/docs/text-layout.md) for wrapping,
+baseline and independent measurement. Build UI and run `pnpm test:text-labels`
+for minified Canvas/WebGL browser verification.
 
-## Font readiness and integration
+## KUI and states
 
-Load project fonts before measuring where possible. If fonts become ready later,
-call `label.invalidateSize()` to clear both component and native text metrics,
-then allow normal layout validation. RichLabel does not load font files or
-install global font-loading listeners.
+```xml
+<RichLabel id="description" width="210" size="18" stroke="1"
+           textColor="#FFFFFF" size.disabled="16" bold.disabled="false">
+    <textFlow>
+        <Span text="Attack increases by " />
+        <Span text="10%" textColor="#00EC00" />
+    </textFlow>
+</RichLabel>
+```
 
-Authoring requires document >= 0.12.0, CLI >= 3.4.0 or runtime >= 0.9.0,
-plus their declared peers.
-Editor controls belong to the consuming application; all consumers retain
-textFlow ownership and separation from Label presets.
+The surrounding Skin declares disabled. Scalar state overrides replace and
+restore only their own property, independently of textFlow changes. A local
+Span override still wins in every state. Whole-flow overrides retain the existing
+replacement semantics: [] clears and leaving the state restores the old flow.
 
-See [Core text layout](../../core/docs/text-layout.md) for Unicode wrapping,
-single-line behavior and independent measurement. Run `pnpm test:text-labels`
-after building Core and UI for minified Canvas/WebGL browser verification.
+Applications own listeners, timers and asynchronous work. Stage removal retains
+the component's content and skin; dispose application activity through its owner.

@@ -124,9 +124,9 @@ describe('native text materialization', () => {
 
 	it.each([
 		'<RichLabel text="wrong" />',
-		'<RichLabel textColor="#FFFFFF" />',
+		'<RichLabel textColor="#FFFFFFF" />',
 		'<RichLabel textFit="shrink" />',
-		'<RichLabel size.disabled="20" />',
+		'<RichLabel size.disabled="-1" />',
 		'<BitmapLabel size="20" />',
 	])('rejects properties from incompatible text contracts %s', body => {
 		expect(() =>

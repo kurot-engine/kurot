@@ -1,8 +1,9 @@
 # Native text materialization
 
-The runtime requires Core `^2.4.0`, UI `^3.4.0` and document `^0.13.0`.
+The runtime requires Core `^2.4.0`, UI `^4.1.0` and document `^0.14.0`.
 It materializes BitmapLabel and RichLabel with their real native constructors;
-neither inherits Label or accepts whole-component Label typography/presets.
+both remain independent of Label. RichLabel exposes seven component typography
+properties; Label presets, fitting and plain text remain separate contracts.
 
 ```ts
 import { parseUIDocument, UIAssetRegistry } from '@kurot/ui-document';
@@ -13,10 +14,10 @@ assets.registerResource({ key: 'score_font', resourceType: 'font' });
 const document = parseUIDocument(`
 <Skin xmlns="https://kurot.dev/ui/1" class="TextSkin">
     <BitmapLabel id="score" font="score_font" text="100.80" />
-    <RichLabel id="notice" width="240">
+    <RichLabel id="notice" width="240" size="20" stroke="1">
         <textFlow>
-            <Span text="Balance: " size="20" />
-            <Span text="100.80" size="20" bold="true" textColor="#FFCC00" />
+            <Span text="Balance: " />
+            <Span text="100.80" bold="true" textColor="#FFCC00" />
         </textFlow>
     </RichLabel>
 </Skin>`);
@@ -36,9 +37,12 @@ the caller/cache retains ownership of fonts, textures and the stage root.
 
 RichLabel textFlow uses the shared isUITextFlow contract, and the native setter
 copies every run and style. The runtime preserves literal content and applies
-only multiline, lineSpacing, textAlign, verticalAlign and wordWrap alongside
-normal geometry. Native measurement follows width/maxWidth changes. Label's
-font size, textFit, textStyle and plain text do not apply to RichLabel.
+fontFamily, size, textColor, stroke, strokeColor, bold and italic, plus multiline,
+lineSpacing, textAlign, verticalAlign and wordWrap alongside normal geometry.
+Omitted run fields follow the corresponding component value; explicit false/zero
+values win. Typography never modifies raw flow snapshots. Native measurement
+follows font and width/maxWidth changes. TextFit, textStyle, baseStyle and plain
+text are not RichLabel properties.
 
 Appearance states use native SetProperty. Reusable component states and data
 bindings use the existing atomic transaction path. Flow overrides replace the

@@ -1,6 +1,6 @@
 # addEventListener
 
-Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 addEventListener<K extends string>(type: K, listener: (event: ArrayCollectionEvents[K]) => void, useCapture?: boolean, priority?: number): void;

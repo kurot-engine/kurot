@@ -7,10 +7,10 @@ its own engine. Semantic document format is 2.
 ```xml
 <Skin xmlns="https://kurot.dev/ui/1" class="TextSkin" states="disabled">
     <BitmapLabel id="score" text="100.80" font="score_font" />
-    <RichLabel id="notice" width="240">
+    <RichLabel id="notice" width="240" size="20" stroke="1" size.disabled="18">
         <textFlow>
-            <Span text="Balance: " size="20" />
-            <Span text="100.80" size="20" bold="true" textColor="#FFCC00" />
+            <Span text="Balance: " />
+            <Span text="100.80" bold="true" textColor="#FFCC00" />
         </textFlow>
         <textFlow.disabled />
     </RichLabel>
@@ -25,7 +25,12 @@ colors or text presets. Scale the component when bitmap glyph scaling is needed.
 RichLabel inherits Component, not Label. Its only content property is textFlow.
 Supported Span styles are fontFamily, size, bold, italic, textColor, strokeColor
 and stroke. Runs share continuous wrapping; omitted styles use native defaults
-independently. Text, including spaces, backslashes and numeric-looking strings,
+independently. UI 4.1 component properties fontFamily, size, bold, italic,
+textColor, strokeColor and stroke provide the defaults; explicit Span fields
+win, including false and zero. Ordinary scalar assignments and SetProperty
+state overrides are emitted directly. No baseStyle or new XML property element
+is generated. CLI 4.1 consumes document ^0.14.0 for this catalog.
+Text, including spaces, backslashes and numeric-looking strings,
 is literal. Use `&#10;` for explicit hard line breaks.
 
 A state flow replaces the complete run array. `<textFlow.disabled />` clears

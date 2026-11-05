@@ -1,14 +1,14 @@
 # RichLabel
 
-Package: `@kurot/ui@4.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@4.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class RichLabel extends Component
 ```
 
 Displays styled text runs in one continuous layout. Content is assigned only
-through textFlow; ordinary Label text and appearance presets are not exposed.
-Unspecified run styles use the TextField defaults captured at construction.
+through textFlow; seven component typography properties supply omitted run
+styles. Label plain text, presets and fitting are not exposed.
 
 Related types: [Component](Component-class.md).
 
@@ -25,6 +25,7 @@ Related types: [Component](Component-class.md).
 | `anchorOffsetX` | public, inherited | [open](RichLabel-class/anchorOffsetX-accessor.md) |
 | `anchorOffsetY` | public, inherited | [open](RichLabel-class/anchorOffsetY-accessor.md) |
 | `blendMode` | public, inherited | [open](RichLabel-class/blendMode-accessor.md) |
+| `bold` | public | [open](RichLabel-class/bold-accessor.md) |
 | `bottom` | public, inherited | [open](RichLabel-class/bottom-accessor.md) |
 | `cacheAsBitmap` | public, inherited | [open](RichLabel-class/cacheAsBitmap-accessor.md) |
 | `contentHeight` | public, inherited | [open](RichLabel-class/contentHeight-accessor.md) |
@@ -34,12 +35,14 @@ Related types: [Component](Component-class.md).
 | `filters` | public, inherited | [open](RichLabel-class/filters-accessor.md) |
 | `flipX` | public, inherited | [open](RichLabel-class/flipX-accessor.md) |
 | `flipY` | public, inherited | [open](RichLabel-class/flipY-accessor.md) |
+| `fontFamily` | public | [open](RichLabel-class/fontFamily-accessor.md) |
 | `graphics` | public, inherited | [open](RichLabel-class/graphics-accessor.md) |
 | `height` | public, inherited | [open](RichLabel-class/height-accessor.md) |
 | `horizontalCenter` | public, inherited | [open](RichLabel-class/horizontalCenter-accessor.md) |
 | `hostComponentKey` | public, inherited | [open](RichLabel-class/hostComponentKey-accessor.md) |
 | `includeInLayout` | public, inherited | [open](RichLabel-class/includeInLayout-accessor.md) |
 | `isCachedAsTexture` | public, inherited | [open](RichLabel-class/isCachedAsTexture-accessor.md) |
+| `italic` | public | [open](RichLabel-class/italic-accessor.md) |
 | `left` | public, inherited | [open](RichLabel-class/left-accessor.md) |
 | `lineSpacing` | public | [open](RichLabel-class/lineSpacing-accessor.md) |
 | `mask` | public, inherited | [open](RichLabel-class/mask-accessor.md) |
@@ -64,6 +67,7 @@ Related types: [Component](Component-class.md).
 | `scrollH` | public, inherited | [open](RichLabel-class/scrollH-accessor.md) |
 | `scrollRect` | public, inherited | [open](RichLabel-class/scrollRect-accessor.md) |
 | `scrollV` | public, inherited | [open](RichLabel-class/scrollV-accessor.md) |
+| `size` | public | [open](RichLabel-class/size-accessor.md) |
 | `skewX` | public, inherited | [open](RichLabel-class/skewX-accessor.md) |
 | `skewY` | public, inherited | [open](RichLabel-class/skewY-accessor.md) |
 | `skin` | public, inherited | [open](RichLabel-class/skin-accessor.md) |
@@ -72,7 +76,10 @@ Related types: [Component](Component-class.md).
 | `skinReady` | protected, inherited | [open](RichLabel-class/skinReady-accessor.md) |
 | `sortableChildren` | public, inherited | [open](RichLabel-class/sortableChildren-accessor.md) |
 | `stage` | public, inherited | [open](RichLabel-class/stage-accessor.md) |
+| `stroke` | public | [open](RichLabel-class/stroke-accessor.md) |
+| `strokeColor` | public | [open](RichLabel-class/strokeColor-accessor.md) |
 | `textAlign` | public | [open](RichLabel-class/textAlign-accessor.md) |
+| `textColor` | public | [open](RichLabel-class/textColor-accessor.md) |
 | `textFlow` | public | [open](RichLabel-class/textFlow-accessor.md) |
 | `textHeight` | public | [open](RichLabel-class/textHeight-accessor.md) |
 | `textWidth` | public | [open](RichLabel-class/textWidth-accessor.md) |

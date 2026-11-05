@@ -41,7 +41,7 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 4.0.0 consumes ui-document ^0.13.0, retaining Label text-fitting metadata. The
+CLI 4.1.0 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI

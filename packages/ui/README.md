@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **4.0.0** (published on npm).
+Kurot games. Package version: **4.1.0** (published on npm).
 Requires Core **^2.5.2**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -9,10 +9,19 @@ the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
 [API topics](docs/api/topics.md) and the [symbol index](docs/api/index.md) for
 exact member contracts. Build-time KUI skins run through UI without ui-runtime.
 
+## RichLabel component typography
+
+RichLabel supports component fontFamily, size, textColor, stroke, strokeColor,
+bold and italic. Omitted Span fields follow the component; explicit local values
+remain fixed. Raw textFlow snapshots stay unchanged. Scalar KUI state overrides
+restore independently. The feature uses UI 4.1, document 0.14 and CLI 4.1;
+semantic materialization uses runtime 0.11. See the
+[shared text contract](../ui-document/docs/text-components.md).
+
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^4.0.0 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^4.1.0 @kurot/core@^2.5.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.

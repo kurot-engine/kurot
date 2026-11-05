@@ -7,6 +7,27 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 4.1.0 — 2026-11-05
+
+Published; exact version and npm latest verified on 2026-11-05. Downloaded
+archive SHA-512 and package manifest match the tested release artifact.
+
+### Added
+
+- Adopt ui-document ^0.14.0 and compile RichLabel's seven component typography
+  attributes and scalar state overrides through the existing assignment and
+  SetProperty generator. Span arrays remain authored literals, with no merged
+  defaults or extra display nodes.
+- Validate new component/state values through the shared catalog, preserving
+  CSS-family strings and explicit false/zero values. New attributes require
+  the application's UI 4.1; older controls retain their existing SDK contracts.
+
+### Verification
+
+- Test ordinary assignments, literal CSS names, independent scalar state
+  restoration, unchanged run records and malformed-property diagnostics.
+  CLI-built skins continue to run directly through UI, without ui-runtime.
+
 ## 4.0.0 — 2026-11-04
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

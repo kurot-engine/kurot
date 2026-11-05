@@ -26,11 +26,7 @@ describe('RichLabel', () => {
 
 		expect(label).toBeInstanceOf(Component);
 		expect(label).not.toBeInstanceOf(Label);
-		expect(
-			['text', 'textColor', 'size', 'fontFamily', 'bold', 'italic', 'textStyle', 'textFit'].some(
-				name => name in label,
-			),
-		).toBe(false);
+		expect(['text', 'textStyle', 'textFit', 'minFontSize', 'baseStyle'].some(name => name in label)).toBe(false);
 		expect(label.numChildren).toBe(1);
 		expect(label.touchChildren).toBe(false);
 		expect(field.text).toBe('abc');

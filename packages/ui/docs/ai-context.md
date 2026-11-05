@@ -6,7 +6,7 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@4.0.0` (published on npm), with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@4.1.0` (published on npm), with Core peer **^2.5.2**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -224,6 +224,6 @@ BitmapLabel uses Core BitmapText and borrows a configured BitmapFont/resource.
 Superseded loads cannot overwrite a new font; asynchronous failures dispatch
 IO_ERROR. [BitmapLabel](bitmap-label.md) documents ownership and constraints.
 
-RichLabel is an independent Component with `textFlow`, not Label text/fitting
-properties. It owns copies of runs/styles, uses continuous wrapping and restores
+RichLabel is an independent Component with `textFlow` plus seven component
+typography defaults. It does not expose Label plain text, presets or fitting. It owns copies of runs/styles, uses continuous wrapping and restores
 whole-flow states. [RichLabel](rich-label.md) documents measurement and cleanup.

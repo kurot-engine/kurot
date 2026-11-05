@@ -1,14 +1,23 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **4.0.0** (published on npm).
+resource watching. Package version: **4.1.0** (published on npm).
 Requires Node.js >= 20 and
-ui-document **^0.13.0**; games supply their own Core/UI runtime packages.
+ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
 
 For UI production use the installed UI [authoring guide](../ui/docs/ui-authoring.md)
 and [ScoreHUD recipe](../ui/docs/recipes/score-hud.md). Legacy EXML projects use
 the separate CLI 1.3.x line. KUI configuration and resource files are project-owned.
+
+## RichLabel component typography
+
+RichLabel supports component fontFamily, size, textColor, stroke, strokeColor,
+bold and italic. Omitted Span fields follow the component; explicit local values
+remain fixed. Raw textFlow snapshots stay unchanged. Scalar KUI state overrides
+restore independently. The feature uses UI 4.1, document 0.14 and CLI 4.1;
+semantic materialization uses runtime 0.11. See the
+[shared text contract](../ui-document/docs/text-components.md).
 
 ## Usage
 
@@ -17,7 +26,7 @@ dependency. New scaffolds use Core ^2.7.0 for release resource versioning and ca
 stage-attribute startup. Existing projects keep their own installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@4.0.0 create my-game
+npx @kurot/cli@4.1.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -25,7 +34,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^4.0.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^4.1.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -193,7 +202,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-The CLI uses `@kurot/ui-document@^0.13.0` and its literal-string XML rules.
+The CLI uses `@kurot/ui-document@^0.14.0` and its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -288,7 +297,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.13.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.14.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.

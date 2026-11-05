@@ -3,7 +3,7 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.13.2` (published). This is a headless,
+Package identity: `@kurot/ui-document@0.14.0` (published on npm). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. The semantic format version is 2.
 
@@ -197,7 +197,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.10.0` consumes format version 2 with ui-document ^0.13.0
+- `@kurot/ui-runtime@0.11.0` consumes format version 2 with ui-document ^0.14.0
   and executes the current reuse, appearance, data-binding, semantic-action,
   transition, and typed resource-adapter slice. Incremental reconciliation
   remains pending.
@@ -265,3 +265,11 @@ before native rendering/code generation. Local fields and state field overrides
 win. Reject dynamic selection, non-Label use and instance overrides. No I/O or
 migration; schemaVersion 1/format 2 stay unchanged. UIStyleSheet requires a
 labels map; parsing an omitted JSON section produces an empty immutable map.
+
+## RichLabel component typography
+
+RichLabel accepts seven component defaults: fontFamily (literal CSS string), size,
+textColor, stroke, strokeColor, bold and italic. Explicit Span fields win; omitted
+fields follow the component. Raw runs remain snapshots. Scalar state restoration
+and XML attribute codecs are reused. No baseStyle, new property format, Label
+presets or fitting is added. Use UI 4.1 / document 0.14 / CLI 4.1 / runtime 0.11.

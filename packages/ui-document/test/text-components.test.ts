@@ -22,11 +22,18 @@ describe('BitmapLabel and RichLabel catalog', () => {
 		const definition = components.resolve(type)!;
 		expect(definition.baseTypes).not.toContain('kui.Label');
 		expect(definition.children).toBe('none');
-		for (const property of ['textStyle', 'textFit', 'minFontSize', 'size', 'fontFamily', 'textColor']) {
+		for (const property of ['textStyle', 'textFit', 'minFontSize', 'baseStyle']) {
 			expect(definition.properties[property]).toBeUndefined();
 		}
 		expect(definition.properties.multiline?.defaultValue).toBe(true);
 		expect(definition.properties.textAlign?.enumValues).toEqual(['left', 'center', 'right']);
+	});
+
+	it('keeps vector typography off BitmapLabel', () => {
+		const definition = components.resolve('kui.BitmapLabel')!;
+		for (const property of ['size', 'fontFamily', 'textColor', 'stroke', 'strokeColor', 'bold', 'italic']) {
+			expect(definition.properties[property]).toBeUndefined();
+		}
 	});
 
 	it('uses a typed font resource and literal BitmapLabel text in default and named states', () => {
@@ -134,7 +141,7 @@ describe('BitmapLabel and RichLabel catalog', () => {
 		).toThrow('array value type');
 	});
 
-	it.each(['text', 'textColor', 'textStyle', 'bold', 'italic', 'size', 'fontFamily', 'textFit'])(
+	it.each(['text', 'textStyle', 'textFit', 'minFontSize', 'baseStyle'])(
 		'rejects whole-component RichLabel property %s',
 		property => {
 			const document = createUIDocument({

@@ -1,4 +1,5 @@
 import type { UIPropertyDefinition } from '../../schema/UIComponentDefinition.js';
+import { LABEL_PROPERTIES } from './basic-component-properties.js';
 
 const TEXT_LAYOUT_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	multiline: { valueType: 'boolean', defaultValue: true },
@@ -29,6 +30,22 @@ export const BITMAP_LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefiniti
  */
 export const RICH_LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	...TEXT_LAYOUT_PROPERTIES,
+	fontFamily: {
+		valueType: 'string',
+		defaultValue: 'Arial',
+		description: 'CSS font family for runs without a local family; construction may use the UIContext font.',
+	},
+	size: {
+		valueType: 'number',
+		minimum: 0,
+		defaultValue: 30,
+		description: 'Logical font size for runs without an explicitly authored size.',
+	},
+	bold: LABEL_PROPERTIES.bold!,
+	italic: LABEL_PROPERTIES.italic!,
+	textColor: LABEL_PROPERTIES.textColor!,
+	stroke: LABEL_PROPERTIES.stroke!,
+	strokeColor: LABEL_PROPERTIES.strokeColor!,
 	textFlow: {
 		valueType: 'array',
 		format: 'text-flow',

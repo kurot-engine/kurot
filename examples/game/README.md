@@ -8,8 +8,8 @@ sliders, progress, panel closing and hidden-bar list scrolling are interactive.
 
 ## Run the example
 
-The lock installs registry Core 2.8.0, UI 4.0.0, Game 2.0.1, ui-document 0.13.2
-and CLI 4.0.0. UI and Game resolve the same Core instance. Each example owns its
+The lock installs registry Core 2.8.0, UI 4.1.0, Game 2.0.1, ui-document 0.14.0
+and CLI 4.1.0. UI and Game resolve the same Core instance. Each example owns its
 installation and lockfile independently. DefaultUI declares its Skin parts and uses
 direct fields; onSkinRemoved releases its listeners before replacement.
 

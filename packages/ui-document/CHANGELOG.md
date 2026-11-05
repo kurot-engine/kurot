@@ -4,6 +4,30 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## 0.14.0 — 2026-11-05
+
+Published; exact version and npm latest verified on 2026-11-05. Downloaded
+archive SHA-512 and package manifest match the tested release artifact.
+
+### Added
+
+- Catalog RichLabel component fontFamily (literal CSS string), size, textColor,
+  stroke, strokeColor, bold and italic. Reuse scalar KUI attributes, typed
+  validation, color tokens, per-property states and canonical XML round trips.
+- Preserve explicit local Span fields and omitted component values without
+  filling, merging or removing equal-valued overrides. Keep RichLabel's native
+  wrapping defaults and BitmapLabel's separate glyph-font contract.
+
+### Compatibility and verification
+
+- Semantic format remains 2. No structured style format, baseStyle object,
+  rendering dependency or existing-document migration is introduced.
+- New attributes require UI 4.1, CLI 4.1 or runtime 0.11. The new 0.x feature
+  line is adopted explicitly by dependent packages; older applications can
+  retain their existing catalog and lock.
+- Tests cover numeric/boolean-looking CSS names, component/local/state intent,
+  color tokens, malformed scalar values and preservation of omitted defaults.
+
 ## [0.13.2] — 2026-10-28
 
 Published on npm; registry version, downloaded archive and integrity verified on 2026-10-28.

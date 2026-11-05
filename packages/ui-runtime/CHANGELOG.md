@@ -4,6 +4,29 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## 0.11.0 — 2026-11-05
+
+Published; exact version and npm latest verified on 2026-11-05. Downloaded
+archive SHA-512 and package manifest match the tested release artifact.
+
+### Added
+
+- Materialize RichLabel fontFamily, size, textColor, stroke, strokeColor, bold
+  and italic through explicit property handlers. Keep raw flows independent
+  and use native per-run fallback/measurement rather than merging style data.
+- Validate resolved scalar types/ranges at the exact runtime property path.
+  Native appearance states and transactional bindings restore typography
+  independently of content, including rollback after a later adapter failure.
+
+### Compatibility
+
+- Adopt UI ^4.1.0 and document ^0.14.0 peers/development dependencies; this
+  replaces the previous UI 3 line without a legacy compatibility branch.
+- Keep this package's own Core API minimum ^2.4.0, while satisfying UI's Core
+  ^2.5.2 peer. Development uses one shared Core 2.5.3 instance.
+- Semantic format remains 2. Existing consumers can stay on runtime 0.10 until
+  they deliberately adopt the new UI/document contracts.
+
 ## Development dependency adoption — 2026-10-28
 
 - Update only the development lock/installation to published ui-document 0.13.2.
