@@ -81,8 +81,9 @@ describe('Texture', () => {
 		expect(() => new Texture().dispose()).not.toThrow();
 	});
 
-	it('getPixel32 throws error', () => {
-		expect(() => new Texture().getPixel32(0, 0)).toThrow('getPixel32 is not supported');
+	it('exposes supported pixel readback only on RenderTexture', () => {
+		expect('getPixel32' in new Texture()).toBe(false);
+		expect(typeof new RenderTexture().getPixel32).toBe('function');
 	});
 
 	it('does not expose unsupported bulk-read or export placeholders', () => {

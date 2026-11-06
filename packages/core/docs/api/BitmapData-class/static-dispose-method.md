@@ -1,6 +1,6 @@
 # static dispose
 
-Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static dispose(bitmapData: BitmapData | undefined): void;

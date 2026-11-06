@@ -5,6 +5,44 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — Core 3.1 publication verified
+
+- Verify @kurot/core 3.1.0 and npm latest 3.1.0 against the official registry.
+  Downloaded archive SHA-512 integrity passes; all 3,208 files and the compressed
+  archive are byte-identical to the final tested release artifact.
+- Confirm runtime engineVersion/API index 3.1.0, Texture.hitTestAlpha, removal
+  of the base getPixel32 placeholder and preserved RenderTexture capture reads.
+  The prepared build, 1,028 unit tests, 24 source/packed browser cases, 20 strict
+  API examples and strict-peer consumer verification apply to the published code.
+- Synchronize package/root READMEs, Core context/architecture and release status.
+  The immutable npm archive retains its preparation-time publication wording.
+  Other SDK versions, peers, development locks and application dependencies stay
+  unchanged; no new package version is prepared here.
+
+## 2026-11-06 — Core 3.1 release preparation
+
+- Prepare Core 3.1.0 with Texture.hitTestAlpha for original trimmed-content
+  alpha, atlas rotation/density handling, reusable Canvas sampling and exception
+  recovery. The public instance method replaces the unreleased standalone helper.
+- Remove the always-throwing base Texture.getPixel32 placeholder while preserving
+  RenderTexture capture reads. Record the explicitly accepted minor-release type
+  compatibility exception in Core's CHANGELOG; no compatibility shim is added.
+- Synchronize runtime engineVersion, source manifest, current documentation,
+  root package indexes and generated API references. Carry queued Core native
+  capability wording into this release. Publication remains pending.
+- Core's bitmap-font dependency is unchanged. UI/Game/DragonBones/ui-runtime and
+  Spine retain accepted Core ^3.0.0 peer/development ranges; no consumer uses the
+  removed base method. CLI and headless packages need no change. SDK/app locks,
+  examples, Templates and SAO are not upgraded; hitTestAlpha adopters need 3.1.0.
+  CLI starters already select Core latest and require no template/CLI release.
+- Verification: Core build and all 1,028 unit tests pass. Fifteen source browser
+  regressions and nine packed alpha cases pass on Canvas/WebGL 1/2, including
+  independent output resolutions and readback recovery. API checks have zero
+  missing entries; all 20 examples compile against built and packed declarations.
+- A strict-peer temporary install with published UI/Game/DragonBones/runtime
+  and all four Spine lines passes full declaration checking and resolves one
+  packed Core 3.1.0 instance. Repository consumer manifests and locks stay intact.
+
 ## 2026-11-06 — Examples and Templates adopt Core 3
 
 - Update demo, game and star-catcher plus the five external Templates games

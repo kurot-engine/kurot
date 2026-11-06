@@ -47,7 +47,9 @@ owner unregisters them. Removing a display node does not unregister a callback.
 
 ## Texture capability boundary
 
-Texture has no getPixels or toDataURL methods in this source contract. Its
-getPixel32 base method still throws; RenderTexture.getPixel32 implements reads
-from an existing Canvas capture. Render-buffer readback and Canvas export are
-separate capabilities and retain their implementations.
+Core 3.0 removes Texture.getPixels and Texture.toDataURL. Core 3.1 also removes
+the unsupported base getPixel32 declaration and adds Texture.hitTestAlpha for
+original texture alpha. RenderTexture.getPixel32 implements RGBA reads from an
+existing Canvas capture. Render-buffer readback and Canvas export are separate
+capabilities and retain their implementations. See
+[texture alpha testing](texture-density.md#texture-alpha-testing).

@@ -62,6 +62,50 @@ inferred. RenderTexture retains its capture API and does not accept source-densi
 constructor arguments. BitmapFont's literal descriptor metrics still require a
 page with resolution=1; this feature does not reinterpret font metrics.
 
+## Texture alpha testing
+
+Available in Core 3.1. `texture.hitTestAlpha(x, y): boolean` tests the original
+alpha of the texture's trimmed, upright content. It is also inherited by
+RenderTexture and available on SpriteSheet views.
+
+```ts
+import type { Point, Texture } from '@kurot/core';
+
+export function hitAnimationFrame(texture: Texture, point: Point, frameOffset: Point): boolean {
+    return texture.hitTestAlpha(point.x - frameOffset.x, point.y - frameOffset.y);
+}
+```
+
+- Subtract animation frame placement once in the caller. Coordinates start at
+  the trimmed content's left/top edge; never add or subtract texture.offsetX/Y.
+  Those offsets position the content within its original logical frame, not
+  within the atlas sampling rectangle.
+- Truncate logical x/y toward zero before density conversion. For example,
+  -0.9 samples coordinate 0; -1 is outside. At density 2, logical 1.9 truncates
+  to 1 and selects source pixel 2 within the upright region. A fractional source
+  position selects the containing pixel without smoothing or downsampling.
+- Bounds use scaleBitmapWidth/Height, excluding original trim margins. Atlas
+  placement and clockwise rotation are mapped internally. Outside content,
+  non-finite coordinates and missing/encoded-only sources return false.
+- Every nonzero alpha hits, including 1. Display visibility, alpha, transforms,
+  tint and filters do not participate. Player backend and output-canvas
+  resolution do not change the result.
+
+The browser's shared 3×3 hit-test Canvas/context is created lazily and reused;
+no Bitmap, RenderTexture or additional Canvas is created for each call. Sampling
+reads current source pixels rather than retaining an alpha cache, so Canvas/video
+edits are visible immediately. Rendering uploads still need BitmapData.invalidate
+according to the normal mutable-source contract.
+
+The sampler resets its state before/after drawing, including failures. Canvas
+drawing/readback errors propagate, including cross-origin SecurityError; a failed
+read cannot contaminate the next call. Sampling never disposes or retains the
+caller's Texture/BitmapData or closes a borrowed ImageBitmap. No Player
+initialization is required, but a browser Canvas 2D context is required.
+
+For RGBA values from an existing Canvas capture, use RenderTexture.getPixel32().
+Texture itself has no getPixel32/getPixels/toDataURL placeholders.
+
 ## Authoring and verification
 
 The default KUI kit uses a 2× atlas while retaining logical layout, hit targets
@@ -75,6 +119,16 @@ clip/repeat and rotated edge crops. Browser fill tests compare Canvas/WebGL 1/2
 at different output resolutions and source densities, including tint, texture
 swaps, cache refresh and nine-slice invariance. Use the package's existing build,
 unit and visual-regression commands when changing this contract.
+
+Alpha tests cover transparent holes, alpha=1, signed frame/trim placement,
+fractional and out-of-range coordinates, alternating textures, live pixel edits,
+shared atlas ownership and exception recovery. The texture-alpha browser suite
+checks Canvas/WebGL 1/2 with independent source densities and output resolutions,
+including a real cross-origin readback error. Run it from packages/core:
+
+```sh
+pnpm exec playwright test --config examples/visual-regression/playwright.config.ts texture-alpha.spec.ts
+```
 
 ## Decoded pixel ownership
 

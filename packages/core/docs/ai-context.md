@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.0.0` (published on npm). It provides Kurot's
+Package identity: `@kurot/core@3.1.0` (published on npm). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -23,7 +23,10 @@ Core >= 2.6.0 can consume canvas stage attributes in `createPlayer`; see
 [stage configuration](stage-configuration.md) for precedence and validation.
 
 Core 3 removes ticker receiver parameters and Texture bulk-read/export
-placeholders. Use [ticker ownership](ticker.md) for callback identity and release.
+placeholders. Core 3.1 adds Texture.hitTestAlpha and removes the unsupported
+base getPixel32 declaration; real capture reads remain on RenderTexture.
+Use [ticker ownership](ticker.md) for callback identity and release and
+[texture alpha testing](texture-density.md#texture-alpha-testing) for sampling.
 
 ## 1. Directory map
 
@@ -213,9 +216,12 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - `$`-prefixed members are engine internals even when TypeScript visibility
   permits package-level access.
 - `Base64Util.encode()` accepts `ArrayBuffer`.
-- Pixel reads are provided by `RenderTexture.getPixel32()`. Base Texture.getPixel32
-  still throws. Core 3 removes the unsupported getPixels/toDataURL
-  placeholders; real render-buffer reads and Canvas exports remain available.
+- `Texture.hitTestAlpha(x, y)` samples original trimmed-content alpha using the
+  shared Canvas hit-test buffer. Logical coordinates truncate toward zero before
+  density conversion; do not apply Texture.offsetX/Y again. No Player is required.
+  Readback errors propagate and cleanup resets origin taint without disposing
+  source pixels. RGBA capture reads remain on `RenderTexture.getPixel32()`;
+  Texture has no getPixel32/getPixels/toDataURL placeholders.
 - Hit-test and lookup misses return `undefined`.
 - The supported runtime target is the browser; there is no native-wrapper
   backend.

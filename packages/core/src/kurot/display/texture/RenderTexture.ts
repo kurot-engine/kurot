@@ -82,7 +82,7 @@ export class RenderTexture extends Texture {
 	 * textureScaleFactor and rounded to capture pixels. Returns [] without a usable
 	 * capture; Canvas security/readback errors propagate to the caller.
 	 */
-	public override getPixel32(x: number, y: number): number[] {
+	public getPixel32(x: number, y: number): number[] {
 		if (!this._canvas) {
 			return [];
 		}

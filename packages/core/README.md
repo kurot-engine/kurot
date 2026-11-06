@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **3.0.0** (published on npm).
+for browser games. Package version: **3.1.0** (published on npm).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -19,9 +19,26 @@ and docs without requiring the engine source.
 
 ## Callback ownership
 
-Core 3 uses callback-only ticker registration and removes unsupported
-Texture.getPixels/toDataURL placeholders. Use stable arrow members or callbacks
+Core 3 uses callback-only ticker registration. Use stable arrow members or callbacks
 bound once when they access instance state. See [ticker ownership](docs/ticker.md).
+
+## Texture alpha testing
+
+Core 3.1 adds `texture.hitTestAlpha(x, y)` for the original alpha of trimmed
+texture content, including atlas views, rotation and source density. Coordinates
+are logical content coordinates after subtracting animation frame placement;
+do not adjust `texture.offsetX/Y` again. The method truncates toward zero and
+samples without smoothing. Any nonzero alpha hits, including 1.
+
+The shared Canvas sampler requires no Bitmap/RenderTexture allocation or Player
+initialization. It reads mutable sources on every call, propagates readback
+errors and resets sampling state without disposing borrowed pixels. See
+[the full contract](docs/texture-density.md#texture-alpha-testing).
+
+Core 3.1 removes the unsupported base `Texture.getPixel32()` declaration as an
+explicit minor-release type compatibility exception. RGBA reads from an actual
+Canvas capture remain on `RenderTexture.getPixel32()`; ordinary Texture no
+longer exposes the getPixel32/getPixels/toDataURL placeholders.
 
 ## Installation
 
@@ -29,7 +46,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.0.0
+pnpm add @kurot/core@^3.1.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -112,7 +129,8 @@ Bitmap nine-slice rendering also works in Canvas, including WebGL
 
 **Design Credits**
 
-The rendering pipeline borrows concepts from Pixi.js 8 while keeping the Egret display object model and API intact:
+The rendering pipeline draws on Pixi.js 8 batching concepts and Egret's retained
+display-tree heritage. Kurot defines its own current API and lifecycle contracts:
 
 | Aspect                                | Source    | Notes                                                           |
 | ------------------------------------- | --------- | --------------------------------------------------------------- |
@@ -121,7 +139,7 @@ The rendering pipeline borrows concepts from Pixi.js 8 while keeping the Egret d
 | Multi-texture batching                | Pixi.js   | `aTextureId` per vertex, up to 8 textures per draw call         |
 | Tint                                  | Pixi.js   | `displayObject.tint` passed as premultiplied vertex color       |
 | Dirty flag separation                 | Pixi.js 8 | `structureDirty` (rebuild) vs `renderDirty` (patch)             |
-| Display objects / events / API        | Egret     | Fully preserved for minimal migration cost                      |
+| Retained display tree and events      | Egret     | Adapted to Kurot's native types and lifecycle contracts           |
 | Filter shaders                        | Egret     | Original GLSL, blur upgraded to ping-pong dual-pass             |
 | WebGL state management                | Egret     | DrawCmdManager batching command queue                           |
 | Mask strategies                       | Egret     | scissor / stencil / offscreen compositing                       |

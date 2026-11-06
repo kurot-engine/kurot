@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -8320,6 +8320,12 @@
           "inherited": false
         },
         {
+          "name": "hitTestAlpha",
+          "file": "RenderTexture-class/hitTestAlpha-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
           "name": "initData",
           "file": "RenderTexture-class/initData-method.md",
           "protected": false,
@@ -12838,8 +12844,8 @@
           "inherited": false
         },
         {
-          "name": "getPixel32",
-          "file": "Texture-class/getPixel32-method.md",
+          "name": "hitTestAlpha",
+          "file": "Texture-class/hitTestAlpha-method.md",
           "protected": false,
           "inherited": false
         },

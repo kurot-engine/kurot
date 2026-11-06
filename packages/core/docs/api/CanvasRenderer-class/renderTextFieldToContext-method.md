@@ -1,6 +1,6 @@
 # renderTextFieldToContext
 
-Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 renderTextFieldToContext(tf: TextField, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number): void;

@@ -18,7 +18,7 @@ has no unified workspace install/build command.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 3.0.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/core`](packages/core/README.md)               | 3.1.0   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 5.0.0   | `packages/ui`          | Skinnable UI components, typed lists and part fields, layout, theming, and data binding                         | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 3.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
 | [`@kurot/cli`](packages/cli/README.md)                 | 4.1.2   | `packages/cli`         | KUI XML compilation, declared-part validation and project tooling; EXML projects use CLI 1.3.x                   | `ui-document`               |
@@ -37,7 +37,7 @@ Current manifest dependency ranges:
 
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
-| Core 3.0.0        | bitmap-font `^0.1.0`                              |
+| Core 3.1.0        | bitmap-font `^0.1.0`                              |
 | UI 5.0.0          | Core `^3.0.0`                                     |
 | Game 3.0.0        | Core `^3.0.0`                                     |
 | CLI 4.1.2         | ui-document `^0.14.0`                             |
@@ -58,7 +58,14 @@ UI 4.2 adds item-data generics through collections, lists and item-tap events.
 Declared typed list fields in KUI hosts require CLI >= 4.1.1 within 4.x; ordinary
 TypeScript use needs only UI 4.2. See [typed list data](packages/ui/docs/list-data-types.md).
 
-Core 3.0.0, UI 5.0.0, Game 3.0.0, DragonBones 0.2.0, ui-runtime 0.12.0
+Core 3.1.0 adds `Texture.hitTestAlpha(x, y)`
+for original texture alpha, with shared sampling storage, atlas/density handling
+and exception cleanup. See [texture alpha testing](packages/core/docs/texture-density.md#texture-alpha-testing).
+It also removes the unsupported base `Texture.getPixel32()` declaration as an
+explicit minor-release type compatibility exception; the real
+`RenderTexture.getPixel32()` capture API remains available.
+
+Core 3.1.0, UI 5.0.0, Game 3.0.0, DragonBones 0.2.0, ui-runtime 0.12.0
 and CLI 4.1.2 are published on npm.
 Native packages require Core ^3.0.0;
 ui-runtime also requires UI ^5.0.0. Callback receiver parameters and unsupported

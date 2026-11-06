@@ -4,7 +4,40 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
-## Unreleased
+## 3.1.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 3,208 files and the compressed archive
+are byte-identical to the tested release artifact. Repository publication
+markers are updated after verification; the immutable npm archive retains
+its original preparation markers.
+
+### Added
+
+- Add Texture.hitTestAlpha(x, y) for original trimmed-content alpha. Truncate
+  logical coordinates toward zero before density conversion, map atlas rotation
+  and ignore frame placement/trim offsets already handled by the caller. Any
+  nonzero alpha hits, including 1; transparent/outside pixels return false.
+- Reuse the existing lazy Canvas hit-test buffer without per-call Bitmap,
+  RenderTexture or Canvas objects. Read current pixels without an alpha cache;
+  keep display state and output resolution independent. Propagate Canvas errors
+  while resetting sampler state/origin taint and preserving borrowed sources.
+
+### API cleanup and compatibility
+
+- Remove the unsupported Texture.getPixel32 declaration, which always threw.
+  Keep real RenderTexture.getPixel32 capture reads and inherit hitTestAlpha on
+  RenderTexture. Explicitly accept this removed declaration as a minor-release
+  type compatibility exception: code calling getPixel32 through the base Texture
+  type must use RenderTexture for RGBA captures or hitTestAlpha for raw alpha.
+- Release Core only. Existing UI/Game/DragonBones/ui-runtime and Spine Core
+  ^3.0.0 peers accept 3.1.0 and do not use the removed placeholder; their versions
+  and minimums remain unchanged. CLI/document/Atlas/bitmap-font are unaffected.
+  SDK development locks, examples and external applications remain on their own
+  accepted baselines; callers adopting hitTestAlpha require Core >=3.1.0 within 3.x.
+- CLI game/empty starters already select Core latest and need no template or CLI
+  release. New projects can resolve published 3.1.0; existing projects
+  retain their explicit declarations and locks.
 
 ### Documentation
 
@@ -12,6 +45,25 @@ All notable changes to `@kurot/core` are documented here.
   capabilities in package metadata, README and architecture guides. Remove
   broad Egret API compatibility claims; retain documented file-format support,
   migration guidance and third-party provenance. Published 3.0.0 is unchanged.
+- Synchronize source/runtime version 3.1.0, package/root READMEs, agent context,
+  texture sampling/ownership and ticker capability guides. Regenerate public API
+  references and include a strict-compilable hitTestAlpha example.
+
+### Verification
+
+- Build and all 1,028 unit tests pass (87 files), including strict positive and
+  negative API checks. All 15 source browser regressions pass: nine alpha cases
+  across Canvas/WebGL 1/2 at 1×/2×/3× output resolution, plus six existing atlas
+  fill/crop/cache cases. The packed Core passes the same nine alpha cases and
+  reports runtime engineVersion 3.1.0.
+- API tooling tests and generated coverage/link checks pass with 168 exports,
+  2,149 members and zero missing references. All 20 Core/Game/UI API examples
+  compile strictly against both built and source-free packed declarations.
+- A temporary consumer installs the packed Core with published UI 5.0.0,
+  Game 3.0.0, DragonBones 0.2.0, ui-runtime 0.12.0, document 0.14.0 and all
+  four Spine adapter lines with strict peers. Complete declaration checking
+  passes; all nine native SDKs resolve the same Core 3.1.0 instance. Repository
+  manifests/locks for those consumers remain unchanged.
 
 ## 3.0.0 — 2026-11-06
 

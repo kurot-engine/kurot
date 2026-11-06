@@ -7,12 +7,18 @@ import { fileURLToPath } from 'node:url';
 const directory = fileURLToPath(new URL('./', import.meta.url));
 const imports =
 	"import { ticker, Texture, RenderTexture } from '../src/index.js';\nconst callback = (now: number): boolean => now > 0;\n";
-const valid = 'ticker.startTick(callback); ticker.stopTick(callback); new RenderTexture().getPixel32(0, 0);';
+const valid = `ticker.startTick(callback); ticker.stopTick(callback);
+new RenderTexture().getPixel32(0, 0);
+const textureHit: boolean = new Texture().hitTestAlpha(0, 0);
+const captureHit: boolean = new RenderTexture().hitTestAlpha(0, 0);`;
 const invalid: Readonly<Record<string, string>> = {
 	startReceiver: 'ticker.startTick(callback, {});',
 	stopReceiver: 'ticker.stopTick(callback, {});',
 	texturePixels: 'new Texture().getPixels(0, 0);',
 	textureExport: 'new Texture().toDataURL("image/png");',
+	texturePixel: 'new Texture().getPixel32(0, 0);',
+	alphaCoordinates: 'new Texture().hitTestAlpha("0", 0);',
+	alphaResult: 'const rgba: number[] = new Texture().hitTestAlpha(0, 0);',
 	capturePixels: 'new RenderTexture().getPixels(0, 0);',
 	captureExport: 'new RenderTexture().toDataURL("image/png");',
 };

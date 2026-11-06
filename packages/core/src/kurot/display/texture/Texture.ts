@@ -1,3 +1,4 @@
+import { hitTestBuffer } from '../../player/canvas/CanvasBuffer.js';
 import { BitmapData } from './BitmapData.js';
 
 /**
@@ -173,11 +174,71 @@ export class Texture {
 	}
 
 	/**
-	 * @deprecated Base Texture does not support pixel reads and always throws.
-	 * Use RenderTexture.getPixel32() for a Canvas capture.
+	 * Tests the original alpha of a texture's trimmed, upright content.
+	 *
+	 * Coordinates are logical content coordinates, truncated toward zero before
+	 * density conversion. Subtract animation frame placement before calling; do
+	 * not add or subtract Texture.offsetX/offsetY. Each position samples the source
+	 * pixel containing it, without smoothing, display transforms, alpha or filters.
+	 * Any nonzero alpha, including 1, hits. Outside content, non-finite coordinates
+	 * and missing/encoded-only pixel sources return false.
+	 *
+	 * Uses the same reusable Canvas buffer as Bitmap.pixelHitTest, without retaining
+	 * textures or caching pixels. Mutable sources are read on every call. Canvas
+	 * drawing/readback errors (including cross-origin SecurityError) propagate;
+	 * the buffer is reset even on failure. Caller-owned pixels are never disposed.
+	 * Requires a browser Canvas 2D context, independently of the Player backend or
+	 * output resolution; no Player initialization is needed.
+	 *
+	 * @param x Horizontal position relative to the trimmed content's left edge.
+	 * @param y Vertical position relative to the trimmed content's top edge.
+	 *
+	 * @example
+	 * ```ts
+	 * import { BitmapData, Texture } from '@kurot/core';
+	 *
+	 * const canvas = document.createElement('canvas');
+	 * canvas.width = canvas.height = 1;
+	 * const pixels = canvas.getContext('2d');
+	 * if (!pixels) {
+	 *     throw new Error('Canvas 2D is required');
+	 * }
+	 * pixels.fillRect(0, 0, 1, 1);
+	 * const texture = new Texture();
+	 * texture.setBitmapData(new BitmapData(canvas));
+	 * console.log(texture.hitTestAlpha(0, 0)); // true
+	 * texture.dispose();
+	 * ```
 	 */
-	public getPixel32(_x: number, _y: number): number[] {
-		throw new Error('getPixel32 is not supported');
+	public hitTestAlpha(x: number, y: number): boolean {
+		const source = this.bitmapData?.source;
+		const contentX = Math.trunc(x);
+		const contentY = Math.trunc(y);
+		if (
+			!source || source instanceof ArrayBuffer ||
+			!Number.isFinite(contentX) || !Number.isFinite(contentY) ||
+			contentX < 0 || contentY < 0 ||
+			contentX >= this.scaleBitmapWidth || contentY >= this.scaleBitmapHeight ||
+			this.bitmapWidth <= 0 || this.bitmapHeight <= 0
+		) {
+			return false;
+		}
+
+		const pixelX = Math.floor(contentX / this.pixelScale);
+		const pixelY = Math.floor(contentY / this.pixelScale);
+		const sourceX = Math.floor(this.bitmapX + (this.rotated ? this.bitmapHeight - 1 - pixelY : pixelX));
+		const sourceY = Math.floor(this.bitmapY + (this.rotated ? pixelX : pixelY));
+		const buffer = hitTestBuffer();
+		// Resizing keeps the Canvas/context objects but clears state and origin taint,
+		// including taint left by another user of the shared hit-test buffer.
+		buffer.resize(3, 3);
+		try {
+			buffer.context.imageSmoothingEnabled = false;
+			buffer.context.drawImage(source, sourceX, sourceY, 1, 1, 1, 1, 1, 1);
+			return buffer.context.getImageData(1, 1, 1, 1).data[3] !== 0;
+		} finally {
+			buffer.resize(3, 3);
+		}
 	}
 
 	// ── Internal methods ──────────────────────────────────────────────────────

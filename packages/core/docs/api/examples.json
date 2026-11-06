@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "examples": [
     {
       "file": "examples/c54bc3fde14d.ts",
@@ -13,6 +13,10 @@
     {
       "file": "examples/3e3cd12d6e21.ts",
       "owner": "Texture"
+    },
+    {
+      "file": "examples/63087c509cdd.ts",
+      "owner": "Texture.hitTestAlpha"
     },
     {
       "file": "examples/203bf7b1f013.ts",

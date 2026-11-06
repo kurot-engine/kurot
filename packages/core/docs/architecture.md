@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 3.0.0 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 3.1.0 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -17,6 +17,14 @@ state and event propagation. WebGL rendering uses a flat
 Core uses `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
+
+`Texture.hitTestAlpha()` samples original source pixels through the same lazy,
+shared 3×3 Canvas buffer used by Bitmap/Graphics pixel hits. It maps upright
+content coordinates into the atlas without creating display objects or captures.
+Canvas/context objects are reused; reset before/after sampling removes inherited
+state, stale pixels and cross-origin taint. Source pixels stay borrowed and read
+errors propagate. This browser operation does not depend on Player backend or
+output resolution. See [the coordinate contract](texture-density.md#texture-alpha-testing).
 
 SoundChannel schedules Web Audio repeats through one native looping
 source. Finite total counts end on the audio clock, independently of JavaScript
