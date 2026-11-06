@@ -5,6 +5,37 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — Examples and Templates adopt Core 3.1
+
+- Update demo, game and star-catcher plus Card Booster, MilfMaster, Runaway,
+  Skydive and Tentax to published Core 3.1.0. Preserve each project's exact/caret
+  declarations; refresh registry installs, pnpm locks and active SDK documentation.
+- Registry latest checks confirm the other adopted Kurot packages are current.
+  Keep UI 5.0.0, Game 3.0.0, CLI 4.1.2, document 0.14.0, DragonBones 0.2.0,
+  Spine 4.0 adapter 0.3.0 and Atlas 0.1.0 where already used. No SDK is bumped.
+- All eight strict-peer registry installs and frozen offline installs pass.
+  Strict development/release builds and complete declaration checks pass, with
+  architecture/tool checks where provided and all 753 existing application tests.
+- Dependency audits confirm one shared Core 3.1.0 per application and no changes
+  to any other package version/integrity or unrelated manifest declarations.
+- Expanded browser regression covers development/release on WebGL and Canvas
+  for all eight projects. Demo covers startup/resize; Game covers both ordinary
+  animated content and the KUI gallery; Star Catcher passes all twelve keyboard,
+  touch, scoring, restart and disposal cases across the four configurations.
+- All five Templates pass the full native browser workflows. Tentax now checks
+  the actual compiled Main entry in both build modes, with shared Skin fields,
+  component behaviors, betting/dialog flows and cleanup. Networking uses local
+  protocol fixtures; production-service integration is outside these checks.
+- Diagnose and fix a pre-existing MilfMaster BigWin browser test timing race:
+  title screenshots could finish counting before a click assumed to skip it.
+  Core 3.0/3.1 reproduce the same expected close. Separate title/manual cases,
+  guard the manual tick pause with finally, assert automatic input delivery and
+  use UI-condition waits; exact delay boundaries stay in controlled-clock unit
+  tests. Add the focused --big-win-only runner. No production logic is changed.
+- Release resource cache checks pass, including descriptor pages, fonts,
+  cached resource responses and application JS reuse. Runaway's resource/asset
+  provenance check passes. Complete results remain in local verification logs.
+
 ## 2026-11-06 — Core 3.1 publication verified
 
 - Verify @kurot/core 3.1.0 and npm latest 3.1.0 against the official registry.

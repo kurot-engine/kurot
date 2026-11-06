@@ -9,7 +9,7 @@
 		"clean": "kurot clean"
 	},
 	"dependencies": {
-		"@kurot/core": "^3.0.0",
+		"@kurot/core": "^3.1.0",
 		"@kurot/game": "^3.0.0",
 		"@kurot/ui": "^5.0.0",
 		"@kurot/ui-document": "^0.14.0"
