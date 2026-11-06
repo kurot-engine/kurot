@@ -5,6 +5,29 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — Examples and Templates adopt Core 3
+
+- Update demo, game and star-catcher plus the five external Templates games
+  to published Core 3.0.0 and CLI 4.1.2. Existing UI/Game users adopt UI 5.0.0
+  and Game 3.0.0; Core-only examples remain Core-only. Keep exact/caret styles.
+- MilfMaster adopts DragonBones 0.2.0; Tentax adopts Spine 4.0 adapter 0.3.0.
+  Keep document 0.14.0, Atlas 0.1.0, all other declarations and all non-Kurot
+  lock versions. Each application resolves one registry Core 3 instance.
+- Adapt the six old ticker receiver arguments in Card Booster startup/disposal
+  and MilfMaster gift/confetti presentation. Existing arrow callbacks preserve
+  instance ownership, timing and cleanup; authored skins/resources stay unchanged.
+- All eight registry installs and frozen offline installs pass, together with
+  strict development/release builds and complete declaration checks. All 753
+  existing application/model tests pass; relevant architecture/tool checks pass.
+- Browser checks pass for both demo builds and the game KUI gallery's native
+  button, slider/progress, list and Skin-replacement behavior. Star Catcher passes
+  all six development/release gameplay and lifecycle cases.
+- Card Booster, Runaway and Skydive development/release browser regressions pass.
+  MilfMaster's affected confetti passes development/release WebGL and development
+  Canvas. Tentax's development fixture covers components, bets, dialogs and
+  disposal; its release business browser scenarios are not rerun. Fixtures are
+  local and do not establish live backend behavior. No SDK version is bumped.
+
 ## 2026-11-06 — Coordinated release publication complete
 
 - Audit all nine engine packages and four Spine adapters against the official

@@ -9,12 +9,12 @@
 		"clean": "kurot clean"
 	},
 	"dependencies": {
-		"@kurot/core": "^2.8.0",
-		"@kurot/game": "^2.0.1",
-		"@kurot/ui": "^4.2.0",
+		"@kurot/core": "^3.0.0",
+		"@kurot/game": "^3.0.0",
+		"@kurot/ui": "^5.0.0",
 		"@kurot/ui-document": "^0.14.0"
 	},
 	"devDependencies": {
-		"@kurot/cli": "^4.1.1"
+		"@kurot/cli": "^4.1.2"
 	}
 }
