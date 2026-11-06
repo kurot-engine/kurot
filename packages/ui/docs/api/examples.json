@@ -1,6 +1,6 @@
 {
   "package": "@kurot/ui",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "examples": [
     {
       "file": "examples/37f49b480a1c.ts",
@@ -19,7 +19,7 @@
       "owner": "Binding.bindProperty"
     },
     {
-      "file": "examples/d9d3bd3be01f.ts",
+      "file": "examples/0ec6d9fa6766.ts",
       "owner": "Binding.bindHandler"
     },
     {

@@ -3,7 +3,7 @@
 `TextFitMode` is `none | shrink`. Native Label owns normal layout, single- and
 multiline fitting, outline-safe bounds and derived rendering observations.
 KUI compilation and semantic materialization pass the authored policy to that
-same native component. UI's Core peer requirement is ^2.5.2.
+same native component. UI 5's Core peer requirement is ^3.0.0.
 
 ## Outline-safe layout
 
@@ -53,8 +53,8 @@ automatically; omitted Label flags continue to allow wrapping.
 ## Vertical alignment and skin defaults
 
 Label, RichLabel and EditableText inherit TextField's default; BitmapLabel
-inherits BitmapText's. With Core >= 2.5.3 they default to
-`verticalAlign="middle"`; the accepted Core 2.5.2 baseline defaults to top. Button
+inherits BitmapText's. With Core 3 they default to
+`verticalAlign="middle"`. Button
 skins in the native KUI kit already set middle explicitly. Button does not
 overwrite an authored top/bottom or a skin state. Use explicit top for content
 intended to start at the top of a taller box. `verticalCenter` positions the

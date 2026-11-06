@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kurot/core':
-        specifier: ^2.2.0
-        version: 2.2.0
+        specifier: ^3.0.0
+        version: 3.0.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.5
@@ -359,8 +359,8 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/core@2.2.0':
-    resolution: {integrity: sha512-iUaBXJ4jeJVWo2gsCdSQXlnxUR5ssLSRICRy5+yrwMtkNNYBigy8u08uRJXF5QygNFSG06Ht3o9JPjgXUQdDMg==}
+  '@kurot/core@3.0.0':
+    resolution: {integrity: sha512-ofhctncMXDvHOb6lSv6pDZou3rYqTjAflMaYCazDlX9tUe3/MsjFDYGG61E4CSi5aohhMckDLbOYqNKSaIbz3g==}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -958,7 +958,7 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/core@2.2.0':
+  '@kurot/core@3.0.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0

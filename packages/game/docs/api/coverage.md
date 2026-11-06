@@ -1,6 +1,6 @@
 # @kurot/game API coverage
 
-Version: 2.0.1. Public export names: 33. Public/protected member entries: 480.
+Version: 3.0.0. Public export names: 33. Public/protected member entries: 478.
 
 Missing declaration references: **0**. Inventory is independently read through the TypeScript checker.
 

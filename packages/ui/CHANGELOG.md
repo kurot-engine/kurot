@@ -4,6 +4,43 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## Unreleased
+
+### Documentation
+
+- Present the package as Kurot's native UI, including KUI skins, typed
+  collections, layout, binding and states. Replace EUI compatibility positioning
+  in metadata, keywords, guides and API comments with native contracts.
+
+The wording cleanup is reserved for a later patch; the published release below
+retains its original descriptions and comments. Runtime code and types are unchanged.
+
+## 5.0.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes (5,588 files). Runtime JS and declarations
+match the tested preparation after removing comments. Source wording, metadata
+and generated documentation cleanup remains unreleased for a later patch.
+
+### Breaking
+
+- Remove callback receiver arguments from Animation, Watcher construction/watch/
+  setHandler and Binding.bindHandler. Watcher's optional next link is now its
+  third constructor argument. Initial and later notifications run unbound.
+- Follow Core's callback-only ticker API. Keep TouchScroll's update callback as
+  a stable arrow member so throw/bounce animations retain their owning instance.
+- Add runtime and strict compiler coverage for unbound callbacks, downstream
+  Watchers, handler replacement, unwatch, animation completion/stop and bounce.
+  Existing Skin factory and EventDispatcher receiver contracts are unchanged.
+- Require Core ^3.0.0 for its callback-only ticker contract. Keep existing
+  list generics, Skin part binding and KUI semantics unchanged.
+
+- Verification: package build and all 472 unit tests pass against matching
+  prepared dependencies. Source/packed declaration and browser integration are
+  recorded in the repository CHANGELOG.
+
+
+
 ## 4.2.0 — 2026-11-06
 
 Published; exact version and npm latest verified on 2026-11-06. Downloaded

@@ -5,6 +5,132 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-06 — Coordinated release publication complete
+
+- Audit all nine engine packages and four Spine adapters against the official
+  registry. Every source manifest version is published and matches npm latest:
+  Core 3.0.0, UI 5.0.0, Game 3.0.0, CLI 4.1.2, document 0.14.0, runtime
+  0.12.0, DragonBones 0.2.0, Atlas/bitmap-font 0.1.0; Spine 4.0/4.1/4.2
+  adapters 0.3.0 and Spine 4.3 adapter 0.4.0.
+- Verify CLI 4.1.2 archive SHA-512 and all 285 files against the tested
+  preparation. The compressed archive is byte-identical; confirm document
+  dependency ^0.14.0 and callback-only Tween.call in the game starter.
+- Synchronize final CLI and root publication markers. No prepared SDK version
+  remains unpublished. Source description/comment cleanup for already published
+  Core/UI/Game/document stays queued for later patches; applications retain
+  their own dependency adoption schedules. No new version is bumped here.
+
+## 2026-11-06 — Runtime 0.12 publication verified
+
+- Verify @kurot/ui-runtime 0.12.0 and npm latest 0.12.0. Downloaded archive
+  SHA-512 integrity passes; all 167 files and the compressed archive are
+  byte-identical to the artifact tested with published Core 3.0.0, UI 5.0.0
+  and document 0.14.0. Its 90-test and packed strict-type validation still applies.
+- Confirm peers Core ^3.0.0, UI ^5.0.0 and document ^0.14.0, package exports
+  and shipped declarations. No dependency or lock changes are needed.
+- Synchronize repository README and runtime publication markers. CLI 4.1.2
+  remains prepared for publication; wording cleanup stays queued for later patches.
+
+## 2026-11-06 — Native publications and runtime readiness
+
+- Verify UI 5.0.0, Game 3.0.0, DragonBones 0.2.0, Spine 4.0/4.1/4.2 adapter
+  0.3.0 and Spine 4.3 adapter 0.4.0 against exact registry versions and latest
+  tags. All seven downloaded archives pass registry SHA-512 verification.
+- Published UI/Game retain the earlier wording. Removing comments yields the
+  same runtime code and declarations as the tested preparation. Reserve native
+  description, guide and comment cleanup for later patches without bumping now.
+- DragonBones matches the prepared archive byte-for-byte. Spine differs only
+  in package.json indentation, with identical metadata, runtime and declarations.
+- Correct ui-runtime's UI 5.0.0 lock integrity to the official published archive;
+  keep Core ^3.0.0, UI ^5.0.0 and document ^0.14.0 peer/development ranges.
+- Runtime frozen installation, build and all 90 tests pass with official Core
+  3.0.0, UI 5.0.0 and document 0.14.0. ui-runtime 0.12.0 remains prepared for
+  publication; CLI 4.1.2 follows. No consumer application is upgraded here.
+
+## 2026-11-06 — Native engine and UI descriptions
+
+- Replace broad EUI/Egret compatibility positioning with Kurot's own rendering,
+  scene, event, KUI Skin, layout, binding and state contracts. Update package
+  metadata, current guides, agent context and API comments/references.
+- Keep explicit imported file-format support, parser names, migration docs,
+  benchmark references, historical releases and third-party copyright/provenance.
+- Refresh descriptions in the pending UI/Game/CLI releases. Core 3.0.0 and
+  ui-document 0.14.0 are immutable published artifacts; their source wording
+  changes remain unreleased. No package version or dependency range changes.
+- Verification: 21 edited TypeScript files retain identical comment-free syntax
+  and types. UI/Game/CLI/document builds pass; all 333 document tests pass.
+  Generated API references have zero gaps; all 19 examples compile against
+  built and source-free packed declarations. Runtime algorithms are unchanged.
+
+## 2026-11-06 — Core 3 publication verified
+
+- Verify @kurot/core 3.0.0 and npm latest 3.0.0 against the official registry.
+  Downloaded archive SHA-512 integrity passes; all 3,206 files and the compressed
+  archive are byte-identical to the previously tested release artifact.
+- Confirm runtime engineVersion and API index version 3.0.0, callback-only
+  ticker declarations and removal of Texture.getPixels/toDataURL.
+- Update repository Core publication markers. The published archive remains
+  immutable and retains the original preparation markers. Existing SDK Core 3
+  lock integrities already match the registry; no dependency changes are needed.
+- UI 5.0.0, Game 3.0.0, DragonBones 0.2.0, ui-runtime 0.12.0, CLI 4.1.2 and
+  the four sibling Spine adapters remain prepared for publication. UI/Game/
+  DragonBones/Spine can follow Core; runtime follows UI, and CLI follows Core/Game.
+
+## 2026-11-06 — Core 3 coordinated release preparation
+
+- Prepare Core 3.0.0, UI 5.0.0, Game 3.0.0, DragonBones 0.2.0,
+  ui-runtime 0.12.0 and CLI 4.1.2. Publication remains pending.
+- Require Core ^3.0.0 in UI/Game/DragonBones/ui-runtime; runtime also requires
+  UI ^5.0.0. CLI keeps ui-document ^0.14.0 and no runtime Core/UI dependency.
+- Synchronize runtime Capabilities.engineVersion, source manifests, dependency
+  tables, package READMEs, callback contracts and generated API references.
+- Prepare sibling Spine 4.0/4.1/4.2 adapters 0.3.0 and Spine 4.3 adapter 0.4.0
+  for Core ^3.0.0 only; keep Spine runtime lines and rendering algorithms.
+- Publish Core first, then native consumers and Spine adapters; runtime follows
+  UI. Publish CLI after Core/Game so newly created game projects resolve the
+  matching callback APIs. External applications/Templates are not upgraded here.
+
+- Validation: all six engine builds and 1,882 tests pass; DragonBones full
+  typechecking passes. CLI's default parallel run hit a 5-second process-test
+  timeout; all 208 tests pass with two workers and unchanged test thresholds.
+- All four Spine builds, strict source/test checks and 28 tests pass against
+  prepared Core 3. Strict source-free consumers install with enforced peers;
+  no third-party tool/runtime version updates are introduced in SDK locks.
+- API verification has zero missing references; all 19 examples compile against
+  built and packed declarations. Fourteen minified browser runs pass 64 checks:
+  eight engine callback/transition/capture scenarios each on WebGL and Canvas,
+  plus four Spine lines on Canvas/WebGL1/WebGL2 covering object identity,
+  binary/atlas metadata, live animation pixels and listener cleanup.
+- Registry-shaped SDK locks pass frozen offline installation using the prepared
+  archive cache. No local file/link dependency or permanent override is committed.
+
+### Callback ownership cleanup and initial source verification
+
+- Remove Kurot-owned receiver parameters from Core ticker, UI Animation/Watcher/
+  Binding and Game Tween callbacks/options. Keep stable function identity,
+  callback snapshots, timing, forward-only steps and lifecycle ownership.
+- Preserve the upstream DragonBones event receiver protocol. Adapt only its
+  internal ticker driver to a stable arrow callback; keep imported runtime code
+  and KUI/semantic document formats unchanged.
+- Remove unsupported Texture.getPixels/toDataURL placeholders, their declarations
+  and generated references. Keep real buffer operations and RenderTexture.getPixel32.
+- Update native consumers, ui-runtime transitions, CLI starter and engine example
+  calls. Initial validation retained published manifests/locks; the coordinated
+  preparation above now assigns the incompatible releases. Templates/SAO remain
+  on their existing dependency baselines.
+- All six affected package builds and 1,882 unit tests pass, plus DragonBones
+  full typechecking. Fifteen strict compiler negatives reject removed arguments,
+  options and Texture members. New test files also pass complete strict checks.
+- API generation/verification has zero missing references. All 19 examples compile
+  against both built and source-free packed declarations. Packed Core/UI/Game/
+  DragonBones/ui-runtime pass strict consumer types and eight browser scenarios
+  on both WebGL and Canvas: ticker identity, binding, Animation/TouchScroll/
+  ProgressBar, Tween, Timer, DragonBones receivers, numeric transitions and capture.
+- Star Catcher passes strict types, four model tests, development/release builds
+  and browser gameplay/lifecycle checks with the checkout Core; game also passes
+  strict development/release builds. Cross-package validation uses temporary
+  checkout peers, preserving the registry manifests and locks.
+
 ## 2026-11-06 — Examples and Templates adopt UI 4.2 / CLI 4.1.1
 
 - Update CLI to 4.1.1 in demo, game, star-catcher and all five external Templates

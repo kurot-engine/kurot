@@ -64,6 +64,9 @@ still match after resizing. Build output is served over HTTP.
 
 ## 3. Own a game clock and explicit round state
 
+The ticker examples below use Core 3's callback-only API.
+Use the installed Core declarations; see [ticker ownership](ticker.md).
+
 Use application state such as ready → playing ↔ paused → ended. Restart may
 create a fresh session on the same Player; Kurot does not supply a Phaser-style
 SceneManager. Display-list removal is independent from callback lifetime.
@@ -78,9 +81,9 @@ const onTick = (timeStamp: number): boolean => {
 	// Advance application rules by seconds; render the resulting state.
 	return false;
 };
-ticker.startTick(onTick, undefined);
+ticker.startTick(onTick);
 // Pause/end: unregister the same callback and receiver, then reset the clock.
-ticker.stopTick(onTick, undefined);
+ticker.stopTick(onTick);
 lastTime = undefined;
 ```
 
@@ -106,7 +109,7 @@ horizontal axis or moveTo(x). Clear held keys and pointer ownership on blur,
 cancel, pause and exit. Retain callback identities for later removal.
 
 EventDispatcher listener arguments are `(type, listener, useCapture?, priority?)`;
-there is no Egret thisObject parameter. Use stable arrow callbacks or bind once.
+the listener owns its instance binding. Use stable arrow callbacks or bind once.
 Resource has a separate on/off interface; it is not an EventDispatcher.
 
 For simple gameplay, use explicit same-coordinate-system AABBs or

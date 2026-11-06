@@ -1,6 +1,6 @@
 # static interpolate
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static interpolate(pt1: Point, pt2: Point, f: number): Point;

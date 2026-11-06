@@ -1,6 +1,6 @@
 # @kurot/game architecture
 
-> Current version: 2.0.1 (published), with peerDependency `@kurot/core: ^2.0.0`.
+> Current version: 3.0.0 (published on npm), with peerDependency `@kurot/core: ^3.0.0`.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal
@@ -14,7 +14,7 @@
 [`@kurot/core`](../../core/docs/architecture.md). It provides higher-level features:
 chainable property animation (Tween), externally driven frame animation
 (MovieClip), inertial scrolling (ScrollView), particle systems and an
-Egret-compatible network-loading wrapper (URLLoader).
+format-aware network-loading wrapper (URLLoader).
 
 Core is a `peerDependency`, excluded from the output bundle. Consumers explicitly
 install and control its version to avoid multiple Core instances.
@@ -71,7 +71,7 @@ runtime behavior.
 Tween.get(target)
   → _addActive(tween)
     → when _activeTweens.size changes from 0 to 1
-      → ticker.startTick(_globalTick, null)   register once
+      → ticker.startTick(_globalTick)   register once
 
 _globalTick(timeStamp)
   → derive deltaTime; the first callback only records the timestamp
@@ -80,7 +80,7 @@ _globalTick(timeStamp)
 
 Tween completion/removal → _removeActive(tween)
   → when _activeTweens.size becomes 0
-    → ticker.stopTick(_globalTick, null)      unregister
+    → ticker.stopTick(_globalTick)      unregister
 ```
 
 All Tween instances in the module share one `_globalTick` callback on Core's
@@ -91,7 +91,7 @@ tween, such as dozens of simultaneous UI transitions.
 
 ```text
 particleSystem.start()
-  → ticker.startTick(this._update, this)      register each instance
+  → ticker.startTick(this._update)      register each instance
 
 particleSystem.stop(clear = false)
   → stop emission; keep the ticker until existing particles expire
@@ -213,7 +213,7 @@ not describe the particle rendering type.
 
 ## 8. URLLoader backends
 
-URLLoader provides an Egret-style loading entry point and routes requests to
+URLLoader loads textures, sounds and HTTP data, routing requests to
 three Core components according to dataFormat:
 
 | dataFormat                 | Backend       | Meaning of `data`                                      |

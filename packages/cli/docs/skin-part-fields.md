@@ -1,6 +1,6 @@
 # Declared Skin fields
 
-CLI 4 validates direct part access for UI 4. XML IDs remain the part names and
+CLI 4 validates direct part access for UI 4 and 5. XML IDs remain the part names and
 business classes declare the fields they use:
 
 ```ts
@@ -46,7 +46,7 @@ targeted contract validation does not replace the project's complete
 
 ## Typed list fields
 
-With UI >= 4.2.0 and CLI >= 4.1.1 within their respective 4.x lines, a host may
+With UI 4.2.x or 5.x and CLI >= 4.1.1 within 4.x, a host may
 declare `items: List<ItemData | null>` for an authored `<List id="items" />`.
 The checker permits the unknown business-data parameter to follow that
 declaration. No XML generic syntax is introduced.

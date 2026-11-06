@@ -42,7 +42,6 @@ export class Panel extends Component {
 
 	/**
 	 * Write-only: adds declarative children to the panel.
-	 * Mirrors Egret's `registerProperty(Panel, "elementsContent", "Array", true)`.
 	 */
 	public set elementsContent(value: DisplayObject[] | undefined) {
 		if (!value) return;

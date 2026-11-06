@@ -1,6 +1,6 @@
 # static get
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static get(gl: GL, vertSrc: string, fragSrc: string, key: string): WebGLProgram;

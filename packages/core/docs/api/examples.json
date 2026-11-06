@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "2.8.0",
+  "version": "3.0.0",
   "examples": [
     {
       "file": "examples/c54bc3fde14d.ts",
@@ -19,7 +19,7 @@
       "owner": "createPlayer"
     },
     {
-      "file": "examples/3d05a120a788.ts",
+      "file": "examples/a886ecac175d.ts",
       "owner": "SystemTicker.startTick"
     },
     {

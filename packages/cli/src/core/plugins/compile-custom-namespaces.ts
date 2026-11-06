@@ -27,7 +27,7 @@ interface NamespaceEntry {
 
 /**
  * Bundles each project-defined KUI namespace (`ui.namespaces` in
- * `kurot.config.ts`, matching Egret's `xmlns:game="game.*"` convention)
+ * `kurot.config.ts`)
  * into its own chunk under `js/`.
  *
  * A namespace barrel (e.g. `src/ui/index.ts` re-exporting `HeroNarrowIR`,

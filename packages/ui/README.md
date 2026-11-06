@@ -1,13 +1,19 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **4.2.0** (published on npm).
-Requires Core **^2.5.2**.
+Kurot games. Package version: **5.0.0** (published on npm).
+Requires Core **^3.0.0**.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
 the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
 [API topics](docs/api/topics.md) and the [symbol index](docs/api/index.md) for
 exact member contracts. Build-time KUI skins run through UI without ui-runtime.
+
+## Callback ownership
+
+UI 5 removes receiver parameters from Animation, Watcher and Binding.bindHandler
+and uses Core 3's callback-only ticker. Use stable arrow members or callbacks
+bound once when they access instance state. See [callback ownership](docs/callbacks.md).
 
 ## Typed list data
 
@@ -30,7 +36,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^4.2.0 @kurot/core@^2.5.2
+pnpm add @kurot/ui@^5.0.0 @kurot/core@^3.0.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -62,9 +68,8 @@ CLI 4 exports local Skin factories with
 path, then pass the factories and default mappings to UIContext. See the
 [context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
 
-Existing global applications keep their Theme/asset behavior. UIContext needs
-no new Core API beyond the existing ^2.5.2 peer; Core 2.8.0 is required only when
-adopting its new ImageBitmap support. Dispose views and their activity before
+Existing global applications keep their Theme/asset behavior. This UI release
+requires Core ^3.0.0, including ImageBitmap support. Dispose views and their activity before
 the context, then release borrowed resources/fonts through their owners.
 
 ## Stage-sized UI roots
@@ -415,19 +420,17 @@ The page opens at `/benchmark/`. Automated runs write local results under
 `examples/benchmark/results/`; use the same scenario and environment when
 comparing results. These are UI self-comparisons rather than framework rankings.
 
-## Differences from Egret EUI
+## Native UI model
 
-|                | Egret EUI                   | @kurot/ui                                                   |
-| -------------- | --------------------------- | ----------------------------------------------------------- |
-| Namespace      | `eui.*` global              | ES Module named exports                                     |
-| Component base | `namespace` + `mixin`       | Standard class inheritance                                  |
-| Layout state   | Prototype-injected          | `UIState` delegation                                        |
-| Authored skins | EXML runtime parser         | KUI XML compiled by `@kurot/cli`                            |
-| Skin parts     | Incremental dynamic fields  | Complete typed host fields and a framework part map         |
-| Skin lifecycle | `partAdded` / `partRemoved` | `onSkinReady` / `onSkinRemoved`                             |
-| `thisObject`   | Required in event listeners | Not needed — use arrow functions                            |
-| Virtual layout | Default on                  | Opt-in via `useVirtualLayout = true`                        |
-| i18n           | Built-in                    | Project-managed translations; Core handles Unicode wrapping |
+| Capability | Contract |
+| --- | --- |
+| Modules | Named ESM exports backed by the application's shared Core instance. |
+| Layout | UIState delegation with properties, measurement and display-list validation. |
+| Skins | KUI XML compiled by CLI into Skin factories. |
+| Skin parts | Declared typed host fields, bound before `onSkinReady` and cleared after `onSkinRemoved`. |
+| Callbacks | Stable arrow functions or functions bound once by their owner. |
+| Virtual layout | Explicitly enabled with `useVirtualLayout = true`. |
+| Translations | Project-managed text; Core owns Unicode wrapping and text rendering. |
 
 ## Bitmap labels
 

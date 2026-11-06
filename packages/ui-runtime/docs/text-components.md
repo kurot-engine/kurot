@@ -1,6 +1,6 @@
 # Native text materialization
 
-The runtime requires Core `^2.4.0`, UI `^4.1.0` and document `^0.14.0`.
+The runtime requires Core `^3.0.0`, UI `^5.0.0` and document `^0.14.0`.
 It materializes BitmapLabel and RichLabel with their real native constructors;
 both remain independent of Label. RichLabel exposes seven component typography
 properties; Label presets, fitting and plain text remain separate contracts.

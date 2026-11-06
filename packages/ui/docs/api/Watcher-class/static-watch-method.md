@@ -1,9 +1,9 @@
 # static watch
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
-static watch(host: IEventDispatcher | undefined, chain: string[], handler?: (value: unknown) => void, thisObject?: unknown): Watcher | undefined;
+static watch(host: IEventDispatcher | undefined, chain: string[], handler?: (value: unknown) => void): Watcher | undefined;
 ```
 
 Creates and starts a Watcher for a property chain.
@@ -12,6 +12,8 @@ Does not emit an initial callback; read getValue() or use Binding.bindHandler
 for that behavior. Each defined chain host must implement IEventDispatcher
 and notify PROPERTY_CHANGE. Call unwatch() when its owner closes; errors from
 property access or handlers propagate rather than becoming an error event.
+Handlers run without a receiver; retain instance state with a stable arrow
+member or a function bound once by its owner.
 
 ```ts
 import { EventDispatcher } from '@kurot/core';

@@ -1,8 +1,8 @@
 # Typed list data
 
-Available in UI >= 4.2.0 within 4.x. Declared typed list fields in KUI hosts also
+Available in UI 4.2.x and 5.x. Declared typed list fields in KUI hosts also
 require CLI >= 4.1.1 within 4.x; ordinary TypeScript use needs only UI.
-Core peer remains ^2.5.2, with no resource or KUI format change.
+UI 5 requires Core ^3.0.0. List data types do not change resource or KUI formats.
 
 ## Collections and selection
 

@@ -1,6 +1,6 @@
 # constructor
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 constructor(distance: number, angle: number, color: number, alpha: number, blurX: number, blurY: number, strength: number, quality: number, inner: boolean, knockout: boolean, hideObject: boolean);

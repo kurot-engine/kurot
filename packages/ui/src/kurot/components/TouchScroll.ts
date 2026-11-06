@@ -41,13 +41,17 @@ export class TouchScroll {
 	private _maxScrollPos = 0;
 	private _offsetPoint = 0;
 	private _started = false;
+	private readonly _onScrollingUpdate = (animation: Animation): void => {
+		this._currentScrollPos = animation.currentValue;
+		this._updateFunction(animation.currentValue);
+	};
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
 	public constructor(updateFunction: (scrollPos: number) => void, endFunction: () => void) {
 		this._updateFunction = updateFunction;
 		this._endFunction = endFunction;
-		this._animation = new Animation(this._onScrollingUpdate, this);
+		this._animation = new Animation(this._onScrollingUpdate);
 		this._animation.easerFunction = easeOut;
 		this._animation.endFunction = () => this._endFunction();
 	}
@@ -60,7 +64,7 @@ export class TouchScroll {
 
 	public stop(): void {
 		this._animation.stop();
-		ticker.stopTick(this._onTick, this);
+		ticker.stopTick(this._onTick);
 		this._started = false;
 	}
 
@@ -75,7 +79,7 @@ export class TouchScroll {
 		this._previousTime = getTimer();
 		this._previousPosition = this._currentPosition = touchPoint;
 		this._offsetPoint = touchPoint;
-		ticker.startTick(this._onTick, this);
+		ticker.startTick(this._onTick);
 	}
 
 	public update(touchPoint: number, maxScrollValue: number, scrollValue: number): void {
@@ -109,7 +113,7 @@ export class TouchScroll {
 	public finish(currentScrollPos: number, maxScrollPos: number): void {
 		this._currentScrollPos = currentScrollPos;
 		this._maxScrollPos = maxScrollPos = Math.max(0, maxScrollPos);
-		ticker.stopTick(this._onTick, this);
+		ticker.stopTick(this._onTick);
 		this._started = false;
 
 		if (currentScrollPos < 0 || currentScrollPos > maxScrollPos) {
@@ -161,10 +165,5 @@ export class TouchScroll {
 		anim.from = hsp;
 		anim.to = posTo;
 		anim.play();
-	}
-
-	private _onScrollingUpdate(animation: Animation): void {
-		this._currentScrollPos = animation.currentValue;
-		this._updateFunction(animation.currentValue);
 	}
 }

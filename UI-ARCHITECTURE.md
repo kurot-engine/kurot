@@ -67,9 +67,9 @@ an exact node and property path.
 ### 1.4 The authoring model is not EXML 2.0
 
 The future model must not inherit EXML namespaces, reflection rules, global
-component exports, stringly typed attributes, or EUI-specific skin lookup merely
+component exports, stringly typed attributes, or implicit global skin lookup merely
 for compatibility. Legacy EXML projects remain on the independent CLI 1.3.x
-line. Current CLI 4.0.0 compiles KUI XML and validates declared part fields.
+line. The current CLI compiles KUI XML and validates declared part fields.
 
 ### 1.5 Serialization syntax is not the semantic model
 
@@ -189,7 +189,7 @@ their narrower programmatic/runtime boundary.
 
 The existing `@kurot/ui` package already owns the real UI behavior: measurement,
 layout, validation, skins, states, bindings, collections, themes, and controls.
-The CLI parses canonical KUI XML through document ^0.13.0 and emits ESM Skin
+The CLI parses canonical KUI XML through document ^0.14.0 and emits ESM Skin
 factories, theme output and typed skin-part declarations. It also handles project
 namespace components and development resource synchronization. Editor implementation and application lifecycle belong to their own
 integration repository.
@@ -378,7 +378,7 @@ becoming a second behavior class. It should support concepts such as:
 - design-token and resource references.
 
 The target model must define these concepts directly. It must not expose
-`hostComponentKey`, reflective EUI part discovery, or `skinName` string lookup as
+`hostComponentKey`, reflective part discovery, or `skinName` string lookup as
 the authoring foundation. Runtime adapters may translate the new semantics to
 current `@kurot/ui` mechanisms during migration.
 

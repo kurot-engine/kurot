@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
+## Unreleased
+
+### Documentation
+
+- Describe KUI layout nodes and native text-input restrict metadata directly,
+  without EUI compatibility labels. Keep catalog values, validation, serialized
+  formats and runtime behavior unchanged. Published 0.14.0 is unchanged.
+
 ## 0.14.0 — 2026-11-05
 
 Published; exact version and npm latest verified on 2026-11-05. Downloaded

@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@2.8.0` (published on npm). It provides Kurot's
+Package identity: `@kurot/core@3.0.0` (published on npm). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -21,6 +21,9 @@ something isn't exported.
 
 Core >= 2.6.0 can consume canvas stage attributes in `createPlayer`; see
 [stage configuration](stage-configuration.md) for precedence and validation.
+
+Core 3 removes ticker receiver parameters and Texture bulk-read/export
+placeholders. Use [ticker ownership](ticker.md) for callback identity and release.
 
 ## 1. Directory map
 
@@ -210,8 +213,9 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - `$`-prefixed members are engine internals even when TypeScript visibility
   permits package-level access.
 - `Base64Util.encode()` accepts `ArrayBuffer`.
-- Pixel reads are provided by `RenderTexture.getPixel32()`; the corresponding
-  base `Texture` read/export methods throw unsupported-operation errors.
+- Pixel reads are provided by `RenderTexture.getPixel32()`. Base Texture.getPixel32
+  still throws. Core 3 removes the unsupported getPixels/toDataURL
+  placeholders; real render-buffer reads and Canvas exports remain available.
 - Hit-test and lookup misses return `undefined`.
 - The supported runtime target is the browser; there is no native-wrapper
   backend.

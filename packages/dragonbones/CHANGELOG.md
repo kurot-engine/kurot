@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 197 files and the compressed archive
+are byte-identical to the tested release artifact.
+
+- Register one stable arrow callback with Core's callback-only ticker API; keep
+  timestamp conversion, driver switching and release ownership unchanged.
+- Preserve the upstream addDBEventListener/removeDBEventListener receiver
+  parameter, receiver-aware deduplication and listener removal. Add a regression
+  proving two owners of the same listener remain independent.
+- Require Core ^3.0.0. Imported DragonBones runtime algorithms, provenance
+  and the public event receiver protocol remain unchanged.
+
+- Verification: package build and all 20 unit tests pass against matching
+  prepared dependencies. Source/packed declaration and browser integration are
+  recorded in the repository CHANGELOG.
+
 ## 0.1.0 — 2026-10-08
 
 - Add the official DragonBones 5.7.000 TypeScript runtime adapted to ESM, with

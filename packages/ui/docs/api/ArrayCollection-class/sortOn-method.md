@@ -1,12 +1,12 @@
 # sortOn
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 sortOn(fieldName: string, options: number): void;
 ```
 
-Sort the collection by a field name (Egret-compatible sortOn).
+Sort the collection by a field name with string or numeric comparison.
 
 **Parameter fieldName:** Property name to sort by.
 

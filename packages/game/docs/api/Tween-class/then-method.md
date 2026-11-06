@@ -1,6 +1,6 @@
 # then
 
-Package: `@kurot/game@2.0.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/game@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 then<TResult1 = void, TResult2 = never>(onfulfilled?: ((value: void) => TResult1 | PromiseLike<TResult1>) | null, onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null): PromiseLike<TResult1 | TResult2>;

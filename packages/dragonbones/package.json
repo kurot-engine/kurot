@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/dragonbones",
-	"version": "0.1.0",
-	"description": "DragonBones 5.7 runtime adapter for Kurot Core 2.x",
+	"version": "0.2.0",
+	"description": "DragonBones 5.7 runtime adapter for Kurot Core 3.x",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -37,10 +37,10 @@
 		"prepack": "pnpm build"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^2.1.1"
+		"@kurot/core": "^3.0.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.2.0",
+		"@kurot/core": "^3.0.0",
 		"@types/node": "^22.0.0",
 		"typescript": "~5.9.3",
 		"tsx": "^4.20.6",

@@ -94,7 +94,6 @@ export class ListBase<T = unknown> extends DataGroup<T> {
 		}
 
 		// Resolve a pending selectedItem now that dataProvider is available
-		// (egret `commitProperties` pendingSelectedItem resolve).
 		if (this._pendingSelectedItem !== undefined && this.dataProvider) {
 			const item = this._pendingSelectedItem;
 			this._pendingSelectedItem = undefined;
@@ -110,7 +109,7 @@ export class ListBase<T = unknown> extends DataGroup<T> {
 
 	/**
 	 * Override updateRenderer to sync the renderer's `selected` state when it
-	 * is created/recycled (matching Egret's `itemSelected` call).
+	 * is created or recycled.
 	 */
 	public override updateRenderer(renderer: ItemRenderer<string, T>, itemIndex: number, data: T | undefined): ItemRenderer<string, T> {
 		this.itemSelected(itemIndex, this._selectedIndex === itemIndex);
@@ -215,7 +214,7 @@ export class ListBase<T = unknown> extends DataGroup<T> {
 
 	/**
 	 * Adjust the selection index in response to collection mutations without
-	 * dispatching events or calling `itemSelected` (egret `adjustSelection`).
+	 * dispatching events or calling `itemSelected`.
 	 *
 	 * The index is mutated silently so that multiple add/remove operations
 	 * within a single frame only produce one final commit event when
@@ -226,7 +225,7 @@ export class ListBase<T = unknown> extends DataGroup<T> {
 	}
 
 	/**
-	 * Called when the data provider is reset or refreshed (egret parity).
+	 * Called when the data provider is reset or refreshed.
 	 * Re-applies {@link requireSelection} logic so that the first item is
 	 * automatically selected when the data source is replaced.
 	 */

@@ -1,6 +1,6 @@
 # VSlider
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class VSlider extends SliderBase
@@ -9,7 +9,7 @@ class VSlider extends SliderBase
 VSlider — a vertical slider (bottom-to-top, standard slider convention).
 
 Overrides `pointToValue` and `updateSkinDisplayList` to position the thumb
-using the track's layout bounds (not the slider's own height), matching egret.
+using the track's layout bounds.
 
 Related types: [SliderBase](SliderBase-class.md).
 

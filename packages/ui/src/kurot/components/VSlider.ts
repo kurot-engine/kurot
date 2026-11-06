@@ -7,7 +7,7 @@ import { isUIComponent } from '../core/UIComponent.js';
  * VSlider — a vertical slider (bottom-to-top, standard slider convention).
  *
  * Overrides `pointToValue` and `updateSkinDisplayList` to position the thumb
- * using the track's layout bounds (not the slider's own height), matching egret.
+ * using the track's layout bounds.
  */
 export class VSlider extends SliderBase {
 

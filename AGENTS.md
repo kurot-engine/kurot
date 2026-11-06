@@ -1,7 +1,8 @@
 # Kurot — agent context index
 
-Kurot is a TypeScript 2D web game engine derived from Egret, with a
-Pixi.js-8-inspired renderer. Use this repository's contracts for Kurot behavior.
+Kurot is a TypeScript 2D web game engine with a retained display tree,
+WebGL instruction rendering and native skinnable UI. Use this repository's
+contracts for Kurot behavior.
 
 ## Choose the task first
 
@@ -31,14 +32,14 @@ installation establish its baseline. Package versions are independent.
 
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
-| `@kurot/core` | 2.8.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
-| `@kurot/ui` | 4.2.0 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
-| `@kurot/game` | 2.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
-| `@kurot/cli` | 4.1.1 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
+| `@kurot/core` | 3.0.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
+| `@kurot/ui` | 5.0.0 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
+| `@kurot/game` | 3.0.0 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
+| `@kurot/cli` | 4.1.2 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.14.0 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
-| `@kurot/ui-runtime` | 0.11.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
+| `@kurot/ui-runtime` | 0.12.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
 | `@kurot/atlas` | 0.1.0 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
-| `@kurot/dragonbones` | 0.1.0 | DragonBones 5.7 runtime and native adapter | [context](packages/dragonbones/docs/ai-context.md) |
+| `@kurot/dragonbones` | 0.2.0 | DragonBones 5.7 runtime and native adapter | [context](packages/dragonbones/docs/ai-context.md) |
 | `@kurot/bitmap-font` | 0.1.0 | Headless font parsing, validation and layout | [context](packages/bitmap-font/docs/ai-context.md) |
 
 Dependency direction is one-way. Core depends on bitmap-font. UI, Game and

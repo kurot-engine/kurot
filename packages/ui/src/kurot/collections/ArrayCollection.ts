@@ -185,7 +185,7 @@ export class ArrayCollection<T = unknown> extends EventDispatcher<ArrayCollectio
 	}
 
 	/**
-	 * Sort the collection by a field name (Egret-compatible sortOn).
+	 * Sort the collection by a field name with string or numeric comparison.
 	 * @param fieldName Property name to sort by.
 	 * @param options   Sort options: 0=ascending string, 4=descending, 16=numeric.
 	 */

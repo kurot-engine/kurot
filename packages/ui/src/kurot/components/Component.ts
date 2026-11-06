@@ -134,11 +134,11 @@ export class Component<TSkin extends string = string> extends Sprite implements 
 	/**
 	 * Enable or disable this component (and its children).
 	 *
-	 * Mirrors egret's `$setEnabled`: writes `touchEnabled` / `touchChildren`
+	 * Writes `touchEnabled` / `touchChildren`
 	 * directly at the display-object level (via `super`) so that:
 	 *
 	 * 1. The display-layer values change immediately (disabled components are
-	 *    skipped in hit-testing, just like egret).
+	 *    skipped in hit-testing).
 	 * 2. `_explicitTouchEnabled` / `_explicitTouchChildren` survive the
 	 *    disable→enable cycle so the original intent is restored on re-enable.
 	 */

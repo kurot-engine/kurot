@@ -37,7 +37,7 @@ export class ProgressBar extends Component {
 
 	public constructor() {
 		super();
-		this._animation = new Animation(this._onAnimationUpdate, this);
+		this._animation = new Animation(this._onAnimationUpdate);
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────

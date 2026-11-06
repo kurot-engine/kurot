@@ -20,7 +20,6 @@ export class Watcher {
 
 	private _host?: Bindable;
 	private _handler?: (value: unknown) => void;
-	private _thisObject: unknown;
     private _isExecuting = false;
 
 	private _onPropertyChange = (event: Event): void => {
@@ -31,8 +30,9 @@ export class Watcher {
 			if (this._next) {
 				this._next.reset(this._getHostPropertyValue() as IEventDispatcher | undefined);
 			}
-			if (this._handler) {
-				this._handler.call(this._thisObject, this.getValue());
+			const handler = this._handler;
+			if (handler) {
+				handler(this.getValue());
 			}
 		} finally {
 			this._isExecuting = false;
@@ -44,12 +44,10 @@ export class Watcher {
 	public constructor(
 		property: string,
 		handler?: (value: unknown) => void,
-		thisObject?: unknown,
 		next?: Watcher,
 	) {
 		this._property = property;
 		this._handler = handler;
-		this._thisObject = thisObject;
 		this._next = next;
 	}
 
@@ -62,6 +60,8 @@ export class Watcher {
 	 * for that behavior. Each defined chain host must implement IEventDispatcher
 	 * and notify PROPERTY_CHANGE. Call unwatch() when its owner closes; errors from
 	 * property access or handlers propagate rather than becoming an error event.
+	 * Handlers run without a receiver; retain instance state with a stable arrow
+	 * member or a function bound once by its owner.
 	 *
 	 * ```ts
 	 * import { EventDispatcher } from '@kurot/core';
@@ -78,13 +78,12 @@ export class Watcher {
 		host: IEventDispatcher | undefined,
 		chain: string[],
 		handler?: (value: unknown) => void,
-		thisObject?: unknown,
 	): Watcher | undefined {
 		if (chain.length === 0) return undefined;
 		const property = chain[0];
 		const remaining = chain.slice(1);
-		const next = remaining.length > 0 ? Watcher.watch(undefined, remaining, handler, thisObject) : undefined;
-		const watcher = new Watcher(property, handler, thisObject, next);
+		const next = remaining.length > 0 ? Watcher.watch(undefined, remaining, handler) : undefined;
+		const watcher = new Watcher(property, handler, next);
 		watcher.reset(host);
 		return watcher;
 	}
@@ -99,13 +98,14 @@ export class Watcher {
 	}
 
 	/**
-	 * Replace the chain's handler and callback receiver. Does not immediately emit
+	 * Replace the chain's unbound handler. Does not immediately emit
 	 * the current value; call getValue() for an initial read. Handler errors propagate.
 	 */
-	public setHandler(handler: (value: unknown) => void, thisObject: unknown): void {
+	public setHandler(handler: (value: unknown) => void): void {
 		this._handler = handler;
-		this._thisObject = thisObject;
-		if (this._next) this._next.setHandler(handler, thisObject);
+		if (this._next) {
+			this._next.setHandler(handler);
+		}
 	}
 
 	/**

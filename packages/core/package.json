@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/core",
-	"version": "2.8.0",
-	"description": "Modern rewrite of the Egret game engine — WebGL multi-texture batching, instruction-driven render pipeline, strict TypeScript, Egret-compatible API",
+	"version": "3.0.0",
+	"description": "TypeScript 2D web game engine — WebGL multi-texture batching, instruction-driven rendering, display objects, text and resources",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",

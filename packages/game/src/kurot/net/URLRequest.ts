@@ -3,7 +3,7 @@ import { URLRequestMethod } from './URLRequestMethod.js';
 import type { URLVariables } from './URLVariables.js';
 
 /**
- * Captures all information in a single HTTP request, Egret-compatible.
+ * Describes an HTTP request, including its URL, method, headers and body.
  *
  * @example
  * ```ts

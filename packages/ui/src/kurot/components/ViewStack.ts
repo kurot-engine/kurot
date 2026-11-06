@@ -14,7 +14,7 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
  * just invisible and excluded from layout.
  *
  * Implements {@link ICollection} so it can be used directly as a
- * `dataProvider` for {@link TabBar} (`<eui:TabBar dataProvider="{viewStack}"/>`).
+ * `dataProvider` for {@link TabBar} (`tabBar.dataProvider = viewStack`).
  *
  * States: none (container component).
  */

@@ -1,6 +1,6 @@
 # ViewStack
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ViewStack extends Group implements ICollection<string>
@@ -14,7 +14,7 @@ it appears in the same location. However, the old child still exists; it is
 just invisible and excluded from layout.
 
 Implements [ICollection](ICollection-interface.md) so it can be used directly as a
-`dataProvider` for [TabBar](TabBar-class.md) (`<eui:TabBar dataProvider="{viewStack}"/>`).
+`dataProvider` for [TabBar](TabBar-class.md) (`tabBar.dataProvider = viewStack`).
 
 States: none (container component).
 

@@ -455,7 +455,7 @@ describe('Tween ticker integration', () => {
 		tick!(100);
 
 		expect(target.x).toBe(100);
-		expect(stopTick).toHaveBeenCalledWith(tick, null);
+		expect(stopTick).toHaveBeenCalledWith(tick);
 	});
 });
 

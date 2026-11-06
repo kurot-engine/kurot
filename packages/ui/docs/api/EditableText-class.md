@@ -1,18 +1,16 @@
 # EditableText
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class EditableText extends Label implements IDisplayText
 ```
 
-Editable text component with EUI layout participation and prompt support.
+Editable text component with native UI layout participation and prompt support.
 
 The native-input TextField lives inside this Component, just like Label's
 display TextField. Consequently BasicLayout constraints are resolved on the
 wrapper first and updateDisplayList passes the final bounds to StageText.
-
-Egret-compatible: eui.EditableText
 
 Related types: [Label](Label-class.md), [IDisplayText](IDisplayText-interface.md).
 

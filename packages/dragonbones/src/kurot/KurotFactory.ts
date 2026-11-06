@@ -25,6 +25,12 @@ export class KurotFactory extends dragonBones.BaseFactory {
 	private _advancing = false;
 	private _needsFlush = false;
 	private _disposeRequested = false;
+	private readonly _handleTick = (time: number): boolean => {
+		const elapsed = this._lastTime === undefined ? 0 : Math.max(0, time - this._lastTime) / 1000;
+		this._lastTime = time;
+		this.advanceTime(elapsed);
+		return true;
+	};
 
 	public constructor(options: KurotFactoryOptions = {}) {
 		super();
@@ -181,17 +187,10 @@ export class KurotFactory extends dragonBones.BaseFactory {
 		this._ticking = ticking;
 		this._lastTime = undefined;
 		if (ticking) {
-			ticker.startTick(this.handleTick, this);
+			ticker.startTick(this._handleTick);
 		} else {
-			ticker.stopTick(this.handleTick, this);
+			ticker.stopTick(this._handleTick);
 		}
-	}
-
-	private handleTick(time: number): boolean {
-		const elapsed = this._lastTime === undefined ? 0 : Math.max(0, time - this._lastTime) / 1000;
-		this._lastTime = time;
-		this.advanceTime(elapsed);
-		return true;
 	}
 
 	private assertAlive(): void {

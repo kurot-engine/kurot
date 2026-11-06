@@ -133,7 +133,7 @@ export interface Project {
 	/**
 	 * Absolute output directory.
 	 * - development: `bin-debug`
-	 * - release: `bin-release/web/<timestamp>` (Egret-style versioned folder)
+	 * - release: `bin-release/web/<timestamp>`
 	 */
 	readonly outputDir: string;
 	/**
@@ -297,7 +297,7 @@ function detectEnginePackages(root: string): string[] {
 }
 
 /**
- * Egret-style `YYMMDDHHmmss` version stamp.
+ * `YYMMDDHHmmss` timestamp used for release output directories.
  */
 function timestamp(): string {
 	const d = new Date();

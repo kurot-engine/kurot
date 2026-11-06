@@ -32,7 +32,7 @@ const TEXT_ENTRY_PROPERTIES: Readonly<Record<string, UIPropertyDefinition>> = {
 	restrict: {
 		valueType: 'string',
 		defaultValue: '',
-		description: 'Egret-compatible character inclusion or exclusion pattern.',
+		description: 'Character inclusion or exclusion pattern for native text input.',
 	},
 };
 

@@ -2,21 +2,27 @@
 
 Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Package version: 2.0.1.** Requires `@kurot/core@^2.0.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.0.0 (published on npm).** Requires `@kurot/core@^3.0.0`. Targets ES2022 + evergreen browsers, same as core.
+
+## Callback ownership
+
+Game 3 removes Tween.call receiver arguments and receiver options; callbacks run
+without an implicit target receiver. The argument array is the second call
+parameter. See [Tween callbacks](docs/tween-callbacks.md).
 
 ## Installation
 
 ```bash
-pnpm add @kurot/game@^2.0.1 @kurot/core@^2.1.1
+pnpm add @kurot/game@^3.0.0 @kurot/core@^3.0.0
 ```
 
 `@kurot/game` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.
 
-Game supports Core 2.x. The recommended installation includes nested/rotated
+Game 3 requires Core 3.x. The recommended installation includes nested/rotated
 WebGL scroll clipping support (Core >= 2.1.1). Game has no dependency on UI,
 ui-document or CLI and does not interpret KUI XML or project style.json.
 
-Upgrade Core to 2.x together with game 2.x. Refresh old sheet manifests with
+Install Core 3 together with Game 3. Refresh old sheet manifests with
 string-valued `subkeys` in Kurot Editor before launch. See the
 [resource migration guide](../ui-document/docs/resource-nine-slice.md).
 

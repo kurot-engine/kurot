@@ -1,7 +1,7 @@
 {
 	"name": "@kurot/ui",
-	"version": "4.2.0",
-	"description": "EUI-compatible UI component framework for the Kurot game engine — skin-based components, layouts, data binding, view states",
+	"version": "5.0.0",
+	"description": "Native UI components for the Kurot game engine — KUI XML skins, layouts, typed collections, data binding and view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
@@ -34,10 +34,10 @@
 		"test:text-labels": "playwright test test/browser --workers=1"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^2.5.2"
+		"@kurot/core": "^3.0.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.5.2",
+		"@kurot/core": "^3.0.0",
 		"@playwright/test": "1.62.1",
 		"@types/node": "^22.0.0",
 		"esbuild": "^0.28.2",
@@ -49,7 +49,7 @@
 	"keywords": [
 		"kurot",
 		"ui",
-		"eui",
+		"kui",
 		"skin",
 		"h5-game",
 		"typescript"

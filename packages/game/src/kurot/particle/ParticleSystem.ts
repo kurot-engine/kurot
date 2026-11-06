@@ -237,7 +237,7 @@ export class ParticleSystem extends DisplayObject {
 
 		this.emissionTime = duration;
 		this._timeStamp = getTimer();
-		ticker.startTick(this._update, this);
+		ticker.startTick(this._update);
 	}
 
 	/**
@@ -250,7 +250,7 @@ export class ParticleSystem extends DisplayObject {
 		this.emissionTime = 0;
 		if (clear) {
 			this.clear();
-			ticker.stopTick(this._update, this);
+			ticker.stopTick(this._update);
 		}
 	}
 
@@ -405,7 +405,7 @@ export class ParticleSystem extends DisplayObject {
 		this.$markDirty();
 
 		if (this.numParticles === 0 && this.emissionTime === 0) {
-			ticker.stopTick(this._update, this);
+			ticker.stopTick(this._update);
 			this.dispatchEventWith(Event.COMPLETE);
 		}
 

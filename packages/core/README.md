@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **2.8.0** (published on npm).
+for browser games. Package version: **3.0.0** (published on npm).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -17,13 +17,19 @@ and docs without requiring the engine source.
 | Resources, manifests and errors | [Resource loading](docs/resource.md) |
 | Shader and filter ownership | [Filters](docs/filters.md) |
 
+## Callback ownership
+
+Core 3 uses callback-only ticker registration and removes unsupported
+Texture.getPixels/toDataURL placeholders. Use stable arrow members or callbacks
+bound once when they access instance state. See [ticker ownership](docs/ticker.md).
+
 ## Installation
 
 The package includes the generated API reference and game authoring guide.
-Canvas stage-attribute startup requires Core >= 2.6.0 within 2.x.
+Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^2.8.0
+pnpm add @kurot/core@^3.0.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -37,12 +43,12 @@ UI provides BitmapLabel when the application needs native bitmap-font UI layout.
 
 - WebGL-first with automatic Canvas 2D fallback when WebGL initialization fails
 - High-DPI backing stores and resolution-aware WebGL text and vector graphics rasterization
-- WebGL-only InstructionSet pipeline (Build → Execute two-phase, inspired by Pixi.js 8)
+- WebGL-only InstructionSet pipeline with separate Build and Execute phases
 - Multi-texture batching (up to 8 textures per draw call)
 - RenderGroup layers — localize instruction rebuilds to the affected subtree
 - Filters: Blur (ping-pong dual-pass), Glow, DropShadow, ColorMatrix, custom shaders
 - Masks: automatic selection between scissor / stencil / offscreen compositing, including nested scroll clips
-- PixiJS-style `cacheAsTexture()` plus Egret-compatible `cacheAsBitmap`
+- Subtree texture caching through `cacheAsTexture()` and its `cacheAsBitmap` alias
 - WebGL Context Lost recovery
 - ImageBitmap pixel sources, explicit pixel/upload disposal and bounded weak
   registration cleanup; see [decoded pixel ownership](docs/texture-density.md#decoded-pixel-ownership).
@@ -58,7 +64,7 @@ UI provides BitmapLabel when the application needs native bitmap-font UI layout.
 
 **Event System**
 
-- Egret-compatible event classes: Event, TouchEvent, TimerEvent, ProgressEvent, etc.
+- Native event classes: Event, TouchEvent, TimerEvent, ProgressEvent, etc.
 - Capture / bubble two-phase dispatch, object pooling, `once()` built-in
 - Unified touch + mouse handling, multi-touch support
 

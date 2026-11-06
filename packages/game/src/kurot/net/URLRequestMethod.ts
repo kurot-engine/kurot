@@ -1,5 +1,5 @@
 /**
- * HTTP request method constants, Egret-compatible.
+ * HTTP request method constants used by URLRequest.
  */
 export const URLRequestMethod = {
 	GET: 'get',

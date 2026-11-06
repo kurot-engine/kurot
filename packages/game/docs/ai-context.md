@@ -7,10 +7,13 @@ unfamiliar with Kurot does not need to re-derive the architecture from
 scratch each session. It describes the current source and public exports;
 internal plans and reviews are not required context.
 
-Package identity: `@kurot/game@2.0.1`, published. Peer-depends on `@kurot/core@^2.0.0`.
+Package identity: `@kurot/game@3.0.0`, published on npm. Peer-depends on `@kurot/core@^3.0.0`.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` groups exports into
 tween / display / particle / net — see §4.
+
+Game 3 removes Tween receiver arguments/options and uses Core 3 callback
+identity for ticker ownership. Read [Tween callbacks](tween-callbacks.md).
 
 ## 1. Directory map
 
@@ -140,7 +143,7 @@ src/kurot/
 ### Particle / GravityParticle system
 
 - **`ParticleSystem` registers with the ticker per-instance**
-  (`ticker.startTick(this._update, this)`). Tween uses one shared registration.
+  (`ticker.startTick(this._update)`). Tween uses one shared registration.
 - `stop(false)` (the default) stops new emission but does **not**
   unregister the ticker or clear existing particles — the ticker keeps
   running until existing particles naturally expire and count hits 0. Only

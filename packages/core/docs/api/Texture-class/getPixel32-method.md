@@ -1,6 +1,6 @@
 # getPixel32
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 getPixel32(_x: number, _y: number): number[];

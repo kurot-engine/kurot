@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 2.7.0 (published). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 3.0.0 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -10,9 +10,9 @@
 ## 1. Overview
 
 `@kurot/core` provides Kurot's display objects, rendering, events, geometry, text,
-resources, networking and media runtime. Public APIs follow Egret's
-`DisplayObject` and event model, while rendering uses a flat
-`InstructionSet + RenderPipe` pipeline inspired by Pixi.js 8.
+resources, networking and media runtime. A retained display tree owns scene
+state and event propagation. WebGL rendering uses a flat
+`InstructionSet + RenderPipe` pipeline.
 
 Core uses `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
@@ -42,7 +42,7 @@ each layout. See [text layout](text-layout.md).
 | Modules            | ES modules (`@kurot/core` npm package)                     |
 | Types              | Strict TypeScript (`strict: true`)                         |
 | Target             | ES2022 and modern browsers                                 |
-| Rendering          | InstructionSet pipeline inspired by Pixi.js 8              |
+| Rendering          | InstructionSet build/execute pipeline              |
 | Batching           | Multiple textures, up to 8 per batch                       |
 | Package management | Independent pnpm package                                   |
 | Resources          | Loading, caching and lifecycle management through Resource |

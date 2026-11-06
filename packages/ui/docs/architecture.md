@@ -3,7 +3,7 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 3.6.2 (published), with peerDependency `@kurot/core: ^2.5.2`.
+> Package version: 5.0.0 (published on npm), with peerDependency `@kurot/core: ^3.0.0`.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
@@ -17,16 +17,14 @@ For production game UI and project directories, use
 
 ## 1. Overview
 
-`@kurot/ui` is an EUI-compatible UI framework rewritten on top of
+`@kurot/ui` provides native skinnable components and layout on top of
 [`@kurot/core`](../../core/docs/architecture.md). Core is a `peerDependency`,
 excluded from the output bundle. Consumers explicitly install it so packages
 using UI share one Core instance, display tree infrastructure and global state.
 
-The central architectural choice is delegation in place of prototype mixins.
-Egret EUI uses `implementUIComponent()` to copy prototype members and combine
-DisplayObject and UIComponent behavior. Such copied members are difficult to
-represent in strict TypeScript. Kurot uses composition instead: Group and
-Component both directly extend Sprite and hold a UIState instance as `this.ui`.
+Group and Component directly extend Sprite and hold a UIState instance as
+`this.ui`. Display-tree ownership stays with the host; UIState owns layout
+properties, measurement and validation.
 Their IUIComponent methods delegate layout state and validation to UIState.
 UIState communicates with its host through the narrow IUIOwner callback interface,
 without depending on the host's concrete DisplayObject subclass. This separation
@@ -111,8 +109,7 @@ validateClient instead converges synchronously for its target subtree.
 `_schedule()` uses Core's ticker.callLater() to schedule `_flush()`. Core executes
 flushCallLaters() before Player.render(), so initial property commits, measurement
 and layout run before newly mounted components are drawn. This provides the
-render-preparation ordering that Egret's Validator establishes through
-Event.RENDER, without independent UI and renderer RAF loops competing for order.
+ordering needed to validate UI before drawing within the same Core frame loop.
 
 ---
 
@@ -121,8 +118,7 @@ Event.RENDER, without independent UI and renderer RAF loops competing for order.
 ### 3.1 Skin is a data object
 
 `components/Skin.ts` defines Skin as an EventDispatcher<SkinEvents>, rather than
-a display object. Egret EUI's Skin also extends EventDispatcher; its nonvisual
-role is shared with Kurot.
+a display object. Its content is attached to the host Component.
 
 Skin declares skinParts (names), states (State entries) and elementsContent
 (display objects to attach). Component._setSkin() performs the attachment:
@@ -192,8 +188,8 @@ Theme for a default:
   and calls component._applySkinName(), causing validation of the applied skin.
 
 An early-created component can render without its skin until theme loading,
-including the skinsJs import, finishes. This follows EUI's asynchronous-theme
-pattern and decouples UI-tree construction from theme loading.
+including the skinsJs import, finishes. UI-tree construction and asynchronous
+theme loading have separate lifecycles.
 
 ### 3.5 Replacing a skin
 
@@ -442,24 +438,17 @@ pluggable LayoutBase.
 
 ---
 
-## 7. Relationship to Egret EUI
+## 7. Native integration contracts
 
-| Egret EUI concept                                      | Kurot UI counterpart                                      | Notes                                                                                                                                                                          |
-| ------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `eui.Component`                                        | `Component`                                               | Same role; UI behavior uses standard Sprite inheritance and explicit delegation rather than prototype mixins                                                                   |
-| `eui.Skin`                                             | `Skin`                                                    | Both are nonvisual EventDispatcher objects; their content is attached to the host component                                                                                    |
-| Three-phase UIComponent validation                     | `UIState` + `Validator`                                   | Depth-ordered properties, measurement and display-list phases; Kurot uses Core's callLater queue before rendering where Egret uses Event.RENDER                                |
-| Theme adapters and theme registration                  | `IThemeAdapter` + `Theme`/`getTheme()`/`setTheme()`       | Both support theme adapters; Kurot injects the adapter through the Theme constructor, while the Egret reference resolves eui.IThemeAdapter through its implementation registry |
-| Global registration of compiled EXML skins             | `globalThis["skins.X"] = factory` from ESM imports        | Both use global skin names; Kurot's compiled output registers factories invoked with .call(this) to provide host context                                                       |
-| State/SetProperty/SetStateProperty/AddItems            | Same class names and IOverride interface                  | Direct adaptation of declarative state overrides                                                                                                                               |
-| BasicLayout/VerticalLayout/HorizontalLayout/TileLayout | Same class names                                          | Similar percentage allocation, gaps, padding and virtual-layout algorithms, including iterative min/max clamping                                                               |
-| Prototype-copy UIComponent implementation              | TypeScript inheritance + UIState/ILayoutTarget delegation | The central architectural change described in section 1                                                                                                                        |
+| Owner | Contract |
+| --- | --- |
+| Component / Group | Sprite subclasses delegate layout and validation to UIState. |
+| Skin | Nonvisual EventDispatcher containing parts, states and host-attached display content. |
+| UIState / Validator | Depth-ordered property, measurement and display-list queues flushed through Core's callLater before rendering. |
+| Theme / UIContext | Skin factories, defaults and resource adapters are resolved through the configured global or local application scope. |
+| State / IOverride | Declarative property, binding and display-child overrides are applied and restored by the owning component. |
+| Layouts | Basic, vertical, horizontal and tile layout own allocation, gaps, padding, min/max bounds and optional virtualization. |
 
-Kurot-specific choices include the IUIOwner/UIState composition boundary,
-constructor-based Theme adapter injection and ESM skin factories with explicit
-host context. UIState can exist independently of a specific DisplayObject
-subclass; Group and Component each hold an instance rather than requiring a
-shared visual base class for all validation state.
 
 ---
 
@@ -476,7 +465,7 @@ file and case counts.
 | Collections and data-driven components | ArrayCollection, DataGroup, ListBase, ItemRenderer, ComboBox, TabBar, ViewStack                                                                |
 | Individual components                  | RadioButton, Range, Slider, ProgressBar, Scroller, Label, BitmapLabel, RichLabel, TextInput                                                    |
 | Text fitting                           | ButtonLabelTextFit, LabelTextFit, LabelTextFitBounds                                                                                           |
-| Cross-component behavior               | Enabled (EUI-aligned enabled/touchEnabled/touchChildren behavior), EventMapOverride, GestureLifecycle, TransformLayout, ScrollAndVirtualLayout |
+| Cross-component behavior               | Enabled (enabled/touchEnabled/touchChildren coordination), EventMapOverride, GestureLifecycle, TransformLayout, ScrollAndVirtualLayout |
 
 There is no dedicated Group.test.ts; Group state behavior is covered indirectly
 by container/component tests. There are also no separate VerticalLayout.test.ts

@@ -1,6 +1,6 @@
 # renderGraphicsToContext
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 renderGraphicsToContext(graphics: Graphics, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number, forHitTest: boolean, skipCache: boolean): void;

@@ -5,8 +5,6 @@
  * the URL's query string, for POST requests it's sent as
  * `application/x-www-form-urlencoded` (via `toString()`). `URLLoader` handles
  * both cases automatically.
- *
- * Egret-compatible: egret.URLVariables
  */
 export class URLVariables {
 	variables: Record<string, string | string[]> = {};

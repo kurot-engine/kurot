@@ -1,6 +1,6 @@
 # TextInput
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class TextInput extends Component implements IDisplayText
@@ -13,8 +13,6 @@ Skin parts:
 - `promptDisplay` — Label shown when text is empty and unfocused
 
 States: `normal`, `disabled`, `normalWithPrompt`, `disabledWithPrompt`
-
-Egret-compatible: eui.TextInput
 
 Related types: [Component](Component-class.md), [IDisplayText](IDisplayText-interface.md).
 

@@ -1,6 +1,6 @@
 # HSlider
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class HSlider extends SliderBase
@@ -9,7 +9,7 @@ class HSlider extends SliderBase
 HSlider — a horizontal slider (left-to-right).
 
 Overrides `pointToValue` and `updateSkinDisplayList` to position the thumb
-using the track's layout bounds (not the slider's own width), matching egret.
+using the track's layout bounds.
 
 Related types: [SliderBase](SliderBase-class.md).
 

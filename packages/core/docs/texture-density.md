@@ -78,7 +78,7 @@ unit and visual-regression commands when changing this contract.
 
 ## Decoded pixel ownership
 
-Core >= 2.8.0 within 2.x accepts ImageBitmap sources through the BitmapData
+Core 3 accepts ImageBitmap sources through the BitmapData
 constructor or source setter.
 With premultipliedAlpha=false (the default), WebGL uploads normalize these pixels
 through a temporary Canvas 2D surface before uploading premultiplied pixels. This

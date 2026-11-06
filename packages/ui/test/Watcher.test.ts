@@ -29,7 +29,7 @@ describe('Watcher', () => {
 		it('invokes the handler only when the watched property changes (not on attach)', () => {
 			const host = new BindableHost({ name: 'initial' });
 			const handler = vi.fn();
-			const w = Watcher.watch(host, ['name'], handler, undefined);
+			const w = Watcher.watch(host, ['name'], handler);
 
 			expect(w).toBeDefined();
 			// Watcher is lazy: attaching does not fire the handler.
@@ -46,7 +46,7 @@ describe('Watcher', () => {
 		it('does not fire for a different property on the same host', () => {
 			const host = new BindableHost({ a: 1, b: 2 });
 			const handler = vi.fn();
-			Watcher.watch(host, ['a'], handler, undefined);
+			Watcher.watch(host, ['a'], handler);
 
 			host.set('b', 99);
 
@@ -55,7 +55,7 @@ describe('Watcher', () => {
 
 		it('returns undefined for an empty chain', () => {
 			const host = new BindableHost({});
-			expect(Watcher.watch(host, [], () => {}, undefined)).toBeUndefined();
+			expect(Watcher.watch(host, [], () => {})).toBeUndefined();
 		});
 	});
 
@@ -66,7 +66,7 @@ describe('Watcher', () => {
 			const root = new BindableHost({ child: mid });
 
 			const handler = vi.fn();
-			const w = Watcher.watch(root, ['child', 'child', 'value'], handler, undefined);
+			const w = Watcher.watch(root, ['child', 'child', 'value'], handler);
 
 			// getValue walks the chain at query time.
 			expect(w?.getValue()).toBe(42);
@@ -84,7 +84,7 @@ describe('Watcher', () => {
 			const root = new BindableHost({ child: leafA });
 
 			const handler = vi.fn();
-			const w = Watcher.watch(root, ['child', 'value'], handler, undefined);
+			const w = Watcher.watch(root, ['child', 'value'], handler);
 
 			// Swap the intermediate child to a different subtree.
 			root.set('child', leafB);
@@ -109,7 +109,7 @@ describe('Watcher', () => {
 		it('detaches the handler and stops firing', () => {
 			const host = new BindableHost({ x: 1 });
 			const handler = vi.fn();
-			const w = Watcher.watch(host, ['x'], handler, undefined);
+			const w = Watcher.watch(host, ['x'], handler);
 			expect(w).toBeDefined();
 
 			host.set('x', 2);
@@ -124,7 +124,7 @@ describe('Watcher', () => {
 		it('removes the property-change listener from the host (no retained reference)', () => {
 			const host = new BindableHost({ x: 1 });
 			const handler = vi.fn();
-			const w = Watcher.watch(host, ['x'], handler, undefined);
+			const w = Watcher.watch(host, ['x'], handler);
 
 			// WeakRef-style check: after unwatch, hasEventListener should be false.
 			expect(host.hasEventListener(PropertyEvent.PROPERTY_CHANGE)).toBe(true);
@@ -138,7 +138,7 @@ describe('Watcher', () => {
 			const leaf = new BindableHost({ value: 1 });
 			const root = new BindableHost({ child: leaf });
 			const handler = vi.fn();
-			const w = Watcher.watch(root, ['child', 'value'], handler, undefined);
+			const w = Watcher.watch(root, ['child', 'value'], handler);
 
 			expect(root.hasEventListener(PropertyEvent.PROPERTY_CHANGE)).toBe(true);
 			expect(leaf.hasEventListener(PropertyEvent.PROPERTY_CHANGE)).toBe(true);
@@ -158,7 +158,7 @@ describe('Watcher', () => {
 			const hostA = new BindableHost({ x: 'a' });
 			const hostB = new BindableHost({ x: 'b' });
 			const handler = vi.fn();
-			const w = Watcher.watch(hostA, ['x'], handler, undefined);
+			const w = Watcher.watch(hostA, ['x'], handler);
 
 			expect(hostA.hasEventListener(PropertyEvent.PROPERTY_CHANGE)).toBe(true);
 			expect(hostB.hasEventListener(PropertyEvent.PROPERTY_CHANGE)).toBe(false);
@@ -180,7 +180,7 @@ describe('Watcher', () => {
 		it('reset(undefined) detaches without firing', () => {
 			const host = new BindableHost({ x: 1 });
 			const handler = vi.fn();
-			const w = Watcher.watch(host, ['x'], handler, undefined);
+			const w = Watcher.watch(host, ['x'], handler);
 
 			handler.mockClear();
 			w?.reset(undefined);

@@ -1,6 +1,6 @@
 # SkinPartsOf
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 type SkinPartsOf<TSkin extends string> = TSkin extends keyof SkinPartsMap ? SkinPartsMap[TSkin] : Readonly<Record<string, unknown>>;

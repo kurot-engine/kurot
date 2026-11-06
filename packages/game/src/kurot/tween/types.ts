@@ -33,7 +33,6 @@ export interface WaitStep extends BaseStep {
 export interface CallStep extends BaseStep {
 	type: 'call';
 	fn: (...args: unknown[]) => void;
-	thisObj?: object;
 	params: unknown[];
 }
 
@@ -90,19 +89,13 @@ export interface TweenOptions {
 	 * Optional callback after each tween update, including the final update.
 	 * Called synchronously with the Tween argument; exceptions propagate to the caller
 	 * or ticker. Stop/remove the tween to end future callbacks during game disposal.
+	 * Runs without a receiver; instance state belongs to the supplied callback.
 	 */
 	onChange?: (tween: Tween) => void;
 	/**
-	 * Callback receiver for onChange; defaults to the tween target when omitted.
-	 */
-	onChangeObj?: object;
-	/**
 	 * Optional synchronous callback after a cycle that will repeat, before the
 	 * next cycle. It does not run for the final finite cycle. Exceptions propagate.
+	 * Runs without a receiver, with the Tween supplied as its argument.
 	 */
 	onLoopComplete?: (tween: Tween) => void;
-	/**
-	 * Callback receiver for onLoopComplete; defaults to the tween target when omitted.
-	 */
-	onLoopCompleteObj?: object;
 }

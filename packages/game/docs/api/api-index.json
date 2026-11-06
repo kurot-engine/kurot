@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/game",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "symbols": [
     {
       "name": "Ease",
@@ -3019,20 +3019,8 @@
           "inherited": false
         },
         {
-          "name": "onChangeObj",
-          "file": "TweenOptions-interface/onChangeObj-property.md",
-          "protected": false,
-          "inherited": false
-        },
-        {
           "name": "onLoopComplete",
           "file": "TweenOptions-interface/onLoopComplete-property.md",
-          "protected": false,
-          "inherited": false
-        },
-        {
-          "name": "onLoopCompleteObj",
-          "file": "TweenOptions-interface/onLoopCompleteObj-property.md",
           "protected": false,
           "inherited": false
         },

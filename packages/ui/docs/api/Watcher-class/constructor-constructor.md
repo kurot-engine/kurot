@@ -1,9 +1,9 @@
 # constructor
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
-constructor(property: string, handler?: (value: unknown) => void, thisObject?: unknown, next?: Watcher);
+constructor(property: string, handler?: (value: unknown) => void, next?: Watcher);
 ```
 
 The declaration above is the available reference; no additional behavioral JSDoc is present.

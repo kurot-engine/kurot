@@ -1,6 +1,6 @@
 # ICollectionEvents
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 interface ICollectionEvents<T = unknown> extends EventMap

@@ -20,10 +20,14 @@ Left/Right or A/D; tap/drag the playfield on touch. Refresh manually after a bui
 Window blur or backgrounding pauses gameplay; Resume is explicit. Close disposes
 the application; reload to play again.
 
-The runtime is exact registry Core 2.8.0 with CLI 4.1.1. TypeScript, Vitest,
+The manifest records exact registry Core 2.8.0 with CLI 4.1.1. TypeScript, Vitest,
 Playwright and tsx retain their pinned versions. This example owns its registry
 installation and lockfile. The tsx launcher handles the TypeScript CLI config
 without requiring Node's newer built-in type stripping.
+
+The current working source uses the callback-only ticker API prepared for Core 3.
+Until its release is adopted, validate GameSession with a matching checkout
+Core build; the published baseline above retains its receiver parameter.
 
 ## Stage configuration
 

@@ -7,7 +7,7 @@ const onTick = (now: number): boolean => {
   console.log(deltaSeconds);
   return false;
 };
-ticker.startTick(onTick, undefined);
-ticker.stopTick(onTick, undefined);
+ticker.startTick(onTick);
+ticker.stopTick(onTick);
 
 export {};

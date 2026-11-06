@@ -277,8 +277,8 @@ It defines the abstract semantic bases `kurot.DisplayObject`,
 accepts ordered children; the other concrete nodes are leaves.
 
 `kui.*` is the canonical Kurot UI namespace. Authored Skin files use the
-[`KUI XML format`](./docs/kui-xml.md); EUI names and EXML are not stored in the
-semantic document.
+[`KUI XML format`](./docs/kui-xml.md), which serializes the native semantic
+document model.
 
 The foundation catalog declares the serializable authoring properties inherited
 from Kurot display objects and UI layout elements, then adds the audited direct

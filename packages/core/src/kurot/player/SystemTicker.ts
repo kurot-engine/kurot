@@ -15,11 +15,6 @@ export function setRequestRenderingFlag(value: boolean): void {
 
 type TickCallback = (timeStamp: number) => boolean;
 
-interface TickEntry {
-	callback: TickCallback;
-	thisObject: unknown;
-}
-
 /**
  * Render callback — called by SystemTicker each frame to render a player.
  */
@@ -34,7 +29,7 @@ export class SystemTicker {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	private _players: Renderable[] = [];
-	private _ticks: TickEntry[] = [];
+	private _ticks: TickCallback[] = [];
 	private _frameRate = 30;
 	private _frameDeltaTime: number;
 	private _frameInterval: number;
@@ -92,8 +87,9 @@ export class SystemTicker {
 
 	/**
 	 * Registers a callback receiving absolute milliseconds from getTimer(), not
-	 * a delta or seconds. Returning true requests rendering. The callback and
-	 * thisObject pair is deduplicated and must match when calling stopTick().
+	 * a delta or seconds. Returning true requests rendering. The callback runs
+	 * without a receiver and is deduplicated by function identity. Use an arrow
+	 * member or bind once when the callback needs instance state.
 	 * Registration does not start the requestAnimationFrame loop by itself.
 	 *
 	 * @example
@@ -107,22 +103,27 @@ export class SystemTicker {
 	 *   console.log(deltaSeconds);
 	 *   return false;
 	 * };
-	 * ticker.startTick(onTick, undefined);
-	 * ticker.stopTick(onTick, undefined);
+	 * ticker.startTick(onTick);
+	 * ticker.stopTick(onTick);
 	 * ```
 	 */
-	public startTick(callback: TickCallback, thisObject: unknown): void {
-		if (this.getTickIndex(callback, thisObject) !== -1) return;
-		this._ticks.push({ callback, thisObject });
+	public startTick(callback: TickCallback): void {
+		if (this._ticks.includes(callback)) {
+			return;
+		}
+		this._ticks.push(callback);
 	}
 
 	/**
-	 * Detaches the exact callback/thisObject pair passed to startTick().
-	 * A missing pair is harmless; a newly bound callback is a different identity.
+	 * Detaches the exact function passed to startTick(). A missing callback is
+	 * harmless; a newly bound callback is a different identity. Removal during
+	 * an update takes effect on the next callback snapshot.
 	 */
-	public stopTick(callback: TickCallback, thisObject: unknown): void {
-		const i = this.getTickIndex(callback, thisObject);
-		if (i !== -1) this._ticks.splice(i, 1);
+	public stopTick(callback: TickCallback): void {
+		const i = this._ticks.indexOf(callback);
+		if (i !== -1) {
+			this._ticks.splice(i, 1);
+		}
 	}
 
 	/**
@@ -198,8 +199,10 @@ export class SystemTicker {
 
 		let needRender = requestRenderingFlag;
 		const ticks = [...this._ticks];
-		for (const entry of ticks) {
-			if (entry.callback.call(entry.thisObject, timeStamp)) needRender = true;
+		for (const callback of ticks) {
+			if (callback(timeStamp)) {
+				needRender = true;
+			}
 		}
 
 		const t2 = Date.now();
@@ -262,13 +265,6 @@ export class SystemTicker {
 		for (const entry of list) {
 			entry.fn(...entry.args);
 		}
-	}
-
-	private getTickIndex(callback: TickCallback, thisObject: unknown): number {
-		for (let i = this._ticks.length - 1; i >= 0; i--) {
-			if (this._ticks[i].callback === callback && this._ticks[i].thisObject === thisObject) return i;
-		}
-		return -1;
 	}
 }
 

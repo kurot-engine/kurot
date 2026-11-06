@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Texture } from '../src/kurot/display/texture/Texture.js';
 import { BitmapData } from '../src/kurot/display/texture/BitmapData.js';
+import { RenderTexture } from '../src/kurot/display/texture/RenderTexture.js';
 
 function makeBitmapData(): BitmapData {
 	const bd = new BitmapData();
@@ -84,11 +85,11 @@ describe('Texture', () => {
 		expect(() => new Texture().getPixel32(0, 0)).toThrow('getPixel32 is not supported');
 	});
 
-	it('getPixels throws error', () => {
-		expect(() => new Texture().getPixels(0, 0)).toThrow('getPixels requires renderer implementation');
-	});
-
-	it('toDataURL throws error', () => {
-		expect(() => new Texture().toDataURL('png')).toThrow('toDataURL requires renderer implementation');
+	it('does not expose unsupported bulk-read or export placeholders', () => {
+		for (const texture of [new Texture(), new RenderTexture()]) {
+			expect('getPixels' in texture).toBe(false);
+			expect('toDataURL' in texture).toBe(false);
+		}
+		expect(new RenderTexture().getPixel32(0, 0)).toEqual([]);
 	});
 });

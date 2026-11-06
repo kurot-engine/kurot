@@ -82,7 +82,7 @@ export class Timer extends EventDispatcher<TimerEvents> {
 	public start(): void {
 		if (this._running) return;
 		this._lastTimeStamp = getTimer();
-		ticker.startTick(this._update, this);
+		ticker.startTick(this._update);
 		this._running = true;
 	}
 
@@ -108,7 +108,7 @@ export class Timer extends EventDispatcher<TimerEvents> {
 	 */
 	public stop(): void {
 		if (!this._running) return;
-		ticker.stopTick(this._update, this);
+		ticker.stopTick(this._update);
 		this._running = false;
 	}
 

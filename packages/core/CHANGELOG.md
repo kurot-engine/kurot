@@ -4,6 +4,39 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## Unreleased
+
+### Documentation
+
+- Describe the engine through native rendering, display, event and resource
+  capabilities in package metadata, README and architecture guides. Remove
+  broad Egret API compatibility claims; retain documented file-format support,
+  migration guidance and third-party provenance. Published 3.0.0 is unchanged.
+
+## 3.0.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 3,206 files and the compressed archive
+are byte-identical to the tested release artifact. Repository publication
+markers are updated after verification; the immutable npm archive retains
+its original preparation markers.
+
+### Breaking
+
+- Remove the receiver parameter from SystemTicker.startTick/stopTick. Deduplicate
+  and remove callbacks by function identity; execute them without a receiver.
+  Preserve callback snapshots, timestamps, rendering requests and pause behavior.
+- Remove Texture.getPixels and Texture.toDataURL, which always threw and had no
+  RenderTexture implementation. Keep RenderTexture.getPixel32 and real buffer
+  readback/export operations unchanged.
+- Update Timer and authoring examples. Add runtime and strict compiler regressions
+  for callback identity, bound owners, mutation during dispatch and removed APIs.
+  Runtime version identity is now 3.0.0; bitmap-font remains ^0.1.0.
+
+- Verification: package build and all 1007 unit tests pass against matching
+  prepared dependencies. Source/packed declaration and browser integration are
+  recorded in the repository CHANGELOG.
+
 ## [2.8.0] — 2026-11-01
 
 Published; exact version, npm latest and downloaded archive SHA-512 integrity

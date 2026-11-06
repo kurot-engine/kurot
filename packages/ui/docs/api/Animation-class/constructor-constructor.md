@@ -1,11 +1,12 @@
 # constructor
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
-constructor(updateFunction: (animation: Animation) => void, thisObject: unknown);
+constructor(updateFunction: (animation: Animation) => void);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Update and end callbacks receive this Animation as their argument and run
+without a receiver. Use a stable arrow member or bind once for instance state.
 
 Related types: [Animation](../Animation-class.md).

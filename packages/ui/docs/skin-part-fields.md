@@ -103,7 +103,7 @@ side effects.
 
 ## Typed list fields
 
-UI >= 4.2.0 within 4.x supports `declare items: List<ItemData | null>` on a host
+UI 4.2.x and 5.x supports `declare items: List<ItemData | null>` on a host
 component. Its dataProvider, selectedItem and itemTap callbacks retain that item
 type. ItemRenderer uses `ItemRenderer<TSkin, T>` so existing Skin arguments keep
 their meaning. See [list data types](list-data-types.md).

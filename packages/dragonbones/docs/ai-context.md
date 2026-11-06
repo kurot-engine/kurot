@@ -1,11 +1,10 @@
 # @kurot/dragonbones — AI context
 
-Version 0.1.0 is published to npm.
-The only peer is `@kurot/core ^2.1.1`; development declares `^2.2.0` and the
-lockfile resolves published Core 2.2.0 without local overrides. Updating that
-development lock does not raise the peer minimum or require a new adapter release
-when shipped output is unchanged. The adapter does not require Core's TextField wrapping
-changes or the new UI BitmapLabel.
+Version 0.2.0 is published on npm.
+The only peer and development requirement are `@kurot/core ^3.0.0`.
+The factory uses the callback-only ticker while the upstream DragonBones event
+receiver protocol remains intact. Compatible development updates need no
+adapter release when shipped output is unchanged.
 ES2022, ESM and strict TypeScript. Maintained in `packages/dragonbones` within
 the Kurot repository; directory paths below are relative to this package.
 

@@ -6,10 +6,43 @@ All notable changes to `@kurot/game` are documented here.
 
 ## Unreleased
 
-### Documentation — 2026-10-18
+### Documentation
+
+- Describe ScrollView and URL loading through their native behavior. Retain
+  explicit MovieClip exporter format contracts and named parser APIs.
+
+The wording cleanup is reserved for a later patch; the published release below
+retains its original descriptions and comments. Runtime code and types are unchanged.
+
+## 3.0.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes (653 files). Runtime JS and declarations
+match the tested preparation after removing comments. Source wording, metadata
+and generated documentation cleanup remains unreleased for a later patch.
+
+### Breaking
+
+- Remove Tween.call's receiver argument; the optional argument array is now the
+  second parameter. Remove TweenOptions.onChangeObj/onLoopCompleteObj and their
+  stored receivers. Callbacks run unbound, without a fallback to the tween target.
+- Preserve forward-only call steps, seeking/yoyo behavior, update/loop arguments,
+  exceptions and lifecycle ownership. Follow Core's callback-only ticker API in
+  the shared Tween driver and ParticleSystem.
+- Add runtime and strict compiler regressions for argument arrays, caller-bound
+  callbacks, update/loop receivers and rejected removed options/signatures.
+  Require Core ^3.0.0; Sprite/MovieClip/ScrollView behavior stays unchanged.
+
+- Verification: package build and all 85 unit tests pass against matching
+  prepared dependencies. Source/packed declaration and browser integration are
+  recorded in the repository CHANGELOG.
+
+### Documentation
 
 - Record 2.0.1 publication and correct installation/docs-distribution status.
   Runtime, public signatures and dependency requirements remain unchanged.
+
+
 
 ## [2.0.1] — 2026-10-18
 

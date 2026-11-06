@@ -1,14 +1,15 @@
 # startTick
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
-startTick(callback: TickCallback, thisObject: unknown): void;
+startTick(callback: TickCallback): void;
 ```
 
 Registers a callback receiving absolute milliseconds from getTimer(), not
-a delta or seconds. Returning true requests rendering. The callback and
-thisObject pair is deduplicated and must match when calling stopTick().
+a delta or seconds. Returning true requests rendering. The callback runs
+without a receiver and is deduplicated by function identity. Use an arrow
+member or bind once when the callback needs instance state.
 Registration does not start the requestAnimationFrame loop by itself.
 
 **example**
@@ -23,8 +24,8 @@ const onTick = (now: number): boolean => {
   console.log(deltaSeconds);
   return false;
 };
-ticker.startTick(onTick, undefined);
-ticker.stopTick(onTick, undefined);
+ticker.startTick(onTick);
+ticker.stopTick(onTick);
 ```
 
 Related types: [TickCallback](../supporting/core-TickCallback.md).

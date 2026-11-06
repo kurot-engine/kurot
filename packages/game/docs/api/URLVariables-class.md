@@ -1,6 +1,6 @@
 # URLVariables
 
-Package: `@kurot/game@2.0.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/game@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class URLVariables
@@ -12,8 +12,6 @@ Assign an instance to `URLRequest.data`: for GET requests it's appended to
 the URL's query string, for POST requests it's sent as
 `application/x-www-form-urlencoded` (via `toString()`). `URLLoader` handles
 both cases automatically.
-
-Egret-compatible: egret.URLVariables
 
 ## Members
 

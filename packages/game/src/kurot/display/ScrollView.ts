@@ -28,7 +28,7 @@ const RESISTANCE = 0.4;
 const FRAME_MS = 16.67;
 
 /**
- * Inertial scrolling container, Egret-compatible.
+ * Touch-driven scrolling container with inertia and boundary bounce.
  *
  * Wraps a content `Sprite` and provides touch-driven inertial scrolling
  * with bounce-back when the content is dragged past its bounds.

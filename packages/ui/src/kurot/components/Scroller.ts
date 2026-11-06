@@ -70,13 +70,12 @@ export class Scroller extends Component {
 
 	/**
 	 * Whether a CHANGE_START event has been dispatched for the current
-	 * scroll gesture (egret parity). Cleared when CHANGE_END fires.
+	 * scroll gesture. Cleared when CHANGE_END fires.
 	 */
 	private _changeStartDispatched = false;
 
 	/**
 	 * Timer ID for the 200 ms auto-hide timeout on the scroll bars.
-	 * Matches egret's {@code autoHideTimer} (a {@code egret.Timer(200, 1)}).
 	 */
 	private _autoHideTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -184,7 +183,7 @@ export class Scroller extends Component {
 		super.updateDisplayList(unscaledWidth, unscaledHeight);
 		const vp = this._viewport;
 		if (vp && isUIComponent(vp)) {
-			// Match egret: size the viewport to fill the Scroller and anchor it at (0,0).
+			// Size the viewport to fill the Scroller and anchor it at (0,0).
 			vp.setLayoutBoundsSize(unscaledWidth, unscaledHeight);
 			vp.setLayoutBoundsPosition(0, 0);
 		}
@@ -242,7 +241,7 @@ export class Scroller extends Component {
 
 	protected override setSkin(skin: Skin | undefined): void {
 		super.setSkin(skin);
-		// Match egret: after the skin (scroll bars) is applied, re-add the viewport
+		// After applying the skin, re-add the viewport
 		// at index 0 so it sits beneath the scroll bars and is never orphaned by
 		// the skin application.
 		const vp = this._viewport;
@@ -378,7 +377,7 @@ export class Scroller extends Component {
 			this._touchMoved = true;
 			this._updateScrollBarVisibility(true);
 
-			// Dispatch CHANGE_START once per gesture (egret parity).
+			// Dispatch CHANGE_START once per gesture.
 			if (!this._changeStartDispatched) {
 				this._changeStartDispatched = true;
 				UIEvent.dispatchUIEvent(this, UIEvent.CHANGE_START);
@@ -444,7 +443,7 @@ export class Scroller extends Component {
 	};
 
 	/**
-	 * Called when a scroll throw animation ends (egret parity).
+	 * Called when a scroll throw animation ends.
 	 * Dispatches CHANGE_END when both horizontal and vertical animations
 	 * have stopped, and starts the auto-hide timer for the scroll bars.
 	 */
@@ -462,7 +461,7 @@ export class Scroller extends Component {
 		UIEvent.dispatchUIEvent(this, UIEvent.CHANGE_END);
 	}
 
-	// ── Auto-hide scroll bars (egret parity) ─────────────────────────
+	// ── Auto-hide scroll bars ───────────────────────────────────────
 
 	private _scheduleAutoHide(): void {
 		this._clearAutoHideTimer();

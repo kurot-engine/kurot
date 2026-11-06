@@ -1,6 +1,6 @@
 # Texture
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Texture
@@ -50,7 +50,5 @@ texture.dispose();
 | `textureWidth` | public | [open](Texture-class/textureWidth-accessor.md) |
 | `dispose` | public | [open](Texture-class/dispose-method.md) |
 | `getPixel32` | public | [open](Texture-class/getPixel32-method.md) |
-| `getPixels` | public | [open](Texture-class/getPixels-method.md) |
 | `initData` | public | [open](Texture-class/initData-method.md) |
 | `setBitmapData` | public | [open](Texture-class/setBitmapData-method.md) |
-| `toDataURL` | public | [open](Texture-class/toDataURL-method.md) |

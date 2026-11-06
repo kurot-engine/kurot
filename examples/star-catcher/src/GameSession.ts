@@ -48,7 +48,7 @@ export class GameSession {
 		if (this._model.snapshot.phase !== 'playing') return;
 		this._lastTime = undefined;
 		this._input.start();
-		ticker.startTick(this._onTick, this);
+		ticker.startTick(this._onTick);
 		this._ticking = true;
 		this.render();
 	}
@@ -72,7 +72,7 @@ export class GameSession {
 
 	private stopActivity(): void {
 		if (this._ticking) {
-			ticker.stopTick(this._onTick, this);
+			ticker.stopTick(this._onTick);
 			this._ticking = false;
 		}
 		this._input.stop();

@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui-runtime",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"description": "Runtime materialization layer for validated Kurot UI documents",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -32,13 +32,13 @@
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"peerDependencies": {
-		"@kurot/core": "^2.4.0",
-		"@kurot/ui": "^4.1.0",
+		"@kurot/core": "^3.0.0",
+		"@kurot/ui": "^5.0.0",
 		"@kurot/ui-document": "^0.14.0"
 	},
 	"devDependencies": {
-		"@kurot/core": "^2.5.2",
-		"@kurot/ui": "^4.1.0",
+		"@kurot/core": "^3.0.0",
+		"@kurot/ui": "^5.0.0",
 		"@kurot/ui-document": "^0.14.0",
 		"@types/node": "^22.0.0",
 		"happy-dom": "^20.8.9",

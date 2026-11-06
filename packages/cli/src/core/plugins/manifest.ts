@@ -3,15 +3,15 @@ import { writeFile } from '../../utils/fs.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 
 /**
- * Writes Egret-style `manifest.json` for release builds:
+ * Writes `manifest.json` with engine and application script groups for release builds:
  *
  * ```json
  * { "initial": ["js/kurot.core.min_<hash>.js", ...], "game": ["js/main.min_<hash>.js"] }
  * ```
  *
- * `initial` lists the engine chunks (loaded first), `game` the app entry. Skins
- * are embedded in `default.thm.json` and loaded at runtime, so they are not
- * listed here. No-op outside release mode.
+ * `initial` lists engine chunks loaded first; `game` lists the compiled Skin
+ * script, when present, followed by the application entry. No-op outside
+ * release mode.
  */
 export function writeManifest(): BuildPlugin {
 	return {

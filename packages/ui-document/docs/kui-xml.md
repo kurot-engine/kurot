@@ -88,8 +88,7 @@ and are not authored XML attributes.
 One axis cannot define both a fixed and percentage size. State-specific sizes
 use the same syntax, for example `width.compact="50%"`.
 
-Group layouts keep the same property-element shape used by EUI rather than the
-generic object form:
+Group layouts use a layout property element containing a concrete layout node:
 
 ```xml
 <Group id="content">

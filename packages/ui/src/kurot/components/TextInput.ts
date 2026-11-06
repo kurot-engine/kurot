@@ -12,8 +12,6 @@ import type { IDisplayText } from '../core/IDisplayText.js';
  * - `promptDisplay` — Label shown when text is empty and unfocused
  *
  * States: `normal`, `disabled`, `normalWithPrompt`, `disabledWithPrompt`
- *
- * Egret-compatible: eui.TextInput
  */
 export class TextInput extends Component implements IDisplayText {
 	// ── Instance fields ───────────────────────────────────────────────────

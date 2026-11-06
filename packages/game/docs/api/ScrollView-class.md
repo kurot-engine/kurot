@@ -1,12 +1,12 @@
 # ScrollView
 
-Package: `@kurot/game@2.0.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/game@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ScrollView extends Sprite
 ```
 
-Inertial scrolling container, Egret-compatible.
+Touch-driven scrolling container with inertia and boundary bounce.
 
 Wraps a content `Sprite` and provides touch-driven inertial scrolling
 with bounce-back when the content is dragged past its bounds.

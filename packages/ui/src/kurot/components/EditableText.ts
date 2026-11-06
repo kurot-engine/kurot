@@ -4,13 +4,11 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
 import { Label } from './Label.js';
 
 /**
- * Editable text component with EUI layout participation and prompt support.
+ * Editable text component with native UI layout participation and prompt support.
  *
  * The native-input TextField lives inside this Component, just like Label's
  * display TextField. Consequently BasicLayout constraints are resolved on the
  * wrapper first and updateDisplayList passes the final bounds to StageText.
- *
- * Egret-compatible: eui.EditableText
  */
 export class EditableText extends Label implements IDisplayText {
 	private _prompt = '';

@@ -8,7 +8,6 @@ export class Animation {
 	// ── Instance fields ───────────────────────────────────────────────────
 
 	private _updateFunction: (animation: Animation) => void;
-	private _thisObject: unknown;
 	private _easerFunction: ((fraction: number) => number) | undefined = f => -(Math.cos(Math.PI * f) - 1) * 0.5;
 	private _isPlaying = false;
 	private _duration = 500;
@@ -20,9 +19,12 @@ export class Animation {
 
 	// ── Constructor ───────────────────────────────────────────────────────
 
-	public constructor(updateFunction: (animation: Animation) => void, thisObject: unknown) {
+	/**
+	 * Update and end callbacks receive this Animation as their argument and run
+	 * without a receiver. Use a stable arrow member or bind once for instance state.
+	 */
+	public constructor(updateFunction: (animation: Animation) => void) {
 		this._updateFunction = updateFunction;
-		this._thisObject = thisObject;
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
@@ -85,7 +87,7 @@ export class Animation {
 	public stop(): void {
 		this._isPlaying = false;
 		this._startTime = 0;
-		ticker.stopTick(this._doInterval, this);
+		ticker.stopTick(this._doInterval);
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────
@@ -95,7 +97,7 @@ export class Animation {
 		this._currentValue = 0;
 		this._startTime = getTimer();
 		this._doInterval(this._startTime);
-		ticker.startTick(this._doInterval, this);
+		ticker.startTick(this._doInterval);
 	}
 
 	private _doInterval = (currentTime: number): boolean => {
@@ -109,13 +111,15 @@ export class Animation {
 			fraction = this._easerFunction(fraction);
 		}
 		this._currentValue = this._from + (this._to - this._from) * fraction;
-		this._updateFunction.call(this._thisObject, this);
+		const updateFunction = this._updateFunction;
+		updateFunction(this);
 		const isEnded = runningTime >= duration;
 		if (isEnded) {
 			this.stop();
 		}
-		if (isEnded && this._endFunction) {
-			this._endFunction.call(this._thisObject, this);
+		const endFunction = this._endFunction;
+		if (isEnded && endFunction) {
+			endFunction(this);
 		}
 		return true;
 	};

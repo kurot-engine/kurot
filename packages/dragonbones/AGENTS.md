@@ -2,15 +2,14 @@
 
 Read the repository root `AGENTS.md`, this package's `docs/ai-context.md`, and
 `../../docs/code-rules.md` before editing. This package is maintained in
-`Kurot/packages/dragonbones`; version 0.1.0 is published to npm.
+`Kurot/packages/dragonbones`; version 0.2.0 is published on npm.
 
 Own code follows the root TypeScript / ESM / ES2022 / strict rules. The local
 `.prettierrc` preserves the Templates/tentax formatting requested for this port.
-The only runtime peer dependency is `@kurot/core ^2.1.1`.
-Development declares Core ^2.2.0 and the lockfile currently resolves published
-2.2.0 without local overrides. Compatible development updates need no adapter
-release when shipped output is unchanged. Keep the peer minimum at 2.1.1 unless
-an adapter change requires a newer Core API; see the
+The runtime peer and development requirement are both `@kurot/core ^3.0.0`.
+Core 3 supplies the callback-only ticker used by KurotFactory. Preserve the
+DragonBones event receiver protocol. Compatible development updates need no
+adapter release when shipped output is unchanged; see the
 [independent release policy](../../docs/dependency-policy.md).
 
 `src/runtime` contains maintained TypeScript source adapted from the pinned

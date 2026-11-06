@@ -1,6 +1,6 @@
 # RenderTexture
 
-Package: `@kurot/core@2.8.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class RenderTexture extends Texture
@@ -38,7 +38,5 @@ Related types: [Texture](Texture-class.md).
 | `dispose` | public | [open](RenderTexture-class/dispose-method.md) |
 | `drawToTexture` | public | [open](RenderTexture-class/drawToTexture-method.md) |
 | `getPixel32` | public | [open](RenderTexture-class/getPixel32-method.md) |
-| `getPixels` | public, inherited | [open](RenderTexture-class/getPixels-method.md) |
 | `initData` | public, inherited | [open](RenderTexture-class/initData-method.md) |
 | `setBitmapData` | public, inherited | [open](RenderTexture-class/setBitmapData-method.md) |
-| `toDataURL` | public, inherited | [open](RenderTexture-class/toDataURL-method.md) |

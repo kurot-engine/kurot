@@ -41,11 +41,11 @@ factory variables, property assignments, semantic layout children, and state
 property overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 4.1.1 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. The
+CLI 4.1.2 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
-4.x and its compatible Core. Core ^2.5.2 remains UI's peer minimum.
+4.x or 5.x and its compatible Core. UI 5 requires Core ^3.0.0.
 
 Host-field validation uses compiler syntax and installed declarations before
 installing the Skin bundle or tooling declarations. Application and namespace

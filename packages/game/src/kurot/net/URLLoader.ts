@@ -22,7 +22,7 @@ export interface URLLoaderEvents extends EventMap {
 }
 
 /**
- * High-level resource loader, Egret-compatible.
+ * High-level loader for textures, sounds and HTTP data.
  *
  * Delegates to the appropriate core loader based on `dataFormat`,
  * then populates `data` and dispatches `Event.COMPLETE`.

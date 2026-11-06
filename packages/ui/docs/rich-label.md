@@ -1,7 +1,7 @@
 # RichLabel
 
-Native rich text in an independent Component using Core TextField. UI 4.1 adds
-component typography while retaining Core peer ^2.5.2. KUI authoring uses CLI 4.1
+Native rich text in an independent Component using Core TextField. UI 5 requires
+Core ^3.0.0 and retains component typography. KUI authoring uses CLI 4.1
 and ui-document 0.14; direct TypeScript use needs UI only.
 
 ```ts
@@ -71,8 +71,8 @@ and alpha remain available.
 | verticalAlign | Host Core | top, middle or bottom. |
 | textWidth / textHeight | Read-only | Complete content under the current width constraint, before height clipping. Empty content has zero metrics. |
 
-Vertical alignment follows the host TextField default: middle with Core >= 2.5.3,
-top with the accepted Core 2.5.2 baseline. Explicit alignment works in either
+Vertical alignment follows the host TextField default: middle with Core 3.
+Explicit alignment works in either
 line mode. The headless catalog records middle; omitted XML retains the native
 host default.
 

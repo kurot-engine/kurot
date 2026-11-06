@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@4.1.1` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@4.1.2` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -109,7 +109,7 @@ constructors during field validation. `skin-host-generic-names.ts` keeps SDK dat
 arguments out of Skin association discovery, retaining ItemRenderer TSkin first.
 Do not replace these with blanket generic erasure or short-name identity checks.
 The generated XML/factory format remains unchanged. Typed list fields require
-UI >= 4.2.0 and CLI >= 4.1.1 within their respective 4.x lines; other UI 4
+UI 4.2.x or 5.x and CLI >= 4.1.1 within 4.x; other UI 4
 contracts retain their existing requirements. See [field checks](skin-part-fields.md).
 
 ## Reusable components

@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "2.8.0",
+  "version": "3.0.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -8320,12 +8320,6 @@
           "inherited": false
         },
         {
-          "name": "getPixels",
-          "file": "RenderTexture-class/getPixels-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
           "name": "initData",
           "file": "RenderTexture-class/initData-method.md",
           "protected": false,
@@ -8334,12 +8328,6 @@
         {
           "name": "setBitmapData",
           "file": "RenderTexture-class/setBitmapData-method.md",
-          "protected": false,
-          "inherited": true
-        },
-        {
-          "name": "toDataURL",
-          "file": "RenderTexture-class/toDataURL-method.md",
           "protected": false,
           "inherited": true
         }
@@ -12856,12 +12844,6 @@
           "inherited": false
         },
         {
-          "name": "getPixels",
-          "file": "Texture-class/getPixels-method.md",
-          "protected": false,
-          "inherited": false
-        },
-        {
           "name": "initData",
           "file": "Texture-class/initData-method.md",
           "protected": false,
@@ -12870,12 +12852,6 @@
         {
           "name": "setBitmapData",
           "file": "Texture-class/setBitmapData-method.md",
-          "protected": false,
-          "inherited": false
-        },
-        {
-          "name": "toDataURL",
-          "file": "Texture-class/toDataURL-method.md",
           "protected": false,
           "inherited": false
         }

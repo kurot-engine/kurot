@@ -214,7 +214,8 @@ draw call 就得把它们拼进同一张图集，而图集有尺寸上限、也�
 | `getChildAt()` 越界 | 抛异常 → 返回 `undefined` | 检查返回值 |
 | hitTest 返回值 | `null` → `undefined` | 检查 `=== null` |
 | 命名空间 | `egret.xxx` → ES Module | 全量替换 |
-| `Texture.getPixel32/getPixels/toDataURL` | 已废弃 | 仅 `RenderTexture.getPixel32` 可用 |
+| `Texture.getPixels/toDataURL` | 工作区源码已移除，待发布 | 原实现始终抛异常；缓冲区的读取和导出接口保留 |
+| `Texture.getPixel32` | 基类不支持 | 使用有实际实现的 `RenderTexture.getPixel32` |
 | `Base64Util.encode` 签名 | `string` → `ArrayBuffer` | `encode(new TextEncoder().encode(str))` |
 | `HashObject` / `IHashObject` / `.hashCode` 移除 | 依赖整数哈希做对象身份比较的代码 | 用 `===` 或 `WeakMap` 键控查找 |
 | `Resource.instance` 单例 getter 移除 | 通过 `Resource.instance` 访问单例的代码 | `import { resource } from '@kurot/core'` |

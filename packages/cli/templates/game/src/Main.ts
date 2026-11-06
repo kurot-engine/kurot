@@ -166,7 +166,7 @@ class Main extends UILayer {
 			tw.to({ alpha: 1 }, 200);
 			tw.wait(2000);
 			tw.to({ alpha: 0 }, 200);
-			tw.call(change, this);
+			tw.call(change);
 		};
 		change();
 	}

@@ -242,15 +242,40 @@ describe('Kurot DragonBones adapter', () => {
 		const display = build(factory);
 		display.animation.play('move', 1);
 		const callback = start.mock.calls[0][0];
-		callback.call(factory, 1000);
-		callback.call(factory, 1250);
+		expect(start.mock.calls[0]).toEqual([callback]);
+		callback(1000);
+		callback(1250);
 		expect(display.animation.lastAnimationState?.currentTime).toBeCloseTo(0.25);
 		factory.autoUpdate = false;
 		expect(stop).toHaveBeenCalledTimes(1);
 		factory.advanceTime(0.1);
 		factory.autoUpdate = true;
-		callback.call(factory, 5000);
+		callback(5000);
 		expect(display.animation.lastAnimationState?.currentTime).toBeCloseTo(0.35);
+	});
+
+	it('retains upstream event receiver identity and removes only the matching binding', () => {
+		const display = new KurotArmatureDisplay();
+		const first = { calls: 0 };
+		const second = { calls: 0 };
+		const event = new dragonBones.EventObject();
+		function onFrame(this: { calls: number }): void {
+			this.calls++;
+		}
+		try {
+			display.addDBEventListener('frameEvent', onFrame, first);
+			display.addDBEventListener('frameEvent', onFrame, first);
+			display.addDBEventListener('frameEvent', onFrame, second);
+			display.dispatchDBEvent('frameEvent', event);
+			expect(first.calls).toBe(1);
+			expect(second.calls).toBe(1);
+			display.removeDBEventListener('frameEvent', onFrame, first);
+			display.dispatchDBEvent('frameEvent', event);
+			expect(first.calls).toBe(1);
+			expect(second.calls).toBe(2);
+		} finally {
+			display.dispose();
+		}
 	});
 
 	it('keeps scalar event snapshots valid after upstream event pooling', () => {

@@ -1,10 +1,10 @@
 # setHandler
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
-setHandler(handler: (value: unknown) => void, thisObject: unknown): void;
+setHandler(handler: (value: unknown) => void): void;
 ```
 
-Replace the chain's handler and callback receiver. Does not immediately emit
+Replace the chain's unbound handler. Does not immediately emit
 the current value; call getValue() for an initial read. Handler errors propagate.

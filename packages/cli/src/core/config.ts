@@ -18,7 +18,7 @@ export interface StageConfig {
 	 */
 	readonly height: number;
 	/**
-	 * Egret-style scale mode: `showAll` | `noScale` | `exactFit` | `noBorder` |
+	 * Stage content scale mode: `showAll` | `noScale` | `exactFit` | `noBorder` |
 	 * `fixedHeight` | `fixedWidth` | `fixedNarrow` | `fixedWide`.
 	 */
 	readonly scaleMode: string;

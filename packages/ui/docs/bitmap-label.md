@@ -33,8 +33,8 @@ DisplayObject tint. Alignments position glyphs without scaling them. Set scaleX
 and scaleY for decorative number sizing. Default multiline=true; explicit false
 keeps the first hard-separated line unwrapped.
 
-Vertical alignment inherits BitmapText's default: middle with Core >= 2.5.3,
-top with the accepted Core 2.5.2 baseline. Explicit alignment remains effective
+Vertical alignment inherits BitmapText's default: middle with Core 3.
+Explicit alignment remains effective
 in either line mode. The headless catalog records middle; omitted XML values
 still use the native host default.
 

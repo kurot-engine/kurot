@@ -4,6 +4,23 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## 0.12.0 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 167 files and the compressed archive
+are byte-identical to the tested release artifact. Repository publication
+markers are updated after verification; the npm archive remains immutable.
+
+- Construct native Animation with its callback only. Preserve numeric transition
+  delay/easing, cancellation and state restoration; no semantic format changes.
+- Require Core ^3.0.0 and UI ^5.0.0. Keep ui-document ^0.14.0, semantic
+  format 2 and existing transition ownership unchanged.
+
+- Verification: frozen installation, build and all 90 tests pass with published
+  Core 3.0.0, UI 5.0.0 and document 0.14.0. The UI lock integrity matches the
+  official downloaded archive. Source/packed declaration and browser integration
+  are recorded in the repository CHANGELOG.
+
 ## 0.11.0 — 2026-11-05
 
 Published; exact version and npm latest verified on 2026-11-05. Downloaded

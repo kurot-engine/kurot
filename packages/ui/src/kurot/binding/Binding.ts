@@ -31,7 +31,7 @@ export class Binding {
 			const assign = (value: unknown): void => {
 				(target as Record<string, unknown>)[prop] = value;
 			};
-			watcher.setHandler(assign, undefined);
+			watcher.setHandler(assign);
 			assign(watcher.getValue());
 		}
 		return watcher;
@@ -43,13 +43,14 @@ export class Binding {
 	 * An empty chain returns undefined without calling the handler. Changes need
 	 * PROPERTY_CHANGE notifications; exceptions propagate. The caller must unwatch
 	 * the returned Watcher on disposal, independently of stage removal.
+	 * The handler runs without a receiver for both its initial and later calls.
 	 *
 	 * ```ts
 	 * import { EventDispatcher } from '@kurot/core';
 	 * import { Binding } from '@kurot/ui';
 	 *
 	 * const user = Object.assign(new EventDispatcher(), { name: 'Player' });
-	 * const watcher = Binding.bindHandler(user, ['name'], value => console.log(value), undefined);
+	 * const watcher = Binding.bindHandler(user, ['name'], value => console.log(value));
 	 * watcher?.unwatch();
 	 * ```
 	 */
@@ -57,11 +58,10 @@ export class Binding {
 		host: unknown,
 		chain: string[],
 		handler: (value: unknown) => void,
-		thisObject: unknown,
 	): Watcher | undefined {
-		const watcher = Watcher.watch(host as IEventDispatcher | undefined, chain, handler, thisObject);
+		const watcher = Watcher.watch(host as IEventDispatcher | undefined, chain, handler);
 		if (watcher) {
-			handler.call(thisObject, watcher.getValue());
+			handler(watcher.getValue());
 		}
 		return watcher;
 	}
@@ -123,7 +123,7 @@ export class Binding {
 
 			if (watcher) {
 				templates[index] = watcher;
-				watcher.setHandler(assign, undefined);
+				watcher.setHandler(assign);
 
 				lastWatcher = watcher;
 			}

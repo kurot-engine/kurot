@@ -62,7 +62,7 @@ function _registerTicker(): void {
 		return;
 	}
 	_tickerRegistered = true;
-	ticker.startTick(_globalTick, null);
+	ticker.startTick(_globalTick);
 }
 
 function _unregisterTicker(): void {
@@ -71,7 +71,7 @@ function _unregisterTicker(): void {
 	}
 	_tickerRegistered = false;
 	_lastTimeStamp = undefined;
-	ticker.stopTick(_globalTick, null);
+	ticker.stopTick(_globalTick);
 }
 
 function _globalTick(timeStamp: number): boolean {
@@ -231,9 +231,7 @@ export class Tween {
 	private _ignoreGlobalPause = false;
 	private _defaultEase: EaseFunction = Ease.linear;
 	private _onChange?: (tween: Tween) => void;
-	private _onChangeObj?: object;
 	private _onLoopComplete?: (tween: Tween) => void;
-	private _onLoopCompleteObj?: object;
 	private _resolvers: Array<() => void> = [];
 	private _releaseListeners: Array<() => void> = [];
 	private _isCompleted = false;
@@ -306,11 +304,12 @@ export class Tween {
 	}
 
 	/**
-	 * Adds a callback step.
+	 * Adds an unbound callback step with an optional argument array.
 	 * Runs only in forward playback; seeking and yoyo reverse passes skip it.
+	 * Use an arrow member or bind once when the callback needs instance state.
 	 */
-	public call(callback: (...args: unknown[]) => void, thisObj?: object, params?: unknown[]): this {
-		this._steps.push({ type: 'call', duration: 0, fn: callback, thisObj, params: params ?? [] });
+	public call(callback: (...args: unknown[]) => void, params?: unknown[]): this {
+		this._steps.push({ type: 'call', duration: 0, fn: callback, params: params ?? [] });
 		return this;
 	}
 
@@ -472,9 +471,7 @@ export class Tween {
 		this._hasTimedSteps = false;
 		this._pendingPosition = undefined;
 		this._onChange = undefined;
-		this._onChangeObj = undefined;
 		this._onLoopComplete = undefined;
-		this._onLoopCompleteObj = undefined;
 		this._releaseListeners = [];
 	}
 
@@ -494,9 +491,7 @@ export class Tween {
 		this._ignoreGlobalPause = options?.ignoreGlobalPause ?? false;
 		this._defaultEase = options?.ease ?? Ease.linear;
 		this._onChange = options?.onChange;
-		this._onChangeObj = options?.onChangeObj;
 		this._onLoopComplete = options?.onLoopComplete;
-		this._onLoopCompleteObj = options?.onLoopCompleteObj;
 	}
 
 	private _advanceInstantSteps(): void {
@@ -522,8 +517,9 @@ export class Tween {
 		this._stepIndex = 0;
 		this._stepElapsed = 0;
 		this._reversed = this._yoyo ? !this._reversed : false;
-		if (this._onLoopComplete) {
-			this._onLoopComplete.call(this._onLoopCompleteObj ?? this._target, this);
+		const onLoopComplete = this._onLoopComplete;
+		if (onLoopComplete) {
+			onLoopComplete(this);
 		}
 	}
 
@@ -573,7 +569,8 @@ export class Tween {
 
 	private _executeInstantStep(step: TweenStep): void {
 		if (step.type === 'call') {
-			step.fn.apply(step.thisObj ?? this._target, step.params);
+			const { fn, params } = step;
+			fn(...params);
 		} else if (step.type === 'set') {
 			this._applySetStep(step);
 		}
@@ -620,8 +617,9 @@ export class Tween {
 	}
 
 	private _notifyChange(): void {
-		if (this._onChange) {
-			this._onChange.call(this._onChangeObj ?? this._target, this);
+		const onChange = this._onChange;
+		if (onChange) {
+			onChange(this);
 		}
 	}
 }

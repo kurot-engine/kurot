@@ -1,8 +1,8 @@
 # @kurot/dragonbones
 
-Version **0.1.0**. A standalone ESM DragonBones **5.7.000** runtime and native
-Kurot adapter. The only runtime peer is `@kurot/core ^2.1.1`; development declares
-Core `^2.2.0`, currently locked to published 2.2.0 without local overrides.
+Version **0.2.0** (published on npm). A standalone ESM DragonBones **5.7.000** runtime and native
+Kurot adapter. The runtime peer and development requirement are both
+`@kurot/core ^3.0.0`.
 UI and Game are not required. Compatible Core updates do not require a new
 adapter release when its shipped output and compatibility stay unchanged.
 
@@ -11,14 +11,19 @@ weighted and unweighted mesh deformation, nested armatures, animation events,
 sound-event forwarding and Core ticker updates. Sound events are notifications;
 the application owns audio playback.
 
+## Core integration
+
+The factory uses Core 3's callback-only ticker through a stable arrow callback.
+DragonBones event listener receivers retain their upstream contract.
+
 ## Installation
 
 ```sh
-pnpm add @kurot/dragonbones@^0.1.0 @kurot/core@^2.2.0
+pnpm add @kurot/dragonbones@^0.2.0 @kurot/core@^3.0.0
 ```
 
-Core 2.1.1 is the minimum supported version. Core 2.2.0 also satisfies the peer
-range, and is required when the application uses UI 3.2.0's BitmapLabel.
+Core 3.0.0 is the minimum supported version. Install a single shared Core
+instance for the application and its native adapters.
 The npm package contains runtime code, declarations, documentation and licenses.
 
 For local development, build this package and install it from the consumer's
@@ -29,7 +34,7 @@ pnpm add @kurot/dragonbones@file:../Kurot/packages/dragonbones
 ```
 
 Adjust the relative path to the consumer's location. Alternatively, run
-`pnpm pack --out /tmp/kurot-dragonbones-0.1.0.tgz` in this package and install
+`pnpm pack --out /tmp/kurot-dragonbones-0.2.0.tgz` in this package and install
 the resulting tarball.
 
 ## Usage

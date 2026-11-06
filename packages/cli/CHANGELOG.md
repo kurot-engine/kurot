@@ -7,6 +7,29 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 4.1.2 — 2026-11-06
+
+Published; exact version and npm latest verified on 2026-11-06. Downloaded
+archive SHA-512 integrity passes; all 285 files and the compressed archive
+are byte-identical to the tested release artifact. Confirm ui-document ^0.14.0
+and the game starter's callback-only Tween.call syntax.
+
+- Remove the unnecessary receiver argument from the game starter's Tween.call.
+  Its stable arrow callback retains the Main instance. Generated KUI syntax,
+  compilation and ui-document ^0.14.0 dependency requirements are unchanged.
+  Scaffolding resolves current npm SDK versions; the starter uses Core 3/Game 3.
+
+- Verification: package build and all 208 tests pass with two workers. The
+  default concurrent run hit an existing 5-second CLI process-test timeout;
+  thresholds and test implementation remain unchanged. See repository CHANGELOG
+  for packed consumer and browser validation.
+
+### Documentation
+
+- Describe native stage scaling, KUI namespaces, script manifests and release
+  directories directly. Keep configuration and generated output unchanged.
+
+
 ## 4.1.1 — 2026-11-06
 
 Published; exact version and npm latest verified on 2026-11-06. Downloaded

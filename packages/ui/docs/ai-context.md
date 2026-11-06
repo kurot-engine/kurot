@@ -6,13 +6,16 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@4.2.0` (published on npm), with Core peer **^2.5.2**.
+This maintainer map covers `@kurot/ui@5.0.0` (published on npm), with Core peer **^3.0.0**.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of
 7 barrels — `core`, `layouts`, `components`, `events`, `states`, `collections`,
 `binding` — see §4.
+
+UI 5 uses callback-owned Animation/Watcher/Binding APIs and Core 3's
+callback-only ticker. Read [callback ownership](callbacks.md).
 
 ## 1. Directory map
 
@@ -70,8 +73,7 @@ src/kurot/
   declare `skinParts`/`states`/bindings.
 - `Skin.setPart(name, value)` is the intentional write-side counterpart to
   `getPart(name)`: programmatic materializers use it to install authored part
-  names as real Skin properties. This preserves the existing EUI Skin model;
-  it is not an alternate Map-backed namespace. Callers must reject names that
+  names as real Skin properties, using the same storage as other Skin parts. Callers must reject names that
   collide with `Skin` or inherited runtime members. For Agent-generated UI,
   treat such a collision as invalid authored data and surface a rename
   diagnostic rather than silently rewriting or accepting the name.

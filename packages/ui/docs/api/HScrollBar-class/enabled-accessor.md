@@ -1,6 +1,6 @@
 # enabled
 
-Package: `@kurot/ui@4.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get enabled(): boolean;
@@ -15,10 +15,10 @@ restores requested flags. This does not stop game callbacks, timers or tweens.
 
 Enable or disable this component (and its children).
 
-Mirrors egret's `$setEnabled`: writes `touchEnabled` / `touchChildren`
+Writes `touchEnabled` / `touchChildren`
 directly at the display-object level (via `super`) so that:
 
 1. The display-layer values change immediately (disabled components are
-   skipped in hit-testing, just like egret).
+   skipped in hit-testing).
 2. `_explicitTouchEnabled` / `_explicitTouchChildren` survive the
    disable→enable cycle so the original intent is restored on re-enable.

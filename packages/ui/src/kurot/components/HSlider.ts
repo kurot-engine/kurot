@@ -7,7 +7,7 @@ import { isUIComponent } from '../core/UIComponent.js';
  * HSlider — a horizontal slider (left-to-right).
  *
  * Overrides `pointToValue` and `updateSkinDisplayList` to position the thumb
- * using the track's layout bounds (not the slider's own width), matching egret.
+ * using the track's layout bounds.
  */
 export class HSlider extends SliderBase {
 

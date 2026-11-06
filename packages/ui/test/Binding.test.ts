@@ -64,7 +64,7 @@ describe('Binding', () => {
 			const host = new BindableHost({ count: 5 });
 			const handler = vi.fn();
 
-			Binding.bindHandler(host, ['count'], handler, undefined);
+			Binding.bindHandler(host, ['count'], handler);
 
 			expect(handler).toHaveBeenCalledTimes(1);
 			expect(handler).toHaveBeenLastCalledWith(5);
@@ -73,7 +73,7 @@ describe('Binding', () => {
 		it('invokes the handler on subsequent changes', () => {
 			const host = new BindableHost({ count: 5 });
 			const handler = vi.fn();
-			Binding.bindHandler(host, ['count'], handler, undefined);
+			Binding.bindHandler(host, ['count'], handler);
 			handler.mockClear();
 
 			host.set('count', 10);
