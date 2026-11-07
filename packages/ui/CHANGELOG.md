@@ -4,6 +4,82 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.1.2 — 2026-11-08
+
+Published; exact version, npm latest and Core ^3.2.1 peer verified on 2026-11-08.
+Registry archive integrity is verified during consumer installation. Public
+signatures and stable font-frame baselines remain unchanged.
+
+### Fixed
+
+- Reserve the outline radius plus 2 logical pixels per vertical side of Label,
+  instead of twice the radius plus 2. A 29px font frame with stroke=2 now measures
+  37px rather than 41px. Keep the stable font frame and reserve the vertical
+  allowance only once around the complete multiline block.
+- Keep horizontal outline/overhang protection separate and add a font-relative
+  italic guard. Measurement, fitting and painting use the same insets; the guard
+  uses authored size so shrinking or retyping cannot move the content origin.
+  Retain exact Scroller clipping and native input/RichLabel/BitmapLabel behavior.
+
+### Dependencies
+
+- Keep Core peer ^3.2.1 and the compatible development range ^3.2.0. Recommend
+  Core 3.2.2 alongside this patch for render-only ink retention and mixed-size
+  scrolling; those corrections add no required API or peer-minimum change.
+- Retain the registry Core 3.2.1 development lock until deliberate adoption
+  after publication. Runtime checks also cover the local Core 3.2.2 source.
+  No other SDK or application is bumped by this preparation.
+
+Validation: UI build and all 586 unit tests pass. All 36 targeted browser cases
+pass on macOS with Chromium/WebKit, Canvas/WebGL 1/2 and 1x/2x rendering. Checks
+cover 31 languages, italic overhang, 12–96px sizes, fractional/thick outlines,
+automatic/fixed/maximum bounds, fitting, scrolling, wrapping and retyped text.
+No boundary ink is lost in the outline checks; interior clip-compositing AA
+rounding is allowed up to 2/255. Final verification also uses the prepared
+Core ink-retention correction, without changing logical font frames or baselines.
+An Editor background WKWebView probe using built Core/UI passes 192 native
+pixel comparisons and measures the 24px Barlow/stroke=2 case at 37px.
+That preparation did not publish a package or change consumer dependencies.
+
+Release verification — 2026-11-08: build against registry Core 3.2.1 and all
+586 UI unit tests against local Core 3.2.2 pass. Generated API references match
+5.1.2 with no missing symbols or members; all 22 shared API examples compile
+against built and source-free packed declarations, including paired Core 3.2.2.
+
+## 5.1.1 — 2026-11-07
+
+Published; exact version and npm latest verified on 2026-11-07. Downloaded
+archive SHA-512/SHA-1 integrity passes; all 5,720 files and the archive bytes
+match the tested release preparation. Repository publication markers are updated
+after verification; immutable npm archives retain their original preparation wording.
+
+### Fixed
+
+- Use Core's stable font-frame height consistently for Label automatic sizing
+  and textFit. Keep fixed outline insets and authored size restoration; remove
+  content-dependent glyph-height measurement and its cache.
+- Regress 31 languages with real, subsetted fonts: automatic/fixed frames,
+  accent changes, wrapping, clear/retype, fitting recovery and Scroller edges.
+  Retain input/bitmap contracts and RichLabel's native dynamic measurement.
+- Compare Label/RichLabel pixels for all 31 languages and three vertical
+  alignments, with/without outlines. Check mixed fonts, sizes, colors, bold/italic
+  runs, automatic/fixed rich-text height and repeated rendered typewriter output.
+
+### Dependencies
+
+- Require Core ^3.2.1 for stable dynamic font-frame measurement. Core 3.2.1
+  was published before UI 5.1.1. The published development range ^3.2.0 accepts
+  3.2.1 and is not installed as a consumer runtime dependency. After publication,
+  update the checkout's development lock/installation to registry Core 3.2.1;
+  no runtime output, dependent SDK version or repeat publication is required.
+- No other SDK, template or application version is bumped for this patch.
+
+Validation: clean build, 578 unit tests and 60 source-free packed browser cases
+pass against Core 3.2.1, including 31 languages and native Label/RichLabel pixels.
+Browser checks use Chromium/WebKit on macOS, Canvas/WebGL 1/2 and 1x/2x targets.
+Packed declarations pass all 22 shared API examples. Browser guards confirm one
+shared packed Core instance with runtime engineVersion 3.2.1.
+
 ## 5.1.0 — 2026-11-07
 
 Published; exact version and npm latest verified on 2026-11-07. Downloaded

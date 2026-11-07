@@ -1,6 +1,8 @@
 # Backdrop
 
-Available in published UI **5.1.0**, requiring Core **^3.2.0**.
+Available since UI **5.1.0**, using Core's **3.2.0** native blur API.
+Follow the UI package's current Core peer range, which also covers its other
+component contracts.
 
 `Backdrop` wraps Core's `BackdropBlur` with standard UI layout. Create it in
 TypeScript and insert it before the existing modal input/dim mask and popup.

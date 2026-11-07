@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "3.2.0",
+  "version": "3.2.2",
   "exports": 170,
   "members": 2211,
   "missing": [],
@@ -275,7 +275,6 @@
     "ILineElement.charNum",
     "ILineElement.elements",
     "ILineElement.hasNextLine",
-    "ILineElement.height",
     "ILineElement.width",
     "IOErrorEvent.static IO_ERROR",
     "IOErrorEvent.static dispatchIOErrorEvent",

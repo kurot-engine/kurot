@@ -5,6 +5,172 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-08 — Core 3.2.2 / UI 5.1.2 publication and application adoption
+
+- Verify exact npm versions/latest tags, registry integrity records and UI's
+  unchanged Core ^3.2.1 peer. Synchronize source publication markers; uploaded
+  archives retain their original preparation documentation. No SDK is republished.
+- Adopt Core 3.2.2 and UI 5.1.2 where used in demo, game, star-catcher,
+  Card Booster, MilfMaster, Runaway, Skydive and Tentax. Preserve exact/caret
+  declarations, CLI 4.1.2, Game 3.0.0 and other SDK/tool versions. All unrelated
+  package records and integrity values remain unchanged; configured UI/Game/
+  DragonBones/Spine packages resolve the same registry Core per application.
+- Update current README/context references and per-game adoption records. Retain
+  Skydive's release-age policy with explicit exemptions for the selected Core/UI
+  patches. Editor, other SDK development locks and application code are unchanged.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and complete declaration checks pass. Existing unit suites pass all
+  818 tests, plus architecture/resource/tool checks where provided.
+- Demo/game pass 12 development/release WebGL/Canvas startup cases with runtime
+  3.2.2, shared native UI identity, gallery button input and narrow-screen checks.
+  Star Catcher passes all three gameplay/input/lifecycle browser cases against
+  each build output, including repeated restarts and final listener cleanup.
+- Templates pass development WebGL fixture checks for Card Booster interaction,
+  Skydive component/lifecycle behavior, Runaway gameplay and Tentax navigation/
+  disposal. MilfMaster's real-frame typing/wrapping/scroll regressions pass
+  development WebGL and minified-release Canvas; native raster/outline comparisons
+  pass development Canvas and minified-release WebGL. No application source or
+  regression expectation changes are needed. Temporary browser servers close
+  after verification; live backend integration is outside these fixture checks.
+
+## 2026-11-08 — Core 3.2.2 / UI 5.1.2 preparation
+
+- Prepare two patch releases: Core retains text overhang/italic/AA ink and
+  restores mixed-height row-scroll access; UI reduces excess vertical outline
+  space and shares horizontal italic protection across measurement, fitting and
+  painting. Stable font frames, baselines and public signatures remain intact.
+  Synchronize README/context/architecture indexes, runtime engineVersion and
+  generated API references. Publication is pending.
+- Keep UI's Core ^3.2.1 peer, compatible ^3.2.0 development range and registry
+  3.2.1 lock. Recommend Core 3.2.2 with UI 5.1.2 for both fixes; publish Core
+  first for that pairing, then UI. No unpublished registry resolution is added.
+- Game/DragonBones Core ^3.0.0 and ui-runtime Core ^3.0.0 / UI ^5.0.0 peers
+  accept these patches. Their SDK versions and supported minima stay unchanged;
+  development lock adoption is optional. CLI's latest starters need no change;
+  ui-document, Atlas and bitmap-font are unaffected.
+- Demo/game and MilfMaster/Runaway/Tentax ranges accept the new patches with
+  explicit installation/lock updates. Star Catcher pins Core 3.2.1; Card Booster,
+  Skydive and Editor pin Core 3.2.1 / UI 5.1.1, so adopting them requires a
+  manifest update. Reskin's Core ^2.5.4 still requires a separate major migration.
+  This preparation changes no application or template dependencies.
+- Both package builds and all 1,173 Core / 586 UI unit tests pass. API generation
+  and coverage checks pass with no missing public entries; six documentation
+  tooling tests and all 22 strict examples pass against both built and
+  source-free packed declarations. Packed manifests and API metadata agree on
+  Core 3.2.2 / UI 5.1.2. No npm package is published by this preparation.
+
+## 2026-11-07 — Mixed-height text row-scroll correction
+
+- Fix dynamic TextField's terminal row becoming unreachable after a taller
+  row. Calculate its actual visible height from candidate row starts and gaps,
+  retaining the more-than-half-row threshold and nominal input calculation.
+  Cover a fitting 32px title and 16px body as the primary reproduction.
+- The fitting-title, gap and exact-half-row regressions fail before the fix.
+  All 24 added unit cases pass, including ordinary equal-height rows, input,
+  resize, overlapping rows and the original large-font boundary.
+- Core build and strict fixtures pass; all 1,173 Core and 586 UI unit tests
+  pass. All twelve real Chromium/WebKit scrolling cases pass on Canvas,
+  WebGL 1/2 and 1x/2x targets, comparing scrolled text with standalone pixels.
+- Keep the correction in Core's Unreleased entry. No package version,
+  dependency, application code or publication is changed by this fix.
+
+## 2026-11-07 — Examples and Templates adopt the text-alignment patches
+
+- Adopt registry Core 3.2.1 and UI 5.1.1 where already used in demo, game,
+  star-catcher, Card Booster, MilfMaster, Runaway, Skydive and Tentax. Preserve
+  exact/caret declarations, pnpm, other package versions and one shared Core
+  per application. Current consumer documentation follows the installed patch.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and complete declaration checks pass. Existing unit suites pass all
+  818 tests; architecture/resource/tool checks pass where provided.
+- Demo/game ordinary and gallery routes pass 12 development/release startup
+  cases across WebGL and Canvas, with runtime 3.2.1, native class identity,
+  gallery button input, no browser/resource errors and a narrow-layout check.
+  Star Catcher passes three browser cases for each output.
+- Templates pass their existing development WebGL fixture suites: Card Booster,
+  Runaway, Skydive lifecycle and Tentax navigation/disposal. MilfMaster's Drama
+  typing regression passes development WebGL and minified-release Canvas;
+  outline capture passes development Canvas and release WebGL. Its independent
+  raster reference now uses stable font frames, retaining zero pixel tolerance.
+- Template release builds/types pass; full gameplay, live-backend and complete
+  renderer matrices are not repeated for this dependency-only adoption.
+  No SDK bump, CLI starter edit or application publication is required. CLI
+  starters already use latest. Editor is outside this adoption's final scope.
+
+## 2026-11-07 — Core 3.2.1 / UI 5.1.1 publication
+
+- Verify both exact npm versions/latest tags and the published UI Core ^3.2.1
+  peer. Core was published before UI. Downloaded SHA-512/SHA-1 integrity and
+  archive bytes match the tested preparation: all 3,295 Core and 5,720 UI files
+  are identical. The same artifacts already passed the 84 text browser cases.
+- Published UI's development range ^3.2.0 accepts Core 3.2.1 and is not a
+  consumer runtime dependency. No metadata fix or repeat UI publication is
+  needed. Refresh only the UI development installation/lock to registry Core
+  3.2.1, preserve declared ranges/transitive versions and verify frozen offline
+  installation. Published runtime/declaration output is unchanged.
+- A fresh strict-peer registry consumer installs Core 3.2.1, UI 5.1.1, Game
+  3.0.0, ui-runtime 0.12.0 and DragonBones 0.2.0 without conflicts. All resolve
+  the same Core. ESM imports confirm engineVersion 3.2.1 and native Label /
+  RichLabel object identity; all 22 API examples compile against registry types.
+- UI build, all 578 unit tests and nine Canvas/WebGL Backdrop cases pass after
+  adopting registry Core. Derive the browser version assertion from the installed
+  manifest instead of a stale 3.2.0 literal. Synchronize source publication
+  markers; immutable npm archives retain their preparation wording. No SDK
+  version or application/template dependency is changed by this verification.
+
+## 2026-11-07 — Core 3.2.1 / UI 5.1.1 preparation
+
+- Prepare patch releases for stable dynamic font-frame alignment, consistent
+  Label automatic sizing/textFit, preserved outline capture and RichLabel
+  baseline/typewriter behavior. No public property or authored data format is
+  removed. Tall fonts can measure higher or fit smaller inside fixed bounds.
+  Both source versions are release preparations; publication is pending.
+- UI requires Core ^3.2.1 for the new measurement contract. Publish Core first.
+  Preserve UI's compatible ^3.2.0 development declaration and published 3.2.0
+  lock for type compilation; behavior uses local and packed 3.2.1. Refresh that
+  registry development lock after Core publication without inventing an
+  unpublished registry resolution or committing a local package override.
+- Game/DragonBones Core ^3.0.0 and ui-runtime Core ^3.0.0 / UI ^5.0.0 peers
+  accept the patches. Their compatible development locks are optional adoption;
+  no dependent SDK is bumped. ui-document/Atlas/bitmap-font are unaffected, and
+  CLI's latest-based starters need no CLI or template change.
+- Demo/game and MilfMaster ranges accept the patches after lock/install updates.
+  Star Catcher may retain its exact Core 3.2.0, or deliberately adopt the patch.
+  Editor's exact Core 3.2.0 / UI 5.1.0 require a separate application update to
+  bundle this fix. Adopting UI 5.1.1 requires resolving Core >= 3.2.1 together.
+  Reskin has no UI dependency and remains on Core ^2.5.4; Core 3 adoption is a
+  separate migration. Application/template manifests and locks are untouched
+  by this preparation; earlier adoption changes remain separate work.
+- Synchronize package/root READMEs, context/architecture guides, agent version
+  index, runtime engineVersion and generated API references. Keep original
+  Backdrop API-introduction minima distinct from current package peer ranges.
+- Clean Core/UI builds and all 1,146 / 578 unit tests pass. Source-free packed
+  Core 3.2.1 / UI 5.1.1 pass 84 native browser cases across Chromium/WebKit,
+  Canvas/WebGL 1/2 and 1x/2x. Coverage includes 31 languages, automatic/fixed
+  frames, textFit, wrapping, Scroller edges, mixed rich runs and repeated typing.
+  Guards verify one Core instance and runtime 3.2.1. All 22 strict API examples
+  pass against built and packed declarations, with no implementation source or
+  test/font fixtures shipped in the archives.
+
+## 2026-11-07 — Examples and Templates adopt Core 3.2 / UI 5.1
+
+- Update demo, game and star-catcher plus Card Booster, MilfMaster, Runaway,
+  Skydive and Tentax to registry Core 3.2.0 and UI 5.1.0 where already used.
+  Preserve exact/caret declarations, refresh pnpm locks and current SDK docs.
+- Keep CLI 4.1.2, Game 3.0.0, document 0.14.0, DragonBones/Spine and other tool
+  versions/integrity unchanged. All eight installations pass strict peers and
+  offline frozen installation; native packages resolve one shared Core per app.
+- All eight strict development/release builds and complete declaration checks
+  pass. Existing architecture/tool checks and all 817 application tests pass.
+- Demo and game's ordinary/gallery routes pass twelve development/release
+  WebGL/Canvas startup, pixels, controls/list input and narrow-layout cases.
+  Star Catcher passes its three browser cases for each output.
+- Templates pass development WebGL browser checks: Card Booster and Runaway
+  existing suites, MilfMaster's focused Slot KUI, Skydive's focused lifecycle
+  and Tentax's existing component/navigation/disposal smoke. Template release
+  validation covers strict builds/types; their full release/Canvas browser
+  matrices are not repeated for this dependency-only adoption.
+
 ## 2026-11-07 — UI 5.1.0 publication
 
 - Verify npm UI 5.1.0 exact/latest metadata, Core ^3.2.0 peer and downloaded

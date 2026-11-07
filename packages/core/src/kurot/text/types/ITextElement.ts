@@ -22,9 +22,12 @@ export interface IWTextElement extends ITextElement {
 
 export interface ILineElement {
 	width: number;
+	/**
+	 * Dynamic row height contains run sizes and font ascent/descent; input uses its base size.
+	 */
 	height: number;
 	/**
-	 * Shared alphabetic baseline measured from the nominal line top, in logical pixels.
+	 * Shared alphabetic baseline measured from the stable line-frame top, in logical pixels.
 	 */
 	baseline: number;
 	/**

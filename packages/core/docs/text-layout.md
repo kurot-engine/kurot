@@ -40,38 +40,66 @@ the browser's grapheme implementation.
 
 ## Vertical alignment
 
+The stable dynamic font-frame contract requires Core >= 3.2.1 within 3.x.
+
 TextField and BitmapText default to middle. UI text components inherit their
 host Core default; explicit top/middle/bottom remains authoritative.
 
 | Setting | Dynamic text placement |
 | --- | --- |
-| `top` | Align the complete block's top edge to the field's top. |
-| `middle` | Align the block's midpoint to the field's midpoint. |
-| `bottom` | Align the block's bottom edge to the field's bottom. |
+| `top` | Align the first line frame's top edge to the field's top. |
+| `middle` | Align the complete line-frame block's midpoint to the field's midpoint. |
+| `bottom` | Align the last line frame's bottom edge to the field's bottom. |
 
-The dynamic block is the union of glyph ink and nominal blank rows, including
-leading/trailing blanks. Mixed-size runs, fallback fonts and combining marks
-participate. Each mode applies one translation without changing relative
-alphabetic baselines or row spacing. `multiline` controls line generation only.
-Overflowing dynamic text retains the selected alignment under viewport clipping.
-Automatic height uses nominal content height as the available field height.
+Dynamic rows use stable font metrics, independent of the glyphs in the current
+string. Each row is at least its largest run size and its maximum font ascent
+plus maximum font descent. Any remaining leading is divided equally above and
+below the font frame. Runs share an alphabetic baseline. Blank rows retain their
+applicable font frame, including leading/trailing blanks. Switching `PROMOCION`
+to `PROMOCIÓN` therefore changes the painted accents without moving the baseline.
+
+All modes translate this same block once; they never recenter the current ink.
+`multiline` controls line generation only. Overflowing dynamic text retains the
+selected alignment under viewport clipping. Automatic height uses the complete
+line-frame height. A font whose ascent/descent exceed its authored size can
+therefore measure taller than that size. Different fonts and sizes can still
+have different baselines; this is not a per-language optical-centering offset.
+
+For a row with font ascent `A`, descent `D` and height `H`, the alphabetic
+baseline is `(H + A - D) / 2` from the line-frame top. `H` is at least the
+largest authored run size and `A + D`. Current glyph ink, outlines and italic
+overhang do not enter this formula. Font-family/weight/style changes may supply
+different font frames; changing only accents or descenders in the same frame
+does not optically recenter the row.
 
 INPUT aligns stable nominal editing rows for text, caret, selection, composition
 and character hits. When those rows exceed the viewport, input stays top-aligned
 and scrolling reveals the caret. Glyph changes cannot move its editing frame.
 BitmapText aligns its bitmap-font line frame and literal glyph offsets.
 
-Core measurements, wrapping and font-fitting metrics remain nominal. Core
-outlines are render-only; UI Label reserves its own outline-safe layout inset.
+Dynamic measurement and font fitting use these same line frames. Core outlines
+are render-only; UI Label reserves its own outline-safe layout inset.
 `verticalCenter` places the whole UI box and does not select text alignment.
 Set explicit top for progressively typed dialogue or top-origin paragraphs.
+
+`scrollV` is a one-based first-visible-row index, clamped by `maxScrollV`.
+Dynamic text uses actual row heights and inter-row spacing to calculate the
+terminal range. Earlier rows start at their full row boundaries; a partial
+terminal row counts only when more than half of it is visible. This keeps a
+small body row reachable after a taller title, including when the title itself
+fits completely inside the viewport. At least one row remains addressable in
+a viewport too short to meet the half-row threshold. INPUT keeps its nominal
+editing-row range calculation.
 
 ## Baselines and cached metrics
 
 Canvas and WebGL use the same alphabetic baseline and Canvas TextMetrics in
 logical units. Rich runs share a line baseline even with different fonts/sizes.
-Visible bounds include accents, fallback glyphs and combining marks. Block
-translation, painting, link hits and capture margins share cached layout data.
+Font frames are measured with an empty string in each run's font configuration,
+so changing its letters cannot move the baseline. Actual ink bounds independently
+include accents, fallback glyphs and combining marks; render captures preserve
+overhang without using it to align or resize the line frame. Painting, link hits
+and capture margins share cached layout data.
 Changing font/content/wrapping/spacing invalidates those metrics. Actual fonts
 and browser rasterization may vary across systems.
 
@@ -85,8 +113,9 @@ width wrapping as it does during rendering.
 The result excludes height clipping and scrolling. Measurement does not replace
 rendered line caches or change width, height, content or dirty flags. It uses the
 same run styles and line spacing as rendering. For dynamic rich text, line height
-is the largest run size on that line; blank and trailing hard-separated lines
-retain the relevant run size. Input fields keep the base size contract. Unstyled blank
+contains the largest run size and font ascent/descent on that line; blank and
+trailing hard-separated lines retain the relevant font frame. Input fields keep
+the base size contract. Unstyled blank
 runs between styled runs use the base size rather than the later run's size.
 
 Assigning `text`, including the same string represented by a previous `textFlow`,
@@ -101,6 +130,15 @@ display-list caches, filter captures and object-mask buffers retain this ink.
 The margin covers stroke antialiasing and glyph overhang; it is not part of
 `width`, `height`, `textWidth`, `textHeight`, `measureText()` or hit-test bounds.
 Wrapping and horizontal/vertical alignment use the original layout dimensions.
+
+Horizontal ink bearings and right overhang are cached with each laid-out row,
+outside the public line metrics. Dynamic ink also keeps a small antialiasing
+margin for fractional advances. Italic runs reserve a font-frame-sized render
+guard because some native synthetic-italic metrics omit horizontal skew.
+These rules depend on font/ink observations, never font names or language
+offset tables. Canvas, GPU text textures, caches and filter captures share them.
+Corrections to ink retention belong in this render margin; they must not alter
+logical line frames, baselines, authored coordinates or text fitting dimensions.
 
 Explicit dimensions still constrain layout and select visible lines. Partially
 visible lines clip against the expanded ink area; fully hidden lines are not
@@ -130,6 +168,9 @@ ordinary and emergency wrapping; text/segmentation results are not cached global
 Run Core's build and unit tests. LineBreaks checks the pinned Unicode corpus;
 TextWrapping/TextGraphemes check dictionary and emergency tailoring, rich runs,
 hard separators and source offsets. TextVerticalLayout/TextMeasurement/TextStroke
-cover nominal metrics, alignment, input rows, capture ink and font invalidation.
+cover font-frame metrics, alignment, input rows, capture ink and font invalidation.
 Minified browser suites compare Canvas, WebGL 1 and WebGL 2 rendering, clips,
 link/input coordinates and outlines at different output resolutions.
+Shared fixtures cover 31 languages with licensed, test-only font subsets. UI's
+stable-text and label-outline browser suites exercise those fonts through native
+Label measurement, fitting, repeated typewriter output and Scroller clipping.

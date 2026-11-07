@@ -21,7 +21,9 @@ declare global {
 }
 
 const canvas = document.querySelector('canvas');
-if (!canvas) throw new Error('Missing text alignment canvas.');
+if (!canvas) {
+	throw new Error('Missing text alignment canvas.');
+}
 const params = new URLSearchParams(location.search);
 if (params.get('backend') === 'canvas') canvas.getContext('2d');
 const resolution = Number(params.get('resolution') ?? 1);
@@ -55,7 +57,11 @@ async function compare(clip = false): Promise<PixelComparison> {
 	const reference = document.createElement('canvas');
 	reference.width = capture.width;
 	reference.height = capture.height;
-	const context = reference.getContext('2d')!;
+	// WebKit's CPU and accelerated Canvas paths use different text antialiasing.
+	// Match the raster surface kind while keeping placement independently derived.
+	const rasterized = player.isWebGL || !!field.$displayList || !!root.$displayList
+		|| !!root.filters?.length || !!field.mask;
+	const context = reference.getContext('2d', { willReadFrequently: rasterized })!;
 	context.scale(resolution, resolution);
 	context.translate(field.x, field.y);
 	context.textBaseline = 'alphabetic';
@@ -73,29 +79,18 @@ async function compare(clip = false): Promise<PixelComparison> {
 				style?.fontFamily ?? field.fontFamily, style?.bold ?? field.bold, style?.italic ?? field.italic);
 			return { ink: context.measureText(element.text), frame: context.measureText('') };
 		});
-		const visible = metrics.map(metric => metric.ink).filter(metric => metric.actualBoundingBoxAscent + metric.actualBoundingBoxDescent > 0);
 		context.font = kurot.getFontString(field.size, field.fontFamily, field.bold, field.italic);
 		const emptyFrame = context.measureText('');
 		const fontAscent = Math.max(0, ...metrics.map(metric => metric.frame.fontBoundingBoxAscent));
 		const fontDescent = Math.max(0, ...metrics.map(metric => metric.frame.fontBoundingBoxDescent));
 		const baseline = (line.height + (metrics.length ? fontAscent : emptyFrame.fontBoundingBoxAscent)
 			- (metrics.length ? fontDescent : emptyFrame.fontBoundingBoxDescent)) / 2;
-		return { line, baseline,
-			top: visible.length ? baseline - Math.max(...visible.map(metric => metric.actualBoundingBoxAscent)) : 0,
-			bottom: visible.length ? baseline + Math.max(...visible.map(metric => metric.actualBoundingBoxDescent)) : line.height };
-	});
-	let cursor = 0;
-	const edges = measured.flatMap(row => {
-		const edge = [cursor + row.top, cursor + row.bottom];
-		cursor += row.line.height + field.lineSpacing;
-		return edge;
+		return { line, baseline };
 	});
 	const input = field.type === kurot.TextFieldType.INPUT;
-	const top = input ? 0 : Math.min(...edges);
-	const bottom = input ? nominalHeight : Math.max(...edges);
 	const factor = field.verticalAlign === 'middle' ? 0.5 : field.verticalAlign === 'bottom' ? 1 : 0;
-	const freeHeight = field.height - (bottom - top);
-	let lineTop = (input ? Math.max(0, freeHeight) : freeHeight) * factor - top;
+	const freeHeight = field.height - nominalHeight;
+	let lineTop = (input ? Math.max(0, freeHeight) : freeHeight) * factor;
 	if (input || clip) {
 		context.beginPath();
 		context.rect(0, 0, field.width, field.height);
@@ -157,7 +152,9 @@ async function compare(clip = false): Promise<PixelComparison> {
 	let maxY = -1;
 	let inkPixels = 0;
 	for (let i = 0; i < actual.length; i += 4) {
-		if (Math.abs(actual[i + 3] - expected[i + 3]) > 8) mismatches++;
+		if (Math.abs(actual[i + 3] - expected[i + 3]) > 8) {
+			mismatches++;
+		}
 		if (actual[i + 3] > 16) {
 			const y = Math.floor(i / 4 / capture.width);
 			minY = Math.min(minY, y);

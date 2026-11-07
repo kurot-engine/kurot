@@ -6,8 +6,8 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.1.0` (published on npm),
-with Core peer **^3.2.0** for native BackdropBlur support.
+This maintainer map covers `@kurot/ui@5.1.2` (published on npm),
+with Core peer **^3.2.1** for stable text frames and native BackdropBlur.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -223,8 +223,10 @@ before patching core's transform code.
 
 ## Text and font contracts
 
-Label layout reserves symmetric outline/AA insets and complete ink bounds.
-Normal measurement, wrapping and fitting share those content bounds. Empty
+Label layout reserves separate horizontal/vertical outline/AA insets around stable Core font-frame
+rows. Measurement, wrapping and fitting share these content bounds. Current
+glyph ink never changes the baseline or automatic height within a row of the
+same font; adding rows still changes the aligned block. Empty
 Label and EditableText preserve their native sizing rules. `textFit` defaults
 to `none`; `shrink` supports single/multiline text, keeps authored `size` and
 reports read-only renderedSize/textFitOverflow. `minFontSize` defaults to 12

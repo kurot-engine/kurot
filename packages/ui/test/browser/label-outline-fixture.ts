@@ -8,6 +8,8 @@ interface OutlineCase {
 	vertical: string;
 	mode: 'automatic' | 'height' | 'fixed' | 'maximum' | 'fit' | 'tail';
 	italic?: boolean;
+	fontFamily?: string;
+	size?: number;
 }
 
 declare global {
@@ -19,6 +21,7 @@ declare global {
 				size: number;
 				rows: number;
 				scroll: number;
+				height: number;
 			};
 			typewriter(): { baselines: number[]; origins: number[] };
 			webgl: boolean;
@@ -66,7 +69,9 @@ window.labelOutlines = {
 	run(options: OutlineCase) {
 		root.removeChildren();
 		const label = createLabel(options.text);
+		label.fontFamily = options.fontFamily ?? label.fontFamily;
 		label.stroke = options.stroke;
+		label.size = options.size ?? label.size;
 		label.textAlign = options.horizontal;
 		label.verticalAlign = options.vertical;
 		label.italic = options.italic ?? false;
@@ -107,16 +112,24 @@ window.labelOutlines = {
 		// Earlier rows above a scrolled viewport are deliberately clipped. Compare
 		// the visible region and all space beyond its other three boundaries.
 		const startY = (options.mode === 'tail' ? 50 : 0) * density;
+		const left = scroller.x * density;
+		const top = scroller.y * density;
+		const right = (scroller.x + scroller.width) * density;
+		const bottom = (scroller.y + scroller.height) * density;
 		for (let y = startY; y < canvas.height; y++) {
 			for (let x = 0; x < canvas.width; x++) {
 				const offset = (y * canvas.width + x) * 4;
 				if (reference[offset + 3] > 0) painted++;
-				if (
-					clipped[offset] !== reference[offset] ||
-					clipped[offset + 1] !== reference[offset + 1] ||
-					clipped[offset + 2] !== reference[offset + 2] ||
-					clipped[offset + 3] !== reference[offset + 3]
-				) {
+				const outside = x < left || y < top || x >= right || y >= bottom;
+				const delta = Math.max(
+					Math.abs(clipped[offset] - reference[offset]),
+					Math.abs(clipped[offset + 1] - reference[offset + 1]),
+					Math.abs(clipped[offset + 2] - reference[offset + 2]),
+					Math.abs(clipped[offset + 3] - reference[offset + 3]),
+				);
+				// Clip compositing can round interior AA by 2/255 in WebKit.
+				// Any ink lost beyond the viewport is still an error, at any alpha.
+				if (delta > 2 || (outside && reference[offset + 3] > clipped[offset + 3])) {
 					different++;
 				}
 			}
@@ -124,7 +137,7 @@ window.labelOutlines = {
 		const field = label.getChildAt(0);
 		if (!(field instanceof TextField)) throw new Error('Missing Label text field.');
 		if (label.textFitOverflow) throw new Error('Outline fixture must fit above the minimum size.');
-		return { different, painted, size: label.renderedSize, rows: field.numLines, scroll };
+		return { different, painted, size: label.renderedSize, rows: field.numLines, scroll, height: label.height };
 	},
 	typewriter() {
 		root.removeChildren();
@@ -148,7 +161,7 @@ window.labelOutlines = {
 				if (!(field instanceof TextField)) throw new Error('Missing typewriter text field.');
 				const line = field.getLinesArr()[0];
 				origins.push(field.y);
-				baselines.push(field.y + line.inkAscent);
+				baselines.push(field.y + line.baseline);
 			}
 		}
 		return { baselines, origins };

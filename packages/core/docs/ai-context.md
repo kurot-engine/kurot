@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.2.0` (published on npm). It provides Kurot's
+Package identity: `@kurot/core@3.2.2` (published on npm). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -54,7 +54,7 @@ src/kurot/
 │                   push/pop scene integration in player/pipes/.
 ├── text/           TextField, BitmapText/BitmapFont, StageText (DOM overlay, INPUT mode only),
 │                   HtmlTextParser, InputController, TextMeasurer, TextSegmentation,
-│                   LineBreaks, TextLineLayout, TextBlockBounds, TextVerticalLayout, WordWrap.
+│                   LineBreaks, TextLineLayout, TextVerticalLayout, WordWrap.
 ├── resource/        Resource class + `resource` singleton, ResourceLoader, analyzers/
 │                   (Image/Json/Text/Sound/Sheet/Font). Async, resource.json-driven (RES-compatible).
 ├── net/            HttpRequest, ImageLoader, resolveResourceUrl. Low-level; resource/analyzers build on these.
@@ -243,7 +243,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 | Change how instructions are built/executed | `player/webgl/WebGLRenderer.ts`, `player/InstructionSet.ts`                                                                                                                     |
 | Add a new resource type/parser             | `resource/analyzers/`, register in `Resource.ts`                                                                                                                                |
 | Debug a texture-batching issue             | `player/webgl/MultiTextureBatcher.ts`, `player/webgl/WebGLDrawCmdManager.ts`                                                                                                    |
-| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextBlockBounds.ts`, `text/TextVerticalLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                       |
+| Change text layout/wrapping                | `text/LineBreaks.ts`, `text/TextLineLayout.ts`, `text/TextVerticalLayout.ts`, `text/TextSegmentation.ts`, `text/TextMeasurer.ts`; `docs/text-layout.md`                                                       |
 | Understand dirty-flag propagation          | `display/DisplayObject.ts` (`$markDirty`, `$cacheDirtyUp`, `$renderDirtyUp`)                                                                                                    |
 | Run perf tests                             | `examples/benchmark/`, `pnpm benchmark`; automated Kurot/PixiJS/Egret comparison via `pnpm benchmark:compare`                                                                   |
 
@@ -258,17 +258,21 @@ with local index remapping (player/webgl/split-mesh.ts).
 
 ## Text alignment
 
-Dynamic top/middle/bottom use `TextBlockBounds.ts` for the same complete glyph
-block, with nominal rows for blanks. `TextVerticalLayout.ts` translates the block
-without changing relative baselines; multiline controls only line generation.
+Dynamic top/middle/bottom translate the same stable font-frame block through
+`TextVerticalLayout.ts`. TextLineLayout measures each run's full font frame with
+an empty string, uses the larger of run sizes or ascent+descent as row height,
+and shares one alphabetic baseline. Accents/descenders never recenter a row.
+Blank lines retain the applicable frame; multiline controls line generation.
 TextField/BitmapText default to middle; Label/RichLabel/EditableText/BitmapLabel
 inherit their host default. Explicit top/bottom remain effective. The standalone
 bitmap-font kernel is unchanged; BitmapText passes its own alignment into it.
-Input aligns stable nominal editing rows in all modes, clamping overflowing input
-to top for caret scrolling. TextRenderBounds uses the natural content height for
-capture padding so an overflowing viewport cannot inflate surfaces. Edge glyphs
-retain antialiasing; CanvasRenderer skips fully hidden dynamic glyph rows before
-stroke painting. Link hits share the offset. Measurements remain nominal.
+Input aligns nominal editing rows in all modes, clamping overflowing input to
+top for caret scrolling. Dynamic scroll capacity uses actual row heights.
+TextRenderBounds uses natural line frames for capture padding so an overflowing
+viewport cannot inflate surfaces. Ink overhang/outline padding remains separate
+from layout. CanvasRenderer skips fully hidden rows before stroke painting.
+Link hits share the baseline offset. Label automatic height and fitting use the
+same Core font-frame measurements; tall fonts can increase measured height.
 Read [text layout](text-layout.md#vertical-alignment).
 
 ## Line breaking
@@ -311,8 +315,8 @@ restoration and shared-schema boundaries.
 `TextField.measureText(width = NaN)` returns complete content width/height without
 changing rendered constraints, line caches, scrolling or dirty flags. NaN is
 unconstrained; finite nonnegative widths are accepted; other widths throw.
-Rich-text line height follows the largest run on that line rather than the
-base size; blank lines retain their applicable style. Assigning plain `text`
+Rich-text line height contains its largest run size and full font ascent/descent;
+blank lines retain their applicable style. Assigning plain `text`
 always clears a previous rich flow, including identical string assignments.
 An unstyled blank run uses the base size rather than borrowing a
 later styled run's size. See `test/TextMeasurement.test.ts` and `docs/text-layout.md`.

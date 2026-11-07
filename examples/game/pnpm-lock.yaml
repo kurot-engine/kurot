@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^3.2.2
+        version: 3.2.2
       '@kurot/game':
         specifier: ^3.0.0
-        version: 3.0.0(@kurot/core@3.1.0)
+        version: 3.0.0(@kurot/core@3.2.2)
       '@kurot/ui':
-        specifier: ^5.0.0
-        version: 5.0.0(@kurot/core@3.1.0)
+        specifier: ^5.1.2
+        version: 5.1.2(@kurot/core@3.2.2)
       '@kurot/ui-document':
         specifier: ^0.14.0
         version: 0.14.0
@@ -199,8 +199,8 @@ packages:
     resolution: {integrity: sha512-o+KwpdmczOMdJHN/HXUeHEcd4tvIDlLsqvgusMEhcvVw+b/wGEba0uwE5RPW//bgEshMKgQdK8bzapRVcFVD+Q==}
     hasBin: true
 
-  '@kurot/core@3.1.0':
-    resolution: {integrity: sha512-hXlAYiZ1K3WUhpvy1Ah7lvqQfyvqFfWZAMmcz/1jJh+1S26t8e3JbZ29kzm8Gd6luXJBbEmBZfynX1c8bBT7ZQ==}
+  '@kurot/core@3.2.2':
+    resolution: {integrity: sha512-JVD+IPkAmEwxPoKqXuLjd+WFKI0TTUEfWPKelPf4mtx6xWE++MMrnnhPeGtEL45FJ34gj9AP2YISmiB518vCMA==}
 
   '@kurot/game@3.0.0':
     resolution: {integrity: sha512-P3DPzTTLSWJN4aB8xHnEOY+w7iPitzE6Ik2tcresN/I0Pl7UZcSGejlXQWDglvGcF6+XkbzLh5TH+dDcGsEFCA==}
@@ -210,10 +210,10 @@ packages:
   '@kurot/ui-document@0.14.0':
     resolution: {integrity: sha512-fd7YFhikVxQ1qLgn4k7bcjh4dH4yyfyxvnY97ndSWAUvGgTP9gl4X2swIlFRXnGCXGuuriHU+GGfHN52csXFdQ==}
 
-  '@kurot/ui@5.0.0':
-    resolution: {integrity: sha512-YcX3zoeQW/SQgUfrEyax+uY+fjdrz+lZN33s+SULbb5/6Khx0jA+DK3YlFHRNG5ll+b8sHi0BFW5C1hrcJ6kaQ==}
+  '@kurot/ui@5.1.2':
+    resolution: {integrity: sha512-YXFZs2jDyEab2yaPaJf03Q3+v4JL1xIIqE42vIB8Y1fFjm6oEVDwrXwp9fR589GxQHX2utuMy9KcBjDqf+6b0A==}
     peerDependencies:
-      '@kurot/core': ^3.0.0
+      '@kurot/core': ^3.2.1
 
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
@@ -341,20 +341,20 @@ snapshots:
       postcss-value-parser: 4.2.0
       typescript: 5.9.3
 
-  '@kurot/core@3.1.0':
+  '@kurot/core@3.2.2':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/game@3.0.0(@kurot/core@3.1.0)':
+  '@kurot/game@3.0.0(@kurot/core@3.2.2)':
     dependencies:
-      '@kurot/core': 3.1.0
+      '@kurot/core': 3.2.2
 
   '@kurot/ui-document@0.14.0': {}
 
-  '@kurot/ui@5.0.0(@kurot/core@3.1.0)':
+  '@kurot/ui@5.1.2(@kurot/core@3.2.2)':
     dependencies:
-      '@kurot/core': 3.1.0
+      '@kurot/core': 3.2.2
 
   commander@13.1.0: {}
 

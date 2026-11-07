@@ -1,3 +1,4 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CanvasRenderer, Stage, TextField } from '@kurot/core';
 import type { ITextElement } from '@kurot/core';
@@ -14,7 +15,7 @@ describe('RichLabel', () => {
 	beforeEach(() => {
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
 			font: '',
-			measureText: (text: string) => ({ width: text.length * 10 }),
+			measureText: (text: string) => createTextMetrics(text.length * 10),
 		} as unknown as CanvasRenderingContext2D);
 	});
 
@@ -182,7 +183,7 @@ describe('RichLabel', () => {
 			font: '',
 			fillStyle: '',
 			textBaseline: 'alphabetic',
-			measureText: (text: string) => ({ width: text.length * 10 }),
+			measureText: (text: string) => createTextMetrics(text.length * 10),
 			fillText(this: { font: string; fillStyle: string }, text: string): void {
 				painted.push({ text, font: this.font, color: this.fillStyle });
 			},

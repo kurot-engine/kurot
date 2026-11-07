@@ -26,11 +26,12 @@ if (params.get('backend') === 'canvas') {
 	canvas.getContext('2d');
 }
 const resolution = Number(params.get('resolution') ?? 1);
+const height = Number(params.get('height') ?? 180);
 canvas.width = 320 * resolution;
-canvas.height = 180 * resolution;
+canvas.height = height * resolution;
 kurot.Capabilities._init();
 const player = new kurot.Player(canvas);
-player.updateStageSize(320, 180, 320 * resolution, 180 * resolution);
+player.updateStageSize(320, height, 320 * resolution, height * resolution);
 const root = new kurot.Sprite();
 player.stage.addChild(root);
 const field = new kurot.TextField();
@@ -57,7 +58,11 @@ function compare(clip = false): PixelComparison {
 	const reference = document.createElement('canvas');
 	reference.width = canvas!.width;
 	reference.height = canvas!.height;
-	const context = reference.getContext('2d')!;
+	// WebKit's CPU and accelerated Canvas paths use different text antialiasing.
+	// Match the raster surface kind while keeping placement independently derived.
+	const rasterized = player.isWebGL || !!field.$displayList || !!root.$displayList
+		|| !!root.filters?.length || !!field.mask;
+	const context = reference.getContext('2d', { willReadFrequently: rasterized })!;
 	context.scale(resolution, resolution);
 	context.translate(field.x, field.y);
 	if (clip) {
@@ -71,31 +76,23 @@ function compare(clip = false): PixelComparison {
 	const line = field.getLinesArr()[0];
 	let x = field.textAlign === kurot.HorizontalAlign.CENTER ? (field.width - line.width) / 2
 		: field.textAlign === kurot.HorizontalAlign.RIGHT ? field.width - line.width : 0;
-	context.font = '20px Arial';
+	context.font = kurot.getFontString(field.size, field.fontFamily, field.bold, field.italic);
 	const font = context.measureText('');
-	const baseline = (20 + font.fontBoundingBoxAscent - font.fontBoundingBoxDescent) / 2;
-	let y = baseline + (field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - 20
-		: field.verticalAlign === kurot.VerticalAlign.MIDDLE ? (field.height - 20) / 2 : 0);
-	if (field.type === kurot.TextFieldType.DYNAMIC) {
-		const ink = line.elements.map(element => context.measureText(element.text))
-			.filter(metrics => metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 0);
-		if (ink.length > 0) {
-			const ascent = Math.max(...ink.map(metrics => metrics.actualBoundingBoxAscent));
-			const descent = Math.max(...ink.map(metrics => metrics.actualBoundingBoxDescent));
-			y = field.verticalAlign === kurot.VerticalAlign.TOP ? ascent
-				: field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - descent
-					: field.height / 2 + (ascent - descent) / 2;
-		}
-	}
+	const rowHeight = field.type === kurot.TextFieldType.INPUT ? field.size
+		: Math.max(field.size, font.fontBoundingBoxAscent + font.fontBoundingBoxDescent);
+	const baseline = (rowHeight + font.fontBoundingBoxAscent - font.fontBoundingBoxDescent) / 2;
+	const y = baseline + (field.verticalAlign === kurot.VerticalAlign.BOTTOM ? field.height - rowHeight
+		: field.verticalAlign === kurot.VerticalAlign.MIDDLE ? (field.height - rowHeight) / 2 : 0);
 	for (const element of line.elements) {
 		const stroke = element.style?.stroke ?? field.stroke;
-		context.font = '20px Arial';
-		context.strokeStyle = '#ff0000';
+		context.font = kurot.getFontString(element.style?.size ?? field.size, element.style?.fontFamily ?? field.fontFamily,
+			element.style?.bold ?? field.bold, element.style?.italic ?? field.italic);
+		context.strokeStyle = '#' + (element.style?.strokeColor ?? field.strokeColor).toString(16).padStart(6, '0');
 		context.lineWidth = stroke * 2;
 		if (stroke > 0) {
 			context.strokeText(element.text, x, y);
 		}
-		context.fillStyle = '#ffffff';
+		context.fillStyle = '#' + (element.style?.textColor ?? field.textColor).toString(16).padStart(6, '0');
 		context.fillText(element.text, x, y);
 		x += element.width;
 	}

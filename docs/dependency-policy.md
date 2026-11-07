@@ -28,7 +28,7 @@ The manifests are authoritative. Current Kurot package requirements are:
 | Package     | Ordinary Kurot dependency | Kurot peers                                       | Purpose                                                         |
 | ----------- | ------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
 | core        | bitmap-font `^0.1.0`      | None                                              | Headless font parsing and layout used by native rendering.      |
-| ui          | None                      | core `^3.2.0`                                     | Components and Backdrop use the application's Core objects.     |
+| ui          | None                      | core `^3.2.1`                                     | Components and Backdrop use the application's Core objects.     |
 | game        | None                      | core `^3.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
 | dragonbones | None                      | core `^3.0.0`                                     | Animation displays and meshes use the application's Core.       |
 | ui-runtime  | None                      | core `^3.0.0`, ui `^5.0.0`, ui-document `^0.14.0` | Materializes a document into the application's Core/UI objects. |
@@ -44,9 +44,11 @@ an ordinary CLI dependency for semantic Skin-field checks. The CLI's
 esbuild, parse5 and postcss-value-parser are dependencies of the build tool,
 not game runtime dependencies.
 
-UI 5.1 imports Core 3.2's BackdropBlur and requires ^3.2.0. Both versions are
-published on npm.
-This feature does not raise the minima of unchanged Game, DragonBones or
+UI 5.1.2 requires Core ^3.2.1 for stable font-frame text layout, in addition to
+Core 3.2's BackdropBlur API. Core 3.2.2 is recommended for the accompanying
+ink-retention and mixed-size scrolling fixes; those compatible corrections do
+not raise the supported peer minimum. Publication is recorded in CHANGELOG.md.
+This requirement does not raise the minima of unchanged Game, DragonBones or
 ui-runtime. CLI/templates and application adoption are separate follow-ups.
 
 Core does not depend on UI, Game, ui-runtime, DragonBones or Atlas. UI does not

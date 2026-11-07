@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/core",
-	"version": "3.2.0",
+	"version": "3.2.2",
 	"description": "TypeScript 2D web game engine — WebGL multi-texture batching, instruction-driven rendering, display objects, text and resources",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

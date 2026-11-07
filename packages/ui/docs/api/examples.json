@@ -1,6 +1,6 @@
 {
   "package": "@kurot/ui",
-  "version": "5.1.0",
+  "version": "5.1.2",
   "examples": [
     {
       "file": "examples/37f49b480a1c.ts",

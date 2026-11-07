@@ -8,6 +8,7 @@ test.use({ headless: true, viewport: { width: 640, height: 360 } });
 
 test.beforeAll(async () => {
 	const result = await build({
+		alias: { '@kurot/core': fileURLToPath(new URL('../../../core/src/index.ts', import.meta.url)) },
 		entryPoints: [fileURLToPath(new URL('./text-label-fixture.ts', import.meta.url))],
 		bundle: true,
 		write: false,

@@ -1,3 +1,4 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Group, HorizontalLayout, Label } from '../src/index.js';
 
@@ -27,7 +28,7 @@ describe('Label fitting alignment', () => {
 	beforeEach(() => {
 		context.measureText.mockReset().mockImplementation((text: string) => {
 			const size = Number(/([\d.]+)px/.exec(context.font)?.[1] ?? 30);
-			return { width: (text.length * size) / 2 };
+			return createTextMetrics((text.length * size) / 2);
 		});
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
 			context as unknown as CanvasRenderingContext2D,
@@ -50,11 +51,11 @@ describe('Label fitting alignment', () => {
 		validate(label);
 		expect(label.renderedSize).toBe(20);
 		expect(label.lineStarts).toEqual(original);
-		expect(label.textRegion.slice(1)).toEqual([4, 112, 52]);
+		expect(label.textRegion.slice(1)).toEqual([3, 112, 54]);
 		label.textFit = 'none';
 		validate(label);
 		expect(label.lineStarts).toEqual(original);
-		expect(label.textRegion).toEqual([4, 4, 112, 52]);
+		expect(label.textRegion).toEqual([4, 3, 112, 54]);
 	});
 
 	it.each(['top', 'middle', 'bottom'])('preserves the inset content height for %s alignment', alignment => {
@@ -68,7 +69,7 @@ describe('Label fitting alignment', () => {
 		label.textFit = 'shrink';
 		validate(label);
 		expect(label.renderedSize).toBe(20);
-		expect(label.textRegion).toEqual([6, 6, 108, 48]);
+		expect(label.textRegion).toEqual([6, 4, 108, 52]);
 	});
 
 	it.each(['automatic', 'width', 'height', 'maximums'])(
@@ -95,7 +96,7 @@ describe('Label fitting alignment', () => {
 			}
 			expect([label.width, label.height, label.renderedSize]).toEqual([...original, 20]);
 			expect(label.textRegion[0]).toBe(6);
-			expect(label.textRegion[1]).toBe(6);
+			expect(label.textRegion[1]).toBe(4);
 		},
 	);
 

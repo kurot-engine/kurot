@@ -1,6 +1,6 @@
 # BackdropBlur
 
-Requires Core >= 3.2.0 within 3.x; version 3.2.0 is published on npm.
+Available in Core >= 3.2.0 within 3.x.
 For UI layout constraints, see the separate [UI 5.1 Backdrop wrapper](../../ui/docs/backdrop.md).
 
 `BackdropBlur` is a display-tree leaf that blurs pixels already drawn in the

@@ -9,6 +9,7 @@ test.use({ headless: true, viewport: { width: 640, height: 360 } });
 
 test.beforeAll(async () => {
 	const result = await build({
+		alias: { '@kurot/core': fileURLToPath(new URL('../../../core/src/index.ts', import.meta.url)) },
 		entryPoints: [fixture],
 		bundle: true,
 		write: false,
@@ -102,6 +103,13 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 			rich.multiline = false;
 			paint();
 			const singleHeight = rich.height;
+			const context = document.createElement('canvas').getContext('2d');
+			if (!context) {
+				throw new Error('Missing font-frame measurement context.');
+			}
+			context.font = `bold 18px ${rich.fontFamily}`;
+			const metrics = context.measureText('');
+			const singleFrame = Math.max(18, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent);
 			rich.textFlow = [];
 			bitmap.text = '';
 			paint();
@@ -110,6 +118,7 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				wide,
 				wrapped,
 				singleHeight,
+				singleFrame,
 				cleared: [rich.width, rich.height, bitmap.width, bitmap.height],
 			};
 		});
@@ -120,7 +129,7 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 		expect(edited.wrapped.width).toBeLessThanOrEqual(80);
 		expect(edited.wrapped.lines).toBeGreaterThan(1);
 		expect(edited.wrapped.height).toBeGreaterThan(18);
-		expect(edited.singleHeight).toBe(18);
+		expect(edited.singleHeight).toBe(edited.singleFrame);
 		expect(edited.cleared).toEqual([0, 0, 0, 0]);
 		expect(errors).toEqual([]);
 	});

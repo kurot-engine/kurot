@@ -1,3 +1,4 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CanvasRenderer, TextField } from '@kurot/core';
 import { Component, PropertyEvent, RichLabel, SetProperty, Skin } from '../src/index.js';
@@ -17,7 +18,7 @@ describe('RichLabel typography', () => {
 			font: '',
 			measureText(this: { font: string }, text: string) {
 				const size = Number(this.font.match(/([\d.]+)px/)?.[1] ?? 30);
-				return { width: (text.length * size) / 2 };
+				return createTextMetrics((text.length * size) / 2);
 			},
 		} as unknown as CanvasRenderingContext2D);
 	});

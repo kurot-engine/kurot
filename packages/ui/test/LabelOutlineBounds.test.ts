@@ -33,13 +33,7 @@ function region(label: InspectableLabel): number[] {
 
 function firstBaseline(label: InspectableLabel): number {
 	const lines = label.field.getLinesArr();
-	let top = Infinity;
-	let offset = 0;
-	for (const line of lines) {
-		top = Math.min(top, offset + line.baseline - line.inkAscent);
-		offset += line.height + label.lineSpacing;
-	}
-	return label.field.y + lines[0].baseline - top;
+	return label.field.y + lines[0].baseline;
 }
 
 describe('outlined Label layout', () => {
@@ -50,8 +44,8 @@ describe('outlined Label layout', () => {
 			const size = Number(/([\d.]+)px/.exec(context.font)?.[1] ?? 30);
 			return {
 				width: (text.length * size * widthScale) / 2,
-				fontBoundingBoxAscent: size * 0.8,
-				fontBoundingBoxDescent: size * 0.2,
+				fontBoundingBoxAscent: size * (tallInk ? 0.9 : 0.8),
+				fontBoundingBoxDescent: size * (tallInk ? 0.4 : 0.2),
 				actualBoundingBoxAscent: text ? size * (tallInk ? 0.9 : 0.7) : 0,
 				actualBoundingBoxDescent: text ? size * (tallInk ? 0.4 : text.includes('y') ? 0.2 : 0) : 0,
 			};
@@ -65,8 +59,8 @@ describe('outlined Label layout', () => {
 	it('contains outlines in automatic dimensions and removes the inset for empty or unoutlined text', () => {
 		const label = outlined();
 		validate(label);
-		expect([label.width, label.height]).toEqual([52, 32]);
-		expect(region(label)).toEqual([6, 6, 40, 20]);
+		expect([label.width, label.height]).toEqual([52, 28]);
+		expect(region(label)).toEqual([6, 4, 40, 20]);
 		label.text = '';
 		validate(label);
 		expect([label.width, label.height]).toEqual([0, 20]);
@@ -103,34 +97,34 @@ describe('outlined Label layout', () => {
 			'AB',
 			'CD',
 		]);
-		expect([label.width, label.height]).toEqual([32, 52]);
-		expect(region(label)).toEqual([6, 6, 20, 40]);
+		expect([label.width, label.height]).toEqual([32, 48]);
+		expect(region(label)).toEqual([6, 4, 20, 40]);
 		label.width = 52;
 		label.maxWidth = 100000;
 		validate(label);
-		expect(label.height).toBe(32);
+		expect(label.height).toBe(28);
 	});
 
 	it('retains explicit single-line mode and hard breaks, blank rows and line spacing in multiline mode', () => {
 		const label = outlined('A\n\nB\n');
 		label.lineSpacing = 3;
 		validate(label);
-		expect(label.height).toBe(101);
+		expect(label.height).toBe(97);
 		expect(label.field.numLines).toBe(4);
 		label.multiline = false;
 		label.width = 15;
 		validate(label);
 		expect(label.field.numLines).toBe(1);
-		expect(label.height).toBe(32);
+		expect(label.height).toBe(28);
 	});
 
-	it('includes ink taller than nominal rows and uses the same height for fitting', () => {
+	it('includes tall font frames and uses the same height for fitting', () => {
 		tallInk = true;
 		const label = outlined('字');
 		validate(label);
-		expect(label.field.textHeight).toBe(20);
-		expect(label.height).toBe(38);
-		label.height = 32;
+		expect(label.field.textHeight).toBe(26);
+		expect(label.height).toBe(34);
+		label.height = 28;
 		label.textFit = 'shrink';
 		validate(label);
 		expect(label.renderedSize).toBeCloseTo(15.3, 1);
@@ -148,23 +142,23 @@ describe('outlined Label layout', () => {
 		for (let pass = 0; pass < 8; pass++) {
 			validate(label);
 		}
-		expect([label.renderedSize, label.field.numLines, label.textFitOverflow]).toEqual([12, 2, false]);
+		expect([label.renderedSize, label.field.numLines, label.textFitOverflow]).toEqual([12.7, 2, false]);
 		context.measureText.mockClear();
 		validate(label);
 		expect(context.measureText).not.toHaveBeenCalled();
 		label.width = 112;
-		label.height = 32;
+		label.height = 28;
 		validate(label);
 		expect(label.renderedSize).toBe(20);
 		label.height = 10;
 		validate(label);
-		expect([label.renderedSize, label.textFitOverflow, label.field.height]).toEqual([12, true, 0]);
+		expect([label.renderedSize, label.textFitOverflow, label.field.height]).toEqual([12, true, 2]);
 	});
 
 	it('revalidates after a late font becomes wider and taller', () => {
 		const label = outlined();
 		label.width = 52;
-		label.height = 32;
+		label.height = 28;
 		label.textFit = 'shrink';
 		validate(label);
 		widthScale = 1.5;
@@ -191,7 +185,7 @@ describe('outlined Label layout', () => {
 				validate(label);
 				baseline ??= firstBaseline(label);
 				expect(firstBaseline(label)).toBe(baseline);
-				expect(region(label).slice(0, 2)).toEqual([6, 6]);
+				expect(region(label).slice(0, 2)).toEqual([6, 4]);
 			}
 		}
 	});
@@ -206,10 +200,10 @@ describe('outlined Label layout', () => {
 		stage.addChild(group);
 		try {
 			group.validateNow();
-			expect([group.height, label.height, label.field.numLines]).toEqual([52, 52, 2]);
+			expect([group.height, label.height, label.field.numLines]).toEqual([48, 48, 2]);
 			group.width = 52;
 			group.validateNow();
-			expect([group.height, label.height, label.field.numLines]).toEqual([32, 32, 1]);
+			expect([group.height, label.height, label.field.numLines]).toEqual([28, 28, 1]);
 			context.measureText.mockClear();
 			group.validateNow();
 			expect(context.measureText).not.toHaveBeenCalled();
@@ -229,7 +223,7 @@ describe('outlined Label layout', () => {
 		expect([label.width, label.height]).toEqual([40, 20]);
 		override.remove(host, skin);
 		validate(label);
-		expect([label.width, label.height]).toEqual([52, 32]);
+		expect([label.width, label.height]).toEqual([52, 28]);
 		const editable = new EditableText();
 		editable.text = 'ABCD';
 		editable.size = 20;

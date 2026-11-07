@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **3.2.0** (published on npm).
+for browser games. Package version: **3.2.2** (published on npm).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -17,6 +17,19 @@ and docs without requiring the engine source.
 | Resources, manifests and errors | [Resource loading](docs/resource.md) |
 | Shader and filter ownership | [Filters](docs/filters.md) |
 | Dynamic background blur and modal ordering | [BackdropBlur](docs/backdrop-blur.md) |
+
+## Stable text layout
+
+Dynamic TextField rows use font-wide ascent/descent and one alphabetic baseline.
+Accents and descenders no longer recenter an unchanged row. Automatic height
+includes the full font frame; fonts with tall metrics can therefore measure
+higher than their authored size. Glyph/outline capture bounds stay separate.
+Input editing and bitmap-font line heights keep their existing contracts.
+Render-only bounds retain negative bearings, right overhang, italic ink and
+fractional antialiasing without changing logical row frames or baselines.
+Mixed-size dynamic rows remain scrollable through the last row, including a
+small body row after a taller title; input scrolling keeps nominal editing rows.
+See [text layout](docs/text-layout.md) for wrapping, font readiness and bounds.
 
 ## Callback ownership
 
@@ -37,7 +50,7 @@ cached ancestors are rejected. Full-screen Retina effects remain expensive;
 prefer modest quality and a suitable resolution cap. See
 [the complete contract and example](docs/backdrop-blur.md).
 
-This release provides the Core node. The separate UI package has an
+The separate UI package provides an
 [UI 5.1 layout wrapper](../ui/docs/backdrop.md); XML integration is not added.
 
 ## Texture alpha testing
@@ -64,7 +77,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.2.0
+pnpm add @kurot/core@^3.2.2
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

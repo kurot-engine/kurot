@@ -239,7 +239,7 @@ export class RichLabel extends Component {
 	}
 
 	/**
-	 * Text-block alignment inherited from Core (middle on 2.5.3+, top on 2.5.2).
+	 * Stable font-frame alignment inherited from Core; defaults to middle.
 	 * Only top, middle and bottom are accepted; other values throw RangeError.
 	 */
 	public get verticalAlign(): 'top' | 'middle' | 'bottom' {

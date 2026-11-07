@@ -1,9 +1,9 @@
 # height
 
-Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 height: number;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Dynamic row height contains run sizes and font ascent/descent; input uses its base size.

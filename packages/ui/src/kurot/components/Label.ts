@@ -1,7 +1,7 @@
 import { Component } from './Component.js';
 import { TextField, TextFieldType } from '@kurot/core';
 import { fitLabelText } from '../text/fit-label-text.js';
-import { getLabelOutlinePadding, getLabelTextHeight } from '../text/label-text-bounds.js';
+import { getLabelOutlineInsets } from '../text/label-text-bounds.js';
 import type { HorizontalAlign, VerticalAlign } from '@kurot/core';
 import type { IDisplayText } from '../core/IDisplayText.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
@@ -393,8 +393,8 @@ export class Label extends Component implements IDisplayText {
 		this._applyTextFit(availableWidth, availableHeight);
 		try {
 			tf.width = this._getTextContentWidth(availableWidth);
-			const outline = getLabelOutlinePadding(tf) * 2;
-			this.setMeasuredSize(tf.textWidth + outline, getLabelTextHeight(tf) + outline);
+			const inset = getLabelOutlineInsets(tf, this.size);
+			this.setMeasuredSize(tf.textWidth + inset.x * 2, tf.textHeight + inset.y * 2);
 		} finally {
 			tf.width = oldWidth;
 		}
@@ -438,11 +438,11 @@ export class Label extends Component implements IDisplayText {
 		}
 		// Measure, wrap, fit and paint reserve the same space exactly once. Core
 		// alignment remains authored and operates inside this inset text region.
-		const padding = getLabelOutlinePadding(this._textField);
-		this._textField.x = padding;
-		this._textField.y = padding;
-		this._textField.width = Math.max(0, unscaledWidth - padding * 2);
-		this._textField.height = Math.max(0, unscaledHeight - padding * 2);
+		const inset = getLabelOutlineInsets(this._textField, this.size);
+		this._textField.x = inset.x;
+		this._textField.y = inset.y;
+		this._textField.width = Math.max(0, unscaledWidth - inset.x * 2);
+		this._textField.height = Math.max(0, unscaledHeight - inset.y * 2);
 	}
 
 	// ── Private methods ────────────────────────────────────────────────────
@@ -495,7 +495,7 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	private _getTextContentWidth(width: number): number {
-		const outline = getLabelOutlinePadding(this._textField) * 2;
+		const outline = getLabelOutlineInsets(this._textField, this.size).x * 2;
 		return Number.isFinite(width) ? Math.max(0, width - outline) : NaN;
 	}
 }

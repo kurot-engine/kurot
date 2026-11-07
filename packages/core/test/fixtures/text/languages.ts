@@ -1,0 +1,107 @@
+/**
+ * Real strings for baseline, wrapping and incremental-output regressions.
+ * Browser checks pair each script with a font that contains its glyphs.
+ */
+export const textLanguages = [
+	{ code: 'en', script: 'latin', text: 'Play the game', variants: ['PLAY', 'Play', 'playing'] },
+	{
+		code: 'es',
+		script: 'latin',
+		text: 'Promoción y giros gratis',
+		variants: ['PROMOCION', 'PROMOCIÓN', '¿Promoción?'],
+	},
+	{
+		code: 'pt',
+		script: 'latin',
+		text: 'Promoção e rodadas grátis',
+		variants: ['PROMOCAO', 'PROMOÇÃO', 'ação grátis'],
+	},
+	{
+		code: 'fr',
+		script: 'latin',
+		text: 'Récompenses déjà gagnées',
+		variants: ['RECOMPENSE', 'RÉCOMPENSE', 'déjà gagné'],
+	},
+	{ code: 'de', script: 'latin', text: 'Größere Gewinne erhalten', variants: ['GEWINNE', 'Größe', 'größere'] },
+	{
+		code: 'it',
+		script: 'latin',
+		text: 'Più possibilità di vincere',
+		variants: ['POSSIBILITA', 'POSSIBILITÀ', 'più possibilità'],
+	},
+	{ code: 'nl', script: 'latin', text: 'Ontvang je beloning', variants: ['BELONING', 'Beloning', 'één beloning'] },
+	{ code: 'pl', script: 'latin', text: 'Odbierz swoją nagrodę', variants: ['NAGRODA', 'ŁÓDŹ', 'swoją nagrodę'] },
+	{ code: 'cs', script: 'latin', text: 'Získejte další odměnu', variants: ['ODMENA', 'ODMĚNA', 'další odměnu'] },
+	{ code: 'sk', script: 'latin', text: 'Získajte ďalšiu odmenu', variants: ['ODMENA', 'ĎALŠIA', 'ďalšiu odmenu'] },
+	{
+		code: 'hu',
+		script: 'latin',
+		text: 'Gyűjtsd össze a nyereményt',
+		variants: ['NYEREMENY', 'NYEREMÉNY', 'gyűjtsd össze'],
+	},
+	{
+		code: 'ro',
+		script: 'latin',
+		text: 'Primește următoarea recompensă',
+		variants: ['RECOMPENSA', 'RECOMPENSĂ', 'primește'],
+	},
+	{ code: 'tr', script: 'latin', text: 'Ücretsiz dönüş ödülü', variants: ['ODUL', 'ÖDÜL', 'ücretsiz dönüş'] },
+	{
+		code: 'sv',
+		script: 'latin',
+		text: 'Hämta din nästa belöning',
+		variants: ['BELONING', 'BELÖNING', 'hämta nästa'],
+	},
+	{ code: 'da', script: 'latin', text: 'Få din næste belønning', variants: ['BELOENNING', 'BELØNNING', 'få næste'] },
+	{ code: 'fi', script: 'latin', text: 'Kerää seuraava palkinto', variants: ['PALKINTO', 'Kerää', 'seuraava'] },
+	{
+		code: 'vi',
+		script: 'latin',
+		text: 'Nhận phần thưởng miễn phí',
+		variants: ['PHAN THUONG', 'PHẦN THƯỞNG', 'nhận miễn phí'],
+	},
+	{ code: 'id', script: 'latin', text: 'Dapatkan hadiah berikutnya', variants: ['HADIAH', 'Hadiah', 'berikutnya'] },
+	{ code: 'ms', script: 'latin', text: 'Dapatkan ganjaran percuma', variants: ['GANJARAN', 'Ganjaran', 'percuma'] },
+	{ code: 'el', script: 'greek', text: 'Κερδίστε δωρεάν ανταμοιβές', variants: ['ΠΑΙΧΝΙΔΙ', 'ΠΑΙΧΝΊΔΙ', 'δωρεάν'] },
+	{
+		code: 'ru',
+		script: 'cyrillic',
+		text: 'Получите бесплатную награду',
+		variants: ['НАГРАДА', 'Награда', 'ещё награды'],
+	},
+	{
+		code: 'uk',
+		script: 'cyrillic',
+		text: 'Отримайте безкоштовну нагороду',
+		variants: ['НАГОРОДА', 'Нагорода', 'ще нагороди'],
+	},
+	{ code: 'ar', script: 'arabic', text: 'احصل على مكافآت مجانية', variants: ['مكافأة', 'مُكَافَأَة', 'مجانية'] },
+	{ code: 'he', script: 'hebrew', text: 'קבל פרס נוסף בחינם', variants: ['משחק', 'מִשְׂחָק', 'בחינם'] },
+	{
+		code: 'hi',
+		script: 'devanagari',
+		text: 'अगला मुफ़्त पुरस्कार प्राप्त करें',
+		variants: ['खेल', 'खेलें', 'मुफ़्त पुरस्कार'],
+	},
+	{
+		code: 'bn',
+		script: 'bengali',
+		text: 'পরবর্তী বিনামূল্যের পুরস্কার নিন',
+		variants: ['খেলা', 'খেলুন', 'পুরস্কার'],
+	},
+	{ code: 'th', script: 'thai', text: 'รับรางวัลและหมุนฟรีครั้งต่อไป', variants: ['ก', 'กิ้', 'เริ่มเกมฟรี'] },
+	{ code: 'ja', script: 'japanese', text: '次の無料ゲーム報酬を受け取る', variants: ['ケ', 'ゲ', '無料の報酬'] },
+	{ code: 'zh', script: 'simplified', text: '领取下一次免费游戏奖励', variants: ['游戏', '免费游戏', '领取奖励'] },
+	{
+		code: 'zh-Hant',
+		script: 'traditional',
+		text: '領取下一次免費遊戲獎勵',
+		variants: ['遊戲', '免費遊戲', '領取獎勵'],
+	},
+	{
+		code: 'ko',
+		script: 'korean',
+		text: '다음 무료 게임 보상을 받으세요',
+		variants: ['게임', '무료 게임', '보상 받기'],
+	},
+] as const;

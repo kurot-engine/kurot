@@ -1,5 +1,5 @@
 import { TextField } from '@kurot/core';
-import { getLabelOutlinePadding, getLabelTextHeight } from './label-text-bounds.js';
+import { getLabelOutlineInsets } from './label-text-bounds.js';
 
 interface LabelTextMetrics {
 	text: string;
@@ -37,16 +37,16 @@ export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
 	field.wordWrap = metrics.wordWrap;
 	field.lineSpacing = metrics.lineSpacing;
 	field.stroke = metrics.stroke;
-	const outline = getLabelOutlinePadding(field) * 2;
-	const width = Number.isFinite(metrics.width) ? Math.max(0, metrics.width - outline) : NaN;
+	const inset = getLabelOutlineInsets(field, metrics.size);
+	const width = Number.isFinite(metrics.width) ? Math.max(0, metrics.width - inset.x * 2) : NaN;
 	const fits = (size: number): boolean => {
 		// Core intentionally measures zero-width content as empty, not as overflow.
 		if (width === 0) return false;
 		field.size = size;
 		field.width = width;
 		return (
-			(!Number.isFinite(metrics.width) || field.textWidth + outline <= metrics.width) &&
-			(!Number.isFinite(metrics.height) || getLabelTextHeight(field) + outline <= metrics.height)
+			(!Number.isFinite(metrics.width) || field.textWidth + inset.x * 2 <= metrics.width) &&
+			(!Number.isFinite(metrics.height) || field.textHeight + inset.y * 2 <= metrics.height)
 		);
 	};
 	if (fits(metrics.size)) {

@@ -1,6 +1,6 @@
 # renderToContext
 
-Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 renderToContext(displayObject: DisplayObject, ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number, resolution: number): void;

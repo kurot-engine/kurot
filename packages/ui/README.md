@@ -1,8 +1,8 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.1.0** (published on npm).
-Requires Core **^3.2.0** for native BackdropBlur support.
+Kurot games. Package version: **5.1.2** (published on npm).
+Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
 the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
@@ -45,13 +45,29 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.1.0 @kurot/core@^3.2.0
+pnpm add @kurot/ui@^5.1.2 @kurot/core@^3.2.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
 UI inherits text defaults from the installed Core; set important alignment,
-wrapping and fitting policies explicitly. Outlined Label layout reserves its
-ink bounds; read [Label text layout](docs/label-text-layout.md) when sizing text.
+wrapping and fitting policies explicitly. Label reserves fixed outline insets
+around stable font-frame rows; read [Label text layout](docs/label-text-layout.md)
+when sizing text.
+
+## Stable Label and RichLabel layout
+
+Label automatic height and textFit use Core's full font-frame measurement.
+Accents and descenders do not move unchanged baselines; tall font metrics may
+increase automatic height or require a smaller fitted size in fixed bounds.
+RichLabel uses the same dynamic row contract for mixed textFlow fonts/sizes,
+without adopting Label's outline insets or fitting API. Set explicit top alignment
+for progressively typed paragraphs that must retain their first-line origin.
+
+Outlined Labels reserve `ceil(stroke) + 2` logical pixels above and below the
+whole block. A 29px font frame with stroke=2 measures 37px. Horizontal protection
+is separate and includes an authored-size italic guard; measurement, fitting and
+painting share those insets. Use Core 3.2.2 for the accompanying render-only ink
+and mixed-size scrolling corrections; the supported Core peer remains ^3.2.1.
 
 ## Text and styles
 
@@ -77,8 +93,8 @@ CLI 4 exports local Skin factories with
 path, then pass the factories and default mappings to UIContext. See the
 [context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
 
-Existing global applications keep their Theme/asset behavior. UI 5.1
-requires Core ^3.2.0. Dispose views and their activity before
+Existing global applications keep their Theme/asset behavior. UI 5.1.2
+requires Core ^3.2.1. Dispose views and their activity before
 the context, then release borrowed resources/fonts through their owners.
 
 ## Stage-sized UI roots

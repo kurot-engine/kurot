@@ -1,26 +1,24 @@
 import type { TextField } from './TextField.js';
-import { getTextBlockBounds } from './TextBlockBounds.js';
 import { TextFieldType } from './enums/TextFieldType.js';
 import { VerticalAlign } from './enums/VerticalAlign.js';
 
 /**
- * Aligns one complete block independently of multiline. Dynamic text uses glyph
- * bounds; input uses nominal rows and keeps overflowing editing rows top-aligned.
+ * Aligns stable line frames independently of the currently painted glyphs.
+ * Input keeps overflowing editing rows top-aligned for caret scrolling.
  */
 export function getTextVerticalOffset(
 	field: TextField,
 	height: number = !isNaN(field.$explicitHeight) ? field.$explicitHeight : field.textHeight,
 ): number {
 	const input = field.type === TextFieldType.INPUT;
-	const bounds = input ? { top: 0, bottom: field.textHeight } : getTextBlockBounds(field);
-	const remaining = height - (bounds.bottom - bounds.top);
+	const remaining = height - field.textHeight;
 	const space = input ? Math.max(0, remaining) : remaining;
 
 	if (field.verticalAlign === VerticalAlign.BOTTOM) {
-		return space - bounds.top;
+		return space;
 	}
 	if (field.verticalAlign === VerticalAlign.MIDDLE) {
-		return space / 2 - bounds.top;
+		return space / 2;
 	}
-	return 0 - bounds.top;
+	return 0;
 }

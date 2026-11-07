@@ -194,8 +194,8 @@ export class TextField extends DisplayObject {
 	}
 
 	/**
-	 * Defaults to middle. All modes align the complete glyph block for dynamic text
-	 * and stable editing rows for input, independently of multiline.
+	 * Defaults to middle. Dynamic text aligns stable font-frame rows, independently
+	 * of accents/descenders in the current string. Input aligns nominal editing rows.
 	 */
 	public get verticalAlign(): VerticalAlign {
 		return this._verticalAlign;
@@ -583,6 +583,7 @@ export class TextField extends DisplayObject {
 	}
 	/**
 	 * Laid-out content height in logical units, including inter-row spacing.
+	 * Dynamic rows contain their largest run size and full font ascent/descent.
 	 * Single-line INPUT reports its nominal font size. This differs from an explicit
 	 * viewport height and from painted ink/outline bounds.
 	 */
@@ -706,7 +707,8 @@ export class TextField extends DisplayObject {
 	 * field's viewport, scrolling or line caches. width defaults to NaN (unconstrained).
 	 * Finite non-negative widths constrain wrapping according to multiline/wordWrap.
 	 * Throws RangeError for a negative or non-finite width other than NaN.
-	 * Returns nominal text layout dimensions, including line spacing and rich styles.
+	 * Returns font-frame layout dimensions, including line spacing and rich styles.
+	 * Input retains nominal editing-row heights. Glyph ink and outlines are separate.
 	 */
 	public measureText(width: number = NaN): { width: number; height: number } {
 		if (!Number.isNaN(width) && (!Number.isFinite(width) || width < 0)) {
@@ -999,13 +1001,38 @@ export class TextField extends DisplayObject {
 	}
 
 	private getScrollNum(): number {
-		if (!this.multiline) return 1;
-		if (isNaN(this.$explicitHeight)) return this._numLines;
+		if (!this.multiline) {
+			return 1;
+		}
+		if (isNaN(this.$explicitHeight)) {
+			return this._numLines;
+		}
+		if (this._type !== TextFieldType.INPUT) {
+			// Scrolling starts at a row boundary. Earlier rows and gaps precede
+			// the terminal row; only that terminal row may count as a partial row.
+			const lines = this._linesArr ?? [];
+			const lastHeight = lines[lines.length - 1]?.height ?? 0;
+			let lastLineTop = 0;
+			let count = 1;
+			for (let index = lines.length - 2; index >= 0; index--) {
+				lastLineTop += lines[index].height + this._lineSpacing;
+				const visibleHeight = Math.min(this.$explicitHeight, lastLineTop + lastHeight) - Math.max(0, lastLineTop);
+				if (lastHeight > 0 ? visibleHeight <= lastHeight / 2 : lastLineTop > this.$explicitHeight) {
+					break;
+				}
+				count++;
+			}
+			return count;
+		}
 		const lineH = this._fontSize + this._lineSpacing;
-		if (lineH <= 0) return this._numLines;
+		if (lineH <= 0) {
+			return this._numLines;
+		}
 		let scrollNum = Math.floor(this.$explicitHeight / lineH);
 		const leftH = this.$explicitHeight - lineH * scrollNum;
-		if (leftH > this._fontSize / 2) scrollNum++;
+		if (leftH > this._fontSize / 2) {
+			scrollNum++;
+		}
 		return Math.max(1, scrollNum);
 	}
 

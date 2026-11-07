@@ -1,11 +1,12 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Stage } from '@kurot/core';
 import { Group, Label } from '../src/index.js';
 
 const metrics = {
 	font: '',
-	measureText: vi.fn(function (this: { font: string }, text: string): { width: number } {
-		return { width: (text.length * Number(/([\d.]+)px/.exec(this.font)?.[1] ?? 30)) / 2 };
+	measureText: vi.fn(function (this: { font: string }, text: string): TextMetrics {
+		return createTextMetrics((text.length * Number(/([\d.]+)px/.exec(this.font)?.[1] ?? 30)) / 2);
 	}),
 };
 

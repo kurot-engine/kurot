@@ -1,3 +1,4 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Stage } from '@kurot/core';
 import { Button, EditableText, Group, Label, SetProperty, Skin } from '../src/index.js';
@@ -39,7 +40,7 @@ describe('Label text layout and font fitting', () => {
 			const bold = metrics.font.includes('bold') ? 1.1 : 1;
 			const italic = metrics.font.includes('italic') ? 1.1 : 1;
 			const family = metrics.font.includes('Wide') ? 1.5 : 1;
-			return { width: ((text.length * size) / 2) * bold * italic * family * fontScale };
+			return createTextMetrics(((text.length * size) / 2) * bold * italic * family * fontScale);
 		});
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
 			metrics as unknown as CanvasRenderingContext2D,
@@ -114,7 +115,7 @@ describe('Label text layout and font fitting', () => {
 		label.height = 30;
 		label.stroke = 2;
 		validate(label);
-		expect(label.renderedSize).toBeCloseTo(18, 0);
+		expect(label.renderedSize).toBeCloseTo(22, 0);
 		label.height = 40;
 		label.width = 20;
 		validate(label);

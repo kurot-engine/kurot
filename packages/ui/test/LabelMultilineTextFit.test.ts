@@ -1,3 +1,4 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Stage } from '@kurot/core';
 import { Group, Label } from '../src/index.js';
@@ -37,7 +38,7 @@ describe('multiline Label font fitting', () => {
 		fontScale = 1;
 		context.measureText.mockReset().mockImplementation((text: string) => {
 			const size = Number(/([\d.]+)px/.exec(context.font)?.[1] ?? 30);
-			return { width: (text.length * size * fontScale) / 2 };
+			return createTextMetrics((text.length * size * fontScale) / 2);
 		});
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
 			context as unknown as CanvasRenderingContext2D,
@@ -135,19 +136,20 @@ describe('multiline Label font fitting', () => {
 		for (let pass = 0; pass < 8; pass++) {
 			validate(label);
 		}
-		expect(label.renderedSize).toBeCloseTo(12, 0);
-		expect(label.contentBounds.height + 12).toBeLessThanOrEqual(36);
+		expect(label.renderedSize).toBeGreaterThanOrEqual(12.7);
+		expect(label.renderedSize).toBeLessThanOrEqual(12.8);
+		expect(label.contentBounds.height + 8).toBeLessThanOrEqual(36);
 		expect(label.contentBounds.width + 12).toBeLessThanOrEqual(44);
-		expect(label.textRegion).toEqual([6, 6, label.width - 12, label.height - 12]);
-		expect(label.width).toBeCloseTo(42, 0);
-		expect(label.height).toBeCloseTo(36, 0);
+		expect(label.textRegion).toEqual([6, 4, label.width - 12, label.height - 8]);
+		expect(label.width).toBeCloseTo(44, 0);
+		expect(label.height).toBe(34);
 		expect(label.textFitOverflow).toBe(false);
 		context.measureText.mockClear();
 		validate(label);
 		expect(context.measureText).not.toHaveBeenCalled();
 		label.textFit = 'none';
 		validate(label);
-		expect(label.textRegion.slice(0, 2)).toEqual([6, 6]);
+		expect(label.textRegion.slice(0, 2)).toEqual([6, 4]);
 	});
 
 	it.each(['Доказуемая честность', '自动提现设置', '👩‍💻👩‍💻👩‍💻'])(

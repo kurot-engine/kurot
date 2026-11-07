@@ -78,10 +78,10 @@ window.multilineFit = {
 				if (bounds === 'width') {
 					caption.width = 90;
 				} else if (bounds === 'height') {
-					caption.height = 22;
+					caption.height = 26;
 				} else {
 					caption.maxWidth = 90;
-					caption.maxHeight = 22;
+					caption.maxHeight = 26;
 				}
 				root.addChild(caption);
 				alignmentLabels.push(caption);

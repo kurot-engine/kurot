@@ -4,6 +4,78 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.2.2 — 2026-11-08
+
+Published; exact version and npm latest verified on 2026-11-08. Registry archive
+integrity is verified during consumer installation. Public signatures and stable
+font-frame layout remain unchanged. Runtime engineVersion is 3.2.2.
+
+### Fixed
+
+- Keep the terminal dynamic-text row reachable with mixed font sizes and
+  spacing. Derive the row-scroll limit from the terminal row's visible portion
+  at candidate row starts, retaining the more-than-half-row policy. Cover a
+  fully fitting 32px title followed by 16px body text, not only oversized rows.
+  Nominal input editing rows retain their existing range calculation.
+- Preserve negative horizontal bearings, right overhang and fractional-advance
+  antialiasing in dynamic text. Cache ink observations with laid-out rows without
+  adding public layout fields or changing advances, line heights or baselines.
+- Protect synthetic italic ink when native metrics omit its skew, using a
+  font-frame-sized render guard shared by Canvas/GPU textures, caches and filter
+  captures. Retain exact input/explicit mask viewports. No font-name or language
+  special cases are introduced.
+
+Earlier ink-retention validation: Core build and all 1,149 unit tests passed.
+All 24 targeted browser cases passed with Chromium/WebKit, Canvas/WebGL 1/2
+and 1x/2x rendering. Native
+drawing comparisons cover 12 test fonts, their actual scripts and fallback
+glyphs, 12–96px sizes, plain/italic text and outlines; Canvas additionally
+compares fractional outlines, while UI tests check fractional GPU clipping.
+The existing cache/filter/mask/input and layout-stability checks also pass.
+That verification did not publish a package or application.
+
+Scroll-range validation: the fitting-title, row-gap and exact-half-row cases
+fail before the correction and pass afterward. All 24 new unit cases pass,
+including ordinary uniform rows, input, resizing and overlapping rows. Core
+build, strict fixture compilation, all 1,173 Core and 586 UI unit tests pass.
+Twelve Chromium/WebKit browser cases cover Canvas/WebGL 1/2 at physical 1x/2x;
+the scrolled body matches standalone body pixels, with normal title/body sizes,
+row spacing and the oversized-title boundary.
+
+Release verification — 2026-11-08: build and all 1,173 Core unit tests pass.
+Generated API references match 3.2.2 with no missing symbols or members;
+all 22 shared API examples compile against built and source-free packed
+declarations. Packed metadata and documentation versions agree.
+
+## 3.2.1 — 2026-11-07
+
+Published; exact version and npm latest verified on 2026-11-07. Downloaded
+archive SHA-512/SHA-1 integrity passes; all 3,295 files and the archive bytes
+match the tested release preparation. Repository publication markers are updated
+after verification; immutable npm archives retain their original preparation wording.
+
+### Fixed
+
+- Align dynamic text with stable font ascent/descent and shared alphabetic
+  baselines instead of recentering each string's ink. Accents and descenders
+  no longer shift unchanged rows. Retain nominal input editing geometry.
+- Measure dynamic row height from font frames as well as authored run sizes;
+  preserve blank rows, rich runs, rendering overhang and actual-height scrolling.
+- Add 31-language baseline/typewriter regressions and licensed font fixtures;
+  update native Canvas/WebGL alignment and outline pixel comparisons.
+
+### Layout impact
+
+- The authored font size and all public properties remain intact. Natural
+  height now includes the font's full ascent/descent; fonts with tall metrics
+  can increase automatic height or shrink more inside fixed textFit bounds.
+  INPUT editing rows and bitmap-font line heights retain their contracts.
+
+Validation: clean build, 1,146 unit tests and 24 source-free packed browser cases
+pass. Browser checks use Chromium/WebKit on macOS, Canvas/WebGL 1/2 and physical
+1x/2x targets. Packed declarations pass all 22 shared API examples; archives
+exclude implementation source and test assets. Runtime engineVersion is 3.2.1.
+
 ## 3.2.0 — 2026-11-07
 
 Published; exact version and npm latest verified on 2026-11-07. Downloaded

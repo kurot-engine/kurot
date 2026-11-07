@@ -1,11 +1,11 @@
 # verticalAlign
 
-Package: `@kurot/ui@5.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.2`. Generated from public declarations and JSDoc.
 
 ```ts
 get verticalAlign(): "top" | "middle" | "bottom";
 set verticalAlign(value: "top" | "middle" | "bottom");
 ```
 
-Text-block alignment inherited from Core (middle on 2.5.3+, top on 2.5.2).
+Stable font-frame alignment inherited from Core; defaults to middle.
 Only top, middle and bottom are accepted; other values throw RangeError.

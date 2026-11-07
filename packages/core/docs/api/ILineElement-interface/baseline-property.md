@@ -1,9 +1,9 @@
 # baseline
 
-Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 baseline: number;
 ```
 
-Shared alphabetic baseline measured from the nominal line top, in logical pixels.
+Shared alphabetic baseline measured from the stable line-frame top, in logical pixels.

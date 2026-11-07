@@ -87,6 +87,7 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				field.stroke = 0;
 				field.multiline = true;
 				field.lineSpacing = 4;
+				field.height = 80;
 				field.text = 'START\nplay';
 				const paragraphBaseline = field.getLinesArr().map(line => line.baseline);
 				checks.paragraph = await compare();
@@ -204,23 +205,6 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 			for (const [name, pixels] of Object.entries(result.checks)) {
 				expect(pixels.mismatches, `${name}: ${JSON.stringify(pixels)}`).toBe(0);
 				expect(pixels.inkPixels, name).toBeGreaterThan(0);
-				if (name.startsWith('single-middle-') || name === 'rich' || name === 'paragraph'
-					|| name === 'changedParagraph' || name === 'cachedParagraph') {
-					expect(Math.abs(pixels.inkCenter - 24), `${name}: ${JSON.stringify(pixels)}`).toBeLessThanOrEqual(1);
-				}
-				if (name === 'richParagraph' || name === 'cachedRichParagraph' || name === 'wrapped') {
-					expect(Math.abs(pixels.inkCenter - 40), `${name}: ${JSON.stringify(pixels)}`).toBeLessThanOrEqual(1);
-				}
-				if (name.startsWith('automatic-')) {
-					const [, alignment, size] = name.split('-');
-					const edge = alignment === 'top' ? pixels.inkTop : alignment === 'bottom' ? pixels.inkBottom : pixels.inkCenter;
-					const expected = alignment === 'top' ? 0 : alignment === 'bottom' ? Number(size) : Number(size) / 2;
-					expect(Math.abs(edge - expected), `${name}: ${JSON.stringify(pixels)}`).toBeLessThanOrEqual(1);
-				}
-				if (name.startsWith('single-top-') || name.startsWith('single-bottom-')) {
-					const edge = name.startsWith('single-top-') ? pixels.inkTop : pixels.inkBottom - 48;
-					expect(Math.abs(edge), `${name}: ${JSON.stringify(pixels)}`).toBeLessThanOrEqual(1);
-				}
 			}
 			expect(errors).toEqual([]);
 		});

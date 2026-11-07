@@ -1,6 +1,7 @@
 import { getWordLineBreaks } from './LineBreaks.js';
 import { getFontString, measureTextMetrics } from './TextMeasurer.js';
 import { getGraphemeEndPositions } from './TextSegmentation.js';
+import { setLineInkBounds } from './TextInkBounds.js';
 import type { ILineElement, ITextElement, ITextStyle, IWTextElement } from './types/ITextElement.js';
 
 export interface TextLineLayoutOptions {
@@ -170,6 +171,9 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 		let fontDescent = 0;
 		let inkAscent = -Infinity;
 		let inkDescent = -Infinity;
+		let inkLeft = 0;
+		let inkRight = 0;
+		let italicMargin = 0;
 		while (spanIndex < spans.length && spans[spanIndex].end <= start) {
 			spanIndex++;
 		}
@@ -188,9 +192,20 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 				style?.bold ?? options.bold,
 				style?.italic ?? options.italic,
 			);
+			if (Number.isFinite(metrics.actualBoundingBoxLeft)) {
+				inkLeft = Math.max(inkLeft, metrics.actualBoundingBoxLeft - width);
+			}
+			if (Number.isFinite(metrics.actualBoundingBoxRight)) {
+				inkRight = Math.max(inkRight, width + metrics.actualBoundingBoxRight);
+			}
 			lineElements.push({ text: content, width: metrics.width, style });
 			width += metrics.width;
 			const frame = getFontFrame(options.isInput ? undefined : style);
+			if (style?.italic ?? options.italic) {
+				// Some WebKit synthetic-italic metrics omit the skewed horizontal ink.
+				// A font-frame-sized render guard covers this without changing layout.
+				italicMargin = Math.max(italicMargin, size, frame.fontBoundingBoxAscent + frame.fontBoundingBoxDescent);
+			}
 			fontAscent = Math.max(fontAscent, frame.fontBoundingBoxAscent);
 			fontDescent = Math.max(fontDescent, frame.fontBoundingBoxDescent);
 			if (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent > 0) {
@@ -213,12 +228,19 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 			fontAscent = metrics.fontBoundingBoxAscent;
 			fontDescent = metrics.fontBoundingBoxDescent;
 		}
+		// A dynamic row contains its font frame even when the current word has no
+		// accents or descenders. Input keeps its established editing-row height.
+		if (!options.isInput) {
+			height = Math.max(height, fontAscent + fontDescent);
+		}
 		const baseline = (height + fontAscent - fontDescent) / 2;
-		return {
+		const line: ILineElement = {
 			width, height, baseline,
 			inkAscent: inkAscent === -Infinity ? 0 : inkAscent,
 			inkDescent: inkDescent === -Infinity ? 0 : inkDescent,
 			charNum: end - start, hasNextLine: false, elements: lineElements,
 		};
+		setLineInkBounds(line, { left: inkLeft, right: inkRight, italicMargin });
+		return line;
 	}
 }

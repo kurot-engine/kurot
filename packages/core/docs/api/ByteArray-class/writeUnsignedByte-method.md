@@ -1,6 +1,6 @@
 # writeUnsignedByte
 
-Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 writeUnsignedByte(value: number): void;

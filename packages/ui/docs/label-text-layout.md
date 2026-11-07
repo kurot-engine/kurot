@@ -3,28 +3,44 @@
 `TextFitMode` is `none | shrink`. Native Label owns normal layout, single- and
 multiline fitting, outline-safe bounds and derived rendering observations.
 KUI compilation and semantic materialization pass the authored policy to that
-same native component. UI 5's Core peer requirement is ^3.0.0.
+same native component. UI 5.1.2 requires Core ^3.2.1 for the stable dynamic
+font-frame contract below. Core 3.2.2 is recommended for render-only ink
+protection and mixed-size row scrolling; it does not raise that peer minimum.
 
 ## Outline-safe layout
 
-Nonempty dynamic Labels with a positive finite `stroke` reserve
-`ceil(2 * stroke) + 2` logical pixels on each side. This conservative allowance
-contains the stroke and antialiasing inside the Label's external layout box.
-The TextField is inset by that fixed amount; it does not change with a typewriter
-prefix or fitting candidate. Scroller clips remain exact, with no new setting.
+Nonempty dynamic Labels with a positive finite `stroke` reserve separate
+horizontal and vertical insets in logical pixels:
 
-Automatic width includes both insets. Automatic height contains nominal rows
-(including blank rows and line spacing), the complete glyph block if taller,
-and both insets. Fixed/parent/max dimensions remain the outer box; line generation
+- Top/bottom: `ceil(stroke) + 2`. The font frame already contains the glyph body;
+  reserve the outline radius plus rounding and antialiasing space rather than
+  doubling the radius on each side.
+- Left/right: `ceil(2 * stroke) + 2`, with an additional `ceil(size / 4)` for
+  italic text, whose ink can extend beyond its horizontal advance. The size in
+  this guard is authored `size`, so fitting cannot move the content origin.
+
+Both insets stay independent of the current string and fitting candidate.
+Measurement, wrapping, fitting and painting use the same corresponding axes.
+Scroller clips remain exact, with no new setting. For a 24px font whose natural
+frame is 29px, a 2px outline adds 4px above and below: automatic height is 37px.
+
+Automatic width includes both horizontal insets. Automatic height contains stable
+font-frame rows (including blank rows and line spacing) and both vertical insets.
+A row contains its font ascent/descent even when the current string has no accents
+or descenders.
+Fixed/parent/max dimensions remain the outer box; line generation
 and fitting use its inner area. Minimum-size overflow still reports failure
 and permits clipping; a box too small for its inset does not become automatic.
 Fitting toggles at unchanged drawing size retain identical geometry and pixels.
 Unoutlined or empty Labels add no inset; empty-row measurements stay native.
-EditableText, RichLabel and BitmapLabel do not adopt this layout change.
+EditableText, RichLabel and BitmapLabel do not adopt Label's outline insets.
+RichLabel does use Core's dynamic font-frame rows; EditableText retains nominal
+input rows, and BitmapLabel retains the bitmap font's line-height contract.
 
 Keep explicit `verticalAlign="top"` for progressively typed dialogue. The origin
-stays fixed after clearing/retyping; middle alignment intentionally follows its
-changing glyph block and is not appropriate for that effect. Font readiness still
+stays fixed after clearing/retyping. Middle and bottom also retain their baseline
+when only accents or descenders change, but adding rows shifts their whole block
+to maintain the selected alignment. Font readiness still
 uses `invalidateSize()`. Outline/state changes invalidate the normal UI layout.
 
 ## Lines and bounds
@@ -61,9 +77,12 @@ intended to start at the top of a taller box. `verticalCenter` positions the
 Label box in its parent; it does not align text inside the Label.
 
 The authoring catalog reports middle without inserting omitted properties.
-Dynamic top/middle/bottom align the complete glyph block in either line mode;
-blank rows retain their height. Input uses stable editing-row boundaries. Core
-measurements stay nominal while Label reserves its outline-safe layout area.
+Dynamic top/middle/bottom align the same stable font-frame block in either line
+mode; blank rows retain their height. Input uses stable editing-row boundaries.
+Label measurement and textFit use Core's full line-frame height plus the fixed
+outline allowance. Fonts with tall metrics can increase automatic height or
+require a smaller fitted size in an unchanged fixed box. Glyph-specific ink
+bounds protect drawing captures and do not recenter the text.
 See [Core text layout](../../core/docs/text-layout.md).
 
 ## Shrink to fit
@@ -171,5 +190,19 @@ Browser suites include exact clipped/unclipped pixel comparisons in real
 Scroller viewports, across all nine alignments, italic text, thick outlines,
 automatic/fixed/maximum/fitted bounds, and Japanese scroll tails. Minified Canvas,
 WebGL 1 and WebGL 2 tests use physical 1x/2x targets. Unit tests additionally
-cover glyphs taller than nominal rows, state outline restoration, late fonts,
+cover font frames taller than authored sizes, state outline restoration, late fonts,
 empty text, EditableText isolation and repeated top-aligned typewriter prefixes.
+
+Stable-text browser fixtures additionally load licensed font subsets for 31
+languages: Latin variants, Greek, Cyrillic, Arabic, Hebrew, Hindi, Bengali, Thai,
+Japanese, simplified/traditional Chinese and Korean. They check accents without
+baseline movement, automatic/fixed dimensions, wrapping, clear/retype cycles,
+fit/resize recovery and unclipped marks/outlines inside Scrollers at 1x/2x.
+
+Text-components browser checks compare Label and RichLabel pixels in identical
+content regions, accounting for Label's outline insets. RichLabel mixed-font,
+size, color, bold/italic and outline runs are compared against a native TextField
+with the same authored flow, including automatic/fixed height and wrapping.
+Repeated clear/retype cycles render every prefix and retain the first baseline
+for all 31 languages. RichLabel retains its own typography/measurement contract;
+Label alone provides textFit and outline-safe outer insets.

@@ -1,13 +1,14 @@
+import { createTextMetrics } from './helpers/text-metrics.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Stage } from '@kurot/core';
 import { Button, Label, SetProperty, Skin, State } from '../src/index.js';
 
 const metrics = {
 	font: '',
-	measureText: vi.fn(function (this: { font: string }, text: string): { width: number } {
+	measureText: vi.fn(function (this: { font: string }, text: string): TextMetrics {
 		const size = Number(/([\d.]+)px/.exec(this.font)?.[1] ?? 30);
 		const weight = this.font.includes('bold') ? 1.25 : 1;
-		return { width: (text.length * size * weight) / 2 };
+		return createTextMetrics((text.length * size * weight) / 2);
 	}),
 };
 

@@ -13,7 +13,7 @@
 		"check": "pnpm typecheck && pnpm test && pnpm build && pnpm release && pnpm test:browser"
 	},
 	"dependencies": {
-		"@kurot/core": "3.1.0"
+		"@kurot/core": "3.2.2"
 	},
 	"devDependencies": {
 		"@kurot/cli": "4.1.2",

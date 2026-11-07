@@ -1,6 +1,6 @@
 # BlendMode
 
-Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 type BlendMode = typeof BlendMode[keyof typeof BlendMode];

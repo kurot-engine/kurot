@@ -6,6 +6,7 @@ let browserBundle: string;
 test.use({ headless: true, viewport: { width: 320, height: 160 } });
 test.beforeAll(async () => {
 	const result = await build({
+		alias: { '@kurot/core': fileURLToPath(new URL('../../../core/src/index.ts', import.meta.url)) },
 		entryPoints: [fileURLToPath(new URL('./multiline-fit-fixture.ts', import.meta.url))],
 		bundle: true,
 		write: false,
