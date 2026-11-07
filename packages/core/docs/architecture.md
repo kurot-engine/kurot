@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 3.1.0 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 3.2.0 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -17,6 +17,12 @@ state and event propagation. WebGL rendering uses a flat
 Core uses `@kurot/bitmap-font ^0.1.0` as the headless font-data
 and layout kernel. Core manages font resources, image-page ownership and glyph
 drawing in both backends. UI components belong to the UI package.
+
+`BackdropBlur` is a native display-tree leaf. Its instruction samples previously
+drawn pixels in the active compositing layer. Backend implementations own pooled
+GPU targets or reusable Canvas working surfaces; the node owns only dimensions,
+blur parameters and invalidation. Later foreground stays sharp. See
+[sampling, isolation and lifecycle](backdrop-blur.md).
 
 `Texture.hitTestAlpha()` samples original source pixels through the same lazy,
 shared 3×3 Canvas buffer used by Bitmap/Graphics pixel hits. It maps upright

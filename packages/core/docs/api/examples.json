@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "examples": [
     {
       "file": "examples/c54bc3fde14d.ts",
@@ -9,6 +9,10 @@
     {
       "file": "examples/db6f82242b56.ts",
       "owner": "Timer.stop"
+    },
+    {
+      "file": "examples/2686963017bf.ts",
+      "owner": "BackdropBlur"
     },
     {
       "file": "examples/3e3cd12d6e21.ts",

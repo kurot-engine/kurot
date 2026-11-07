@@ -1,6 +1,6 @@
 # RenderObjectType
 
-Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 enum RenderObjectType
@@ -13,6 +13,7 @@ visibility and compositing classification.
 
 | Member | Scope | Reference |
 | --- | --- | --- |
+| `BACKDROP_BLUR` | public | [open](RenderObjectType-enum/BACKDROP_BLUR-enummember.md) |
 | `BITMAP` | public | [open](RenderObjectType-enum/BITMAP-enummember.md) |
 | `BITMAP_TEXT` | public | [open](RenderObjectType-enum/BITMAP_TEXT-enummember.md) |
 | `MESH` | public | [open](RenderObjectType-enum/MESH-enummember.md) |

@@ -6,7 +6,8 @@ For local Skin/asset/font resolution or automatic radio-group isolation, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.0.0` (published on npm), with Core peer **^3.0.0**.
+This maintainer map covers `@kurot/ui@5.1.0` (published on npm),
+with Core peer **^3.2.0** for native BackdropBlur support.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
 
@@ -57,6 +58,10 @@ src/kurot/
 - UILayer follows logical Stage dimensions on attachment and RESIZE. Its callback
   retains the layer instance, and cleanup uses the subscribed Stage because
   REMOVED_FROM_STAGE arrives after the layer's stage reference has been cleared.
+- Backdrop is a code-created Component with one owned Core BackdropBlur, no
+  intrinsic size, no default Skin and pass-through input. Normal parent layout
+  determines its region; four zero edges fill a UILayer/BasicLayout. It adds no
+  resize/ticker listener. See [backdrop](backdrop.md).
 
 - `flipX`/`flipY` are native Core booleans inherited by every UI display
   component. Group and Component provide their validated, unscaled actual frame
@@ -169,7 +174,7 @@ Flat re-export of 7 barrels, in this order: `core`, `layouts`, `components`,
 
 - **core**: `IUIComponent`, `IUIOwner`, `UIState`, `isUIComponent`, `Validator`/`validator`, `Theme`/`getTheme`/`setTheme`, `UIContext`/`UIContextOptions`/`SkinFactory`/`getUIContext`, `IViewport`, `IAssetAdapter`/`DefaultAssetAdapter`, `setAssetAdapter`/`getAssetAdapter`, `IThemeAdapter`/`DefaultThemeAdapter`, `Direction`, `ScrollPolicy`, `IDisplayText`, `IItemRenderer`.
 - **layouts**: `ILayoutTarget`, `LayoutBase`, `BasicLayout`, `LinearLayoutBase`, `VerticalLayout`, `HorizontalLayout`, `TileLayout`, `ColumnAlign`, `RowAlign`, `JustifyAlign`, `TileOrientation`.
-- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `RichLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
+- **components**: `Group`/`GroupEvents`, `Component`/`ComponentEvents`, `Skin`/`SkinEvents`; `Button`, `Label`/`TextFitMode` (type), `BitmapLabel`, `RichLabel`, `CheckBox`, `RadioButton`/`RadioButtonGroup`, `ToggleButton`, `ToggleSwitch`, `ProgressBar`, `HSlider`/`VSlider`/`SliderBase`, `Rect`, `Backdrop`, `Image`, `EditableText`, `TextInput`, `Panel`, `ViewStack`, `Scroller`, `TouchScroll`, `UILayer`, `DataGroup`, `List`/`ListBase`, `TabBar`, `ComboBox`, `ItemRenderer`, `HScrollBar`/`VScrollBar`/`ScrollBarBase`, `Animation`, `Range`.
 - **events**: `UIEvent`, `ItemTapEvent`, `CollectionEvent`/`CollectionEventKind`, `PropertyEvent`, `ScrollerThrowEvent`.
 - **states**: `State`, `IOverride`, `SetProperty`, `SetStateProperty`, `AddItems`.
 - **collections**: `ICollection`, `ArrayCollection`.

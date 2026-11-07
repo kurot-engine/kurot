@@ -23,6 +23,9 @@ import { getTextVerticalOffset } from '../../text/TextVerticalLayout.js';
 import { CanvasBuffer, hitTestBuffer } from './CanvasBuffer.js';
 import { getRenderContentBounds } from '../render-bounds.js';
 import { drawUnscaledBitmapFill } from '../bitmap-fill.js';
+import type { BackdropBlur } from '../../display/BackdropBlur.js';
+import { assertBackdropCache, containsBackdrop } from '../backdrop.js';
+import { CanvasBackdropSystem } from './CanvasBackdropSystem.js';
 
 const CAPS_MAP: Record<string, CanvasLineCap> = { none: 'butt', square: 'square', round: 'round' };
 const CANVAS_BLUR_RADIUS_SCALE = 0.25;
@@ -56,8 +59,16 @@ export class CanvasRenderer {
 	private _globalTint = 0xffffff;
 	private readonly _fontGlyphBitmaps = new WeakMap<Texture, Bitmap>();
 	private _resolution = 1;
+	private readonly _backdrop = new CanvasBackdropSystem();
 
 	// ── Public methods ────────────────────────────────────────────────────────
+
+	/**
+	 * Releases reusable backdrop working surfaces when this renderer is destroyed.
+	 */
+	public releaseBackdropResources(): void {
+		this._backdrop.release();
+	}
 
 	/**
 	 * Renders a display object tree into the given buffer.
@@ -136,6 +147,7 @@ export class CanvasRenderer {
 
 		const $displayList = displayObject.$displayList;
 		if ($displayList && !_isStage) {
+			assertBackdropCache(displayObject);
 			const previousWidth = $displayList.canvasBuffer.width;
 			const previousHeight = $displayList.canvasBuffer.height;
 			const previousResolution = $displayList.actualResolution;
@@ -218,22 +230,24 @@ export class CanvasRenderer {
 				ctx.globalAlpha *= child.$alpha;
 			}
 
-			if (child.$renderMode === RenderMode.FILTER) {
-				drawCalls += this.drawWithFilter(child, ctx, childOffsetX, childOffsetY);
-			} else if (child.$renderMode === RenderMode.SCROLLRECT) {
-				drawCalls += this.drawWithScrollRect(child, ctx, childOffsetX, childOffsetY);
-			} else if (child.$renderMode === RenderMode.CLIP) {
-				drawCalls += this.drawWithClip(child, ctx, childOffsetX, childOffsetY);
-			} else {
-				drawCalls += this.drawDisplayObject(child, ctx, childOffsetX, childOffsetY);
+			try {
+				if (child.$renderMode === RenderMode.FILTER) {
+					drawCalls += this.drawWithFilter(child, ctx, childOffsetX, childOffsetY);
+				} else if (child.$renderMode === RenderMode.SCROLLRECT) {
+					drawCalls += this.drawWithScrollRect(child, ctx, childOffsetX, childOffsetY);
+				} else if (child.$renderMode === RenderMode.CLIP) {
+					drawCalls += this.drawWithClip(child, ctx, childOffsetX, childOffsetY);
+				} else {
+					drawCalls += this.drawDisplayObject(child, ctx, childOffsetX, childOffsetY);
+				}
+			} finally {
+				if (child.$useTranslate) {
+					ctx.restore();
+				} else if (prevAlpha !== undefined) {
+					ctx.globalAlpha = prevAlpha;
+				}
+				this._globalTint = previousTint;
 			}
-
-			if (child.$useTranslate) {
-				ctx.restore();
-			} else if (prevAlpha !== undefined) {
-				ctx.globalAlpha = prevAlpha;
-			}
-			this._globalTint = previousTint;
 		}
 
 		return drawCalls;
@@ -252,12 +266,14 @@ export class CanvasRenderer {
 			offsetY -= rect.y;
 		}
 		ctx.save();
-		ctx.beginPath();
-		ctx.rect(rect.x + offsetX, rect.y + offsetY, rect.width, rect.height);
-		ctx.clip();
-		const drawCalls = this.drawDisplayObject(displayObject, ctx, offsetX, offsetY);
-		ctx.restore();
-		return drawCalls;
+		try {
+			ctx.beginPath();
+			ctx.rect(rect.x + offsetX, rect.y + offsetY, rect.width, rect.height);
+			ctx.clip();
+			return this.drawDisplayObject(displayObject, ctx, offsetX, offsetY);
+		} finally {
+			ctx.restore();
+		}
 	}
 
 	private drawWithFilter(
@@ -302,6 +318,9 @@ export class CanvasRenderer {
 		}
 
 		const hasBlendMode = displayObject.$blendMode !== 0;
+		if (containsBackdrop(displayObject)) {
+			return this.drawIsolatedBackdropGroup(displayObject, ctx, offsetX, offsetY, cssFilters, hasCpuFilter);
+		}
 
 		// ── Fast path: all filters expressible as CSS ─────────────────────────
 		if (!hasCpuFilter && cssFilters.length > 0) {
@@ -363,6 +382,53 @@ export class CanvasRenderer {
 		return drawCalls + 1;
 	}
 
+	private drawIsolatedBackdropGroup(
+		node: DisplayObject,
+		ctx: CanvasRenderingContext2D,
+		x: number,
+		y: number,
+		cssFilters: string[],
+		hasCpuFilter: boolean,
+	): number {
+		const bounds = getRenderContentBounds(node);
+		let pad = 0;
+		for (const filter of node.$filters) {
+			const p = filter.getPadding();
+			pad += Math.max(p.left, p.right, p.top, p.bottom);
+		}
+		const resolution = this._resolution;
+		const buffer = new CanvasBuffer((bounds.width + pad * 2) * resolution, (bounds.height + pad * 2) * resolution);
+		const off = buffer.context;
+		off.setTransform(resolution, 0, 0, resolution, 0, 0);
+		off.globalAlpha = ctx.globalAlpha;
+		ctx.save();
+		try {
+			const ox = pad - bounds.x;
+			const oy = pad - bounds.y;
+			const calls = node.$mask ? this.drawWithClip(node, off, ox, oy)
+				: node.$scrollRect || node.$maskRect ? this.drawWithScrollRect(node, off, ox, oy)
+				: this.drawDisplayObject(node, off, ox, oy);
+			if (hasCpuFilter) {
+				const pixels = off.getImageData(0, 0, buffer.width, buffer.height);
+				for (const filter of node.$filters) {
+					if (filter instanceof ColorMatrixFilter) {
+						applyColorMatrix(pixels.data, filter.matrix);
+					}
+				}
+				off.putImageData(pixels, 0, 0);
+			}
+			ctx.globalAlpha = 1;
+			ctx.filter = cssFilters.join(' ') || 'none';
+			ctx.globalCompositeOperation = node.blendMode as GlobalCompositeOperation;
+			ctx.drawImage(buffer.surface, x + bounds.x - pad, y + bounds.y - pad,
+				buffer.width / resolution, buffer.height / resolution);
+			return calls + 1;
+		} finally {
+			ctx.restore();
+			buffer.destroy();
+		}
+	}
+
 	private drawWithClip(
 		displayObject: DisplayObject,
 		ctx: CanvasRenderingContext2D,
@@ -371,81 +437,70 @@ export class CanvasRenderer {
 	): number {
 		const scrollRect = displayObject.$scrollRect ?? displayObject.$maskRect;
 		const mask = displayObject.$mask;
-		const hasBlendMode = displayObject.$blendMode !== 0;
-
-		if (hasBlendMode) {
-			ctx.globalCompositeOperation = displayObject.blendMode as GlobalCompositeOperation;
-		}
-
-		if (scrollRect) {
-			ctx.save();
-			ctx.beginPath();
-			ctx.rect(scrollRect.x + offsetX, scrollRect.y + offsetY, scrollRect.width, scrollRect.height);
-			ctx.clip();
-		}
-
-		if (mask) {
+		let contentBuffer: CanvasBuffer | undefined;
+		ctx.save();
+		try {
+			if (displayObject.$blendMode !== 0) {
+				ctx.globalCompositeOperation = displayObject.blendMode as GlobalCompositeOperation;
+			}
+			if (scrollRect) {
+				ctx.beginPath();
+				ctx.rect(scrollRect.x + offsetX, scrollRect.y + offsetY, scrollRect.width, scrollRect.height);
+				ctx.clip();
+			}
+			if (!mask) {
+				return this.drawDisplayObject(displayObject, ctx, offsetX, offsetY);
+			}
 			const bounds = getRenderContentBounds(displayObject);
 			if (bounds.width <= 0 || bounds.height <= 0) {
-				if (scrollRect) ctx.restore();
-				if (hasBlendMode) ctx.globalCompositeOperation = 'source-over';
 				return 0;
 			}
-			const bw = Math.ceil(bounds.width);
-			const bh = Math.ceil(bounds.height);
+			const resolution = this._resolution;
 			const bx = bounds.x;
 			const by = bounds.y;
-
-			const contentBuffer = new CanvasBuffer(bw, bh);
+			contentBuffer = new CanvasBuffer(bounds.width * resolution, bounds.height * resolution);
 			const contentCtx = contentBuffer.context;
+			contentCtx.setTransform(resolution, 0, 0, resolution, 0, 0);
+			// Match GPU isolation: children and backdrop strength receive world
+			// opacity once; the completed layer is composited at alpha 1.
+			contentCtx.globalAlpha = ctx.globalAlpha;
 			const drawCalls = this.drawDisplayObject(displayObject, contentCtx, -bx, -by);
-
+			contentCtx.globalAlpha = 1;
 			contentCtx.globalCompositeOperation = 'destination-in';
 			const maskMatrix = mask.$getConcatenatedMatrix();
 			const parentMatrix = displayObject.$getConcatenatedMatrix();
 			contentCtx.save();
-			const invA = parentMatrix.a,
-				invB = parentMatrix.b,
-				invC = parentMatrix.c,
-				invD = parentMatrix.d;
-			const invTx = parentMatrix.tx,
-				invTy = parentMatrix.ty;
-			const det = invA * invD - invB * invC;
-			if (Math.abs(det) > 1e-6) {
-				const ia = invD / det,
-					ib = -invB / det,
-					ic = -invC / det,
-					id = invA / det;
-				const itx = (invC * invTy - invD * invTx) / det;
-				const ity = (invB * invTx - invA * invTy) / det;
-				const ra = ia * maskMatrix.a + ic * maskMatrix.b;
-				const rb = ib * maskMatrix.a + id * maskMatrix.b;
-				const rc = ia * maskMatrix.c + ic * maskMatrix.d;
-				const rd = ib * maskMatrix.c + id * maskMatrix.d;
-				const rtx = ia * maskMatrix.tx + ic * maskMatrix.ty + itx - bx;
-				const rty = ib * maskMatrix.tx + id * maskMatrix.ty + ity - by;
-				contentCtx.setTransform(ra, rb, rc, rd, rtx, rty);
-			} else {
-				contentCtx.translate(-bx, -by);
+			try {
+				const { a, b, c, d, tx, ty } = parentMatrix;
+				const det = a * d - b * c;
+				if (Math.abs(det) > 1e-6) {
+					const ia = d / det, ib = -b / det, ic = -c / det, id = a / det;
+					const itx = (c * ty - d * tx) / det;
+					const ity = (b * tx - a * ty) / det;
+					contentCtx.setTransform(
+						(ia * maskMatrix.a + ic * maskMatrix.b) * resolution,
+						(ib * maskMatrix.a + id * maskMatrix.b) * resolution,
+						(ia * maskMatrix.c + ic * maskMatrix.d) * resolution,
+						(ib * maskMatrix.c + id * maskMatrix.d) * resolution,
+						(ia * maskMatrix.tx + ic * maskMatrix.ty + itx - bx) * resolution,
+						(ib * maskMatrix.tx + id * maskMatrix.ty + ity - by) * resolution,
+					);
+				} else {
+					contentCtx.translate(-bx, -by);
+				}
+				this.drawDisplayObject(mask, contentCtx, 0, 0);
+			} finally {
+				contentCtx.restore();
 			}
-			this.drawDisplayObject(mask, contentCtx, 0, 0);
-			contentCtx.restore();
 			contentCtx.globalCompositeOperation = 'source-over';
-
-			ctx.drawImage(contentBuffer.surface, offsetX + bx, offsetY + by);
-			contentBuffer.destroy();
-
-			if (scrollRect) ctx.restore();
-			if (hasBlendMode) ctx.globalCompositeOperation = 'source-over';
+			ctx.globalAlpha = 1;
+			ctx.drawImage(contentBuffer.surface, offsetX + bx, offsetY + by,
+				contentBuffer.width / resolution, contentBuffer.height / resolution);
 			return drawCalls + 1;
+		} finally {
+			contentBuffer?.destroy();
+			ctx.restore();
 		}
-
-		const drawCalls = this.drawDisplayObject(displayObject, ctx, offsetX, offsetY);
-
-		if (scrollRect) ctx.restore();
-		if (hasBlendMode) ctx.globalCompositeOperation = 'source-over';
-
-		return drawCalls;
 	}
 
 	// ── Private: render individual node types ─────────────────────────────────
@@ -457,6 +512,8 @@ export class CanvasRenderer {
 		offsetY: number,
 	): number {
 		switch (displayObject.$renderObjectType) {
+			case RenderObjectType.BACKDROP_BLUR:
+				return this._backdrop.render(displayObject as BackdropBlur, ctx, offsetX, offsetY);
 			case RenderObjectType.MESH:
 				return this.renderMesh(displayObject as Mesh, ctx, offsetX, offsetY);
 			case RenderObjectType.BITMAP:

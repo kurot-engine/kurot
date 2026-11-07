@@ -3,7 +3,7 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 5.0.0 (published on npm), with peerDependency `@kurot/core: ^3.0.0`.
+> Package version: 5.1.0 (published on npm), with Core peer ^3.2.0.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
@@ -30,6 +30,11 @@ UIState communicates with its host through the narrow IUIOwner callback interfac
 without depending on the host's concrete DisplayObject subclass. This separation
 allows skin and validation systems to evolve independently and follows the
 repository preference for composition over deeper application inheritance.
+
+`Backdrop` composes one Core BackdropBlur with Component's UIState. It bypasses
+default Skin lookup, has zero intrinsic size and synchronizes the effect to its
+validated local frame. Core owns sampling and reusable rendering resources;
+UILayer/parent layout owns resize. See [the backdrop contract](backdrop.md).
 
 ---
 

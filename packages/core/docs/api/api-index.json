@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -49,6 +49,382 @@
           "name": "onResourceDestroy",
           "file": "AnalyzerBase-class/onResourceDestroy-method.md",
           "protected": true,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "BackdropBlur",
+      "kind": "Class",
+      "file": "BackdropBlur-class.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "BackdropBlur-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "BackdropBlur-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "BackdropBlur-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "BackdropBlur-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "BackdropBlur-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "BackdropBlur-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blurX",
+          "file": "BackdropBlur-class/blurX-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "blurY",
+          "file": "BackdropBlur-class/blurY-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "BackdropBlur-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "filters",
+          "file": "BackdropBlur-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "BackdropBlur-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "BackdropBlur-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "BackdropBlur-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "BackdropBlur-class/height-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "BackdropBlur-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "mask",
+          "file": "BackdropBlur-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "BackdropBlur-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "BackdropBlur-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "BackdropBlur-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "name",
+          "file": "BackdropBlur-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "BackdropBlur-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "quality",
+          "file": "BackdropBlur-class/quality-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resolution",
+          "file": "BackdropBlur-class/resolution-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "rotation",
+          "file": "BackdropBlur-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "BackdropBlur-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "BackdropBlur-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRect",
+          "file": "BackdropBlur-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewX",
+          "file": "BackdropBlur-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "BackdropBlur-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "BackdropBlur-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "BackdropBlur-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "BackdropBlur-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchEnabled",
+          "file": "BackdropBlur-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "BackdropBlur-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "BackdropBlur-class/width-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "x",
+          "file": "BackdropBlur-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "BackdropBlur-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "BackdropBlur-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "BackdropBlur-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "BackdropBlur-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "BackdropBlur-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "BackdropBlur-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "BackdropBlur-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "BackdropBlur-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "BackdropBlur-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "BackdropBlur-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "BackdropBlur-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "localToGlobal",
+          "file": "BackdropBlur-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "notifyListener",
+          "file": "BackdropBlur-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "BackdropBlur-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "BackdropBlur-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortChildren",
+          "file": "BackdropBlur-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "BackdropBlur-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "BackdropBlur-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
+        }
+      ]
+    },
+    {
+      "name": "BackdropBlurOptions",
+      "kind": "Interface",
+      "file": "BackdropBlurOptions-interface.md",
+      "topic": "display",
+      "members": [
+        {
+          "name": "blurX",
+          "file": "BackdropBlurOptions-interface/blurX-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "blurY",
+          "file": "BackdropBlurOptions-interface/blurY-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "height",
+          "file": "BackdropBlurOptions-interface/height-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "quality",
+          "file": "BackdropBlurOptions-interface/quality-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resolution",
+          "file": "BackdropBlurOptions-interface/resolution-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "width",
+          "file": "BackdropBlurOptions-interface/width-property.md",
+          "protected": false,
           "inherited": false
         }
       ]
@@ -1882,6 +2258,12 @@
         {
           "name": "constructor",
           "file": "CanvasRenderer-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "releaseBackdropResources",
+          "file": "CanvasRenderer-class/releaseBackdropResources-method.md",
           "protected": false,
           "inherited": false
         },
@@ -8105,6 +8487,12 @@
       "file": "RenderObjectType-enum.md",
       "topic": "display",
       "members": [
+        {
+          "name": "BACKDROP_BLUR",
+          "file": "RenderObjectType-enum/BACKDROP_BLUR-enummember.md",
+          "protected": false,
+          "inherited": false
+        },
         {
           "name": "BITMAP",
           "file": "RenderObjectType-enum/BITMAP-enummember.md",
@@ -14908,6 +15296,12 @@
         {
           "name": "disableStencilTest",
           "file": "WebGLRenderContext-class/disableStencilTest-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "drawBackdropBlur",
+          "file": "WebGLRenderContext-class/drawBackdropBlur-method.md",
           "protected": false,
           "inherited": false
         },

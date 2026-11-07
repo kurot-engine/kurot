@@ -135,6 +135,9 @@ export class WebGLRenderBuffer implements RenderBuffer {
 			this.rootRenderTarget.height = height;
 		}
 		if (this.isRoot) {
+			// Finish queued activations with their old viewport before resizing the
+			// drawing buffer. A backdrop copy must see this frame at its new size.
+			this.context.flush();
 			this.context.resize(width, height);
 		}
 		this.context.clear();

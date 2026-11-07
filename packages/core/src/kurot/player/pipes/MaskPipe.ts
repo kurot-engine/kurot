@@ -109,8 +109,8 @@ export class MaskPipe implements RenderPipe<DisplayObject> {
 
 		const a = m.a,
 			d = m.d,
-			tx = m.tx,
-			ty = m.ty;
+			tx = m.tx + (renderable.$scrollRect ? 0 : a * rect.x),
+			ty = m.ty + (renderable.$scrollRect ? 0 : d * rect.y);
 		const xMax = rect.width,
 			yMax = rect.height;
 		const minX = Math.min(tx, a * xMax + tx);

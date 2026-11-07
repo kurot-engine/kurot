@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -284,6 +284,764 @@
           "file": "ArrayCollectionEvents-interface/collectionChange-property.md",
           "protected": false,
           "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "Backdrop",
+      "kind": "Class",
+      "file": "Backdrop-class.md",
+      "topic": "components",
+      "members": [
+        {
+          "name": "constructor",
+          "file": "Backdrop-class/constructor-constructor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "isRenderGroup",
+          "file": "Backdrop-class/isRenderGroup-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skinNameExplicitlySet",
+          "file": "Backdrop-class/skinNameExplicitlySet-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "ui",
+          "file": "Backdrop-class/ui-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "static defaultTouchEnabled",
+          "file": "Backdrop-class/static-defaultTouchEnabled-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "alpha",
+          "file": "Backdrop-class/alpha-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetX",
+          "file": "Backdrop-class/anchorOffsetX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "anchorOffsetY",
+          "file": "Backdrop-class/anchorOffsetY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blendMode",
+          "file": "Backdrop-class/blendMode-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "blurX",
+          "file": "Backdrop-class/blurX-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "blurY",
+          "file": "Backdrop-class/blurY-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "bottom",
+          "file": "Backdrop-class/bottom-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsBitmap",
+          "file": "Backdrop-class/cacheAsBitmap-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "contentHeight",
+          "file": "Backdrop-class/contentHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "contentWidth",
+          "file": "Backdrop-class/contentWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "currentState",
+          "file": "Backdrop-class/currentState-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "enabled",
+          "file": "Backdrop-class/enabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "filters",
+          "file": "Backdrop-class/filters-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipX",
+          "file": "Backdrop-class/flipX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "flipY",
+          "file": "Backdrop-class/flipY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "graphics",
+          "file": "Backdrop-class/graphics-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "height",
+          "file": "Backdrop-class/height-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "horizontalCenter",
+          "file": "Backdrop-class/horizontalCenter-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hostComponentKey",
+          "file": "Backdrop-class/hostComponentKey-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "includeInLayout",
+          "file": "Backdrop-class/includeInLayout-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "isCachedAsTexture",
+          "file": "Backdrop-class/isCachedAsTexture-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "left",
+          "file": "Backdrop-class/left-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "mask",
+          "file": "Backdrop-class/mask-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "matrix",
+          "file": "Backdrop-class/matrix-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "maxHeight",
+          "file": "Backdrop-class/maxHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "maxWidth",
+          "file": "Backdrop-class/maxWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredHeight",
+          "file": "Backdrop-class/measuredHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measuredWidth",
+          "file": "Backdrop-class/measuredWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "minHeight",
+          "file": "Backdrop-class/minHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "minWidth",
+          "file": "Backdrop-class/minWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "name",
+          "file": "Backdrop-class/name-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "numChildren",
+          "file": "Backdrop-class/numChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "numElements",
+          "file": "Backdrop-class/numElements-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "parent",
+          "file": "Backdrop-class/parent-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "percentHeight",
+          "file": "Backdrop-class/percentHeight-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "percentWidth",
+          "file": "Backdrop-class/percentWidth-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "quality",
+          "file": "Backdrop-class/quality-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "resolution",
+          "file": "Backdrop-class/resolution-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "right",
+          "file": "Backdrop-class/right-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "rotation",
+          "file": "Backdrop-class/rotation-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleX",
+          "file": "Backdrop-class/scaleX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scaleY",
+          "file": "Backdrop-class/scaleY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollH",
+          "file": "Backdrop-class/scrollH-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollRect",
+          "file": "Backdrop-class/scrollRect-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "scrollV",
+          "file": "Backdrop-class/scrollV-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewX",
+          "file": "Backdrop-class/skewX-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skewY",
+          "file": "Backdrop-class/skewY-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skin",
+          "file": "Backdrop-class/skin-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skinName",
+          "file": "Backdrop-class/skinName-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skinParts",
+          "file": "Backdrop-class/skinParts-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "skinReady",
+          "file": "Backdrop-class/skinReady-accessor.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "sortableChildren",
+          "file": "Backdrop-class/sortableChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "stage",
+          "file": "Backdrop-class/stage-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "tint",
+          "file": "Backdrop-class/tint-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "top",
+          "file": "Backdrop-class/top-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchChildren",
+          "file": "Backdrop-class/touchChildren-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "touchEnabled",
+          "file": "Backdrop-class/touchEnabled-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "verticalCenter",
+          "file": "Backdrop-class/verticalCenter-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "visible",
+          "file": "Backdrop-class/visible-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "width",
+          "file": "Backdrop-class/width-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "x",
+          "file": "Backdrop-class/x-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "y",
+          "file": "Backdrop-class/y-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "zIndex",
+          "file": "Backdrop-class/zIndex-accessor.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addChild",
+          "file": "Backdrop-class/addChild-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addChildAt",
+          "file": "Backdrop-class/addChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "addEventListener",
+          "file": "Backdrop-class/addEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "cacheAsTexture",
+          "file": "Backdrop-class/cacheAsTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "childAdded",
+          "file": "Backdrop-class/childAdded-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "childRemoved",
+          "file": "Backdrop-class/childRemoved-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "childrenCreated",
+          "file": "Backdrop-class/childrenCreated-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "commitProperties",
+          "file": "Backdrop-class/commitProperties-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "contains",
+          "file": "Backdrop-class/contains-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "createChildren",
+          "file": "Backdrop-class/createChildren-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dispatchEvent",
+          "file": "Backdrop-class/dispatchEvent-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "dispatchEventWith",
+          "file": "Backdrop-class/dispatchEventWith-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getBounds",
+          "file": "Backdrop-class/getBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildAt",
+          "file": "Backdrop-class/getChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildByName",
+          "file": "Backdrop-class/getChildByName-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getChildIndex",
+          "file": "Backdrop-class/getChildIndex-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getCurrentState",
+          "file": "Backdrop-class/getCurrentState-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "getElementAt",
+          "file": "Backdrop-class/getElementAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getLayoutBounds",
+          "file": "Backdrop-class/getLayoutBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getPreferredBounds",
+          "file": "Backdrop-class/getPreferredBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getSkinPartValidator",
+          "file": "Backdrop-class/getSkinPartValidator-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "getTransformedBounds",
+          "file": "Backdrop-class/getTransformedBounds-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "getVirtualElementAt",
+          "file": "Backdrop-class/getVirtualElementAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "globalToLocal",
+          "file": "Backdrop-class/globalToLocal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hasEventListener",
+          "file": "Backdrop-class/hasEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "hitTestPoint",
+          "file": "Backdrop-class/hitTestPoint-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "invalidateDisplayList",
+          "file": "Backdrop-class/invalidateDisplayList-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "invalidateProperties",
+          "file": "Backdrop-class/invalidateProperties-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "invalidateSize",
+          "file": "Backdrop-class/invalidateSize-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "invalidateState",
+          "file": "Backdrop-class/invalidateState-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "localToGlobal",
+          "file": "Backdrop-class/localToGlobal-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "measure",
+          "file": "Backdrop-class/measure-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "notifyListener",
+          "file": "Backdrop-class/notifyListener-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "once",
+          "file": "Backdrop-class/once-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "onSkinReady",
+          "file": "Backdrop-class/onSkinReady-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "onSkinRemoved",
+          "file": "Backdrop-class/onSkinRemoved-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "removeChild",
+          "file": "Backdrop-class/removeChild-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeChildAt",
+          "file": "Backdrop-class/removeChildAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeChildren",
+          "file": "Backdrop-class/removeChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "removeEventListener",
+          "file": "Backdrop-class/removeEventListener-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setChildIndex",
+          "file": "Backdrop-class/setChildIndex-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setContentSize",
+          "file": "Backdrop-class/setContentSize-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setLayoutBoundsPosition",
+          "file": "Backdrop-class/setLayoutBoundsPosition-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setLayoutBoundsSize",
+          "file": "Backdrop-class/setLayoutBoundsSize-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setMeasuredSize",
+          "file": "Backdrop-class/setMeasuredSize-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "setSkin",
+          "file": "Backdrop-class/setSkin-method.md",
+          "protected": true,
+          "inherited": true
+        },
+        {
+          "name": "setVirtualElementIndicesInView",
+          "file": "Backdrop-class/setVirtualElementIndicesInView-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "sortChildren",
+          "file": "Backdrop-class/sortChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "swapChildren",
+          "file": "Backdrop-class/swapChildren-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "swapChildrenAt",
+          "file": "Backdrop-class/swapChildrenAt-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "updateCacheTexture",
+          "file": "Backdrop-class/updateCacheTexture-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "updateDisplayList",
+          "file": "Backdrop-class/updateDisplayList-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "validateDisplayList",
+          "file": "Backdrop-class/validateDisplayList-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "validateNow",
+          "file": "Backdrop-class/validateNow-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "validateProperties",
+          "file": "Backdrop-class/validateProperties-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "validateSize",
+          "file": "Backdrop-class/validateSize-method.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
+          "name": "willTrigger",
+          "file": "Backdrop-class/willTrigger-method.md",
+          "protected": false,
+          "inherited": true
         }
       ]
     },

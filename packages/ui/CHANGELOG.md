@@ -4,7 +4,53 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
-## Unreleased
+## 5.1.0 — 2026-11-07
+
+Published; exact version and npm latest verified on 2026-11-07. Downloaded
+archive SHA-512/SHA-1 integrity passes; all 5,720 files match the tested release
+preparation byte-for-byte. Repository publication markers are updated after
+verification; the immutable npm archive retains its original preparation markers.
+
+### Added
+
+- Add code-created Backdrop: one Core BackdropBlur with standard UI dimensions,
+  constraints, percent/center allocation and inherited display transforms.
+  Four zero edges fill a UILayer/BasicLayout and follow logical Stage resize.
+- Keep no intrinsic preferred size, default Theme/UIContext Skin, resize/ticker
+  callback or per-node capture resource. Default hit testing passes through;
+  explicitly enabling touchEnabled opts into the validated local bounds.
+- Forward blurX/blurY/quality/resolution to Core. Preserve ordered stacking,
+  alpha, clipping, cache errors and Canvas approximation/fallback semantics.
+  No KUI/catalog/CLI/runtime or application integration is included.
+
+### Dependencies
+
+- Require Core ^3.2.0 for the new imported BackdropBlur API; adopt its verified
+  published artifact in the UI development lock. Published UI 5.0.0 retains
+  Core ^3.0.0 and does not include Backdrop.
+- Existing ui-runtime ^5.0.0 peers accept UI 5.1.0; no dependent SDK release is
+  required. Consumers adopting UI 5.1 need Core >=3.2.0 within 3.x. Keep existing
+  example/application locks until explicitly selected for adoption. CLI's game
+  starter already selects UI latest and needs no CLI/template release.
+
+### Validation — 2026-11-07
+
+- Build and all 481 unit tests pass, including nine Backdrop layout, input,
+  theme bypass, parameter and lifecycle cases. All 30 browser cases pass against
+  registry Core 3.2.0: nine Backdrop cases across Canvas/WebGL 1/WebGL 2 and
+  1×/2×/3× device/output density, plus 21 existing UI regressions.
+- Pixel checks cover dynamic background, sharp foreground, world alpha,
+  multiple modals, clipping, transformations, resize, removal/reinsertion and
+  recovery after a rejected texture cache. Input remains application-owned.
+- Benchmark production build and strict compilation of the new test fixtures
+  pass. Generated API coverage has zero missing references; all 22 Core/Game/UI
+  examples compile against built and source-free packed declarations.
+- The prepared UI 5.1.0 archive passes all nine Backdrop browser cases again,
+  with 55 pixel/layout/input/lifecycle assertions per case, one shared packed
+  Core 3.2.0 and no checkout implementation source loaded. Packed version,
+  required peer and generated API versions match the release manifest.
+- After publication, downloaded npm UI 5.1.0 and Core 3.2.0 pass the same nine
+  browser cases and all 22 strict API examples, sharing one source-free Core.
 
 ### Documentation
 
@@ -12,15 +58,13 @@ All notable changes to `@kurot/ui` are documented here.
   collections, layout, binding and states. Replace EUI compatibility positioning
   in metadata, keywords, guides and API comments with native contracts.
 
-The wording cleanup is reserved for a later patch; the published release below
-retains its original descriptions and comments. Runtime code and types are unchanged.
-
 ## 5.0.0 — 2026-11-06
 
 Published; exact version and npm latest verified on 2026-11-06. Downloaded
 archive SHA-512 integrity passes (5,588 files). Runtime JS and declarations
-match the tested preparation after removing comments. Source wording, metadata
-and generated documentation cleanup remains unreleased for a later patch.
+match the tested preparation after removing comments. The immutable archive
+retains its original descriptions/comments; native wording cleanup is included
+in the 5.1.0 release above.
 
 ### Breaking
 

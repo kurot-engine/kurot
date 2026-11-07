@@ -5,6 +5,78 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-07 — UI 5.1.0 publication
+
+- Verify npm UI 5.1.0 exact/latest metadata, Core ^3.2.0 peer and downloaded
+  SHA-512/SHA-1 integrity. All 5,720 archive files match the tested preparation
+  byte-for-byte; synchronize repository publication markers. Immutable npm
+  artifacts retain preparation wording. No runtime code changes follow publication.
+- Downloaded UI 5.1.0 and Core 3.2.0 pass nine real Canvas/WebGL 1/WebGL 2
+  Backdrop cases at 1×/2×/3× density, with 55 assertions per case and one
+  source-free Core instance. All 22 strict API examples pass against those
+  registry artifacts and the unchanged Game declarations.
+- Include the completed Core/UI Backdrop implementation, tests, benchmarks,
+  exports and release documentation in the engine commit. Application/template
+  dependencies and other SDK manifests remain unchanged.
+
+## 2026-11-07 — UI 5.1.0 preparation
+
+- Bump UI to 5.1.0 for code-created Backdrop and its required Core ^3.2.0 API.
+  Synchronize package/root READMEs, architecture/context guides, the Backdrop
+  contract, agent version table and generated API references. Publication is
+  pending; native UI wording cleanup is included in this release.
+- Existing ui-runtime ^5.0.0 peers accept this UI minor. Keep other SDK versions
+  and development locks unchanged. Examples/applications remain optional
+  adoption; CLI's UI latest starter needs no dependency or CLI release.
+- Clean UI build and all 481 unit tests pass. Generated coverage and all
+  22 API examples pass against built/source-free packed declarations. The
+  prepared UI 5.1.0 archive passes nine real Canvas/WebGL 1/WebGL 2 Backdrop
+  cases at 1×/2×/3× density, 55 assertions each, sharing one packed Core 3.2.0.
+
+## 2026-11-07 — Core 3.2 publication and UI Backdrop
+
+- Verify npm Core 3.2.0 exact/latest metadata and downloaded SHA-512/SHA-1
+  integrity; all 3,299 archive files match the tested release preparation.
+  Synchronize repository publication markers; the immutable npm archive
+  retains preparation wording. Published runtime output is unchanged here.
+- Add unreleased UI Backdrop with standard layout, pass-through input and an
+  owned Core effect node. Follow UILayer resizing without new subscriptions;
+  bypass default Skins and intrinsic-size feedback. No KUI/CLI/runtime or SAO
+  modification, application dependency adoption or UI version bump is included.
+- Raise UI's Core peer/development minimum to ^3.2.0 and install the published
+  dependency. Core owns all capture buffers and blur work. Other SDK versions,
+  dependency minima and development locks stay unchanged.
+- UI build, all 481 unit tests and all 30 browser cases pass against registry
+  Core 3.2.0. New pixels cover all three backends at 1×/2×/3× density, ordered
+  modals, transforms/clips, input, live updates, resizing and removal/recovery.
+- Benchmark build, strict new fixtures and generated API coverage pass. All
+  22 API examples compile against built and source-free packed SDK declarations.
+
+## 2026-11-07 — Core 3.2.0 preparation
+
+- Add a Core display-tree backdrop node with WebGL 1/2 GPU sampling, reuse of
+  BlurFilter and pooled targets, plus a reusable Canvas approximation. Define
+  ordered stacking, premultiplied alpha, transforms/clips, isolated parents and
+  explicit cache restrictions. Core source is bumped to 3.2.0; publication is pending.
+  UI Backdrop, SAO and application dependency adoption remain deferred.
+- Add a live Core backdrop-blur example and the integration guide. Validate
+  twelve real Chromium backdrop cases across backends/densities and single-sample
+  capture, 50 related browser cases, 1,057 Core tests and strict builds.
+- Optimize captures to the blur's working density and composite the actual
+  transformed quad. Preserve canvas antialiasing and the native staging copies
+  required by WebGL 1 / multisample defaults. Add a GPU timer-query benchmark
+  and [M1 Max raw measurements](packages/core/examples/benchmark/backdrop/results/2026-11-07-m1-max.json).
+  Full-resolution small-radius timings remain similar; large-radius intermediate
+  idle storage falls substantially. Package CHANGELOG records conditions/results.
+- Fix root resize command ordering, render-group effect wrapping and nonzero
+  rectangle scissor origins encountered by the new pixel regressions.
+- Release audit fixes nested Canvas sampling-failure state recovery and masked
+  world-alpha/density parity. Preserve existing SDK peer minima; compatible
+  development locks and selected applications remain unchanged.
+- Validate all 21 API examples against built and packed declarations. The
+  source-free Core 3.2.0 archive passes the same twelve backdrop browser cases
+  and reports the matching runtime version. Core example/benchmark builds pass.
+
 ## 2026-11-06 — Examples and Templates adopt Core 3.1
 
 - Update demo, game and star-catcher plus Card Booster, MilfMaster, Runaway,

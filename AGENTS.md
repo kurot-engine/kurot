@@ -32,8 +32,8 @@ installation establish its baseline. Package versions are independent.
 
 | Package | Version | Role | Read first |
 | --- | --- | --- | --- |
-| `@kurot/core` | 3.1.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
-| `@kurot/ui` | 5.0.0 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
+| `@kurot/core` | 3.2.0 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
+| `@kurot/ui` | 5.1.0 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 3.0.0 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
 | `@kurot/cli` | 4.1.2 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.14.0 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
@@ -64,6 +64,7 @@ do not establish the required implementation.
 | KUI strings, fonts/colors, Label presets | [project styles](packages/ui-document/docs/project-styles.md), [text components](packages/ui-document/docs/text-components.md) |
 | CLI game startup, default skins or dev refresh | [template startup](packages/cli/docs/game-template.md), [skins](packages/cli/docs/default-ui-skins.md), [watching](packages/cli/docs/dev-resource-watching.md) |
 | Native UI vs semantic editing/runtime ownership | [UI architecture](UI-ARCHITECTURE.md) |
+| Backdrop blur, UI region layout and modal ordering | [Core backdrop blur](packages/core/docs/backdrop-blur.md), [UI Backdrop](packages/ui/docs/backdrop.md) |
 
 ## High-signal rules
 

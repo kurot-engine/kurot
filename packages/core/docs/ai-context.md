@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.1.0` (published on npm). It provides Kurot's
+Package identity: `@kurot/core@3.2.0` (published on npm). It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -70,6 +70,11 @@ The dev-only benchmark page, runtime, adapters, vendor baseline, and tests are
 colocated under `examples/benchmark/`; none are exported from `index.ts`.
 
 ## 2. Non-obvious current behavior
+
+- Core 3.2 BackdropBlur samples earlier pixels in the current compositing
+  layer; later siblings remain sharp. Parent offscreen filters/object masks
+  isolate sampling. Rendered cached ancestors are rejected. See
+  [backdrop blur](backdrop-blur.md) for transforms, alpha, fallback and ownership.
 
 - BitmapData accepts ImageBitmap. Default alpha handling normalizes through a
   temporary Canvas; premultipliedAlpha=true declares already-premultiplied input
@@ -190,7 +195,7 @@ Re-export order: `events`, `geom`, `utils`, `display`, `net`, `filters`,
 - **Events**: `Event`, `EventMap` (type), `EventPhase`, `IEventDispatcher`, `EventDispatcher`, `FocusEvent`, `HTTPStatusEvent`, `IOErrorEvent`, `ProgressEvent`, `StageOrientationEvent`, `TextEvent`, `TimerEvent`, `TouchEvent`.
 - **Geom**: `Point`/`sharedPoint`, `Rectangle`/`sharedRectangle`, `Matrix`/`sharedMatrix`.
 - **Utils**: `NumberUtils`, `Base64Util`, `toColorString`, `Logger`/`LogLevel`, `Timer`/`TimerEvents`, `ByteArray`/`Endian`, `registerFontMapping`/`cacheFontResource`, `DebugLog`.
-- **Display**: enums (`BitmapFillMode`, `BlendMode`/`blendModeToNumber`/`numberToBlendMode`, `CapsStyle`, `GradientType`, `JointStyle`, `OrientationMode`, `StageScaleMode`); `DisplayObject`/`RenderMode`/`RenderObjectType`/`DisplayObjectEvents`/`CacheAsTextureOptions`; `DisplayObjectContainer`, `Stage`, `Graphics`/`setGraphicsHitTest`, `Shape`, `Sprite`, `Bitmap`/`setBitmapPixelHitTest`, `Mesh`; textures: `BitmapData`/`CompressedTextureData`, `Texture`/`textureScaleFactor`, `RenderTexture`, `SpriteSheet`; `PathCommandType`/`GraphicsCommand` (type).
+- **Display**: enums (`BitmapFillMode`, `BlendMode`/`blendModeToNumber`/`numberToBlendMode`, `CapsStyle`, `GradientType`, `JointStyle`, `OrientationMode`, `StageScaleMode`); `DisplayObject`/`RenderMode`/`RenderObjectType`/`DisplayObjectEvents`/`CacheAsTextureOptions`; `DisplayObjectContainer`, `Stage`, `Graphics`/`setGraphicsHitTest`, `Shape`, `Sprite`, `BackdropBlur`/`BackdropBlurOptions`, `Bitmap`/`setBitmapPixelHitTest`, `Mesh`; textures: `BitmapData`/`CompressedTextureData`, `Texture`/`textureScaleFactor`, `RenderTexture`, `SpriteSheet`; `PathCommandType`/`GraphicsCommand` (type).
 - **Net**: `HttpMethod`/`HttpMethodType`, `HttpResponseType`/`HttpResponseTypeType`, `HttpRequest`/`HttpRequestEvents`, `ImageLoader`/`ImageLoaderEvents`.
 - **Filters**: `Filter`, `BlurFilter`, `ColorMatrixFilter`, `GlowFilter`, `DropShadowFilter`, `CustomFilter`, `MultiPassFilter`, `BloomFilter`; types `CustomFilterOptions`, `CustomFilterUniform`, `FilterProgramSource`, `FilterTexture`, `FilterPass`, `FilterPassInput`, `BloomFilterOptions`.
 - **Media**: `Sound`/`SoundType`/`SoundEvents`, `SoundChannel`, `Video`.

@@ -1,10 +1,14 @@
 {
   "package": "@kurot/ui",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "examples": [
     {
       "file": "examples/37f49b480a1c.ts",
       "owner": "Theme"
+    },
+    {
+      "file": "examples/15c37ae8a98b.ts",
+      "owner": "Backdrop"
     },
     {
       "file": "examples/792376c209f3.ts",

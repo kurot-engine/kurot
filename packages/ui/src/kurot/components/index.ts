@@ -1,6 +1,7 @@
 export { Component, type ComponentEvents, type SkinPartsMap, type SkinPartsOf } from './Component.js';
 export { Group, type GroupEvents } from './Group.js';
 export { Rect } from './Rect.js';
+export { Backdrop } from './Backdrop.js';
 export { Image } from './Image.js';
 export { Label, type TextFitMode } from './Label.js';
 export { Button } from './Button.js';

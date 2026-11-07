@@ -1,13 +1,22 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.0.0** (published on npm).
-Requires Core **^3.0.0**.
+Kurot games. Package version: **5.1.0** (published on npm).
+Requires Core **^3.2.0** for native BackdropBlur support.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
 the [complete ScoreHUD component/Skin pair](docs/recipes/score-hud.md). Use
 [API topics](docs/api/topics.md) and the [symbol index](docs/api/index.md) for
 exact member contracts. Build-time KUI skins run through UI without ui-runtime.
+
+## Background blur
+
+UI 5.1's `Backdrop` wraps Core 3.2's dynamic background blur with normal
+UI sizing. Create it in code before a modal's mask/popup. Four zero edge
+constraints stretch it inside a UILayer/BasicLayout, following logical Stage
+resize; regular containers use their own frame. Input passes through by default.
+See [the API, ordering and lifecycle](docs/backdrop.md). No KUI component or
+default Skin is introduced.
 
 ## Callback ownership
 
@@ -36,7 +45,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.0.0 @kurot/core@^3.0.0
+pnpm add @kurot/ui@^5.1.0 @kurot/core@^3.2.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -68,8 +77,8 @@ CLI 4 exports local Skin factories with
 path, then pass the factories and default mappings to UIContext. See the
 [context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
 
-Existing global applications keep their Theme/asset behavior. This UI release
-requires Core ^3.0.0, including ImageBitmap support. Dispose views and their activity before
+Existing global applications keep their Theme/asset behavior. UI 5.1
+requires Core ^3.2.0. Dispose views and their activity before
 the context, then release borrowed resources/fonts through their owners.
 
 ## Stage-sized UI roots

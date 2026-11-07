@@ -1,6 +1,7 @@
 # components
 
 - [Animation](../Animation-class.md) — Class
+- [Backdrop](../Backdrop-class.md) — Class
 - [BitmapLabel](../BitmapLabel-class.md) — Class
 - [Button](../Button-class.md) — Class
 - [CheckBox](../CheckBox-class.md) — Class

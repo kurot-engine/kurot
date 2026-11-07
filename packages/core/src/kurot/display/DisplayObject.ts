@@ -87,6 +87,10 @@ export const enum RenderObjectType {
 	TEXT = 5,
 	PARTICLE = 6,
 	BITMAP_TEXT = 7,
+	/**
+	 * Samples and blurs earlier pixels in the current compositing layer.
+	 */
+	BACKDROP_BLUR = 8,
 }
 
 /**

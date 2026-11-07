@@ -1,4 +1,6 @@
 import { splitMesh } from './split-mesh.js';
+import { WebGLBackdropSystem } from './WebGLBackdropSystem.js';
+import type { BackdropBlur } from '../../display/BackdropBlur.js';
 import { MultiPassFilter } from '../../filters/MultiPassFilter.js';
 import { WebGLFilterSystem } from './WebGLFilterSystem.js';
 import type { FilterSampler } from './WebGLFilterSystem.js';
@@ -67,6 +69,7 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _vao: WebGLVertexArrayObject;
 	private readonly _filterTextures: WebGLFilterTextures;
 	private readonly _filterSystem: WebGLFilterSystem;
+	private _backdropSystem?: WebGLBackdropSystem;
 	private _filterPassInputs: Record<string, FilterSampler> = {};
 	private _filterOutputWidth = 0;
 	private _filterOutputHeight = 0;
@@ -716,6 +719,44 @@ export class WebGLRenderContext implements RenderContext {
 		}
 	}
 
+	/**
+	 * Executes a backdrop at the current instruction position without CPU readback.
+	 */
+	public drawBackdropBlur(node: BackdropBlur, buffer: WebGLRenderBuffer): void {
+		if (this.contextLost) {
+			return;
+		}
+		this._backdropSystem ??= new WebGLBackdropSystem(this, this._filterSystem);
+		this._backdropSystem.render(node, buffer);
+	}
+
+	/**
+	 * Draws only the transformed effect quad. Constant-alpha blending interpolates
+	 * premultiplied destination pixels without a second original-image sampler.
+	 */
+	public $drawBackdropComposite(
+		filter: CustomFilter,
+		input: WebGLRenderTarget,
+		parent: WebGLRenderBuffer,
+		vertices: readonly number[],
+	): void {
+		try {
+			this._drawFullscreenQuad(this._getTextureProgram(filter), input.texture!, parent.width, parent.height,
+				program => this._uploadFilterUniforms(program, filter, input.width, input.height), vertices);
+		} finally {
+			this._filterPassInputs = {};
+			this._filterResolution = 1;
+		}
+	}
+
+	/**
+	 * Restores the engine's queued blend contract after an immediate backdrop pass.
+	 */
+	public $restoreBackdropBlend(): void {
+		this.gl.blendColor(0, 0, 0, 0);
+		this._applyBlend(this.currentBlendMode);
+	}
+
 	public $drawFilterPass(
 		filter: Filter | undefined,
 		input: WebGLRenderTarget,
@@ -791,6 +832,7 @@ export class WebGLRenderContext implements RenderContext {
 		w: number,
 		h: number,
 		setUniforms: (prog: WebGLProgram) => void,
+		vertices?: readonly number[],
 	): void {
 		const gl = this.gl;
 		gl.useProgram(prog.id);
@@ -825,23 +867,23 @@ export class WebGLRenderContext implements RenderContext {
 		const f32 = new Float32Array(20);
 		const u32 = new Uint32Array(f32.buffer);
 		const packed = 0xffffffff;
-		f32[0] = 0;
-		f32[1] = 0;
+		f32[0] = vertices?.[0] ?? 0;
+		f32[1] = vertices?.[1] ?? 0;
 		f32[2] = 0;
 		f32[3] = 1;
 		u32[4] = packed;
-		f32[5] = w;
-		f32[6] = 0;
+		f32[5] = vertices?.[2] ?? w;
+		f32[6] = vertices?.[3] ?? 0;
 		f32[7] = 1;
 		f32[8] = 1;
 		u32[9] = packed;
-		f32[10] = w;
-		f32[11] = h;
+		f32[10] = vertices?.[4] ?? w;
+		f32[11] = vertices?.[5] ?? h;
 		f32[12] = 1;
 		f32[13] = 0;
 		u32[14] = packed;
-		f32[15] = 0;
-		f32[16] = h;
+		f32[15] = vertices?.[6] ?? 0;
+		f32[16] = vertices?.[7] ?? h;
 		f32[17] = 0;
 		f32[18] = 0;
 		u32[19] = packed;

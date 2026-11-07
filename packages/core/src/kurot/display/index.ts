@@ -19,6 +19,7 @@ export { Stage } from './Stage.js';
 export { Graphics, setGraphicsHitTest } from './Graphics.js';
 export { Shape } from './Shape.js';
 export { Sprite } from './Sprite.js';
+export { BackdropBlur, type BackdropBlurOptions } from './BackdropBlur.js';
 // Pixel sources and shared texture frames.
 export { BitmapData, CompressedTextureData } from './texture/BitmapData.js';
 export { Texture, textureScaleFactor } from './texture/Texture.js';

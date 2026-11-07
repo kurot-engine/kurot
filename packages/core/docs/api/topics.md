@@ -2,7 +2,7 @@
 
 Read one capability list, then only the required symbol/member pages.
 
-- [display](topics/display.md) — 38 declarations
+- [display](topics/display.md) — 40 declarations
 - [events](topics/events.md) — 13 declarations
 - [external](topics/external.md) — 1 declarations
 - [filters](topics/filters.md) — 15 declarations

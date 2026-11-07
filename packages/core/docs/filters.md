@@ -1,5 +1,9 @@
 # GPU filters
 
+To blur previously drawn background while keeping later popup content sharp,
+use the native [BackdropBlur node](backdrop-blur.md). Ordinary display-object
+filters process that object's own content and descendants.
+
 Kurot executes `displayObject.filters` in array order. Each filter reads the
 previous filter's image. WebGL 1 and WebGL 2 are supported; shader sources are
 compiled verbatim, with no automatic GLSL translation.

@@ -1,5 +1,7 @@
 # display
 
+- [BackdropBlur](../BackdropBlur-class.md) — Class
+- [BackdropBlurOptions](../BackdropBlurOptions-interface.md) — Interface
 - [Bitmap](../Bitmap-class.md) — Class
 - [BitmapData](../BitmapData-class.md) — Class
 - [BitmapFillMode](../BitmapFillMode-typealias.md) — TypeAlias

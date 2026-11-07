@@ -38,6 +38,17 @@ function createContext(): WebGLRenderContext {
 }
 
 describe('WebGLRenderBuffer pool', () => {
+	it('finishes queued target activations before changing the root drawing-buffer size', () => {
+		const context = createContext();
+		const calls: string[] = [];
+		vi.mocked(context.flush).mockImplementation(() => { calls.push('flush'); });
+		context.resize = vi.fn(() => { calls.push('resize'); });
+		const root = new WebGLRenderBuffer(context, 30, 20, true);
+		calls.length = 0;
+		root.resize(15, 10);
+		expect(calls).toEqual(['flush', 'resize']);
+	});
+
 	it('fully resets transient state before reusing a buffer', () => {
 		const context = createContext();
 		const buffer = new WebGLRenderBuffer(context, 20, 30);

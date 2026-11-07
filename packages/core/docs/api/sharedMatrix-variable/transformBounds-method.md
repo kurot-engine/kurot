@@ -1,6 +1,6 @@
 # transformBounds
 
-Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 transformBounds(bounds: Rectangle): void;

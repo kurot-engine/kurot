@@ -1,6 +1,6 @@
 # removeEventListener
 
-Package: `@kurot/ui@5.0.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.0`. Generated from public declarations and JSDoc.
 
 ```ts
 removeEventListener: { (type: K, listener: (event: GroupEvents<T>[K]) => void, useCapture?: boolean): void; (type: string, listener: (event: Event) => void, useCapture?: boolean): void };

@@ -11,6 +11,20 @@ afterEach(() => {
 });
 
 describe('MaskPipe viewport clipping', () => {
+	it('preserves a rectangle-mask origin on the axis-aligned scissor path', () => {
+		const node = new Sprite();
+		node.mask = new Rectangle(15, 25, 40, 70);
+		const enableScissor = vi.fn();
+		const buffer = {
+			globalMatrix: new Matrix(2, 0, 0, 3, 10, 20), height: 400, hasScissor: false,
+			context: { enableScissor },
+		} as unknown as WebGLRenderBuffer;
+		const push = MaskPipe.makePush(node, 0, 0);
+		expect(new MaskPipe(() => {}).executeScrollRectPush(push, buffer)).toBe(true);
+		expect(enableScissor).toHaveBeenCalledWith(40, 95, 80, 210);
+		MaskPipe.releasePush(push);
+	});
+
 	it.each([
 		{ name: 'nested clip', nested: true, matrix: new Matrix(2, 0, 0, 2, 100, 120) },
 		{ name: 'rotated clip', nested: false, matrix: new Matrix(0, 2, -2, 0, 100, 120) },

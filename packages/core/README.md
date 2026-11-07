@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **3.1.0** (published on npm).
+for browser games. Package version: **3.2.0** (published on npm).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -16,11 +16,29 @@ and docs without requiring the engine source.
 | Audio time units, loops and channel cleanup | [Audio playback](docs/audio-playback.md) |
 | Resources, manifests and errors | [Resource loading](docs/resource.md) |
 | Shader and filter ownership | [Filters](docs/filters.md) |
+| Dynamic background blur and modal ordering | [BackdropBlur](docs/backdrop-blur.md) |
 
 ## Callback ownership
 
 Core 3 uses callback-only ticker registration. Use stable arrow members or callbacks
 bound once when they access instance state. See [ticker ownership](docs/ticker.md).
+
+## Background blur
+
+Core 3.2 adds the native `BackdropBlur` display node. Insert it before a modal
+mask and popup to blur earlier content while keeping later foreground sharp.
+Set width/height in logical units and synchronize them on resize. The node
+passes input through by default and does not pause game logic.
+
+WebGL 1/2 use GPU-only sampling, pooled targets and local compositing; Canvas
+uses a reusable approximation or preserves original background when native
+filters are unavailable. Parent offscreen effects isolate sampling; rendered
+cached ancestors are rejected. Full-screen Retina effects remain expensive;
+prefer modest quality and a suitable resolution cap. See
+[the complete contract and example](docs/backdrop-blur.md).
+
+This release provides the Core node. The separate UI package has an
+[UI 5.1 layout wrapper](../ui/docs/backdrop.md); XML integration is not added.
 
 ## Texture alpha testing
 
@@ -46,7 +64,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.1.0
+pnpm add @kurot/core@^3.2.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

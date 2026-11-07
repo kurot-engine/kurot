@@ -4,6 +4,105 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.2.0 — 2026-11-07
+
+Published; exact version and npm latest verified on 2026-11-07. Downloaded
+archive SHA-512/SHA-1 integrity passes; all 3,299 files match the tested release
+preparation byte-for-byte. Repository publication markers are updated after
+verification; the immutable npm archive retains its original preparation markers.
+
+### Added
+
+- Add native BackdropBlur and BackdropBlurOptions for dynamic regional
+  background blur in display order. Keep later foreground sharp, pass input
+  through by default and leave ticker/game suspension to the application.
+- Reuse GPU BlurFilter passes and bounded effect targets on WebGL 1/2, with
+  GPU-only sampling, premultiplied interpolation, transformed local blur,
+  clipping, density, sampling padding and target-edge extension.
+- Add a Canvas approximation with reusable working surfaces; preserve original
+  pixels when context.filter is unavailable. Document isolation, stacked
+  effects, cache restrictions and SAO integration.
+- Add an interactive backdrop-blur example and browser pixel/lifecycle tests.
+
+### Rendering optimization
+
+- Capture directly from existing parent textures; single-sample WebGL 2 canvases
+  downsample during framebuffer blit. Preserve the native-size temporary needed
+  by WebGL 1 and antialiased default canvases, returning it before blur executes.
+- Move BlurFilter's existing large-radius working-density reduction before
+  snapshot creation, eliminating redundant full-density local images and
+  intermediate upsampling. Keep application antialiasing and stage rendering.
+- Composite only the transformed effect quad. Interpolate premultiplied alpha
+  using destination blending, eliminating the original-image sampler.
+- Add a reproducible GPU timer-query benchmark with warmed per-scenario pools,
+  raw samples, median/p95 and explicit unavailable/disjoint-timer errors.
+
+### Fixed
+
+- Flush queued root-target activations before resizing the drawing buffer to
+  preserve the first rendered frame after resolution changes.
+- Preserve render groups' own filters and clips, including incremental rebuilds.
+- Preserve nonzero Rectangle-mask origins on the axis-aligned scissor path.
+- Unwind nested Canvas transforms, alpha, tint and clip state after a backdrop
+  sampling failure. A later frame preserves its original pixels and opacity.
+- Propagate inherited alpha and render density through Canvas object-mask
+  isolation, applying mask/final composition opacity once to match WebGL.
+
+### Release scope
+
+- Bump Core only, including Capabilities.engineVersion, active documentation
+  and generated API references. Existing UI/Game/DragonBones/ui-runtime and Spine
+  Core ^3.0.0 peers accept 3.2.0 and require no dependent SDK release.
+- New BackdropBlur callers require Core >=3.2.0 within 3.x. Defer UI Backdrop,
+  XML/CLI/document/runtime integration, SAO and example/template adoption until
+  their explicitly selected follow-up. CLI starter Core latest needs no change.
+- No npm publication is performed by this preparation.
+
+### Validation
+
+- Core build, example/benchmark production build and 1,057 tests pass. Strict
+  compilation includes the browser fixtures, benchmark and interactive example.
+- Twelve real Chromium cases cover Canvas/WebGL 1/WebGL 2 at device/output
+  densities 1/2/3 plus fractional resize. Pixel assertions cover dynamic
+  background, sharp foreground, exterior identity, transparent alpha, ancestor
+  opacity, stacking, affine transforms, clips, parent isolation and edge fill.
+- Include single-sample WebGL 2 at all three densities. Assert real downsampled
+  blit sizes, borrowed parent texture ownership, local composite geometry,
+  early large-radius reduction and visible pixels under each optimization.
+- Check repeated removal/reinsertion without new GPU textures or Canvas
+  objects, no GPU CPU readback, sampling exception recovery, real WebGL context
+  loss/restoration and Player cleanup. Canvas-without-filter fallback passes.
+- Add red-before/green-after nested Canvas exception tests plus real pixel
+  assertions for masked-parent world alpha and failure recovery.
+- Fifty existing related browser cases pass, including ordered/custom/multipass
+  effects, resource restoration, nested clips and unchanged golden screenshots.
+- Generated API coverage has no missing declarations; all 21 API examples pass
+  strict compilation against built and source-free packed declarations.
+- The source-free Core 3.2.0 archive passes all twelve backdrop browser cases
+  again, with runtime engineVersion 3.2.0 and no engine implementation source
+  loaded from the checkout.
+
+### GPU measurement — 2026-11-07
+
+M1 Max / ANGLE Metal, 1920 × 1080 backing canvas, fixed 960 × 540 logical
+fixture. Antialiased runs use before/after/after/before order, 30 timed samples
+per scenario per run after 12 warmups, without a concurrent GPU test runner.
+The table combines 60 GPU samples per version; idle pools are cleared before
+each scenario. Pool sizes are warmed idle effect targets, not total GPU memory.
+
+| Full-screen case, Q1 | GPU median before → after | Idle pool before → after |
+| --- | --- | --- |
+| Radius 12, inherited 2× | 7.27 → 7.12 ms | 33.31 → 33.31 MiB |
+| Radius 12, resolution 0.5 | 1.20 → 1.16 ms | 9.50 → 9.50 MiB |
+| Radius 48, inherited 2× | 2.18 → 2.04 ms | 31.82 → 11.33 MiB |
+| Radius 96, inherited 2× | 1.59 → 1.42 ms | 34.72 → 8.98 MiB |
+
+The small-radius full-resolution case remains expensive; minor timing changes
+can reflect GPU clocks/scheduling. Large radii chiefly reduce intermediate
+storage. A separate single-sample run at radius 12 / resolution 0.5 measures
+0.624 → 0.525 ms and 9.50 → 2.08 MiB; production antialiasing is not changed
+to obtain this path. See [raw results and metadata](examples/benchmark/backdrop/results/2026-11-07-m1-max.json).
+
 ## 3.1.0 — 2026-11-06
 
 Published; exact version and npm latest verified on 2026-11-06. Downloaded

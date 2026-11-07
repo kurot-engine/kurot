@@ -1,0 +1,13 @@
+# hostComponentKey
+
+Package: `@kurot/ui@5.1.0`. Generated from public declarations and JSDoc.
+
+```ts
+get hostComponentKey(): string;
+set hostComponentKey(value: string);
+```
+
+Inherited from `hostComponentKey`; shown with this receiver's substituted types.
+
+Key used to look up the default skin in the active Theme.
+Defaults to the component's class name if not set.

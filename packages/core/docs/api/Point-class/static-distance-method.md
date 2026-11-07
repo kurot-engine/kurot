@@ -1,6 +1,6 @@
 # static distance
 
-Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static distance(p1: Point, p2: Point): number;

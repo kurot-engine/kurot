@@ -21,6 +21,8 @@ import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { getRenderContentBounds } from '../render-bounds.js';
+import type { BackdropBlur } from '../../display/BackdropBlur.js';
+import { assertBackdropCache } from '../backdrop.js';
 
 // ── Transform context ─────────────────────────────────────────────────────────
 
@@ -48,7 +50,8 @@ const MASK_BUILD_OPTIONS: InstructionBuildOptions = { inlineRenderGroups: true }
 // ── Augmented instruction types ───────────────────────────────────────────────
 
 type BaseLeafInstruction =
-	BitmapInstruction | GraphicsInstruction | MeshInstruction | TextInstruction | ParticleInstruction | BitmapTextInstruction;
+	BitmapInstruction | GraphicsInstruction | MeshInstruction | TextInstruction | ParticleInstruction | BitmapTextInstruction |
+	{ renderPipeId: 'backdropBlur'; renderable: BackdropBlur; offsetX: number; offsetY: number };
 
 type LeafInstruction = BaseLeafInstruction & {
 	transform: TransformState;
@@ -209,6 +212,7 @@ export class WebGLRenderer {
 	): void {
 		const $displayList = displayObject.$displayList;
 		if ($displayList && !options?.isStage) {
+			assertBackdropCache(displayObject);
 			const inst = this._makeCacheInstruction(displayObject, offsetX, offsetY, buffer);
 			if (inst) set.addLeaf(inst);
 			return;
@@ -292,6 +296,8 @@ export class WebGLRenderer {
 		offsetY: number,
 	): BaseLeafInstruction | undefined {
 		switch (obj.$renderObjectType) {
+			case RenderObjectType.BACKDROP_BLUR:
+				return { renderPipeId: 'backdropBlur', renderable: obj as BackdropBlur, offsetX, offsetY };
 			case RenderObjectType.MESH:
 				return {
 					renderPipeId: 'mesh',
@@ -441,7 +447,7 @@ export class WebGLRenderer {
 		if (groupSet.structureDirty) {
 			this._releaseInstructions(groupSet);
 			groupSet.reset();
-			this._buildInstructions(obj, groupSet, buffer, offsetX, offsetY);
+			this._buildRenderGroupContents(obj, groupSet, buffer, offsetX, offsetY);
 			groupSet.structureDirty = false;
 		} else {
 			this._updateDirtyRenderables(groupSet);
@@ -456,6 +462,30 @@ export class WebGLRenderer {
 			offsetY,
 			transform,
 		} as RenderGroupInstruction);
+	}
+
+	private _buildRenderGroupContents(
+		obj: DisplayObject,
+		set: InstructionSet,
+		buffer: WebGLRenderBuffer,
+		x: number,
+		y: number,
+	): void {
+		// Render groups isolate instruction rebuilding, not compositing semantics.
+		switch (obj.$renderMode) {
+			case RenderMode.FILTER:
+				this._buildFilter(obj, set, buffer, x, y);
+				break;
+			case RenderMode.CLIP:
+				this._buildClip(obj, set, buffer, x, y);
+				break;
+			case RenderMode.SCROLLRECT:
+				this._buildScrollRect(obj, set, buffer, x, y);
+				break;
+			default:
+				this._buildInstructions(obj, set, buffer, x, y);
+				break;
+		}
 	}
 
 	private _makeCacheInstruction(
@@ -537,7 +567,7 @@ export class WebGLRenderer {
 					this._applyTransform(buffer, group.transform);
 					this._releaseInstructions(groupSet);
 					groupSet.reset();
-					this._buildInstructions(group.renderable, groupSet, buffer, 0, 0);
+					this._buildRenderGroupContents(group.renderable, groupSet, buffer, 0, 0);
 					groupSet.structureDirty = false;
 				} finally {
 					buffer.globalMatrix.copyFrom(savedMatrix);
@@ -631,6 +661,11 @@ export class WebGLRenderer {
 				const inst = set.instructions[i] as AnyInstruction;
 
 				switch (inst.renderPipeId) {
+					case 'backdropBlur': {
+						this._applyTransform(activeBuffer, inst.transform);
+						activeBuffer.context.drawBackdropBlur(inst.renderable, activeBuffer);
+						break;
+					}
 					// ── Leaf nodes ────────────────────────────────────────────────
 					case 'bitmap':
 					case 'mesh':

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kurot · BackdropBlur</title>
+		<style>
+			* { box-sizing: border-box; }
+			body { margin: 0; background: #0b1020; color: #e2e8f0; font: 14px system-ui, sans-serif; }
+			main { max-width: 1140px; margin: 40px auto; padding: 0 24px; }
+			h1 { margin: 8px 0; font-size: 28px; letter-spacing: -0.7px; }
+			p { color: #94a3b8; line-height: 1.7; }
+			nav, .controls { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin: 20px 0; }
+			a { color: #93c5fd; text-underline-offset: 4px; }
+			#viewport { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #334155; border-radius: 14px; }
+			canvas { display: block; width: 100%; height: 100%; }
+			label { display: flex; align-items: center; gap: 10px; }
+			input, button { accent-color: #60a5fa; }
+			button { padding: 9px 16px; border: 1px solid #475569; border-radius: 8px; background: #1e293b; color: #f8fafc; cursor: pointer; }
+			button:focus-visible, a:focus-visible { outline: 2px solid #93c5fd; outline-offset: 4px; }
+			#status { color: #67e8f9; }
+		</style>
+	</head>
+	<body>
+		<main>
+			<span id="status">正在初始化渲染器…</span>
+			<h1>背景在动，弹窗保持清晰。</h1>
+			<p>模糊只影响矩形范围内已经绘制的内容。文字和按钮随后绘制；左侧场景保持原样。</p>
+			<nav aria-label="渲染后端">
+				<a href="?backend=webgl2">WebGL 2</a>
+				<a href="?backend=webgl1">WebGL 1</a>
+				<a href="?backend=canvas">Canvas 2D</a>
+				<a href="/benchmark/backdrop/">GPU 性能测试</a>
+			</nav>
+			<div id="viewport"><canvas aria-label="Kurot 动态背景模糊演示"></canvas></div>
+			<div class="controls">
+				<label>模糊 <input id="blur" aria-label="模糊强度" type="range" min="0" max="96" value="12" /><output id="radius">12</output></label>
+				<label>效果透明度 <input id="alpha" aria-label="效果透明度" type="range" min="0" max="1" step="0.05" value="1" /></label>
+				<button id="toggle">移除模糊层</button>
+				<button id="stack">叠加第二个弹窗</button>
+				<button id="motion">暂停背景动画</button>
+			</div>
+			<p>Canvas 使用浏览器的近似模糊。可拖动窗口观察舞台适配；“移除模糊层”保留弹窗，方便直接比较背景细节。</p>
+		</main>
+		<script type="module" src="./main.ts"></script>
+	</body>
+</html>

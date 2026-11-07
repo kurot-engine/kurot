@@ -1,6 +1,6 @@
 # once
 
-Package: `@kurot/core@3.1.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 once<K extends string>(type: K, listener: (event: DisplayObjectEvents[K]) => void, useCapture?: boolean, priority?: number): void;
