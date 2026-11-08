@@ -9,6 +9,8 @@ format changes are documented explicitly in each release.
 
 ## 5.1.1 — 2026-11-08
 
+The published [npm package](https://www.npmjs.com/package/@kurot/cli/v/5.1.1) matches the tested archive byte for byte. Its `gitHead` and the annotated release tag identify the same source. See the [publication record](../../CHANGELOG.md#2026-11-08--cli-511-published-and-verified) for the integrity and commit.
+
 - When a component is added during `kurot dev`, the generated namespace now exports it as soon as the CLI reports a successful refresh. In 5.1.0 an overlapping watch build could leave the new export missing until another rebuild. No project configuration or runtime dependency changes are required.
 
 ## 5.1.0 — 2026-11-08

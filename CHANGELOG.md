@@ -5,11 +5,14 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
-## 2026-11-08 — CLI 5.1.1 prepared
+## 2026-11-08 — CLI 5.1.1 published and verified
 
-- Only the CLI changes. During `kurot dev`, adding a reusable component now refreshes its namespace even when another source build is in flight. See the [CLI changelog](packages/cli/CHANGELOG.md#511--2026-11-08).
-- SDK dependencies, Node requirements and consumer locks are unchanged. After publication, projects on `^5.0.0` or `~5.1.0` can update their lock. Projects pinned to 5.1.0 (including SAO) or on `~5.0.0` must change their CLI declaration to adopt the fix.
+- [npm](https://www.npmjs.com/package/@kurot/cli/v/5.1.1) published CLI 5.1.1 at 15:30 UTC and marked it `latest`. The [downloaded archive](https://registry.npmjs.org/@kurot/cli/-/cli-5.1.1.tgz) is byte-identical to the tested candidate (370,784 bytes, 304 files). Its verified registry integrity is `sha512-wqqR3pd94dDWYdPszZOQVGcb3H38DU5SZmYjUVyG3ecMB6cAtnGb71heK4RE2yQN5nYtH7pXFx7CUoSLLak5cQ==`.
+- npm's `gitHead` and the annotated tag `@kurot/cli@5.1.1` point to the same [release source](https://github.com/kurot-engine/kurot/commit/de42bd67109a3f6a8223b071d2e1cd1c691fc2f0). All 11 [CI jobs](https://github.com/kurot-engine/kurot/actions/runs/42494389284) passed on that commit.
+- Only the CLI was released. During `kurot dev`, adding a reusable component now refreshes its namespace even when another source build is in flight. See the [CLI changelog](packages/cli/CHANGELOG.md#511--2026-11-08).
+- SDK dependencies, Node requirements and consumer locks are unchanged. Projects on `^5.0.0` or `~5.1.0` can update their lock. Projects pinned to 5.1.0 or on `~5.0.0` must change their CLI declaration to adopt the fix.
 - All 224 CLI tests passed. The packed CLI built both starters in development and release on Node 22.12.0 and 22.23.4. A running `kurot dev` served the new component export after its first successful refresh; the generated module loaded and the component could be instantiated without restarting the server.
+- A fresh npm registry install on Node 22.12.0 also reported version 5.1.1, served and instantiated a newly added component without restarting `kurot dev`, and built the project for release.
 
 ## 2026-11-08 — CLI 5.1.0 published and verified
 
