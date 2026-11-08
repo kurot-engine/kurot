@@ -5,7 +5,7 @@ console prints `Kurot game started`. Add your gameplay in `src/Main.ts`.
 
 ## Run and build
 
-Use Node.js 20+ and pnpm from this project directory:
+Use Node.js 22.x (22.12.0 or later) and pnpm. Run `nvm use` in this project if you use nvm:
 
 ```sh
 pnpm install

@@ -11,19 +11,18 @@ permissions:
 
 jobs:
   packages:
-    name: ${{ matrix.package }} · Node ${{ matrix.node }}
+    name: ${{ matrix.package }} · Node 22
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         package: [core, ui, game, cli, ui-document, ui-runtime, atlas, dragonbones, bitmap-font]
-        node: [20, 22]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version-file: .nvmrc
       - run: npm install --global pnpm@10.33.0
       # UI's Vitest config aliases Core to its source instead of the npm peer.
       - if: matrix.package == 'ui'
@@ -31,16 +30,17 @@ jobs:
       - run: pnpm --dir packages/${{ matrix.package }} install --frozen-lockfile
       - run: pnpm --dir packages/${{ matrix.package }} build
       - run: pnpm --dir packages/${{ matrix.package }} test
-      # Contributor tooling uses a recent Node 20 patch; the installed CLI
-      # promises the entire 20.x line. Check its bin on the actual floor.
+      - name: Create and build both templates using the packed CLI
+        if: matrix.package == 'cli'
+        run: bash tools/ci/check-cli-templates.sh
       - name: Switch to the oldest supported runtime for the CLI smoke test
-        if: matrix.package == 'cli' && matrix.node == 20
+        if: matrix.package == 'cli'
         uses: actions/setup-node@v4
         with:
-          node-version: 20.0.0
-      - if: matrix.package == 'cli' && matrix.node == 20
+          node-version: 22.12.0
+      - if: matrix.package == 'cli'
         run: npm install --global pnpm@10.33.0
-      - name: Create and build both templates using the packed CLI
+      - name: Verify both packed templates at the Node 22.12.0 floor
         if: matrix.package == 'cli'
         run: bash tools/ci/check-cli-templates.sh
 
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
       - run: npm install --global pnpm@10.33.0
       # UI browser fixtures load Core source and its bitmap-font dependency.
       - run: pnpm --dir packages/core install --frozen-lockfile

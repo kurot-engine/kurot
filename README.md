@@ -21,7 +21,7 @@ has no unified workspace install/build command.
 | [`@kurot/core`](packages/core/README.md)               | 3.2.3   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 5.1.2   | `packages/ui`          | Skinnable UI components, typed lists and part fields, layout, theming, and data binding                         | `@kurot/core`               |
 | [`@kurot/game`](packages/game/README.md)               | 3.0.1   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 4.1.4   | `packages/cli`         | KUI XML compilation, declared-part validation and project tooling; EXML projects use CLI 1.3.x                   | `ui-document`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 5.0.0   | `packages/cli`         | KUI XML compilation, declared-part validation and project tooling; EXML projects use CLI 1.3.x                   | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.14.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
 | [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.13.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
 | [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.1   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
@@ -40,7 +40,7 @@ Current manifest dependency ranges:
 | Core 3.2.3        | bitmap-font `^0.1.0`                              |
 | UI 5.1.2         | Core `^3.2.1`                                     |
 | Game 3.0.1        | Core `^3.0.0`                                     |
-| CLI 4.1.4         | ui-document `^0.14.0`                             |
+| CLI 5.0.0         | ui-document `^0.14.0`                             |
 | ui-runtime 0.13.0 | Core `^3.0.0`, UI `^5.0.0`, ui-document `^0.14.0` |
 | dragonbones 0.2.0 | Core `^3.0.0`                                     |
 
@@ -55,7 +55,7 @@ and runtime 0.11. See [RichLabel](packages/ui/docs/rich-label.md). CLI-built ski
 use UI directly; existing applications keep their own installed versions.
 
 UI 4.2 adds item-data generics through collections, lists and item-tap events.
-Declared typed list fields in KUI hosts require CLI >= 4.1.1 within 4.x; ordinary
+Declared typed list fields in KUI hosts require CLI 4.1.1 or later; ordinary
 TypeScript use needs only UI 4.2. See [typed list data](packages/ui/docs/list-data-types.md).
 
 Core 3.2 adds native `BackdropBlur`. It samples
@@ -76,7 +76,7 @@ reachable mixed-size scroll tails and more compact Label outline insets. Stable
 font frames and baselines are preserved. UI's Core peer remains ^3.2.1; use
 Core 3.2.2 to include the accompanying Core corrections. See the package
 CHANGELOGs for release details and validation.
-Core 3.2.3, Game 3.0.1, CLI 4.1.3, Atlas 0.1.1 and ui-runtime 0.13.0 are published; their package tags point to the verified release source. DragonBones 0.2.0 is also published. CLI 4.1.4 is prepared for publication to support TypeScript project configuration on Node 20.
+Core 3.2.3, Game 3.0.1, CLI 4.1.3, Atlas 0.1.1 and ui-runtime 0.13.0 are published; their package tags point to the verified release source. DragonBones 0.2.0 is also published. CLI 5.0.0 is prepared for publication. It requires Node.js 22.12.0 or later and loads TypeScript project configs without an external loader. Existing projects on CLI 4.x opt in explicitly; browser SDK versions do not change.
 Game, DragonBones and ui-runtime retain Core ^3.0.0 peers. ui-runtime also
 requires UI ^5.0.0. Callback receiver parameters and unsupported
 Texture methods have been removed. See [ticker ownership](packages/core/docs/ticker.md),
@@ -88,7 +88,7 @@ for the same Core 3 line.
 
 ### Requirements
 
-- Node.js 20 or later
+- Node.js 22.x for development and CI (minimum 22.12.0); run `nvm use` from this repository
 - pnpm 10.33.0
 - A modern browser environment with ES2022 and ESM support
 

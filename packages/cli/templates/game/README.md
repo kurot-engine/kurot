@@ -5,7 +5,7 @@ and Tween animation. Extend `src/Main.ts` with your game's rules and interaction
 
 ## Run and build
 
-Use Node.js 20+ and pnpm from this project directory:
+Use Node.js 22.x (22.12.0 or later) and pnpm. Run `nvm use` in this project if you use nvm:
 
 ```sh
 pnpm install

@@ -1,10 +1,11 @@
 {
 	"name": "@kurot/cli",
-	"version": "4.1.4",
+	"version": "5.0.0",
 	"description": "Kurot CLI - build tool for Kurot Editor KUI XML workflows",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
 	"type": "module",
+	"engines": { "node": ">=22.12.0" },
 	"main": "./dist/define.js",
 	"types": "./dist/define.d.ts",
 	"bin": {

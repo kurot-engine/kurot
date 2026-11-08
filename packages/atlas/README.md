@@ -13,6 +13,9 @@ It can be called by Reskin, Editor, a separate atlas tool or build automation.
 - `@kurot/atlas/png`: synchronous Node.js >=20 PNG decoding/encoding through
   [pngjs](https://github.com/pngjs/pngjs), without native binaries.
 
+This subpath's runtime minimum is independent of the repository build tools;
+use Node 22.x (22.12.0 or later) when developing Kurot.
+
 The package performs no filesystem I/O. Callers own reading, source-image storage,
 project-path validation, resource manifests, worker scheduling and atomic saves.
 The PNG functions are synchronous; run larger batches in your tool's worker.

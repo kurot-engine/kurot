@@ -8,6 +8,7 @@ on:
       - packages/ui/**
       - tools/api-docs/**
       - .github/workflows/api-docs.yml
+      - .nvmrc
   workflow_dispatch:
 
 permissions:
@@ -21,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
       - run: npm install --global pnpm@10.33.0
       - run: pnpm --dir packages/core install --frozen-lockfile
       - run: pnpm --dir packages/game install --frozen-lockfile

@@ -23,7 +23,10 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 const [archive, cli] = process.argv.slice(2);
 const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
-assert.equal(manifest.devDependencies['@kurot/cli'], '^' + JSON.parse(readFileSync(cli, 'utf8')).version);
+const cliManifest = JSON.parse(readFileSync(cli, 'utf8'));
+assert.equal(manifest.devDependencies['@kurot/cli'], '^' + cliManifest.version);
+assert.equal(manifest.engines.node, cliManifest.engines.node);
+assert.equal(readFileSync('.nvmrc', 'utf8').trim(), '22');
 manifest.devDependencies['@kurot/cli'] = 'file:' + archive;
 writeFileSync('package.json', JSON.stringify(manifest, null, 2));
 JS

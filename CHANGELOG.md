@@ -5,13 +5,12 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
-## 2026-11-08 — Verified SDK publication and CLI 4.1.4 preparation
+## 2026-11-08 — Verified SDK publication and CLI 5.0.0 preparation
 
 - Downloaded and verified the registry SHA-512 for CLI 4.1.3, Atlas 0.1.1, Core 3.2.3, Game 3.0.1 and ui-runtime 0.13.0. Clean builds of the release source reproduced all five npm archives byte for byte.
 - The npm metadata records the earlier `gitHead` (`433a376a`). Use the annotated tags `@kurot/cli@4.1.3`, `@kurot/atlas@0.1.1`, `@kurot/core@3.2.3`, `@kurot/game@3.0.1` and `@kurot/ui-runtime@0.13.0` at `57e3f50a` for the matching source. Repository publication markers are updated separately from immutable package contents.
-- Prepare CLI 4.1.4 only: the installed CLI loads TypeScript project configs on Node 20 without a separate loader. Existing game configs and SDK peer ranges remain compatible. Exact CLI pins in consumer projects can adopt the patch explicitly; scaffolds start their CLI caret range at the version that created them.
-- CI builds and tests all nine packages on Node 20 and 22, builds both templates with the packed CLI, and checks Core/UI in Chromium.
-- Local verification: 2,556 package tests on each of Node 20 and Node 22; Core 148 browser tests, UI 42, and 22 strict API examples against both built declarations and installed archives. Both starter templates complete development and release builds with the packed CLI on Node 20.0.0, 20.20.2, 22.23.4, 24.22.2 and 26.13.0.
+- Prepare CLI 5.0.0 only. Its Node minimum moves from 20 to 22.12.0. CLI and generated projects declare this requirement, and the repository and templates select Node 22 via `.nvmrc`. A CLI 4.x range or exact lock does not adopt 5.x automatically. Configs, KUI and browser SDK contracts are unchanged; application adoption is separate.
+- CI builds and tests all nine packages on the Node 22 line, exercises the packed CLI on both the current 22.x and 22.12.0, and checks Core/UI in Chromium. Publication of CLI 5.0.0 is pending.
 
 ## 2026-11-08 — SDK review fixes prepared for publication
 

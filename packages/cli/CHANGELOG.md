@@ -7,12 +7,13 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## 4.1.4 — 2026-11-08
+## 5.0.0 — 2026-11-08
 
 Prepared for publication.
 
-- Build and release new game and empty projects on Node 20 without a TypeScript preloader. The CLI now loads TypeScript configs and their relative helpers itself. Default and named exports, native JavaScript configs, and root-only dev refresh keep their existing contracts.
-- No engine peer or application config changes are required.
+- **Breaking:** CLI and its new projects require Node.js >= 22.12.0. Develop and build on the latest Node 22.x. Projects pinned to 4.x must explicitly adopt 5.x after upgrading Node; Node 20 is outside the supported range.
+- The CLI loads TypeScript configs and their relative helpers without a separate preloader, including on 22.12.0. Default and named exports, native JavaScript configs, and root-only dev refresh retain their existing behavior. Both starter templates include `.nvmrc` and declare the same Node requirement.
+- No engine peer, KUI format or application config changes are required.
 
 ## 4.1.3 — 2026-11-08
 

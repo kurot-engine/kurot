@@ -41,8 +41,12 @@ Third-party tools are separate from this graph. Core's linebreak package is a
 runtime dependency; Atlas's PNG adapter uses pngjs. SDK build compilers, Vitest,
 test-only esbuild and browser tools are development dependencies. TypeScript is
 an ordinary CLI dependency for semantic Skin-field checks. The CLI's
-esbuild, parse5 and postcss-value-parser are dependencies of the build tool,
+esbuild, jiti, parse5 and postcss-value-parser are dependencies of the build tool,
 not game runtime dependencies.
+
+CLI 5 requires Node.js 22.12.0 or newer. A project on CLI 4.x must upgrade
+Node and explicitly select CLI 5 to adopt it. This changes the build tool's
+requirements only; it does not raise the runtime peer ranges of any game SDK.
 
 Consumers upgrading ui-runtime from 0.12.x to 0.13.x must select the new minor explicitly.
 For authored IDs containing reserved path characters, use the runtime's qualified key helpers;

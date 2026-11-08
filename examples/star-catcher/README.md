@@ -8,7 +8,7 @@ round commands and an accessible status mirror.
 
 ## Run
 
-Use Node.js >= 20 and pnpm 10.33.0 in this directory:
+Use Node.js 22.x (22.12.0 or later) and pnpm 10.33.0 in this directory:
 
 ```sh
 pnpm install --frozen-lockfile

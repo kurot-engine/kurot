@@ -1,8 +1,8 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **4.1.4** (prepared for publication).
-Requires Node.js >= 20 and
+resource watching. Package version: **5.0.0** (prepared for publication).
+Requires Node.js >= 22.12.0 (develop and test on 22.x) and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
 
@@ -29,6 +29,8 @@ semantic materialization uses runtime 0.11. See the
 
 ## Usage
 
+When migrating from CLI 4.x, update to the latest Node 22.x first, then explicitly change the CLI dependency to 5.x and reinstall. The existing TypeScript config, KUI files and game SDK dependencies can stay as they are.
+
 The CLI does not require a global install. Install it as a project development
 dependency. New scaffolds resolve current SDK versions from npm and fall back to
 latest when lookup fails. The game template uses Core 3 and Game 3's callback
@@ -36,7 +38,7 @@ API. Existing projects keep their own
 installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@4.1.4 create my-game
+npx @kurot/cli@5.0.0 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -44,7 +46,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^4.1.4`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^5.0.0`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -127,7 +129,7 @@ Removes the configured development output and `bin-release`. Output paths must b
 
 ## Configuration
 
-The CLI loads `kurot.config.ts` on Node.js 20 and later, including relative TypeScript
+The CLI loads `kurot.config.ts` on Node.js 22.12.0 and later, including relative TypeScript
 helpers. Generated projects need no loader flags or extra dependencies. If both
 files exist, TypeScript takes precedence over `kurot.config.js`; JavaScript
 configuration continues to use the native Node loader.
@@ -343,8 +345,7 @@ stylesheet must contain valid font definitions even if the build only consumes
 colors; see the shared [project style contract](../ui-document/docs/project-styles.md).
 The CLI does not load fonts, apply runtime CSS or introduce live game theme
 switching. CLI-built skins run directly through `@kurot/ui`; `@kurot/ui-runtime`
-is not required for this compilation path. Node.js >= 20 and semantic format
-version 2 remain unchanged.
+is not required for this compilation path. The semantic document format remains version 2.
 
 Only `@style:colors:<key>` is accepted for authored palette references.
 Ordinary text remains literal; color expansion changes compiled copies only.
