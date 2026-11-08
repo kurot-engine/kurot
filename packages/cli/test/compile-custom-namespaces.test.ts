@@ -7,6 +7,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { refreshProjectComponents } from '../src/core/components/discover-components.js';
 import { createContext, disposeContext } from '../src/core/pipeline.js';
 import { compileSource } from '../src/core/plugins/compile-source.js';
+import { startSourceWatch } from '../src/core/source-watch.js';
+import { namespaceEntriesPlugin } from '../src/core/namespace-entries.js';
+import { skinPartValidationPlugin } from '../src/core/kui/skin-part-watch.js';
 import type { Project, ProjectComponent } from '../src/core/project.js';
 
 const temporaryDirs: string[] = [];
@@ -137,6 +140,55 @@ describe('automatic component namespace compilation', () => {
 				const a = await import(${JSON.stringify(app)}), n = await import(${JSON.stringify(ns)});
 				if (new a.Base().lookup() !== n.Derived || !(new n.Derived() instanceof a.Base)) process.exit(1);
 			`]);
+		}
+	});
+
+	it.each([false, true])('installs new namespace exports when a refresh overlaps an older build (old failure: %s)', async oldFails => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kurot-namespace-overlap-'));
+		temporaryDirs.push(root);
+		const first = createComponent(root, path.join(root, 'BetButton.ts'));
+		const project = createProject(root, path.join(root, 'out'), first);
+		const ctx = createContext(project, { watch: true });
+		const second = { ...first, name: 'HistoryItem', source: path.join(root, 'HistoryItem.ts') };
+		await fs.writeFile(first.source, 'export class BetButton {}');
+		await fs.writeFile(second.source, 'export class HistoryItem {}');
+		const output = path.join(project.outputDir, 'ns.mjs');
+		const captured = Promise.withResolvers<void>();
+		const resume = Promise.withResolvers<void>();
+		let builds = 0;
+		try {
+			await startSourceWatch(ctx, {
+				absWorkingDir: root, entryPoints: ['#ns/game'], bundle: true, format: 'esm', outfile: output,
+				plugins: [namespaceEntriesPlugin(project.customNamespaces, root), skinPartValidationPlugin(ctx), {
+					name: 'hold-old-output',
+					setup(build): void {
+						build.onEnd(async () => {
+							if (++builds === 2) {
+								captured.resolve();
+								await resume.promise;
+								if (oldFails) {
+									return { errors: [{ text: 'Stale component list' }] };
+								}
+							}
+						});
+					},
+				}],
+			});
+			const old = ctx.outputs.sourceRebuilder!().catch(error => {
+				if (!oldFails || !String(error).includes('Stale component list')) {
+					throw error;
+				}
+			});
+			await captured.promise;
+			project.components.push(second);
+			const refreshed = ctx.outputs.sourceRebuilder!();
+			resume.resolve();
+			await Promise.all([old, refreshed]);
+			const namespace = await import(pathToFileURL(output).href);
+			expect(Object.keys(namespace)).toEqual(['BetButton', 'HistoryItem']);
+		} finally {
+			resume.resolve();
+			await disposeContext(ctx);
 		}
 	});
 

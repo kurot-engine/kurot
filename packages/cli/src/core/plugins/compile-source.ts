@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { logger } from '../../utils/logger.js';
 import { namespaceEntriesPlugin } from '../namespace-entries.js';
+import { startSourceWatch } from '../source-watch.js';
 import { skinPartValidationPlugin } from '../kui/skin-part-watch.js';
 import type { BuildContext, BuildPlugin } from '../pipeline.js';
 
@@ -59,18 +60,7 @@ export function compileSource(): BuildPlugin {
 				},
 			};
 
-			let result: esbuild.BuildResult;
-			if (ctx.watch) {
-				const context = await esbuild.context({ ...options, write: false });
-				ctx.disposers.push(() => context.dispose());
-				ctx.outputs.sourceRebuilder = async () => {
-					await context.rebuild();
-				};
-				result = await context.rebuild();
-				await context.watch();
-			} else {
-				result = await esbuild.build(options);
-			}
+			const result = ctx.watch ? await startSourceWatch(ctx, options) : await esbuild.build(options);
 
 			// Multiple entries may use the same barrel. Match the emitted entry name,
 			// not the first JS file in the metafile (which may be a shared chunk).
