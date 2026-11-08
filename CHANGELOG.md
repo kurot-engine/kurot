@@ -5,6 +5,12 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-08 — CLI 5.1.0 prepared
+
+- CLI 5.1.0 shares project modules between the game and custom KUI namespaces and compiles state-dependent children with `includeIn`. Node, ui-document and engine runtime requirements are unchanged. See the [CLI changelog](packages/cli/CHANGELOG.md#510--2026-11-08).
+- Only the CLI needs publication. A project on `^5.0.0` can adopt 5.1.0 by updating its lock after publication; exact 5.0.0 and `~5.0.0` consumers must change their declarations to adopt it. In particular, SAO keeps its tested 5.0.0 patch until it can install the formal release. No consumer lock is changed here.
+- All 222 CLI tests passed. The packed CLI scaffolded both `game` and `empty` and built each in development and release on Node 22.12.0 and 22.23.4. All 59 shipped JavaScript files match the patched CLI used for SAO's regression checks byte for byte.
+
 ## 2026-11-08 — Examples and Templates adopt CLI 5 and Node 22
 
 - Update demo, game and star-catcher plus Card Booster, MilfMaster, Runaway,

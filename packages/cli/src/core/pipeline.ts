@@ -36,22 +36,6 @@ export interface BuildOutputs {
 	 * Import-map entries from module specifiers to output-relative chunk paths.
 	 */
 	engine: Record<string, string>;
-	/**
-	 * Source modules already owned by namespace bundles.
-	 *
-	 * Keys are normalized, extensionless absolute paths. Values are virtual
-	 * namespace specifiers. Source compilation uses the map to preserve a single
-	 * class identity when relative imports bypass a namespace entry.
-	 */
-	namespaceModules: Map<string, string>;
-	/**
-	 * Generated entry sources for convention-based component namespaces.
-	 */
-	namespaceEntries: Map<string, string>;
-	/**
-	 * Namespace rebuild callbacks used when component membership changes.
-	 */
-	namespaceRebuilders: Map<string, () => Promise<void>>;
 }
 
 /**
@@ -127,9 +111,6 @@ export function createContext(
 		diagnostics: new DiagnosticCollector({ strict }),
 		outputs: {
 			engine: {},
-			namespaceModules: new Map(),
-			namespaceEntries: new Map(),
-			namespaceRebuilders: new Map(),
 		},
 		disposers: [],
 	};

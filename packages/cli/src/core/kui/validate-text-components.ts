@@ -18,7 +18,9 @@ export function validateTextComponents(document: UIDocument): void {
 				throw new Error(`${node.type} "${node.id}" cannot contain display children.`);
 			}
 			for (const [name, value] of Object.entries(node.properties)) {
-				validateProperty(node, name, value);
+				if (name !== 'includeIn') {
+					validateProperty(node, name, value);
+				}
 			}
 		}
 		for (const child of node.children) {

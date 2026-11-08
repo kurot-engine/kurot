@@ -7,6 +7,12 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 5.1.0 — 2026-11-08
+
+- Compile applications and custom KUI namespaces in one module graph in both modes. Aliases, relative imports and KUI share component constructors and business singletons; private third-party imports no longer target the public namespace barrel.
+- Support [state-dependent visual children](docs/state-children.md) using `includeIn`: compiled states attach and remove existing nodes in authored order without changing their visibility. Uses the existing UI state API.
+- Node.js >=22.12.0 and `@kurot/ui-document@^0.14.0` remain unchanged. Rebuild existing projects to use these changes. When moving off a patched 5.0.0, remove the version-specific patch and reinstall.
+
 ## 5.0.0 — 2026-11-08
 
 Published on npm. All 299 files match the tested candidate in path and contents.

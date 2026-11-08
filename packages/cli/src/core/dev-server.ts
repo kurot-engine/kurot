@@ -5,13 +5,11 @@ import { createContext, disposeContext, runPipeline } from './pipeline.js';
 import {
 	compileKUI,
 	compileEngine,
-	compileCustomNamespaces,
 	writeComponentCatalog,
 	compileSource,
 	generateHtml,
 	copyAssets,
 } from './plugins/index.js';
-import { refreshGeneratedNamespaceEntries } from './plugins/compile-custom-namespaces.js';
 import { refreshProjectComponents } from './components/discover-components.js';
 import { createResourceAssetSync } from './resource-asset-sync.js';
 import { rebuildSkinPartSources } from './kui/skin-part-watch.js';
@@ -60,7 +58,6 @@ export async function startDevServer(project: Project, options: DevServerOptions
 		await runPipeline(ctx, [
 			compileKUI(),
 			compileEngine(),
-			compileCustomNamespaces(),
 			writeComponentCatalog(),
 			compileSource(),
 			generateHtml(),
@@ -211,7 +208,6 @@ function watchComponents(
 					try {
 						await refreshProjectComponents(project);
 						await compileKUI().apply(ctx);
-						await refreshGeneratedNamespaceEntries(ctx, false);
 						await rebuildSkinPartSources(ctx);
 						await writeComponentCatalog().apply(ctx);
 						await syncAssets();

@@ -98,6 +98,9 @@ class CodeGenerator {
 			const uiImports = moduleImports.get('@kurot/ui')!;
 			uiImports.add('State');
 			uiImports.add('SetProperty');
+			if (this._ir.states.some(state => state.overrides.some(override => override.type === 'AddItems'))) {
+				uiImports.add('AddItems');
+			}
 		}
 
 		for (const [modulePath, classes] of moduleImports) {
@@ -139,7 +142,7 @@ class CodeGenerator {
 		this.emitNodeDeclarations(this._ir.children);
 
 		if (this._ir.children.length > 0) {
-			const childVars = this._ir.children.map(n => n.varName).join(', ');
+			const childVars = this._ir.children.filter(n => !n.includeIn).map(n => n.varName).join(', ');
 			this.line(`skin.elementsContent = [${childVars}];`);
 		}
 
@@ -170,7 +173,7 @@ class CodeGenerator {
 				const info = lookupComponent(node.className);
 				const defaultProp = info?.defaultProperty ?? 'elementsContent';
 				const isArray = info?.isArray !== false;
-				const childVars = node.children.map(c => c.varName).join(', ');
+				const childVars = node.children.filter(c => !c.includeIn).map(c => c.varName).join(', ');
 				if (isArray) {
 					this.line(`${node.varName}.${defaultProp} = [${childVars}];`);
 				} else {
@@ -258,19 +261,22 @@ class CodeGenerator {
 	 */
 	private generateStateExpr(state: StateDef): string {
 		if (state.overrides.length === 0) {
-			return `new State("${state.name}")`;
+			return `new State(${JSON.stringify(state.name)})`;
 		}
 
 		const overrides = state.overrides.map(o => this.generateOverrideExpr(o)).join(', ');
 
-		return `new State("${state.name}", [${overrides}])`;
+		return `new State(${JSON.stringify(state.name)}, [${overrides}])`;
 	}
 
 	/**
 	 * Formats a runtime SetProperty state override.
 	 */
 	private generateOverrideExpr(override: StateOverride): string {
-		return `new SetProperty("${override.targetId}", "${override.name}", ${this.propertyValueToJS(override.name, override.value)})`;
+		if (override.type === 'AddItems') {
+			return `new AddItems(${JSON.stringify(override.targetId)}, ${JSON.stringify(override.destination)}, ${override.position})`;
+		}
+		return `new SetProperty(${JSON.stringify(override.targetId)}, ${JSON.stringify(override.name)}, ${this.propertyValueToJS(override.name, override.value)})`;
 	}
 
 	/**
@@ -346,7 +352,7 @@ class CodeGenerator {
 	private hasPropertyInTree(propertyName: string): boolean {
 		if (
 			this._ir.properties.some(prop => prop.name === propertyName) ||
-			this._ir.states.some(state => state.overrides.some(override => override.name === propertyName))
+			this._ir.states.some(state => state.overrides.some(override => override.type === 'SetProperty' && override.name === propertyName))
 		)
 			return true;
 

@@ -21,6 +21,7 @@ import type {
 import { localName, lookupComponent } from './registry.js';
 import type { NamespaceModule } from './registry.js';
 import { validateFlipProperties } from './validate-flip-properties.js';
+import { addStateChildren, parseIncludedStates } from './state-membership.js';
 import { validateTextComponents } from './validate-text-components.js';
 
 /**
@@ -48,6 +49,7 @@ class KUIParseContext {
 	private readonly _skinParts: string[] = [];
 	private readonly _unresolvedTags: UnresolvedTag[] = [];
 	private _variable = 0;
+	private readonly _stateNames: ReadonlySet<string>;
 
 	/**
 	 * Creates the conversion context for a resolved UI document.
@@ -57,7 +59,9 @@ class KUIParseContext {
 		private readonly _document: UIDocument,
 		private readonly _className: string,
 		private readonly _customNamespaces: readonly NamespaceModule[],
-	) {}
+	) {
+		this._stateNames = new Set(Object.keys(_document.contract.states));
+	}
 
 	/**
 	 * Builds the Skin IR from the document root and contract.
@@ -71,7 +75,11 @@ class KUIParseContext {
 
 		const width = numericProperty(root.properties.width);
 		const height = numericProperty(root.properties.height);
+		parseIncludedStates(root.properties.includeIn, this._stateNames, root.id, false);
 		const rootProperties = this._properties(root, new Set(['height', 'width']));
+		const children = root.children.map(child => this._node(child)).filter(isSkinNode);
+		const states = this._states();
+		addStateChildren(states, children);
 
 		return {
 			className: this._className,
@@ -80,9 +88,9 @@ class KUIParseContext {
 			properties: rootProperties.properties,
 			imports: this._imports,
 			skinParts: this._skinParts,
-			children: root.children.map(child => this._node(child)).filter(isSkinNode),
+			children,
 			propertyChildren: rootProperties.propertyChildren,
-			states: this._states(),
+			states,
 			declarations: [],
 			unresolvedTags: this._unresolvedTags,
 		};
@@ -91,7 +99,7 @@ class KUIParseContext {
 	/**
 	 * Converts a supported node and records imports, Skin parts and unknown tags.
 	 */
-	private _node(node: UINode, exposeAsPart = true): SkinNode | undefined {
+	private _node(node: UINode, exposeAsPart = true, visual = true): SkinNode | undefined {
 		if (node.instance !== undefined) {
 			throw new Error(`KUI Skin node "${node.id}" cannot be a reusable component instance.`);
 		}
@@ -112,15 +120,18 @@ class KUIParseContext {
 			this._skinParts.push(node.id);
 		}
 
-		const { properties, propertyChildren } = this._properties(node);
+		const includeIn = parseIncludedStates(node.properties.includeIn, this._stateNames, node.id, visual && exposeAsPart);
+		const { properties, propertyChildren } = this._properties(node, new Set(['includeIn']));
+		const visualChildren = (info.defaultProperty ?? 'elementsContent') === 'elementsContent';
 
 		return {
 			className,
 			module: info.module,
 			varName: safeVariable(node.id, className, ++this._variable),
 			id: node.id,
+			includeIn,
 			properties,
-			children: node.children.map(child => this._node(child)).filter(isSkinNode),
+			children: node.children.map(child => this._node(child, true, visualChildren)).filter(isSkinNode),
 			propertyChildren,
 		};
 	}
@@ -175,6 +186,9 @@ class KUIParseContext {
 		return Object.entries(this._document.contract.states).map(([name, definition]) => ({
 			name,
 			overrides: definition.overrides.map(override => {
+				if (override.property === 'includeIn') {
+					throw new Error('includeIn is a structural directive; use one list of declared states on the child.');
+				}
 				if (override.transition !== undefined) {
 					throw new Error(`Compiled KUI skins do not support transitions in state "${name}".`);
 				}

@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@5.0.0` is build-time tooling on Node.js >= 22.12.0, with ordinary
+`@kurot/cli@5.1.0` is build-time tooling on Node.js >= 22.12.0, with ordinary
 ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior. For TypeScript configs, the CLI ships its own loader; consumers on Node 22 do not install one. Dev reloads only the edited root, not imported helpers.
@@ -63,7 +63,7 @@ configure its size metadata, and its direct visual children become
 `skin.elementsContent` on the host Component without an extra Group. Display
 transforms such as `flipX`/`flipY` belong on those children. Overrides use local
 `property.state` attributes. Storage IDs and runtime mapping metadata are not
-authored XML fields.
+authored XML fields. Visual children use [includeIn](state-children.md) for actual state membership, independent of visibility.
 
 The compiler validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
@@ -82,7 +82,7 @@ input. Duplicate conventional mappings are errors.
 
 `SkinIR` is intentionally smaller than `UIDocument`. It contains resolved
 runtime classes, assignments, visual children, layout descriptor children,
-and state `SetProperty` overrides. Reuse, data contracts, actions, and editor
+and native `SetProperty` and `AddItems` state overrides. Reuse, data contracts, actions, and editor
 transactions stay in `@kurot/ui-document` and `@kurot/ui-runtime`.
 
 Successful compilation writes `.kurot/skin-parts.d.ts` from the same IR. Every
@@ -139,9 +139,9 @@ manual prefix cannot conflict with `ui.components.namespace`.
   batches, and reconciles deletions. Browser refresh remains manual; HTTP is
   no-store. Per-file staging/rename is not an atomic atlas pair transaction.
   Read [dev resource watching](dev-resource-watching.md) for the exact boundaries.
-- `compileCustomNamespaces` must precede `compileSource`. Application-relative
-  imports and generated `#ns/<prefix>` imports must resolve to one bundled class
-  identity.
+- `compileSource` builds application and namespace entries together. Relative
+  paths, tsconfig aliases and the Skin import map share the same implementation;
+  a barrel's private imports are not exports of its public specifier.
 - Engine and custom namespace chunks share `ctx.outputs.engine` because the
   import-map writer treats both as external specifier mappings.
 - Engine and reusable namespace bundles preserve class names in both modes.
@@ -166,16 +166,15 @@ manual prefix cannot conflict with `ui.components.namespace`.
 1. clean output;
 2. compile KUI;
 3. compile engine packages;
-4. compile project namespaces;
-5. write the development component catalog;
-6. compile application source;
-7. generate HTML;
-8. write the release manifest;
-9. copy runtime assets;
-10. optionally version release assets with `output.versionedAssets`.
+4. write the development component catalog;
+5. compile application source and namespace entries;
+6. generate HTML;
+7. write the release manifest;
+8. copy runtime assets;
+9. optionally version release assets with `output.versionedAssets`.
 
-Do not reorder namespace or source compilation without reviewing externalization
-in `namespace-external-plugin.ts`.
+`namespace-entries.ts` handles explicit public namespace imports and discovered
+component entries. Ordinary imports retain esbuild's native resolution.
 
 CLI >= 3.8.1 within 3.x with Core >= 2.7.0 within 2.x supports resource
 queries. `version-resources.ts` runs last and

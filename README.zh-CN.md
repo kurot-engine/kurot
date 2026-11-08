@@ -31,7 +31,7 @@ Kurot 是一个开源的 TypeScript 2D 游戏引擎，用来制作可以在浏�
 准备 **Node.js 22.12.0 或更高版本**（项目使用 Node 22.x）和 **pnpm**。无需克隆引擎仓库，即可创建游戏：
 
 ```sh
-npx @kurot/cli@5.0.0 create my-game --template game
+npx @kurot/cli@5 create my-game --template game
 cd my-game
 pnpm install
 pnpm dev

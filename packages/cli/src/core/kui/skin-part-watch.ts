@@ -60,8 +60,5 @@ export function skinPartValidationPlugin(ctx: BuildContext): Plugin {
  * Retries source contexts after a corrected Skin makes blocked declarations valid.
  */
 export async function rebuildSkinPartSources(ctx: BuildContext): Promise<void> {
-	for (const rebuild of ctx.outputs.namespaceRebuilders.values()) {
-		await rebuild();
-	}
 	await ctx.outputs.sourceRebuilder?.();
 }

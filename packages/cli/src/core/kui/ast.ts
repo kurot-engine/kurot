@@ -88,6 +88,10 @@ export interface SkinNode {
 	 */
 	readonly id?: string;
 	/**
+	 * Named states in which this child belongs to its authored parent.
+	 */
+	readonly includeIn?: readonly string[];
+	/**
 	 * Properties to set on this node.
 	 */
 	readonly properties: PropertyAssignment[];
@@ -139,7 +143,12 @@ export interface StateSetProperty {
 /**
  * Override forms accepted by a skin state.
  */
-export type StateOverride = StateSetProperty;
+export type StateOverride = StateSetProperty | {
+	readonly type: 'AddItems';
+	readonly targetId: string;
+	readonly destination: string;
+	readonly position: number;
+};
 
 // ── State definition ─────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { createContext, runPipeline } from '../src/core/pipeline.js';
 import { loadProject } from '../src/core/project.js';
 import { writeComponentCatalog } from '../src/core/plugins/component-catalog.js';
-import { compileCustomNamespaces } from '../src/core/plugins/compile-custom-namespaces.js';
+import { compileSource } from '../src/core/plugins/compile-source.js';
 import { compileKUI } from '../src/core/plugins/compile-kui.js';
 
 const originalCwd = process.cwd();
@@ -23,7 +23,7 @@ describe('reusable component build', () => {
 		const project = await loadProject('development');
 		const ctx = createContext(project);
 
-		await runPipeline(ctx, [compileKUI(), compileCustomNamespaces(), writeComponentCatalog()]);
+		await runPipeline(ctx, [compileKUI(), compileSource(), writeComponentCatalog()]);
 
 		expect(ctx.diagnostics.all()).toEqual([]);
 		expect(project.components.map(component => component.name)).toEqual(['BetButton']);

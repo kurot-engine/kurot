@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Published package: [**5.0.0**](https://www.npmjs.com/package/@kurot/cli/v/5.0.0).
+resource watching. Source version: **5.1.0**. See [npm releases](https://www.npmjs.com/package/@kurot/cli?activeTab=versions) for published versions.
 Requires Node.js >= 22.12.0 (develop and test on 22.x) and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
@@ -38,7 +38,7 @@ API. Existing projects keep their own
 installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@5.0.0 create my-game
+npx @kurot/cli@5 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -46,7 +46,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^5.0.0`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@5`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -254,6 +254,10 @@ After changing authored Skin inputs or declarations, rebuild and run
 `tsc --noEmit --skipLibCheck false`. Edit authored inputs rather than generated
 `.kurot/` files. Runtime Skin factories are separate from editor declarations.
 
+With CLI 5.1 or newer, a visual child can declare `includeIn="common,spec"` to attach the same object
+only in the listed Skin states. See [state-dependent children](docs/state-children.md)
+for ordering, nested groups and the difference from `visible`.
+
 ## Reusable components
 
 Convention-based reusable components pair:
@@ -268,6 +272,11 @@ class with `class`, for example `class="skins.ActionCardSkin"`; the source/skin
 pair supplies the host association. The CLI exposes the component as `<namespace>:<Name>` in
 KUI XML, refreshes the namespace bundle, and emits development catalog data at
 `.kurot/component-catalog.json`.
+
+For a manual `ui.namespaces` barrel, export the components KUI needs. Game code
+can import the same class via a relative path or a tsconfig alias: the app and
+namespace share compiled modules. Do not re-export internal library helpers or
+application singletons solely to make the build work.
 
 Use `onSkinReady()` for logic that needs skin parts and `onSkinRemoved()` for
 cleanup before a skin replacement. Declare fields on the view and access them

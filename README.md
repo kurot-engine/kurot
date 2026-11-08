@@ -31,7 +31,7 @@ The [benchmark](packages/core/README.md#test-pages) runs the same seven workload
 Use **Node.js 22.12.0 or newer** (the project uses Node 22.x) and **pnpm**. Create a game without cloning the engine:
 
 ```sh
-npx @kurot/cli@5.0.0 create my-game --template game
+npx @kurot/cli@5 create my-game --template game
 cd my-game
 pnpm install
 pnpm dev

@@ -13,9 +13,8 @@ share a `BuildContext` through `core/pipeline.ts`.
 clean output
   → compile KUI
   → compile engine packages
-  → compile custom namespaces
   → write development component catalog
-  → compile application source
+  → compile application and namespace entries
   → generate HTML
   → write release manifest
   → copy runtime assets
@@ -23,8 +22,12 @@ clean output
 ```
 
 KUI compilation runs first because skin factories can import project namespace
-components. Namespace and engine chunks are externalized consistently so the
-application, UI runtime, and generated skins share one class identity.
+components. The Skin bundle imports public barrels as `#ns/<prefix>`. The
+application and namespace barrels are entry points of one esbuild graph. The
+bundler resolves project aliases, relative imports and package internals in
+their original modules and emits shared chunks as needed. Only the barrel’s own
+exports are exposed via the import map; private dependencies are not redirected
+to the public barrel. Engine packages remain external across these bundles.
 
 ## KUI boundary
 
@@ -38,18 +41,18 @@ KUI XML → UIDocument → SkinIR → skin factory → theme bundle
 
 `SkinIR` contains runtime code-generation details only: resolved imports,
 factory variables, property assignments, semantic layout children, and state
-property overrides. Document contracts, reusable instances, data bindings, and
+property and [child membership](state-children.md) overrides. Document contracts, reusable instances, data bindings, and
 actions remain `UIDocument` concepts.
 
-CLI 5.0.0 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. The
+CLI 5.1.0 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. The
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
 4.x or 5.x and its compatible Core. UI 5 requires Core ^3.0.0.
 
 Host-field validation uses compiler syntax and installed declarations before
-installing the Skin bundle or tooling declarations. Application and namespace
-watch contexts repeat the checks and write successful in-memory build outputs
+installing the Skin bundle or tooling declarations. The shared application/namespace
+watch context repeats the checks and writes successful in-memory build outputs
 only. Failed source builds retain their last good output. See
 [declared fields](skin-part-fields.md).
 

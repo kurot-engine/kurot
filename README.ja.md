@@ -31,7 +31,7 @@ Kurot は、ブラウザーで動く 2D ゲームを TypeScript で開発する�
 **Node.js 22.12.0 以降**（本プロジェクトでは Node 22.x を使用）と **pnpm** を用意します。エンジンのリポジトリをクローンせずにゲームを作成できます。
 
 ```sh
-npx @kurot/cli@5.0.0 create my-game --template game
+npx @kurot/cli@5 create my-game --template game
 cd my-game
 pnpm install
 pnpm dev
