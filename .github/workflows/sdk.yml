@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm install --global pnpm@10.33.0
+      # UI's Vitest config aliases Core to its source instead of the npm peer.
+      - if: matrix.package == 'ui'
+        run: pnpm --dir packages/core install --frozen-lockfile
       - run: pnpm --dir packages/${{ matrix.package }} install --frozen-lockfile
       - run: pnpm --dir packages/${{ matrix.package }} build
       - run: pnpm --dir packages/${{ matrix.package }} test
@@ -60,7 +63,16 @@ jobs:
       - run: pnpm --dir packages/core install --frozen-lockfile
       - if: matrix.package == 'ui'
         run: pnpm --dir packages/ui install --frozen-lockfile
+      - if: matrix.package == 'ui'
+        run: pnpm --dir packages/ui build
       - if: matrix.package == 'core'
-        run: pnpm --dir packages/core exec playwright test --config examples/visual-regression/playwright.config.ts --update-snapshots=none
+        name: Run Core browser tests with a non-silent MP3 fixture
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            apt-get update -qq
+            apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -v error -f lavfi -i sine=frequency=440:sample_rate=44100:duration=0.37 -c:a libmp3lame /tmp/kurot-loop.mp3
+          KUROT_AUDIO_FIXTURE=/tmp/kurot-loop.mp3 pnpm --dir packages/core exec playwright test --config examples/visual-regression/playwright.config.ts --update-snapshots=none
       - if: matrix.package == 'ui'
         run: pnpm --dir packages/ui test:text-labels
