@@ -1,9 +1,9 @@
 # Changelog
 
 Repository-wide documentation, publication and application-adoption records.
-Observations below describe their recorded event. Current package versions and
-usage are indexed in [README.md](README.md); SDK changes are recorded in each
-package's CHANGELOG.md.
+Observations below describe their recorded event. See the [package map](AGENTS.md#package-map)
+for current versions and the [README](README.md) for usage. Each SDK records
+its changes in its own CHANGELOG.md.
 
 ## 2026-11-08 — Examples and Templates adopt CLI 5 and Node 22
 

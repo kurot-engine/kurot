@@ -111,7 +111,9 @@ pressed, selected, and disabled visuals are an appearance or skin.
 
 Core/UI own display and component behavior; ui-document owns the semantic
 model, CLI compiles Skin appearances, and ui-runtime materializes semantic
-assets. Current versions and dependency ranges are in the root README. Document format remains 2. CLI compiles Skin
+assets. See the [package map](AGENTS.md#package-map) for current versions and the
+[dependency policy](docs/dependency-policy.md#package-graph) for required ranges.
+Document format remains 2. CLI compiles Skin
 appearances from KUI XML, and the separate Kurot Editor edits those same files.
 Semantic screen/component assets and incremental preview reconciliation retain
 their narrower programmatic/runtime boundary.
