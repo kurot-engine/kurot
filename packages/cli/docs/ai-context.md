@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@5.0.0` (prepared for publication) is build-time tooling on Node.js >= 22.12.0, with ordinary
+`@kurot/cli@5.0.0` is build-time tooling on Node.js >= 22.12.0, with ordinary
 ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior. For TypeScript configs, the CLI ships its own loader; consumers on Node 22 do not install one. Dev reloads only the edited root, not imported helpers.

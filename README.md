@@ -76,7 +76,7 @@ reachable mixed-size scroll tails and more compact Label outline insets. Stable
 font frames and baselines are preserved. UI's Core peer remains ^3.2.1; use
 Core 3.2.2 to include the accompanying Core corrections. See the package
 CHANGELOGs for release details and validation.
-Core 3.2.3, Game 3.0.1, CLI 4.1.3, Atlas 0.1.1 and ui-runtime 0.13.0 are published; their package tags point to the verified release source. DragonBones 0.2.0 is also published. CLI 5.0.0 is prepared for publication. It requires Node.js 22.12.0 or later and loads TypeScript project configs without an external loader. Existing projects on CLI 4.x opt in explicitly; browser SDK versions do not change.
+Core 3.2.3, Game 3.0.1, CLI 4.1.3, Atlas 0.1.1 and ui-runtime 0.13.0 are published; their package tags point to the verified release source. DragonBones 0.2.0 is also published. [CLI 5.0.0](https://www.npmjs.com/package/@kurot/cli/v/5.0.0) requires Node.js 22.12.0 or later and loads TypeScript project configs without an external loader. Existing projects on CLI 4.x opt in explicitly; browser SDK versions do not change.
 Game, DragonBones and ui-runtime retain Core ^3.0.0 peers. ui-runtime also
 requires UI ^5.0.0. Callback receiver parameters and unsupported
 Texture methods have been removed. See [ticker ownership](packages/core/docs/ticker.md),

@@ -5,12 +5,18 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-08 — CLI 5.0.0 published and verified
+
+- [npm](https://www.npmjs.com/package/@kurot/cli/v/5.0.0) published `@kurot/cli@5.0.0` at 11:16 UTC and marked it `latest`. Its `gitHead` and the annotated tag `@kurot/cli@5.0.0` point to the [tested source](https://github.com/kurot-engine/kurot/commit/5c3841abfee3c6a252bda04787ef0b5358840569). All 11 [CI jobs](https://github.com/kurot-engine/kurot/actions/runs/42473679020) passed on that commit.
+- The [npm archive](https://registry.npmjs.org/@kurot/cli/-/cli-5.0.0.tgz) matches its registry integrity: `sha512-y6dT0JciLkUYrVafZ/2QmT2rc3Gqv1qNz6ypERvJYXgelP88k2DEqDoe12ntjaK5qHi1rqhCx9RrU5lkpSWYTw==`. All 299 file paths and contents match the tested archive. The archives themselves are not byte-identical: the tar entry for `templates/game/template/web/logo.png` changed from `0644` to `0600`; no file contents changed.
+- Installed the published version on Node 22.12.0, created both `game` and `empty`, installed their dependencies with strict peer checks, and ran `pnpm build` and `pnpm release` in both. All four builds passed. Fresh npm and pnpm installs both produced a `0644` logo in the installed CLI and in the generated game; the development and release builds preserved the image contents.
+
 ## 2026-11-08 — Verified SDK publication and CLI 5.0.0 preparation
 
 - Downloaded and verified the registry SHA-512 for CLI 4.1.3, Atlas 0.1.1, Core 3.2.3, Game 3.0.1 and ui-runtime 0.13.0. Clean builds of the release source reproduced all five npm archives byte for byte.
 - The npm metadata records the earlier `gitHead` (`433a376a`). Use the annotated tags `@kurot/cli@4.1.3`, `@kurot/atlas@0.1.1`, `@kurot/core@3.2.3`, `@kurot/game@3.0.1` and `@kurot/ui-runtime@0.13.0` at `57e3f50a` for the matching source. Repository publication markers are updated separately from immutable package contents.
 - Prepare CLI 5.0.0 only. Its Node minimum moves from 20 to 22.12.0. CLI and generated projects declare this requirement, and the repository and templates select Node 22 via `.nvmrc`. A CLI 4.x range or exact lock does not adopt 5.x automatically. Configs, KUI and browser SDK contracts are unchanged; application adoption is separate.
-- CI builds and tests all nine packages on the Node 22 line, exercises the packed CLI on both the current 22.x and 22.12.0, and checks Core/UI in Chromium. Publication of CLI 5.0.0 is pending.
+- CI builds and tests all nine packages on the Node 22 line, exercises the packed CLI on both the current 22.x and 22.12.0, and checks Core/UI in Chromium. CLI 5.0.0 was unpublished at the time of preparation.
 
 ## 2026-11-08 — SDK review fixes prepared for publication
 

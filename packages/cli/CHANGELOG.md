@@ -9,7 +9,10 @@ format changes are documented explicitly in each release.
 
 ## 5.0.0 — 2026-11-08
 
-Prepared for publication.
+Published on npm. All 299 files match the tested candidate in path and contents.
+The archive differs only in the game template logo's tar permissions (`0644` in
+the candidate, `0600` on npm). Both starters built for development and release
+from the published package on Node 22.12.0. See the [publication record](../../CHANGELOG.md#2026-11-08--cli-500-published-and-verified) for the integrity and source commit.
 
 - **Breaking:** CLI and its new projects require Node.js >= 22.12.0. Develop and build on the latest Node 22.x. Projects pinned to 4.x must explicitly adopt 5.x after upgrading Node; Node 20 is outside the supported range.
 - The CLI loads TypeScript configs and their relative helpers without a separate preloader, including on 22.12.0. Default and named exports, native JavaScript configs, and root-only dev refresh retain their existing behavior. Both starter templates include `.nvmrc` and declare the same Node requirement.
