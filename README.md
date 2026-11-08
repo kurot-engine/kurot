@@ -18,13 +18,13 @@ has no unified workspace install/build command.
 
 | Package                                                | Version | Path                   | Responsibility                                                                                                   | Internal dependencies       |
 | ------------------------------------------------------ | ------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| [`@kurot/core`](packages/core/README.md)               | 3.2.2   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
+| [`@kurot/core`](packages/core/README.md)               | 3.2.3   | `packages/core`        | Core engine capabilities: display objects, rendering, events, geometry, text, resources, networking, and media   | `@kurot/bitmap-font`        |
 | [`@kurot/ui`](packages/ui/README.md)                   | 5.1.2   | `packages/ui`          | Skinnable UI components, typed lists and part fields, layout, theming, and data binding                         | `@kurot/core`               |
-| [`@kurot/game`](packages/game/README.md)               | 3.0.0   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
-| [`@kurot/cli`](packages/cli/README.md)                 | 4.1.2   | `packages/cli`         | KUI XML compilation, declared-part validation and project tooling; EXML projects use CLI 1.3.x                   | `ui-document`               |
+| [`@kurot/game`](packages/game/README.md)               | 3.0.1   | `packages/game`        | Game extensions: Tween, MovieClip, ScrollView, URLLoader, etc.                                                   | `@kurot/core`               |
+| [`@kurot/cli`](packages/cli/README.md)                 | 4.1.3   | `packages/cli`         | KUI XML compilation, declared-part validation and project tooling; EXML projects use CLI 1.3.x                   | `ui-document`               |
 | [`@kurot/ui-document`](packages/ui-document/README.md) | 0.14.0  | `packages/ui-document` | Headless UI assets, component capabilities, reuse, typed contracts, validation, transactions, diffs, and history | None                        |
-| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.12.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
-| [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.0   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
+| [`@kurot/ui-runtime`](packages/ui-runtime/README.md)   | 0.13.0   | `packages/ui-runtime`  | Materializes semantic assets with transactional bindings, actions, transitions, resources, and component reuse   | `core`, `ui`, `ui-document` |
+| [`@kurot/atlas`](packages/atlas/README.md)             | 0.1.1   | `packages/atlas`       | Published independent RGBA atlas packing and Node PNG tooling                                                    | None                        |
 | [`@kurot/dragonbones`](packages/dragonbones/README.md) | 0.2.0   | `packages/dragonbones` | DragonBones 5.7 runtime, native displays, atlas regions, deformable meshes, events and clock           | `@kurot/core`               |
 | [`@kurot/bitmap-font`](packages/bitmap-font/README.md) | 0.1.0   | `packages/bitmap-font` | Published headless font data, parsing, validation, serialization and layout                                      | None                        |
 
@@ -37,11 +37,11 @@ Current manifest dependency ranges:
 
 | Consumer          | Required Kurot packages                           |
 | ----------------- | ------------------------------------------------- |
-| Core 3.2.2        | bitmap-font `^0.1.0`                              |
+| Core 3.2.3        | bitmap-font `^0.1.0`                              |
 | UI 5.1.2         | Core `^3.2.1`                                     |
-| Game 3.0.0        | Core `^3.0.0`                                     |
-| CLI 4.1.2         | ui-document `^0.14.0`                             |
-| ui-runtime 0.12.0 | Core `^3.0.0`, UI `^5.0.0`, ui-document `^0.14.0` |
+| Game 3.0.1        | Core `^3.0.0`                                     |
+| CLI 4.1.3         | ui-document `^0.14.0`                             |
+| ui-runtime 0.13.0 | Core `^3.0.0`, UI `^5.0.0`, ui-document `^0.14.0` |
 | dragonbones 0.2.0 | Core `^3.0.0`                                     |
 
 See the [dependency policy](docs/dependency-policy.md) for compatibility and

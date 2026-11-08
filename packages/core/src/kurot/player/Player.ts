@@ -29,6 +29,7 @@ export class Player implements Renderable {
 	};
 
 	private _isPlaying = false;
+	private _destroyed = false;
 	private _root?: DisplayObject;
 	private _canvas2dBuffer?: CanvasBuffer;
 	private _canvas2dRenderer?: CanvasRenderer;
@@ -59,6 +60,7 @@ export class Player implements Renderable {
 
 			return;
 		} catch {
+			this._webglContext?.dispose();
 			this._webglContext = undefined;
 			this._webglBuffer = undefined;
 		}
@@ -86,6 +88,9 @@ export class Player implements Renderable {
 	}
 
 	public start(root?: DisplayObject): void {
+		if (this._destroyed) {
+			throw new Error('Cannot start a destroyed Player.');
+		}
 		if (this._isPlaying) return;
 		this._isPlaying = true;
 		if (root && !this._root) {
@@ -110,11 +115,19 @@ export class Player implements Renderable {
 	 * Destroy the player and release all resources.
 	 */
 	public destroy(): void {
+		if (this._destroyed) {
+			return;
+		}
+		this._destroyed = true;
 		this.pause();
-		this._webglContext?.releaseFilterResources();
+		this._webglContext?.dispose();
 		this._canvas2dRenderer?.releaseBackdropResources();
 		for (const fn of this._unregisterCallbacks) fn();
 		this._unregisterCallbacks = [];
+		this._webglBuffer?.rootRenderTarget.dispose();
+		this._webglBuffer = undefined;
+		this._webglRenderer = undefined;
+		this._webglContext = undefined;
 		DisplayObject.$onStructureChange = undefined;
 		DisplayObject.$onRenderableDirty = undefined;
 		DisplayObjectContainer.$onContainerStructureChange = undefined;

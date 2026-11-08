@@ -235,11 +235,9 @@ export class BitmapData {
 		// Detach ownership before callbacks so repeated or reentrant cleanup is safe.
 		const source = this._source;
 		this._source = undefined;
-		const releaseTexture = this._textureDisposer;
-		this._textureDisposer = undefined;
 		const errors: unknown[] = [];
 		try {
-			releaseTexture?.();
+			this.$releaseTextureUpload();
 		} catch (error) {
 			errors.push(error);
 		}
@@ -300,5 +298,15 @@ export class BitmapData {
 	 */
 	public $setTextureDisposer(dispose: () => void): void {
 		this._textureDisposer = dispose;
+	}
+
+	/**
+	 * @internal
+	 * Releases the current GPU upload once while retaining its decoded source.
+	 */
+	public $releaseTextureUpload(): void {
+		const release = this._textureDisposer;
+		this._textureDisposer = undefined;
+		release?.();
 	}
 }

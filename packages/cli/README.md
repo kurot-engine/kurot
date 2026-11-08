@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Package version: **4.1.2** (published on npm).
+resource watching. Package version: **4.1.3** (prepared for publication).
 Requires Node.js >= 20 and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
@@ -36,7 +36,7 @@ API. Existing projects keep their own
 installed SDKs and resources.
 
 ```bash
-npx @kurot/cli@4.1.2 create my-game
+npx @kurot/cli@4.1.3 create my-game
 cd my-game
 pnpm install
 pnpm dev
@@ -44,7 +44,7 @@ pnpm dev
 
 Scaffolded projects expose `build`, `dev`, and `clean` scripts. For an
 Editor-managed KUI XML project, install the package with
-`pnpm add -D @kurot/cli@^4.1.2`. Existing EXML projects should keep their current
+`pnpm add -D @kurot/cli@^4.1.3`. Existing EXML projects should keep their current
 1.3.x dependency.
 
 ## Commands
@@ -123,7 +123,7 @@ for batching, cache headers and the limits of multi-file updates.
 
 ### `kurot clean`
 
-Removes `bin-debug` and `bin-release`.
+Removes the configured development output and `bin-release`. Output paths must be real directories strictly inside the project; paths through symlinks and paths overlapping project inputs are rejected before cleanup.
 
 ## Configuration
 

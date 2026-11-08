@@ -1,6 +1,6 @@
 # @kurot/game architecture
 
-> Current version: 3.0.0 (published on npm), with peerDependency `@kurot/core: ^3.0.0`.
+> Current version: 3.0.1 (prepared for publication), with peerDependency `@kurot/core: ^3.0.0`.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
 > and task-to-file references. This document explains design decisions and internal

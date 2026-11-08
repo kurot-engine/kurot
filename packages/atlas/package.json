@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/atlas",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Independent RGBA atlas packing and PNG tooling with Kurot-compatible sheet output",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

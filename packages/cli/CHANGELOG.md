@@ -7,6 +7,13 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 4.1.3 — 2026-11-08
+
+Prepared for publication.
+
+- Restrict development, release and clean outputs to real directories inside the project. Reject symlink path components, the project root, and overlap with project inputs before deleting anything.
+- Serve development files on the IPv4 loopback interface. Reject traversal and file links outside the output root; escaped asset names and query strings remain supported.
+
 ## 4.1.2 — 2026-11-06
 
 Published; exact version and npm latest verified on 2026-11-06. Downloaded

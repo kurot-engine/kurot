@@ -38,6 +38,7 @@ export class ResourceLoader {
 	private loadingList: ResourceItem[] = [];
 	private retryDic: Map<string, number> = new Map<string, number>();
 	private analyzerMap: Map<string, AnalyzerBase> = new Map<string, AnalyzerBase>();
+	private generation = 0;
 	private activeCount = 0;
 	private totalCount = 0;
 	private completedCount = 0;
@@ -73,9 +74,11 @@ export class ResourceLoader {
 	}
 
 	/**
-	 * Abort all loading.
+	 * Ends the current batch. In-flight analyzers may settle, but their results
+	 * cannot advance, retry or notify a later batch.
 	 */
 	public abort(): void {
+		this.generation++;
 		this.pendingList = [];
 		this.loadingList = [];
 		this.activeCount = 0;
@@ -107,10 +110,11 @@ export class ResourceLoader {
 	}
 
 	private loadItem(item: ResourceItem): void {
+		const generation = this.generation;
 		const analyzer = this.analyzerMap.get(item.type);
 		if (!analyzer) {
 			item.loaded = false;
-			this.finishItem(item);
+			this.finishItem(item, generation);
 			return;
 		}
 
@@ -119,42 +123,51 @@ export class ResourceLoader {
 			result = analyzer.loadFile(item);
 		} catch {
 			item.loaded = false;
-			this.finishItem(item);
+			this.finishItem(item, generation);
 			return;
 		}
 
 		result.then(
 			r => {
-				this.finishItem(r);
+				this.finishItem(r, generation);
 			},
 			() => {
+				if (generation !== this.generation) {
+					return;
+				}
 				item.loaded = false;
-				this.finishItem(item);
+				this.finishItem(item, generation);
 			},
 		);
 	}
 
-	private finishItem(item: ResourceItem): void {
+	private finishItem(item: ResourceItem, generation: number): void {
+		if (generation !== this.generation) {
+			return;
+		}
 		this.loadingList = this.loadingList.filter(i => i !== item);
 		this.activeCount--;
 
 		if (item.loaded) {
-			this.onItemComplete(item);
+			this.onItemComplete(item, generation);
 		} else {
-			this.onItemError(item);
+			this.onItemError(item, generation);
 		}
 	}
 
-	private onItemComplete(item: ResourceItem): void {
+	private onItemComplete(item: ResourceItem, generation: number): void {
 		this.completedCount++;
 		this.reportProgress();
+		if (generation !== this.generation) {
+			return;
+		}
 
 		this.safeNotify(() => this.onComplete?.(item));
 
 		this.next();
 	}
 
-	private onItemError(item: ResourceItem): void {
+	private onItemError(item: ResourceItem, generation: number): void {
 		const retries = this.retryDic.get(item.name) ?? 0;
 		if (retries < this.retryCount) {
 			this.retryDic.set(item.name, retries + 1);
@@ -165,6 +178,9 @@ export class ResourceLoader {
 
 		this.completedCount++;
 		this.safeNotify(() => this.onError?.(item));
+		if (generation !== this.generation) {
+			return;
+		}
 		this.reportProgress();
 		this.next();
 	}

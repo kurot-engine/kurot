@@ -131,12 +131,12 @@ export class SoundChannel extends EventDispatcher {
 		source.onended = this.onWebAudioEnded;
 		this._webAudioStartTime = this._context.currentTime;
 		const offset = Math.min(this._startOffset, duration);
+		source.start(this._webAudioStartTime, this._startOffset);
 		if (Number.isFinite(count)) {
-			// The initial partial play counts once; subsequent iterations start at zero.
+			// A content duration can round up into the next loop by one sample.
+			// Schedule the end on the audio clock at the intended output frame.
 			this._playbackDuration = duration - offset + duration * (count - 1);
-			source.start(this._webAudioStartTime, this._startOffset, this._playbackDuration);
-		} else {
-			source.start(this._webAudioStartTime, this._startOffset);
+			source.stop(this._webAudioStartTime + this._playbackDuration);
 		}
 		this._startOffset = offset;
 	}

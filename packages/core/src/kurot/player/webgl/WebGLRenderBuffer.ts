@@ -36,6 +36,18 @@ export class WebGLRenderBuffer implements RenderBuffer {
 		}
 	}
 
+	/**
+	 * A later player on the same canvas owns a different context wrapper.
+	 */
+	public static discardPool(context: WebGLRenderContext): void {
+		for (let index = _pool.length - 1; index >= 0; index--) {
+			if (_pool[index].context === context) {
+				const [buffer] = _pool.splice(index, 1);
+				buffer.rootRenderTarget.dispose();
+			}
+		}
+	}
+
 	public static release(buf: WebGLRenderBuffer): void {
 		buf.filterPadX = 0;
 		buf.filterPadY = 0;

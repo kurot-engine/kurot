@@ -67,3 +67,19 @@ test('rejects invalid output images and empty PNG batches', () => {
 	expect(() => encodePNG({ width: 1, height: 2, pixels: new Uint8Array(4) })).toThrow(/Invalid RGBA/);
 	expect(() => packPNGAtlas([])).toThrow(/between/);
 });
+
+test('rejects a second IHDR before decoding a larger image', () => {
+	const small = encodePNG(makeSource('small', 1, 1));
+	const larger = encodePNG(makeSource('large', 8, 8));
+	const input = Buffer.concat([small.subarray(0, 33), larger.subarray(8)]);
+	expect(() => decodePNG(input, 1)).toThrow(/IHDR/);
+	expect(() => packPNGAtlas([{ name: 'icon', png: input }], { maxPixels: 1 })).toThrow(/IHDR/);
+});
+
+test('bounds inflated Adam7 scanlines and preserves ordinary interlaced PNGs', () => {
+	// One RGBA pixel in pass 1; the second fixture declares the same pixel but expands to 4 KiB.
+	const valid = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAFoEvQfAAAADUlEQVR4nGPgEpH7DwABpAE8k4sOtwAAAABJRU5ErkJggg==', 'base64');
+	const oversized = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAFoEvQfAAAAGklEQVR4nO3BAQ0AAADCoPdPbQ8HFAAAAPBuEAAAAUueozwAAAAASUVORK5CYII=', 'base64');
+	expect([...decodePNG(valid, 1).pixels]).toEqual([10, 20, 30, 255]);
+	expect(() => decodePNG(oversized, 1)).toThrow(AtlasError);
+});

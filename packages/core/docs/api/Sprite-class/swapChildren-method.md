@@ -1,6 +1,6 @@
 # swapChildren
 
-Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 swapChildren(child1: DisplayObject, child2: DisplayObject): void;

@@ -134,19 +134,21 @@ describe('SoundChannel (Web Audio)', () => {
 		new SoundChannel(ctx as unknown as AudioContext, audioBuffer, undefined, 1, loops);
 		const count = loops > 0 ? Math.ceil(loops) : 1;
 		expect(bufferSource.loop).toBe(count > 1);
-		expect(bufferSource.start).toHaveBeenCalledWith(10, 1, 2 + 3 * (count - 1));
-		expect(bufferSource.stop).not.toHaveBeenCalled();
+		expect(bufferSource.start).toHaveBeenCalledWith(10, 1);
+		expect(bufferSource.stop).toHaveBeenCalledWith(10 + 2 + 3 * (count - 1));
 	});
 
 	it.each([-1, -Infinity, Infinity])('loops = %s is unlimited', loops => {
 		new SoundChannel(ctx as unknown as AudioContext, audioBuffer, undefined, 1, loops);
 		expect(bufferSource.loop).toBe(true);
 		expect(bufferSource.start).toHaveBeenCalledWith(0, 1);
+		expect(bufferSource.stop).not.toHaveBeenCalled();
 	});
 
 	it.each([3, 4])('an offset of %s counts an empty initial play before the next full iteration', offset => {
 		new SoundChannel(ctx as unknown as AudioContext, audioBuffer, undefined, offset, 2);
-		expect(bufferSource.start).toHaveBeenCalledWith(0, offset, 3);
+		expect(bufferSource.start).toHaveBeenCalledWith(0, offset);
+		expect(bufferSource.stop).toHaveBeenCalledWith(3);
 	});
 
 	it('position wraps from the initial offset and uses the audio clock', () => {

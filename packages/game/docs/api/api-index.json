@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/game",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "symbols": [
     {
       "name": "Ease",

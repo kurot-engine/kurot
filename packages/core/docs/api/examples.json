@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "examples": [
     {
       "file": "examples/c54bc3fde14d.ts",

@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -15106,6 +15106,12 @@
           "inherited": false
         },
         {
+          "name": "static discardPool",
+          "file": "WebGLRenderBuffer-class/static-discardPool-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "static handleContextRestored",
           "file": "WebGLRenderBuffer-class/static-handleContextRestored-method.md",
           "protected": false,
@@ -15296,6 +15302,12 @@
         {
           "name": "disableStencilTest",
           "file": "WebGLRenderContext-class/disableStencilTest-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "dispose",
+          "file": "WebGLRenderContext-class/dispose-method.md",
           "protected": false,
           "inherited": false
         },

@@ -7,7 +7,7 @@ unfamiliar with Kurot does not need to re-derive the architecture from
 scratch each session. It describes the current source and public exports;
 internal plans and reviews are not required context.
 
-Package identity: `@kurot/game@3.0.0`, published on npm. Peer-depends on `@kurot/core@^3.0.0`.
+Package identity: `@kurot/game@3.0.1`, prepared for publication. Peer-depends on `@kurot/core@^3.0.0`.
 
 Source root: `src/kurot/`. Public API: `src/index.ts` groups exports into
 tween / display / particle / net — see §4.
@@ -192,7 +192,8 @@ lifespan / maxParticles` in its constructor, after `parseConfig()` sets
   exception.
 - `URLVariables.decode()` uses a custom regex parser and collapses repeated
   query keys into an array value.
-- `close()` fully cleans up all three loader paths (xhr/imageLoader/sound):
+- Successful SOUND loads detach the delivered Sound before notifying listeners. Its owner closes it separately.
+- `close()` cleans up remaining in-flight loader paths (xhr/imageLoader/sound):
   removes listeners, aborts, and dereferences. Still don't rely on
   inspecting internal fields as an "is it done" check; use the
   `Event.COMPLETE`/`IOErrorEvent.IO_ERROR` events instead.

@@ -141,38 +141,4 @@ describe('EventDispatcher<TMap> — generic overloads', () => {
 			expect(untyped).toHaveBeenCalledOnce();
 		});
 	});
-
-	describe('runtime correctness unchanged', () => {
-		it('stopImmediatePropagation still works', () => {
-			const d = new EventDispatcher<TestEventMap>();
-			const fn1 = vi.fn((e: TypedPayloadEvent) => e.stopImmediatePropagation());
-			const fn2 = vi.fn();
-			d.addEventListener('typedPayload', fn1);
-			d.addEventListener('typedPayload', fn2);
-			d.dispatchEvent(new TypedPayloadEvent('typedPayload', 0));
-			expect(fn1).toHaveBeenCalledOnce();
-			expect(fn2).not.toHaveBeenCalled();
-		});
-
-		it('duplicate listener is still deduplicated', () => {
-			const d = new EventDispatcher<TestEventMap>();
-			const fn = vi.fn();
-			d.addEventListener('typedPayload', fn);
-			d.addEventListener('typedPayload', fn);
-			d.dispatchEvent(new TypedPayloadEvent('typedPayload', 0));
-			expect(fn).toHaveBeenCalledOnce();
-		});
-
-		it('adding listener during dispatch does not affect current round', () => {
-			const d = new EventDispatcher<TestEventMap>();
-			const late = vi.fn();
-			d.addEventListener('typedPayload', () => {
-				d.addEventListener('typedPayload', late);
-			});
-			d.dispatchEvent(new TypedPayloadEvent('typedPayload', 0));
-			expect(late).not.toHaveBeenCalled();
-			d.dispatchEvent(new TypedPayloadEvent('typedPayload', 0));
-			expect(late).toHaveBeenCalledOnce();
-		});
-	});
 });

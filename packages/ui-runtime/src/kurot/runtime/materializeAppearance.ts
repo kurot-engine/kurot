@@ -5,7 +5,7 @@ import { isSyntheticNodeId } from '@kurot/ui-document';
 import type { UIDocument, UINode } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
 import { materializeNode } from './materializeNode.js';
-import { qualifyNodeId } from './node-identity.js';
+import { qualifyAppearanceScope, qualifyNodeId } from './node-identity.js';
 import { assetPath } from './assetPath.js';
 import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
@@ -36,7 +36,7 @@ export function applyAppearance(
 		);
 	}
 	const appearance = requireAppearance(node.appearance.assetId, path, context);
-	const scope = `${hostIdentity}@appearance:${appearance.id}`;
+	const scope = qualifyAppearanceScope(hostIdentity, appearance.id);
 	const elements = appearance.root.children.map((child, index) =>
 		materializeNode(child, assetPath(appearance.id, `.root.children[${index}]`), scope, context),
 	);

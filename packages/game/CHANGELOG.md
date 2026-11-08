@@ -4,15 +4,12 @@ All notable changes to `@kurot/game` are documented here.
 
 ---
 
-## Unreleased
+## 3.0.1 — 2026-11-08
 
-### Documentation
+Prepared for publication.
 
-- Describe ScrollView and URL loading through their native behavior. Retain
-  explicit MovieClip exporter format contracts and named parser APIs.
-
-The wording cleanup is reserved for a later patch; the published release below
-retains its original descriptions and comments. Runtime code and types are unchanged.
+- URLLoader transfers ownership of a completed Sound before dispatching COMPLETE. Closing or reusing the loader still cancels an unfinished sound, but no longer invalidates a previously delivered one.
+- Clarify native ScrollView and URL loader behavior and retain MovieClip exporter contracts and named parser APIs.
 
 ## 3.0.0 — 2026-11-06
 

@@ -1,6 +1,6 @@
 {
   "package": "@kurot/game",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "examples": [
     {
       "file": "examples/41c4476bd377.ts",

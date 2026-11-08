@@ -113,12 +113,7 @@ export class URLLoader extends EventDispatcher<URLLoaderEvents> {
 			this._imageLoader.close();
 			this._imageLoader = undefined;
 		}
-		if (this._sound) {
-			this._sound.removeEventListener(Event.COMPLETE, this._handleSoundComplete);
-			this._sound.removeEventListener(IOErrorEvent.IO_ERROR, this._handleError);
-			this._sound.close();
-			this._sound = undefined;
-		}
+		this._detachSound()?.close();
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────
@@ -223,8 +218,18 @@ export class URLLoader extends EventDispatcher<URLLoaderEvents> {
 		this.dispatchEventWith(Event.COMPLETE);
 	};
 
+	private _detachSound(): Sound | undefined {
+		const sound = this._sound;
+		this._sound = undefined;
+		if (sound) {
+			sound.removeEventListener(Event.COMPLETE, this._handleSoundComplete);
+			sound.removeEventListener(IOErrorEvent.IO_ERROR, this._handleError);
+		}
+		return sound;
+	}
+
 	private _handleSoundComplete = (_e: Event): void => {
-		this.data = this._sound;
+		this.data = this._detachSound();
 		this.dispatchEventWith(Event.COMPLETE);
 	};
 

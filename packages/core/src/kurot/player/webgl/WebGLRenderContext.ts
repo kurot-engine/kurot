@@ -83,6 +83,7 @@ export class WebGLRenderContext implements RenderContext {
 	private _defaultEmptyTexture?: WebGLTexture;
 	private _maxTextureUnits = MultiTextureBatcher.MAX_TEXTURES;
 	private _filterResolution = 1;
+	private readonly _canvasEvents = new AbortController();
 	private readonly _contextRestoredCallbacks: Array<() => void> = [];
 	private readonly _trackedBitmapDatas: Set<WeakRef<BitmapData>> = new Set();
 	private readonly _bitmapDataRefs = new WeakMap<BitmapData, WeakRef<BitmapData>>();
@@ -143,11 +144,11 @@ export class WebGLRenderContext implements RenderContext {
 		canvas.addEventListener('webglcontextlost', e => {
 			e.preventDefault();
 			this.contextLost = true;
-		});
+		}, { signal: this._canvasEvents.signal });
 		canvas.addEventListener('webglcontextrestored', () => {
 			this.contextLost = false;
 			this._onContextRestored();
-		});
+		}, { signal: this._canvasEvents.signal });
 	}
 
 	// ── Getters ───────────────────────────────────────────────────────────────
@@ -824,6 +825,32 @@ export class WebGLRenderContext implements RenderContext {
 		this.flush();
 		this._filterSystem.pool.clear();
 		this._filterTextures.clear();
+	}
+
+	/**
+	 * Detaches this player's handlers and releases its GPU allocations without
+	 * closing borrowed image sources or losing a canvas shared with a future player.
+	 */
+	public dispose(): void {
+		if (this._canvasEvents.signal.aborted) {
+			return;
+		}
+		this._canvasEvents.abort();
+		this._contextRestoredCallbacks.length = 0;
+		this.releaseFilterResources();
+		WebGLRenderBuffer.discardPool(this);
+		WebGLProgram.clearCache(this.gl, this.contextLost);
+		for (const ref of this._trackedBitmapDatas) {
+			ref.deref()?.$releaseTextureUpload();
+		}
+		this._trackedBitmapDatas.clear();
+		this._bitmapDataSweep = undefined;
+		if (this._defaultEmptyTexture) {
+			this.gl.deleteTexture(this._defaultEmptyTexture);
+			this._defaultEmptyTexture = undefined;
+		}
+		this.gl.deleteBuffer(this._vertexBuffer);
+		this.gl.deleteBuffer(this._indexBuffer);
 	}
 
 	private _drawFullscreenQuad(

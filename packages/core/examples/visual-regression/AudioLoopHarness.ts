@@ -94,9 +94,10 @@ export async function renderSyntheticLoop(
 	loops: number,
 	offsetFrames = 0,
 	sampleRate = 44100,
+	bufferFrames = 257,
 ): Promise<AudioLoopResult> {
-	const context = new OfflineAudioContext(2, 257, sampleRate);
-	const buffer = context.createBuffer(2, 257, sampleRate);
+	const context = new OfflineAudioContext(2, bufferFrames, sampleRate);
+	const buffer = context.createBuffer(2, bufferFrames, sampleRate);
 	for (let c = 0; c < 2; c++) {
 		const data = buffer.getChannelData(c);
 		for (let i = 0; i < data.length; i++) {

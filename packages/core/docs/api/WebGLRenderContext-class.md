@@ -1,6 +1,6 @@
 # WebGLRenderContext
 
-Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 class WebGLRenderContext implements RenderContext
@@ -43,6 +43,7 @@ Related types: [RenderContext](supporting/core-RenderContext.md).
 | `disableScissor` | public | [open](WebGLRenderContext-class/disableScissor-method.md) |
 | `disableScissorTest` | public | [open](WebGLRenderContext-class/disableScissorTest-method.md) |
 | `disableStencilTest` | public | [open](WebGLRenderContext-class/disableStencilTest-method.md) |
+| `dispose` | public | [open](WebGLRenderContext-class/dispose-method.md) |
 | `drawBackdropBlur` | public | [open](WebGLRenderContext-class/drawBackdropBlur-method.md) |
 | `drawFramebufferTexture` | public | [open](WebGLRenderContext-class/drawFramebufferTexture-method.md) |
 | `drawImage` | public | [open](WebGLRenderContext-class/drawImage-method.md) |

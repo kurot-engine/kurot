@@ -4,7 +4,7 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current version: 0.12.0 (published on npm).** Requires `@kurot/core@^3.0.0`,
+> **Current version: 0.13.0 (prepared for publication).** Requires `@kurot/core@^3.0.0`,
 > `@kurot/ui@^5.0.0`, and `@kurot/ui-document@^0.14.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
@@ -18,11 +18,11 @@ This release requires Core 3 and UI 5; the semantic document format is unchanged
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.12.0 @kurot/ui-document@^0.14.0 @kurot/ui@^5.0.0 @kurot/core@^3.0.0
+pnpm add @kurot/ui-runtime@^0.13.0 @kurot/ui-document@^0.14.0 @kurot/ui@^5.0.0 @kurot/core@^3.0.0
 ```
 
 Install all peers explicitly and satisfy the chosen UI package's Core peer
-as well as runtime's own peers. UI 5 and this runtime both require Core ^3.0.0.
+as well as runtime's own peers. For example, UI 5.1.2 requires Core ^3.2.1; runtime itself requires Core ^3.0.0.
 Semantic format version is 2.
 
 CLI 4.1 uses document ^0.14.0 for build-time validation, typography and styles,
@@ -183,6 +183,8 @@ state?.clearState();
 result.data.setValue('balanceText', '$1,250.00');
 result.dispose();
 ```
+
+For arbitrary authored IDs, use `qualifyNodeId(parentScope, nodeId)`. Pass `''` for the root scope. For appearance children pass `qualifyAppearanceScope(hostKey, appearanceAssetId)` as the parent. For example, a literal screen ID `play/label` maps to `play%2Flabel`, while child `label` inside instance `play` retains `play/label`. Upgrade callers that build map keys from raw IDs containing `%`, `/` or `@appearance:`; the underlying document and Skin part names stay unchanged.
 
 Required data fields must receive an initial value or declare a Schema default.
 A later `setValue()` commits only after every binding target succeeds; failure

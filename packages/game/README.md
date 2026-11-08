@@ -2,7 +2,7 @@
 
 Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Package version: 3.0.0 (published on npm).** Requires `@kurot/core@^3.0.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.0.1 (prepared for publication).** Requires `@kurot/core@^3.0.0`. Targets ES2022 + evergreen browsers, same as core.
 
 ## Callback ownership
 
@@ -10,10 +10,12 @@ Game 3 removes Tween.call receiver arguments and receiver options; callbacks run
 without an implicit target receiver. The argument array is the second call
 parameter. See [Tween callbacks](docs/tween-callbacks.md).
 
+When URLLoader completes a SOUND request, the application owns the returned Sound. Reusing or closing the loader does not stop its channels or close its data; stop channels and close the Sound when the application is done with them.
+
 ## Installation
 
 ```bash
-pnpm add @kurot/game@^3.0.0 @kurot/core@^3.0.0
+pnpm add @kurot/game@^3.0.1 @kurot/core@^3.0.0
 ```
 
 `@kurot/game` declares `@kurot/core` as a peer dependency. Install both packages explicitly so the application controls the resolved core version.

@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import { resolveOutputPath } from './output-path.js';
 import { loadConfig } from './config.js';
 import { discoverComponents } from './components/discover-components.js';
 import { ConfigError } from './errors.js';
@@ -189,10 +190,9 @@ export const KUI_THEME_OUTPUT_PATH = 'resource/default.thm.json';
 export async function loadProject(mode: BuildMode): Promise<Project> {
 	const root = process.cwd();
 	const config = await loadConfig();
-	const outputDir =
-		mode === 'release'
-			? path.resolve(root, OUTPUT_DIRS.release, 'web', timestamp())
-			: path.resolve(root, config.output.dir);
+	const outputDir = await resolveOutputPath(root, mode === 'release'
+		? path.join(OUTPUT_DIRS.release, 'web', timestamp())
+		: config.output.dir, config);
 	const componentConvention = resolveComponentConvention(root, config);
 	const components = await discoverComponents(root, componentConvention);
 	const customNamespaces = resolveCustomNamespaces(root, config.ui?.namespaces);

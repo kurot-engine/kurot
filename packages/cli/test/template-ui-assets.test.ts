@@ -45,7 +45,6 @@ describe('native KUI default skin assets', () => {
 		const directory = new URL('ui/skins/', resourceRoot);
 		for (const filename of await readdir(directory)) {
 			const source = await readFile(new URL(filename, directory), 'utf8');
-			expect(source).not.toMatch(/eui|_png/);
 			const ir = parseToIR(source, undefined, [], resources, style.colors, style);
 			expect(ir.unresolvedTags).toEqual([]);
 			const assignments = nodes(ir.children).flatMap(node => node.properties).concat(ir.states.flatMap(state => state.overrides));

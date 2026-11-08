@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { PNG } from 'pngjs';
+import { inflateSync } from 'node:zlib';
 import { AtlasError } from '../AtlasError.js';
 import type { AtlasData, AtlasImage, AtlasOptions } from '../AtlasTypes.js';
 import { packAtlas } from '../pack-atlas.js';
@@ -47,10 +48,30 @@ export function decodePNG(bytes: Uint8Array, maxPixels = 16_777_216): AtlasImage
 	if (!Number.isSafeInteger(maxPixels) || maxPixels < 1 || maxPixels > 67_108_864) {
 		throw new AtlasError('invalid-options', 'Invalid maxPixels limit.');
 	}
-	if (readPixelCount(bytes) > maxPixels) {
+	const pixels = readPixelCount(bytes);
+	if (pixels > maxPixels) {
 		throw new AtlasError('invalid-input', 'PNG pixels exceed maxPixels.');
 	}
 	try {
+		// pngjs bounds ordinary scanlines but uses an unbounded inflate for Adam7.
+		// Verify that stream first: even RGBA16 needs at most 8 bytes plus one
+		// filter byte per pixel, including all seven passes.
+		if (bytes[28] === 1) {
+			const buffer = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+			const chunks: Buffer[] = [];
+			for (let offset = 33; offset + 12 <= buffer.length;) {
+				const length = buffer.readUInt32BE(offset);
+				const type = buffer.toString('latin1', offset + 4, offset + 8);
+				if (type === 'IEND') {
+					break;
+				}
+				if (type === 'IDAT' && length > 0) {
+					chunks.push(buffer.subarray(offset + 8, offset + 8 + length));
+				}
+				offset += length + 12;
+			}
+			inflateSync(Buffer.concat(chunks), { maxOutputLength: pixels * 9 });
+		}
 		const png = PNG.sync.read(Buffer.from(bytes), { checkCRC: true });
 		return { width: png.width, height: png.height, pixels: new Uint8Array(png.data) };
 	} catch (cause) {
@@ -96,7 +117,11 @@ function readPixelCount(bytes: Uint8Array): number {
 		if (length > buffer.length - offset - 12) {
 			throw new AtlasError('invalid-png', 'Truncated PNG chunk.');
 		}
-		if (buffer.toString('ascii', offset + 4, offset + 8) === 'acTL') {
+		const type = buffer.toString('latin1', offset + 4, offset + 8);
+		if (offset !== 8 && type === 'IHDR') {
+			throw new AtlasError('invalid-png', 'PNG must contain exactly one IHDR chunk.');
+		}
+		if (type === 'acTL') {
 			throw new AtlasError('invalid-png', 'Animated PNG is not supported.');
 		}
 		offset += length + 12;

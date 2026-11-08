@@ -1,5 +1,4 @@
-import * as http from 'node:http';
-import * as fs from 'node:fs/promises';
+import { startHttpServer } from './static-server.js';
 import * as fsSync from 'node:fs';
 import * as path from 'node:path';
 import { createContext, disposeContext, runPipeline } from './pipeline.js';
@@ -43,28 +42,6 @@ export interface DevServerOptions {
 	readonly onEvent?: (event: DevEvent) => void;
 }
 
-const MIME_TYPES: Record<string, string> = {
-	'.html': 'text/html; charset=utf-8',
-	'.js': 'application/javascript',
-	'.mjs': 'application/javascript',
-	'.map': 'application/json',
-	'.css': 'text/css',
-	'.json': 'application/json',
-	'.png': 'image/png',
-	'.jpg': 'image/jpeg',
-	'.jpeg': 'image/jpeg',
-	'.gif': 'image/gif',
-	'.svg': 'image/svg+xml',
-	'.webp': 'image/webp',
-	'.mp3': 'audio/mpeg',
-	'.ogg': 'audio/ogg',
-	'.wav': 'audio/wav',
-	'.mp4': 'video/mp4',
-	'.woff': 'font/woff',
-	'.woff2': 'font/woff2',
-	'.ttf': 'font/ttf',
-};
-
 /**
  * Starts a development server.
  *
@@ -104,7 +81,7 @@ export async function startDevServer(project: Project, options: DevServerOptions
 	watchResources(project, ctx, options, componentSkinsWatched, enqueue, syncAssets);
 	watchStageConfiguration(ctx, enqueue, options.onEvent);
 
-	const server = startHttpServer(project, options);
+	const server = await startHttpServer(project, options);
 
 	process.on('SIGINT', async () => {
 		logger.info('Stopping dev server...');
@@ -316,46 +293,10 @@ function isWithin(directory: string, file: string): boolean {
 }
 
 /**
- * Serves static files from the project output directory.
- */
-function startHttpServer(project: Project, options: DevServerOptions): http.Server {
-	const server = http.createServer(async (req, res) => {
-		const url = (req.url ?? '/').split('?')[0];
-		const filePath = path.join(project.outputDir, url === '/' ? 'index.html' : url);
-
-		try {
-			const data = await fs.readFile(filePath);
-			res.writeHead(200, { 'Content-Type': mimeType(filePath), 'Cache-Control': 'no-store' });
-			res.end(data);
-		} catch {
-			res.writeHead(404);
-			res.end('Not found');
-		}
-	});
-
-	server.listen(options.port, () => {
-		const url = `http://localhost:${options.port}`;
-
-		logger.success(`Dev server running at ${url}`);
-		logger.info('Watching for changes (refresh the browser to reload)...');
-		options.onEvent?.({ type: 'server-ready', url });
-	});
-
-	return server;
-}
-
-/**
  * Forwards collected diagnostics to the dev event consumer.
  */
 function emitDiagnostics(ctx: BuildContext, options: DevServerOptions): void {
 	for (const diagnostic of ctx.diagnostics.all()) {
 		options.onEvent?.({ type: 'diagnostic', diagnostic });
 	}
-}
-
-/**
- * Selects the response content type from the file extension.
- */
-function mimeType(filePath: string): string {
-	return MIME_TYPES[path.extname(filePath).toLowerCase()] ?? 'application/octet-stream';
 }

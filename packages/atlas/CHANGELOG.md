@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 — 2026-11-08
+
+Prepared for publication.
+
+- Reject repeated PNG image headers during preflight, before decoding either an individual image or a batch. Bound decompression for interlaced PNGs while retaining valid Adam7 input and the existing RGBA/atlas format.
+
 ## 0.1.0 — 2026-10-07
 
 Initial release, published to npm.

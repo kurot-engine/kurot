@@ -62,6 +62,14 @@ for (const sampleRate of [44100, 48000]) {
 	}
 }
 
+test('finite repeats stop before the first sample of an extra iteration', async ({ page }) => {
+	// At 44.1 kHz, converting 12,000 frames to seconds and back rounds slightly upward.
+	const result = await page.evaluate(() => window.audioLoop.renderSyntheticLoop(2, 0, 44100, 12000));
+	expect(result.maxError).toBeLessThan(1e-5);
+	expect(result.trailingPeak).toBe(0);
+	expect(result.completions).toBe(1);
+});
+
 for (const loops of [0, 2]) {
 	test(`external MP3 loops=${loops}: preserves every decoded sample at the join`, async ({ page }) => {
 		test.skip(!process.env.KUROT_AUDIO_FIXTURE, 'Set KUROT_AUDIO_FIXTURE to verify an application-owned MP3.');

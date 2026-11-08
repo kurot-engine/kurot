@@ -4,6 +4,15 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.2.3 — 2026-11-08
+
+Prepared for publication.
+
+- Aborting a ResourceLoader batch now ignores late analyzer completions and retries; subsequent batches finish independently.
+- Destroying a WebGL player detaches its context listeners and releases its uploads, pooled targets and buffers without disposing callers' pixel sources.
+- Finite Web Audio playback stops at the requested output frame even when the decoded buffer's duration rounds upward. Previously a short sound played twice could emit the first sample of a third play.
+- Refresh the reviewed text region of the macOS and Linux golden scenes; context restoration still reproduces the original frame.
+
 ## 3.2.2 — 2026-11-08
 
 Published; exact version and npm latest verified on 2026-11-08. Registry archive

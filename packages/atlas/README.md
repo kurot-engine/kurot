@@ -1,6 +1,6 @@
 # @kurot/atlas
 
-Version **0.1.0**, published to npm.
+Version **0.1.1**, prepared for publication.
 
 Independent, deterministic sprite-atlas tooling. Packs straight-alpha RGBA pixels
 and outputs the flat `file`/`frames` sheet format consumed by Kurot. No dependency
@@ -79,7 +79,7 @@ TexturePacker's exact placement or compressed PNG bytes.
 
 Margin, extrusion and padding are integers 0–1024. maxPixels is an integer
 1–67108864. Batches contain 1–4096 sources. PNG input has a 32 MiB per-file limit;
-dimensions are checked before decoding a batch. Static PNG input is normalized to
+dimensions and a unique IHDR are checked before decoding a batch; interlaced image data is also checked against its pixel budget before the codec expands it. Static PNG input is normalized to
 RGBA8; APNG is rejected. The input buffers, decoder intermediates and output may
 coexist, so maxPixels is not a process-wide memory quota.
 

@@ -1,6 +1,6 @@
 # makeBlurH
 
-Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 readonly makeBlurH: ((tier: 4 | 8 | 16 | 32) => string) | ((tier: 4 | 8 | 16 | 32) => string);

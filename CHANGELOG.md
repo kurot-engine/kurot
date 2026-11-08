@@ -5,6 +5,14 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-08 — SDK review fixes prepared for publication
+
+- Prepare CLI 4.1.3 and Atlas 0.1.1 for filesystem and PNG input boundaries; Core 3.2.3 and Game 3.0.1 for cancellation, player and sound ownership; ui-runtime 0.13.0 for collision-free instance keys and lookup helpers.
+- Core 3.2.3 also fixes a one-sample overrun at the end of finite Web Audio loops, reproduced with a template MP3 and a deterministic PCM fixture.
+- Keep existing dependency and peer minima. UI changes only the multiline browser test. No UI, ui-document, DragonBones or bitmap-font release is needed. Existing application installations and locks are unchanged. In particular, Editor/Studio must explicitly select ui-runtime 0.13.0 and audit special-character ID lookups to adopt it.
+- All nine packages build and pass 2,555 package tests. Core passes 148 browser tests (including real MP3 loops), UI passes 42, and all six Linux visual checks pass. Core/UI benchmark smoke passes without a reference-machine regression gate.
+- Install all five candidate archives together under strict peers: Star Catcher builds for development and release and passes all three browser cases on each output. All 22 API examples typecheck against built declarations and packed packages. Candidate packages have not been published.
+
 ## 2026-11-08 — Core 3.2.2 / UI 5.1.2 publication and application adoption
 
 - Verify exact npm versions/latest tags, registry integrity records and UI's

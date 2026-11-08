@@ -1,6 +1,6 @@
 # WebGLRenderBuffer
 
-Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 class WebGLRenderBuffer implements RenderBuffer
@@ -58,5 +58,6 @@ Related types: [RenderBuffer](supporting/core-RenderBuffer.md).
 | `transform` | public | [open](WebGLRenderBuffer-class/transform-method.md) |
 | `useOffset` | public | [open](WebGLRenderBuffer-class/useOffset-method.md) |
 | `static create` | public | [open](WebGLRenderBuffer-class/static-create-method.md) |
+| `static discardPool` | public | [open](WebGLRenderBuffer-class/static-discardPool-method.md) |
 | `static handleContextRestored` | public | [open](WebGLRenderBuffer-class/static-handleContextRestored-method.md) |
 | `static release` | public | [open](WebGLRenderBuffer-class/static-release-method.md) |

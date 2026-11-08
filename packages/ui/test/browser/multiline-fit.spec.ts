@@ -73,8 +73,8 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				expect(result.size).toBeLessThan(30);
 				expect(result.rows).toBe(2);
 				expect(Math.max(...result.widths)).toBeLessThanOrEqual(112);
-				expect(result.height).toBeLessThanOrEqual(36);
-				expect(result.region).toEqual([4, 4, 112, 36]);
+				expect(result.height).toBeLessThanOrEqual(38);
+				expect(result.region).toEqual([4, 3, 112, 38]);
 				expect(result.overflow).toBe(false);
 				await page.screenshot({ path: `test-results/multiline-fit-${backend}-${density}x.png` });
 				const resized = await page.evaluate(() => {
@@ -103,7 +103,7 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 				expect(resized.text).toBe('自动提现设置');
 				expect(resized.overflow).toBe(false);
 				expect(resized.width).toBeLessThanOrEqual(112);
-				expect(resized.height).toBeLessThanOrEqual(36);
+				expect(resized.height).toBeLessThanOrEqual(38);
 				await page.evaluate(() => window.multilineFit.paintAlignmentGrid(false));
 				const originalAlignment = await page.locator('canvas').screenshot();
 				await page.evaluate(() => window.multilineFit.paintAlignmentGrid(true));

@@ -1,3 +1,4 @@
+export { qualifyAppearanceScope, qualifyNodeId } from './node-identity.js';
 export { createKurotUI } from './createKurotUI.js';
 export { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 export { createKurotUIResourceAdapters } from './resources/createKurotUIResourceAdapters.js';

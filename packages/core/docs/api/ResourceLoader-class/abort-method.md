@@ -1,9 +1,10 @@
 # abort
 
-Package: `@kurot/core@3.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 abort(): void;
 ```
 
-Abort all loading.
+Ends the current batch. In-flight analyzers may settle, but their results
+cannot advance, retry or notify a later batch.

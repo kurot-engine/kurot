@@ -21,9 +21,10 @@ NaN retains the old single-play behavior. Native offset validation is retained.
 
 Web Audio uses one AudioBufferSourceNode with `loopStart = 0` and `loopEnd` equal
 to the decoded buffer duration. Repeated plays use `loop = true`; no JavaScript
-callback, timeout or new source is needed at each join. Finite playback passes
-the initial remaining duration plus the full repetitions to `start()` as total
-buffer content. Rendering stops on the audio clock even if the control thread is
+callback, timeout or new source is needed at each join. Finite playback schedules
+`stop()` on the audio clock after the initial remaining duration plus the full
+repetitions. This avoids playing the first sample of an extra iteration when
+the buffer duration rounds upward. Rendering stops even if the control thread is
 busy or the AudioContext is suspended and later resumed.
 
 `position` is seconds within the current iteration, including the first offset.

@@ -1,6 +1,6 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@4.1.2` (published on npm) is build-time tooling on Node.js >= 20, with ordinary
+`@kurot/cli@4.1.3` (prepared for publication) is build-time tooling on Node.js >= 20, with ordinary
 ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior.
@@ -16,7 +16,9 @@ src/
 │   ├── config.ts                  configuration loading and validation
 │   ├── project.ts                 resolved paths, dependencies, namespaces
 │   ├── pipeline.ts                BuildContext and ordered plugin runner
-│   ├── dev-server.ts              static server and watchers
+│   ├── dev-server.ts              build and resource watchers
+│   ├── static-server.ts           loopback HTTP server confined to output files
+│   ├── output-path.ts             shared build, dev and clean directory validation
 │   ├── resource-watcher.ts        recursive resource + shallow parent watch/reconnect
 │   ├── resource-asset-sync.ts     content comparison, staged writes and deletion reconciliation
 │   ├── diagnostics/               stable codes and JSON/JSONL output

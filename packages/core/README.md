@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **3.2.2** (published on npm).
+for browser games. Package version: **3.2.3** (prepared for publication).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -17,6 +17,10 @@ and docs without requiring the engine source.
 | Resources, manifests and errors | [Resource loading](docs/resource.md) |
 | Shader and filter ownership | [Filters](docs/filters.md) |
 | Dynamic background blur and modal ordering | [BackdropBlur](docs/backdrop-blur.md) |
+
+When leaving a game view, destroy its player before reusing the canvas. Destruction detaches WebGL context listeners and releases player-owned GPU storage; the application still owns its decoded pixels. Aborting a ResourceLoader batch ends its queue notifications. An already-running analyzer may finish its own work, but cannot settle or retry the next batch.
+
+Finite Web Audio repeats end on the scheduled output frame, including when the decoded sound's length cannot be represented exactly in seconds. See [audio playback](docs/audio-playback.md) for offset and loop-count behavior.
 
 ## Stable text layout
 
@@ -77,7 +81,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.2.2
+pnpm add @kurot/core@^3.2.3
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

@@ -199,8 +199,9 @@ export interface KurotUICreationResult {
 	readonly root: DisplayObject;
 
 	/**
-	 * Runtime instances keyed by document node ID. Reusable component internals
-	 * use slash-qualified keys such as `action/label`.
+	 * Runtime instances keyed by qualifyNodeId(). Reusable component internals
+	 * use slash-qualified keys such as `action/label`. Appearance children
+	 * use qualifyAppearanceScope() as their parent.
 	 */
 	readonly instances: ReadonlyMap<string, DisplayObject>;
 

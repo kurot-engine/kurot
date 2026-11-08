@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.12.0` (published on npm). This package consumes validated
+Package identity: `@kurot/ui-runtime@0.13.0` (prepared for publication). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
@@ -75,7 +75,7 @@ then forwarded by the real control when those parts bind. Input type is
 currently restricted to plain `text` by the shared Schema and runtime.
 
 Reusable component internals are materialized under slash-qualified identities,
-for example `play-action/label`. Parameters apply through declared bindings,
+for example `play-action/label`. Use `qualifyNodeId` and `qualifyAppearanceScope` for arbitrary authored IDs: literal percent, slash and the appearance separator are escaped per segment. Parameters apply through declared bindings,
 then instance overrides apply as the most specific values. Slot children retain
 their owning document scope. Appearance internals use an `@appearance:` scope
 and are installed as a native `Skin`; declared states become `State` and
