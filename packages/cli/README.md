@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Published version: [**5.1.0**](https://www.npmjs.com/package/@kurot/cli/v/5.1.0).
+resource watching. Source version: **5.1.1**. See [npm releases](https://www.npmjs.com/package/@kurot/cli?activeTab=versions) for published versions.
 Requires Node.js >= 22.12.0 (develop and test on 22.x) and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
@@ -107,7 +107,9 @@ kurot dev [--port 3000] [--sourcemap] [--strict]
 
 The development server rebuilds TypeScript, KUI XML, custom namespaces, and
 the component catalog as their sources change. Browser refresh is currently
-manual. JSONL mode reserves stdout for incremental build and server events.
+manual. After adding a reusable component, wait for the successful refresh
+before reloading the page; its namespace then includes the new export.
+JSONL mode reserves stdout for incremental build and server events.
 
 Root `kurot.config.ts` / `.js` stage edits are reloaded and published to HTML
 without restarting dev. Wait for the successful update, then refresh manually.

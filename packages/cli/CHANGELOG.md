@@ -7,9 +7,9 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## Unreleased
+## 5.1.1 — 2026-11-08
 
-- When a component is added during `kurot dev`, wait for a source build that sees the refreshed component list before reporting success. An overlapping watch build could otherwise leave the namespace without the new export until another rebuild. This fix is not in the published 5.1.0.
+- When a component is added during `kurot dev`, the generated namespace now exports it as soon as the CLI reports a successful refresh. In 5.1.0 an overlapping watch build could leave the new export missing until another rebuild. No project configuration or runtime dependency changes are required.
 
 ## 5.1.0 — 2026-11-08
 

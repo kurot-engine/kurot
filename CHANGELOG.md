@@ -5,6 +5,12 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-08 — CLI 5.1.1 prepared
+
+- Only the CLI changes. During `kurot dev`, adding a reusable component now refreshes its namespace even when another source build is in flight. See the [CLI changelog](packages/cli/CHANGELOG.md#511--2026-11-08).
+- SDK dependencies, Node requirements and consumer locks are unchanged. After publication, projects on `^5.0.0` or `~5.1.0` can update their lock. Projects pinned to 5.1.0 (including SAO) or on `~5.0.0` must change their CLI declaration to adopt the fix.
+- All 224 CLI tests passed. The packed CLI built both starters in development and release on Node 22.12.0 and 22.23.4. A running `kurot dev` served the new component export after its first successful refresh; the generated module loaded and the component could be instantiated without restarting the server.
+
 ## 2026-11-08 — CLI 5.1.0 published and verified
 
 - [npm](https://www.npmjs.com/package/@kurot/cli/v/5.1.0) published CLI 5.1.0 at 15:02 UTC and marked it `latest`. The [downloaded archive](https://registry.npmjs.org/@kurot/cli/-/cli-5.1.0.tgz) is byte-identical to the tested candidate and matches the registry integrity: `sha512-hVVzMKLUzuP+9TSzGF7pDF4wh0yUL+q/4IlLSfd0NPbqjKxd3dyl4/tKGkl+nHcck32S16gArizmmGyvs5UiZw==`.
