@@ -9,6 +9,10 @@ format changes are documented explicitly in each release.
 
 ## 5.1.0 — 2026-11-08
 
+Published on npm. The downloaded archive is byte-identical to the tested
+candidate. The annotated release tag identifies the verified source; npm's
+`gitHead` refers to the preceding commit. See the [publication record](../../CHANGELOG.md#2026-11-08--cli-510-published-and-verified).
+
 - Compile applications and custom KUI namespaces in one module graph in both modes. Aliases, relative imports and KUI share component constructors and business singletons; private third-party imports no longer target the public namespace barrel.
 - Support [state-dependent visual children](docs/state-children.md) using `includeIn`: compiled states attach and remove existing nodes in authored order without changing their visibility. Uses the existing UI state API.
 - Node.js >=22.12.0 and `@kurot/ui-document@^0.14.0` remain unchanged. Rebuild existing projects to use these changes. When moving off a patched 5.0.0, remove the version-specific patch and reinstall.

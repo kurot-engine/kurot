@@ -5,11 +5,15 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
-## 2026-11-08 — CLI 5.1.0 prepared
+## 2026-11-08 — CLI 5.1.0 published and verified
 
+- [npm](https://www.npmjs.com/package/@kurot/cli/v/5.1.0) published CLI 5.1.0 at 15:02 UTC and marked it `latest`. The [downloaded archive](https://registry.npmjs.org/@kurot/cli/-/cli-5.1.0.tgz) is byte-identical to the tested candidate and matches the registry integrity: `sha512-hVVzMKLUzuP+9TSzGF7pDF4wh0yUL+q/4IlLSfd0NPbqjKxd3dyl4/tKGkl+nHcck32S16gArizmmGyvs5UiZw==`.
+- The registry's `gitHead` is the previous commit (`c47dbf69`). The annotated tag `@kurot/cli@5.1.0` points to the [matching source](https://github.com/kurot-engine/kurot/commit/15c95783ec1fef35c00703588c156c020804262c). A clean build of that commit reproduced all 300 file paths and contents. The only file permission difference was `templates/game/template/web/logo.png` (`0600` on npm, `0644` in the clean repack).
 - CLI 5.1.0 shares project modules between the game and custom KUI namespaces and compiles state-dependent children with `includeIn`. Node, ui-document and engine runtime requirements are unchanged. See the [CLI changelog](packages/cli/CHANGELOG.md#510--2026-11-08).
-- Only the CLI needs publication. A project on `^5.0.0` can adopt 5.1.0 by updating its lock after publication; exact 5.0.0 and `~5.0.0` consumers must change their declarations to adopt it. In particular, SAO keeps its tested 5.0.0 patch until it can install the formal release. No consumer lock is changed here.
+- Only the CLI was released. Projects on `^5.0.0` can update their lock to adopt 5.1.0; exact 5.0.0 and `~5.0.0` consumers must update their declarations. SAO can now replace its 5.0.0 patch with the published version. This release record does not change any consumer locks.
 - All 222 CLI tests passed. The packed CLI scaffolded both `game` and `empty` and built each in development and release on Node 22.12.0 and 22.23.4. All 59 shipped JavaScript files match the patched CLI used for SAO's regression checks byte for byte.
+- A fresh registry install of 5.1.0 on Node 22.12.0 also created both starters. Each resolved the published CLI, installed with strict peer checks and built for development and release.
+- During post-publication verification on macOS, two parallel test runs each timed out waiting for one filesystem watcher event: the stage config test in one run and the resource manifest test in the other. Both tests passed in the other run.
 
 ## 2026-11-08 — Examples and Templates adopt CLI 5 and Node 22
 
