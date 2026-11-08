@@ -5,6 +5,34 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-08 — Examples and Templates adopt CLI 5 and Node 22
+
+- Update demo, game and star-catcher plus Card Booster, MilfMaster, Runaway,
+  Skydive and Tentax to registry Core 3.2.3 and CLI 5.0.0. Adopt Game 3.0.1
+  and Atlas 0.1.1 where already used. Preserve exact/caret policies, UI 5.1.2,
+  document 0.14.0, animation adapters and unrelated tool versions/integrity.
+  CLI adds its required jiti dependency and associated optional peer contexts.
+- Add .nvmrc selecting Node 22 to all eight projects. Examples declare
+  Node >=22.12.0; the five games declare >=22.18.0 for existing native TypeScript
+  tools and synchronous test hooks. Star Catcher's CLI commands use the CLI's
+  config loader directly; tsx remains for its browser runner. SDK peer minima,
+  KUI files and application source are unchanged.
+- All eight strict-peer offline frozen installs, strict development/release
+  builds and complete declaration checks pass. The examples also pass on exact
+  Node 22.12.0; all five games pass on exact Node 22.18.0, including all 818
+  existing application tests and their architecture/resource/tool checks.
+- All eight CLI 5 dev commands serve valid generated HTML, import maps and
+  scripts on those respective Node floors. Temporary servers are stopped after
+  each check. Atlas 0.1.1 decodes and repacks both games' existing business PNGs
+  without mutating inputs or writing resources. Native SDKs resolve one shared
+  Core 3.2.3 per application. Synchronize current project docs and adoption logs.
+- Browser checks pass on the respective Node floors: 12 demo/game development/
+  release WebGL/Canvas startup cases and six Star Catcher gameplay/lifecycle
+  cases. Templates pass their existing development WebGL fixtures; MilfMaster
+  additionally passes minified-release Canvas Slot KUI, three spin modes, input,
+  Skin replacement and teardown. No live backend or application-source change
+  is included in this dependency adoption.
+
 ## 2026-11-08 — CLI 5.0.0 published and verified
 
 - [npm](https://www.npmjs.com/package/@kurot/cli/v/5.0.0) published `@kurot/cli@5.0.0` at 11:16 UTC and marked it `latest`. Its `gitHead` and the annotated tag `@kurot/cli@5.0.0` point to the [tested source](https://github.com/kurot-engine/kurot/commit/5c3841abfee3c6a252bda04787ef0b5358840569). All 11 [CI jobs](https://github.com/kurot-engine/kurot/actions/runs/42473679020) passed on that commit.

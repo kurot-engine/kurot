@@ -8,11 +8,13 @@ sliders, progress, panel closing and hidden-bar list scrolling are interactive.
 
 ## Run the example
 
-The lock installs registry Core 3.2.2, UI 5.1.2, Game 3.0.0, ui-document 0.14.0
-and CLI 4.1.2. UI and Game resolve the same Core instance. Each example owns its
+The lock installs registry Core 3.2.3, UI 5.1.2, Game 3.0.1, ui-document 0.14.0
+and CLI 5.0.0. UI and Game resolve the same Core instance. Each example owns its
 installation and lockfile independently. DefaultUI declares its Skin parts and uses
 direct fields; onSkinRemoved releases its listeners before replacement.
 
+Use Node.js 22.x (22.12.0 or later); `.nvmrc` selects Node 22. CLI 5 loads
+TypeScript configs and relative helpers without a separate preloader.
 For the ordinary scene, run from this directory:
 
 ```sh

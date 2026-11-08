@@ -20,10 +20,10 @@ Left/Right or A/D; tap/drag the playfield on touch. Refresh manually after a bui
 Window blur or backgrounding pauses gameplay; Resume is explicit. Close disposes
 the application; reload to play again.
 
-The manifest records exact registry Core 3.2.2 with CLI 4.1.2. TypeScript, Vitest,
+The manifest records exact registry Core 3.2.3 with CLI 5.0.0. TypeScript, Vitest,
 Playwright and tsx retain their pinned versions. This example owns its registry
-installation and lockfile. The tsx launcher handles the TypeScript CLI config
-without requiring Node's newer built-in type stripping.
+installation and lockfile. `.nvmrc` selects Node 22. CLI 5 loads the TypeScript
+config itself; tsx remains only for the browser verification script.
 
 GameSession uses Core 3's callback-only ticker API. The installed registry
 package supplies the matching declarations; no checkout source binding is needed.
@@ -32,7 +32,7 @@ package supplies the matching declarations; no checkout source binding is needed
 
 Main uses `createPlayer({ canvas })`; `kurot.config.ts` provides the 640 × 800
 stage, scale mode and frame rate through CLI-generated canvas attributes.
-With CLI 4.1.2 dev, save stage settings, wait for the successful update and
+With CLI 5.0.0 dev, save stage settings, wait for the successful update and
 manually refresh the browser without restarting dev. Structural configuration
 or imported configuration helper changes still require a restart.
 GameModel's dimensions define the authored playfield and collision bounds;

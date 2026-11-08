@@ -1,13 +1,13 @@
 # Core-only demo
 
 A minimal Kurot entry with one Player and a Sprite root. It installs registry
-Core 3.2.2 and CLI 4.1.2 through its own pnpm lockfile; no UI or Game package is
+Core 3.2.3 and CLI 5.0.0 through its own pnpm lockfile; no UI or Game package is
 required.
 
 ## Run
 
-Use Node.js with native TypeScript config loading (22.18+) and pnpm in this
-directory:
+Use Node.js 22.x (22.12.0 or later) and pnpm in this directory. `.nvmrc`
+selects Node 22; CLI 5 loads TypeScript configs and relative helpers itself:
 
 ```sh
 pnpm install --frozen-lockfile
