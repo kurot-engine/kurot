@@ -6,7 +6,7 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ## 0.13.0 — 2026-11-08
 
-Prepared for publication.
+Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
 
 - Preserve distinct node, component and appearance identities when authored IDs contain a slash, percent sign or the literal appearance delimiter.
 - Export qualifyNodeId and qualifyAppearanceScope for instance/controller lookups. Ordinary keys such as play/label are unchanged; migrate manual lookups of IDs containing reserved characters to these helpers. Raw document IDs, part names and peer requirements do not change.

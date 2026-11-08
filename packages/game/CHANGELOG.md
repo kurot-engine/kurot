@@ -6,7 +6,7 @@ All notable changes to `@kurot/game` are documented here.
 
 ## 3.0.1 — 2026-11-08
 
-Prepared for publication.
+Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
 
 - URLLoader transfers ownership of a completed Sound before dispatching COMPLETE. Closing or reusing the loader still cancels an unfinished sound, but no longer invalidates a previously delivered one.
 - Clarify native ScrollView and URL loader behavior and retain MovieClip exporter contracts and named parser APIs.

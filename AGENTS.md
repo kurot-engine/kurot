@@ -35,7 +35,7 @@ installation establish its baseline. Package versions are independent.
 | `@kurot/core` | 3.2.3 | Display, rendering, events, text, resources, media | [context](packages/core/docs/ai-context.md) |
 | `@kurot/ui` | 5.1.2 | Components, layouts, skins, theming, binding | [context](packages/ui/docs/ai-context.md) |
 | `@kurot/game` | 3.0.1 | Tween, MovieClip, particles, ScrollView, URLLoader | [context](packages/game/docs/ai-context.md) |
-| `@kurot/cli` | 4.1.3 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
+| `@kurot/cli` | 4.1.4 | Build-time KUI XML → ESM and project tooling | [context](packages/cli/docs/ai-context.md) |
 | `@kurot/ui-document` | 0.14.0 | Headless UI authoring, validation, transactions/history | [context](packages/ui-document/docs/ai-context.md) |
 | `@kurot/ui-runtime` | 0.13.0 | Browser materialization, bindings, actions/transitions | [context](packages/ui-runtime/docs/ai-context.md) |
 | `@kurot/atlas` | 0.1.1 | Independent build-time RGBA packing; Node PNG subpath | [context](packages/atlas/docs/ai-context.md) |
@@ -106,6 +106,10 @@ All nine packages provide these commands. Run build/tests for changed packages
 and finish with `git diff --check`. Add/update tests for observable behavior;
 pure documentation/comment changes do not require new unit tests. Package
 contexts describe additional relevant browser/integration checks.
+
+[SDK verification](.github/workflows/sdk.yml) checks each package on Node 20 and
+22. After building CLI, run `bash tools/ci/check-cli-templates.sh` to exercise
+both templates with the actual packed CLI and public SDK dependencies.
 
 ## Repository and documentation boundaries
 

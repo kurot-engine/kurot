@@ -1,6 +1,6 @@
 # @kurot/atlas
 
-Version **0.1.1**, prepared for publication.
+Version **0.1.1**, published on npm.
 
 Independent, deterministic sprite-atlas tooling. Packs straight-alpha RGBA pixels
 and outputs the flat `file`/`frames` sheet format consumed by Kurot. No dependency

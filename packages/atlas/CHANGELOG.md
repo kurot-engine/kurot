@@ -2,7 +2,7 @@
 
 ## 0.1.1 — 2026-11-08
 
-Prepared for publication.
+Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
 
 - Reject repeated PNG image headers during preflight, before decoding either an individual image or a batch. Bound decompression for interlaced PNGs while retaining valid Adam7 input and the existing RGBA/atlas format.
 

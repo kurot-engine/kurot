@@ -1,7 +1,7 @@
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { exists } from '../utils/fs.js';
 import { ConfigError } from './errors.js';
+import { importConfig } from './config-import.js';
 
 /**
  * Runtime platform targeted by project builds.
@@ -150,8 +150,6 @@ const VALID_SCALE_MODES = [
 	'fixedWide',
 ] as const;
 
-let configRevision = 0;
-
 /**
  * Loads and validates `kurot.config.ts` (or `.js`) from the current working
  * directory, merging it over `DEFAULTS`. Falls back to `DEFAULTS` entirely
@@ -169,15 +167,9 @@ export async function loadConfig(options: { root?: string; fresh?: boolean } = {
 
 	let config: ProjectConfig;
 
-	if ((await exists(configPath)) || (await exists(jsConfigPath))) {
-		// Dynamic import of `kurot.config.ts` relies on Node's built-in
-		// TypeScript type-stripping support (no `tsx`/`ts-node` involved).
-		const url = pathToFileURL((await exists(configPath)) ? configPath : jsConfigPath);
-		if (options.fresh) {
-			url.searchParams.set('kurotConfigRevision', String(++configRevision));
-		}
-		const mod = await import(url.href);
-		const userConfig: ProjectConfig = mod.default ?? mod;
+	const hasTypeScriptConfig = await exists(configPath);
+	if (hasTypeScriptConfig || await exists(jsConfigPath)) {
+		const userConfig = await importConfig(hasTypeScriptConfig ? configPath : jsConfigPath, options.fresh);
 		config = { ...DEFAULTS, ...userConfig, stage: { ...DEFAULTS.stage, ...userConfig.stage } };
 	} else {
 		config = DEFAULTS;

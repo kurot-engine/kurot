@@ -1,0 +1,66 @@
+name: SDK verification
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    name: ${{ matrix.package }} · Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, ui, game, cli, ui-document, ui-runtime, atlas, dragonbones, bitmap-font]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm install --global pnpm@10.33.0
+      - run: pnpm --dir packages/${{ matrix.package }} install --frozen-lockfile
+      - run: pnpm --dir packages/${{ matrix.package }} build
+      - run: pnpm --dir packages/${{ matrix.package }} test
+      # Contributor tooling uses a recent Node 20 patch; the installed CLI
+      # promises the entire 20.x line. Check its bin on the actual floor.
+      - name: Switch to the oldest supported runtime for the CLI smoke test
+        if: matrix.package == 'cli' && matrix.node == 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.0.0
+      - if: matrix.package == 'cli' && matrix.node == 20
+        run: npm install --global pnpm@10.33.0
+      - name: Create and build both templates using the packed CLI
+        if: matrix.package == 'cli'
+        run: bash tools/ci/check-cli-templates.sh
+
+  browser:
+    name: ${{ matrix.package }} · Chromium
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.62.1-noble
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, ui]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --global pnpm@10.33.0
+      # UI browser fixtures load Core source and its bitmap-font dependency.
+      - run: pnpm --dir packages/core install --frozen-lockfile
+      - if: matrix.package == 'ui'
+        run: pnpm --dir packages/ui install --frozen-lockfile
+      - if: matrix.package == 'core'
+        run: pnpm --dir packages/core exec playwright test --config examples/visual-regression/playwright.config.ts --update-snapshots=none
+      - if: matrix.package == 'ui'
+        run: pnpm --dir packages/ui test:text-labels

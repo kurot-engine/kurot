@@ -7,9 +7,16 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
-## 4.1.3 — 2026-11-08
+## 4.1.4 — 2026-11-08
 
 Prepared for publication.
+
+- Build and release new game and empty projects on Node 20 without a TypeScript preloader. The CLI now loads TypeScript configs and their relative helpers itself. Default and named exports, native JavaScript configs, and root-only dev refresh keep their existing contracts.
+- No engine peer or application config changes are required.
+
+## 4.1.3 — 2026-11-08
+
+Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
 
 - Restrict development, release and clean outputs to real directories inside the project. Reject symlink path components, the project root, and overlap with project inputs before deleting anything.
 - Serve development files on the IPv4 loopback interface. Reject traversal and file links outside the output root; escaped asset names and query strings remain supported.

@@ -5,13 +5,21 @@ Observations below describe their recorded event. Current package versions and
 usage are indexed in [README.md](README.md); SDK changes are recorded in each
 package's CHANGELOG.md.
 
+## 2026-11-08 — Verified SDK publication and CLI 4.1.4 preparation
+
+- Downloaded and verified the registry SHA-512 for CLI 4.1.3, Atlas 0.1.1, Core 3.2.3, Game 3.0.1 and ui-runtime 0.13.0. Clean builds of the release source reproduced all five npm archives byte for byte.
+- The npm metadata records the earlier `gitHead` (`433a376a`). Use the annotated tags `@kurot/cli@4.1.3`, `@kurot/atlas@0.1.1`, `@kurot/core@3.2.3`, `@kurot/game@3.0.1` and `@kurot/ui-runtime@0.13.0` at `57e3f50a` for the matching source. Repository publication markers are updated separately from immutable package contents.
+- Prepare CLI 4.1.4 only: the installed CLI loads TypeScript project configs on Node 20 without a separate loader. Existing game configs and SDK peer ranges remain compatible. Exact CLI pins in consumer projects can adopt the patch explicitly; scaffolds start their CLI caret range at the version that created them.
+- CI builds and tests all nine packages on Node 20 and 22, builds both templates with the packed CLI, and checks Core/UI in Chromium.
+- Local verification: 2,556 package tests on each of Node 20 and Node 22; Core 148 browser tests, UI 42, and 22 strict API examples against both built declarations and installed archives. Both starter templates complete development and release builds with the packed CLI on Node 20.0.0, 20.20.2, 22.23.4, 24.22.2 and 26.13.0.
+
 ## 2026-11-08 — SDK review fixes prepared for publication
 
 - Prepare CLI 4.1.3 and Atlas 0.1.1 for filesystem and PNG input boundaries; Core 3.2.3 and Game 3.0.1 for cancellation, player and sound ownership; ui-runtime 0.13.0 for collision-free instance keys and lookup helpers.
 - Core 3.2.3 also fixes a one-sample overrun at the end of finite Web Audio loops, reproduced with a template MP3 and a deterministic PCM fixture.
 - Keep existing dependency and peer minima. UI changes only the multiline browser test. No UI, ui-document, DragonBones or bitmap-font release is needed. Existing application installations and locks are unchanged. In particular, Editor/Studio must explicitly select ui-runtime 0.13.0 and audit special-character ID lookups to adopt it.
 - All nine packages build and pass 2,555 package tests. Core passes 148 browser tests (including real MP3 loops), UI passes 42, and all six Linux visual checks pass. Core/UI benchmark smoke passes without a reference-machine regression gate.
-- Install all five candidate archives together under strict peers: Star Catcher builds for development and release and passes all three browser cases on each output. All 22 API examples typecheck against built declarations and packed packages. Candidate packages have not been published.
+- Install all five candidate archives together under strict peers: Star Catcher builds for development and release and passes all three browser cases on each output. All 22 API examples typecheck against built declarations and packed packages. Publication was pending at the time of this preparation.
 
 ## 2026-11-08 — Core 3.2.2 / UI 5.1.2 publication and application adoption
 

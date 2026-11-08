@@ -1,6 +1,6 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.13.0` (prepared for publication). This package consumes validated
+Package identity: `@kurot/ui-runtime@0.13.0` (published on npm). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 

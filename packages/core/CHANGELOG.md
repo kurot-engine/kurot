@@ -6,7 +6,7 @@ All notable changes to `@kurot/core` are documented here.
 
 ## 3.2.3 — 2026-11-08
 
-Prepared for publication.
+Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
 
 - Aborting a ResourceLoader batch now ignores late analyzer completions and retries; subsequent batches finish independently.
 - Destroying a WebGL player detaches its context listeners and releases its uploads, pooled targets and buffers without disposing callers' pixel sources.

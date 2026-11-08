@@ -2,7 +2,7 @@
 
 Game extensions for [@kurot/core](https://github.com/kurot-engine/kurot/tree/main/packages/core): chainable Tween animation, externally scheduled MovieClip playback, and common UI/network helpers.
 
-> **Package version: 3.0.1 (prepared for publication).** Requires `@kurot/core@^3.0.0`. Targets ES2022 + evergreen browsers, same as core.
+> **Package version: 3.0.1 (published on npm).** Requires `@kurot/core@^3.0.0`. Targets ES2022 + evergreen browsers, same as core.
 
 ## Callback ownership
 

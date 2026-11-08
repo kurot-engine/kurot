@@ -25,6 +25,13 @@ Preparing source changes does not establish publication. When publication is
 authorized, record registry version/tag, downloaded artifact and integrity
 verification separately from the source version.
 
+When publishing, commit the release source first and pack from a clean checkout
+of that commit. Publish the tested archive, then verify the downloaded SHA-512
+and `gitHead`. Use the annotated tag `@kurot/<package>@<version>` for the
+matching commit. Packages released together may share a commit. If an earlier
+publication recorded the wrong `gitHead`, verify the matching source by
+repacking, then document the discrepancy without moving existing release tags.
+
 For a documentation/publication status sync, check README opening banners,
 package identity blocks, architecture headers and active compatibility guides
 against the manifest and exact registry/latest metadata. Update current
