@@ -5,6 +5,33 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — Examples and Templates adopt UI 5.1.4 / CLI 5.1.1
+
+- Verify npm availability and adopt CLI 5.1.1 in demo, game and star-catcher
+  plus Card Booster, MilfMaster, Runaway, Skydive and Tentax; adopt UI 5.1.4
+  where already used. Preserve exact/caret declarations, Node 22 floors,
+  Core 3.2.3, Game 3.0.1, document 0.14.0 and other tool versions/integrity.
+- Pick up List pressed-renderer tracking and skin-state fixes, RadioButton
+  appearance reset, unified application/namespace constructor identity and
+  successful dev export refresh. Rebuild ordinary project outputs without
+  changing application source or authored KUI. Update current documentation
+  and the module-graph contract behind canonical component imports.
+- All eight strict-peer offline frozen installs, strict development/release
+  builds and full declaration checks pass on the existing Node 22.12.0/22.18.0
+  project floors. All 818 application tests pass, with existing architecture,
+  resource and tool checks. Each project's native SDKs resolve the same Core.
+- Twelve demo/game development/release WebGL/Canvas browser cases pass. The
+  gallery additionally verifies radio press/deselection/clear states, exactly
+  one itemTap when the pressed hit child is replaced, taps on the selected row
+  and Scroller drag cancellation. Core touchTap remains suppressed during
+  child retargeting while List still selects the original data item.
+- Star Catcher passes three gameplay/lifecycle browser cases per build. All
+  five Templates pass their existing development WebGL fixtures; MilfMaster
+  also passes minified-release Canvas Slot KUI, constructor identity, three
+  spin modes, Skin replacement and teardown. All eight CLI dev commands serve
+  the generated HTML, import maps and scripts; temporary servers stop afterward.
+  Browser verification uses deterministic fixtures.
+
 ## 2026-11-09 — UI 5.1.4 release preparation
 
 - Prepare only `@kurot/ui` for the [List and ItemRenderer fixes](packages/ui/CHANGELOG.md#514--2026-11-09).

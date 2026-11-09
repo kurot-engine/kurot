@@ -13,8 +13,8 @@ importers:
         version: 3.2.3
     devDependencies:
       '@kurot/cli':
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.1.1
+        version: 5.1.1
 
 packages:
 
@@ -186,8 +186,8 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@5.0.0':
-    resolution: {integrity: sha512-y6dT0JciLkUYrVafZ/2QmT2rc3Gqv1qNz6ypERvJYXgelP88k2DEqDoe12ntjaK5qHi1rqhCx9RrU5lkpSWYTw==}
+  '@kurot/cli@5.1.1':
+    resolution: {integrity: sha512-wqqR3pd94dDWYdPszZOQVGcb3H38DU5SZmYjUVyG3ecMB6cAtnGb71heK4RE2yQN5nYtH7pXFx7CUoSLLak5cQ==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -318,7 +318,7 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@5.0.0':
+  '@kurot/cli@5.1.1':
     dependencies:
       '@kurot/ui-document': 0.14.0
       commander: 13.1.0
