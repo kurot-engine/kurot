@@ -43,6 +43,31 @@ when only accents or descenders change, but adding rows shifts their whole block
 to maintain the selected alignment. Font readiness still
 uses `invalidateSize()`. Outline/state changes invalidate the normal UI layout.
 
+## Automatic width and parent layout
+
+An automatic-width Label contributes its preferred width to its parent's
+measurement, including paired `left`/`right` offsets in BasicLayout. Changing
+long text to short text and back must let an automatic Group shrink and grow.
+The preferred width is measured from current content and authored dimensions or
+maximums. A previous allocation is not a permanent limit on new content.
+
+Parent allocation then reflows text to determine automatic height and fitting.
+Width reflow retains the preferred width so a parent can grow again when
+its constraints are relaxed. Height-limited fitting can still reduce automatic
+preferred width. `getPreferredBounds()` reports that preferred size, while
+`getLayoutBounds()` reports the allocated frame. The allocated local bounds
+remain authoritative for painting, clipping and fitting; even an unchanged allocation needs reflow
+when content changes. A consumed reflow constraint is not reused by a later
+preferred-size measurement. Unchanged content and bounds settle without further
+measurement on repeated validation.
+
+With automatic width, `maxWidth="120"`, `multiline="false"` and
+`textFit="shrink"`, short text keeps its base size and natural width. Longer text
+expands up to the effective outer width limit before shrinking. Parent limits,
+height constraints, minimum dimensions and outline insets still apply. Returning
+to short text restores the base size and recalculates preferred width; minimum
+font-size overflow retains the existing reporting and clipping behavior.
+
 ## Lines and bounds
 
 - `Label.multiline` defaults to `true`. Text wraps at a finite available width;

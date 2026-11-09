@@ -54,33 +54,4 @@ describe('Label', () => {
 		});
 	});
 
-	describe('width constraint from layout', () => {
-		it('setLayoutBoundsSize stores the layout width', () => {
-			const label = new Label('');
-			const h = label as unknown as { _widthConstraint: number };
-			expect(isNaN(h._widthConstraint)).toBe(true);
-
-			// Simulate the parent layout assigning a width.
-			label.setLayoutBoundsSize(200, NaN);
-
-			// The constraint should now be stored.
-			expect(h._widthConstraint).toBe(200);
-		});
-
-		it('measure() retains the external width constraint across text changes', () => {
-			const label = new Label('');
-			const h = label as unknown as { _widthConstraint: number };
-			const tf = textField(label);
-
-			// Simulate a layout constraint of 200.
-			h._widthConstraint = 200;
-
-			label.measure();
-
-			// The parent constraint remains authoritative for subsequent measurements.
-			expect(h._widthConstraint).toBe(200);
-			// And restored the text field width.
-			expect(isNaN(tf.$explicitWidth)).toBe(true);
-		});
-	});
 });

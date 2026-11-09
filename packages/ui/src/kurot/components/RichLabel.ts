@@ -13,7 +13,11 @@ export class RichLabel extends Component {
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	private readonly _textField = new TextField();
-	private _widthConstraint = NaN;
+
+	private _layoutWidth = NaN;
+	private _measureLayout = false;
+	private _measuredWidthConstraint = NaN;
+	private _preferredWidth = 0;
 	private _measurement?: { width: number; height: number };
 	private _measurementWidth = NaN;
 
@@ -272,6 +276,7 @@ export class RichLabel extends Component {
 	// ── Override methods ──────────────────────────────────────────────────────
 
 	public override invalidateSize(): void {
+		this._measureLayout = false;
 		// A late font load can change metrics without changing the authored runs.
 		this._measurement = undefined;
 		this._textField?.invalidateTextMetrics();
@@ -284,16 +289,32 @@ export class RichLabel extends Component {
 	}
 
 	public override measure(): void {
-		const measured = this._measureText();
-		this.setMeasuredSize(measured.width, measured.height);
+		const reflow = this._measureLayout;
+		const width = this._getMeasureWidth(this._measureLayout ? this._layoutWidth : NaN);
+		this._measureLayout = false;
+		this._measuredWidthConstraint = width;
+		const measured = this._measureText(width);
+		// Keep preferred width independent of wrapping in the current allocation,
+		// so an automatic parent can expand after content or constraint changes.
+		if (!reflow || !Number.isFinite(this._layoutWidth)) {
+			this._preferredWidth = measured.width;
+		}
+		this.setMeasuredSize(this._preferredWidth, measured.height);
+		if (!reflow && Number.isFinite(this._layoutWidth)) {
+			this.ui.$invalidateParentLayout();
+		}
 	}
 
 	public override setLayoutBoundsSize(layoutWidth: number, layoutHeight: number): void {
 		super.setLayoutBoundsSize(layoutWidth, layoutHeight);
 		const width = Number.isFinite(layoutWidth) ? this.width : NaN;
-		if (Object.is(this._widthConstraint, width)) return;
-		this._widthConstraint = width;
-		this._invalidateText();
+		this._layoutWidth = width;
+		// New preferred metrics must be reflowed even if the allocation is unchanged.
+		if (!Object.is(this._measuredWidthConstraint, this._getMeasureWidth(width))) {
+			this._measureLayout = true;
+			super.invalidateSize();
+			this.invalidateDisplayList();
+		}
 	}
 
 	public override updateDisplayList(unscaledWidth: number, unscaledHeight: number): void {
@@ -332,16 +353,20 @@ export class RichLabel extends Component {
 		this.invalidateDisplayList();
 	}
 
-	private _measureText(): { width: number; height: number } {
-		if (!this._textField.text) return { width: 0, height: 0 };
-
-		const width = Number.isFinite(this._widthConstraint)
-			? this._widthConstraint
+	private _getMeasureWidth(layoutWidth: number): number {
+		return Number.isFinite(layoutWidth)
+			? layoutWidth
 			: Number.isFinite(this.$explicitWidth)
 				? this.$explicitWidth
 				: this.maxWidth !== 100000
 					? this.maxWidth
 					: NaN;
+	}
+
+	private _measureText(width: number = this._getMeasureWidth(this._layoutWidth)): { width: number; height: number } {
+		if (!this._textField.text) {
+			return { width: 0, height: 0 };
+		}
 		if (!this._measurement || !Object.is(this._measurementWidth, width)) {
 			this._measurement = this._textField.measureText(width);
 			this._measurementWidth = width;

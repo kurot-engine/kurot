@@ -76,9 +76,15 @@ Explicit alignment works in either
 line mode. The headless catalog records middle; omitted XML retains the native
 host default.
 
-Measurement uses parent-assigned width first, then explicit width, then maxWidth,
-otherwise unconstrained width. Each row uses its largest run size; automatic
-height includes all wrapped rows and inter-line spacing. Hard separators and
+Preferred width uses explicit width or maxWidth, otherwise unconstrained width.
+The parent can therefore grow an automatic Group again after shorter content.
+Parent-assigned width is used for the subsequent reflow and automatic height,
+without replacing the preferred width with a historical wrapping limit.
+`textWidth`/`textHeight` query the current parent-assigned width first, then
+explicit width, then maxWidth, otherwise unconstrained width. Unchanged bounds
+settle after reflow; text changes reflow even at the same assigned width.
+Each row uses its largest run size; automatic height includes all wrapped rows
+and inter-line spacing. Hard separators and
 trailing blank lines follow the Core text contract. Empty content measures
 0 × 0, while Component minimum dimensions can still enlarge layout bounds.
 Fixed height clips drawing without discarding content metrics. Alignment positions

@@ -23,8 +23,12 @@ export class Label extends Component implements IDisplayText {
 
 	protected _textField: TextField;
 
-	private _widthConstraint = NaN;
+	private _layoutWidth = NaN;
 	private _layoutHeight = NaN;
+	private _measureLayout = false;
+	private _measuredWidthConstraint = NaN;
+	private _measuredHeightConstraint = NaN;
+	private _preferredWidth = 0;
 	private _baseSize: number;
 	private _textFit: TextFitMode = 'none';
 	private _minFontSize = 12;
@@ -355,6 +359,9 @@ export class Label extends Component implements IDisplayText {
 	// ── Override methods ──────────────────────────────────────────────────
 
 	public override invalidateSize(): void {
+		// Content/font changes start a new preferred-size measurement. A previous
+		// allocation may itself have come from this label's old preferred size.
+		this._measureLayout = false;
 		// Font readiness can invalidate metrics without changing the family name.
 		this._fitKey = undefined;
 		this._textField?.invalidateTextMetrics();
@@ -376,27 +383,40 @@ export class Label extends Component implements IDisplayText {
 	public override measure(): void {
 		const tf = this._textField;
 		const oldWidth = tf.$explicitWidth;
-		const availableWidth = Number.isFinite(this._widthConstraint)
-			? this._widthConstraint
-			: Number.isFinite(this.$explicitWidth)
-				? this.$explicitWidth
-				: this.maxWidth !== 100000
-					? this.maxWidth
-					: NaN;
-		const availableHeight = Number.isFinite(this._layoutHeight)
-			? this._layoutHeight
-			: Number.isFinite(this.$explicitHeight)
-				? this.$explicitHeight
-				: this.maxHeight !== 100000
-					? this.maxHeight
-					: NaN;
-		this._applyTextFit(availableWidth, availableHeight);
+		const reflow = this._measureLayout;
+		const availableWidth = this._getMeasureWidth(reflow ? this._layoutWidth : NaN);
+		const availableHeight = this._getMeasureHeight(reflow ? this._layoutHeight : NaN);
+		this._measureLayout = false;
+		this._measuredWidthConstraint = availableWidth;
+		this._measuredHeightConstraint = availableHeight;
 		try {
-			tf.width = this._getTextContentWidth(availableWidth);
 			const inset = getLabelOutlineInsets(tf, this.size);
-			this.setMeasuredSize(tf.textWidth + inset.x * 2, tf.textHeight + inset.y * 2);
+			if (
+				reflow && Number.isFinite(this._layoutWidth) &&
+				Number.isFinite(availableHeight) && this.textFit === 'shrink'
+			) {
+				// Height is an independent fitting limit. Preserve its effect on
+				// automatic width without recycling the allocated width as a cap.
+				const preferredWidth = this._getMeasureWidth(NaN);
+				this._applyTextFit(preferredWidth, availableHeight);
+				tf.width = this._getTextContentWidth(preferredWidth);
+				this._preferredWidth = tf.textWidth + inset.x * 2;
+			}
+			this._applyTextFit(availableWidth, availableHeight);
+			tf.width = this._getTextContentWidth(availableWidth);
+			// Width reflow must not overwrite the preferred width that lets an
+			// automatic parent expand again when its own constraints are relaxed.
+			if (!reflow || !Number.isFinite(this._layoutWidth)) {
+				this._preferredWidth = tf.textWidth + inset.x * 2;
+			}
+			this.setMeasuredSize(this._preferredWidth, tf.textHeight + inset.y * 2);
 		} finally {
 			tf.width = oldWidth;
+		}
+		if (!reflow && (Number.isFinite(this._layoutWidth) || Number.isFinite(this._layoutHeight))) {
+			// Equal natural dimensions can still have different line breaks under
+			// the parent's allocation (for example an emoji versus plain letters).
+			this.ui.$invalidateParentLayout();
 		}
 	}
 
@@ -406,13 +426,18 @@ export class Label extends Component implements IDisplayText {
 		// Fitting uses the resolved local size, never the parent's raw dimensions.
 		const width = Number.isFinite(layoutWidth) ? this.width : NaN;
 		const height = Number.isFinite(layoutHeight) ? this.height : NaN;
-		const widthChanged = !Object.is(this._widthConstraint, width);
-		const heightChanged = !Object.is(this._layoutHeight, height);
-		this._widthConstraint = width;
+		this._layoutWidth = width;
 		this._layoutHeight = height;
-		if ((widthChanged || heightChanged) && (this.multiline || this.textFit === 'shrink')) {
-			this.invalidateSize();
-			this.invalidateDisplayList();
+		const measureWidth = this._getMeasureWidth(width);
+		const measureHeight = this._getMeasureHeight(height);
+		// Compare against the measurement, not just the previous allocation:
+		// new content still needs reflow when a fixed parent assigns the same width.
+		if (
+			(this.multiline || this.textFit === 'shrink') &&
+			(!Object.is(this._measuredWidthConstraint, measureWidth) ||
+				(this.textFit === 'shrink' && !Object.is(this._measuredHeightConstraint, measureHeight)))
+		) {
+			this._invalidateLayoutMeasurement();
 		}
 	}
 
@@ -420,7 +445,7 @@ export class Label extends Component implements IDisplayText {
 		super.updateDisplayList(unscaledWidth, unscaledHeight);
 		// Automatic axes must not feed their own measured size back into fitting.
 		const fitWidth =
-			Number.isFinite(this._widthConstraint) || Number.isFinite(this.$explicitWidth)
+			Number.isFinite(this._layoutWidth) || Number.isFinite(this.$explicitWidth)
 				? unscaledWidth
 				: this.maxWidth !== 100000
 					? this.maxWidth
@@ -434,7 +459,7 @@ export class Label extends Component implements IDisplayText {
 		const previousSize = this.renderedSize;
 		this._applyTextFit(fitWidth, fitHeight);
 		if (previousSize !== this.renderedSize && (isNaN(this.$explicitWidth) || isNaN(this.$explicitHeight))) {
-			this.invalidateSize();
+			this._invalidateLayoutMeasurement();
 		}
 		// Measure, wrap, fit and paint reserve the same space exactly once. Core
 		// alignment remains authored and operates inside this inset text region.
@@ -446,6 +471,30 @@ export class Label extends Component implements IDisplayText {
 	}
 
 	// ── Private methods ────────────────────────────────────────────────────
+
+	private _getMeasureWidth(layoutWidth: number): number {
+		return Number.isFinite(layoutWidth)
+			? layoutWidth
+			: Number.isFinite(this.$explicitWidth)
+				? this.$explicitWidth
+				: this.maxWidth !== 100000 ? this.maxWidth : NaN;
+	}
+
+	private _getMeasureHeight(layoutHeight: number): number {
+		return Number.isFinite(layoutHeight)
+			? layoutHeight
+			: Number.isFinite(this.$explicitHeight)
+				? this.$explicitHeight
+				: this.maxHeight !== 100000 ? this.maxHeight : NaN;
+	}
+
+	private _invalidateLayoutMeasurement(): void {
+		// Consume the allocation only for this reflow; retain it separately for
+		// painting and fitting until the parent assigns new bounds.
+		this._measureLayout = true;
+		super.invalidateSize();
+		this.invalidateDisplayList();
+	}
 
 	private _applyTextFit(width: number, height: number): void {
 		const tf = this._textField;

@@ -1,6 +1,6 @@
 # static dispatchItemTapEvent
 
-Package: `@kurot/ui@5.2.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 static dispatchItemTapEvent<T = unknown>(target: IEventDispatcher, item: T | undefined, itemIndex: number, itemRenderer?: ItemRenderer<string, T>): boolean;

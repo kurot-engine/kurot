@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.2.1**.
+Kurot games. Package version: **5.2.2**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -63,7 +63,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.2.1 @kurot/core@^3.3.0
+pnpm add @kurot/ui@^5.2.2 @kurot/core@^3.3.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -73,6 +73,14 @@ around stable font-frame rows; read [Label text layout](docs/label-text-layout.m
 when sizing text.
 
 ## Stable Label and RichLabel layout
+
+Automatic Label and RichLabel widths recover after long → short → long content
+changes, including automatic Groups with paired left/right constraints. Preferred
+width stays independent of historical wrapping limits; current parent bounds
+still control reflow, automatic height and painting. Label with maxWidth and
+shrink expands before reducing renderedSize, and shorter text restores authored
+size. See [automatic width and parent layout](docs/label-text-layout.md#automatic-width-and-parent-layout)
+for width/height limits and fitting behavior.
 
 Label automatic height and textFit use Core's full font-frame measurement.
 Accents and descenders do not move unchanged baselines; tall font metrics may

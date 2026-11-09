@@ -1,6 +1,6 @@
 # measuredHeight
 
-Package: `@kurot/ui@5.2.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 get measuredHeight(): number;

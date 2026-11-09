@@ -1,6 +1,6 @@
 # BitmapLabel
 
-Package: `@kurot/ui@5.2.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
 
 ```ts
 class BitmapLabel extends Component implements IDisplayText

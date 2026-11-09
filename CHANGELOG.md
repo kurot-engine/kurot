@@ -5,6 +5,31 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-10 — UI 5.2.2 release preparation
+
+- Prepare only `@kurot/ui` for the [Label and RichLabel width recovery fix](packages/ui/CHANGELOG.md#522--2026-11-10).
+  Preserve preferred width across layout reflow so automatic Groups can grow
+  after shorter text or relaxed constraints. maxWidth plus shrink expands before
+  reducing renderedSize; current parent width/height bounds, wrapping, outline
+  insets and minimum-size overflow keep their existing contracts.
+- Core stays at the `^3.2.1` peer minimum. ui-runtime accepts this patch through
+  its `^5.0.0` peer/development range and needs no release. The CLI game template
+  uses `latest`; the game example and caret-based Templates can adopt through
+  installation/lock updates. Fixed pins in SAO, Card Booster, Skydive and Editor
+  require explicit adoption. Skia and its demo's `~5.1.2` range require a separate
+  5.2 compatibility update; Studio's UI 3.x baseline remains a separate migration.
+  No consumer manifests or locks are changed in this release preparation.
+- All nine SDK builds and 2,626 unit tests pass, including 641 UI cases. All 49
+  UI Chromium cases pass across Canvas and WebGL 1/2, including identical pixels
+  after text round trips and stable repeated validation. The original reproduction
+  passes against built UI with Core 3.3.0 without a diagnostic reset.
+- ui-runtime's 91 tests pass with both its accepted dependency lock and local
+  Core/UI source. Both packed CLI templates build in development/release modes;
+  all 22 API examples compile against built and packed declarations. API references
+  and current package documentation identify UI 5.2.2.
+- This records source preparation. npm publication and its annotated tag follow
+  verification of the published archive.
+
 ## 2026-11-09 — Game example and Templates adopt UI 5.2.1
 
 - Verify npm latest and adopt UI 5.2.1 in the game example, Card Booster,

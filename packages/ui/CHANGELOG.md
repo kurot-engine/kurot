@@ -4,6 +4,27 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.2.2 — 2026-11-10
+
+- Fix Label and RichLabel automatic width after long → short → long content
+  changes in an automatic Group with paired edge constraints. Separate preferred
+  width from allocated bounds and consume layout reflow constraints per
+  measurement. Content with unchanged natural dimensions still reflows at the
+  parent's current width; relaxing parent maximums restores the preferred width.
+- Automatic Label width with maxWidth and shrink expands before fitting and
+  restores the authored font size for shorter text. Parent width/height limits,
+  minimum-size overflow, wrapping, outline insets and clipping retain their
+  existing behavior. Core text policies and public component APIs are unchanged.
+
+Validation: all nine SDK builds and 2,626 tests pass, including 641 UI tests.
+The 49 UI Chromium cases pass across Canvas and WebGL 1/2; automatic text
+round trips restore identical pixels and repeated validation adds no measurement
+work. All 91 ui-runtime tests also pass against the local Core/UI source.
+The original width reproduction passes against the built UI and Core 3.3.0
+without resetting a private constraint. Both packed CLI templates build in
+development and release modes; all 22 API examples compile against built and
+packed declarations.
+
 ## 5.2.1 — 2026-11-09
 
 - Resolve unknown nonempty Skin state requests to the first declared state
