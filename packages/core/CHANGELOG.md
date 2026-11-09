@@ -6,6 +6,12 @@ All notable changes to `@kurot/core` are documented here.
 
 ## 3.3.0 — 2026-11-09
 
+The published [npm package](https://www.npmjs.com/package/@kurot/core/v/3.3.0)
+matches the tested archive byte for byte, including SHA-512 integrity. Its
+`gitHead` and annotated release tag identify the same source. See the
+[publication record](../../CHANGELOG.md#2026-11-09--core-330-ui-520-and-cli-512-published-and-verified)
+for the integrity and commit.
+
 - Resolve manifest names, unambiguous manifest URLs and sheet frames to their
   owning entry. `Resource.loadSource(source, urlType)` also loads unregistered
   URLs into the same cache used by `get` and `destroy`. Concurrent group,

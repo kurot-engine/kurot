@@ -48,7 +48,8 @@ CLI 5.1.2 consumes ui-document ^0.14.0, retaining Label text-fitting metadata. T
 compiler emits `textFit`, `minFontSize`, base font sizes and state overrides;
 native UI owns measurement and derives drawing sizes after layout validation.
 See [Label compilation](label-text-layout.md). The application supplies UI
-4.x or 5.x and its compatible Core. UI 5 requires Core ^3.0.0.
+4.x or 5.x and its compatible Core. UI 5.2 requires Core ^3.2.1; its complete
+default asset adapter behavior requires Core >= 3.3.0 within 3.x.
 
 Host-field validation uses compiler syntax and installed declarations before
 installing the Skin bundle or tooling declarations. The shared application/namespace

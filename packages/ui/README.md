@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.2.0**.
+Kurot games. Published version: [**5.2.0**](https://www.npmjs.com/package/@kurot/ui/v/5.2.0).
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -78,8 +78,9 @@ for progressively typed paragraphs that must retain their first-line origin.
 Outlined Labels reserve `ceil(stroke) + 2` logical pixels above and below the
 whole block. A 29px font frame with stroke=2 measures 37px. Horizontal protection
 is separate and includes an authored-size italic guard; measurement, fitting and
-painting share those insets. Use Core 3.2.2 for the accompanying render-only ink
-and mixed-size scrolling corrections; the supported Core peer remains ^3.2.1.
+painting share those insets. Core >= 3.2.2 within 3.x supplies the accompanying
+render-only ink and mixed-size scrolling corrections; the supported Core peer
+remains ^3.2.1.
 
 ## Text and styles
 

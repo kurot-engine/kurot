@@ -6,6 +6,12 @@ All notable changes to `@kurot/ui` are documented here.
 
 ## 5.2.0 — 2026-11-09
 
+The published [npm package](https://www.npmjs.com/package/@kurot/ui/v/5.2.0)
+matches the tested archive byte for byte, including SHA-512 integrity. Its
+`gitHead` and annotated release tag identify the same source. See the
+[publication record](../../CHANGELOG.md#2026-11-09--core-330-ui-520-and-cli-512-published-and-verified)
+for the integrity and commit.
+
 - DefaultAssetAdapter uses Core's Resource cache for named images, sheet frames
   and URLs. Cached textures return synchronously, including when a List rebuilds
   its rows; failures complete once with undefined. The adapter accepts a scoped

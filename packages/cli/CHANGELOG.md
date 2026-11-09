@@ -9,6 +9,12 @@ format changes are documented explicitly in each release.
 
 ## 5.1.2 — 2026-11-09
 
+The published [npm package](https://www.npmjs.com/package/@kurot/cli/v/5.1.2)
+matches the tested archive byte for byte, including SHA-512 integrity. Its
+`gitHead` and annotated release tag identify the same source. See the
+[publication record](../../CHANGELOG.md#2026-11-09--core-330-ui-520-and-cli-512-published-and-verified)
+for the integrity and commit.
+
 - The game starter uses UI's resource-aware default image adapter instead of
   installing a project-specific copy. Manifest, theme and preload startup order
   is unchanged. Use UI >= 5.2.0 with Core >= 3.3.0 for complete resource

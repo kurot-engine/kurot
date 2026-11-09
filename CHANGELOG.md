@@ -5,6 +5,37 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — Core 3.3.0, UI 5.2.0 and CLI 5.1.2 published and verified
+
+- All three downloaded npm archives are byte-identical to their tested clean-checkout
+  candidates. Their SHA-512 integrity, SHA-1 shasum, package versions and `latest`
+  tags match the release records. Publication times below are UTC.
+
+| Package | Published at | Archive bytes |
+| --- | --- | --- |
+| [@kurot/core@3.3.0](https://www.npmjs.com/package/@kurot/core/v/3.3.0) | 12:15:47 | 675,240 |
+| [@kurot/ui@5.2.0](https://www.npmjs.com/package/@kurot/ui/v/5.2.0) | 12:27:08 | 555,541 |
+| [@kurot/cli@5.1.2](https://www.npmjs.com/package/@kurot/cli/v/5.1.2) | 12:35:45 | 370,971 |
+
+- Each registry `gitHead` is [`6fd498a0`](https://github.com/kurot-engine/kurot/commit/6fd498a084023ac1b78f8b0a79564ea735325fed).
+  The annotated tags `@kurot/core@3.3.0`, `@kurot/ui@5.2.0` and
+  `@kurot/cli@5.1.2` identify that release source. Publication documentation is
+  committed afterward; it does not change the immutable package contents.
+- UI retains Core peer `^3.2.1`; complete resource sharing requires Core 3.3.0.
+  CLI retains Node >=22.12.0 and ui-document `^0.14.0`. Applications retain
+  their existing locks and custom adapters until explicitly upgraded.
+- A fresh registry install on Node 22.23.4 creates both `game` and `empty`
+  starters with CLI 5.1.2 and Core 3.3.0 (plus UI 5.2.0 for `game`). Both
+  pass strict-peer installation, strict TypeScript checking and development/
+  release builds. Game and UI resolve the same Core instance. The byte-identical
+  artifacts retain the candidate's 2,597 SDK unit tests, 43 UI browser tests and
+  22 built/packed API example checks.
+
+Verified registry SHA-512 integrity:
+
+- `@kurot/core@3.3.0`: `sha512-xugN6kC+j8EyVNzZqEqfTFwRGBRsSqU77fGouNsrMM2TISznzoDkmJLnTYRUJJ2hYcCGclvgfcDAvGMlg1zSMQ==`.
+- `@kurot/ui@5.2.0`: `sha512-Gol9V5RUSTAPVzWvaes/vR/Fcm35VSIpp27M+WybfOro90svZx/akFyVBbLtY6VVbT4PS8lqGJKZ1el0K+CF5w==`.
+- `@kurot/cli@5.1.2`: `sha512-QpdNOME9l+fVlVEKGt2Pk1uP3OpHq1pigYhhjVARN7ZJZZU7f7jlgjuTFdn+I9mu7hrX8M7+s8ngSJB5O0jg1Q==`.
 
 ## 2026-11-09 — Core 3.3.0, UI 5.2.0 and CLI 5.1.2 release preparation
 
