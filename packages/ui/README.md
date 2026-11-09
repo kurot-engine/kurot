@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.1.3**.
+Kurot games. Package version: **5.1.4**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -33,6 +33,12 @@ Declared typed list fields in KUI hosts require CLI **>= 4.1.1 within 4.x**;
 ordinary TypeScript use does not require CLI. See
 [list data types](docs/list-data-types.md) for examples and null/undefined behavior.
 
+A List tap follows the data row: pressing its image and releasing over its
+selection frame emits one `ItemTapEvent.ITEM_TAP`. Scrolling, releasing over
+another row, or recycling the pressed renderer does not activate an item.
+Selected renderers use their skin's matching `AndSelected` state when present;
+otherwise they use `down` while enabled and `disabled` while disabled.
+
 ## RichLabel component typography
 
 RichLabel supports component fontFamily, size, textColor, stroke, strokeColor,
@@ -45,7 +51,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.1.3 @kurot/core@^3.2.2
+pnpm add @kurot/ui@^5.1.4 @kurot/core@^3.2.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.

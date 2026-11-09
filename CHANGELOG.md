@@ -5,6 +5,19 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — UI 5.1.4 release preparation
+
+- Prepare only `@kurot/ui` for the [List and ItemRenderer fixes](packages/ui/CHANGELOG.md#514--2026-11-09).
+  A tap can begin and end on different children of the same data row; scrolling
+  and recycling still cancel the tap. Selected rows keep their `down` appearance
+  when the skin omits `downAndSelected`.
+- The Core peer stays at `^3.2.1`. The ui-runtime peer and development ranges
+  (`^5.0.0`), CLI game template (`latest`) and game example (`^5.1.2`)
+  accept this patch. Applications pinned to an earlier patch, including SAO
+  at 5.1.3, must update their declaration and lock to adopt it after publication.
+- The UI build, all 599 unit tests and all 42 Chromium tests passed on Node 22.
+  All 22 shared API examples compile against both built and packed declarations.
+
 ## 2026-11-09 — UI 5.1.3 release preparation
 
 - Prepare `@kurot/ui` for the [RadioButton skin fix](packages/ui/CHANGELOG.md#513--2026-11-09).

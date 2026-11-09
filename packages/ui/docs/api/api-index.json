@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "5.1.3",
+  "version": "5.1.4",
   "symbols": [
     {
       "name": "AddItems",
@@ -15214,7 +15214,7 @@
           "name": "getVirtualElementAt",
           "file": "List-class/getVirtualElementAt-method.md",
           "protected": false,
-          "inherited": true
+          "inherited": false
         },
         {
           "name": "globalToLocal",
@@ -15412,7 +15412,7 @@
           "name": "updateRenderer",
           "file": "List-class/updateRenderer-method.md",
           "protected": false,
-          "inherited": true
+          "inherited": false
         },
         {
           "name": "validateDisplayList",

@@ -1,6 +1,6 @@
 # ItemRenderer
 
-Package: `@kurot/ui@5.1.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.4`. Generated from public declarations and JSDoc.
 
 ```ts
 class ItemRenderer<TSkin extends string = string, T = unknown> extends Component<TSkin> implements IItemRenderer<T>
@@ -9,7 +9,9 @@ class ItemRenderer<TSkin extends string = string, T = unknown> extends Component
 Base class for item renderers used in data-driven containers
 (DataGroup, List, TabBar…).
 
-States: `up` | `down` | `disabled` | `upAndSelected` | `downAndSelected`
+Selected items use the skin's `upAndSelected`, `downAndSelected`, or
+`disabledAndSelected` state when declared. Without the matching state,
+enabled items use `down` and disabled items use `disabled`.
 
 **skinPart**
 

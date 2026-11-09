@@ -4,6 +4,18 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.1.4 — 2026-11-09
+
+- A List tap follows the pressed renderer and data item even if its skin
+  changes the hit child before release. A drag intercepted by a Scroller,
+  a release outside the row, or recycling the row does not select an item.
+  A completed tap on an already selected row still emits one `itemTap`.
+- Pressing a selected ItemRenderer again keeps its `down` appearance when
+  the skin omits `downAndSelected`. Disabling the selected item uses
+  `disabledAndSelected` when declared, otherwise `disabled`.
+- Core's global `TOUCH_TAP` matching and the Core peer (`^3.2.1`) are
+  unchanged. Existing row skins do not need migration.
+
 ## 5.1.3 — 2026-11-09
 
 - A tapped RadioButton now returns to its `up` skin when another radio is

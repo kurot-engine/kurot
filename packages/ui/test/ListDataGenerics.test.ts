@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Event, TouchEvent } from '@kurot/core';
+import { Event, Stage, TouchEvent } from '@kurot/core';
 import {
 	ArrayCollection,
 	CollectionEvent,
@@ -32,6 +32,11 @@ function makeList(source: (ItemData | null)[]): DataList {
 	list.dataProvider = new ArrayCollection(source);
 	list.validateProperties();
 	return list;
+}
+
+function tap(row: ItemRenderer<string, ItemData | null>): void {
+	row.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_BEGIN, true));
+	row.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_END, true));
 }
 
 describe('typed list runtime preservation', () => {
@@ -85,6 +90,7 @@ describe('typed list runtime preservation', () => {
 
 	it('retains renderer identity on data replacement and preserves the tap/remove/once event machinery', () => {
 		const list = makeList([{ id: 1 }, null]);
+		new Stage().addChild(list);
 		const collection = list.dataProvider;
 		if (!(collection instanceof ArrayCollection)) {
 			throw new Error('Missing collection');
@@ -105,8 +111,8 @@ describe('typed list runtime preservation', () => {
 		collection.replaceItemAt({ id: 2 }, 0);
 		expect(list.getElementAt(0)).toBe(row);
 		expect(row.data).toEqual({ id: 2 });
-		row.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_TAP));
-		list.getElementAt(1)!.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_TAP));
+		tap(row);
+		tap(list.getElementAt(1)!);
 		list.validateProperties();
 		expect(taps).toEqual([{ id: 2 }, null]);
 		expect(once).toBe(1);
@@ -122,18 +128,29 @@ describe('typed list runtime preservation', () => {
 		list.layout = layout;
 		list.itemRenderer = Row;
 		list.dataProvider = new ArrayCollection([{ id: 1 }, null, { id: 3 }]);
+		new Stage().addChild(list);
 		list.validateProperties();
 		const first = list.getVirtualElementAt(0)!;
+		first.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_BEGIN, true));
+		expect(first.currentState).toBe('down');
 		list.setVirtualElementIndicesInView(1, 1);
 		const reused = list.getVirtualElementAt(1)!;
 		expect(reused).toBe(first);
 		expect(reused.itemIndex).toBe(1);
 		expect(reused.data).toBeNull();
+		expect(reused.currentState).toBe('up');
 		const tapped: { item: ItemData | null | undefined; index: number }[] = [];
 		list.addEventListener(ItemTapEvent.ITEM_TAP, event =>
 			tapped.push({ item: event.item, index: event.itemIndex }),
 		);
-		reused.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_TAP));
+		reused.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_END, true));
+		expect(tapped).toEqual([]);
+		tap(reused);
+		expect(tapped).toEqual([{ item: null, index: 1 }]);
+		reused.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_BEGIN, true));
+		list.setVirtualElementIndicesInView(2, 2);
+		expect(list.getVirtualElementAt(1)).toBe(reused);
+		reused.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_END, true));
 		expect(tapped).toEqual([{ item: null, index: 1 }]);
 		expect(list.getVirtualElementAt(-1)).toBeUndefined();
 		expect(list.getVirtualElementAt(99)).toBeUndefined();

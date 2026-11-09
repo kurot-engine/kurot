@@ -1,6 +1,6 @@
 # removeEventListener
 
-Package: `@kurot/ui@5.1.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.4`. Generated from public declarations and JSDoc.
 
 ```ts
 removeEventListener<K extends string>(type: K, listener: (event: SkinEvents[K]) => void, useCapture?: boolean): void;

@@ -1,4 +1,4 @@
-import { TouchEvent, Event, type Stage } from '@kurot/core';
+import { TouchEvent, type Stage } from '@kurot/core';
 import { Component } from './Component.js';
 import { Label } from './Label.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
@@ -8,7 +8,9 @@ import type { IItemRenderer } from '../core/IItemRenderer.js';
  * Base class for item renderers used in data-driven containers
  * (DataGroup, List, TabBar…).
  *
- * States: `up` | `down` | `disabled` | `upAndSelected` | `downAndSelected`
+ * Selected items use the skin's `upAndSelected`, `downAndSelected`, or
+ * `disabledAndSelected` state when declared. Without the matching state,
+ * enabled items use `down` and disabled items use `disabled`.
  *
  * @skinPart labelDisplay — optional Label for the item label
  */
@@ -26,7 +28,7 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 
 	private _data: T | undefined;
 	private _selected = false;
-	private _touchCaptured = false;
+	private readonly _pressedTouches = new Set<number>();
 	private _touchStage?: Stage;
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -44,6 +46,9 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 
 	public set data(value: T | undefined) {
 		if (this._data === value) return;
+		if (this._pressedTouches.size) {
+			this._releaseTouchCapture();
+		}
 		this._data = value;
 		PropertyEvent.dispatchPropertyEvent(this, 'data');
 		this.dataChanged();
@@ -60,6 +65,14 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 	}
 
 	// ── Override methods ──────────────────────────────────────────────────
+
+	public override $setVisible(value: boolean): void {
+		super.$setVisible(value);
+		// DataGroup hides pooled renderers without removing them from the stage.
+		if (!value && this._pressedTouches.size) {
+			this._releaseTouchCapture();
+		}
+	}
 
 	public override $onRemoveFromStage(): void {
 		this._releaseTouchCapture();
@@ -82,13 +95,20 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 	}
 
 	protected override getCurrentState(): string {
-		if (!this.enabled) return 'disabled';
-		if (this._touchCaptured) return this._selected ? 'downAndSelected' : 'down';
-		if (this._selected) {
-			if (this.skin?.hasState('upAndSelected')) return 'upAndSelected';
-			return 'down';
+		let state: string;
+		if (!this.enabled) {
+			state = 'disabled';
+		} else {
+			state = this._pressedTouches.size ? 'down' : 'up';
 		}
-		return 'up';
+		if (!this._selected) {
+			return state;
+		}
+		const selectedState = state + 'AndSelected';
+		if (this.skin?.hasState(selectedState)) {
+			return selectedState;
+		}
+		return state === 'disabled' ? 'disabled' : 'down';
 	}
 
 	// ── Protected methods ─────────────────────────────────────────────────
@@ -110,25 +130,30 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 
 	private _onTouchBegin = (e: TouchEvent): void => {
 		const stage = this.stage;
-		if (!stage) return;
+		if (!stage) {
+			return;
+		}
 		this._touchStage = stage;
-		stage.addEventListener(TouchEvent.TOUCH_END, this._onStageTouchEnd);
-		stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onStageTouchEnd);
-		this._touchCaptured = true;
+		// Release the visual press even when a Scroller suppresses the bubbling end.
+		stage.addEventListener(TouchEvent.TOUCH_END, this._onStageTouchEnd, true);
+		stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onStageTouchEnd, true);
+		this._pressedTouches.add(e.touchPointID);
 		this.invalidateState();
 		e.updateAfterEvent();
 	};
 
-	private _onStageTouchEnd = (_e: Event): void => {
-		this._releaseTouchCapture();
+	private _onStageTouchEnd = (e: TouchEvent): void => {
+		if (this._pressedTouches.delete(e.touchPointID) && !this._pressedTouches.size) {
+			this._releaseTouchCapture();
+		}
 	};
 
 	private _releaseTouchCapture(): void {
 		const stage = this._touchStage;
-		stage?.removeEventListener(TouchEvent.TOUCH_END, this._onStageTouchEnd);
-		stage?.removeEventListener(TouchEvent.TOUCH_CANCEL, this._onStageTouchEnd);
+		stage?.removeEventListener(TouchEvent.TOUCH_END, this._onStageTouchEnd, true);
+		stage?.removeEventListener(TouchEvent.TOUCH_CANCEL, this._onStageTouchEnd, true);
 		this._touchStage = undefined;
-		this._touchCaptured = false;
+		this._pressedTouches.clear();
 		this.invalidateState();
 	}
 }

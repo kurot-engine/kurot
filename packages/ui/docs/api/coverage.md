@@ -1,6 +1,6 @@
 # @kurot/ui API coverage
 
-Version: 5.1.3. Public export names: 95. Public/protected member entries: 5149.
+Version: 5.1.4. Public export names: 95. Public/protected member entries: 5149.
 
 Missing declaration references: **0**. Inventory is independently read through the TypeScript checker.
 

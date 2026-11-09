@@ -1,6 +1,6 @@
 # List
 
-Package: `@kurot/ui@5.1.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.4`. Generated from public declarations and JSDoc.
 
 ```ts
 class List<T = unknown> extends ListBase<T>
@@ -8,8 +8,9 @@ class List<T = unknown> extends ListBase<T>
 
 List extends ListBase with touch-to-select interaction.
 
-Tapping a renderer selects it (updating `selectedIndex`) and dispatches
-an [ItemTapEvent.ITEM_TAP](ItemTapEvent-class/static-ITEM_TAP-property.md).
+A press and release within the same renderer select its item and dispatch
+one [ItemTapEvent.ITEM_TAP](ItemTapEvent-class/static-ITEM_TAP-property.md), even if the skin changes the hit child.
+Scrolling or releasing over another item does not activate the row.
 
 **defaultProperty**
 
@@ -119,7 +120,7 @@ Related types: [ListBase](ListBase-class.md).
 | `getPreferredBounds` | public, inherited | [open](List-class/getPreferredBounds-method.md) |
 | `getRendererAt` | protected, inherited | [open](List-class/getRendererAt-method.md) |
 | `getTransformedBounds` | public, inherited | [open](List-class/getTransformedBounds-method.md) |
-| `getVirtualElementAt` | public, inherited | [open](List-class/getVirtualElementAt-method.md) |
+| `getVirtualElementAt` | public | [open](List-class/getVirtualElementAt-method.md) |
 | `globalToLocal` | public, inherited | [open](List-class/globalToLocal-method.md) |
 | `hasEventListener` | public, inherited | [open](List-class/hasEventListener-method.md) |
 | `hasState` | public, inherited | [open](List-class/hasState-method.md) |
@@ -152,7 +153,7 @@ Related types: [ListBase](ListBase-class.md).
 | `swapChildrenAt` | public, inherited | [open](List-class/swapChildrenAt-method.md) |
 | `updateCacheTexture` | public, inherited | [open](List-class/updateCacheTexture-method.md) |
 | `updateDisplayList` | public, inherited | [open](List-class/updateDisplayList-method.md) |
-| `updateRenderer` | public, inherited | [open](List-class/updateRenderer-method.md) |
+| `updateRenderer` | public | [open](List-class/updateRenderer-method.md) |
 | `validateDisplayList` | public, inherited | [open](List-class/validateDisplayList-method.md) |
 | `validateNow` | public, inherited | [open](List-class/validateNow-method.md) |
 | `validateProperties` | public, inherited | [open](List-class/validateProperties-method.md) |

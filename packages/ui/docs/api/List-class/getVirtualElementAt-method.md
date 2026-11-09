@@ -1,12 +1,10 @@
 # getVirtualElementAt
 
-Package: `@kurot/ui@5.1.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.4`. Generated from public declarations and JSDoc.
 
 ```ts
 getVirtualElementAt(index: number): ItemRenderer<string, T> | undefined;
 ```
-
-Inherited from `getVirtualElementAt`; shown with this receiver's substituted types.
 
 Return or materialize/recycle a renderer for a logical item index. Integer-
 coerces the index; returns undefined without a provider or when out of bounds.

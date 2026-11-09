@@ -2,7 +2,7 @@
 
 Available in UI 4.2.x and 5.x. Declared typed list fields in KUI hosts also
 require CLI >= 4.1.1 within 4.x; ordinary TypeScript use needs only UI.
-UI 5 requires Core ^3.0.0. List data types do not change resource or KUI formats.
+UI 5.1.4 requires Core ^3.2.1. List data types do not change resource or KUI formats.
 
 ## Collections and selection
 
@@ -67,13 +67,17 @@ including a freshly constructed event with no payload. Property, touch, selectio
 and custom Event callbacks keep their existing contracts. Listener refinements on
 DataGroup are declaration-only; Core and Group event methods are unchanged.
 
+List dispatches one `itemTap` when a touch begins and ends on the same rendered
+item, even if its skin changes which child is hit. Scrolling, releasing on a
+different row or outside the List, or recycling the pressed row cancels the tap.
+
 TabBar retains ViewStack synchronization. ViewStack's collection data is its child
 names (strings), including its existing empty-string fallback. ComboBox's selected
 item and inner List carry T; its label callback keeps the existing nullish guard.
 
 ## Runtime preservation
 
-The implementation changes types only: collection mutations/events, selection
-clamping/cancellation, renderer pooling and null/undefined values retain their
-existing behavior. Type assertions do not validate external data at runtime;
+Generic type parameters do not change collection mutations/events, selection
+clamping/cancellation, renderer pooling or null/undefined values.
+Type assertions do not validate external data at runtime;
 validate application inputs at their existing boundary.
