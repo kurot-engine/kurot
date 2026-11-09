@@ -5,6 +5,24 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — Game example and Templates adopt UI 5.2.1
+
+- Verify npm latest and adopt UI 5.2.1 in the game example, Card Booster,
+  MilfMaster, Runaway, Skydive and Tentax. Synchronize current dependency docs
+  and locks while retaining version-range styles. Other examples and SDKs are
+  already current; Core stays at 3.3.0 and CLI at 5.1.2.
+- Retain application source and authored KUI; sparse ItemRenderer skins receive
+  the published Skin fallback-state fix through the dependency update.
+- All six strict-peer offline frozen installations, strict development/release
+  builds and full declaration checks pass on Node 22.12.0/22.18.0. The five
+  Templates pass all 814 existing unit tests and provided architecture/resource
+  checks. Installed native SDKs share the application's Core instance.
+- The existing demo/game browser runner passes all twelve development/release
+  WebGL/Canvas cases, including row press/selection, retargeting, radio states
+  and drag cancellation. All five Templates pass their development WebGL
+  fixtures; MilfMaster also passes minified-release Canvas Slot KUI. Checks use
+  deterministic fixtures and close their temporary servers/browser sessions.
+
 ## 2026-11-09 — UI 5.2.1 release preparation
 
 - Prepare only `@kurot/ui` for the [Skin state fallback fix](packages/ui/CHANGELOG.md#521--2026-11-09).
@@ -28,6 +46,28 @@ its changes in its own CHANGELOG.md.
   all six API tooling tests and 22 built/packed API example checks pass.
   This records source preparation; npm publication and annotated tags follow
   verification of the published archive.
+
+## 2026-11-09 — Examples and Templates adopt Core 3.3.0 / UI 5.2.0 / CLI 5.1.2
+
+- Adopt published Core 3.3.0 and CLI 5.1.2 in demo, game and star-catcher
+  plus Card Booster, MilfMaster, Runaway, Skydive and Tentax; adopt UI 5.2.0
+  where already installed. Synchronize current dependency documentation and
+  each selected lock, retaining version-range styles and unrelated tools.
+- Keep Game 3.0.1, animation adapters, ui-document 0.14.0 and Node 22 floors.
+  All installed native SDKs resolve the same Core instance. Existing project
+  image adapters and authored KUI remain unchanged; adopting CLI's revised
+  starter does not rewrite existing application startup.
+- All eight strict-peer offline frozen installations, strict development/
+  release builds and full declaration checks pass on the existing Node
+  22.12.0/22.18.0 project floors. All 818 existing application unit tests and
+  provided architecture/resource checks pass.
+- Twelve demo/game development/release browser cases pass with WebGL/Canvas,
+  including native resource loading, radio states, row retargeting and Scroller
+  drag cancellation. Star Catcher passes all six gameplay/lifecycle browser cases.
+- All five Templates pass their existing development WebGL fixtures. MilfMaster
+  also passes minified-release Canvas Slot KUI, constructor identity, three spin
+  modes, skin replacement and teardown. Browser checks use deterministic fixtures;
+  their temporary servers and browser sessions close afterward.
 
 ## 2026-11-09 — Core 3.3.0, UI 5.2.0 and CLI 5.1.2 published and verified
 

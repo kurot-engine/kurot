@@ -9,21 +9,21 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^3.2.3
-        version: 3.2.3
+        specifier: ^3.3.0
+        version: 3.3.0
       '@kurot/game':
         specifier: ^3.0.1
-        version: 3.0.1(@kurot/core@3.2.3)
+        version: 3.0.1(@kurot/core@3.3.0)
       '@kurot/ui':
-        specifier: ^5.1.4
-        version: 5.1.4(@kurot/core@3.2.3)
+        specifier: ^5.2.1
+        version: 5.2.1(@kurot/core@3.3.0)
       '@kurot/ui-document':
         specifier: ^0.14.0
         version: 0.14.0
     devDependencies:
       '@kurot/cli':
-        specifier: ^5.1.1
-        version: 5.1.1
+        specifier: ^5.1.2
+        version: 5.1.2
 
 packages:
 
@@ -195,13 +195,13 @@ packages:
     resolution: {integrity: sha512-SuPSKVtK/RREJdG4gFdij2XjyOFjOo5jm2y/4+xCypqlfL6a1E7SwNqQx+5G023504qSUddyztelzhhULr6XOA==}
     engines: {node: '>=20'}
 
-  '@kurot/cli@5.1.1':
-    resolution: {integrity: sha512-wqqR3pd94dDWYdPszZOQVGcb3H38DU5SZmYjUVyG3ecMB6cAtnGb71heK4RE2yQN5nYtH7pXFx7CUoSLLak5cQ==}
+  '@kurot/cli@5.1.2':
+    resolution: {integrity: sha512-QpdNOME9l+fVlVEKGt2Pk1uP3OpHq1pigYhhjVARN7ZJZZU7f7jlgjuTFdn+I9mu7hrX8M7+s8ngSJB5O0jg1Q==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@kurot/core@3.2.3':
-    resolution: {integrity: sha512-I7SKVnsb3h92/qcFANcZiA3OGn13i0NElJGotztfTPk9vUdmOMb05knoLoLVSEXI+43T/+w7o4PUWg9PGe24rA==}
+  '@kurot/core@3.3.0':
+    resolution: {integrity: sha512-xugN6kC+j8EyVNzZqEqfTFwRGBRsSqU77fGouNsrMM2TISznzoDkmJLnTYRUJJ2hYcCGclvgfcDAvGMlg1zSMQ==}
 
   '@kurot/game@3.0.1':
     resolution: {integrity: sha512-5CMQhw1Wj2+6ccosG/Q6UMNeh1A7y+L//J+tiDgIyhlRY5bRJXDi0ZieKfAzeq4yXiRUYbmwdn2VLdeKaM3YHQ==}
@@ -211,8 +211,8 @@ packages:
   '@kurot/ui-document@0.14.0':
     resolution: {integrity: sha512-fd7YFhikVxQ1qLgn4k7bcjh4dH4yyfyxvnY97ndSWAUvGgTP9gl4X2swIlFRXnGCXGuuriHU+GGfHN52csXFdQ==}
 
-  '@kurot/ui@5.1.4':
-    resolution: {integrity: sha512-dari/AdzjHgXPhIru3fWb1qAkRnv0sSUT+gI/wpj+OszNxqAvIx3XG2g1S5ohijDDSYMHYxznuGlZt0yY2g4mw==}
+  '@kurot/ui@5.2.1':
+    resolution: {integrity: sha512-f+FCZW/TAyIQH9A/AspNqAN+aD2JPmBAKqA9fXRykWgFv8jPjCdkQvx0Q+h/0VhI8FRKxKXb8TEB0s19PJnHng==}
     peerDependencies:
       '@kurot/core': ^3.2.1
 
@@ -337,7 +337,7 @@ snapshots:
 
   '@kurot/bitmap-font@0.1.0': {}
 
-  '@kurot/cli@5.1.1':
+  '@kurot/cli@5.1.2':
     dependencies:
       '@kurot/ui-document': 0.14.0
       commander: 13.1.0
@@ -347,20 +347,20 @@ snapshots:
       postcss-value-parser: 4.2.0
       typescript: 5.9.3
 
-  '@kurot/core@3.2.3':
+  '@kurot/core@3.3.0':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0
 
-  '@kurot/game@3.0.1(@kurot/core@3.2.3)':
+  '@kurot/game@3.0.1(@kurot/core@3.3.0)':
     dependencies:
-      '@kurot/core': 3.2.3
+      '@kurot/core': 3.3.0
 
   '@kurot/ui-document@0.14.0': {}
 
-  '@kurot/ui@5.1.4(@kurot/core@3.2.3)':
+  '@kurot/ui@5.2.1(@kurot/core@3.3.0)':
     dependencies:
-      '@kurot/core': 3.2.3
+      '@kurot/core': 3.3.0
 
   commander@13.1.0: {}
 
