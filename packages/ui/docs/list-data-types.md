@@ -2,7 +2,7 @@
 
 Available in UI 4.2.x and 5.x. Declared typed list fields in KUI hosts also
 require CLI >= 4.1.1 within 4.x; ordinary TypeScript use needs only UI.
-UI 5.2.0 requires Core ^3.2.1. List data types do not change resource or KUI formats.
+UI 5.2.1 requires Core ^3.2.1. List data types do not change resource or KUI formats.
 
 ## Collections and selection
 

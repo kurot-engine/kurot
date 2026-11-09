@@ -147,12 +147,21 @@ export class Skin extends EventDispatcher<SkinEvents> {
 		PropertyEvent.dispatchPropertyEvent(this, 'hostComponent');
 	}
 
+	/**
+	 * Effective state name. Unknown nonempty requests use the first declared
+	 * state; an undeclared empty name clears overrides. Stateless skins retain
+	 * the supplied name without applying overrides. Reassigning the same
+	 * effective state leaves its overrides and display children untouched.
+	 */
 	public get currentState(): string {
 		return this._currentState;
 	}
 
 	public set currentState(value: string) {
-		if (this._currentState === value) return;
+		value = this._resolveStateName(value);
+		if (this._currentState === value) {
+			return;
+		}
 		const old = this._currentState;
 		this._currentState = value;
 		if (this._stateInitialized && this._hostComponent) {
@@ -211,22 +220,32 @@ export class Skin extends EventDispatcher<SkinEvents> {
 	};
 
 	private _initializeStates(): void {
-		if (this._stateInitialized) return;
+		if (this._stateInitialized) {
+			return;
+		}
+		this._currentState = this._resolveStateName(this._currentState);
 		this._stateInitialized = true;
 		this._applyState('', this._currentState);
+	}
+
+	private _resolveStateName(value: string): string {
+		if (value && this.states.length > 0 && !this.hasState(value)) {
+			return this.states[0].name;
+		}
+		return value;
 	}
 
 	private _applyState(fromState: string, toState: string): void {
 		if (!this.states || this.states.length === 0) return;
 
 		const oldState = this.states.find(s => s.name === fromState);
+		const newState = this.states.find(s => s.name === toState);
 		if (oldState) {
 			for (const override of oldState.overrides) {
 				override.remove(this._hostComponent!, this);
 			}
 		}
 
-		const newState = this.states.find(s => s.name === toState);
 		if (newState) {
 			for (const override of newState.overrides) {
 				override.apply(this._hostComponent!, this);

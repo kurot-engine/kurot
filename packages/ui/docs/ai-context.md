@@ -8,7 +8,7 @@ For named textures, atlas frames, URL caches and ownership, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.2.0`,
+This maintainer map covers `@kurot/ui@5.2.1`,
 with Core peer **^3.2.1** for stable text frames and native BackdropBlur.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
@@ -78,6 +78,10 @@ src/kurot/
   `Component` by `Component._setSkin()`, not onto the skin itself. The skin
   object itself never appears in the display tree — its only job is to
   declare `skinParts`/`states`/bindings.
+- Skin resolves unknown nonempty state requests to the first declaration before
+  undoing overrides. An unchanged effective state keeps children mounted;
+  an undeclared empty state still clears overrides. Component keeps the requested
+  name and its existing computed-state rules. See [state transitions](architecture.md#4-view-states-and-overrides).
 - `Skin.setPart(name, value)` is the intentional write-side counterpart to
   `getPart(name)`: programmatic materializers use it to install authored part
   names as real Skin properties, using the same storage as other Skin parts. Callers must reject names that

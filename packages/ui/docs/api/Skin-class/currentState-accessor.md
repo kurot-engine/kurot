@@ -1,10 +1,13 @@
 # currentState
 
-Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.1`. Generated from public declarations and JSDoc.
 
 ```ts
 get currentState(): string;
 set currentState(value: string);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Effective state name. Unknown nonempty requests use the first declared
+state; an undeclared empty name clears overrides. Stateless skins retain
+the supplied name without applying overrides. Reassigning the same
+effective state leaves its overrides and display children untouched.

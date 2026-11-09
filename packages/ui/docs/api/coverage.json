@@ -1,6 +1,6 @@
 {
   "package": "@kurot/ui",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "exports": 95,
   "members": 5149,
   "missing": [],
@@ -261,7 +261,6 @@
     "SetStateProperty.name",
     "SetStateProperty.remove",
     "SetStateProperty.value",
-    "Skin.currentState",
     "Skin.hasState",
     "SkinEvents.propertyChange",
     "SliderBase.direction",

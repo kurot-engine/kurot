@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Published version: [**5.2.0**](https://www.npmjs.com/package/@kurot/ui/v/5.2.0).
+Kurot games. Package version: **5.2.1**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -45,6 +45,12 @@ another row, or recycling the pressed renderer does not activate an item.
 Selected renderers use their skin's matching `AndSelected` state when present;
 otherwise they use `down` while enabled and `disabled` while disabled.
 
+Skin resolves an unknown nonempty state to its first declared state. If that
+state is already active, its overrides and children stay untouched, so sparse
+item skins keep their contents and hit target through presses. An undeclared
+empty Skin state still clears overrides. See [state transitions](docs/architecture.md#4-view-states-and-overrides)
+for effective states and the Component request.
+
 ## RichLabel component typography
 
 RichLabel supports component fontFamily, size, textColor, stroke, strokeColor,
@@ -57,7 +63,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.2.0 @kurot/core@^3.3.0
+pnpm add @kurot/ui@^5.2.1 @kurot/core@^3.3.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.

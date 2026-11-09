@@ -136,7 +136,11 @@ generated declarations. Correct those inputs instead of editing `.kurot/`.
   translations, empty strings, large scores and outlined captions.
 - Declare Skin states and use `property.state` overrides. A Button already
   owns pressed/disabled/selected behavior; game logic should set its public
-  properties rather than simulating those internals.
+  properties rather than simulating those internals. Put the default appearance
+  first: an unknown nonempty state name resolves to the first declared state.
+  If that state is already active, overrides and `includeIn` children stay
+  untouched. An undeclared empty Skin state clears overrides; setting the
+  Component's state to `''` instead restores its computed state.
 - Use shared palette entries such as `@style:colors:text` in XML. Numeric colors
   in runtime TS and loaded fonts remain application responsibilities; UI does
   not load style.json itself or implement live theme switching.

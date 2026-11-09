@@ -5,7 +5,15 @@ export function mockTextMeasurement(): void {
 	beforeAll(() => {
 		vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
 			font: '',
-			measureText: (text: string) => ({ width: text.length * 10 }),
+			// Zero font bounds keep authored size as the height in this width-only fixture.
+			measureText: (text: string): TextMetrics => ({
+				width: text.length * 10,
+				actualBoundingBoxAscent: 0, actualBoundingBoxDescent: 0,
+				actualBoundingBoxLeft: 0, actualBoundingBoxRight: text.length * 10,
+				fontBoundingBoxAscent: 0, fontBoundingBoxDescent: 0,
+				emHeightAscent: 0, emHeightDescent: 0,
+				alphabeticBaseline: 0, hangingBaseline: 0, ideographicBaseline: 0,
+			}),
 		} as unknown as CanvasRenderingContext2D);
 	});
 }

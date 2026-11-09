@@ -448,6 +448,8 @@ describe('createKurotUI', () => {
 		stage.addChild(root);
 		root.validateNow();
 
+		// Start the restoration check from the base appearance, with no state overrides.
+		skin.currentState = '';
 		expect(button.x).toBe(468);
 		expect(button.width).toBe(172);
 		expect(background.width).toBe(172);

@@ -3,7 +3,7 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 5.2.0, with Core peer ^3.2.1.
+> Package version: 5.2.1, with Core peer ^3.2.1.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology
@@ -228,13 +228,20 @@ remains the enumeration interface for frameworks and tooling. See
 ### 4.1 State transitions remove and reapply overrides
 
 IOverride defines apply(host, skin) and remove(host, skin).
-Skin._applyState(fromState, toState) follows this algorithm:
+Skin resolves an unknown nonempty request to the first declared state before
+comparing it to the active state. Equal effective names skip the transition,
+so `includeIn` children keep their parent, identity, order and visibility.
+`Skin.currentState` reports that effective name; `Component.currentState`
+continues to report the requested/computed name. An undeclared empty Skin
+state clears overrides, and a skin without states retains the supplied name
+without applying overrides. Populate states before host attachment.
+
+For a real state change, Skin._applyState(fromState, toState) uses:
 
 ```text
 oldState = states.find(s => s.name === fromState)
-if present: call override.remove(host, this) for every oldState override
-
 newState = states.find(s => s.name === toState)
+if present: call override.remove(host, this) for every oldState override
 if present: call override.apply(host, this) for every newState override
 ```
 

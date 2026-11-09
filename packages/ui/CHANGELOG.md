@@ -4,6 +4,24 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.2.1 — 2026-11-09
+
+- Resolve unknown nonempty Skin state requests to the first declared state
+  before removing overrides. If the effective state is unchanged, keep its
+  children attached with the same identity, order and visibility. Sparse
+  ItemRenderer skins can remain visible and tappable through presses and
+  repeated selection. Empty-state reset, stateless skins, declared custom and
+  selected states, and scrolling cancellation retain their existing contracts.
+
+Validation: UI build, 622 unit tests and 46 Chromium cases pass. Native mouse
+presses in Canvas/WebGL 1/2 retain both content pixels and the hit target, with
+no detach/reattach events and one core tap plus one List item tap per click.
+The original sparse-skin reproduction passes against the compiled UI and Core
+3.3.0 without its simulated fallback. All 22 API examples compile against built
+and packed declarations. The 91 ui-runtime tests pass with both its accepted
+Core/UI 3.0.0/5.0.0 lock and the local Core/UI source; test fixtures explicitly
+reset the base appearance and supply complete Canvas text metrics.
+
 ## 5.2.0 — 2026-11-09
 
 The published [npm package](https://www.npmjs.com/package/@kurot/ui/v/5.2.0)

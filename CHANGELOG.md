@@ -5,6 +5,30 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — UI 5.2.1 release preparation
+
+- Prepare only `@kurot/ui` for the [Skin state fallback fix](packages/ui/CHANGELOG.md#521--2026-11-09).
+  Resolve unknown nonempty requests to the first declared state before undoing
+  overrides. An unchanged effective state retains mounted content and its hit
+  target. Empty-state reset, declared states and scrolling cancellation retain
+  their existing contracts. Core touch rules and application skins are unchanged.
+- The Core peer stays at `^3.2.1`. ui-runtime accepts the patch through its
+  `^5.0.0` peer/development range and needs no release: its changes only make
+  test fixtures explicit about the base state and complete Canvas text metrics.
+  CLI's game template uses `latest`; caret-based examples/Templates may adopt
+  through a lock update. Exact pins such as SAO's 5.2.0 need an explicit update.
+  Skia's `~5.1.2` range still needs separate 5.2 compatibility adoption.
+- On Node 22.23.4, the UI build, all 622 unit tests and 46 Chromium cases pass.
+  Native mouse checks in Canvas/WebGL 1/2 retain both content pixels through
+  repeated presses, with no detach/reattach and one core tap plus one item tap
+  per valid click. The original reproduction passes with compiled and packed
+  UI, without the test's simulated fallback.
+- All 91 ui-runtime tests pass with both its accepted Core/UI 3.0.0/5.0.0 lock
+  and the local Core/UI source. Regression fixtures pass strict TypeScript;
+  all six API tooling tests and 22 built/packed API example checks pass.
+  This records source preparation; npm publication and annotated tags follow
+  verification of the published archive.
+
 ## 2026-11-09 — Core 3.3.0, UI 5.2.0 and CLI 5.1.2 published and verified
 
 - All three downloaded npm archives are byte-identical to their tested clean-checkout

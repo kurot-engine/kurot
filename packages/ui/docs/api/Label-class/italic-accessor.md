@@ -1,6 +1,6 @@
 # italic
 
-Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.1`. Generated from public declarations and JSDoc.
 
 ```ts
 get italic(): boolean;
