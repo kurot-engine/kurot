@@ -81,7 +81,7 @@ export class List<T = unknown> extends ListBase<T> {
 				return;
 			}
 			if (end.type === TouchEvent.TOUCH_END && end.target instanceof DisplayObject && renderer.contains(end.target)) {
-				// Let the row handle this END synchronously. If capture stops it (e.g. a scroll),
+				// Let the row handle this END synchronously. If another listener stops propagation,
 				// discard the press after dispatch without retaining the pooled event.
 				queueMicrotask(cancel);
 			} else {
@@ -93,7 +93,7 @@ export class List<T = unknown> extends ListBase<T> {
 				return;
 			}
 			cancel();
-			if (this.getRendererAt(index) !== renderer || this.dataProvider !== provider || renderer.itemIndex !== index) {
+			if (end.isDefaultPrevented() || this.getRendererAt(index) !== renderer || this.dataProvider !== provider || renderer.itemIndex !== index) {
 				return;
 			}
 			this.setSelectedIndex(index, true);

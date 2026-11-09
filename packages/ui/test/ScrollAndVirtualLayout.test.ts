@@ -82,7 +82,7 @@ describe('virtual layout integration', () => {
 });
 
 describe('scroll release lifecycle', () => {
-	it('ends a real propagated drag before viewport capture swallows TOUCH_END', () => {
+	it('releases its stage listeners on end and accepts the next gesture', () => {
 		const stage = new Stage();
 		const scroller = new Scroller();
 		const viewport = new Group();

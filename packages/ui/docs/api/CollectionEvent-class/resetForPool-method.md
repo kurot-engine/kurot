@@ -1,6 +1,6 @@
 # resetForPool
 
-Package: `@kurot/ui@5.1.4`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
 
 ```ts
 resetForPool(type: string, bubbles?: boolean, cancelable?: boolean): void;

@@ -66,7 +66,7 @@ export class Scroller extends Component {
 	private _startTouchPointX = 0;
 	private _startTouchPointY = 0;
 	private _touchMoved = false;
-	private _touchCancelled = false;
+	private readonly _suppressedTaps = new Set<number>();
 
 	/**
 	 * Whether a CHANGE_START event has been dispatched for the current
@@ -83,8 +83,8 @@ export class Scroller extends Component {
 
 	public constructor() {
 		super();
-		this._hScroll = new TouchScroll(this.onHScrollUpdate, this.onHScrollEnd);
-		this._vScroll = new TouchScroll(this.onVScrollUpdate, this.onVScrollEnd);
+		this._hScroll = new TouchScroll(this.onHScrollUpdate, this._onScrollEnd);
+		this._vScroll = new TouchScroll(this.onVScrollUpdate, this._onScrollEnd);
 		this.touchChildren = true;
 	}
 
@@ -108,12 +108,12 @@ export class Scroller extends Component {
 			this._removeStageTouchListeners();
 			this._hScroll.stop();
 			this._vScroll.stop();
+			this._changeStartDispatched = false;
 			this._touchPointID = -1;
 			if (this.horizontalScrollBar) this.horizontalScrollBar.viewport = undefined;
 			if (this.verticalScrollBar) this.verticalScrollBar.viewport = undefined;
 			old.removeEventListener(PropertyEvent.PROPERTY_CHANGE, this._onViewportPropChange);
 			old.removeEventListener(TouchEvent.TOUCH_BEGIN, this._onTouchBeginCapture, true);
-			old.removeEventListener(TouchEvent.TOUCH_END, this._onTouchEndCapture, true);
 			old.removeEventListener(TouchEvent.TOUCH_TAP, this._onTouchTapCapture, true);
 			old.scrollEnabled = false;
 			const oldDisplay = old as unknown as DisplayObject;
@@ -124,7 +124,6 @@ export class Scroller extends Component {
 			this.addChildAt(value as unknown as DisplayObject, 0);
 			value.addEventListener(PropertyEvent.PROPERTY_CHANGE, this._onViewportPropChange);
 			value.addEventListener(TouchEvent.TOUCH_BEGIN, this._onTouchBeginCapture, true);
-			value.addEventListener(TouchEvent.TOUCH_END, this._onTouchEndCapture, true);
 			value.addEventListener(TouchEvent.TOUCH_TAP, this._onTouchTapCapture, true);
 			value.scrollEnabled = true;
 		}
@@ -194,6 +193,7 @@ export class Scroller extends Component {
 		this._removeStageTouchListeners();
 		this._hScroll.stop();
 		this._vScroll.stop();
+		this._changeStartDispatched = false;
 		this._touchPointID = -1;
 		this._clearAutoHideTimer();
 		super.$onRemoveFromStage();
@@ -296,21 +296,8 @@ export class Scroller extends Component {
 		}
 	};
 
-	private _onTouchBeginCapture = (e: Event): void => {
-		if (!this._canScroll()) return;
-		this._touchCancelled = false;
-		this._touchMoved = false;
-		this._onTouchBegin(e);
-	};
-
-	private _onTouchEndCapture = (e: Event): void => {
-		if (this._touchCancelled) {
-			e.stopPropagation();
-		}
-	};
-
 	private _onTouchTapCapture = (e: Event): void => {
-		if (this._touchCancelled) {
+		if (e instanceof TouchEvent && this._suppressedTaps.delete(e.touchPointID)) {
 			e.stopPropagation();
 		}
 	};
@@ -320,29 +307,34 @@ export class Scroller extends Component {
 		if (!vp) return false;
 		const b = vpBounds;
 		vp.getLayoutBounds(b);
-		return vp.contentWidth > b.width || vp.contentHeight > b.height;
+		return (this._horizontalScrollPolicy !== ScrollPolicy.OFF && vp.contentWidth > b.width)
+			|| (this._verticalScrollPolicy !== ScrollPolicy.OFF && vp.contentHeight > b.height);
 	}
 
-	private _onTouchBegin = (e: Event): void => {
-		const te = e as TouchEvent;
-		if (this._touchPointID !== -1) return;
-
-		const vp = this._viewport;
-		if (!vp) return;
-
-		this._touchPointID = te.touchPointID;
-		this._startTouchPointX = te.stageX;
-		this._startTouchPointY = te.stageY;
+	private _onTouchBeginCapture = (e: Event): void => {
+		if (!(e instanceof TouchEvent)) {
+			return;
+		}
+		this._suppressedTaps.delete(e.touchPointID);
+		if (this._touchPointID !== -1 || !this._canScroll()) {
+			return;
+		}
+		this._touchMoved = false;
+		this._touchPointID = e.touchPointID;
+		this._startTouchPointX = e.stageX;
+		this._startTouchPointY = e.stageY;
 
 		this._hScroll.stop();
 		this._vScroll.stop();
+		// A new press can interrupt a fling or rebound before its completion callback.
+		this._onScrollEnd();
 		this._clearAutoHideTimer();
 
 		const stage = this.stage;
 		if (stage) {
 			this._touchStage = stage;
-			stage.addEventListener(TouchEvent.TOUCH_MOVE, this._onTouchMove);
-			// Finish before viewport capture suppresses the child's touch-end event.
+			// Nested viewports get first refusal on the direction of this drag.
+			stage.addEventListener(TouchEvent.TOUCH_MOVE, this._onTouchMove, false, this.$nestLevel);
 			stage.addEventListener(TouchEvent.TOUCH_END, this._onTouchEnd, true);
 			stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onTouchEnd, true);
 		}
@@ -360,6 +352,13 @@ export class Scroller extends Component {
 
 	private _onTouchMove = (e: TouchEvent): void => {
 		if (e.touchPointID !== this._touchPointID) return;
+		if (e.isDefaultPrevented()) {
+			if (!this._touchMoved) {
+				this._removeStageTouchListeners();
+				this._touchPointID = -1;
+			}
+			return;
+		}
 
 		const vp = this._viewport;
 		if (!vp) return;
@@ -371,35 +370,35 @@ export class Scroller extends Component {
 			if (Math.abs(moveX) < Scroller.DEFAULT_THRESHOLD && Math.abs(moveY) < Scroller.DEFAULT_THRESHOLD) {
 				return;
 			}
-			// Scroll gesture confirmed — swallow the upcoming tap so child
-			// components (e.g. List items) don't receive a false "click".
-			this._touchCancelled = true;
-			this._touchMoved = true;
-			this._updateScrollBarVisibility(true);
-
-			// Dispatch CHANGE_START once per gesture.
-			if (!this._changeStartDispatched) {
-				this._changeStartDispatched = true;
-				UIEvent.dispatchUIEvent(this, UIEvent.CHANGE_START);
-			}
-
 			const tb = vpBounds;
 			vp.getLayoutBounds(tb);
 			const maxH = Math.max(0, vp.contentWidth - tb.width);
 			const maxV = Math.max(0, vp.contentHeight - tb.height);
 
-			if (maxH > 0 && Math.abs(moveX) >= Math.abs(moveY)) {
+			if (maxH > 0 && this._horizontalScrollPolicy !== ScrollPolicy.OFF && Math.abs(moveX) >= Math.abs(moveY)) {
 				this._hScroll.scrollFactor = this.scrollFactor;
 				this._hScroll.bounces = this.bounces;
 				this._hScroll.start(e.stageX);
 			}
-			if (maxV > 0 && Math.abs(moveY) >= Math.abs(moveX)) {
+			if (maxV > 0 && this._verticalScrollPolicy !== ScrollPolicy.OFF && Math.abs(moveY) >= Math.abs(moveX)) {
 				this._vScroll.scrollFactor = this.scrollFactor;
 				this._vScroll.bounces = this.bounces;
 				this._vScroll.start(e.stageY);
 			}
+			this._touchMoved = true;
+			if (!this._hScroll.isStarted() && !this._vScroll.isStarted()) {
+				// A swipe is not a tap. Let an outer viewport claim its axis.
+				this._touchStage?.removeEventListener(TouchEvent.TOUCH_MOVE, this._onTouchMove);
+				return;
+			}
+			this._updateScrollBarVisibility(true);
+			if (!this._changeStartDispatched) {
+				this._changeStartDispatched = true;
+				UIEvent.dispatchUIEvent(this, UIEvent.CHANGE_START);
+			}
 		}
 
+		e.preventDefault();
 		if (this._hScroll.isStarted()) {
 			const b = vpBounds;
 			vp.getLayoutBounds(b);
@@ -415,6 +414,14 @@ export class Scroller extends Component {
 	private _onTouchEnd = (e: TouchEvent): void => {
 		if (e.touchPointID !== this._touchPointID) return;
 
+		if (e.type === TouchEvent.TOUCH_END && this._touchMoved) {
+			// Cancel activation, not propagation: all gesture owners finish on the original END.
+			e.preventDefault();
+			const id = e.touchPointID;
+			this._suppressedTaps.add(id);
+			// Core may send a separate TAP synchronously after END, or none if the hit changed.
+			queueMicrotask(() => this._suppressedTaps.delete(id));
+		}
 		this._touchPointID = -1;
 		this._removeStageTouchListeners();
 		const vp = this._viewport;
@@ -443,23 +450,18 @@ export class Scroller extends Component {
 	};
 
 	/**
-	 * Called when a scroll throw animation ends.
-	 * Dispatches CHANGE_END when both horizontal and vertical animations
-	 * have stopped, and starts the auto-hide timer for the scroll bars.
+	 * Pair CHANGE_START with one CHANGE_END when both axes finish or the
+	 * next press interrupts their animation.
 	 */
-	private onHScrollEnd = (): void => {
-		if (!this._vScroll.isStarted()) this._onChangeEnd();
-	};
-
-	private onVScrollEnd = (): void => {
-		if (!this._hScroll.isStarted()) this._onChangeEnd();
-	};
-
-	private _onChangeEnd(): void {
+	private _onScrollEnd = (): void => {
+		if (!this._changeStartDispatched || this._hScroll.isStarted() || this._vScroll.isStarted()
+			|| this._hScroll.isPlaying() || this._vScroll.isPlaying()) {
+			return;
+		}
 		this._changeStartDispatched = false;
 		this._scheduleAutoHide();
 		UIEvent.dispatchUIEvent(this, UIEvent.CHANGE_END);
-	}
+	};
 
 	// ── Auto-hide scroll bars ───────────────────────────────────────
 

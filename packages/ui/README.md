@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.1.4**.
+Kurot games. Package version: **5.1.5**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -51,7 +51,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.1.4 @kurot/core@^3.2.2
+pnpm add @kurot/ui@^5.1.5 @kurot/core@^3.2.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -304,6 +304,14 @@ To hide a bar while retaining touch scrolling, set the bar's skin properties
 `autoVisibility="false" visible="false"`. With the default `autoVisibility`,
 the bar appears after a drag passes the touch threshold and hides after the
 gesture. Set `visible="true" autoVisibility="false"` to keep a bar visible.
+
+After a scroll, the original `TOUCH_END` still bubbles to the stage. Use it
+to clean up the gesture for its `touchPointID`. A Scroller calls
+`preventDefault()` on the release to cancel activation: custom controls that
+activate on release should check `!event.isDefaultPrevented()` before acting,
+and always clear their pressed state. A subsequent tap for that finger is
+suppressed inside the viewport. Nested Scrollers give the innermost viewport
+that can scroll in the drag direction first choice.
 
 ### Data-Driven
 

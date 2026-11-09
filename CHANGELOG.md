@@ -5,6 +5,21 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — UI 5.1.5 release preparation
+
+- Prepare only `@kurot/ui` for the [Scroller fix](packages/ui/CHANGELOG.md#515--2026-11-09).
+  The original touch end reaches outer gesture listeners once, while scrolling
+  cancels item and button activation. Core's global tap rules are unchanged.
+- The Core peer remains `^3.2.1`. The ui-runtime peer and development range
+  (`^5.0.0`), CLI game template (`latest`), game example (`^5.1.4`) and
+  Kurot-Skia (`~5.1.2`) accept the patch. Applications pinned to 5.1.4,
+  including SAO, must update their dependency and lock to adopt it after
+  publication.
+- UI builds on Node 22; all 607 unit and 42 Chromium tests pass. The ten
+  Scroller regression cases cover original event identity and coordinates,
+  successive drags, cancellation, multiple fingers, nesting and rebound.
+  All 22 shared API examples compile against both built and packed declarations.
+
 ## 2026-11-09 — Examples and Templates adopt UI 5.1.4 / CLI 5.1.1
 
 - Verify npm availability and adopt CLI 5.1.1 in demo, game and star-catcher

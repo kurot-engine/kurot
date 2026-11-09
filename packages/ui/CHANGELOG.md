@@ -4,6 +4,19 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.1.5 — 2026-11-09
+
+- Scrolling preserves the original bubbling `TOUCH_END`, so outer gesture
+  listeners can finish once per finger. The release cancels row and button
+  activation and suppresses the following tap without affecting other fingers.
+  Nested Scrollers claim a drag once, according to the scrolling axis.
+  Starting a new drag during a rebound closes the previous scroll's
+  `CHANGE_START` / `CHANGE_END` pair first.
+- Custom controls that activate on release should check
+  `!event.isDefaultPrevented()` before performing the action, and always clean
+  up the gesture. This change requires no skin migration or Core update;
+  the Core peer stays at `^3.2.1`.
+
 ## 5.1.4 — 2026-11-09
 
 - A List tap follows the pressed renderer and data item even if its skin

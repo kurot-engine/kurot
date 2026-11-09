@@ -134,7 +134,7 @@ export class ItemRenderer<TSkin extends string = string, T = unknown> extends Co
 			return;
 		}
 		this._touchStage = stage;
-		// Release the visual press even when a Scroller suppresses the bubbling end.
+		// Release the visual press even if a descendant stops the bubbling end.
 		stage.addEventListener(TouchEvent.TOUCH_END, this._onStageTouchEnd, true);
 		stage.addEventListener(TouchEvent.TOUCH_CANCEL, this._onStageTouchEnd, true);
 		this._pressedTouches.add(e.touchPointID);

@@ -30,7 +30,7 @@ export class Button extends Component implements IDisplayText {
 	private _icon?: string | Texture;
 	private _selected = false;
 	private _toggle = false;
-	private _touchCaptured = false;
+	private _touchPointID?: number;
 	private _touchStage?: Stage;
 	private _stickyHighlighting = false;
 
@@ -117,7 +117,7 @@ export class Button extends Component implements IDisplayText {
 	 * owned by the game and must be removed when their round/view ends.
 	 */
 	public get touchCaptured(): boolean {
-		return this._touchCaptured;
+		return this._touchPointID !== undefined;
 	}
 
 	public override get enabled(): boolean {
@@ -174,7 +174,7 @@ export class Button extends Component implements IDisplayText {
 		let state: string;
 		if (!this.enabled) {
 			state = 'disabled';
-		} else if (this._touchCaptured || this._stickyHighlighting) {
+		} else if (this.touchCaptured || this._stickyHighlighting) {
 			state = 'down';
 		} else {
 			state = 'up';
@@ -204,9 +204,11 @@ export class Button extends Component implements IDisplayText {
 
 	// ── Private methods ───────────────────────────────────────────────────
 
-	private _onTouchBegin = (_e: Event): void => {
-		if (!this.enabled) return;
-		this._touchCaptured = true;
+	private _onTouchBegin = (e: TouchEvent): void => {
+		if (!this.enabled || this.touchCaptured) {
+			return;
+		}
+		this._touchPointID = e.touchPointID;
 		this.invalidateState();
 		const stage = this.stage;
 		if (stage) {
@@ -217,17 +219,22 @@ export class Button extends Component implements IDisplayText {
 	};
 
 	private _onStageTouchEnd = (e: TouchEvent): void => {
+		if (e.touchPointID !== this._touchPointID) {
+			return;
+		}
 		this._removeStageListeners();
 		const target = e.target;
-		if (target instanceof DisplayObject && this.contains(target)) {
+		if (!e.isDefaultPrevented() && target instanceof DisplayObject && this.contains(target)) {
 			this.buttonReleased();
 		}
-		this._touchCaptured = false;
+		this._touchPointID = undefined;
 		this.invalidateState();
 	};
 
-	private _onTouchCancel = (_e: Event): void => {
-		this._cancelTouchCapture();
+	private _onTouchCancel = (e: TouchEvent): void => {
+		if (e.touchPointID === this._touchPointID) {
+			this._cancelTouchCapture();
+		}
 	};
 
 	private _removeStageListeners(): void {
@@ -240,7 +247,7 @@ export class Button extends Component implements IDisplayText {
 
 	private _cancelTouchCapture(): void {
 		this._removeStageListeners();
-		this._touchCaptured = false;
+		this._touchPointID = undefined;
 		this.invalidateState();
 	}
 }
