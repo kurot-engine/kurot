@@ -52,7 +52,7 @@ Consumers upgrading ui-runtime from 0.12.x to 0.13.x must select the new minor e
 For authored IDs containing reserved path characters, use the runtime's qualified key helpers;
 the ui-document schema and the runtime's Core/UI/document peer minima are unchanged.
 
-UI 5.1.2 requires Core ^3.2.1 for stable font-frame text layout, in addition to
+UI requires Core ^3.2.1 for stable font-frame text layout, in addition to
 Core 3.2's BackdropBlur API. Core 3.2.2 is recommended for the accompanying
 ink-retention and mixed-size scrolling fixes; those compatible corrections do
 not raise the supported peer minimum. Publication is recorded in CHANGELOG.md.

@@ -5,6 +5,19 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-09 — UI 5.1.3 release preparation
+
+- Prepare `@kurot/ui` for the [RadioButton skin fix](packages/ui/CHANGELOG.md#513--2026-11-09).
+  Selecting another radio or clearing the group now restores the old radio's
+  idle skin. No changes to public APIs, KUI skins or the Core `^3.2.1` peer.
+- Only UI needs publication. The ui-runtime peer and development range
+  (`^5.0.0`), the CLI game template (`latest`) and the game example
+  (`^5.1.2`) accept the patch. Applications pinned to 5.1.2, including SAO,
+  must update their dependency and lock after publication to receive the fix.
+- The UI build, all 594 unit tests and 42 browser tests passed on Node 22.
+  The generated reference has no missing exports or members; all 22 shared API
+  examples compile against both built and packed declarations.
+
 ## 2026-11-08 — CLI 5.1.1 published and verified
 
 - [npm](https://www.npmjs.com/package/@kurot/cli/v/5.1.1) published CLI 5.1.1 at 15:30 UTC and marked it `latest`. The [downloaded archive](https://registry.npmjs.org/@kurot/cli/-/cli-5.1.1.tgz) is byte-identical to the tested candidate (370,784 bytes, 304 files). Its verified registry integrity is `sha512-wqqR3pd94dDWYdPszZOQVGcb3H38DU5SZmYjUVyG3ecMB6cAtnGb71heK4RE2yQN5nYtH7pXFx7CUoSLLak5cQ==`.

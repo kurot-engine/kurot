@@ -4,6 +4,15 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.1.3 — 2026-11-09
+
+- A tapped RadioButton now returns to its `up` skin when another radio is
+  selected or the group's selection is cleared. This works with both basic
+  skins and skins that define `AndSelected` states. A press still in progress
+  keeps its `down` state until release or cancellation.
+- No public API, skin migration or dependency change. The Core peer remains
+  `^3.2.1`.
+
 ## 5.1.2 — 2026-11-08
 
 Published; exact version, npm latest and Core ^3.2.1 peer verified on 2026-11-08.

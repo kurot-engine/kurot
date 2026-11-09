@@ -87,8 +87,14 @@ export class Button extends Component implements IDisplayText {
 	}
 
 	public set selected(value: boolean) {
-		if (this._selected === value) return;
+		if (this._selected === value) {
+			return;
+		}
 		this._selected = value;
+		if (!value) {
+			// Deselecting ends the highlight from a completed tap, even when a group owns the selection.
+			this._stickyHighlighting = false;
+		}
 		PropertyEvent.dispatchPropertyEvent(this, 'selected');
 		this.invalidateState();
 	}

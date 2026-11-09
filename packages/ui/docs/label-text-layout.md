@@ -3,7 +3,7 @@
 `TextFitMode` is `none | shrink`. Native Label owns normal layout, single- and
 multiline fitting, outline-safe bounds and derived rendering observations.
 KUI compilation and semantic materialization pass the authored policy to that
-same native component. UI 5.1.2 requires Core ^3.2.1 for the stable dynamic
+same native component. UI requires Core ^3.2.1 for the stable dynamic
 font-frame contract below. Core 3.2.2 is recommended for render-only ink
 protection and mixed-size row scrolling; it does not raise that peer minimum.
 

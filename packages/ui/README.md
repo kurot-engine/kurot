@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.1.2** (published on npm).
+Kurot games. Package version: **5.1.3**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -45,7 +45,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.1.2 @kurot/core@^3.2.2
+pnpm add @kurot/ui@^5.1.3 @kurot/core@^3.2.2
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -93,9 +93,9 @@ CLI 4 exports local Skin factories with
 path, then pass the factories and default mappings to UIContext. See the
 [context contract](docs/ui-context.md) and [complete module loader](../cli/docs/module-skins.md).
 
-Existing global applications keep their Theme/asset behavior. UI 5.1.2
-requires Core ^3.2.1. Dispose views and their activity before
-the context, then release borrowed resources/fonts through their owners.
+Existing global applications keep their Theme/asset behavior. Dispose views
+and their activity before the context, then release borrowed resources/fonts
+through their owners.
 
 ## Stage-sized UI roots
 
@@ -422,6 +422,11 @@ Button selects `up`, `down` or `disabled` through its native behavior. Each
 state restores the previous property values before applying the next overrides.
 CLI-built skins generate the same `State`/`SetProperty` objects from XML
 attributes such as `textColor.disabled`.
+
+For a RadioButton group, selecting another radio or clearing
+`group.selection = undefined` returns the previously selected radio to `up`
+when enabled and no longer pressed. This also applies to skins that define
+`upAndSelected` and `downAndSelected`.
 
 ## Events
 

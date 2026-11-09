@@ -1,6 +1,6 @@
 # currentTarget
 
-Package: `@kurot/ui@5.1.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.1.3`. Generated from public declarations and JSDoc.
 
 ```ts
 get currentTarget(): IEventDispatcher | undefined;

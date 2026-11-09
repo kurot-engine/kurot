@@ -10,9 +10,104 @@
  * - addInstance adopts an already-selected radio
  */
 import { describe, it, expect } from 'vitest';
-import { RadioButton, RadioButtonGroup } from '../src/index.js';
+import { Stage, TouchEvent } from '@kurot/core';
+import { RadioButton, RadioButtonGroup, Skin, State } from '../src/index.js';
 
 describe('RadioButton / RadioButtonGroup', () => {
+	describe.each([
+		{ kind: 'basic', withSelectedStates: false, tapped: 'down', assigned: 'down' },
+		{ kind: 'AndSelected', withSelectedStates: true, tapped: 'downAndSelected', assigned: 'upAndSelected' },
+	])('$kind skin', ({ withSelectedStates, tapped, assigned }) => {
+		function addRadio(stage: Stage, group: RadioButtonGroup): RadioButton {
+			const names = ['up', 'down', 'disabled'];
+			if (withSelectedStates) {
+				names.push('upAndSelected', 'downAndSelected', 'disabledAndSelected');
+			}
+			const skin = new Skin();
+			skin.states = names.map(name => new State(name));
+			const radio = new RadioButton();
+			radio.group = group;
+			radio.skinName = skin;
+			stage.addChild(radio);
+			return radio;
+		}
+
+		function tap(radio: RadioButton): void {
+			radio.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_BEGIN, true));
+			radio.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_END, true));
+		}
+
+		function expectSkin(radio: RadioButton, state: string): void {
+			radio.validateNow();
+			expect(radio.skin?.currentState).toBe(state);
+		}
+
+		it('restores the old skin after a tap or a programmatic selection takes its place', () => {
+			const stage = new Stage();
+			const group = new RadioButtonGroup();
+			const a = addRadio(stage, group);
+			const b = addRadio(stage, group);
+			tap(a);
+			expectSkin(a, tapped);
+			tap(b);
+			expect(group.selection).toBe(b);
+			expect(a.selected).toBe(false);
+			expectSkin(a, 'up');
+			expectSkin(b, tapped);
+
+			a.selected = true;
+			expect(group.selection).toBe(a);
+			expectSkin(b, 'up');
+			expectSkin(a, assigned);
+		});
+
+		it('clears the tapped skin when either the group or the radio is deselected', () => {
+			const group = new RadioButtonGroup();
+			const radio = addRadio(new Stage(), group);
+			tap(radio);
+			group.selection = undefined;
+			expect(radio.selected).toBe(false);
+			expectSkin(radio, 'up');
+
+			tap(radio);
+			radio.selected = false;
+			expect(group.selection).toBeUndefined();
+			expectSkin(radio, 'up');
+		});
+
+		it('keeps a real press down until stage removal cancels capture', () => {
+			const stage = new Stage();
+			const group = new RadioButtonGroup();
+			const radio = addRadio(stage, group);
+			tap(radio);
+			radio.dispatchEvent(new TouchEvent(TouchEvent.TOUCH_BEGIN, true));
+			group.selection = undefined;
+			expectSkin(radio, 'down');
+			stage.removeChild(radio);
+			stage.addChild(radio);
+			expect(radio.touchCaptured).toBe(false);
+			expectSkin(radio, 'up');
+		});
+
+		it('restores the deselected skin when a disabled group is re-enabled after a transfer', () => {
+			const stage = new Stage();
+			const group = new RadioButtonGroup();
+			const a = addRadio(stage, group);
+			const b = addRadio(stage, new RadioButtonGroup());
+			tap(a);
+			group.enabled = false;
+			expectSkin(a, withSelectedStates ? 'disabledAndSelected' : 'disabled');
+			b.selected = true;
+			b.group = group;
+			expect(group.selection).toBe(b);
+			expect(a.selected).toBe(false);
+			expectSkin(a, 'disabled');
+			group.enabled = true;
+			expectSkin(a, 'up');
+			expectSkin(b, assigned);
+		});
+	});
+
 	describe('default groupName', () => {
 		it('defaults to "radioGroup" so orphan radios are mutually exclusive', () => {
 			const rb1 = new RadioButton();
