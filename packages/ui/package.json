@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/ui",
-	"version": "5.1.5",
+	"version": "5.2.0",
 	"description": "Native UI components for the Kurot game engine — KUI XML skins, layouts, typed collections, data binding and view states",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",

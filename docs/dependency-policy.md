@@ -56,6 +56,12 @@ UI requires Core ^3.2.1 for stable font-frame text layout, in addition to
 Core 3.2's BackdropBlur API. Core 3.2.2 is recommended for the accompanying
 ink-retention and mixed-size scrolling fixes; those compatible corrections do
 not raise the supported peer minimum. Publication is recorded in CHANGELOG.md.
+UI 5.2's default asset adapter uses Core 3.3's shared resource loading when
+available. Complete on-demand frame and manifest URL resolution requires
+Core >= 3.3.0 within 3.x; basic loading remains compatible with the ^3.2.1
+peer minimum. New CLI game starters use this default adapter. Existing custom
+adapters and application locks are adopted separately.
+
 This requirement does not raise the minima of unchanged Game, DragonBones or
 ui-runtime. CLI/templates and application adoption are separate follow-ups.
 

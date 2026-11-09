@@ -36,9 +36,13 @@ requests and the intended interactions in the browser.
 
 - `src/Main.ts`: application startup and gameplay/UI composition. Preserve the
   existing font → Player → resources/theme → translations → scene ordering.
-- `src/StyleManager.ts`, `LocaleManager.ts`, `AssetAdapter.ts`, `Preloader.ts`
+- `src/StyleManager.ts`, `LocaleManager.ts`, `Preloader.ts`
   and `LifecycleHandler.ts`: startup services; consult them when changing their
   responsibility rather than reading all of them for every gameplay task.
+- UI 5.2's default asset adapter uses the same Core `resource` loaded in Main.
+  Use Core >= 3.3.0 for complete on-demand frame loading and shared requests.
+  Use manifest names, sheet frames or image URLs as Image sources. See
+  `node_modules/@kurot/ui/docs/asset-adapter.md` for cache ownership and custom adapters.
 - `resource/default.res.json`: resource manifest; `resource/config/`: fonts,
   colors and language settings; `resource/lang/`: translation text.
 - `resource/ui/skins/`: editable default KUI skins. For reusable controls, pair

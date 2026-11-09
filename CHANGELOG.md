@@ -5,6 +5,38 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+
+## 2026-11-09 — Core 3.3.0, UI 5.2.0 and CLI 5.1.2 release preparation
+
+- Prepare Core's shared resource loading, UI's resource-aware DefaultAssetAdapter
+  and the CLI game template's adoption of that adapter. See the package release
+  notes for [Core](packages/core/CHANGELOG.md#330--2026-11-09),
+  [UI](packages/ui/CHANGELOG.md#520--2026-11-09) and
+  [CLI](packages/cli/CHANGELOG.md#512--2026-11-09). Publish in that order so new
+  scaffolds resolve the complete runtime capability. This records preparation,
+  not npm publication; annotated tags follow registry artifact verification.
+- UI keeps its Core peer at `^3.2.1` and its accepted development lock. Complete
+  cold frame, manifest URL and pending group sharing requires Core 3.3.0 plus
+  UI 5.2.0; basic named/URL loading remains compatible with older supported Core.
+  Applications own cached textures and can retain their explicit adapters.
+- Game, DragonBones and ui-runtime accept the new Core/UI versions through their
+  existing peer/development ranges and need no release. CLI's ui-document
+  dependency is unchanged. CLI templates use `latest`; caret-based examples and
+  external Templates may adopt through a lock update. Exact pins in Star Catcher,
+  SAO, Editor and some Templates need explicit version updates to adopt. Skia's
+  `~3.2.3`/`~5.1.2` peers exclude these new minors and need separate compatibility
+  validation before adoption. No consumer projects are upgraded in this change.
+- On Node 22.23.4, Core/UI/CLI builds and all nine SDK unit suites pass
+  (2,597 tests), along with all 43 UI Chromium tests. Both packed CLI starters
+  pass strict-peer installation and development/release builds. API verification
+  passes six tooling tests and compiles all 22 examples against both built and
+  source-free packed declarations, with no missing public symbols or members.
+- Packed Core/UI browser verification confirms one versioned image request and
+  immediate texture identity/pixel reuse after rebuilding a native List.
+  Registry Core 3.2.1 also passes compiled UI's named/URL cache and concurrency
+  checks. SAO's manifest conversion, aliases, analyzers and version settings
+  remain project-owned.
+
 ## 2026-11-09 — UI 5.1.5 release preparation
 
 - Prepare only `@kurot/ui` for the [Scroller fix](packages/ui/CHANGELOG.md#515--2026-11-09).

@@ -31,6 +31,11 @@ This ordering includes loading-screen Labels in the project font. The loading
 screen's startup messages stay in English because translations are not loaded yet.
 Templates do not implement live font/theme/language replacement.
 
+The game starter uses UI 5.2's DefaultAssetAdapter with the shared Core Resource;
+it needs no project-specific adapter registration. Use Core >= 3.3.0 for complete
+on-demand frame loading and shared URL/group requests. The manifest must precede
+skins that use its names. See [image sources and cache ownership](../../ui/docs/asset-adapter.md).
+
 ## Stage defaults
 
 Both starters use `createPlayer({ canvas })`. Configure width, height, scale mode,

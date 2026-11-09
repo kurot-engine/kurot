@@ -1,6 +1,6 @@
 # static create
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static create<T extends Event>(EventClass: EventConstructor<T>, type: string, bubbles?: boolean, cancelable?: boolean): T;

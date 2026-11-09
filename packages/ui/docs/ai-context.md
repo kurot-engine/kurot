@@ -2,11 +2,13 @@
 
 For local Skin/asset/font resolution or automatic radio-group isolation, read
 [UI contexts](ui-context.md). Compiled module factories require CLI >= 3.9.0.
+For named textures, atlas frames, URL caches and ownership, read
+[image sources and cache ownership](asset-adapter.md).
 
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.1.5`,
+This maintainer map covers `@kurot/ui@5.2.0`,
 with Core peer **^3.2.1** for stable text frames and native BackdropBlur.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.

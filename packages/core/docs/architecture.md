@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 3.2.3 (published on npm). See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 3.3.0. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.

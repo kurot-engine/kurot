@@ -5,8 +5,9 @@ import type { Texture } from '@kurot/core';
  */
 export interface IAssetAdapter {
 	/**
-	 * Resolves an asset and reports `undefined` when it cannot be loaded.
-	 * The callback receives the original source so callers can correlate requests.
+	 * Complete each request once, with a borrowed texture or undefined on failure.
+	 * Return the original source even when looking up a frame through its sheet.
+	 * An adapter with a cached texture should call back synchronously.
 	 */
 	getAsset(source: string, callback: (content: Texture | undefined, source: string) => void): void;
 }

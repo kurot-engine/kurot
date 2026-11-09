@@ -1,6 +1,6 @@
 # ResourceLoader
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class ResourceLoader
@@ -24,6 +24,7 @@ Queue-based resource loader with concurrency control.
 | `retryCount` | public | [open](ResourceLoader-class/retryCount-property.md) |
 | `threadCount` | public | [open](ResourceLoader-class/threadCount-property.md) |
 | `abort` | public | [open](ResourceLoader-class/abort-method.md) |
+| `loadFile` | public | [open](ResourceLoader-class/loadFile-method.md) |
 | `loadResourceList` | public | [open](ResourceLoader-class/loadResourceList-method.md) |
 | `registerAnalyzer` | public | [open](ResourceLoader-class/registerAnalyzer-method.md) |
 | `start` | public | [open](ResourceLoader-class/start-method.md) |

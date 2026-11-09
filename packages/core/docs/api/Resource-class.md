@@ -1,6 +1,6 @@
 # Resource
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Resource
@@ -29,11 +29,13 @@ const texture = resource.get<Texture>('bg.png');
 | `destroyGroup` | public | [open](Resource-class/destroyGroup-method.md) |
 | `get` | public | [open](Resource-class/get-method.md) |
 | `getGroupNames` | public | [open](Resource-class/getGroupNames-method.md) |
+| `getResourceItem` | public | [open](Resource-class/getResourceItem-method.md) |
 | `hasGroup` | public | [open](Resource-class/hasGroup-method.md) |
 | `hasRes` | public | [open](Resource-class/hasRes-method.md) |
 | `load` | public | [open](Resource-class/load-method.md) |
 | `loadConfig` | public | [open](Resource-class/loadConfig-method.md) |
 | `loadGroup` | public | [open](Resource-class/loadGroup-method.md) |
+| `loadSource` | public | [open](Resource-class/loadSource-method.md) |
 | `off` | public | [open](Resource-class/off-method.md) |
 | `on` | public | [open](Resource-class/on-method.md) |
 | `onProgress` | public | [open](Resource-class/onProgress-method.md) |

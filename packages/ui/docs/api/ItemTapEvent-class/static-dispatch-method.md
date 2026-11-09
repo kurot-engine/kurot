@@ -1,6 +1,6 @@
 # static dispatch
 
-Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 static dispatch(target: IEventDispatcher, type: string, bubbles: boolean, data?: unknown): boolean;

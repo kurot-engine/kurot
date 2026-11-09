@@ -1,6 +1,6 @@
 # curveTo
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 curveTo(controlX: number, controlY: number, anchorX: number, anchorY: number): void;

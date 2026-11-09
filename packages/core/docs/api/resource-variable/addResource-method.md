@@ -1,9 +1,11 @@
 # addResource
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
-addResource(def: { name: string; type: string; url: string }): void;
+addResource(def: Pick<ResourceConfigEntry, "name" | "url" | "type" | "subkeys">): void;
 ```
 
 Add a resource definition directly (without a config file).
+
+Related types: [ResourceConfigEntry](../ResourceConfigEntry-interface.md).

@@ -1,6 +1,6 @@
 # resource
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 resource: Resource;
@@ -20,11 +20,13 @@ Related types: [Resource](Resource-class.md).
 | `destroyGroup` | public | [open](resource-variable/destroyGroup-method.md) |
 | `get` | public | [open](resource-variable/get-method.md) |
 | `getGroupNames` | public | [open](resource-variable/getGroupNames-method.md) |
+| `getResourceItem` | public | [open](resource-variable/getResourceItem-method.md) |
 | `hasGroup` | public | [open](resource-variable/hasGroup-method.md) |
 | `hasRes` | public | [open](resource-variable/hasRes-method.md) |
 | `load` | public | [open](resource-variable/load-method.md) |
 | `loadConfig` | public | [open](resource-variable/loadConfig-method.md) |
 | `loadGroup` | public | [open](resource-variable/loadGroup-method.md) |
+| `loadSource` | public | [open](resource-variable/loadSource-method.md) |
 | `off` | public | [open](resource-variable/off-method.md) |
 | `on` | public | [open](resource-variable/on-method.md) |
 | `onProgress` | public | [open](resource-variable/onProgress-method.md) |

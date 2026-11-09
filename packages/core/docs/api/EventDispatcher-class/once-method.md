@@ -1,6 +1,6 @@
 # once
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 once<K extends string>(type: K, listener: (event: TMap[K]) => void, useCapture?: boolean, priority?: number): void;

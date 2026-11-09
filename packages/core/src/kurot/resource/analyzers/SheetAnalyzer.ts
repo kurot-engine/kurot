@@ -39,6 +39,10 @@ export class SheetAnalyzer extends AnalyzerBase {
 	 */
 	private textureMap: Map<string, Texture> = new Map<string, Texture>();
 	/**
+	 * Allocate alternates only for collisions; eviction keeps surviving pages addressable.
+	 */
+	private readonly alternateTextures = new Map<string, Set<Texture>>();
+	/**
 	 * Reverse mapping: sheet name → sub-key names
 	 */
 	private sheetSubkeys: Map<string, string[]> = new Map<string, string[]>();
@@ -90,19 +94,35 @@ export class SheetAnalyzer extends AnalyzerBase {
 	public override destroyRes(name: string): boolean {
 		const sheet = this.fileDic.get(name);
 		if (sheet instanceof SpriteSheet) {
+			this.fileDic.delete(name);
 			const subkeys = this.sheetSubkeys.get(name);
 			if (subkeys) {
 				for (const texName of subkeys) {
-					this.textureMap.delete(texName);
+					const alternates = this.alternateTextures.get(texName);
+					const removed = sheet.getTexture(texName)!;
+					if (this.textureMap.get(texName) === removed) {
+						const next = alternates?.values().next().value;
+						if (next) {
+							this.textureMap.set(texName, next);
+							alternates?.delete(next);
+						} else {
+							this.textureMap.delete(texName);
+						}
+					} else {
+						alternates?.delete(removed);
+					}
+					if (alternates?.size === 0) {
+						this.alternateTextures.delete(texName);
+					}
 				}
 				this.sheetSubkeys.delete(name);
 			}
-			this.fileDic.delete(name);
 			sheet.dispose();
 			return true;
 		}
 		if (this.textureMap.has(name)) {
 			this.textureMap.delete(name);
+			this.alternateTextures.delete(name);
 			return true;
 		}
 		return false;
@@ -124,7 +144,22 @@ export class SheetAnalyzer extends AnalyzerBase {
 				}
 				try {
 					const config = JSON.parse(response) as SheetConfig;
-					if (config.resolution !== undefined && (!Number.isFinite(config.resolution) || config.resolution <= 0)) {
+					if (
+						typeof config.file !== 'string' ||
+						!config.file ||
+						!config.frames ||
+						typeof config.frames !== 'object' ||
+						Array.isArray(config.frames) ||
+						Object.values(config.frames).some(
+							frame => !frame || ![frame.x, frame.y, frame.w, frame.h].every(Number.isFinite),
+						)
+					) {
+						throw new Error('Invalid sheet image or frame coordinates.');
+					}
+					if (
+						config.resolution !== undefined &&
+						(!Number.isFinite(config.resolution) || config.resolution <= 0)
+					) {
 						throw new RangeError('Sheet resolution must be a finite positive number.');
 					}
 					const imageUrl = this.getRelativePath(item.url, config.file);
@@ -210,6 +245,13 @@ export class SheetAnalyzer extends AnalyzerBase {
 			);
 			if (!this.textureMap.has(subkey)) {
 				this.textureMap.set(subkey, subTexture);
+			} else {
+				let alternates = this.alternateTextures.get(subkey);
+				if (!alternates) {
+					alternates = new Set();
+					this.alternateTextures.set(subkey, alternates);
+				}
+				alternates.add(subTexture);
 			}
 			subkeys.push(subkey);
 		}

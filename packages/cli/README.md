@@ -1,7 +1,7 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Published version: [**5.1.1**](https://www.npmjs.com/package/@kurot/cli/v/5.1.1).
+resource watching. Package version: **5.1.2**.
 Requires Node.js >= 22.12.0 (develop and test on 22.x) and
 ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
@@ -9,6 +9,11 @@ UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract che
 For UI production use the installed UI [authoring guide](../ui/docs/ui-authoring.md)
 and [ScoreHUD recipe](../ui/docs/recipes/score-hud.md). Legacy EXML projects use
 the separate CLI 1.3.x line. KUI configuration and resource files are project-owned.
+
+The game starter uses UI 5.2's default asset adapter with Core 3.3 for shared
+image loading and caching. Load the manifest before creating named-image skins;
+preloading is optional. Existing project adapters continue to work. See
+[the game template](docs/game-template.md) for startup order.
 
 ## Typed list Skin fields
 

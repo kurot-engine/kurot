@@ -118,6 +118,18 @@ afterEach(() => {
 });
 
 describe('Resource.loadGroup concurrency', () => {
+	it('shares analyzer work with direct requests for items in the running group', async () => {
+		const resource = new Resource();
+		const order: string[] = [];
+		resource.registerAnalyzer('mock', new OrderTrackingAnalyzer(order));
+		await resource.loadConfig('resource.json');
+		const group = resource.loadGroup('groupA');
+		await Promise.resolve();
+		const [first, second] = await Promise.all([resource.load('a1'), resource.loadSource('a1', 'image'), group]);
+		expect(first).toBe(second);
+		expect(order.sort()).toEqual(['a1', 'a2']);
+	});
+
 	it('queues concurrent loadGroup() calls instead of letting one overwrite the other', async () => {
 		const resource = new Resource();
 		const order: string[] = [];

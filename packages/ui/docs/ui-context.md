@@ -59,7 +59,9 @@ run: establish the context before setting string skinName on detached views.
   name preserves an explicit group. Authors own explicitly shared group lifetime.
   The context registry uses weak keys so detached radio members cannot root a
   disposed game's context. Unscoped radios retain the global grouping behavior.
-- Image uses its context's assetAdapter. BitmapLabel uses its context's Resource;
+- Image uses its context's assetAdapter. Pass `new DefaultAssetAdapter(gameResources)`
+  to share that game's cache; see [image sources and cache ownership](asset-adapter.md).
+  BitmapLabel uses its context's Resource;
   without that provider a scoped bitmap-font lookup does not use global resource.
 - Label/EditableText use the context default family; explicit fontFamily takes
   priority. RichLabel created inside run uses the same default for unstyled runs.

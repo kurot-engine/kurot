@@ -1,11 +1,14 @@
 # constructor
 
-Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
-constructor();
+constructor(resources: Resource);
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Use Core's shared resource by default, or supply an application's own
+Resource for an isolated UIContext. The caller owns its cache lifetime.
 
-Related types: [DefaultAssetAdapter](../DefaultAssetAdapter-class.md).
+**Default resources:** `resource`
+
+Related types: [DefaultAssetAdapter](../DefaultAssetAdapter-class.md), [Resource](../../../../core/docs/api/Resource-class.md).

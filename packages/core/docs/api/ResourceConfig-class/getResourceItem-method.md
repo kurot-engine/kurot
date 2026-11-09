@@ -1,11 +1,12 @@
 # getResourceItem
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 getResourceItem(key: string): ResourceItem | undefined;
 ```
 
-Get a ResourceItem by key.
+Return the owning definition for a name, unique manifest URL, declared subkey or sheet.frame.
+Exact names/subkeys take precedence; the longest matching sheet name wins.
 
 Related types: [ResourceItem](../ResourceItem-class.md).

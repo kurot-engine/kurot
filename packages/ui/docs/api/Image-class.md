@@ -1,6 +1,6 @@
 # Image
 
-Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class Image extends Component
@@ -8,7 +8,7 @@ class Image extends Component
 
 Image component that displays bitmap data.
 
-Supports setting `source` to a URL string (loaded via the asset adapter)
+Supports setting `source` to a resource name, sheet frame or image URL
 or a Texture instance directly.
 
 States: none (non-interactive visual element).

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BitmapData, Event, ResourceItem, SpriteSheet, Texture } from '../src/index.js';
+import { BitmapData, Event, Resource, ResourceItem, SpriteSheet, Texture } from '../src/index.js';
 import { HttpRequest } from '../src/kurot/net/HttpRequest.js';
 import { ImageLoader } from '../src/kurot/net/ImageLoader.js';
 import { SheetAnalyzer } from '../src/kurot/resource/analyzers/SheetAnalyzer.js';
@@ -23,6 +23,35 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('sheet density metadata', () => {
+	it('rejects a malformed frame without loading pixels or caching a partial page, then retries', async () => {
+		const provider = new Resource();
+		provider.addResource({ name: 'hud', url: 'hud.json', type: 'sheet' });
+		response = JSON.stringify({ file: 'hud.png', frames: { good: { x: 0, y: 0, w: 8, h: 8 }, bad: null } });
+		await expect(provider.loadSource('hud.good', 'image')).rejects.toThrow('Failed to load');
+		expect(imageURLs).toEqual([]);
+		expect(provider.get('hud.good')).toBeUndefined();
+		response = JSON.stringify({ file: 'hud.png', frames: { good: { x: 0, y: 0, w: 8, h: 8 } } });
+		await expect(provider.loadSource('hud.good', 'image')).resolves.toBeInstanceOf(Texture);
+	});
+	it('keeps a declared frame bound to its own sheet across load order and eviction', async () => {
+		response = JSON.stringify({ file: 'page.png', frames: { icon: { x: 0, y: 0, w: 8, h: 8 } } });
+		const provider = new Resource();
+		for (const name of ['first.ui', 'second']) {
+			provider.addResource({ name, type: 'sheet', url: name + '.json', subkeys: { icon: {} } });
+		}
+		const other = await provider.loadSource('second.icon', 'image');
+		expect(provider.get('icon')).toBeUndefined();
+		const [bare, qualified] = await Promise.all([provider.load('icon'), provider.load('first.ui.icon')]);
+		expect(bare).toBe(qualified);
+		expect(bare).not.toBe(other);
+		expect(imageURLs).toHaveLength(2);
+		provider.destroy('second');
+		expect(provider.get('icon')).toBe(bare);
+		await expect(provider.loadSource('first.ui.missing', 'image')).rejects.toThrow('not found in loaded');
+		expect(imageURLs).toHaveLength(2);
+		provider.destroyAll();
+		expect(provider.get('icon')).toBeUndefined();
+	});
 	it.each([undefined, 2])('loads density %s with physical atlas coordinates and logical trim bounds', async resolution => {
 		response = JSON.stringify({ file: 'kui.png', resolution,
 			frames: { button: { x: 80, y: 120, w: 72, h: 64, offX: 8, offY: 12, sourceW: 96, sourceH: 96 } } });

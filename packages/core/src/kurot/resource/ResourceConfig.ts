@@ -1,4 +1,4 @@
-import { ResourceItem } from './ResourceItem.js';
+import { ResourceItem, ResourceType } from './ResourceItem.js';
 
 /**
  * Raw resource config file format.
@@ -34,6 +34,8 @@ export interface ResourceGroupEntry {
 export class ResourceConfig {
 	private keyMap = new Map<string, ResourceConfigEntry>();
 	private groupDic = new Map<string, ResourceConfigEntry[]>();
+	// Only unambiguous manifest URLs are aliases. Distinct explicit names stay distinct.
+	private urlMap = new Map<string, ResourceConfigEntry | undefined>();
 
 	/**
 	 * Parse a config JSON object.
@@ -137,11 +139,32 @@ export class ResourceConfig {
 	}
 
 	/**
-	 * Get a ResourceItem by key.
+	 * Return the owning definition for a name, unique manifest URL, declared subkey or sheet.frame.
+	 * Exact names/subkeys take precedence; the longest matching sheet name wins.
 	 */
 	public getResourceItem(key: string): ResourceItem | undefined {
+		const entry = this.resolveEntry(key);
+		return entry ? this.parseResourceItem(entry) : undefined;
+	}
+
+	/**
+	 * @internal Registry lookup for synchronous cache reads without allocating an item.
+	 */
+	public resolveEntry(key: string): Readonly<ResourceConfigEntry> | undefined {
 		const data = this.keyMap.get(key);
-		if (data) return this.parseResourceItem(data);
+		if (data) {
+			return data;
+		}
+		const byUrl = this.urlMap.get(key);
+		if (byUrl) {
+			return byUrl;
+		}
+		for (let dot = key.lastIndexOf('.'); dot > 0; dot = key.lastIndexOf('.', dot - 1)) {
+			const owner = this.keyMap.get(key.slice(0, dot));
+			if (owner?.type === ResourceType.Sheet && owner.name === key.slice(0, dot) && dot < key.length - 1) {
+				return owner;
+			}
+		}
 		return undefined;
 	}
 
@@ -192,6 +215,7 @@ export class ResourceConfig {
 		const existing = this.keyMap.get(item.name);
 		if (!existing || existing.name !== item.name) {
 			this.keyMap.set(item.name, item);
+			this.urlMap.set(item.url, this.urlMap.has(item.url) ? undefined : item);
 		}
 		for (const key of Object.keys(item.subkeys ?? {})) {
 			if (!this.keyMap.has(key)) {

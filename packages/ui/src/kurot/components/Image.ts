@@ -6,7 +6,7 @@ import { getUIContext } from '../core/UIContext.js';
 /**
  * Image component that displays bitmap data.
  *
- * Supports setting `source` to a URL string (loaded via the asset adapter)
+ * Supports setting `source` to a resource name, sheet frame or image URL
  * or a Texture instance directly.
  *
  * States: none (non-interactive visual element).
@@ -35,8 +35,8 @@ export class Image extends Component {
 	 * Borrowed Texture or asset-adapter string, initially undefined. Direct textures
 	 * apply synchronously; strings load during property commit and dispatch COMPLETE
 	 * on success. Adapter callbacks with undefined clear the image. Image does not
-	 * forward IO_ERROR, and the default adapter does not report image-load failure
-	 * to the component; load through Resource first when failure handling is needed.
+	 * forward IO_ERROR. The default adapter reports failure with undefined;
+	 * cache hits apply during the same property commit.
 	 * Only replies for the latest source assignment apply, including when a name
 	 * is reused. Stage removal does not cancel requests; clear/change source to
 	 * invalidate pending replies. Textures are never disposed by Image;

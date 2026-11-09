@@ -42,7 +42,7 @@ when the project needs them; retain existing startup files in older projects.
 ```text
 src/
   Main.ts                         startup and top-level composition
-  StyleManager.ts, AssetAdapter.ts, ...  existing startup services
+  StyleManager.ts, ...                  existing startup services
   game/                           game state, rules and round ownership
   scenes/                         scene controllers; connect model and UI
   services/                       persistence, networking and other services
@@ -141,7 +141,8 @@ generated declarations. Correct those inputs instead of editing `.kurot/`.
   in runtime TS and loaded fonts remain application responsibilities; UI does
   not load style.json itself or implement live theme switching.
 - Reference registered atlas frames such as `kui.button_up`. Preserve the
-  project's AssetAdapter, preload group and density metadata. Manifest sheet
+  project's preload group and density metadata. Use the [default asset adapter](asset-adapter.md)
+  unless the project defines its own naming or loading rules. Manifest sheet
   subkeys are metadata objects, not legacy comma-separated strings.
 
 ## 5. Wait for startup and own teardown

@@ -4,6 +4,15 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.2.0 — 2026-11-09
+
+- DefaultAssetAdapter uses Core's Resource cache for named images, sheet frames
+  and URLs. Cached textures return synchronously, including when a List rebuilds
+  its rows; failures complete once with undefined. The adapter accepts a scoped
+  Resource. Custom adapters and Image's protection against stale replies remain
+  unchanged. Full frame and group sharing requires Core >= 3.3.0; the supported Core
+  peer stays at ^3.2.1 with basic loading on older versions.
+
 ## 5.1.5 — 2026-11-09
 
 - Scrolling preserves the original bubbling `TOUCH_END`, so outer gesture

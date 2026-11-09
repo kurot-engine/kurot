@@ -42,6 +42,7 @@ export class ResourceLoader {
 	private activeCount = 0;
 	private totalCount = 0;
 	private completedCount = 0;
+	private flights = new WeakMap<AnalyzerBase, Map<string, Promise<ResourceItem>>>();
 
 	// ── Public methods ─────────────────────────────────────────────────────────
 
@@ -50,6 +51,45 @@ export class ResourceLoader {
 	 */
 	public registerAnalyzer(type: string, analyzer: AnalyzerBase): void {
 		this.analyzerMap.set(type, analyzer);
+	}
+
+	/**
+	 * Load a single owning item without scheduling a batch. Concurrent callers
+	 * of this loader share analyzer work by resource name, including batch loads.
+	 * A settled request is removed before callers resume, so failures can retry.
+	 */
+	public loadFile(item: ResourceItem): Promise<ResourceItem> {
+		const analyzer = this.analyzerMap.get(item.type);
+		if (!analyzer) {
+			return Promise.reject(new Error(`No analyzer registered for type "${item.type}".`));
+		}
+		let files = this.flights.get(analyzer);
+		if (!files) {
+			files = new Map();
+			this.flights.set(analyzer, files);
+		}
+		let flight = files.get(item.name);
+		if (!flight) {
+			// Install before invoking even a synchronous or reentrant custom analyzer.
+			const ownerFiles = files;
+			let start!: () => void;
+			const work = new Promise<ResourceItem>((resolve, reject) => {
+				start = () => {
+					try {
+						resolve(analyzer.loadFile(item));
+					} catch (error) {
+						reject(error);
+					}
+				};
+			});
+			flight = work.finally(() => ownerFiles.delete(item.name));
+			files.set(item.name, flight);
+			start();
+		}
+		return flight.then(result => {
+			item.loaded = result.loaded;
+			return item;
+		});
 	}
 
 	/**
@@ -79,6 +119,7 @@ export class ResourceLoader {
 	 */
 	public abort(): void {
 		this.generation++;
+		this.flights = new WeakMap();
 		this.pendingList = [];
 		this.loadingList = [];
 		this.activeCount = 0;
@@ -111,23 +152,7 @@ export class ResourceLoader {
 
 	private loadItem(item: ResourceItem): void {
 		const generation = this.generation;
-		const analyzer = this.analyzerMap.get(item.type);
-		if (!analyzer) {
-			item.loaded = false;
-			this.finishItem(item, generation);
-			return;
-		}
-
-		let result: Promise<ResourceItem>;
-		try {
-			result = analyzer.loadFile(item);
-		} catch {
-			item.loaded = false;
-			this.finishItem(item, generation);
-			return;
-		}
-
-		result.then(
+		this.loadFile(item).then(
 			r => {
 				this.finishItem(r, generation);
 			},

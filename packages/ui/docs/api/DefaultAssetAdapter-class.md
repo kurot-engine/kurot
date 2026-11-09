@@ -1,12 +1,13 @@
 # DefaultAssetAdapter
 
-Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class DefaultAssetAdapter implements IAssetAdapter
 ```
 
-Loads image assets as textures with `ImageLoader`.
+Resolves manifest names, sheet frames and image URLs through one Core
+Resource. Cache hits complete synchronously; textures are borrowed.
 
 Related types: [IAssetAdapter](IAssetAdapter-interface.md).
 

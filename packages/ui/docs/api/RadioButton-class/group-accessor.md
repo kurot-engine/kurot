@@ -1,6 +1,6 @@
 # group
 
-Package: `@kurot/ui@5.1.5`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get group(): RadioButtonGroup | undefined;

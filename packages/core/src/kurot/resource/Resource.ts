@@ -9,6 +9,7 @@ import { TextAnalyzer } from './analyzers/TextAnalyzer.js';
 import { SoundAnalyzer } from './analyzers/SoundAnalyzer.js';
 import { FontAnalyzer } from './analyzers/FontAnalyzer.js';
 import { SheetAnalyzer } from './analyzers/SheetAnalyzer.js';
+import { SpriteSheet } from '../display/texture/SpriteSheet.js';
 import { HttpRequest } from '../net/HttpRequest.js';
 import { HttpResponseType } from '../net/HttpResponseType.js';
 import { Event } from '../events/Event.js';
@@ -75,8 +76,8 @@ export class Resource {
 	/**
 	 * Add a resource definition directly (without a config file).
 	 */
-	public addResource(def: { name: string; url: string; type: string }): void {
-		this.config.addItem(def as ResourceConfigEntry);
+	public addResource(def: Pick<ResourceConfigEntry, 'name' | 'url' | 'type' | 'subkeys'>): void {
+		this.config.addItem(def);
 	}
 
 	// ── Group loading ────────────────────────────────────────────────────────
@@ -130,26 +131,47 @@ export class Resource {
 	 * parameter describes expected data; it does not validate downloaded JSON.
 	 */
 	public async load<T = unknown>(name: string): Promise<T> {
-		const cached = this.get<T>(name);
-		if (cached !== undefined) return cached;
+		return this.loadSource<T>(name);
+	}
 
-		const item = this.config.getResourceItem(name);
+	/**
+	 * Return the owning registered item for a name or sheet frame, without
+	 * loading it. Unregistered URL sources have no manifest definition.
+	 */
+	public getResourceItem(source: string): ResourceItem | undefined {
+		return this.config.getResourceItem(source);
+	}
+
+	/**
+	 * Load a name or frame through its registered owner. If no definition
+	 * exists and urlType is supplied, load the exact source as a URL using
+	 * that analyzer. get(), destroy() and concurrent requests use that same
+	 * source, independent of transport version parameters. A declared resource
+	 * failure never falls back to fetching its name as a URL.
+	 */
+	public async loadSource<T = unknown>(name: string, urlType?: string): Promise<T> {
+		const cached = this.get<T>(name);
+		if (cached !== undefined) {
+			return cached;
+		}
+
+		const item = this.getResourceItem(name) ?? (urlType && name ? new ResourceItem(name, name, urlType) : undefined);
 		if (!item) {
 			throw new Error(`Resource "${name}" not found in config.`);
 		}
 
-		const analyzer = this.getAnalyzer(item.type);
-		if (!analyzer) {
-			throw new Error(`No analyzer registered for type "${item.type}".`);
+		if (item.name === name || this.get(item.name) === undefined) {
+			const result = await this.loader.loadFile(item);
+			if (!result.loaded) {
+				throw new Error(`Failed to load resource "${name}" from "${item.url}".`);
+			}
+			this.loadedNames.add(item.name);
 		}
-
-		const result = await analyzer.loadFile(item);
-		if (!result.loaded) {
-			throw new Error(`Failed to load resource "${name}" from "${item.url}".`);
+		const value = this.get<T>(name);
+		if (value === undefined) {
+			throw new Error(`Resource "${name}" not found in loaded "${item.name}".`);
 		}
-
-		this.loadedNames.add(item.name);
-		return this.get<T>(name)!;
+		return value;
 	}
 
 	// ── Cache access ─────────────────────────────────────────────────────────
@@ -158,6 +180,29 @@ export class Resource {
 	 * Get a cached resource synchronously. Returns undefined if not loaded.
 	 */
 	public get<T = unknown>(name: string): T | undefined {
+		const item = this.config.resolveEntry(name);
+		if (item) {
+			const analyzer = this.analyzerMap.get(item.type);
+			if (item.url === name && !this.config.hasKey(name)) {
+				return analyzer?.getRes<T>(item.name);
+			}
+			if (item.type === ResourceType.Sheet && item.name !== name) {
+				const sheet = analyzer?.getRes(item.name);
+				if (sheet instanceof SpriteSheet) {
+					// A manifest subkey can itself contain dots or match another sheet's frame.
+					const bare = this.config.hasKey(name);
+					if (bare && analyzer?.getRes(name) === undefined) {
+						return undefined;
+					}
+					const frame = bare ? name : name.slice(item.name.length + 1);
+					return sheet.getTexture(frame) as T | undefined;
+				}
+				if (sheet === undefined) {
+					return undefined;
+				}
+			}
+			return analyzer?.getRes<T>(name);
+		}
 		for (const analyzer of this.analyzerMap.values()) {
 			const data = analyzer.getRes<T>(name);
 			if (data !== undefined) return data;
@@ -169,10 +214,7 @@ export class Resource {
 	 * Check if a resource is loaded and cached.
 	 */
 	public hasRes(name: string): boolean {
-		for (const analyzer of this.analyzerMap.values()) {
-			if (analyzer.hasRes(name)) return true;
-		}
-		return false;
+		return this.get(name) !== undefined;
 	}
 
 	/**
@@ -198,6 +240,10 @@ export class Resource {
 	 * Callers sharing the entry must coordinate ownership before destroying it.
 	 */
 	public destroy(name: string): boolean {
+		const item = this.config.resolveEntry(name);
+		if (item?.url === name && !this.config.hasKey(name)) {
+			name = item.name;
+		}
 		for (const analyzer of this.analyzerMap.values()) {
 			if (analyzer.destroyRes(name)) {
 				this.loadedNames.delete(name);
@@ -418,10 +464,6 @@ export class Resource {
 				}
 			});
 		});
-	}
-
-	private getAnalyzer(type: string): AnalyzerBase | undefined {
-		return this.analyzerMap.get(type);
 	}
 
 	private isResourceLoaded(name: string): boolean {

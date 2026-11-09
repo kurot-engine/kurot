@@ -1,6 +1,6 @@
 # FIXED_WIDTH
 
-Package: `@kurot/core@3.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 readonly FIXED_WIDTH: "fixedWidth";

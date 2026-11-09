@@ -7,6 +7,13 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 5.1.2 — 2026-11-09
+
+- The game starter uses UI's resource-aware default image adapter instead of
+  installing a project-specific copy. Manifest, theme and preload startup order
+  is unchanged. Use UI >= 5.2.0 with Core >= 3.3.0 for complete resource
+  resolution and shared pending loads. Existing projects are not rewritten.
+
 ## 5.1.1 — 2026-11-08
 
 The published [npm package](https://www.npmjs.com/package/@kurot/cli/v/5.1.1) matches the tested archive byte for byte. Its `gitHead` and the annotated release tag identify the same source. See the [publication record](../../CHANGELOG.md#2026-11-08--cli-511-published-and-verified) for the integrity and commit.

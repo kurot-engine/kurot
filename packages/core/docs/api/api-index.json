@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.2.3",
+  "version": "3.3.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -8790,6 +8790,12 @@
           "inherited": false
         },
         {
+          "name": "getResourceItem",
+          "file": "Resource-class/getResourceItem-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "hasGroup",
           "file": "Resource-class/hasGroup-method.md",
           "protected": false,
@@ -8816,6 +8822,12 @@
         {
           "name": "loadGroup",
           "file": "Resource-class/loadGroup-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "loadSource",
+          "file": "Resource-class/loadSource-method.md",
           "protected": false,
           "inherited": false
         },
@@ -8888,6 +8900,12 @@
           "inherited": false
         },
         {
+          "name": "getResourceItem",
+          "file": "resource-variable/getResourceItem-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "hasGroup",
           "file": "resource-variable/hasGroup-method.md",
           "protected": false,
@@ -8914,6 +8932,12 @@
         {
           "name": "loadGroup",
           "file": "resource-variable/loadGroup-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "loadSource",
+          "file": "resource-variable/loadSource-method.md",
           "protected": false,
           "inherited": false
         },
@@ -9260,6 +9284,12 @@
         {
           "name": "abort",
           "file": "ResourceLoader-class/abort-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "loadFile",
+          "file": "ResourceLoader-class/loadFile-method.md",
           "protected": false,
           "inherited": false
         },

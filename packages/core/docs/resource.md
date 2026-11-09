@@ -1,5 +1,7 @@
 # Resource Manager
 
+`Resource.getResourceItem` and `Resource.loadSource` are available from Core 3.3.0.
+
 ## Overview
 
 Kurot's resource manager is an asynchronous loading and caching system adapted
@@ -90,6 +92,7 @@ await resource.loadGroup('game', 0, (loaded, total) => {
 | -------------------------- | -------------------------------------------------------------- |
 | `loadConfig(url, folder?)` | Load and parse resource.json; `folder` prefixes resource URLs. |
 | `addResource(def)`         | Add a resource definition `{ name, url, type }` dynamically.   |
+| `getResourceItem(source)`  | Return the owning manifest item for a name, unique URL or sheet frame; unregistered URLs return undefined. |
 
 #### Loading
 
@@ -97,6 +100,21 @@ await resource.loadGroup('game', 0, (loaded, total) => {
 | ----------------------------------------- | ----------------------------------------------------------------- |
 | `loadGroup(name, priority?, onProgress?)` | Load a group and return a promise; skip resources already loaded. |
 | `load<T>(name)`                           | Load a single resource and return its cached data.                |
+| `loadSource<T>(source, urlType?)`         | Load a known resource or frame; use the specified analyzer for an unregistered URL. |
+
+Names and declared subkeys take precedence. A unique literal manifest URL
+resolves to its owning item; `sheet.frame` resolves through the named sheet,
+including on a cold cache. For a URL with no definition, the original string
+is both the request URL and the cache key. Version queries introduced by the
+transport never change this key. Core does not normalize distinct URL
+spellings. A configured load failure or missing frame rejects rather than
+falling back to the name as a separate network URL.
+
+Concurrent group, direct and frame requests share analyzer work for the
+same owning item within a Resource. Failures can retry; the analyzer owns
+the resulting data. Use `get(source)` for a synchronous read; an async
+`loadSource()` returns a promise even on a cache hit. Destroy an unregistered
+URL by the same string, a named resource by name, and a sheet by its owner.
 
 #### Cache and lookup
 

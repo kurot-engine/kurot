@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Package version: **3.2.3** (published on npm).
+for browser games. Package version: **3.3.0**.
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -21,6 +21,14 @@ and docs without requiring the engine source.
 When leaving a game view, destroy its player before reusing the canvas. Destruction detaches WebGL context listeners and releases player-owned GPU storage; the application still owns its decoded pixels. Aborting a ResourceLoader batch ends its queue notifications. An already-running analyzer may finish its own work, but cannot settle or retry the next batch.
 
 Finite Web Audio repeats end on the scheduled output frame, including when the decoded sound's length cannot be represented exactly in seconds. See [audio playback](docs/audio-playback.md) for offset and loop-count behavior.
+
+## Shared resource loading
+
+Core 3.3 adds `Resource.getResourceItem` and `Resource.loadSource`. Names,
+declared sheet frames and unambiguous manifest URLs resolve to one owner;
+unregistered URLs use their original string as the cache key. Group and direct
+loads share pending analyzer work. See [resource loading](docs/resource.md)
+for retries, cache lifetime and URL versioning.
 
 ## Stable text layout
 
@@ -81,7 +89,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.2.3
+pnpm add @kurot/core@^3.3.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

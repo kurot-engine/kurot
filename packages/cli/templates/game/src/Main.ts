@@ -6,9 +6,8 @@
  * Lifecycle: constructor → ADDED_TO_STAGE → $onAddToStage → runGame → load → createGameScene → startAnimation
  */
 import { resolveResourceUrl, createPlayer, Event, resource, TextField } from '@kurot/core';
-import { Button, Label, Rect, Theme, UILayer, setAssetAdapter } from '@kurot/ui';
+import { Button, Label, Rect, Theme, UILayer } from '@kurot/ui';
 import { Tween } from '@kurot/game';
-import { AssetAdapter } from '@/AssetAdapter';
 import { LifecycleHandler } from '@/LifecycleHandler';
 import { Preloader } from '@/Preloader';
 import { LocaleManager } from '@/LocaleManager';
@@ -24,7 +23,6 @@ class Main extends UILayer {
 		const stage = this.stage;
 		if (!stage) return;
 
-		setAssetAdapter(new AssetAdapter());
 		LifecycleHandler.init(stage);
 
 		void this._runGame().catch(error => {

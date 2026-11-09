@@ -4,6 +4,16 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.3.0 — 2026-11-09
+
+- Resolve manifest names, unambiguous manifest URLs and sheet frames to their
+  owning entry. `Resource.loadSource(source, urlType)` also loads unregistered
+  URLs into the same cache used by `get` and `destroy`. Concurrent group,
+  direct and frame requests share one analyzer request; failures remain retryable.
+- Preserve a frame's manifest ownership when multiple sheets use the same name,
+  including after one sheet is destroyed. Invalid sheet definitions reject without
+  leaving a pending request or partial frame cache.
+
 ## 3.2.3 — 2026-11-08
 
 Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.
