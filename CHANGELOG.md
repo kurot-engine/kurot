@@ -5,6 +5,41 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-11 — UI 5.2.3 published and verified
+
+- Verify [npm @kurot/ui@5.2.3](https://www.npmjs.com/package/@kurot/ui/v/5.2.3)
+  and its `latest` tag. The downloaded archive passes registry SHA-512 integrity
+  and SHA-1 shasum checks; all 5,722 files match the tested local package byte
+  for byte, including ProgressBar JavaScript, declarations and API documentation.
+- Registry integrity:
+  `sha512-hqxVIWUs2Ov4J4RtkRt9H6JfA89b+cgffxINh6Me9ZLq53m3SgeEqswSbm06wcoG3fSWSncyYn9cZINkHwyIMg==`.
+  SHA-1: `767dd9063d9f8ef8d0030fe1b8bfdbe20f92d1ce`.
+- npm `gitHead` is `558802c6e8dac2a0f9d335f1835d798abcb3c287`, the preceding
+  Core commit, and does not include the then-uncommitted UI release changes.
+  The complete archive comparison establishes the matching implementation;
+  the following source/documentation commit records those changes without
+  altering the published archive or its metadata.
+- Mark the UI README and package CHANGELOG as published. The matching code
+  passed the UI build, 668 unit tests, 52 Chromium cases across Canvas and
+  WebGL 1/2, and 22 API examples against built and packed declarations. Core
+  peer remains `^3.2.1`; other SDK versions and consumer dependencies stay
+  unchanged. Publication-status documentation is updated only in the repository.
+
+## 2026-11-11 — UI 5.2.3 release preparation
+
+- Prepare only `@kurot/ui` for bounded ProgressBar animation targets/displays,
+  exact fractional completion and default label precision. Repeated assignments,
+  range changes, zero spans and immediate updates retain valid progress; public
+  value reads, custom formatters, skin parts and change-event rules are preserved.
+- Update the UI manifest, README, context/architecture versions, package map and
+  generated API references. Core peer `^3.2.1` remains unchanged. ui-runtime's
+  `^5.0.0` ranges accept the patch and need no release; CLI starters use `latest`.
+  Existing examples/application locks may adopt it after publication; exact pins
+  need an explicit update. Other SDK versions and consumer locks are unchanged.
+- The implementation passes all 668 UI unit tests and 52 Chromium cases,
+  including skin-bound ProgressBar pixel checks in Canvas and WebGL 1/2.
+  This records source preparation; npm publication is verified separately.
+
 ## 2026-11-10 — Examples and Templates adopt Core 3.5.1
 
 - Verify npm latest and adopt Core 3.5.1 in demo, game and star-catcher plus

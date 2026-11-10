@@ -4,6 +4,24 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.2.3 — 2026-11-11
+
+The published [npm package](https://www.npmjs.com/package/@kurot/ui/v/5.2.3)
+is marked `latest`. All 5,722 archived files match the tested local package
+byte for byte; downloaded SHA-512 and SHA-1 match the registry. npm `gitHead`
+still points to the preceding commit, so artifact comparison establishes the
+matching implementation. See the [publication record](../../CHANGELOG.md#2026-11-11--ui-523-published-and-verified).
+
+- Keep ProgressBar animation displays and targets within changed bounds. Retarget
+  rapid assignments from the current display, stop stale animations for immediate
+  updates, handle zero ranges and finish at the exact fractional endpoint.
+- Format default animation labels using authored value/range precision instead
+  of raw interpolation tails. Numeric values, custom labelFunction callbacks and
+  label-method overrides retain full precision. Public value reads continue to
+  follow the display; skins and existing change-event behavior remain unchanged.
+
+Core peer remains `^3.2.1`; this patch requires no KUI or dependent SDK migration.
+
 ## 5.2.2 — 2026-11-10
 
 - Fix Label and RichLabel automatic width after long → short → long content

@@ -26,11 +26,13 @@ export class ProgressBar extends Component {
 
 	private _minimum = 0;
 	private _maximum = 100;
+	// Public value follows the display; the requested endpoint stays separate.
 	private _value = 0;
+	private _targetValue = 0;
 	private _direction = Direction.LTR;
 	private _labelFunction?: (value: number, maximum: number) => string;
 	private _slideDuration = 500;
-	private _animationValue = 0;
+	private _animationLabelPrecision = 0;
 	private readonly _animation: Animation;
 
 	// ── Constructor ───────────────────────────────────────────────────────
@@ -38,44 +40,68 @@ export class ProgressBar extends Component {
 	public constructor() {
 		super();
 		this._animation = new Animation(this._onAnimationUpdate);
+		this._animation.endFunction = this._onAnimationEnd;
 	}
 
 	// ── Getters / Setters ─────────────────────────────────────────────────
 
+	/**
+	 * Lower bound. Changes constrain both the current display and its target
+	 * without dispatching a change event.
+	 */
 	public get minimum(): number {
 		return this._minimum;
 	}
 
 	public set minimum(value: number) {
-		if (this._minimum === value) return;
+		if (this._minimum === value) {
+			return;
+		}
 		this._minimum = value;
-		if (this._value < value) this._value = value;
-		this.invalidateDisplayList();
+		this._updateRange();
 	}
 
+	/**
+	 * Upper bound. Changes constrain both the current display and its target
+	 * without dispatching a change event.
+	 */
 	public get maximum(): number {
 		return this._maximum;
 	}
 
 	public set maximum(value: number) {
-		if (this._maximum === value) return;
+		if (this._maximum === value) {
+			return;
+		}
 		this._maximum = value;
-		if (this._value > value) this._value = value;
-		this.invalidateDisplayList();
+		this._updateRange();
 	}
 
+	/**
+	 * Current displayed progress. Setting it requests a bounded target; animated
+	 * reads follow the display until it reaches that exact target.
+	 * Distinct immediate assignments dispatch CHANGE; animation updates do not.
+	 */
 	public get value(): number {
 		return this._value;
 	}
 
 	public set value(val: number) {
-		val = Math.max(this._minimum, Math.min(this._maximum, val));
-		if (this._value === val) return;
-		if (this._slideDuration > 0 && this.stage) {
-			this._startSlide(val);
+		val = this._clampValue(val);
+		const animate = this._slideDuration > 0 && !!this.stage;
+		if (this._targetValue === val && (animate || this._value === val)) {
+			return;
+		}
+		this._targetValue = val;
+		if (animate) {
+			this._startSlide();
 		} else {
+			const changed = this._value !== val;
+			this._animation.stop();
 			this._applyValue(val);
-			this.dispatchEventWith(Event.CHANGE);
+			if (changed) {
+				this.dispatchEventWith(Event.CHANGE);
+			}
 		}
 	}
 
@@ -89,6 +115,10 @@ export class ProgressBar extends Component {
 		this.invalidateDisplayList();
 	}
 
+	/**
+	 * Formats the unrounded displayed value and maximum. The default animated
+	 * label uses the decimal precision of authored values and bounds.
+	 */
 	public get labelFunction(): ((value: number, maximum: number) => string) | undefined {
 		return this._labelFunction;
 	}
@@ -102,6 +132,7 @@ export class ProgressBar extends Component {
 	/**
 	 * Duration in milliseconds of the value-change slide animation.
 	 * A value of `0` applies changes immediately.
+	 * Changing it during an animation settles the current requested target.
 	 *
 	 * @default 500
 	 */
@@ -115,15 +146,19 @@ export class ProgressBar extends Component {
 		this._slideDuration = value;
 		if (this._animation.isPlaying) {
 			this._animation.stop();
-			this._applyValue(this._animation.to);
+			this._applyValue(this._targetValue);
 		}
 	}
 
+	/**
+	 * Displayed fraction clamped to [0, 1], or zero when maximum <= minimum.
+	 */
 	public get ratio(): number {
-		const v = this._animation.isPlaying ? this._animationValue : this._value;
 		const range = this._maximum - this._minimum;
-		if (range <= 0) return 0;
-		return (v - this._minimum) / range;
+		if (range <= 0) {
+			return 0;
+		}
+		return Math.max(0, Math.min(1, (this._value - this._minimum) / range));
 	}
 
 	// ── Override methods ──────────────────────────────────────────────────
@@ -162,8 +197,7 @@ export class ProgressBar extends Component {
 		}
 
 		if (this.labelDisplay) {
-			const v = this._animation.isPlaying ? this._animationValue : this._value;
-			this.labelDisplay.text = this._valueToLabel(v, this._maximum);
+			this.labelDisplay.text = this._valueToLabel(this._value, this._maximum);
 		}
 	}
 
@@ -183,10 +217,15 @@ export class ProgressBar extends Component {
 	 * Converts the current value to display text.
 	 * Override this method to customize the label format.
 	 * The default format is `"value / maximum"`.
+	 * Arguments retain full numeric precision; only the default text is rounded.
 	 */
 	protected _valueToLabel(value: number, maximum: number): string {
 		if (this._labelFunction) {
 			return this._labelFunction(value, maximum);
+		}
+		// toFixed supports up to 100 places; smaller values keep exponent notation.
+		if (this._animation.isPlaying && this._animationLabelPrecision <= 100) {
+			value = Number(value.toFixed(this._animationLabelPrecision));
 		}
 		return value + ' / ' + maximum;
 	}
@@ -194,27 +233,56 @@ export class ProgressBar extends Component {
 	// ── Private methods ───────────────────────────────────────────────────
 
 	private _applyValue(val: number): void {
-		this._value = val;
-		this._animationValue = val;
+		this._value = this._clampValue(val);
 		this.invalidateDisplayList();
 	}
 
-	private _startSlide(targetValue: number): void {
+	private _clampValue(value: number): number {
+		return Math.max(this._minimum, Math.min(this._maximum, value));
+	}
+
+	private _updateRange(): void {
+		this._targetValue = this._clampValue(this._targetValue);
+		this._applyValue(this._value);
 		if (this._animation.isPlaying) {
-			this._animation.stop();
+			this._startSlide();
 		}
+	}
+
+	private _startSlide(): void {
+		// A retargeted interpolation must not introduce artificial label precision.
+		const fromPrecision = this._animation.isPlaying ? this._animationLabelPrecision : this._getLabelPrecision(this._value);
+		this._animationLabelPrecision = Math.max(
+			fromPrecision,
+			this._getLabelPrecision(this._targetValue),
+			this._getLabelPrecision(this._minimum),
+			this._getLabelPrecision(this._maximum),
+		);
+		this._animation.stop();
 		const range = this._maximum - this._minimum;
-		const distance = Math.abs(targetValue - this._animationValue);
+		const distance = Math.abs(this._targetValue - this._value);
 		const duration = range > 0 ? this._slideDuration * (distance / range) : 0;
-		this._animation.duration = duration === Infinity ? 0 : duration;
-		this._animation.from = this._animationValue;
-		this._animation.to = targetValue;
+		if (duration <= 0 || !Number.isFinite(duration)) {
+			this._applyValue(this._targetValue);
+			return;
+		}
+		this._animation.duration = duration;
+		this._animation.from = this._value;
+		this._animation.to = this._targetValue;
 		this._animation.play();
 	}
 
+	private _getLabelPrecision(value: number): number {
+		const [coefficient, exponent = '0'] = value.toString().split('e');
+		const fractionDigits = coefficient.split('.')[1]?.length ?? 0;
+		return Math.max(0, fractionDigits - Number(exponent));
+	}
+
 	private _onAnimationUpdate = (_anim: Animation): void => {
-		this._animationValue = _anim.currentValue;
-		this._value = _anim.currentValue;
-		this.invalidateDisplayList();
+		this._applyValue(_anim.currentValue);
+	};
+
+	private _onAnimationEnd = (): void => {
+		this._applyValue(this._targetValue);
 	};
 }

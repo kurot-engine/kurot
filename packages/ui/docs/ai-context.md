@@ -8,7 +8,7 @@ For named textures, atlas frames, URL caches and ownership, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.2.2`,
+This maintainer map covers `@kurot/ui@5.2.3`,
 with Core peer **^3.2.1** for stable text frames and native BackdropBlur.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
@@ -19,6 +19,8 @@ Source root: `src/kurot/`. Public API: `src/index.ts` is a flat re-export of
 
 UI 5 uses callback-owned Animation/Watcher/Binding APIs and Core 3's
 callback-only ticker. Read [callback ownership](callbacks.md).
+For ProgressBar targets, displayed values, label precision and events, read
+[progress animation](progress-bar.md).
 
 ## 1. Directory map
 

@@ -1,6 +1,6 @@
 # static FOCUS_OUT
 
-Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 static readonly FOCUS_OUT: "focusOut";

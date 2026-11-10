@@ -1,9 +1,9 @@
 # ratio
 
-Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 get ratio(): number;
 ```
 
-The declaration above is the available reference; no additional behavioral JSDoc is present.
+Displayed fraction clamped to [0, 1], or zero when maximum <= minimum.

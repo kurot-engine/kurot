@@ -1,7 +1,7 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Package version: **5.2.2**.
+Kurot games. Published package version: **5.2.3**.
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -14,6 +14,11 @@ Use Core **^3.3.0** for complete on-demand frame loading, manifest URL aliases
 and shared pending group requests; older supported peers retain basic loading.
 See [image sources and cache ownership](docs/asset-adapter.md) for synchronous
 cache hits, scoped resources and custom project adapters.
+
+ProgressBar keeps displayed progress and its pending target within the current
+range. Default animated labels suppress floating-point noise while custom
+formatters retain full precision. See [progress values and animation](docs/progress-bar.md)
+for range changes, fractional values and the existing event contract.
 
 ## Background blur
 
@@ -63,7 +68,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.2.2 @kurot/core@^3.3.0
+pnpm add @kurot/ui@^5.2.3 @kurot/core@^3.3.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.

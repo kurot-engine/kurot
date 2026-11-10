@@ -3,7 +3,7 @@
 For production game UI and project directories, use
 [standard authoring](ui-authoring.md); this document explains engine internals.
 
-> Package version: 5.2.2, with Core peer ^3.2.1.
+> Package version: 5.2.3, with Core peer ^3.2.1.
 > No local Core override is needed for builds or centered-flip checks.
 > See [CHANGELOG.md](../CHANGELOG.md) for release-by-release changes.
 > The [AI context map](./ai-context.md) provides directory, behavior, terminology

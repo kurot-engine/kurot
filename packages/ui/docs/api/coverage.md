@@ -1,10 +1,10 @@
 # @kurot/ui API coverage
 
-Version: 5.2.2. Public export names: 95. Public/protected member entries: 5149.
+Version: 5.2.3. Public export names: 95. Public/protected member entries: 5149.
 
 Missing declaration references: **0**. Inventory is independently read through the TypeScript checker.
 
-Entries without additional behavioral JSDoc: **355** (see [machine report](coverage.json)).
+Entries without additional behavioral JSDoc: **350** (see [machine report](coverage.json)).
 
 Complete declaration coverage does not imply every behavior has prose documentation.
 Simple declarations may be self-explanatory; the comment inventory keeps remaining gaps explicit.

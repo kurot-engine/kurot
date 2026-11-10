@@ -1,6 +1,6 @@
 # hitTestPoint
 
-Package: `@kurot/ui@5.2.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
 
 ```ts
 hitTestPoint(x: number, y: number, shapeFlag?: boolean): boolean;
