@@ -5,6 +5,25 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-10 — Core 3.5.0 published and verified
+
+- [npm @kurot/core@3.5.0](https://www.npmjs.com/package/@kurot/core/v/3.5.0)
+  is published and marked `latest`. The downloaded archive is byte-identical to
+  the tested clean-checkout candidate: 692,209 bytes, 3,331 files. Both the
+  registry SHA-512 integrity and SHA-1 shasum match the downloaded bytes.
+- npm `gitHead` and the annotated tag `@kurot/core@3.5.0` identify the same
+  [release source](https://github.com/kurot-engine/kurot/commit/d6a2f18769ab2d3065752d450a70e74bf566cb18).
+  Publication documentation is committed afterward and does not change the
+  immutable published archive.
+- The matching candidate passed the clean Core build and all 1,185 tests,
+  20 GPU cache checks against the actual archive, and all 22 API examples against
+  built and packed declarations. The feature also passed UI's 641 tests, 167
+  visual checks and 20 GPU checks on M1 Max Metal hardware. The two skipped
+  visual cases require an external MP3 fixture; existing golden images remain
+  unchanged. No consumer dependencies or application code are changed here.
+- Verified integrity:
+  `sha512-fdMjvJw3v0G93WCWJPSsA7+I7Xz78iZTuyz0GVq28EQZfSfzwO3TQlmRMnyuB8G6T0ph92iKZx8uwBRTVN83yw==`.
+
 ## 2026-11-10 — Core 3.5.0 release preparation
 
 - Prepare only `@kurot/core` for WebGL GPU subtree caching. Existing

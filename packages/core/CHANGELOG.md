@@ -6,6 +6,12 @@ All notable changes to `@kurot/core` are documented here.
 
 ## 3.5.0 — 2026-11-10
 
+The published [npm package](https://www.npmjs.com/package/@kurot/core/v/3.5.0)
+matches the tested archive byte for byte, including SHA-512 integrity. Its
+`gitHead` and annotated release tag identify the same source. See the
+[publication record](../../CHANGELOG.md#2026-11-10--core-350-published-and-verified)
+for the integrity and commit.
+
 - Render WebGL `cacheAsBitmap` / `cacheAsTexture` subtrees into persistent GPU
   framebuffers, preserving the public API and Canvas fallback. Reuse unchanged
   source textures; include descendant GPU effects and nested cache captures.
