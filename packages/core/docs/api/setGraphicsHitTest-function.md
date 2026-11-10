@@ -1,6 +1,6 @@
 # setGraphicsHitTest
 
-Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.2`. Generated from public declarations and JSDoc.
 
 ```ts
 setGraphicsHitTest(fn: (graphics: Graphics, localX: number, localY: number) => boolean): void;

@@ -1,6 +1,6 @@
 # updateMaxTouches
 
-Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.2`. Generated from public declarations and JSDoc.
 
 ```ts
 updateMaxTouches(value: number): void;

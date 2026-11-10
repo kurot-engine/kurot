@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Source version: **3.5.1**. Publication is tracked in the
+for browser games. Source version: **3.5.2**. Publication is tracked in the
 [repository changelog](../../CHANGELOG.md).
 
 Start with the [game authoring guide](docs/game-authoring.md),
@@ -35,6 +35,12 @@ cache releases its GPU storage.
 Use Core >= 3.5.1 within 3.x for consecutive cache updates and cache-to-mask
 transitions: it includes the sampler-state and first-frame clearing corrections.
 Existing cache calls and Canvas fallback require no migration.
+
+Core >= 3.5.2 within 3.x also reuses unchanged text textures during ordinary
+WebGL drawing. Text content and style changes still refresh pixels; Canvas
+snapshots, masks and subtree caches retain independent update tracking. This
+optimization applies to native TextField and UI Label/RichLabel without enabling
+`cacheAsBitmap`. See [text layout](docs/text-layout.md#baselines-and-cached-metrics).
 
 Draw Calls include offscreen cache and effect work. Cache rebuilding therefore
 can increase that count while reducing Canvas work and uploads; measure render
@@ -129,7 +135,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.5.1
+pnpm add @kurot/core@^3.5.2
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

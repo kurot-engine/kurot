@@ -24,6 +24,38 @@ its changes in its own CHANGELOG.md.
   and scroll-tail checks, plus minified Canvas Slot KUI spin/skin/disposal checks.
   These use deterministic fixtures; temporary browser sessions and servers close.
 
+## 2026-11-11 — Core 3.5.2 release preparation
+
+- Prepare only `@kurot/core` for independent text-raster version tracking. Static
+  TextFields reuse their Canvas pixels and GPU uploads across ordinary frames;
+  Canvas snapshots cannot consume a pending GPU text update. Parent cache
+  invalidation, dimensions, resolution, context recovery and upload retry retain
+  their behavior. Native Label/RichLabel require no code migration.
+- Update the manifest, runtime engineVersion, README, current package documents,
+  version table and generated API references. Existing UI, Game, DragonBones,
+  ui-runtime and Spine peers accept this patch; development-lock adoption is
+  optional, with no dependent SDK release. CLI templates select `latest`.
+  Caret-based applications can update their locks; exact 3.5.1 pins in SAO,
+  Editor, Star Catcher, Card Booster and Skydive require explicit adoption.
+  Skia's ~3.2.3 and Studio's Core 2.x baselines remain separate compatibility
+  work. Consumer manifests and locks are unchanged by this release.
+- WebGL1/2 static-text raster/upload counts change from [1,1,1] to [1,0,0],
+  retaining one draw per frame. Ten targeted browser cases cover content/style,
+  movement/alpha, bounds/density, nested caches, text masks, Canvas snapshots,
+  upload failures and restoration. Label/RichLabel and shrink layout checks
+  assert zero text uploads during unchanged repeated layout.
+- In three M1 Max hardware trials, uncached scrolling rows reduce source
+  uploads from 1,060 to 8 over 120 frames, with CPU render mean 0.890 → 0.588 ms
+  and unchanged draws. FPS remains near 120. These fixture measurements do not
+  establish the complete SAO page's performance.
+- The isolated release source passes Core build and all 1,185 tests, UI build
+  and its 641 baseline tests, 187 Core browser checks and 49 UI browser checks.
+  Two Core cases require an external MP3 fixture and remain skipped. Strict
+  fixture checks, API completeness and all 22 built-declaration examples pass;
+  unrelated in-progress UI changes are excluded from this release source.
+- This records source preparation. npm publication, downloaded-archive integrity
+  verification and the annotated release tag follow publication.
+
 ## 2026-11-10 — Core 3.5.1 release preparation
 
 - Prepare only `@kurot/core` for complete multi-texture sampler mappings, explicit

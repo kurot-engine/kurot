@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
+import type {} from './text-auto-width-fixture.js';
 
 let browserBundle: string;
 test.use({ headless: true, viewport: { width: 360, height: 220 } });
@@ -110,6 +111,28 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 		expect(heightLimited[0].sample.renderedSize).toBeLessThan(30);
 		expect(heightLimited[1].sample.renderedSize).toBe(30);
 		expect(heightLimited[1].sample.width).toBeGreaterThan(heightLimited[0].sample.width);
+		if (backend !== 'canvas') {
+			const textureStats = await page.evaluate(() => {
+				const fixture = window.textAutoWidth;
+				fixture.setText('Prepare baseline');
+				fixture.paint();
+				return ['Specialty', 'Hi', 'Specialty'].map(text => {
+					fixture.setText(text);
+					fixture.resetTextureStats();
+					fixture.paint();
+					const changed = fixture.textureStats();
+					fixture.resetTextureStats();
+					for (let i = 0; i < 3; i++) {
+						fixture.paint();
+					}
+					return { changed, stable: fixture.textureStats() };
+				});
+			});
+			for (const stats of textureStats) {
+				expect(stats.changed).toEqual({ rasters: 3, uploads: 3 });
+				expect(stats.stable).toEqual({ rasters: 0, uploads: 0 });
+			}
+		}
 		await page.screenshot({ path: `test-results/text-auto-width-${backend}.png` });
 		expect(errors).toEqual([]);
 	});

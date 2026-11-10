@@ -103,6 +103,14 @@ and capture margins share cached layout data.
 Changing font/content/wrapping/spacing invalidates those metrics. Actual fonts
 and browser rasterization may vary across systems.
 
+In Core >= 3.5.2 within 3.x, WebGL text textures track their own uploaded content
+version, independently of display-tree dirty flags. Unchanged text reuses its raster and GPU texture across
+frames, positioning, alpha changes and repeated offscreen passes. Content,
+styling and input decoration changes refresh the pixels; viewport dimensions,
+raster resolution and context restoration also rebuild when needed. A Canvas
+snapshot cannot consume a pending GPU text update. Failed uploads remain retryable.
+This changes raster/upload work only, not measurement, wrapping or text placement.
+
 ## Independent measurement
 
 `textField.measureText(width = NaN)` measures complete content under a separate
@@ -171,6 +179,9 @@ hard separators and source offsets. TextVerticalLayout/TextMeasurement/TextStrok
 cover font-frame metrics, alignment, input rows, capture ink and font invalidation.
 Minified browser suites compare Canvas, WebGL 1 and WebGL 2 rendering, clips,
 link/input coordinates and outlines at different output resolutions.
+The `text-texture` browser cases count text rasters and Canvas-source uploads,
+including static frames, style/bounds changes, transforms, nested caches, masks,
+Canvas snapshots, upload retry and context restoration.
 Shared fixtures cover 31 languages with licensed, test-only font subsets. UI's
 stable-text and label-outline browser suites exercise those fonts through native
 Label measurement, fitting, repeated typewriter output and Scroller clipping.

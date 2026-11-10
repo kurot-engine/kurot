@@ -1,4 +1,4 @@
-import { Capabilities, Player, TextField } from '@kurot/core';
+import { CanvasRenderer, Capabilities, Player, TextField, WebGLRenderContext } from '@kurot/core';
 import { Group, Label, RichLabel } from '../../dist/index.js';
 
 interface TextSample {
@@ -19,6 +19,8 @@ declare global {
 			webgl: boolean;
 			paint(): { samples: TextSample[]; image: string; stable: boolean };
 			setText(text: string): void;
+			resetTextureStats(): void;
+			textureStats(): { rasters: number; uploads: number };
 		};
 	}
 }
@@ -64,10 +66,34 @@ labels[2].multiline = false;
 labels[2].textFit = 'shrink';
 labels[2].minFontSize = 12;
 
+let rasters = 0;
+let uploads = 0;
+const raster = CanvasRenderer.prototype.renderTextFieldToContext;
+CanvasRenderer.prototype.renderTextFieldToContext = function (...args) {
+	rasters++;
+	return raster.apply(this, args);
+};
+const create = WebGLRenderContext.prototype.createTexture;
+WebGLRenderContext.prototype.createTexture = function (...args) {
+	uploads++;
+	return create.apply(this, args);
+};
+const update = WebGLRenderContext.prototype.updateTexture;
+WebGLRenderContext.prototype.updateTexture = function (...args) {
+	uploads++;
+	return update.apply(this, args);
+};
+
 window.textAutoWidth = {
 	groups,
 	labels,
 	webgl: player.isWebGL,
+	resetTextureStats(): void {
+		rasters = uploads = 0;
+	},
+	textureStats(): { rasters: number; uploads: number } {
+		return { rasters, uploads };
+	},
 	setText(text): void {
 		labels[0].text = text;
 		labels[1].textFlow = [{ text: text.slice(0, 2), style: { textColor: 0xffaa33 } }, { text: text.slice(2) }];

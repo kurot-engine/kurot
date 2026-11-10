@@ -4,6 +4,24 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.5.2 — 2026-11-11
+
+Source release preparation; npm publication and artifact verification are
+recorded separately in the [repository changelog](../../CHANGELOG.md).
+
+- Reuse unchanged WebGL text rasters and textures across ordinary frames instead
+  of rerasterizing and uploading them on every draw. TextPipe tracks an uploaded
+  content version rather than the shared display dirty flag; placement/alpha
+  changes keep their textures, while content, styling, dimensions, resolution
+  and context restoration remain invalidation sources.
+- Preserve independent text updates when Canvas snapshots consume display-cache
+  dirty flags before GPU rendering. Commit texture versions only after upload
+  succeeds; retain cache-ancestor invalidation and the Canvas fallback.
+- Add WebGL1/2 raster/upload and pixel regressions for repeated frames,
+  content/style invalidation, effects, nested caches, snapshots and recovery.
+  Extend Label/RichLabel automatic-width and textFit browser checks to verify
+  unchanged layout frames reuse their text textures.
+
 ## 3.5.1 — 2026-11-10
 
 Source release preparation; npm publication and artifact verification are

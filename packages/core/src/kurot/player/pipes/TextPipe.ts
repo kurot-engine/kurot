@@ -23,6 +23,7 @@ interface TextCache {
 	canvasScaleX: number;
 	canvasScaleY: number;
 	contextVersion: number;
+	textRenderVersion: number;
 }
 
 /**
@@ -114,17 +115,8 @@ export class TextPipe implements RenderPipe<TextField> {
 			this._registryTokens.delete(tf);
 			cache.texture = undefined;
 			cache.contextVersion = buffer.context.contextVersion;
-			tf.$renderDirty = true;
 		}
-		let scaleChanged = false;
-
-		if (cache) {
-			scaleChanged = cache.canvasScaleX !== canvasScaleX || cache.canvasScaleY !== canvasScaleY;
-			if (scaleChanged) {
-				cache.canvasScaleX = canvasScaleX;
-				cache.canvasScaleY = canvasScaleY;
-			}
-		} else {
+		if (!cache) {
 			cache = {
 				canvasBuffer: new CanvasBuffer(pixelW, pixelH),
 				texture: undefined,
@@ -133,12 +125,17 @@ export class TextPipe implements RenderPipe<TextField> {
 				canvasScaleX,
 				canvasScaleY,
 				contextVersion: buffer.context.contextVersion,
+				textRenderVersion: -1,
 			};
 			this._cache.set(tf, cache);
 		}
 
+		const textRenderVersion = tf.$textRenderVersion;
 		const needsRebuild =
-			tf.$renderDirty || cache.textureWidth !== pixelW || cache.textureHeight !== pixelH || scaleChanged;
+			!cache.texture ||
+			cache.textRenderVersion !== textRenderVersion ||
+			cache.textureWidth !== pixelW || cache.textureHeight !== pixelH ||
+			cache.canvasScaleX !== canvasScaleX || cache.canvasScaleY !== canvasScaleY;
 
 		if (needsRebuild) {
 			if (cache.canvasBuffer.width !== pixelW || cache.canvasBuffer.height !== pixelH) {
@@ -161,15 +158,20 @@ export class TextPipe implements RenderPipe<TextField> {
 				buffer.context.registerTextureForGC(tf, cache.texture, token);
 				this._registryTokens.set(tf, token);
 			} else {
+				buffer.context.updateTexture(cache.texture, surface);
 				const oldToken = this._registryTokens.get(tf);
 				if (oldToken) buffer.context.unregisterTextureGC(oldToken);
-				buffer.context.updateTexture(cache.texture, surface);
 				const token = {};
 				buffer.context.registerTextureForGC(tf, cache.texture, token);
 				this._registryTokens.set(tf, token);
 			}
 			cache.textureWidth = pixelW;
 			cache.textureHeight = pixelH;
+			cache.canvasScaleX = canvasScaleX;
+			cache.canvasScaleY = canvasScaleY;
+			// Commit only after upload succeeds. Each raster consumer owns its
+			// version; another pass clearing display dirty flags cannot hide changes.
+			cache.textRenderVersion = textRenderVersion;
 		}
 
 		if (!cache.texture) return;

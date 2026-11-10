@@ -38,6 +38,10 @@ export class TextField extends DisplayObject {
 
 	// ── Instance fields ───────────────────────────────────────────────────────
 
+	// Raster consumers track their own version; Canvas captures can consume the
+	// shared display dirty flag before a GPU text texture has been refreshed.
+	public $textRenderVersion = 0;
+
 	private _fontFamily = TextField.default_fontFamily;
 	private _fontSize = TextField.default_size;
 	private _bold = false;
@@ -880,6 +884,11 @@ export class TextField extends DisplayObject {
 		const w = !isNaN(this.$explicitWidth) ? this.$explicitWidth : this._textWidth;
 		const h = !isNaN(this.$explicitHeight) ? this.$explicitHeight : this.textHeight;
 		bounds.setTo(0, 0, w, h);
+	}
+
+	public override $markDirty(): void {
+		this.$textRenderVersion++;
+		super.$markDirty();
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────
