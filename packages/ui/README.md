@@ -1,7 +1,8 @@
 # @kurot/ui
 
 Native skinnable components, layout, collections, binding and view states for
-Kurot games. Published package version: **5.2.3**.
+Kurot games. Source version: **5.3.0**. Publication is tracked in the
+[repository changelog](../../CHANGELOG.md).
 Requires Core **^3.2.1** for stable font-frame text layout and native BackdropBlur.
 
 For game UI, read [standard authoring and directories](docs/ui-authoring.md) and
@@ -68,7 +69,7 @@ semantic materialization uses runtime 0.11. See the
 ## Installation
 
 ```sh
-pnpm add @kurot/ui@^5.2.3 @kurot/core@^3.3.0
+pnpm add @kurot/ui@^5.3.0 @kurot/core@^3.6.0
 ```
 
 Install Core explicitly so the application controls its shared engine instance.
@@ -91,7 +92,7 @@ Label automatic height and textFit use Core's full font-frame measurement.
 Accents and descenders do not move unchanged baselines; tall font metrics may
 increase automatic height or require a smaller fitted size in fixed bounds.
 RichLabel uses the same dynamic row contract for mixed textFlow fonts/sizes,
-without adopting Label's outline insets or fitting API. Set explicit top alignment
+with optional outline insets and no fitting API. Set explicit top alignment
 for progressively typed paragraphs that must retain their first-line origin.
 
 Outlined Labels reserve `ceil(stroke) + 2` logical pixels above and below the
@@ -100,6 +101,32 @@ is separate and includes an authored-size italic guard; measurement, fitting and
 painting share those insets. Core >= 3.2.2 within 3.x supplies the accompanying
 render-only ink and mixed-size scrolling corrections; the supported Core peer
 remains ^3.2.1.
+
+UI >= 5.3.0 can opt RichLabels into the same outline-safe content frame:
+
+```ts
+import { RichLabel } from '@kurot/ui';
+
+// Set before constructing views; existing instances keep their policy.
+RichLabel.defaultOutlineLayout = 'reserve-space';
+const description = new RichLabel([{ text: 'Outlined text' }]);
+description.stroke = 1;
+// An individual instance can retain the original geometry.
+description.outlineLayout = 'render-only';
+```
+
+The default remains `render-only`. A construction UIContext can instead select
+`richLabelOutlineLayout` for its own views. Effective local run styles determine
+the insets; mixed sizes and explicit local stroke/italic overrides are retained.
+EditableText keeps its input geometry. See [RichLabel outline layout](docs/rich-label.md#optional-outline-safe-content-frame).
+
+With Core >= 3.6.0, multiline `wordWrap=true` Labels using `textFit="shrink"`
+first search for the largest size that fits at normal Unicode word boundaries.
+If none fits, emergency word wrapping is used only at the effective minimum,
+with existing overflow reporting and clipping. This can produce smaller intact
+words instead of larger fragments. Older supported Core hosts retain legacy
+fitting; normal wrapping and single-line shrink are unchanged. See
+[Label fitting](docs/label-text-layout.md#shrink-to-fit).
 
 ## Text and styles
 

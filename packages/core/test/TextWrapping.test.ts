@@ -94,6 +94,20 @@ describe('Unicode width-constrained text layout', () => {
 		expect(paintedLines(wrapped('АБВГДЕЖЗ', 30))).toEqual(['АБВ', 'ГДЕ', 'ЖЗ']);
 	});
 
+	it('identifies only line endings that used emergency word breaks', () => {
+		const field = wrapped('ABCDEFGHIJ', 30);
+		expect(field.getLinesArr().map(line => 'hasEmergencyBreak' in line && line.hasEmergencyBreak === true))
+			.toEqual([true, true, true, false]);
+		for (const text of ['ab cd', '你好世界', 'a\u00a0b', 'one\r\ntwo']) {
+			const normal = wrapped(text, 30);
+			expect(normal.getLinesArr().some(line => 'hasEmergencyBreak' in line && line.hasEmergencyBreak === true))
+				.toBe(false);
+		}
+		field.wordWrap = false;
+		expect(field.getLinesArr().some(line => 'hasEmergencyBreak' in line && line.hasEmergencyBreak === true))
+			.toBe(false);
+	});
+
 	it('preserves explicit indentation and accounts for CRLF and mandatory Unicode separators', () => {
 		const field = wrapped('one\r\n  two\u2028', 100);
 		expect(paintedLines(field)).toEqual(['one', '  two', '']);

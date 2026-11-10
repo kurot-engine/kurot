@@ -92,14 +92,85 @@ the continuous block within the assigned bounds.
 
 Explicit/layout width and maxWidth affect wrapping and automatic height. Font,
 size, bold and italic changes clear the component measurement cache. Color and
-outline changes refresh drawing without changing the raw flow. Outlines keep
-Core's render-only padding; RichLabel does not add Label's outline-safe layout
-insets or shrinking behavior.
+outline changes refresh drawing without changing the raw flow. By default,
+outlines keep Core's render-only padding; RichLabel does not add Label's
+outline-safe layout insets or shrinking behavior. The optional outline layout
+below reserves space and makes outline changes invalidate measurement as well.
+Consequently, top-aligned Label and RichLabel outer boxes do not imply aligned
+text baselines when Label has an outline. This is a component layout difference,
+not a change to Core line height. See [mixing the two controls](label-text-layout.md#mixing-label-and-richlabel)
+for alignment choices and their limits. Run-level `stroke=0` still overrides a
+component outline; in the default mode larger run outlines do not add layout padding. A parent
+scrollRect or mask can clip this render-only ink at its authored boundary.
 One native TextField renders through Canvas 2D and WebGL; measurement does not
 temporarily resize it. Unchanged metrics are cached until content, size or width
 invalidation. See [Core text layout](../../core/docs/text-layout.md) for wrapping,
 baseline and independent measurement. Build UI and run `pnpm test:text-labels`
 for minified Canvas/WebGL browser verification.
+
+## Optional outline-safe content frame
+
+This policy requires UI >= 5.3.0 and works with the supported Core ^3.2.1 peer.
+
+`OutlineLayout` is `render-only | reserve-space`. The default remains
+`render-only`, preserving existing geometry. To use Label's content-frame rules
+for subsequently constructed RichLabels, configure UI startup before creating
+views or loading their skins:
+
+```ts
+import { RichLabel } from '@kurot/ui';
+
+RichLabel.defaultOutlineLayout = 'reserve-space';
+const description = new RichLabel([{ text: 'Attack increases' }]);
+description.size = 16;
+description.stroke = 1;
+
+// An individual view can retain its old content frame.
+description.outlineLayout = 'render-only';
+```
+
+Each instance captures its construction policy. Changing the startup default
+does not resize existing instances; assigning an instance policy remeasures it
+and its parent and dispatches a property-change event. Invalid policy values
+throw RangeError before changing the setting. This default belongs to the loaded
+UI runtime, not an automatically isolated project. Applications sharing a runtime
+can supply `UIContextOptions.richLabelOutlineLayout` inside `context.run()`;
+an explicit context setting wins over the startup default. Binding an existing
+subtree does not change captured policies. See [local contexts](ui-context.md).
+These entry points are TypeScript APIs; KUI does not yet expose an
+`outlineLayout` attribute.
+
+In `reserve-space`, outer width/height, min/max and parent allocations retain
+their usual meaning. Measurement, wrapping and painting use the inner frame.
+For a uniform 16px line frame with stroke=1, automatic height is 22, the content
+origin is (4,3), and an outer width of 180 leaves 172 for text, matching Label.
+`textWidth`/`textHeight` report content metrics without the insets; they use the
+inner wrapping width. A narrower inner width can add lines and increase height
+by more than the outline allowance. Recheck fixed frames, list heights and
+parent scroll ranges when enabling the mode.
+
+Insets resolve each run's stroke, italic and authored size using local overrides
+before component defaults; zero and false remain explicit. With any effective
+positive outline, each axis takes the maximum per-run safety requirement:
+vertical `ceil(stroke)+2`, horizontal `ceil(2*stroke)+2` plus `ceil(size/4)` for
+italic runs. Unoutlined italic runs can contribute horizontal protection when
+another run enables outline space. No positive outline means no added inset.
+Empty runs contribute nothing. Single-line mode considers only source content
+before the first hard separator; multiline considers all source runs, including
+offscreen rows. The policy never inspects wrapped lines or current glyph ink.
+
+The insets surround the complete block once; lineSpacing and mixed-size line
+frames remain native. Splitting a run without changing its style does not alter
+the result. Changes to effective outline/italic styles can change the whole
+block's insets. Empty content keeps its zero measurement, subject to minimum
+dimensions. A finite box smaller than its insets has zero available content
+space; it does not become automatic. Parent scrollRect and masks retain exact
+bounds and can still clip undersized content.
+
+Label's shrink, minimum font size and overflow behavior are unchanged. RichLabel
+still does not fit fonts. Equal styles, line policy and content constraints
+produce equal frames; different fonts, mixed-size rows or a fitted Label need
+not have the same baseline. EditableText and BitmapLabel are unaffected.
 
 ## KUI and states
 

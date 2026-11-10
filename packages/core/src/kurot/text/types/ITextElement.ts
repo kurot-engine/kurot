@@ -40,6 +40,11 @@ export interface ILineElement {
 	inkDescent: number;
 	charNum: number;
 	hasNextLine: boolean;
+	/**
+	 * True only when this row ends at an emergency word break instead of a normal
+	 * Unicode opportunity. Absent for normal, hard and grapheme wrapping.
+	 */
+	hasEmergencyBreak?: boolean;
 	elements: IWTextElement[];
 }
 

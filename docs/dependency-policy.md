@@ -62,6 +62,13 @@ Core >= 3.3.0 within 3.x; basic loading remains compatible with the ^3.2.1
 peer minimum. New CLI game starters use this default adapter. Existing custom
 adapters and application locks are adopted separately.
 
+UI >= 5.3.0 provides opt-in RichLabel outline layout on its existing Core
+^3.2.1 peer. Its word-first multiline Label fitting requires Core >= 3.6.0
+within 3.x for `ILineElement.hasEmergencyBreak`; older accepted Core versions
+retain the previous fitting policy. Adopt both packages for that correction.
+Game, DragonBones and ui-runtime need no release or peer increase. CLI templates
+select public `latest`; application and development lock adoption remains explicit.
+
 Projects opting into `backgroundPolicy: 'continue'` require Core >= 3.4.0
 within 3.x. The default remains pause; unchanged SDK peers and application locks
 need no update. Adoption connects independent project frame/second schedulers to

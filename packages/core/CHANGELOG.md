@@ -4,6 +4,16 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.6.0 — 2026-11-11
+
+Source release preparation; npm publication and artifact verification are
+recorded separately in the [repository changelog](../../CHANGELOG.md).
+
+- Expose optional `ILineElement.hasEmergencyBreak` metadata for rows ending at
+  an emergency word break. Keep existing Unicode line selection, dimensions,
+  source offsets and rendering unchanged; UI fitting can distinguish normal
+  wrapping from the oversized-word fallback without another segmentation pass.
+
 ## 3.5.2 — 2026-11-11
 
 Source release preparation; npm publication and artifact verification are

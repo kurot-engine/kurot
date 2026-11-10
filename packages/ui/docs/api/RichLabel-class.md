@@ -1,6 +1,6 @@
 # RichLabel
 
-Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 class RichLabel extends Component
@@ -57,6 +57,7 @@ Related types: [Component](Component-class.md).
 | `name` | public, inherited | [open](RichLabel-class/name-accessor.md) |
 | `numChildren` | public, inherited | [open](RichLabel-class/numChildren-accessor.md) |
 | `numElements` | public, inherited | [open](RichLabel-class/numElements-accessor.md) |
+| `outlineLayout` | public | [open](RichLabel-class/outlineLayout-accessor.md) |
 | `parent` | public, inherited | [open](RichLabel-class/parent-accessor.md) |
 | `percentHeight` | public, inherited | [open](RichLabel-class/percentHeight-accessor.md) |
 | `percentWidth` | public, inherited | [open](RichLabel-class/percentWidth-accessor.md) |
@@ -95,6 +96,7 @@ Related types: [Component](Component-class.md).
 | `x` | public, inherited | [open](RichLabel-class/x-accessor.md) |
 | `y` | public, inherited | [open](RichLabel-class/y-accessor.md) |
 | `zIndex` | public, inherited | [open](RichLabel-class/zIndex-accessor.md) |
+| `static defaultOutlineLayout` | public | [open](RichLabel-class/static-defaultOutlineLayout-accessor.md) |
 | `addChild` | public, inherited | [open](RichLabel-class/addChild-method.md) |
 | `addChildAt` | public, inherited | [open](RichLabel-class/addChildAt-method.md) |
 | `addEventListener` | public, inherited | [open](RichLabel-class/addEventListener-method.md) |

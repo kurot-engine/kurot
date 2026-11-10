@@ -1,5 +1,6 @@
 import { TextFieldType } from '@kurot/core';
 import type { TextField } from '@kurot/core';
+import { getOutlineInsets } from './outline-insets.js';
 
 /**
  * Font frames already contain the vertical glyph body. Reserve the stroke
@@ -14,8 +15,5 @@ export function getLabelOutlineInsets(field: TextField, authoredSize: number = f
 	if (!field.multiline && !field.displayAsPassword && /^[\n\r\v\f\u0085\u2028\u2029]/u.test(field.text)) {
 		return { x: 0, y: 0 };
 	}
-	return {
-		x: Math.ceil(field.stroke * 2) + 2 + (field.italic ? Math.ceil(authoredSize / 4) : 0),
-		y: Math.ceil(field.stroke) + 2,
-	};
+	return getOutlineInsets(field.stroke, authoredSize, field.italic);
 }

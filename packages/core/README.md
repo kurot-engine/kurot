@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Source version: **3.5.2**. Publication is tracked in the
+for browser games. Source version: **3.6.0**. Publication is tracked in the
 [repository changelog](../../CHANGELOG.md).
 
 Start with the [game authoring guide](docs/game-authoring.md),
@@ -89,6 +89,11 @@ Mixed-size dynamic rows remain scrollable through the last row, including a
 small body row after a taller title; input scrolling keeps nominal editing rows.
 See [text layout](docs/text-layout.md) for wrapping, font readiness and bounds.
 
+Core >= 3.6.0 exposes optional `ILineElement.hasEmergencyBreak` on rows that
+use emergency word breaks. UI >= 5.3.0 uses this metadata to prefer intact words
+when fitting multiline Labels, before falling back at the minimum font size.
+Core's existing Unicode wrapping and input behavior are unchanged.
+
 ## Callback ownership
 
 Core 3 uses callback-only ticker registration. Use stable arrow members or callbacks
@@ -135,7 +140,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.5.2
+pnpm add @kurot/core@^3.6.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

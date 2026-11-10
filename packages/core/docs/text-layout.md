@@ -18,6 +18,11 @@ additional wrap opportunities.
   relaxes UAX #14's alphabetic rule LB28. Non-breaking spaces, narrow
   non-breaking spaces, word joiners and punctuation protection remain in force.
   Protected sequences can therefore exceed the field width.
+- In Core >= 3.6.0, a line ending at such an emergency opportunity exposes
+  `ILineElement.hasEmergencyBreak = true`. Normal Unicode opportunities,
+  hard breaks and grapheme wrapping leave the optional field absent. Consumers
+  can inspect cached rows without another segmentation or measurement pass;
+  the metadata does not change line selection, dimensions or source offsets.
 - Ordinary spaces and tabs at a wrapped line's end are omitted from drawing
   and width measurement. They are consumed on that line, so they never become
   indentation on the next automatic line. Explicit indentation after a hard

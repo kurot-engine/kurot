@@ -133,7 +133,12 @@ export function layoutTextLines(elements: ITextElement[], options: TextLineLayou
 				}
 			}
 
-			lines.push(lineAt(chosen));
+			const line = lineAt(chosen);
+			// A fallback can still reach a normal boundary; only mark earlier endings.
+			if (options.wordWrap && chosen < positions[positionIndex]) {
+				line.hasEmergencyBreak = true;
+			}
+			lines.push(line);
 			lineStart = chosen;
 		}
 		const lastLine = lines[lines.length - 1];

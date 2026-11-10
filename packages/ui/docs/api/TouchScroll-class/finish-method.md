@@ -1,6 +1,6 @@
 # finish
 
-Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 finish(currentScrollPos: number, maxScrollPos: number): void;

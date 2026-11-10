@@ -27,7 +27,9 @@ interface LabelTextFit {
  * Never changes authored size or text, and always measures from the base size.
  */
 export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
-	if (!metrics.text) return { size: metrics.size, overflow: false };
+	if (!metrics.text) {
+		return { size: metrics.size, overflow: false };
+	}
 	const field = new TextField();
 	field.text = metrics.text;
 	field.fontFamily = metrics.fontFamily;
@@ -39,11 +41,21 @@ export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
 	field.stroke = metrics.stroke;
 	const inset = getLabelOutlineInsets(field, metrics.size);
 	const width = Number.isFinite(metrics.width) ? Math.max(0, metrics.width - inset.x * 2) : NaN;
-	const fits = (size: number): boolean => {
+	const preferWords = metrics.multiline && metrics.wordWrap && Number.isFinite(width);
+	const fits = (size: number, allowEmergencyBreaks = false): boolean => {
 		// Core intentionally measures zero-width content as empty, not as overflow.
-		if (width === 0) return false;
+		if (width === 0) {
+			return false;
+		}
 		field.size = size;
 		field.width = width;
+		// Reuse Core's cached Unicode/grapheme layout, not a second tokenizer.
+		// Older supported Core versions lack the metadata and retain legacy fitting.
+		if (preferWords && !allowEmergencyBreaks && field.getLinesArr().some(
+			line => 'hasEmergencyBreak' in line && line.hasEmergencyBreak === true,
+		)) {
+			return false;
+		}
 		return (
 			(!Number.isFinite(metrics.width) || field.textWidth + inset.x * 2 <= metrics.width) &&
 			(!Number.isFinite(metrics.height) || field.textHeight + inset.y * 2 <= metrics.height)
@@ -54,7 +66,9 @@ export function fitLabelText(metrics: LabelTextMetrics): LabelTextFit {
 	}
 	const minimum = Math.min(metrics.minimum, metrics.size);
 	if (!fits(minimum)) {
-		return { size: minimum, overflow: true };
+		// Only the minimum may use emergency wrapping. Report overflow from that
+		// final layout, including sequences that Unicode still forbids splitting.
+		return { size: minimum, overflow: !preferWords || !fits(minimum, true) };
 	}
 
 	let lower = minimum;

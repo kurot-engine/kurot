@@ -4,6 +4,26 @@ All notable changes to `@kurot/ui` are documented here.
 
 ---
 
+## 5.3.0 — 2026-11-11
+
+Source release preparation; npm publication and artifact verification are
+recorded separately in the [repository changelog](../../CHANGELOG.md).
+
+- Prefer normal Unicode word boundaries when `multiline`, `wordWrap` and
+  `textFit="shrink"` are enabled together. Search for the largest fitting size
+  before accepting emergency word breaks at `minFontSize`; report remaining
+  overflow from the final fallback layout. Requires Core >= 3.6.0's optional
+  `ILineElement.hasEmergencyBreak` metadata; older supported Core hosts retain
+  legacy fitting. Other wrapping/fitting modes and authored sizes are unchanged.
+- Add opt-in `RichLabel.outlineLayout = 'reserve-space'` to share Label's
+  outline-safe content frame for measurement, wrapping and painting. Resolve
+  effective per-run styles without changing authored flows or mixed-size rows.
+- Preserve the render-only default. `RichLabel.defaultOutlineLayout` selects
+  subsequent instances; UIContext can override construction policy and each
+  instance can override its own. Existing instances do not change when startup
+  settings change. The outline policy leaves Label fitting and input/bitmap text
+  behavior unchanged.
+
 ## 5.2.3 — 2026-11-11
 
 The published [npm package](https://www.npmjs.com/package/@kurot/ui/v/5.2.3)

@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.5.2",
+  "version": "3.6.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -5704,6 +5704,12 @@
         {
           "name": "elements",
           "file": "ILineElement-interface/elements-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "hasEmergencyBreak",
+          "file": "ILineElement-interface/hasEmergencyBreak-property.md",
           "protected": false,
           "inherited": false
         },

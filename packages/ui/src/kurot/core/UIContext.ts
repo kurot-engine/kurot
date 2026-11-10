@@ -3,6 +3,7 @@ import type { Resource } from '@kurot/core';
 import type { Component } from '../components/Component.js';
 import type { Skin } from '../components/Skin.js';
 import type { IAssetAdapter } from './IAssetAdapter.js';
+import type { OutlineLayout } from '../components/RichLabel.js';
 
 /**
  * A compiled factory or authored Skin constructor, local to one UI context.
@@ -29,6 +30,12 @@ export interface UIContextOptions {
 	 * Default family for UI text. Load the font before constructing views.
 	 */
 	readonly fontFamily?: string;
+	/**
+	 * Outline layout captured by RichLabels constructed inside run(). Overrides
+	 * their startup default; omission uses RichLabel.defaultOutlineLayout.
+	 * Binding an existing subtree does not change its captured text geometry.
+	 */
+	readonly richLabelOutlineLayout?: OutlineLayout;
 	/**
 	 * Borrowed bitmap-font/resource provider; absence disables scoped font lookup.
 	 */

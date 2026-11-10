@@ -33,7 +33,9 @@ and fitting use its inner area. Minimum-size overflow still reports failure
 and permits clipping; a box too small for its inset does not become automatic.
 Fitting toggles at unchanged drawing size retain identical geometry and pixels.
 Unoutlined or empty Labels add no inset; empty-row measurements stay native.
-EditableText, RichLabel and BitmapLabel do not adopt Label's outline insets.
+EditableText and BitmapLabel do not adopt Label's outline insets. RichLabel
+retains render-only outlines by default and can opt into the same content-frame
+rules through [outline layout](rich-label.md#optional-outline-safe-content-frame).
 RichLabel does use Core's dynamic font-frame rows; EditableText retains nominal
 input rows, and BitmapLabel retains the bitmap font's line-height contract.
 
@@ -42,6 +44,34 @@ stays fixed after clearing/retyping. Middle and bottom also retain their baselin
 when only accents or descenders change, but adding rows shifts their whole block
 to maintain the selected alignment. Font readiness still
 uses `invalidateSize()`. Outline/state changes invalidate the normal UI layout.
+
+### Mixing Label and RichLabel
+
+By default, the two controls have different outer-box contracts. With the same 16px line
+frame and `stroke=1`, an automatic Label is 22px high and its TextField starts
+at y=3; RichLabel remains 16px high with its TextField at y=0. Both line frames
+and their local alphabetic baselines are identical. Top-aligning the component
+boxes therefore places their text baselines 3px apart. A real font frame can
+be taller than the authored size; the difference still comes from the insets.
+
+Core's render-only margin preserves outline ink without moving a baseline or
+enlarging layout. It does not make either component's box equal to its painted
+pixel bounds, and an ancestor's clip can still cut off that ink.
+
+For a single row with the same font frame and no shrinking, an existing
+`HorizontalLayout` with `verticalAlign="middle"` centers the automatic boxes
+and aligns the text without a hardcoded offset. Equal fixed-height boxes can
+instead use `verticalAlign="middle"` on both text controls, provided they have
+the same line block and sufficient content space. These are center-alignment
+choices, not a general baseline-alignment feature. Different font sizes,
+fitted sizes or line counts need their own composition; use one RichLabel flow
+when runs must share an alphabetic baseline.
+
+For consistent content frames across an application, enable RichLabel's
+`reserve-space` policy at startup. Individual instances can override it; existing
+instances retain their captured policy. Enabling it changes RichLabel automatic
+dimensions and available wrapping width, so check parent sizing and clipping.
+Label retains its existing outline protection and fitting constraints.
 
 ## Automatic width and parent layout
 
@@ -131,16 +161,33 @@ on a Button's `labelDisplay` skin part rather than on the Button itself.
 This uses the default multiline mode. At each candidate size, Core lays out
 the complete displayed text under the effective content width. Measurement
 includes hard breaks, blank/trailing rows and line spacing, independently of
-height clipping. If the base size fits across several rows it is retained.
+height clipping. If the base size fits across several rows under the wrapping
+policy below, it is retained.
 Otherwise fitting searches smaller sizes, recalculating the row breaks each time.
 No maximum row count is implied by a fixed height, and no `maxLines` is added.
 
 | Available bounds                    | Multiline shrink behavior                                                                   |
 | ----------------------------------- | ------------------------------------------------------------------------------------------- |
 | Both automatic                      | Retain base size; soft wrapping has no width constraint.                                    |
-| Width constrained, height automatic | Wrap and measure automatic height; shrink only if a protected sequence still exceeds width. |
+| Width constrained, height automatic | Wrap and measure automatic height; shrink for oversized words with wordWrap, or protected sequences otherwise. |
 | Width automatic, height constrained | Measure hard-separated rows without soft wrapping, then fit their complete height.          |
 | Both constrained                    | Wrap and shrink as needed to fit complete width and height.                                 |
+
+When both `multiline` and `wordWrap` are true, fitting prefers normal Unicode
+line opportunities over emergency word breaks: search for the largest size
+that fits both available axes without splitting oversized alphabetic words.
+If no such size fits, use the existing emergency wrapping **at the minimum**,
+and derive `textFitOverflow` from that final layout. Non-breaking spaces,
+word joiners, punctuation and grapheme protection remain in force even there.
+CJK uses its normal Unicode opportunities; this is not a space-based tokenizer.
+Hard separators, line spacing and outline insets are unchanged.
+
+This can produce smaller, intact words where earlier fitting kept larger
+fragmented words. UI >= 5.3.0 uses optional Core >= 3.6.0
+`ILineElement.hasEmergencyBreak` metadata; older supported Core hosts without
+that metadata retain legacy fitting. Adopt these Core and UI versions together for word-first
+fitting. `textFit="none"`, `wordWrap=false` and single-line fitting keep their
+existing policies. RichLabel does not support font fitting.
 
 - `size` is always the authored/base size. `renderedSize` is the derived drawing
   size after layout validation. State overrides capture and restore `size`.
@@ -205,6 +252,12 @@ assert the layout contract rather than a universal numeric result.
 Multiline tests cover complete-height fitting, blank/trailing rows, line spacing,
 Unicode and grapheme boundaries, password text, minimum/zero-width overflow,
 outline allowance, automatic axes, font readiness and parent resize recovery.
+`LabelWordWrapFit` additionally checks word-first fitting, minimum-size fallback,
+protected Unicode sequences, restoration and reuse of settled measurements.
+`word-wrap-fit.spec.ts` compares fitted pixels with manually sized text in
+Canvas/WebGL 1/2 at 1x/2x. Set `KUROT_TEXT_TEST_FONT=/absolute/path/font.otf`
+when running that suite to load the SAOUI reproduction font; the default suite
+uses platform fonts and does not require consumer-project assets.
 Minified browser tests validate native Russian/Chinese layouts in Canvas,
 WebGL 1 and WebGL 2 at 1x/2x, using independent Canvas width measurements.
 Pixel comparisons verify unchanged painting across fitting toggles for all nine
@@ -230,4 +283,4 @@ size, color, bold/italic and outline runs are compared against a native TextFiel
 with the same authored flow, including automatic/fixed height and wrapping.
 Repeated clear/retype cycles render every prefix and retain the first baseline
 for all 31 languages. RichLabel retains its own typography/measurement contract;
-Label alone provides textFit and outline-safe outer insets.
+Label alone provides textFit; RichLabel can opt into outline-safe outer insets.

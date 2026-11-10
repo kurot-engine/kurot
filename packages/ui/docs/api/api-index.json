@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/ui",
-  "version": "5.2.3",
+  "version": "5.3.0",
   "symbols": [
     {
       "name": "AddItems",
@@ -16277,6 +16277,13 @@
       ]
     },
     {
+      "name": "OutlineLayout",
+      "kind": "TypeAlias",
+      "file": "OutlineLayout-typealias.md",
+      "topic": "components",
+      "members": []
+    },
+    {
       "name": "Panel",
       "kind": "Class",
       "file": "Panel-class.md",
@@ -20827,6 +20834,12 @@
           "inherited": true
         },
         {
+          "name": "outlineLayout",
+          "file": "RichLabel-class/outlineLayout-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "parent",
           "file": "RichLabel-class/parent-accessor.md",
           "protected": false,
@@ -21053,6 +21066,12 @@
           "file": "RichLabel-class/zIndex-accessor.md",
           "protected": false,
           "inherited": true
+        },
+        {
+          "name": "static defaultOutlineLayout",
+          "file": "RichLabel-class/static-defaultOutlineLayout-accessor.md",
+          "protected": false,
+          "inherited": false
         },
         {
           "name": "addChild",
@@ -28101,6 +28120,12 @@
         {
           "name": "resource",
           "file": "UIContextOptions-interface/resource-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "richLabelOutlineLayout",
+          "file": "UIContextOptions-interface/richLabelOutlineLayout-property.md",
           "protected": false,
           "inherited": false
         },

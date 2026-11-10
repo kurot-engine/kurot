@@ -3,6 +3,13 @@ import type { HorizontalAlign, ITextElement, VerticalAlign } from '@kurot/core';
 import { Component } from './Component.js';
 import { getUIContext } from '../core/UIContext.js';
 import { PropertyEvent } from '../events/PropertyEvent.js';
+import { getRichLabelOutlineInsets } from '../text/rich-label-outline.js';
+import type { OutlineInsets } from '../text/outline-insets.js';
+
+/**
+ * Whether outlines only extend painting or reserve space in the UI outer box.
+ */
+export type OutlineLayout = 'render-only' | 'reserve-space';
 
 /**
  * Displays styled text runs in one continuous layout. Content is assigned only
@@ -10,6 +17,21 @@ import { PropertyEvent } from '../events/PropertyEvent.js';
  * styles. Label plain text, presets and fitting are not exposed.
  */
 export class RichLabel extends Component {
+	private static _defaultOutlineLayout: OutlineLayout = 'render-only';
+
+	/**
+	 * Startup default for subsequently constructed RichLabels. Existing instances
+	 * keep their captured policy. A construction UIContext can override this
+	 * shared-runtime default; use explicit context policies for isolated apps.
+	 */
+	public static get defaultOutlineLayout(): OutlineLayout {
+		return RichLabel._defaultOutlineLayout;
+	}
+	public static set defaultOutlineLayout(value: OutlineLayout) {
+		validateOutlineLayout(value);
+		RichLabel._defaultOutlineLayout = value;
+	}
+
 	// ── Instance fields ───────────────────────────────────────────────────────
 
 	private readonly _textField = new TextField();
@@ -20,12 +42,17 @@ export class RichLabel extends Component {
 	private _preferredWidth = 0;
 	private _measurement?: { width: number; height: number };
 	private _measurementWidth = NaN;
+	private _outlineLayout: OutlineLayout;
+	private _outlineInsets?: OutlineInsets;
 
 	// ── Constructor ───────────────────────────────────────────────────────────
 
 	public constructor(textFlow: readonly ITextElement[] = []) {
 		super();
-		const family = getUIContext(this)?.options.fontFamily;
+		const options = getUIContext(this)?.options;
+		this._outlineLayout = options?.richLabelOutlineLayout ?? RichLabel.defaultOutlineLayout;
+		validateOutlineLayout(this._outlineLayout);
+		const family = options?.fontFamily;
 		if (family) {
 			this._textField.fontFamily = family;
 		}
@@ -35,6 +62,25 @@ export class RichLabel extends Component {
 	}
 
 	// ── Getters / Setters ──────────────────────────────────────────────────────
+
+	/**
+	 * Captured from the construction context or startup default, initially
+	 * render-only. reserve-space uses Label's outline-safe content box, including
+	 * effective run styles. Assignment remeasures this instance and its parent;
+	 * it does not change the authored runs or add font fitting.
+	 */
+	public get outlineLayout(): OutlineLayout {
+		return this._outlineLayout;
+	}
+	public set outlineLayout(value: OutlineLayout) {
+		validateOutlineLayout(value);
+		if (this._outlineLayout === value) {
+			return;
+		}
+		this._outlineLayout = value;
+		this._invalidateText();
+		PropertyEvent.dispatchPropertyEvent(this, 'outlineLayout');
+	}
 
 	public override get width(): number {
 		return super.width;
@@ -151,8 +197,8 @@ export class RichLabel extends Component {
 
 	/**
 	 * Outline width in logical pixels for runs without a stroke, initially zero.
-	 * Must be finite and nonnegative. Outlines retain Core's render-only padding;
-	 * they do not add Label's outline insets to RichLabel's measured layout.
+	 * Must be finite and nonnegative. With outlineLayout=reserve-space, effective
+	 * run outlines also contribute to measurement and the inner content frame.
 	 */
 	public get stroke(): number {
 		return this._textField.stroke;
@@ -163,6 +209,9 @@ export class RichLabel extends Component {
 			return;
 		}
 		this._textField.stroke = value;
+		if (this._outlineLayout === 'reserve-space') {
+			this.invalidateSize();
+		}
 		this.invalidateDisplayList();
 		PropertyEvent.dispatchPropertyEvent(this, 'stroke');
 	}
@@ -260,7 +309,8 @@ export class RichLabel extends Component {
 
 	/**
 	 * Complete content metrics under the current width constraint, before
-	 * height clipping. Empty content has zero width and height.
+	 * height clipping and excluding outline insets. Empty content has zero width
+	 * and height; reserve-space measures inside the current outer width.
 	 */
 	public get textWidth(): number {
 		return this._measureText().width;
@@ -279,6 +329,7 @@ export class RichLabel extends Component {
 		this._measureLayout = false;
 		// A late font load can change metrics without changing the authored runs.
 		this._measurement = undefined;
+		this._outlineInsets = undefined;
 		this._textField?.invalidateTextMetrics();
 		super.invalidateSize();
 	}
@@ -292,14 +343,15 @@ export class RichLabel extends Component {
 		const reflow = this._measureLayout;
 		const width = this._getMeasureWidth(this._measureLayout ? this._layoutWidth : NaN);
 		this._measureLayout = false;
-		this._measuredWidthConstraint = width;
+		this._measuredWidthConstraint = this._getContentWidth(width);
 		const measured = this._measureText(width);
+		const inset = this._getOutlineInsets();
 		// Keep preferred width independent of wrapping in the current allocation,
 		// so an automatic parent can expand after content or constraint changes.
 		if (!reflow || !Number.isFinite(this._layoutWidth)) {
-			this._preferredWidth = measured.width;
+			this._preferredWidth = measured.width + inset.x * 2;
 		}
-		this.setMeasuredSize(this._preferredWidth, measured.height);
+		this.setMeasuredSize(this._preferredWidth, measured.height + inset.y * 2);
 		if (!reflow && Number.isFinite(this._layoutWidth)) {
 			this.ui.$invalidateParentLayout();
 		}
@@ -310,7 +362,7 @@ export class RichLabel extends Component {
 		const width = Number.isFinite(layoutWidth) ? this.width : NaN;
 		this._layoutWidth = width;
 		// New preferred metrics must be reflowed even if the allocation is unchanged.
-		if (!Object.is(this._measuredWidthConstraint, this._getMeasureWidth(width))) {
+		if (!Object.is(this._measuredWidthConstraint, this._getContentWidth(this._getMeasureWidth(width)))) {
 			this._measureLayout = true;
 			super.invalidateSize();
 			this.invalidateDisplayList();
@@ -319,8 +371,11 @@ export class RichLabel extends Component {
 
 	public override updateDisplayList(unscaledWidth: number, unscaledHeight: number): void {
 		super.updateDisplayList(unscaledWidth, unscaledHeight);
-		this._textField.width = unscaledWidth;
-		this._textField.height = unscaledHeight;
+		const inset = this._getOutlineInsets();
+		this._textField.x = inset.x;
+		this._textField.y = inset.y;
+		this._textField.width = Math.max(0, unscaledWidth - inset.x * 2);
+		this._textField.height = Math.max(0, unscaledHeight - inset.y * 2);
 	}
 
 	// ── Private methods ───────────────────────────────────────────────────────
@@ -367,10 +422,27 @@ export class RichLabel extends Component {
 		if (!this._textField.text) {
 			return { width: 0, height: 0 };
 		}
-		if (!this._measurement || !Object.is(this._measurementWidth, width)) {
-			this._measurement = this._textField.measureText(width);
-			this._measurementWidth = width;
+		const contentWidth = this._getContentWidth(width);
+		if (!this._measurement || !Object.is(this._measurementWidth, contentWidth)) {
+			this._measurement = this._textField.measureText(contentWidth);
+			this._measurementWidth = contentWidth;
 		}
 		return this._measurement;
+	}
+
+	private _getContentWidth(width: number): number {
+		return Number.isFinite(width) ? Math.max(0, width - this._getOutlineInsets().x * 2) : NaN;
+	}
+
+	private _getOutlineInsets(): OutlineInsets {
+		return this._outlineInsets ??= this._outlineLayout === 'reserve-space'
+			? getRichLabelOutlineInsets(this._textField)
+			: { x: 0, y: 0 };
+	}
+}
+
+function validateOutlineLayout(value: OutlineLayout): void {
+	if (value !== 'render-only' && value !== 'reserve-space') {
+		throw new RangeError('RichLabel outline layout must be render-only or reserve-space.');
 	}
 }

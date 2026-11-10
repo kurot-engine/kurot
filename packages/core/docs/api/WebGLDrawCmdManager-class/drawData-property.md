@@ -1,6 +1,6 @@
 # drawData
 
-Package: `@kurot/core@3.5.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 readonly drawData: DrawCmd[];

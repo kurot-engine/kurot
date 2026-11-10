@@ -1,6 +1,6 @@
 # HttpResponseType
 
-Package: `@kurot/core@3.5.2`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.6.0`. Generated from public declarations and JSDoc.
 
 ```ts
 HttpResponseType: { ARRAY_BUFFER: "arraybuffer"; TEXT: "text" };

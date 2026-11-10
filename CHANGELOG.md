@@ -5,6 +5,39 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-11 — Core 3.6.0 / UI 5.3.0 release preparation
+
+- Prepare Core's optional emergency-word-break metadata and UI's word-first
+  multiline `wordWrap + shrink` fitting. Normal Unicode opportunities are
+  preferred throughout font-size search; the original emergency fallback is
+  accepted at the effective minimum, preserving overflow and clipping. The
+  actual SAOUI French reproduction retains complete words at 14.7px instead
+  of fragmented words at 15.7px, with the same 56×32 content box.
+- Add optional RichLabel outline-safe layout, selected at startup, by a
+  construction UIContext or per instance. The render-only default, existing
+  instances, local rich styles, Label's outline/shrink behavior and EditableText
+  input geometry remain compatible. No SAO or other application source changes.
+- Update both manifests, Core's runtime engineVersion, READMEs, current
+  contracts, architecture/context versions, package map and generated APIs.
+  UI's Core peer remains `^3.2.1`: RichLabel's new policy works at that minimum;
+  word-first fitting requires Core >= 3.6.0 within 3.x. Older accepted Core
+  installations retain the previous fitting policy.
+- Game, DragonBones, ui-runtime and Spine's existing peer ranges accept the
+  releases and require no SDK bump. CLI templates select public `latest`.
+  Caret-based examples and Templates can optionally update their locks; exact
+  pins in SAO, Editor, Star Catcher, Card Booster and Skydive need explicit
+  adoption. Skia's tilde ranges and Studio's older major versions remain
+  separate migration work. Dependency declarations and consumer locks are unchanged.
+- All nine SDK builds and 2,704 unit tests pass on Node 22.23.4. All 61 UI
+  browser cases and six additional SAOUI-font cases pass across Canvas and
+  WebGL 1/2, including unchanged default geometry, mixed styles, wrapping,
+  clipping and stable layout. Strict new-test compilation, API coverage and
+  22 API examples pass. The actual packed CLI builds both templates in
+  development and release modes against public SDK dependencies.
+- Publish Core 3.6.0 before UI 5.3.0. This records tested source preparation;
+  npm publication, downloaded-artifact verification and release tags follow
+  separately after publication.
+
 ## 2026-11-11 — Examples and Templates adopt Core 3.5.2 / UI 5.2.3
 
 - Verify npm latest and adopt Core 3.5.2 in demo, game and star-catcher plus

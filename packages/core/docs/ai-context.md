@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.5.2`. It provides Kurot's
+Package identity: `@kurot/core@3.6.0`. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -289,6 +289,8 @@ graphemes. Never introduce a break inside a cluster; an oversized cluster
 overflows intact. The untailored default profile stays unchanged for Unicode
 conformance. `TextSegmentation.ts` shares cached word/grapheme segmenters;
 ordinary and emergency layout reuse a paragraph's UTF-16 grapheme end offsets.
+Rows ending at emergency word breaks expose optional `hasEmergencyBreak: true`;
+normal/hard/grapheme row endings omit it. UI fitting uses this cached metadata.
 No text or segmentation results are retained globally. See [text layout](text-layout.md).
 Automatic-wrap spaces count in source offsets but not painted width. Core's
 Canvas renderer advances input indices by line.charNum, including hidden spaces

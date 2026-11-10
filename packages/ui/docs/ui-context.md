@@ -65,6 +65,13 @@ run: establish the context before setting string skinName on detached views.
   without that provider a scoped bitmap-font lookup does not use global resource.
 - Label/EditableText use the context default family; explicit fontFamily takes
   priority. RichLabel created inside run uses the same default for unstyled runs.
+- `richLabelOutlineLayout: 'reserve-space'` opts RichLabels constructed inside
+  run into Label's outline-safe content frame; `'render-only'` preserves their
+  original geometry. Omission uses RichLabel.defaultOutlineLayout. The setting
+  is captured at construction, so binding an existing subtree does not resize
+  it. Instances can override outlineLayout. Use explicit policies in contexts
+  that need isolation from a shared runtime's startup default. See
+  [RichLabel outline layout](rich-label.md#optional-outline-safe-content-frame).
 - Core TextField and custom raster text are not UI Label. Their authors must
   explicitly use the context family; TextField.default_fontFamily is unchanged.
 - Unscoped applications keep global Theme, skin registration and asset adapter

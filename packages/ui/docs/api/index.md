@@ -1,6 +1,6 @@
 # @kurot/ui API
 
-Version: **5.2.3**. Read the installed package's matching documentation.
+Version: **5.3.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).
@@ -63,6 +63,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `LinearLayoutBase` | Class | [open](LinearLayoutBase-class.md) |
 | `List` | Class | [open](List-class.md) |
 | `ListBase` | Class | [open](ListBase-class.md) |
+| `OutlineLayout` | TypeAlias | [open](OutlineLayout-typealias.md) |
 | `Panel` | Class | [open](Panel-class.md) |
 | `ProgressBar` | Class | [open](ProgressBar-class.md) |
 | `PropertyEvent` | Class | [open](PropertyEvent-class.md) |

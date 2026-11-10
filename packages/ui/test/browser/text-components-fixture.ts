@@ -1,4 +1,4 @@
-import { Capabilities, Player, Sprite, TextField } from '@kurot/core';
+import { Capabilities, Player, Rectangle, Sprite, TextField } from '@kurot/core';
 import type { DisplayObject, ITextElement } from '@kurot/core';
 import { Label, RichLabel } from '../../dist/index.js';
 import { textLanguages } from '../../../core/test/fixtures/text/languages.js';
@@ -82,7 +82,7 @@ function configure(field: Label | RichLabel | TextField, family: string): void {
 	field.strokeColor = 0xff3399;
 }
 
-function run(code: string, family: string): { comparisons: number; prefixes: number } {
+function run(code: string, family: string, reserve = false): { comparisons: number; prefixes: number } {
 	const language = textLanguages.find(item => item.code === code);
 	if (!language) {
 		throw new Error(`Unknown text fixture ${code}.`);
@@ -103,14 +103,18 @@ function run(code: string, family: string): { comparisons: number; prefixes: num
 			const insetX = stroke ? 6 : 0;
 			const insetY = stroke ? 4 : 0;
 			const rich = new RichLabel([{ text: language.text }]);
+			rich.outlineLayout = reserve ? 'reserve-space' : 'render-only';
 			configure(rich, family);
 			rich.stroke = stroke;
 			rich.verticalAlign = alignment;
-			rich.x += insetX;
-			rich.y += insetY;
-			rich.width = 300 - insetX * 2;
-			rich.height = 112 - insetY * 2;
+			rich.x += reserve ? 0 : insetX;
+			rich.y += reserve ? 0 : insetY;
+			rich.width = 300 - (reserve ? 0 : insetX * 2);
+			rich.height = 112 - (reserve ? 0 : insetY * 2);
 			mount(rich);
+			if (reserve) {
+				check(rich.height === label.height && rich.width === label.width, `${code}: equal outer boxes`);
+			}
 			samePixels(paint(), plain, `${code}/${alignment}/${stroke} Label vs RichLabel`);
 			comparisons++;
 		}
@@ -125,24 +129,35 @@ function run(code: string, family: string): { comparisons: number; prefixes: num
 	for (const alignment of ['top', 'middle', 'bottom'] as const) {
 		for (const automatic of [true, false]) {
 			const rich = new RichLabel(flow);
+			rich.outlineLayout = reserve ? 'reserve-space' : 'render-only';
 			configure(rich, family);
 			rich.width = 260;
 			rich.height = automatic ? NaN : 140;
 			rich.verticalAlign = alignment;
 			mount(rich);
 			const actual = paint();
+			const clip = new Rectangle(0, 0, 220, Math.floor(rich.y + rich.height - 8));
+			root.scrollRect = clip;
+			const clipped = paint();
+			root.scrollRect = undefined;
 			const reference = new TextField();
 			configure(reference, family);
-			reference.width = 260;
-			reference.height = automatic ? NaN : 140;
+			const native = fieldOf(rich);
+			reference.x = rich.x + native.x;
+			reference.y = rich.y + native.y;
+			reference.width = native.width;
+			reference.height = native.height;
 			reference.verticalAlign = alignment;
 			reference.textFlow = flow;
 			check(Math.abs(rich.textHeight - reference.textHeight) < 0.001, `${code}: mixed-flow height`);
 			if (automatic) {
-				check(Math.abs(rich.height - reference.textHeight) < 0.001, `${code}: automatic RichLabel height`);
+				check(Math.abs(rich.height - reference.textHeight - native.y * 2) < 0.001, `${code}: automatic RichLabel height`);
 			}
 			mount(reference);
 			samePixels(actual, paint(), `${code}/${alignment}/${automatic} rich runs vs native field`);
+			root.scrollRect = clip;
+			samePixels(clipped, paint(), `${code}/${alignment}/${automatic} clipped rich runs vs native field`);
+			root.scrollRect = undefined;
 			check(
 				JSON.stringify(flow) === original && JSON.stringify(rich.textFlow) === original,
 				`${code}: changed source runs`,
@@ -151,6 +166,8 @@ function run(code: string, family: string): { comparisons: number; prefixes: num
 		}
 	}
 	const rich = new RichLabel();
+	rich.outlineLayout = reserve ? 'reserve-space' : 'render-only';
+	rich.stroke = reserve ? 1 : 0;
 	configure(rich, family);
 	rich.width = 150;
 	rich.verticalAlign = 'top';
@@ -178,9 +195,43 @@ function run(code: string, family: string): { comparisons: number; prefixes: num
 	return { comparisons, prefixes };
 }
 
+function outlineGeometry(family: string, reserve = false) {
+	return [0, 0.5, 1, 2, 6].map(stroke => {
+		return [new Label('Specialty'), new RichLabel([{ text: 'Specialty' }])].map(component => {
+			if (component instanceof RichLabel) {
+				component.outlineLayout = reserve ? 'reserve-space' : 'render-only';
+			}
+			component.fontFamily = family;
+			component.size = 16;
+			component.stroke = stroke;
+			component.multiline = false;
+			component.verticalAlign = 'top';
+			component.x = component.y = 24;
+			mount(component);
+			const pixels = paint();
+			let inkTop = Infinity;
+			let inkBottom = -Infinity;
+			for (let y = 0; y < snapshot.height; y++) {
+				for (let x = 0; x < snapshot.width; x++) {
+					if (pixels[(y * snapshot.width + x) * 4 + 3] > 0) {
+						inkTop = Math.min(inkTop, y / density);
+						inkBottom = Math.max(inkBottom, (y + 1) / density);
+					}
+				}
+			}
+			const field = fieldOf(component);
+			return {
+				stroke, height: component.height, lineHeight: field.textHeight,
+				origin: field.y, baseline: field.y + field.getLinesArr()[0].baseline,
+				inkTop: inkTop - component.y, inkBottom: inkBottom - component.y,
+			};
+		});
+	});
+}
+
 declare global {
 	interface Window {
-		textComponents: { run: typeof run; webgl: boolean };
+		textComponents: { run: typeof run; outlineGeometry: typeof outlineGeometry; webgl: boolean };
 	}
 }
-window.textComponents = { run, webgl: player.isWebGL };
+window.textComponents = { run, outlineGeometry, webgl: player.isWebGL };

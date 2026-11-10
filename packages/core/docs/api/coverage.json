@@ -1,8 +1,8 @@
 {
   "package": "@kurot/core",
-  "version": "3.5.2",
+  "version": "3.6.0",
   "exports": 172,
-  "members": 2228,
+  "members": 2229,
   "missing": [],
   "withoutComment": [
     "AnalyzerBase.onResourceDestroy",

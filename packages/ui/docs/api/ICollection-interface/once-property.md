@@ -1,6 +1,6 @@
 # once
 
-Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 once: { (type: K, listener: (event: ICollectionEvents<T>[K]) => void, useCapture?: boolean, priority?: number): void; (type: string, listener: (event: Event) => void, useCapture?: boolean, priority?: number): void };

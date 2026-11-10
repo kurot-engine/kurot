@@ -8,7 +8,7 @@ For named textures, atlas frames, URL caches and ownership, read
 For game UI, read [standard authoring](ui-authoring.md) and the
 [ScoreHUD pair](recipes/score-hud.md). For API lookup, use
 [topics](api/topics.md) and the [symbol/member index](api/index.md).
-This maintainer map covers `@kurot/ui@5.2.3`,
+This maintainer map covers `@kurot/ui@5.3.0`,
 with Core peer **^3.2.1** for stable text frames and native BackdropBlur.
 Inherited defaults follow the installed Core; set important alignment explicitly.
 Source and its public barrel define the current API.
@@ -239,6 +239,10 @@ Label and EditableText preserve their native sizing rules. `textFit` defaults
 to `none`; `shrink` supports single/multiline text, keeps authored `size` and
 reports read-only renderedSize/textFitOverflow. `minFontSize` defaults to 12
 logical units and must be finite and >= 1. Automatic axes are unconstrained.
+With multiline word wrapping, fitting first rejects emergency word breaks,
+then accepts the existing fallback only at the minimum size. This uses Core's
+optional `ILineElement.hasEmergencyBreak` (Core >= 3.6.0); hosts without it retain
+legacy fitting. RichLabel outline layout itself keeps the Core ^3.2.1 minimum.
 Font readiness requires `label.invalidateSize()` even when the family name is
 unchanged. See [Label layout](label-text-layout.md).
 
@@ -247,5 +251,9 @@ Superseded loads cannot overwrite a new font; asynchronous failures dispatch
 IO_ERROR. [BitmapLabel](bitmap-label.md) documents ownership and constraints.
 
 RichLabel is an independent Component with `textFlow` plus seven component
-typography defaults. It does not expose Label plain text, presets or fitting. It owns copies of runs/styles, uses continuous wrapping and restores
+typography defaults. It does not expose Label plain text, presets or fitting.
+OutlineLayout defaults to render-only; reserve-space shares Label's content
+insets using effective run styles. defaultOutlineLayout and a construction
+UIContext can select the policy for new instances; outlineLayout overrides one
+instance. It owns copies of runs/styles, uses continuous wrapping and restores
 whole-flow states. [RichLabel](rich-label.md) documents measurement and cleanup.

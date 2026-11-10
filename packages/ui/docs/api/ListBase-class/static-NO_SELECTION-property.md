@@ -1,6 +1,6 @@
 # static NO_SELECTION
 
-Package: `@kurot/ui@5.2.3`. Generated from public declarations and JSDoc.
+Package: `@kurot/ui@5.3.0`. Generated from public declarations and JSDoc.
 
 ```ts
 protected static readonly NO_SELECTION: -1;

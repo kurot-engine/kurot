@@ -28,7 +28,7 @@ test.beforeAll(async () => {
 });
 
 for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
-	for (const density of [1, 2]) {
+	for (const density of [1, 1.5, 2]) {
 		test(`${backend} ${density}x: Label and RichLabel multilingual pixels and incremental output`, async ({
 			page,
 		}) => {
@@ -63,18 +63,35 @@ for (const backend of ['canvas', 'webgl1', 'webgl2'] as const) {
 			expect(errors).toEqual([]);
 			await page.waitForFunction(() => window.textComponents !== undefined);
 			expect(await page.evaluate(() => window.textComponents.webgl)).toBe(backend !== 'canvas');
-			let comparisons = 0;
-			let prefixes = 0;
-			for (const language of textLanguages) {
-				const result = await page.evaluate(({ code, family }) => window.textComponents.run(code, family), {
-					code: language.code,
-					family: textFixtureFamily(language.script),
+			for (const reserve of [false, true]) {
+				const outlines = await page.evaluate(reserve => window.textComponents.outlineGeometry('Fixture-barlow-bold', reserve), reserve);
+				await test.info().attach('outline-geometry', {
+					body: JSON.stringify(outlines, undefined, 2), contentType: 'application/json',
 				});
-				comparisons += result.comparisons;
-				prefixes += result.prefixes;
+				for (const [label, rich] of outlines) {
+					const inset = label.stroke > 0 ? Math.ceil(label.stroke) + 2 : 0;
+					const difference = reserve ? 0 : inset;
+					expect(label.lineHeight).toBe(rich.lineHeight);
+					expect(label.height - rich.height).toBe(difference * 2);
+					expect([label.origin, rich.origin]).toEqual([inset, reserve ? inset : 0]);
+					expect(label.baseline - rich.baseline).toBe(difference);
+					expect(Math.abs(label.inkTop - rich.inkTop - difference)).toBeLessThanOrEqual(1 / density);
+					expect(Math.abs(label.inkBottom - rich.inkBottom - difference)).toBeLessThanOrEqual(1 / density);
+				}
+				let comparisons = 0;
+				let prefixes = 0;
+				for (const language of textLanguages) {
+					const result = await page.evaluate(({ code, family, reserve }) => window.textComponents.run(code, family, reserve), {
+						code: language.code,
+						family: textFixtureFamily(language.script),
+						reserve,
+					});
+					comparisons += result.comparisons;
+					prefixes += result.prefixes;
+				}
+				expect(comparisons).toBe(31 * 12);
+				expect(prefixes).toBeGreaterThan(1000);
 			}
-			expect(comparisons).toBe(31 * 12);
-			expect(prefixes).toBeGreaterThan(1000);
 			expect(errors).toEqual([]);
 		});
 	}
