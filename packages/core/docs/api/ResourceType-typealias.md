@@ -1,6 +1,6 @@
 # ResourceType
 
-Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
 
 ```ts
 type ResourceType = typeof ResourceType[keyof typeof ResourceType];

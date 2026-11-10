@@ -4,6 +4,22 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.5.1 — 2026-11-10
+
+Source release preparation; npm publication and artifact verification are
+recorded separately in the [repository changelog](../../CHANGELOG.md).
+
+- Set the full multi-texture sampler mapping for every batch, aliasing unused
+  samplers to its bound source at unit zero. Sequential GPU cache rebuilds no
+  longer sample framebuffer attachments through stale sampler slots or retain
+  transparent results. Reuse the mapping array without extra texture uploads.
+- Associate queued clears with an explicit render target so disabling a cache
+  before allocating an object mask cannot leave the previous frame visible.
+  Keep the resource-release flush and GPU cache/Canvas behavior.
+- Keep interrupted cache captures invalid when context loss occurs before its
+  DOM event. Cover changed and stable frame pixels, alternating batch sizes,
+  nested caches/effects, failed-capture rollback and first-frame mask cleanup.
+
 ## 3.5.0 — 2026-11-10
 
 The published [npm package](https://www.npmjs.com/package/@kurot/core/v/3.5.0)

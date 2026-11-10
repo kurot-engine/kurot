@@ -2,6 +2,8 @@
 
 GPU subtree capture is available in Core >= 3.5.0 within 3.x. Earlier versions
 use Canvas rasterization for subtree caches even on the WebGL backend.
+Use Core >= 3.5.1 within 3.x for the complete sampler-state and first-frame
+clearing guarantees below. Existing cache settings need no migration.
 
 `display.cacheAsBitmap = true` aliases `display.cacheAsTexture(true)`.
 Use `cacheAsTexture({ resolution, scaleMode })` to select cache sampling;
@@ -30,6 +32,13 @@ live cache surfaces, including detached ones. Unreachable owners have a GC
 fallback; use explicit cache disabling or Player destruction for timely release.
 After context restoration, invalid attachments are recreated and content is
 rendered again before sampling; source pixels retain their original ownership.
+
+Multi-texture batches set all active shader sampler mappings, including unused
+entries, so previous texture slots cannot feed back into the current framebuffer.
+Queued clears explicitly activate their target; allocating a later mask cannot
+redirect a pending clear. A capture becomes reusable only after its commands
+have been submitted without an exception or context loss; frame exceptions
+invalidate captures already refreshed in that frame.
 
 ## Coordinates and composition
 
@@ -65,7 +74,10 @@ CPU render time, GPU work and presentation FPS are different measurements.
 
 Run Core build/tests and `pnpm test:visual` from the Core package. The `gpu-cache`
 browser cases cover WebGL 1/2, 1x/2x pixels, nesting, clipping, masks, filters,
-updates, storage reuse, sampling, texture limits, teardown and context recovery.
+consecutive updates, first-frame clearing, storage reuse, sampling, texture limits,
+teardown and interrupted-capture recovery. The `gpu-sampler-batches` cases alternate
+eight-, one- and intermediate-texture batches across nested caches and effects;
+both updated and subsequent frames are checked.
 The existing Canvas and visual golden checks remain unchanged.
 
 `node tools/verify-cache-list.mjs` runs a native UI List/Scroller with 200 rows,

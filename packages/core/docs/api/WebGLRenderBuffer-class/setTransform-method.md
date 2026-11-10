@@ -1,6 +1,6 @@
 # setTransform
 
-Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
 
 ```ts
 setTransform(a: number, b: number, c: number, d: number, tx: number, ty: number): void;

@@ -1,6 +1,6 @@
 # static EMPTY_FACTOR
 
-Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
 
 ```ts
 static EMPTY_FACTOR: number;

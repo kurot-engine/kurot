@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.5.0`. It provides Kurot's
+Package identity: `@kurot/core@3.5.1`. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two

@@ -74,6 +74,8 @@ ui-runtime. CLI/templates and application adoption are separate follow-ups.
 WebGL GPU subtree caching requires Core >= 3.5.0 within 3.x. Existing
 `cacheAsBitmap` / `cacheAsTexture` calls adopt it by updating the application's
 Core installation; no UI, Game, DragonBones, ui-runtime or CLI release is needed.
+Select Core >= 3.5.1 within 3.x for the sampler-state and first-frame clearing
+corrections when rebuilding caches or transitioning from caches to object masks.
 Keep their peer minima and accepted locks unchanged unless explicitly adopting
 the new Core baseline. See [cache textures](../packages/core/docs/cache-textures.md).
 

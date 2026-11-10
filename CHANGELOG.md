@@ -24,6 +24,37 @@ its changes in its own CHANGELOG.md.
   and scroll-tail checks, plus minified Canvas Slot KUI spin/skin/disposal checks.
   These use deterministic fixtures; temporary browser sessions and servers close.
 
+## 2026-11-10 — Core 3.5.1 release preparation
+
+- Prepare only `@kurot/core` for complete multi-texture sampler mappings, explicit
+  queued-clear targets and interrupted GPU cache capture protection. Consecutive
+  cache updates retain their pixels, and disabling a cache before creating an
+  object mask no longer leaves the previous frame visible. Existing cache APIs,
+  Canvas fallback, input rules and clocks retain their contracts.
+- Update the source/runtime version, README, architecture header, package map
+  and generated API references. UI, Game, DragonBones, ui-runtime and Spine peers
+  already accept this patch; their development-lock adoption is optional. CLI
+  templates use `latest` and require no template or CLI release. Caret-based
+  applications may update their locks; exact pins in SAO, Editor, Star Catcher,
+  Card Booster and Skydive require explicit adoption. Skia's ~3.2.3 and Studio's
+  Core 2.x baselines require separate compatibility work. Consumer code and
+  dependencies are not changed by this preparation.
+- Fix validation passed 1,185 Core and 641 UI tests, 177 browser checks (two
+  external MP3 cases skipped), and 15 hardware-browser comparisons using the
+  original independent probes against Core 3.4.0, npm 3.5.0 and the fixed code.
+  WebGL1/2 cover alternating batch sizes, nested caches, filters, masks, changed
+  and stable pixels, interrupted captures and context restoration.
+- M1 Max list measurements retain about 120 FPS and identical draws/uploads.
+  Three-trial median cached render means are 0.348 → 0.334 ms for scrolling and
+  0.641 → 0.671 ms for continuous updates; no Canvas subtree redraws are added.
+  These are fixture measurements, not the complete SAO Shop page.
+- After the patch bump, Core build and all 1,185 tests pass again. The actual
+  3.5.1 archive passes 30 GPU cache/sampler browser cases; all 22 API examples
+  compile against built and packed declarations. Packed metadata, runtime
+  engineVersion and 2,636 shipped API files agree on Core 3.5.1.
+- This records source preparation. npm publication, downloaded-archive integrity
+  verification and the annotated release tag follow publication.
+
 ## 2026-11-10 — Examples and Templates adopt Core 3.5.0 / UI 5.2.2
 
 - Verify npm latest and adopt Core 3.5.0 in demo, game and star-catcher plus

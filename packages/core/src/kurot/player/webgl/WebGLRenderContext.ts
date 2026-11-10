@@ -76,6 +76,7 @@ export class WebGLRenderContext implements RenderContext {
 	private _filterOutputWidth = 0;
 	private _filterOutputHeight = 0;
 	private readonly _batcher = new MultiTextureBatcher();
+	private readonly _samplerIndices = new Int32Array(MultiTextureBatcher.MAX_TEXTURES);
 	private readonly _bufferStack: WebGLRenderBuffer[] = [];
 	private _currentBuffer?: WebGLRenderBuffer;
 	private _vertexBuffer: WebGLBuffer;
@@ -953,6 +954,12 @@ export class WebGLRenderContext implements RenderContext {
 	}
 
 	public clear(): void {
+		// Allocation can bind an offscreen framebuffer before queued commands
+		// execute. A clear must name its target even if the logical stack did
+		// not change, rather than relying on a previously flushed activation.
+		if (this._currentBuffer) {
+			this.drawCmdManager.pushActivateBuffer(this._currentBuffer);
+		}
 		this.drawCmdManager.pushClearColor();
 	}
 
@@ -1247,13 +1254,19 @@ export class WebGLRenderContext implements RenderContext {
 		if (uProj) gl.uniform2f(uProj, this.projectionX, this.projectionY);
 
 		const uSamplers = prog.uniforms['uSamplers[0]'];
-		const samplerIndices = new Int32Array(cmd.textureCount);
+		// Every shader sampler remains active, even when this batch's vertices
+		// use fewer textures. Alias unused samplers to the bound source at unit 0
+		// so stale units cannot sample the framebuffer currently being written.
+		const samplerIndices = this._samplerIndices;
+		samplerIndices.fill(0);
 		for (let i = 0; i < cmd.textureCount; i++) {
 			gl.activeTexture(gl.TEXTURE0 + i);
 			gl.bindTexture(gl.TEXTURE_2D, cmd.textures[i] ?? null);
 			samplerIndices[i] = i;
 		}
-		if (uSamplers) gl.uniform1iv(uSamplers, samplerIndices);
+		if (uSamplers) {
+			gl.uniform1iv(uSamplers, samplerIndices);
+		}
 		gl.activeTexture(gl.TEXTURE0);
 
 		gl.drawElements(gl.TRIANGLES, count * 3, gl.UNSIGNED_SHORT, indexOffset * 6);

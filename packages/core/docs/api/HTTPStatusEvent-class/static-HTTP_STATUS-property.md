@@ -1,6 +1,6 @@
 # static HTTP_STATUS
 
-Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
 
 ```ts
 static readonly HTTP_STATUS: "httpStatus";

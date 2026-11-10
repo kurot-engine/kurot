@@ -1,6 +1,6 @@
 # createTexture
 
-Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.1`. Generated from public declarations and JSDoc.
 
 ```ts
 createTexture(name: string, bitmapX: number, bitmapY: number, bitmapWidth: number, bitmapHeight: number, offsetX: number, offsetY: number, textureWidth?: number, textureHeight?: number): Texture;

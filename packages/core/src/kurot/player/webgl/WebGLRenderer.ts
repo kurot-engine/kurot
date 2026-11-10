@@ -905,13 +905,24 @@ export class WebGLRenderer {
 			cache?.dispose();
 			cache = displayList.$gpuCache = new WebGLCache(buffer.context);
 		}
+		const context = buffer.context;
+		if (context.contextLost) {
+			cache.valid = false;
+			return;
+		}
 		const surface = cache.prepare(displayList, buffer.resolution);
 		if (!surface) {
 			return;
 		}
 		if (!cache.valid || obj.$cacheDirty || obj.$renderDirty) {
 			cache.valid = false;
+			const contextVersion = context.contextVersion;
 			this._renderCacheContent(obj, surface, displayList.offsetX, displayList.offsetY);
+			// Context loss can precede its DOM event and silently discard GL
+			// commands. Do not commit that capture; restoration must regenerate it.
+			if (context.contextLost || context.contextVersion !== contextVersion || context.gl.isContextLost()) {
+				return;
+			}
 			cache.valid = true;
 			this._updatedCaches.push(cache);
 			displayList.$canvasDirty = true;
