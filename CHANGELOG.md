@@ -5,6 +5,48 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-10 — Examples and Templates adopt Core 3.5.1
+
+- Verify npm latest and adopt Core 3.5.1 in demo, game and star-catcher plus
+  Card Booster, MilfMaster, Runaway, Skydive and Tentax. Synchronize selected
+  locks and current dependency documentation, preserving exact/caret styles.
+- UI stays at 5.2.2 and CLI at 5.1.2; other tools and Node 22 floors are
+  unchanged. The patch corrects WebGL sampler mapping, interrupted captures
+  and first-frame clearing. Applications retain their existing source and KUI.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and full declaration checks pass on Node 22.12.0/22.18.0. All 818
+  application unit tests and provided architecture/resource checks pass.
+  Installed native SDKs resolve the application's shared Core instance.
+- The twelve demo/game development/release WebGL/Canvas cases pass with
+  runtime Core 3.5.1; Star Catcher passes six gameplay/lifecycle cases.
+- The five Templates pass development WebGL fixtures. MilfMaster also passes
+  WebGL and minified Canvas outline, clearing/retyping, English/Japanese wrapping
+  and scroll-tail checks, plus minified Canvas Slot KUI spin/skin/disposal checks.
+  These use deterministic fixtures; temporary browser sessions and servers close.
+
+## 2026-11-10 — Examples and Templates adopt Core 3.5.0 / UI 5.2.2
+
+- Verify npm latest and adopt Core 3.5.0 in demo, game and star-catcher plus
+  Card Booster, MilfMaster, Runaway, Skydive and Tentax. Adopt UI 5.2.2 where
+  already used, retaining exact/caret declarations and selected project locks.
+- Synchronize current dependency docs. CLI remains 5.1.2; Game 3.0.1, animation
+  adapters, ui-document 0.14.0 and unrelated tools retain their existing versions.
+  Native SDKs resolve the application's shared Core. Authored KUI, application
+  source, resource adapters and clock/background-policy settings are unchanged.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and full declaration checks pass on the existing Node 22.12.0/22.18.0
+  floors. All 818 application unit tests and provided architecture/resource
+  checks pass.
+- All twelve demo/game development/release WebGL/Canvas cases pass with
+  runtime Core 3.5.0, including native controls, selection and drag cancellation.
+  Star Catcher passes all six gameplay/lifecycle browser cases.
+- The five Templates pass development WebGL fixtures. MilfMaster additionally
+  passes development WebGL and minified-release Canvas text checks for outline
+  pixels, all viewport edges, clearing/retyping, English/Japanese wrapping and
+  scroll tails. Minified Canvas Slot KUI passes constructor identity, three spin
+  modes, skin replacement and teardown. Fixtures are deterministic; temporary
+  browser sessions and servers close afterward.
+
 ## 2026-11-10 — Core 3.5.0 published and verified
 
 - [npm @kurot/core@3.5.0](https://www.npmjs.com/package/@kurot/core/v/3.5.0)
