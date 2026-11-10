@@ -1,6 +1,6 @@
 # matrix
 
-Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
 
 ```ts
 get matrix(): number[];

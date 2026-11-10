@@ -1,16 +1,17 @@
 # startTick
 
-Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
 
 ```ts
 startTick(callback: TickCallback): void;
 ```
 
-Registers a callback receiving absolute milliseconds from getTimer(), not
+Registers a callback receiving absolute milliseconds on the getTimer() clock, not
 a delta or seconds. Returning true requests rendering. The callback runs
 without a receiver and is deduplicated by function identity. Use an arrow
 member or bind once when the callback needs instance state.
-Registration does not start the requestAnimationFrame loop by itself.
+Registration does not start scheduling. Continue mode runs callbacks once per
+logical frame, including replayed frames; pause mode retains browser tick cadence.
 
 **example**
 

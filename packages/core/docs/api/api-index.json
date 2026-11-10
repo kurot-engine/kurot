@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -428,6 +428,13 @@
           "inherited": false
         }
       ]
+    },
+    {
+      "name": "BackgroundPolicy",
+      "kind": "TypeAlias",
+      "file": "BackgroundPolicy-typealias.md",
+      "topic": "player",
+      "members": []
     },
     {
       "name": "Base64Util",
@@ -6607,6 +6614,12 @@
           "inherited": false
         },
         {
+          "name": "backgroundPolicy",
+          "file": "KurotOptions-interface/backgroundPolicy-property.md",
+          "protected": false,
+          "inherited": true
+        },
+        {
           "name": "canvas",
           "file": "KurotOptions-interface/canvas-property.md",
           "protected": false,
@@ -6651,6 +6664,20 @@
         {
           "name": "scaleMode",
           "file": "KurotOptions-interface/scaleMode-property.md",
+          "protected": false,
+          "inherited": false
+        }
+      ]
+    },
+    {
+      "name": "LifecycleOptions",
+      "kind": "Interface",
+      "file": "LifecycleOptions-interface.md",
+      "topic": "player",
+      "members": [
+        {
+          "name": "backgroundPolicy",
+          "file": "LifecycleOptions-interface/backgroundPolicy-property.md",
           "protected": false,
           "inherited": false
         }
@@ -12084,8 +12111,26 @@
           "inherited": false
         },
         {
+          "name": "backgroundPolicy",
+          "file": "SystemTicker-class/backgroundPolicy-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "frameRate",
           "file": "SystemTicker-class/frameRate-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "pendingTime",
+          "file": "SystemTicker-class/pendingTime-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "time",
+          "file": "SystemTicker-class/time-accessor.md",
           "protected": false,
           "inherited": false
         },
@@ -12122,6 +12167,12 @@
         {
           "name": "setFrameRate",
           "file": "SystemTicker-class/setFrameRate-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setPageHidden",
+          "file": "SystemTicker-class/setPageHidden-method.md",
           "protected": false,
           "inherited": false
         },
@@ -13295,8 +13346,26 @@
       "topic": "player",
       "members": [
         {
+          "name": "backgroundPolicy",
+          "file": "ticker-variable/backgroundPolicy-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
           "name": "frameRate",
           "file": "ticker-variable/frameRate-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "pendingTime",
+          "file": "ticker-variable/pendingTime-accessor.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "time",
+          "file": "ticker-variable/time-accessor.md",
           "protected": false,
           "inherited": false
         },
@@ -13333,6 +13402,12 @@
         {
           "name": "setFrameRate",
           "file": "ticker-variable/setFrameRate-method.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "setPageHidden",
+          "file": "ticker-variable/setPageHidden-method.md",
           "protected": false,
           "inherited": false
         },

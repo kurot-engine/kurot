@@ -1,6 +1,6 @@
 # beginGradientFill
 
-Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
 
 ```ts
 beginGradientFill(gradientType: string, colors: number[], alphas: number[], ratios: number[], matrix?: Matrix): void;

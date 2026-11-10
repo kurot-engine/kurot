@@ -1,6 +1,6 @@
 # @kurot/core API
 
-Version: **3.3.0**. Read the installed package's matching documentation.
+Version: **3.4.0**. Read the installed package's matching documentation.
 
 Choose a capability in [topics](topics.md), then open a symbol and only the members needed.
 Parameter/result helpers are in [supporting types](supporting/index.md); machine lookup is in [api-index.json](api-index.json).
@@ -15,6 +15,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `AnalyzerBase` | Class | [open](AnalyzerBase-class.md) |
 | `BackdropBlur` | Class | [open](BackdropBlur-class.md) |
 | `BackdropBlurOptions` | Interface | [open](BackdropBlurOptions-interface.md) |
+| `BackgroundPolicy` | TypeAlias | [open](BackgroundPolicy-typealias.md) |
 | `Base64Util` | Class | [open](Base64Util-class.md) |
 | `Bitmap` | Class | [open](Bitmap-class.md) |
 | `BitmapData` | Class | [open](BitmapData-class.md) |
@@ -103,6 +104,7 @@ Coverage of declarations and coverage of behavioral comments are reported separa
 | `JsonAnalyzer` | Class | [open](JsonAnalyzer-class.md) |
 | `KurotApp` | Interface | [open](KurotApp-interface.md) |
 | `KurotOptions` | Interface | [open](KurotOptions-interface.md) |
+| `LifecycleOptions` | Interface | [open](LifecycleOptions-interface.md) |
 | `localStorage` | Namespace | [open](localStorage-namespace.md) |
 | `Logger` | Variable | [open](Logger-variable.md) |
 | `LogLevel` | Enum | [open](LogLevel-enum.md) |

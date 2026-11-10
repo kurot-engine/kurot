@@ -15,6 +15,8 @@ export {
 	requestRenderingFlag,
 	setRequestRenderingFlag,
 	type Renderable,
+	type BackgroundPolicy,
+	type LifecycleOptions,
 } from './SystemTicker.js';
 
 // ── Rendering ─────────────────────────────────────────────────────────────────

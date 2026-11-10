@@ -1,3 +1,4 @@
+import type { LifecycleOptions } from './SystemTicker.js';
 import type { StageScaleMode } from '../display/enums/StageScaleMode.js';
 import type { OrientationMode } from '../display/enums/OrientationMode.js';
 
@@ -6,7 +7,7 @@ import type { OrientationMode } from '../display/enums/OrientationMode.js';
  * explicit options first, then the canvas attributes documented below, then
  * their original defaults. Attributes are read once when createPlayer is called.
  */
-export interface KurotOptions {
+export interface KurotOptions extends LifecycleOptions {
 	/**
 	 * The canvas element to render into.
 	 */

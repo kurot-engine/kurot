@@ -3,6 +3,7 @@ import { createPlayer } from '../src/kurot/player/createPlayer.js';
 import { Player } from '../src/kurot/player/Player.js';
 import { ScreenAdapter } from '../src/kurot/player/ScreenAdapter.js';
 import { TouchHandler } from '../src/kurot/player/TouchHandler.js';
+import { ticker } from '../src/kurot/player/SystemTicker.js';
 import { createTextMetrics } from './helpers/text-metrics.js';
 
 describe('createPlayer lifecycle', () => {
@@ -60,6 +61,36 @@ describe('createPlayer lifecycle', () => {
 		player.destroy();
 	});
 
+	it('owns all continuous scheduling through stop, restart and hidden destruction', () => {
+		vi.useFakeTimers();
+		const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+		const app = createPlayer({ canvas: document.createElement('canvas'), backgroundPolicy: 'continue' });
+		const callback = vi.fn(() => false);
+		ticker.startTick(callback);
+		try {
+			app.start();
+			expect(vi.getTimerCount()).toBe(1);
+			app.stop();
+			vi.advanceTimersByTime(60000);
+			expect(callback).not.toHaveBeenCalled();
+			app.start();
+			vi.advanceTimersByTime(1000);
+			expect(callback).toHaveBeenCalledOnce();
+			app.destroy();
+			app.destroy();
+			hidden.mockReturnValue(false);
+			document.dispatchEvent(new globalThis.Event('visibilitychange'));
+			vi.advanceTimersByTime(60000);
+			expect(callback).toHaveBeenCalledOnce();
+			expect(vi.getTimerCount()).toBe(0);
+			expect(ticker.backgroundPolicy).toBe('pause');
+		} finally {
+			app.destroy();
+			ticker.stopTick(callback);
+			vi.useRealTimers();
+		}
+	});
+
 	it('uses CLI canvas stage defaults for a canvas-only startup', () => {
 		const canvas = document.createElement('canvas');
 		Object.assign(canvas.dataset, { contentWidth: '1136', contentHeight: '640', scaleMode: 'exactFit', orientation: 'landscape', frameRate: '30' });
@@ -73,6 +104,25 @@ describe('createPlayer lifecycle', () => {
 			expect(app.screenAdapter.resolution).toBe(Math.min(window.devicePixelRatio || 1, 2));
 		} finally {
 			app.destroy();
+		}
+	});
+
+	it('can destroy a continuous app from inside a tick without continuing that frame', () => {
+		vi.useFakeTimers();
+		vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+		const app = createPlayer({ canvas: document.createElement('canvas'), backgroundPolicy: 'continue' });
+		const render = vi.spyOn(app.player, 'render');
+		const destroy = (): boolean => { app.destroy(); return false; };
+		ticker.startTick(destroy);
+		try {
+			app.start();
+			expect(() => vi.advanceTimersByTime(1000)).not.toThrow();
+			expect(render).not.toHaveBeenCalled();
+			expect(vi.getTimerCount()).toBe(0);
+		} finally {
+			app.destroy();
+			ticker.stopTick(destroy);
+			vi.useRealTimers();
 		}
 	});
 

@@ -1,5 +1,6 @@
 # player
 
+- [BackgroundPolicy](../BackgroundPolicy-typealias.md) — TypeAlias
 - [CanvasBuffer](../CanvasBuffer-class.md) — Class
 - [CanvasRenderer](../CanvasRenderer-class.md) — Class
 - [checkWebGLSupport](../checkWebGLSupport-function.md) — Function
@@ -12,6 +13,7 @@
 - [invalidateRenderFlag](../invalidateRenderFlag-variable.md) — Variable
 - [KurotApp](../KurotApp-interface.md) — Interface
 - [KurotOptions](../KurotOptions-interface.md) — Interface
+- [LifecycleOptions](../LifecycleOptions-interface.md) — Interface
 - [MultiTextureBatcher](../MultiTextureBatcher-class.md) — Class
 - [Player](../Player-class.md) — Class
 - [Renderable](../Renderable-interface.md) — Interface

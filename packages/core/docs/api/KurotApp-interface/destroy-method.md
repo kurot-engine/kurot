@@ -1,6 +1,6 @@
 # destroy
 
-Package: `@kurot/core@3.3.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
 
 ```ts
 destroy(): void;
@@ -9,3 +9,4 @@ destroy(): void;
 Idempotently destroys the Player and detaches canvas input, sizing and
 lifecycle bindings. Remove application-owned handlers, ticker callbacks
 and Tweens separately; this does not dispose every resource in a scene.
+Continue mode cancels all owned background and catch-up scheduling.

@@ -5,6 +5,40 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-10 — Core 3.4.0 release preparation
+
+- Prepare only `@kurot/core` for optional background logic and recovery. The
+  public setting is `backgroundPolicy: 'pause' | 'continue'`, defaulting to
+  pause. Continue shares one fixed-frame logical clock across frame callbacks,
+  Tween and Timer, skips hidden drawing and replays debt in separate bounded
+  tasks. Visibility cannot release a business pause; stop/destroy cancels work.
+- Update the manifest, runtime engineVersion, README, package map and generated
+  API references to 3.4.0. Projects enabling continue must select Core >= 3.4.0
+  and connect separate frame/second schedulers to it; server time stays on the
+  real-world clock. SAO adoption was tested in an isolated installation; its
+  business logic, PureMVC and installed dependency lock are not part of this
+  engine release commit.
+- UI, Game, DragonBones, ui-runtime and Spine peers already accept Core 3.4.0;
+  their development-lock adoption is optional and requires no SDK release.
+  CLI templates use latest, while demo/game and caret-based Templates can adopt
+  via lock updates. Star Catcher, SAO, Card Booster, Skydive and Editor pins
+  need explicit adoption. Skia and its demo's ~3.2.3 range need a separate
+  compatibility update; Studio's Core 2.x baseline remains a separate migration.
+  Consumer manifests, peer minima and locks are unchanged here.
+- All nine SDK builds and 2,635 unit tests passed for this feature. After final
+  naming/version changes, Core's build and all 1,184 tests passed again. The
+  3.4.0 archive passed SAO build/typecheck and all 432 tests: two real reports at
+  0.25/1/2 speed preserve steps, animation frames and notifications through
+  recovery with both frame-source configurations. The background probe advances
+  60 frames and two second callbacks over two seconds, with zero hidden draws.
+- Chromium checks pass with controlled visibility and host callback suspension,
+  including recovery, business pause and destruction. This does not certify
+  actual mobile OS freezing or notification delivery. API completeness and all
+  22 built/packed examples pass. Both packed CLI templates already passed their
+  development/release builds for this feature; git diff whitespace checks pass.
+- This records source preparation. npm publication, downloaded-artifact integrity
+  verification and the annotated release tag follow publication.
+
 ## 2026-11-10 — UI 5.2.2 release preparation
 
 - Prepare only `@kurot/ui` for the [Label and RichLabel width recovery fix](packages/ui/CHANGELOG.md#522--2026-11-10).

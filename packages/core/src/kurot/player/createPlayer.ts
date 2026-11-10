@@ -5,7 +5,7 @@ import { Matrix } from '../geom/Matrix.js';
 import { Player } from './Player.js';
 import { TouchHandler } from './TouchHandler.js';
 import { ScreenAdapter } from './ScreenAdapter.js';
-import { setupLifecycle } from './SystemTicker.js';
+import { setupLifecycle, ticker } from './SystemTicker.js';
 import { CanvasRenderer, CanvasBuffer } from './canvas/index.js';
 import type { KurotOptions } from './KurotOptions.js';
 import { Capabilities } from '../system/Capabilities.js';
@@ -26,7 +26,8 @@ export interface KurotApp {
 	 */
 	start(root?: DisplayObject): void;
 	/**
-	 * Stops this Player without releasing input or lifecycle bindings.
+	 * Stops this Player without releasing input or lifecycle bindings. Continue
+	 * mode also stops its shared logic scheduler; start() excludes stopped time.
 	 * Application-owned ticker callbacks and Tweens require their own cleanup.
 	 */
 	stop(): void;
@@ -34,6 +35,7 @@ export interface KurotApp {
 	 * Idempotently destroys the Player and detaches canvas input, sizing and
 	 * lifecycle bindings. Remove application-owned handlers, ticker callbacks
 	 * and Tweens separately; this does not dispose every resource in a scene.
+	 * Continue mode cancels all owned background and catch-up scheduling.
 	 */
 	destroy(): void;
 }
@@ -102,7 +104,7 @@ export function createPlayer(options: KurotOptions): KurotApp {
 		contentHeight,
 		resolution,
 	);
-	const disposeLifecycle = setupLifecycle(stage);
+	const disposeLifecycle = setupLifecycle(stage, options);
 	let destroyed = false;
 
 	return {
@@ -120,6 +122,7 @@ export function createPlayer(options: KurotOptions): KurotApp {
 		destroy(): void {
 			if (destroyed) return;
 			destroyed = true;
+			ticker.stop();
 			player.destroy();
 			touchHandler.dispose();
 			screenAdapter.dispose();

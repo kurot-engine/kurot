@@ -62,6 +62,12 @@ Core >= 3.3.0 within 3.x; basic loading remains compatible with the ^3.2.1
 peer minimum. New CLI game starters use this default adapter. Existing custom
 adapters and application locks are adopted separately.
 
+Projects opting into `backgroundPolicy: 'continue'` require Core >= 3.4.0
+within 3.x. The default remains pause; unchanged SDK peers and application locks
+need no update. Adoption connects independent project frame/second schedulers to
+the engine clock and keeps server deadlines on real-world time. See
+[background logic](../packages/core/docs/ticker.md#optional-background-logic).
+
 This requirement does not raise the minima of unchanged Game, DragonBones or
 ui-runtime. CLI/templates and application adoption are separate follow-ups.
 

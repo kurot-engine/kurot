@@ -1,6 +1,6 @@
 {
 	"name": "@kurot/core",
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"description": "TypeScript 2D web game engine — WebGL multi-texture batching, instruction-driven rendering, display objects, text and resources",
 	"author": "Kelvin <kyia.x52@gmail.com>",
 	"license": "MIT",
@@ -40,7 +40,8 @@
 		"test:soak:overnight": "SOAK_DURATION_MINUTES=480 playwright test --config examples/benchmark/soak.playwright.config.ts",
 		"test:device-matrix": "playwright test --config examples/benchmark/device-matrix.playwright.config.ts",
 		"build:benchmark": "vite --config vite.config.ts build",
-		"preview:benchmark": "vite preview --config vite.config.ts --host 0.0.0.0 --port 4173"
+		"preview:benchmark": "vite preview --config vite.config.ts --host 0.0.0.0 --port 4173",
+		"test:background": "node tools/verify-background.mjs"
 	},
 	"devDependencies": {
 		"@playwright/test": "1.62.1",

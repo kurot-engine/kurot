@@ -1,7 +1,8 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Published version: [**3.3.0**](https://www.npmjs.com/package/@kurot/core/v/3.3.0).
+for browser games. Source version: **3.4.0**. Publication is tracked in the
+[repository changelog](../../CHANGELOG.md).
 
 Start with the [game authoring guide](docs/game-authoring.md),
 [API topics](docs/api/topics.md) or [symbol index](docs/api/index.md). Read only
@@ -21,6 +22,27 @@ and docs without requiring the engine source.
 When leaving a game view, destroy its player before reusing the canvas. Destruction detaches WebGL context listeners and releases player-owned GPU storage; the application still owns its decoded pixels. Aborting a ResourceLoader batch ends its queue notifications. An already-running analyzer may finish its own work, but cannot settle or retry the next batch.
 
 Finite Web Audio repeats end on the scheduled output frame, including when the decoded sound's length cannot be represented exactly in seconds. See [audio playback](docs/audio-playback.md) for offset and loop-count behavior.
+
+## Optional background progress
+
+Core 3.4 adds a project-selected background policy:
+
+```ts
+import { createPlayer } from '@kurot/core';
+
+const canvas = document.querySelector<HTMLCanvasElement>('canvas')!;
+const app = createPlayer({ canvas, backgroundPolicy: 'continue' });
+// Release application-owned Timer/Tween subscriptions when leaving the game.
+// app.destroy();
+```
+
+The default `'pause'` retains existing scheduling. With `'continue'`, logical
+frames, Tween and Timer share one clock; hidden frames do not draw. After browser
+throttling or freezing, elapsed frames replay in bounded tasks. Business pauses
+remain paused. `getTimer()` then measures logical time: use `Date.now()` for
+server deadlines, and connect independent frame/second schedulers to the ticker.
+Destroying the player cancels its scheduling. See [ticker lifecycle](docs/ticker.md)
+for callback order, catch-up limits and subscription ownership.
 
 ## Shared resource loading
 
@@ -89,7 +111,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.3.0
+pnpm add @kurot/core@^3.4.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared

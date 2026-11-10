@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.3.0`. It provides Kurot's
+Package identity: `@kurot/core@3.4.0`. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -25,7 +25,9 @@ Core >= 2.6.0 can consume canvas stage attributes in `createPlayer`; see
 Core 3 removes ticker receiver parameters and Texture bulk-read/export
 placeholders. Core 3.1 adds Texture.hitTestAlpha and removes the unsupported
 base getPixel32 declaration; real capture reads remain on RenderTexture.
-Use [ticker ownership](ticker.md) for callback identity and release and
+Use [ticker ownership](ticker.md) for callback identity, release and the optional
+`backgroundPolicy: continue` logical clock. Default lifecycle behavior remains
+paused while hidden; business pause is independent of visibility. See also
 [texture alpha testing](texture-density.md#texture-alpha-testing) for sampling.
 
 ## 1. Directory map

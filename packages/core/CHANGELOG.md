@@ -4,6 +4,22 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.4.0 — 2026-11-10
+
+- Add project opt-in `backgroundPolicy: 'continue'`: advance logical frames and
+  Tween/Timer time together, suppress hidden Player rendering, and replay elapsed
+  time after throttling or freezing in bounded, separate tasks. Keep default
+  scheduling, separate business pause from visibility, and cancel all continuous
+  scheduling on Player stop/destroy or lifecycle disposal.
+- Export `BackgroundPolicy` and `LifecycleOptions`; expose logical `ticker.time`
+  and sampled `ticker.pendingTime`. In continue mode `getTimer()` uses logical
+  time, so server deadlines must use a real-world clock. Independent project
+  frame/second sources opt into the ticker explicitly; they are not intercepted.
+- Keep application pause independent of visibility in both policies, and stop
+  owned scheduling on createPlayer destruction in the default policy as well.
+- Cover callback and promise order, hidden drawing, repeated visibility changes,
+  business pause, long debt, integer-millisecond animation boundaries and teardown.
+
 ## 3.3.0 — 2026-11-09
 
 The published [npm package](https://www.npmjs.com/package/@kurot/core/v/3.3.0)
