@@ -1,7 +1,7 @@
 {
   "format": "kurot-api-index-v1",
   "package": "@kurot/core",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "symbols": [
     {
       "name": "AnalyzerBase",
@@ -2775,12 +2775,6 @@
           "inherited": false
         },
         {
-          "name": "canvasBuffer",
-          "file": "DisplayList-class/canvasBuffer-property.md",
-          "protected": false,
-          "inherited": false
-        },
-        {
           "name": "offsetX",
           "file": "DisplayList-class/offsetX-property.md",
           "protected": false,
@@ -2807,6 +2801,12 @@
         {
           "name": "scaleMode",
           "file": "DisplayList-class/scaleMode-property.md",
+          "protected": false,
+          "inherited": false
+        },
+        {
+          "name": "canvasBuffer",
+          "file": "DisplayList-class/canvasBuffer-accessor.md",
           "protected": false,
           "inherited": false
         },

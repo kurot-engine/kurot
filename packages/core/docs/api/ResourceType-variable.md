@@ -1,6 +1,6 @@
 # ResourceType
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 ResourceType: { Font: "font"; Image: "image"; Json: "json"; Sheet: "sheet"; Sound: "sound"; Text: "text" };

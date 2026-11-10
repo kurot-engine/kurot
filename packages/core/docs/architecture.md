@@ -1,6 +1,6 @@
 # @kurot/core architecture
 
-> Package version: 3.3.0. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
+> Package version: 3.5.0. See [CHANGELOG.md](../CHANGELOG.md) for release notes.
 > The [AI context map](./ai-context.md) covers directories, non-obvious behavior,
 > terminology and task-to-file references. This document explains design choices
 > and internal mechanisms for contributors; the two documents complement each other.
@@ -361,7 +361,9 @@ See [GPU filters](filters.md) for APIs, examples, Canvas support and cache limit
 ## 5. Canvas 2D backend
 
 CanvasRenderer traverses the scene graph directly and supplies the fallback when
-WebGL is unavailable. It also rasterizes offscreen caches and RenderTexture captures.
+WebGL is unavailable. It also rasterizes Canvas subtree caches and RenderTexture
+captures. WebGL subtree caches instead own persistent GPU framebuffer textures;
+see [cache textures](cache-textures.md).
 
 - Offscreen Graphics caching through `canvasCacheDirty`.
 - CSS blur/drop-shadow approximations for Blur, DropShadow and Glow.
@@ -376,7 +378,8 @@ WebGL is unavailable. It also rasterizes offscreen caches and RenderTexture capt
 
 CustomFilter, MultiPassFilter and BloomFilter are GPU effects and are skipped.
 Built-in Canvas approximations are not pixel-equivalent to WebGL. The same
-boundary applies to cacheAsTexture and RenderTexture capture.
+boundary applies to Canvas caches and RenderTexture capture. WebGL
+cacheAsTexture uses the GPU pipes and retains descendant GPU effects.
 
 ---
 

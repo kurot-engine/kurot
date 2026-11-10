@@ -1,6 +1,6 @@
 # constructor
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 constructor(context: AudioContext | undefined, audioBuffer: AudioBuffer | undefined, audio: HTMLAudioElement | undefined, startTime: number, loops: number);

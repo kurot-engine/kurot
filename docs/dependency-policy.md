@@ -71,6 +71,12 @@ the engine clock and keeps server deadlines on real-world time. See
 This requirement does not raise the minima of unchanged Game, DragonBones or
 ui-runtime. CLI/templates and application adoption are separate follow-ups.
 
+WebGL GPU subtree caching requires Core >= 3.5.0 within 3.x. Existing
+`cacheAsBitmap` / `cacheAsTexture` calls adopt it by updating the application's
+Core installation; no UI, Game, DragonBones, ui-runtime or CLI release is needed.
+Keep their peer minima and accepted locks unchanged unless explicitly adopting
+the new Core baseline. See [cache textures](../packages/core/docs/cache-textures.md).
+
 Core does not depend on UI, Game, ui-runtime, DragonBones or Atlas. UI does not
 depend directly on bitmap-font. CLI-built skins do not require ui-runtime.
 Editor can combine font and atlas editing while their headless packages remain

@@ -9,4 +9,4 @@ get isCachedAsTexture(): boolean;
 Inherited from `Bitmap.isCachedAsTexture`; shown with this receiver's substituted types.
 
 Whether a display-list texture cache currently exists, initially false.
-The cache uses Canvas capture even when the application renders with WebGL.
+Storage follows the active backend: GPU texture for WebGL, bitmap for Canvas.

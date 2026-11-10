@@ -4,6 +4,18 @@ All notable changes to `@kurot/core` are documented here.
 
 ---
 
+## 3.5.0 — 2026-11-10
+
+- Render WebGL `cacheAsBitmap` / `cacheAsTexture` subtrees into persistent GPU
+  framebuffers, preserving the public API and Canvas fallback. Reuse unchanged
+  source textures; include descendant GPU effects and nested cache captures.
+- Retain local cache geometry through movement, regenerate dirty content and
+  resolution changes, and release targets on disable, empty content or context
+  disposal. Context restoration rebuilds cache attachments before sampling them.
+- Report actual submitted GPU draws across cache/effect targets in Player's draw
+  count. Cache updates may issue more GPU draws while eliminating Canvas subtree
+  redraws and image uploads; the scrolling benchmark reports both costs.
+
 ## 3.4.0 — 2026-11-10
 
 - Add project opt-in `backgroundPolicy: 'continue'`: advance logical frames and

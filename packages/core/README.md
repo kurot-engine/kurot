@@ -1,7 +1,7 @@
 # @kurot/core
 
 TypeScript / ESM / ES2022 display, rendering, events, text, resources and media
-for browser games. Source version: **3.4.0**. Publication is tracked in the
+for browser games. Source version: **3.5.0**. Publication is tracked in the
 [repository changelog](../../CHANGELOG.md).
 
 Start with the [game authoring guide](docs/game-authoring.md),
@@ -16,12 +16,26 @@ and docs without requiring the engine source.
 | Bitmap scale, repeat and clip | [Bitmap fill](docs/bitmap-fill.md) |
 | Audio time units, loops and channel cleanup | [Audio playback](docs/audio-playback.md) |
 | Resources, manifests and errors | [Resource loading](docs/resource.md) |
+| Subtree caching, GPU surfaces and Canvas fallback | [Cache textures](docs/cache-textures.md) |
 | Shader and filter ownership | [Filters](docs/filters.md) |
 | Dynamic background blur and modal ordering | [BackdropBlur](docs/backdrop-blur.md) |
 
 When leaving a game view, destroy its player before reusing the canvas. Destruction detaches WebGL context listeners and releases player-owned GPU storage; the application still owns its decoded pixels. Aborting a ResourceLoader batch ends its queue notifications. An already-running analyzer may finish its own work, but cannot settle or retry the next batch.
 
 Finite Web Audio repeats end on the scheduled output frame, including when the decoded sound's length cannot be represented exactly in seconds. See [audio playback](docs/audio-playback.md) for offset and loop-count behavior.
+
+## GPU subtree caching
+
+Core 3.5 renders WebGL `cacheAsBitmap` / `cacheAsTexture` subtrees directly into
+reusable GPU framebuffer textures. Existing cache configuration continues to
+work; Canvas retains its bitmap fallback. Changed text and Graphics can still
+upload their individual raster textures. Destroying the Player or disabling a
+cache releases its GPU storage.
+
+Draw Calls include offscreen cache and effect work. Cache rebuilding therefore
+can increase that count while reducing Canvas work and uploads; measure render
+time and FPS as well. See [cache textures](docs/cache-textures.md) for composition,
+invalidation, resolution, ownership and the reproducible scrolling comparison.
 
 ## Optional background progress
 
@@ -111,7 +125,7 @@ The package includes the generated API reference and game authoring guide.
 Core 3 supports canvas stage-attribute startup.
 
 ```bash
-pnpm add @kurot/core@^3.4.0
+pnpm add @kurot/core@^3.5.0
 ```
 
 Core depends on `@kurot/bitmap-font ^0.1.0` for bitmap-font data and shared
@@ -169,8 +183,8 @@ console.log(app.player.isWebGL ? 'WebGL' : 'Canvas 2D');
 ```
 
 The flat InstructionSet pipeline and multi-texture batching apply to the WebGL backend. The full-scene Canvas fallback uses direct display-tree traversal. Canvas support is still part of the normal WebGL path: text, Graphics, RenderTexture, and pixel hit testing may be rasterized through Canvas before being uploaded or composited by WebGL.
-Bitmap nine-slice rendering also works in Canvas, including WebGL
-`cacheAsBitmap` subtrees that use Canvas for their offscreen texture.
+Bitmap nine-slice rendering works in both backends. WebGL `cacheAsBitmap`
+subtrees render directly into reusable GPU textures; Canvas keeps its bitmap cache.
 
 **Migrating from Egret (1.0.0 breaking changes)**
 

@@ -5,6 +5,35 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-10 — Core 3.5.0 release preparation
+
+- Prepare only `@kurot/core` for WebGL GPU subtree caching. Existing
+  `cacheAsBitmap` / `cacheAsTexture` configuration captures directly into reusable
+  GPU framebuffer textures; Canvas keeps its bitmap fallback. Nested effects,
+  invalidation, resolution changes, teardown and context restoration are covered.
+  Player Draw Calls now include offscreen cache/effect submissions.
+- Update the manifest, runtime engineVersion, README, architecture header,
+  package map and generated API references to 3.5.0. Game/UI inherited API pages
+  describe the corresponding Core behavior; their runtime code is unchanged.
+- UI, Game, DragonBones, ui-runtime and Spine peers already accept 3.5.0;
+  development locks may adopt it separately without dependent SDK releases.
+  CLI templates use latest; demo/game and caret-based Templates can adopt by
+  updating their locks. SAO 3.4.0, Star Catcher, Card Booster, Skydive and Editor
+  pins require explicit adoption. Skia and its demo's ~3.2.3 ranges exclude this
+  minor; Studio remains on Core 2.x. Consumer manifests and locks are unchanged.
+- Feature validation passed Core's 1,185 tests and UI's 641 tests, 167 visual
+  checks (two external MP3 fixtures skipped), and 20 WebGL cache checks on M1 Max
+  Metal hardware. Existing visual goldens were retained. In the native scrolling
+  List fixture, frequently updated caches reduced CPU render mean from 0.661 to
+  0.541 ms and source uploads from 1,060 to 8 over 120 frames; FPS stayed near
+  120. Stable caches added about 0.09 ms, and rebuilding every row was not faster.
+  These measurements do not establish performance of the complete SAO Shop page.
+- After the 3.5.0 bump, a clean Core build and all 1,185 tests passed again.
+  API completeness and all 22 examples passed against both built declarations
+  and extracted packages; the Core archive includes 2,636 generated API files.
+- This records source preparation. npm publication, downloaded-artifact integrity
+  verification and the annotated release tag follow publication.
+
 ## 2026-11-10 — Core 3.4.0 release preparation
 
 - Prepare only `@kurot/core` for optional background logic and recovery. The

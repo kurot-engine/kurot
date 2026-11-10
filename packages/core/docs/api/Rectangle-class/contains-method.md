@@ -1,6 +1,6 @@
 # contains
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 contains(x: number, y: number): boolean;

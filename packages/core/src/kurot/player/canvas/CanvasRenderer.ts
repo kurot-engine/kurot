@@ -146,6 +146,11 @@ export class CanvasRenderer {
 		let drawCalls = 0;
 
 		const $displayList = displayObject.$displayList;
+		if ($displayList?.$gpuCache && (displayObject.$cacheDirty || displayObject.$renderDirty)) {
+			// A Canvas snapshot can consume dirty flags even when its root cache
+			// is bypassed. Keep the GPU copy invalid until it is captured again.
+			$displayList.$gpuCache.valid = false;
+		}
 		if ($displayList && !_isStage) {
 			assertBackdropCache(displayObject);
 			const previousWidth = $displayList.canvasBuffer.width;
@@ -157,7 +162,10 @@ export class CanvasRenderer {
 				previousHeight !== $displayList.canvasBuffer.height ||
 				previousResolution !== $displayList.actualResolution;
 
-			if (displayObject.$cacheDirty || displayObject.$renderDirty || surfaceChanged) {
+			if (displayObject.$cacheDirty || displayObject.$renderDirty || surfaceChanged || $displayList.$canvasDirty) {
+				if ($displayList.$gpuCache) {
+					$displayList.$gpuCache.valid = false;
+				}
 				if (hasSurface) {
 					$displayList.canvasBuffer.clear();
 					const resolution = $displayList.actualResolution;
@@ -173,8 +181,9 @@ export class CanvasRenderer {
 				}
 				displayObject.$cacheDirty = false;
 				displayObject.$renderDirty = false;
+				$displayList.$canvasDirty = false;
 			}
-			if ($displayList.bitmapData?.source) {
+			if (hasSurface && $displayList.bitmapData?.source) {
 				const resolution = $displayList.actualResolution;
 				const previousSmoothing = ctx.imageSmoothingEnabled;
 				ctx.imageSmoothingEnabled = $displayList.scaleMode === 'linear';

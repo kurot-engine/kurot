@@ -7,7 +7,7 @@ Use [text layout](text-layout.md), [texture density](texture-density.md),
 [audio playback](audio-playback.md) and [centered flips](../../../docs/centered-flips.md)
 when changing those contracts.
 
-Package identity: `@kurot/core@3.4.0`. It provides Kurot's
+Package identity: `@kurot/core@3.5.0`. It provides Kurot's
 scene graph, events, rendering, text, resource, network and media runtime. Rendering uses a
 flat `InstructionSet + RenderPipe` pipeline. ES2022 / evergreen browsers only
 with `strict: true`. Two
@@ -47,7 +47,7 @@ src/kurot/
 │   │               WebGLVertexArrayObject, WebGLDrawCmdManager, MultiTextureBatcher,
 │   │               shaders/ (ShaderLib GLSL 1.00, ShaderLib2 GLSL 3.00). The WebGL-only execute path.
 │   └── canvas/     CanvasRenderer (fallback AND a dependency of the WebGL path — see §2),
-│                   DisplayList (offscreen cache backing cacheAsBitmap), CanvasBuffer.
+│                   DisplayList (cache geometry/ownership and lazy Canvas fallback), CanvasBuffer.
 ├── events/         Event, EventDispatcher (capture/bubble, once()), EventPhase,
 │                   8 concrete subclasses (TouchEvent, TimerEvent, ProgressEvent, etc.).
 ├── geom/           Matrix, Point, Rectangle + shared*/create()/release() object pools.
@@ -94,10 +94,11 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
   throwing. `removeChildren()` returns `void`, not the removed array.
 - `blendMode` string values are Canvas 2D composite-operation names;
   the normal value is `"source-over"`.
-- `cacheAsBitmap` is a pure alias for `cacheAsTexture(true)` — there is no
-  separate legacy path. It **always** rasterizes to an offscreen Canvas 2D
-  surface first (`DisplayList`), then optionally re-uploads as a GL texture.
-  It never means "cache directly to a GPU framebuffer."
+- `cacheAsBitmap` is an alias for `cacheAsTexture(true)`. WebGL captures the
+  local subtree into a persistent GPU framebuffer (`WebGLCache`), then composites
+  its texture; Canvas retains `DisplayList` bitmap rasterization. Text/Graphics
+  still rasterize their individual textures when dirty. See [cache textures](cache-textures.md)
+  for invalidation, sampling, nested effects and context ownership.
 - `DisplayObjectContainer.isRenderGroup` has **zero visual effect on Canvas 2D
   rendering**. It's a WebGL-only optimization hint that isolates a subtree
   into its own `InstructionSet` — toggling it never changes pixels, only which
@@ -154,11 +155,12 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
 - `BlurFilter.quality` controls pass pairs (1–16); large radii downsample to
   stay within the existing 32-physical-pixel shader tier. Glow/DropShadow keep
   their existing fixed-sample shader and do not use their quality metadata.
-- Canvas 2D skips CustomFilter, MultiPassFilter and BloomFilter, including the
-  Canvas capture used by cacheAsTexture and RenderTexture. Built-in Blur, Glow
+- Canvas 2D skips CustomFilter, MultiPassFilter and BloomFilter, including Canvas
+  caches and RenderTexture snapshots. WebGL subtree caches retain GPU effects.
+  Built-in Blur, Glow
   and DropShadow use CSS approximations; ColorMatrix uses CPU pixels. These
-  fallbacks are not pixel-equivalent to WebGL. Do not cache GPU shader effects
-  through those capture APIs. See docs/filters.md.
+  fallbacks are not pixel-equivalent to WebGL. RenderTexture cannot capture GPU
+  shader effects. See docs/filters.md.
 - Filter setters invalidate weakly attached users. Direct uniform/binding edits
   need `filter.invalidate()`. Auxiliary canvas/video edits additionally need
   `BitmapData.invalidate(source)` for upload refresh.
@@ -181,7 +183,7 @@ colocated under `examples/benchmark/`; none are exported from `index.ts`.
 | `RenderPipe`                             | Interface implemented once per display-object category (`BitmapPipe`, `GraphicsPipe`, `MeshPipe`, `TextPipe`, `FilterPipe`, `MaskPipe`, `ParticlePipe`). It defines `addToInstructionSet()` (build), `updateRenderable()` (patch), and optional `destroyRenderable()` cleanup. The current renderer does not invoke cleanup merely because an object leaves the stage. Instructions are dispatched by `renderPipeId`.                                                                  | `player/RenderPipe.ts`, implementations in `player/pipes/`                                                                                                                           |
 | `structureDirty` vs `renderDirty`        | `structureDirty` (on `InstructionSet`): topology changed (child added/removed/reordered, filter/mask changed) → full rebuild. `renderDirty` (on `DisplayObject`, propagated via `$renderDirtyUp()`): only visual data changed (position/alpha/tint/texture) on an object whose instruction-list slot is still valid → patch only, no rebuild.                                                                                                                                          | Propagated in `display/DisplayObject.ts` (`$markDirty()`, `$cacheDirtyUp()`, `$renderDirtyUp()`); consumed in `player/webgl/WebGLRenderer.ts` `render()`                             |
 | `RenderGroup`                            | A `DisplayObjectContainer` with `isRenderGroup = true`. Gets its own independent `InstructionSet` (tracked via `WeakMap`/`WeakRef` in `WebGLRenderer`). Structural changes inside the group never force the parent to rebuild — the parent set holds a single `renderGroup` instruction pointing at the child set.                                                                                                                                                                     | `isRenderGroup` field: `display/DisplayObjectContainer.ts`; group handling: `player/webgl/WebGLRenderer.ts` (`_buildRenderGroup()`, `markStructureDirty()`, `markRenderableDirty()`) |
-| `cacheAsTexture` vs `cacheAsBitmap`      | `cacheAsBitmap` is a pure alias for `cacheAsTexture(true/false)`. `cacheAsTexture(options)` accepts `{resolution?, scaleMode?}` and creates a `DisplayList` (offscreen Canvas 2D buffer), reused across frames until dirty. On WebGL it's drawn as a single `displayListCache` instruction; rasterization still goes through `CanvasRenderer`, then the result is uploaded as a GL texture.                                                                                            | `display/DisplayObject.ts`; `player/canvas/DisplayList.ts`; `player/webgl/WebGLRenderer.ts` (`_executeDisplayListCache()`)                                                           |
+| `cacheAsTexture` vs `cacheAsBitmap`      | `cacheAsBitmap` is a pure alias for `cacheAsTexture(true/false)`. `cacheAsTexture(options)` accepts `{resolution?, scaleMode?}` and creates a `DisplayList` with backend-specific storage, reused across frames until dirty. WebGL captures into a persistent GPU framebuffer through normal render pipes, then composites a `displayListCache` quad. Canvas retains lazy bitmap rasterization.                                                                                            | `display/DisplayObject.ts`; `player/canvas/DisplayList.ts`; `player/webgl/WebGLRenderer.ts` (`_executeDisplayListCache()`)                                                           |
 | `DrawCmdManager` (`WebGLDrawCmdManager`) | Queue of `DrawCmd` records (12 types: TEXTURE, RECT, PUSH*MASK, POP_MASK, BLEND, RESIZE_TARGET, CLEAR_COLOR, ACT_BUFFER, ENABLE_SCISSOR, DISABLE_SCISSOR, SMOOTHING, MULTI_TEXTURE) sitting between `RenderPipe`s and actual GL calls. Auto-merges consecutive compatible commands. `WebGLRenderContext._flush()` walks it once per frame. This is the real batching layer — distinct from `MultiTextureBatcher`, which only assigns texture \_slots* for the `MULTI_TEXTURE` command. | `player/webgl/WebGLDrawCmdManager.ts`                                                                                                                                                |
 | `WebGLRenderContext` lifecycle           | Constructed directly by `Player` (no factory/singleton). Auto-selects `webgl2` (ShaderLib2, GLSL ES 3.00) falling back to `webgl` (ShaderLib, GLSL ES 1.00). Listens for `webglcontextlost`/`webglcontextrestored`; Player.destroy() detaches both listeners, discards pooled targets and releases uploads without closing borrowed pixels; on restore, re-creates GPU buffers, clears the shader cache, invalidates tracked `BitmapData.webGLTexture` refs, and tells `WebGLRenderer` to force a full instruction rebuild.                                                                                    | `player/webgl/WebGLRenderContext.ts`                                                                                                                                                 |
 | `Player` vs `Stage`                      | `Stage` is a `DisplayObjectContainer` subclass: root of the scene graph, holds `stageWidth`/`stageHeight`/`scaleMode`/`orientation`/`frameRate` (proxies to the global `ticker`). No rendering logic itself. `Player` owns the `<canvas>`, constructs the WebGL-or-Canvas2D renderer, registers with `ticker` on `start()`, and calls `renderer.render(stage, buffer, matrix)` every tick. One `Player` per app — see §2.                                                              | `display/Stage.ts`, `player/Player.ts`                                                                                                                                               |
@@ -331,8 +333,8 @@ later styled run's size. See `test/TextMeasurement.test.ts` and `docs/text-layou
 Both BitmapPipe and CanvasRenderer honor repeat/clip through internal
 `player/bitmap-fill.ts`. Repeat periods use original logical texture dimensions,
 including trim margins; edge regions crop source pixels. Rotated atlas coordinates
-and tinting remain supported. Nine-slice applies only to scale. CanvasRenderer is
-also the nested bitmap-cache rasterizer, so both render paths must stay aligned.
+and tinting remain supported. Nine-slice applies only to scale. CanvasRenderer handles fallback caches; WebGL caches use the same GPU pipes
+as normal drawing. Both paths preserve the same bitmap-fill geometry.
 See docs/bitmap-fill.md.
 
 ## Bitmap fonts

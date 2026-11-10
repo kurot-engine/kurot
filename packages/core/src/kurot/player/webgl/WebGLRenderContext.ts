@@ -32,6 +32,7 @@ import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
 import { MultiTextureBatcher, makeMultiCmd, type MultiTextureDrawCmd } from './MultiTextureBatcher.js';
 import type { RenderContext } from '../RenderContext.js';
 import { uploadTextureSource } from './upload-texture-source.js';
+import type { WebGLCache } from './WebGLCache.js';
 
 const BITMAP_DATA_SWEEP_BUDGET = 8;
 
@@ -63,6 +64,7 @@ export class WebGLRenderContext implements RenderContext {
 	public currentBlendMode = 'source-over';
 	public contextVersion = 0;
 	public resolution = 1;
+	public $drawCalls = 0;
 
 	// ── Private fields ────────────────────────────────────────────────────────
 
@@ -89,6 +91,7 @@ export class WebGLRenderContext implements RenderContext {
 	private readonly _bitmapDataRefs = new WeakMap<BitmapData, WeakRef<BitmapData>>();
 	private _bitmapDataSweep?: Iterator<WeakRef<BitmapData>, undefined>;
 	private readonly _uploadedVersions = new WeakMap<BitmapData, number>();
+	private readonly _cacheSurfaces = new Set<WeakRef<WebGLCache>>();
 
 	public constructor(canvas: HTMLCanvasElement) {
 		this.surface = canvas;
@@ -828,14 +831,36 @@ export class WebGLRenderContext implements RenderContext {
 	}
 
 	/**
-	 * Detaches this player's handlers and releases its GPU allocations without
-	 * closing borrowed image sources or losing a canvas shared with a future player.
+	 * Weak ownership lets detached cache owners be collected, while explicit
+	 * context destruction still releases every live persistent surface.
+	 */
+	public $registerCache(cache: WebGLCache): () => void {
+		for (const ref of this._cacheSurfaces) {
+			if (!ref.deref()) {
+				this._cacheSurfaces.delete(ref);
+			}
+		}
+		const ref = new WeakRef(cache);
+		this._cacheSurfaces.add(ref);
+		return () => {
+			this._cacheSurfaces.delete(ref);
+		};
+	}
+
+	/**
+	 * Detaches this player's handlers and releases its GPU allocations, including
+	 * live subtree caches, without closing borrowed image sources or losing a
+	 * canvas shared with a future player.
 	 */
 	public dispose(): void {
 		if (this._canvasEvents.signal.aborted) {
 			return;
 		}
 		this._canvasEvents.abort();
+		for (const ref of this._cacheSurfaces) {
+			ref.deref()?.dispose();
+		}
+		this._cacheSurfaces.clear();
 		this._contextRestoredCallbacks.length = 0;
 		this.releaseFilterResources();
 		WebGLRenderBuffer.discardPool(this);
@@ -920,6 +945,7 @@ export class WebGLRenderContext implements RenderContext {
 		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 		if (this._currentBuffer) {
 			this._currentBuffer.drawCalls++;
+			this.$drawCalls++;
 		}
 
 		gl.bufferData(gl.ARRAY_BUFFER, this._gpuVertexBufferSize, gl.DYNAMIC_DRAW);
@@ -1145,6 +1171,7 @@ export class WebGLRenderContext implements RenderContext {
 
 		if (gpuDrawCalls > 0 && this._currentBuffer) {
 			this._currentBuffer.drawCalls += gpuDrawCalls;
+			this.$drawCalls += gpuDrawCalls;
 		}
 	}
 

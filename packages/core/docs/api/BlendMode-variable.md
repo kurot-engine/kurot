@@ -1,6 +1,6 @@
 # BlendMode
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 BlendMode: { ADD: "lighter"; COLOR: "color"; COLOR_BURN: "color-burn"; COLOR_DODGE: "color-dodge"; DARKEN: "darken"; DIFFERENCE: "difference"; ERASE: "destination-out"; EXCLUSION: "exclusion"; HARD_LIGHT: "hard-light"; HUE: "hue"; LIGHTEN: "lighten"; LUMINOSITY: "luminosity"; MULTIPLY: "multiply"; NORMAL: "source-over"; OVERLAY: "overlay"; SATURATION: "saturation"; SCREEN: "screen"; SOFT_LIGHT: "soft-light" };

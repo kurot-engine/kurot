@@ -113,7 +113,6 @@
     "DebugLog.static tickFrame",
     "DisplayList.actualResolution",
     "DisplayList.bitmapData",
-    "DisplayList.canvasBuffer",
     "DisplayList.configure",
     "DisplayList.offsetX",
     "DisplayList.offsetY",

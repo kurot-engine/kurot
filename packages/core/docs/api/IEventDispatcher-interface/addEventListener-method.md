@@ -1,6 +1,6 @@
 # addEventListener
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 addEventListener(type: string, listener: (event: Event) => void, useCapture?: boolean, priority?: number): void;

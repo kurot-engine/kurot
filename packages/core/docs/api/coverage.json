@@ -1,6 +1,6 @@
 {
   "package": "@kurot/core",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "exports": 172,
   "members": 2228,
   "missing": [],
@@ -118,7 +118,6 @@
     "DebugLog.static tickFrame",
     "DisplayList.actualResolution",
     "DisplayList.bitmapData",
-    "DisplayList.canvasBuffer",
     "DisplayList.configure",
     "DisplayList.offsetX",
     "DisplayList.offsetY",

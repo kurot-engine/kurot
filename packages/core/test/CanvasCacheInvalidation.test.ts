@@ -94,4 +94,22 @@ describe('Canvas display-list cache invalidation', () => {
 		expect(nestedCache.$cacheDirty).toBe(true);
 		expect(root.$cacheDirty).toBe(true);
 	});
+
+	it('does not display old cache pixels after the subtree becomes empty', () => {
+		const scene = new DisplayObjectContainer();
+		const root = new DisplayObjectContainer();
+		const leaf = new BoundedDisplayObject();
+		scene.addChild(root);
+		root.addChild(leaf);
+		root.cacheAsBitmap = true;
+		const renderer = new CanvasRenderer();
+		renderer.renderToContext(scene, context, 0, 0);
+		expect(context.drawImage).toHaveBeenCalledOnce();
+		root.removeChild(leaf);
+		renderer.renderToContext(scene, context, 0, 0);
+		expect(context.drawImage).toHaveBeenCalledOnce();
+		root.addChild(leaf);
+		renderer.renderToContext(scene, context, 0, 0);
+		expect(context.drawImage).toHaveBeenCalledTimes(2);
+	});
 });

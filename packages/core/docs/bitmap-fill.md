@@ -18,8 +18,8 @@ the clockwise atlas convention; destination dimensions remain upright. Sampling,
 tint, alpha and scene transforms retain their existing contracts.
 
 Both render paths use `player/bitmap-fill.ts`: WebGL emits tile quads through
-BitmapPipe, while CanvasRenderer draws tile regions. Bitmap caches rasterize
-through CanvasRenderer even when the main Player uses WebGL. Cached ancestors
+BitmapPipe, while CanvasRenderer draws tile regions. WebGL caches capture tile
+quads directly into GPU targets; Canvas caches use CanvasRenderer. Cached ancestors
 refresh after changing the child fill mode through the existing dirty contract.
 
 The helper emits visible regions directly without allocating tile arrays. Work

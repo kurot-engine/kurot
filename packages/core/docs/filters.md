@@ -216,9 +216,10 @@ them; it continues to approximate supported built-in effects through its existin
 CSS/pixel paths. Its filter combinations and Blur quality are not pixel-equivalent
 to WebGL.
 
-`cacheAsTexture` and `RenderTexture` still rasterize through Canvas 2D. Do not use
-them to capture or cache these GPU effects. For post-processing use filter chains
-or MultiPassFilter, which retain GPU images.
+WebGL `cacheAsTexture` captures descendant GPU effects into its persistent
+framebuffer. The cached owner's own effects remain outside the cache and apply
+once during composition. Canvas caches and `RenderTexture` still rasterize
+through Canvas 2D and cannot capture GPU-only effects. See [cache textures](cache-textures.md).
 
 ## Validation
 

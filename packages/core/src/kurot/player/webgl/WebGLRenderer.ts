@@ -20,6 +20,7 @@ import type { BitmapTextInstruction } from '../pipes/BitmapTextPipe.js';
 import type { BitmapText } from '../../text/BitmapText.js';
 import { TextField } from '../../text/TextField.js';
 import { WebGLRenderBuffer } from './WebGLRenderBuffer.js';
+import { WebGLCache } from './WebGLCache.js';
 import { getRenderContentBounds } from '../render-bounds.js';
 import type { BackdropBlur } from '../../display/BackdropBlur.js';
 import { assertBackdropCache } from '../backdrop.js';
@@ -46,6 +47,7 @@ interface InstructionBuildOptions {
 
 const STAGE_BUILD_OPTIONS: InstructionBuildOptions = { isStage: true };
 const MASK_BUILD_OPTIONS: InstructionBuildOptions = { inlineRenderGroups: true };
+const CACHE_BUILD_OPTIONS: InstructionBuildOptions = { isStage: true, inlineRenderGroups: true };
 
 // ── Augmented instruction types ───────────────────────────────────────────────
 
@@ -105,6 +107,9 @@ export class WebGLRenderer {
 	private readonly _instructionSet = new InstructionSet();
 	private readonly _maskInstructionSets: InstructionSet[] = [];
 	private _maskInstructionDepth = 0;
+	private readonly _cacheInstructionSets: InstructionSet[] = [];
+	private _cacheInstructionDepth = 0;
+	private readonly _updatedCaches: WebGLCache[] = [];
 
 	private readonly _renderGroupSets = new WeakMap<DisplayObjectContainer, InstructionSet>();
 	private readonly _renderGroupSetList: Array<WeakRef<DisplayObjectContainer>> = [];
@@ -155,6 +160,7 @@ export class WebGLRenderer {
 	public render(displayObject: DisplayObject, buffer: WebGLRenderBuffer, matrix: Matrix): number {
 		this._nestLevel++;
 		const ctx = buffer.context;
+		const initialDrawCalls = ctx.$drawCalls;
 		ctx.pushBuffer(buffer);
 
 		try {
@@ -181,12 +187,15 @@ export class WebGLRenderer {
 			this._executeInstructions(set, buffer);
 
 			ctx.flush();
-			const drawCalls = buffer.drawCalls;
+			const drawCalls = ctx.$drawCalls - initialDrawCalls;
 			buffer.onRenderFinish();
 			displayObject.$renderDirty = false;
 			return drawCalls;
 		} catch (error) {
 			ctx.$abortFrame(buffer);
+			for (const cache of this._updatedCaches) {
+				cache.valid = false;
+			}
 			this.markStructureDirty();
 			throw error;
 		} finally {
@@ -194,6 +203,7 @@ export class WebGLRenderer {
 			buffer.setTransform(1, 0, 0, 1, 0, 0);
 			this._nestLevel--;
 			if (this._nestLevel === 0) {
+				this._updatedCaches.length = 0;
 				// Nonzero dimensions also queue root reactivation on the first allocation.
 				WebGLRenderBuffer.release(WebGLRenderBuffer.create(buffer.context, 1, 1));
 			}
@@ -217,6 +227,9 @@ export class WebGLRenderer {
 			if (inst) set.addLeaf(inst);
 			return;
 		}
+		// A consumed ordinary container must allow later descendant invalidations
+		// to propagate to its cached ancestor again.
+		displayObject.$cacheDirty = false;
 		const childOptions = options?.isStage ? (options.inlineRenderGroups ? MASK_BUILD_OPTIONS : undefined) : options;
 
 		this._buildLeaf(displayObject, set, buffer, offsetX, offsetY);
@@ -650,7 +663,28 @@ export class WebGLRenderer {
 
 	// ── Phase B: execute ──────────────────────────────────────────────────────
 
+	private _prepareCaches(set: InstructionSet, buffer: WebGLRenderBuffer, start: number): void {
+		// Prepare independent cache attachments before compositing them, allowing
+		// their final quads to batch. Effects own their resolution/clip scopes and
+		// therefore prepare enclosed caches only after activating those scopes.
+		let effectDepth = 0;
+		for (let i = start; i < set.instructionSize; i++) {
+			const inst = set.instructions[i];
+			if (inst.renderPipeId === 'filterPush' || inst.renderPipeId === 'maskPush') {
+				effectDepth++;
+			} else if (inst.renderPipeId === 'filterPop' || inst.renderPipeId === 'maskPop') {
+				if (effectDepth === 0) {
+					break;
+				}
+				effectDepth--;
+			} else if (effectDepth === 0 && inst.renderPipeId === 'displayListCache') {
+				this._updateCacheSurface(inst.renderable, buffer);
+			}
+		}
+	}
+
 	private _executeInstructions(set: InstructionSet, buffer: WebGLRenderBuffer): void {
+		this._prepareCaches(set, buffer, 0);
 		const offscreenStack: (WebGLRenderBuffer | undefined)[] = [];
 		const scissorStack: boolean[] = [];
 		const parentBuffers: WebGLRenderBuffer[] = [];
@@ -712,6 +746,7 @@ export class WebGLRenderer {
 							);
 							activeBuffer = offscreen;
 						}
+						this._prepareCaches(set, activeBuffer, i + 1);
 						break;
 					}
 					case 'filterPop': {
@@ -746,6 +781,7 @@ export class WebGLRenderer {
 								activeBuffer = displayBuffer;
 							}
 						}
+						this._prepareCaches(set, activeBuffer, i + 1);
 						break;
 					}
 					case 'maskPop': {
@@ -798,6 +834,9 @@ export class WebGLRenderer {
 			case 'particle':
 				this._particlePipe.execute(instruction, buffer);
 				break;
+		}
+		if (this._cacheInstructionDepth > 0) {
+			instruction.renderable.$renderDirty = false;
 		}
 	}
 
@@ -856,62 +895,79 @@ export class WebGLRenderer {
 		buf.hasOffscreenTransform = true;
 	}
 
-	private _executeDisplayListCache(obj: DisplayObject, buffer: WebGLRenderBuffer): void {
-		const $displayList = obj.$displayList;
-		if (!$displayList) return;
-
-		const previousWidth = $displayList.canvasBuffer.width;
-		const previousHeight = $displayList.canvasBuffer.height;
-		const previousResolution = $displayList.actualResolution;
-		const hasSurface = $displayList.updateSurfaceSize(buffer.context.maxTextureSize, buffer.context.resolution);
-		const surfaceChanged =
-			previousWidth !== $displayList.canvasBuffer.width ||
-			previousHeight !== $displayList.canvasBuffer.height ||
-			previousResolution !== $displayList.actualResolution;
-
-		if (obj.$cacheDirty || obj.$renderDirty || surfaceChanged) {
-			if (hasSurface) {
-				$displayList.canvasBuffer.clear();
-				const resolution = $displayList.actualResolution;
-				$displayList.canvasBuffer.context.setTransform(resolution, 0, 0, resolution, 0, 0);
-				this._canvasRenderer.renderToContext(
-					obj,
-					$displayList.canvasBuffer.context,
-					$displayList.offsetX,
-					$displayList.offsetY,
-					resolution,
-				);
-				$displayList.updateBitmapData();
-				const bitmapData = $displayList.bitmapData;
-				if (bitmapData?.webGLTexture && bitmapData.source) {
-					buffer.context.updateTexture(bitmapData.webGLTexture, bitmapData.source as HTMLCanvasElement);
-				}
-			}
+	private _updateCacheSurface(obj: DisplayObject, buffer: WebGLRenderBuffer): WebGLRenderBuffer | undefined {
+		const displayList = obj.$displayList;
+		if (!displayList) {
+			return;
+		}
+		let cache = displayList.$gpuCache;
+		if (!cache || cache.context !== buffer.context) {
+			cache?.dispose();
+			cache = displayList.$gpuCache = new WebGLCache(buffer.context);
+		}
+		const surface = cache.prepare(displayList, buffer.resolution);
+		if (!surface) {
+			return;
+		}
+		if (!cache.valid || obj.$cacheDirty || obj.$renderDirty) {
+			cache.valid = false;
+			this._renderCacheContent(obj, surface, displayList.offsetX, displayList.offsetY);
+			cache.valid = true;
+			this._updatedCaches.push(cache);
+			displayList.$canvasDirty = true;
 			obj.$cacheDirty = false;
 			obj.$renderDirty = false;
 		}
+		return surface;
+	}
 
-		if (!$displayList.bitmapData?.source) return;
-
-		const bd = $displayList.bitmapData;
-		const w = $displayList.canvasBuffer.width;
-		const h = $displayList.canvasBuffer.height;
-		const resolution = $displayList.actualResolution;
-		buffer.context.drawImage(
-			bd,
-			0,
-			0,
-			w,
-			h,
-			-$displayList.offsetX,
-			-$displayList.offsetY,
-			w / resolution,
-			h / resolution,
-			w,
-			h,
-			false,
-			$displayList.scaleMode === 'linear',
+	private _executeDisplayListCache(obj: DisplayObject, buffer: WebGLRenderBuffer): void {
+		const surface = this._updateCacheSurface(obj, buffer);
+		const displayList = obj.$displayList;
+		if (!surface || !displayList) {
+			return;
+		}
+		const width = surface.width;
+		const height = surface.height;
+		buffer.context.drawTexture(
+			surface.rootRenderTarget.texture!, 0, 0, width, height,
+			-displayList.offsetX, -displayList.offsetY,
+			width / surface.resolution, height / surface.resolution, width, height,
+			undefined, undefined, undefined, undefined, undefined,
+			displayList.scaleMode === 'linear', true,
 		);
+	}
+
+	private _renderCacheContent(obj: DisplayObject, buffer: WebGLRenderBuffer, x: number, y: number): void {
+		const context = buffer.context;
+		const filter = context.activeFilter;
+		const blend = context.currentBlendMode;
+		context.flush();
+		context.activeFilter = undefined;
+		context.setGlobalCompositeOperation('source-over');
+		buffer.clear();
+		context.pushBuffer(buffer);
+		const depth = this._cacheInstructionDepth++;
+		const set = this._cacheInstructionSets[depth] ??= new InstructionSet();
+		try {
+			buffer.setTransform(buffer.resolution, 0, 0, buffer.resolution, 0, 0);
+			buffer.globalAlpha = 1;
+			buffer.globalTintColor = 0xffffff;
+			// Capture local content only. The owner's transform, alpha, masks and
+			// filters are applied once by the enclosing instruction sequence.
+			this._buildInstructions(obj, set, buffer, x, y, CACHE_BUILD_OPTIONS);
+			this._executeInstructions(set, buffer);
+			// Flush before sampling this attachment: batched samplers must not
+			// contain the framebuffer texture while it is still being written.
+			context.flush();
+		} finally {
+			context.popBuffer();
+			context.activeFilter = filter;
+			context.setGlobalCompositeOperation(blend);
+			this._releaseInstructions(set);
+			set.reset();
+			this._cacheInstructionDepth--;
+		}
 	}
 
 	private _renderMaskObject(obj: DisplayObject, buffer: WebGLRenderBuffer, offsetX: number, offsetY: number): void {

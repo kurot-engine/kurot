@@ -1,6 +1,6 @@
 # drawFramebufferTexture
 
-Package: `@kurot/core@3.4.0`. Generated from public declarations and JSDoc.
+Package: `@kurot/core@3.5.0`. Generated from public declarations and JSDoc.
 
 ```ts
 drawFramebufferTexture(texture: WebGLTexture, sourceWidth: number, sourceHeight: number, destX: number, destY: number, destWidth: number, destHeight: number): void;

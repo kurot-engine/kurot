@@ -8,9 +8,10 @@ cacheAsTexture(value: boolean | CacheAsTextureOptions): void;
 
 Inherited from `DisplayObject.cacheAsTexture`; shown with this receiver's substituted types.
 
-Enables a Canvas-rasterized subtree cache, or releases it when value is false.
-true uses the default cache options; an options object configures resolution
-and scale mode. GPU-only custom effects are not captured by this Canvas path.
+Enables a subtree texture cache, or releases it when value is false.
+WebGL captures into a persistent GPU target; Canvas uses a bitmap surface.
+true uses defaults; an options object configures resolution and scale mode.
+GPU-only descendant effects are captured on the WebGL backend.
 Release with false when the owning view no longer needs the cache.
 
 Related types: [CacheAsTextureOptions](../../../../core/docs/api/CacheAsTextureOptions-interface.md).

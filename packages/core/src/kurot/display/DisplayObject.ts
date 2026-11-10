@@ -434,9 +434,10 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 	}
 
 	/**
-	 * Enables a Canvas-rasterized subtree cache, or releases it when value is false.
-	 * true uses the default cache options; an options object configures resolution
-	 * and scale mode. GPU-only custom effects are not captured by this Canvas path.
+	 * Enables a subtree texture cache, or releases it when value is false.
+	 * WebGL captures into a persistent GPU target; Canvas uses a bitmap surface.
+	 * true uses defaults; an options object configures resolution and scale mode.
+	 * GPU-only descendant effects are captured on the WebGL backend.
 	 * Release with false when the owning view no longer needs the cache.
 	 */
 	public cacheAsTexture(value: boolean | CacheAsTextureOptions): void {
@@ -462,7 +463,7 @@ export class DisplayObject extends EventDispatcher<DisplayObjectEvents> {
 
 	/**
 	 * Whether a display-list texture cache currently exists, initially false.
-	 * The cache uses Canvas capture even when the application renders with WebGL.
+	 * Storage follows the active backend: GPU texture for WebGL, bitmap for Canvas.
 	 */
 	public get isCachedAsTexture(): boolean {
 		return !!this.$displayList;

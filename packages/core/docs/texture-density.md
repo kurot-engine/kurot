@@ -51,7 +51,7 @@ The original frame is 48×48 logical units. Its manifest default remains
 corner sizes. Crop/trim/sourceW/sourceH in the sheet are physical pixels;
 logical original dimensions are sourceW/resolution and sourceH/resolution.
 
-Scale, clip, repeat, tint, nine-slice and Canvas-backed caches use each texture's
+Scale, clip, repeat, tint, nine-slice and both cache backends use each texture's
 pixelScale. Repeat periods and fixed nine-slice borders stay logical. UVs and
 GPU uploads still address the physical page. Mesh vertices remain authored
 logical geometry; density does not rescale vertices.
