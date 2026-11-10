@@ -20,7 +20,7 @@ Left/Right or A/D; tap/drag the playfield on touch. Refresh manually after a bui
 Window blur or backgrounding pauses gameplay; Resume is explicit. Close disposes
 the application; reload to play again.
 
-The manifest records exact registry Core 3.5.1 with CLI 5.1.2. TypeScript, Vitest,
+The manifest records exact registry Core 3.5.2 with CLI 5.1.2. TypeScript, Vitest,
 Playwright and tsx retain their pinned versions. This example owns its registry
 installation and lockfile. `.nvmrc` selects Node 22. CLI 5 loads the TypeScript
 config itself; tsx remains only for the browser verification script.

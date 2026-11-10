@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@kurot/core':
-        specifier: ^3.5.1
-        version: 3.5.1
+        specifier: ^3.5.2
+        version: 3.5.2
     devDependencies:
       '@kurot/cli':
         specifier: ^5.1.2
@@ -191,8 +191,8 @@ packages:
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@kurot/core@3.5.1':
-    resolution: {integrity: sha512-KGS3ifz/2leLkeIFxY96KR8xwXdxFGkcCB0Xf92vS9wT+sFh0RBGrnGLKpUWDfPSD6H0DJuDsB4/AL2zEUXQYQ==}
+  '@kurot/core@3.5.2':
+    resolution: {integrity: sha512-O2pvrEoUfRSdqqu/8wphOzn7dStWaZAqSSleCpwyhHW1CreMh2DzsRm/teKQps9CCULohJPKMHQFHKZcwq9KhQ==}
 
   '@kurot/ui-document@0.14.0':
     resolution: {integrity: sha512-fd7YFhikVxQ1qLgn4k7bcjh4dH4yyfyxvnY97ndSWAUvGgTP9gl4X2swIlFRXnGCXGuuriHU+GGfHN52csXFdQ==}
@@ -328,7 +328,7 @@ snapshots:
       postcss-value-parser: 4.2.0
       typescript: 5.9.3
 
-  '@kurot/core@3.5.1':
+  '@kurot/core@3.5.2':
     dependencies:
       '@cto.af/linebreak': 4.0.3
       '@kurot/bitmap-font': 0.1.0

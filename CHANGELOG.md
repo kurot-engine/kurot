@@ -5,6 +5,30 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-11 — Examples and Templates adopt Core 3.5.2 / UI 5.2.3
+
+- Verify npm latest and adopt Core 3.5.2 in demo, game and star-catcher plus
+  Card Booster, MilfMaster, Runaway, Skydive and Tentax. Adopt UI 5.2.3 wherever
+  already used. Preserve exact/caret styles, CLI 5.1.2, other tools and Node 22
+  requirements; synchronize selected locks and current dependency documentation.
+- Include text-raster reuse and bounded ProgressBar animations/default labels.
+  Application source, KUI skins and startup configuration remain unchanged.
+  Installed UI, Game, DragonBones and Spine peers share each application's
+  registry Core instance. Lock integrities match npm. Skydive's existing release
+  age exceptions add only the selected Core/UI patch versions.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and full declaration checks pass on Node 22.23.4. All 818 application
+  unit tests and the provided architecture/resource checks pass.
+- Demo/Game pass twelve development/release WebGL/Canvas checks with runtime
+  Core 3.5.2, including native UI controls and selection. Star Catcher passes
+  six development/release gameplay, restart and teardown tests.
+- All five Templates pass development WebGL fixtures for startup and their
+  existing controls/gameplay. MilfMaster additionally passes minified Canvas
+  text-raster, viewport-edge and scroll-tail checks, plus development WebGL Slot
+  KUI geometry, constructor identity, spin modes, skin replacement and teardown.
+  These fixtures do not use production accounts. Temporary test pages and
+  servers close after verification.
+
 ## 2026-11-11 — UI 5.2.3 published and verified
 
 - Verify [npm @kurot/ui@5.2.3](https://www.npmjs.com/package/@kurot/ui/v/5.2.3)
