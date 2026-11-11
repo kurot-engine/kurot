@@ -1,10 +1,10 @@
 # @kurot/ui-runtime — AI context map
 
-Package identity: `@kurot/ui-runtime@0.13.0` (published on npm). This package consumes validated
+Package identity: `@kurot/ui-runtime@0.14.0` (source version; publication is recorded in CHANGELOG.md). This package consumes validated
 `UIDocument` data and creates real Kurot display objects for browser execution
 and editor preview.
 
-It peer-depends on `@kurot/ui-document@^0.14.0`, `@kurot/ui@^5.0.0`, and
+It peer-depends on `@kurot/ui-document@^0.15.0`, `@kurot/ui@^5.0.0`, and
 `@kurot/core@^3.0.0`. It does not
 own component behavior, rendering, document schemas, or Stage lifecycle.
 
@@ -14,6 +14,10 @@ does not parse or migrate XML; old synthetic escape prefixes must be removed
 explicitly by the author. See [KUI XML values](../../ui-document/docs/kui-xml.md#values).
 
 Source root: `src/kurot/runtime/`. Public API: `src/index.ts`.
+
+RichLabel `outlineLayout` is an optional component enum, never a Span style
+or inserted default. KUI support requires document >=0.15.0, CLI >=5.2.0 or
+runtime >=0.14.0, and native UI >=5.3.0. See [text components](text-components.md).
 
 ## Public API
 

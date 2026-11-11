@@ -1,9 +1,9 @@
 # @kurot/cli
 
 Build-time KUI XML → ESM Skin compilation, game scaffolding and development
-resource watching. Published version: [**5.1.2**](https://www.npmjs.com/package/@kurot/cli/v/5.1.2).
+resource watching. Source version: **5.2.0**; publication status is in [CHANGELOG.md](CHANGELOG.md).
 Requires Node.js >= 22.12.0 (develop and test on 22.x) and
-ui-document **^0.14.0**; games supply their own Core/UI runtime packages.
+ui-document **^0.15.0**; games supply their own Core/UI runtime packages.
 UI 4 supplies direct part-field binding; TypeScript powers CLI-side contract checks.
 
 For UI production use the installed UI [authoring guide](../ui/docs/ui-authoring.md)
@@ -31,6 +31,20 @@ remain fixed. Raw textFlow snapshots stay unchanged. Scalar KUI state overrides
 restore independently. The feature uses UI 4.1, document 0.14 and CLI 4.1;
 semantic materialization uses runtime 0.11. See the
 [shared text contract](../ui-document/docs/text-components.md).
+
+## Optional RichLabel outline spacing
+
+`outlineLayout="render-only"` keeps the standard content frame;
+`outlineLayout="reserve-space"` reserves native outline/italic safety space,
+matching Label's content-frame rules. Old skins remain omitted; the compiler
+and runtime never insert or enable the setting. Named-state overrides and
+ordinary save/history operations preserve explicit choices and local Span styles.
+Reserving space can add wrapping and automatic height inside a fixed outer frame.
+
+Use document >=0.15.0 with CLI >=5.2.0 (compiled skins) or runtime >=0.14.0
+(materialized documents), plus UI >=5.3.0. The semantic format stays 2. Older
+accepted UI hosts still work when this property is omitted. See
+[outline authoring](../ui-document/docs/text-components.md#optional-outline-spacing).
 
 ## Usage
 
@@ -226,7 +240,7 @@ use `property.state` on the affected node, so internal graphics remain unnamed.
 Image sources use their resource key directly, for example
 `source="button_up_png"`.
 
-The CLI uses `@kurot/ui-document@^0.14.0` and its literal-string XML rules.
+The CLI uses `@kurot/ui-document@^0.15.0` and its literal-string XML rules.
 For example, `<Label text="100.80" text.down="false" size="48" />` compiles
 the exact strings `100.80` and `false`, while the font size stays numeric.
 String properties no longer add or remove backslash type escapes. Remove old
@@ -330,7 +344,7 @@ KUI builds validate `resource/default.res.json` and inherit image or sheet-frame
 `scale9grid` values into compiled `Image.scale9Grid` when XML does not set one.
 Local grids and `scale9Grid="false"` take priority. Development mode rebuilds
 skins after manifest edits; a malformed manifest leaves the last good Skin
-bundle in place. The current CLI requires `@kurot/ui-document@^0.14.0`.
+bundle in place. The current CLI requires `@kurot/ui-document@^0.15.0`.
 
 Sheet `subkeys` must be an object-valued frame map. Refresh old sheets in the
 Editor before upgrading a KUI project; string-valued subkeys now fail the build.

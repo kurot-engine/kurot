@@ -4,13 +4,21 @@ All notable changes to `@kurot/ui-document` are documented here.
 
 ---
 
-## Unreleased
+## 0.15.0 — 2026-11-11
+
+Source release prepared; npm publication and artifact verification are pending.
+
+Validation: 341 package tests pass with the matching candidate dependencies; Editor save/state/history browser coverage and Canvas/WebGL parity at 1x/2x also pass.
+
+### Added
+
+- Add the optional RichLabel-only `outlineLayout` enum to the foundation catalog. Preserve omitted defaults, sparse Span styles, scalar states and ordinary transaction/history round trips; semantic format stays 2. Explicit use requires native UI >=5.3.0 and matching CLI/runtime consumers.
 
 ### Documentation
 
 - Describe KUI layout nodes and native text-input restrict metadata directly,
   without EUI compatibility labels. Keep catalog values, validation, serialized
-  formats and runtime behavior unchanged. Published 0.14.0 is unchanged.
+  formats and runtime behavior unchanged by that documentation cleanup.
 
 ## 0.14.0 — 2026-11-05
 

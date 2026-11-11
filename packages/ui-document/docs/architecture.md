@@ -145,8 +145,8 @@ This package never imports `@kurot/core` or `@kurot/ui`. Runtime construction,
 resource loading, Canvas/WebGL work, editor UI, filesystem access, and model
 provider calls stay outside it.
 
-Published `@kurot/ui-runtime@0.11.0` consumes format version 2 with ui-document
-`^0.14.0`. Shared fixtures define component, screen and appearance conformance.
+`@kurot/ui-runtime@0.14.0` consumes format version 2 with ui-document
+`^0.15.0`. Shared fixtures define component, screen and appearance conformance.
 The runtime expands reusable instances, executes bounded data bindings and
 semantic actions, dispatches
 typed resources, and installs native appearance skins/states with selected

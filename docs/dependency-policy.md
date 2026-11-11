@@ -31,8 +31,8 @@ The manifests are authoritative. Current Kurot package requirements are:
 | ui          | None                      | core `^3.2.1`                                     | Components and Backdrop use the application's Core objects.     |
 | game        | None                      | core `^3.0.0`                                     | Game helpers use the application's Core objects and ticker.     |
 | dragonbones | None                      | core `^3.0.0`                                     | Animation displays and meshes use the application's Core.       |
-| ui-runtime  | None                      | core `^3.0.0`, ui `^5.0.0`, ui-document `^0.14.0` | Materializes a document into the application's Core/UI objects. |
-| cli         | ui-document `^0.14.0`     | None                                              | Compiles KUI at build time.                                     |
+| ui-runtime  | None                      | core `^3.0.0`, ui `^5.0.0`, ui-document `^0.15.0` | Materializes a document into the application's Core/UI objects. |
+| cli         | ui-document `^0.15.0`     | None                                              | Compiles KUI at build time.                                     |
 | ui-document | None                      | None                                              | Headless authoring, validation and serialization.               |
 | bitmap-font | None                      | None                                              | Headless font data, validation and layout.                      |
 | atlas       | None                      | None                                              | Independent pixel packing with a Node PNG subpath.              |
@@ -66,8 +66,14 @@ UI >= 5.3.0 provides opt-in RichLabel outline layout on its existing Core
 ^3.2.1 peer. Its word-first multiline Label fitting requires Core >= 3.6.0
 within 3.x for `ILineElement.hasEmergencyBreak`; older accepted Core versions
 retain the previous fitting policy. Adopt both packages for that correction.
-Game, DragonBones and ui-runtime need no release or peer increase. CLI templates
-select public `latest`; application and development lock adoption remains explicit.
+Game and DragonBones need no release or peer increase for native text layout.
+KUI `outlineLayout` authoring requires document >=0.15.0 with CLI >=5.2.0 or
+runtime >=0.14.0. CLI's document dependency and runtime's document peer are
+^0.15.0; runtime retains Core ^3.0.0 / UI ^5.0.0 peers, with UI >=5.3.0 required
+only for explicit outline settings. Its development baseline tests UI 5.3.0 and
+Core 3.6.0. Older 0.14.x document / 0.13.x runtime ranges require explicit minor
+adoption; unchanged consumers may retain their supported locks. CLI templates
+select public `latest`; application and Editor adoption remains explicit.
 
 Projects opting into `backgroundPolicy: 'continue'` require Core >= 3.4.0
 within 3.x. The default remains pause; unchanged SDK peers and application locks

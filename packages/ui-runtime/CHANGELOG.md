@@ -4,6 +4,14 @@ All notable changes to `@kurot/ui-runtime` are documented here.
 
 ---
 
+## 0.14.0 — 2026-11-11
+
+Source release prepared; npm publication and artifact verification are pending.
+
+Validation: 99 package tests pass with the matching candidate dependencies; Editor save/state/history browser coverage and Canvas/WebGL parity at 1x/2x also pass.
+
+- Apply optional RichLabel `outlineLayout` through the native setter, retain construction defaults when omitted, and restore them through native states. Reject explicit base/state use on a host lacking the UI >=5.3.0 property. Require document ^0.15.0 and test with Core 3.6.0 / UI 5.3.0. Native peers remain Core ^3.0.0 / UI ^5.0.0; explicit outline settings require UI >=5.3.0, while omission remains supported on older hosts.
+
 ## 0.13.0 — 2026-11-08
 
 Published on npm. The downloaded archive matches the tested candidate byte for byte and the registry SHA-512 integrity.

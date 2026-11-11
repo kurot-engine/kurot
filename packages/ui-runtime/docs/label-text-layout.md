@@ -1,6 +1,6 @@
 # Label text layout
 
-Runtime 0.13.0 requires Core `^3.0.0`, UI `^5.0.0` and document `^0.14.0`.
+Runtime 0.14.0 requires Core `^3.0.0`, UI `^5.0.0` and document `^0.15.0`.
 UI 5 uses the same Core ^3.0.0 contract; satisfy all peers.
 It applies authored text properties to native Labels rather than measuring text
 or fitting fonts itself. The CLI compiles the same properties into KUI skins.

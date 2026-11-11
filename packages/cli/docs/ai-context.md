@@ -1,9 +1,13 @@
 # @kurot/cli — AI context map
 
-`@kurot/cli@5.1.2` is build-time tooling on Node.js >= 22.12.0, with ordinary
-ui-document dependency **^0.14.0**. Projects supply their own Core/UI runtime.
+`@kurot/cli@5.2.0` is build-time tooling on Node.js >= 22.12.0, with ordinary
+ui-document dependency **^0.15.0**. Projects supply their own Core/UI runtime.
 Read [architecture](architecture.md) for the plugin pipeline; the source and
 configuration exports establish current behavior. For TypeScript configs, the CLI ships its own loader; consumers on Node 22 do not install one. Dev reloads only the edited root, not imported helpers.
+
+RichLabel `outlineLayout` is an optional component enum, never a Span style
+or inserted default. KUI support requires document >=0.15.0, CLI >=5.2.0 or
+runtime >=0.14.0, and native UI >=5.3.0. See [text components](text-components.md).
 
 ## Directory map
 
@@ -69,7 +73,7 @@ The compiler validates centered-flip booleans on display nodes and named-state
 overrides, including CLI-only controls. Malformed values and flags on the
 nonvisual Skin root fail compilation. Negative scales are preserved.
 
-The CLI requires `@kurot/ui-document@^0.14.0`. Schema-defined strings, including
+The CLI requires `@kurot/ui-document@^0.15.0`. Schema-defined strings, including
 numeric/boolean-looking text and state text, are literal attributes without
 backslash type escaping. Old synthetic prefixes become literal characters;
 do not migrate them silently. Numeric/boolean properties and schema-free

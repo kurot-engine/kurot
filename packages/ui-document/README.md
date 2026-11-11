@@ -1,7 +1,7 @@
 # @kurot/ui-document
 
 Headless semantic UI documents, canonical Skin KUI XML, validation, reusable
-assets and transactional editing. Package version: **0.14.0** (published on npm).
+assets and transactional editing. Source version: **0.15.0**; publication status is recorded in [CHANGELOG.md](CHANGELOG.md).
 The semantic format is **2**; the package has no Kurot runtime dependency.
 
 Read [KUI XML](docs/kui-xml.md), [text components](docs/text-components.md),
@@ -19,16 +19,30 @@ restore independently. The feature uses UI 4.1, document 0.14 and CLI 4.1;
 semantic materialization uses runtime 0.11. See the
 [shared text contract](../ui-document/docs/text-components.md).
 
+## Optional RichLabel outline spacing
+
+`outlineLayout="render-only"` keeps the standard content frame;
+`outlineLayout="reserve-space"` reserves native outline/italic safety space,
+matching Label's content-frame rules. Old skins remain omitted; the compiler
+and runtime never insert or enable the setting. Named-state overrides and
+ordinary save/history operations preserve explicit choices and local Span styles.
+Reserving space can add wrapping and automatic height inside a fixed outer frame.
+
+Use document >=0.15.0 with CLI >=5.2.0 (compiled skins) or runtime >=0.14.0
+(materialized documents), plus UI >=5.3.0. The semantic format stays 2. Older
+accepted UI hosts still work when this property is omitted. See
+[outline authoring](../ui-document/docs/text-components.md#optional-outline-spacing).
+
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-document@^0.14.0
+pnpm add @kurot/ui-document@^0.15.0
 ```
 
 The package has no runtime dependency on `@kurot/core` or `@kurot/ui`. It
 models UI documents but does not instantiate or render runtime components.
-CLI 4.1 and ui-runtime 0.11 adopt document `^0.14.0` for RichLabel component
-typography. Older consumers can retain their accepted document versions until
+CLI 5.2 and ui-runtime 0.14 adopt document `^0.15.0` for optional RichLabel
+outline layout. Older consumers can retain their accepted document versions until
 they adopt the new attributes. Semantic format 2 and existing authored values
 remain unchanged; no document migration is required.
 
@@ -323,7 +337,7 @@ or network I/O, or model-provider integration. Those concerns belong to
 `@kurot/ui`, the visual builder, CLI orchestration, and Agent adapters
 respectively.
 
-`@kurot/ui-runtime@0.11.0` uses document `^0.14.0` and validates/materializes
+`@kurot/ui-runtime@0.14.0` uses document `^0.15.0` and validates/materializes
 format-version-2 assets,
 including reusable instances, parameter bindings, Slots, component variants,
 part overrides, design tokens, resource hooks, and native appearance
@@ -395,7 +409,7 @@ colors report the semantic path, and other token categories stay unresolved.
 Authored palette references use `@style:colors:<key>`; other XML prefixes are
 rejected. Authoring files remain unchanged by resolution. The CLI compiler
 resolves stylesheet colors and Label presets during KUI compilation. Its
-document `^0.14.0` dependency adopts this catalog. Runtime 0.11.0 requires the same range;
+document `^0.15.0` dependency adopts this catalog. Runtime 0.14.0 requires the same range;
 consumers resolve colors in preview copies or register palette entries in the
 runtime asset registry. Editor and application dependencies must also adopt the same parser.
 No Core/UI rendering change is required. See
@@ -412,7 +426,7 @@ retaining authored XML/history references. `getUILabelStyle()`, `UILabelStyle`,
 The `UIStyleSheet` type requires a `labels` map; `parseUIStyleSheet()`
 supplies an empty map when the optional JSON section is absent.
 See [project styles](docs/project-styles.md) for configuration and resolution order.
-CLI's document `^0.14.0` dependency and runtime 0.11.0's matching requirements
-adopt this catalog. Runtime 0.11.0 also requires UI `^4.1.0` and Core `^2.4.0`;
-satisfy the chosen UI's Core ^2.5.2 peer as well. Preset expansion
+CLI's document `^0.15.0` dependency and runtime 0.14.0's matching requirements
+adopt this catalog. Runtime 0.14.0 also requires UI `^5.0.0` and Core `^3.0.0`;
+satisfy the chosen UI's Core peer as well (UI 5.3 requires Core ^3.2.1). Preset expansion
 itself does not introduce a new native rendering requirement.

@@ -33,6 +33,14 @@ is generated. CLI 4.1 consumes document ^0.14.0 for this catalog.
 Text, including spaces, backslashes and numeric-looking strings,
 is literal. Use `&#10;` for explicit hard line breaks.
 
+RichLabel also accepts optional `outlineLayout="render-only|reserve-space"`
+and `outlineLayout.stateName` attributes through document ^0.15.0. The compiler emits ordinary assignments and SetProperty
+state overrides, validates both enum values, and never fills an omitted base
+value. The application must supply UI >=5.3.0 when using this property. The
+minimum compilation pair is CLI 5.2.0 / document 0.15.0; projects with a direct
+document dependency must select its new minor to use the property themselves. No Core change or separate runtime is required
+for compiled skins. See [outline spacing](../../ui-document/docs/text-components.md#optional-outline-spacing).
+
 A state flow replaces the complete run array. `<textFlow.disabled />` clears
 content, while an omitted state flow inherits it. Generated native SetProperty
 overrides restore the prior array when removed. Span elements are not component

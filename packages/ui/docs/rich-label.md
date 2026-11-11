@@ -137,8 +137,11 @@ UI runtime, not an automatically isolated project. Applications sharing a runtim
 can supply `UIContextOptions.richLabelOutlineLayout` inside `context.run()`;
 an explicit context setting wins over the startup default. Binding an existing
 subtree does not change captured policies. See [local contexts](ui-context.md).
-These entry points are TypeScript APIs; KUI does not yet expose an
-`outlineLayout` attribute.
+KUI authoring requires document >=0.15.0 and CLI >=5.2.0 or ui-runtime >=0.14.0,
+using the same instance `outlineLayout` attribute and ordinary named-state
+overrides. See [KUI outline spacing](../../ui-document/docs/text-components.md#optional-outline-spacing).
+Omitted attributes preserve the construction policy; authoring tools must not
+silently enable the startup default or insert explicit values into old skins.
 
 In `reserve-space`, outer width/height, min/max and parent allocations retain
 their usual meaning. Measurement, wrapping and painting use the inner frame.

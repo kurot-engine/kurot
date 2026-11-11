@@ -7,6 +7,14 @@ and CLI command/configuration APIs follow [Semantic Versioning](https://semver.o
 The early KUI XML contract follows the pre-1.0 `ui-document` kernel; authored
 format changes are documented explicitly in each release.
 
+## 5.2.0 — 2026-11-11
+
+Source release prepared; npm publication and artifact verification are pending.
+
+Validation: 229 package tests pass with the matching candidate dependencies; Editor save/state/history browser coverage and Canvas/WebGL parity at 1x/2x also pass.
+
+- Validate and compile optional RichLabel `outlineLayout` base/state attributes through the updated ui-document catalog and existing scalar/SetProperty code generation. Old skins retain omission. Require document ^0.15.0; authored use requires UI >=5.3.0. Core/UI requirements for existing skins and Node >=22.12.0 are unchanged.
+
 ## 5.1.2 — 2026-11-09
 
 The published [npm package](https://www.npmjs.com/package/@kurot/cli/v/5.1.2)

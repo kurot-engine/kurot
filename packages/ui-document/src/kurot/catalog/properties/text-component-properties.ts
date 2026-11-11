@@ -46,6 +46,12 @@ export const RICH_LABEL_PROPERTIES: Readonly<Record<string, UIPropertyDefinition
 	textColor: LABEL_PROPERTIES.textColor!,
 	stroke: LABEL_PROPERTIES.stroke!,
 	strokeColor: LABEL_PROPERTIES.strokeColor!,
+	outlineLayout: {
+		valueType: 'string',
+		enumValues: ['render-only', 'reserve-space'],
+		defaultValue: 'render-only',
+		description: 'Outline layout policy. Omission preserves native construction policy; reserve-space requires UI 5.3 and can change wrapping and automatic size.',
+	},
 	textFlow: {
 		valueType: 'array',
 		format: 'text-flow',

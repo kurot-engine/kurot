@@ -4,8 +4,8 @@ Runtime materialization layer for validated Kurot UI documents. It converts
 canonical `kui.*` nodes into real `@kurot/ui` components without moving
 document semantics into the component library.
 
-> **Current version: 0.13.0 (published on npm).** Requires `@kurot/core@^3.0.0`,
-> `@kurot/ui@^5.0.0`, and `@kurot/ui-document@^0.14.0`. Uses UI's atomic
+> **Current version: 0.14.0 (source release; publication pending).** Requires `@kurot/core@^3.0.0`,
+> `@kurot/ui@^5.0.0`, and `@kurot/ui-document@^0.15.0`. Uses UI's atomic
 > complete-skin lifecycle for materialized appearances.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
@@ -15,19 +15,33 @@ See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 Numeric transitions construct Animation with only its update callback argument.
 This release requires Core 3 and UI 5; the semantic document format is unchanged.
 
+## Optional RichLabel outline spacing
+
+`outlineLayout="render-only"` keeps the standard content frame;
+`outlineLayout="reserve-space"` reserves native outline/italic safety space,
+matching Label's content-frame rules. Old skins remain omitted; the compiler
+and runtime never insert or enable the setting. Named-state overrides and
+ordinary save/history operations preserve explicit choices and local Span styles.
+Reserving space can add wrapping and automatic height inside a fixed outer frame.
+
+Use document >=0.15.0 with CLI >=5.2.0 (compiled skins) or runtime >=0.14.0
+(materialized documents), plus UI >=5.3.0. The semantic format stays 2. Older
+accepted UI hosts still work when this property is omitted. See
+[outline authoring](../ui-document/docs/text-components.md#optional-outline-spacing).
+
 ## Installation
 
 ```bash
-pnpm add @kurot/ui-runtime@^0.13.0 @kurot/ui-document@^0.14.0 @kurot/ui@^5.0.0 @kurot/core@^3.0.0
+pnpm add @kurot/ui-runtime@^0.14.0 @kurot/ui-document@^0.15.0 @kurot/ui@^5.0.0 @kurot/core@^3.0.0
 ```
 
 Install all peers explicitly and satisfy the chosen UI package's Core peer
-as well as runtime's own peers. For example, UI 5.1.2 requires Core ^3.2.1; runtime itself requires Core ^3.0.0.
+as well as runtime's own peers. For example, UI 5.3.0 requires Core ^3.2.1; runtime itself requires Core ^3.0.0.
 Semantic format version is 2.
 
-CLI 4.1 uses document ^0.14.0 for build-time validation, typography and styles,
+CLI 5.2 uses document ^0.15.0 for build-time validation, typography and styles,
 and emits skins that run directly through UI. That compilation path does not
-require ui-runtime. Runtime 0.12 and CLI 4.1 use the same document 0.14.x contract.
+require ui-runtime. Runtime 0.14 and CLI 5.2 use the same document 0.15.x contract.
 See the [project style contract](../ui-document/docs/project-styles.md).
 
 ## Centered flips

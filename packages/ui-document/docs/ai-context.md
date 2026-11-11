@@ -3,9 +3,13 @@
 Read this before exploring `src/`. The source and `src/index.ts` remain the
 authority for current behavior and public exports.
 
-Package identity: `@kurot/ui-document@0.14.0` (published on npm). This is a headless,
+Package identity: `@kurot/ui-document@0.15.0` (source version; publication is recorded in CHANGELOG.md). This is a headless,
 runtime-independent semantic asset package for Kurot UI authoring. It has no
 runtime dependencies. The semantic format version is 2.
+
+RichLabel `outlineLayout` is an optional component enum, never a Span style
+or inserted default. KUI support requires document >=0.15.0, CLI >=5.2.0 or
+runtime >=0.14.0, and native UI >=5.3.0. See [text components](text-components.md).
 
 ## 1. Directory map
 
@@ -197,7 +201,7 @@ src/
 - Authored fixed and percentage sizes share `width`/`height`; a `%` suffix maps
   to the semantic `percentWidth`/`percentHeight` properties. Do not emit those
   internal property names as XML attributes.
-- `@kurot/ui-runtime@0.11.0` consumes format version 2 with ui-document ^0.14.0
+- `@kurot/ui-runtime@0.14.0` consumes format version 2 with ui-document ^0.15.0
   and executes the current reuse, appearance, data-binding, semantic-action,
   transition, and typed resource-adapter slice. Incremental reconciliation
   remains pending.

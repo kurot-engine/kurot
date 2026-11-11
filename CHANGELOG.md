@@ -5,6 +5,43 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-11 — Document 0.15.0 / CLI 5.2.0 / Runtime 0.14.0 release preparation
+
+- Expose RichLabel `outlineLayout` as an optional component-level KUI enum:
+  `render-only` or `reserve-space`. Preserve omission, constructor policies,
+  sparse Span styles, base/state restoration, serialization and ordinary
+  transaction history. No default padding or automatic skin migration.
+- CLI 5.2.0 consumes document ^0.15.0 and emits ordinary assignments and native
+  SetProperty overrides. Runtime 0.14.0 consumes the same document range and
+  delegates layout to UI's setter; explicit base/state settings on older hosts
+  fail with the UI >=5.3.0 requirement. Semantic format remains 2.
+- Runtime retains Core ^3.0.0 / UI ^5.0.0 peers. Its development ranges now use
+  Core ^3.2.1 / UI ^5.3.0, locked to registry Core 3.6.0 / UI 5.3.0. A packed
+  runtime on actual Core 3.0.0 / UI 5.0.0 preserves old skins and rejects explicit
+  outline settings without creating inert properties.
+- CLI and runtime require the new document minor. Direct document ^0.14.x and
+  runtime ^0.13.x consumers must explicitly adopt the new ranges when selecting
+  this feature; existing supported installations can stay unchanged. Caret CLI
+  ^5.1.2 consumers accept 5.2.0 as optional lock adoption; exact pins and Skia's
+  ~5.0.0 line require explicit selection. Studio's older major baseline remains
+  separate migration work. Game/empty starters already select public latest;
+  examples, Templates, SAO, Skia and Studio declarations/locks are unchanged.
+- Editor adoption is deferred until these SDKs are published. Its formal
+  dependency pins and lock are unchanged; browser integration uses an isolated
+  copy with the actual packed candidates and published Core 3.6.0 / UI 5.3.0.
+  Core, UI, Game, DragonBones, Atlas and bitmap-font need no new release.
+- Node 22.23.4 builds and all 669 tests pass: document 341, CLI 229, runtime 99.
+  Frozen strict-peer installations pass; locks contain normal registry identities
+  and the tested document archive integrity, without local URLs or file overrides.
+  The packed CLI builds game and empty starters in development and release modes.
+  Eleven Chromium checks cover Editor save/state/history/native preview and
+  compiled-game/runtime/Editor parity: 54 state drawings match in Canvas and
+  WebGL 1/2 at 1x/2x. Editor type checking and repository diff checks pass.
+- Publish ui-document 0.15.0 first, then CLI 5.2.0 and ui-runtime 0.14.0 in either
+  order. These are prepared source versions, not publication claims. npm artifact
+  verification and annotated tags follow after publication. Registry-based CI
+  consumers can resolve the new document dependency once its publication lands.
+
 ## 2026-11-11 — Core 3.6.0 / UI 5.3.0 release preparation
 
 - Prepare Core's optional emergency-word-break metadata and UI's word-first

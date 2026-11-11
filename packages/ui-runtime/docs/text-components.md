@@ -1,6 +1,6 @@
 # Native text materialization
 
-The runtime requires Core `^3.0.0`, UI `^5.0.0` and document `^0.14.0`.
+The runtime requires Core `^3.0.0`, UI `^5.0.0` and document `^0.15.0`.
 It materializes BitmapLabel and RichLabel with their real native constructors;
 both remain independent of Label. RichLabel exposes seven component typography
 properties; Label presets, fitting and plain text remain separate contracts.
@@ -43,6 +43,16 @@ Omitted run fields follow the corresponding component value; explicit false/zero
 values win. Typography never modifies raw flow snapshots. Native measurement
 follows font and width/maxWidth changes. TextFit, textStyle, baseStyle and plain
 text are not RichLabel properties.
+
+`outlineLayout` is an optional RichLabel scalar: `render-only` preserves the
+standard content frame; `reserve-space` delegates outline/italic-safe insets to
+native UI >=5.3.0. Omission never assigns a catalog default, so the constructor's
+startup/context policy survives. Explicit settings on an older UI host fail
+with `invalid-property`, including settings authored only in a Skin state.
+State restoration uses the native captured value and never rewrites textFlow.
+This support requires document >=0.15.0 and runtime >=0.14.0. Existing 0.x
+consumers must explicitly adopt the new minor ranges.
+See [outline authoring](../../ui-document/docs/text-components.md#optional-outline-spacing).
 
 Appearance states use native SetProperty. Reusable component states and data
 bindings use the existing atomic transaction path. Flow overrides replace the

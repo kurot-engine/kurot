@@ -32,6 +32,13 @@ export function applyRichLabelProperty(target: RichLabel, name: string, value: u
 		case 'strokeColor':
 			target.strokeColor = requireColor(value, path);
 			return true;
+		case 'outlineLayout':
+			if (value !== 'render-only' && value !== 'reserve-space') {
+				throw invalidRuntimeValue('render-only or reserve-space', path);
+			}
+			requireRichLabelOutlineLayout(target, path);
+			target.outlineLayout = value;
+			return true;
 		case 'textFlow':
 			if (!isUITextFlow(value)) {
 				throw invalidRuntimeValue('a valid textFlow array', path);
@@ -43,6 +50,18 @@ export function applyRichLabelProperty(target: RichLabel, name: string, value: u
 			return true;
 		default:
 			return false;
+	}
+}
+
+/**
+ * Also checks state-only settings before native SetProperty bypasses the adapter.
+ */
+export function requireRichLabelOutlineLayout(
+	target: RichLabel,
+	path: string,
+): asserts target is RichLabel & { outlineLayout: 'render-only' | 'reserve-space' } {
+	if (!('outlineLayout' in target)) {
+		throw invalidRuntimeValue('an outlineLayout-capable RichLabel (@kurot/ui >= 5.3.0)', path);
 	}
 }
 

@@ -191,7 +191,7 @@ their narrower programmatic/runtime boundary.
 
 The existing `@kurot/ui` package already owns the real UI behavior: measurement,
 layout, validation, skins, states, bindings, collections, themes, and controls.
-The CLI parses canonical KUI XML through document ^0.14.0 and emits ESM Skin
+The CLI parses canonical KUI XML through document ^0.15.0 and emits ESM Skin
 factories, theme output and typed skin-part declarations. It also handles project
 namespace components and development resource synchronization. Editor implementation and application lifecycle belong to their own
 integration repository.

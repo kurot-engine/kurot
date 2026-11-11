@@ -1,6 +1,6 @@
 import { createRectangle } from './descriptors/createRectangle.js';
 import type { DisplayObject } from '@kurot/core';
-import { Component, SetProperty, Skin, State } from '@kurot/ui';
+import { Component, RichLabel, SetProperty, Skin, State } from '@kurot/ui';
 import { isSyntheticNodeId } from '@kurot/ui-document';
 import type { UIDocument, UINode } from '@kurot/ui-document';
 import { applyRuntimeProperty } from './applyRuntimeProperty.js';
@@ -11,6 +11,7 @@ import { KurotUIRuntimeError } from './KurotUIRuntimeError.js';
 import { resolvePropertyValue } from './resolvePropertyValue.js';
 import type { KurotUICreationContext } from './types.js';
 import { TransitionSetProperty } from './transitions/TransitionSetProperty.js';
+import { requireRichLabelOutlineLayout } from './builtins/applyRichLabelProperties.js';
 
 const SKIN_SIZE_PROPERTIES = ['width', 'height', 'minWidth', 'maxWidth', 'minHeight', 'maxHeight'] as const;
 const SKIN_SIZE_PROPERTY_NAMES = new Set<string>(SKIN_SIZE_PROPERTIES);
@@ -48,7 +49,7 @@ export function applyAppearance(
 	registerAppearanceNodeTargets(skin, appearance.root, scope, context, publicPartNames);
 	exposeParts(skin, appearance, scope, context, publicPartNames);
 	skin.skinParts = [...publicPartNames].sort();
-	skin.states = createStates(appearance, context);
+	skin.states = createStates(appearance, skin, context);
 	target.skinName = skin;
 }
 
@@ -151,7 +152,7 @@ function exposeParts(
 	}
 }
 
-function createStates(appearance: UIDocument, context: KurotUICreationContext): State[] {
+function createStates(appearance: UIDocument, skin: Skin, context: KurotUICreationContext): State[] {
 	const basePath = assetPath(appearance.id);
 	return Object.keys(appearance.contract.states)
 		.sort()
@@ -160,6 +161,10 @@ function createStates(appearance: UIDocument, context: KurotUICreationContext): 
 			const overrides = definition.overrides.map((override, index) => {
 				const targetId = override.targetId === appearance.root.id ? '' : override.targetId;
 				const valuePath = `${basePath}.contract.states.${name}.overrides[${index}].value`;
+				const target = skin.getPart(targetId);
+				if (override.property === 'outlineLayout' && target instanceof RichLabel) {
+					requireRichLabelOutlineLayout(target, valuePath);
+				}
 				const resolved = resolvePropertyValue(override.value, valuePath, context);
 				const value =
 					override.property === 'scale9Grid'

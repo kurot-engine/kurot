@@ -102,6 +102,38 @@ literal RGB values. Omitted properties stay omitted during XML round trips.
 No new structured property format or semantic document version is introduced.
 The component attributes require native UI 4.1, CLI 4.1 or ui-runtime 0.11.
 
+## Optional outline spacing
+
+`RichLabel.outlineLayout` accepts `render-only` or `reserve-space`. The catalog
+advertises `render-only` as the standard default but never inserts it into old
+skins. Omission preserves the native construction policy, including an explicit
+application startup/context policy. An authored value overrides that policy.
+
+```xml
+<RichLabel id="notice" width="180" size="16" stroke="1"
+           outlineLayout="reserve-space" outlineLayout.compact="render-only">
+    <textFlow><Span text="Notice"/><Span text="local" stroke="0"/></textFlow>
+</RichLabel>
+```
+
+The containing Skin must declare `compact`. This is a component layout property,
+not a Span style. `reserve-space` uses Label's outline/italic-safe content frame;
+for uniform size=16 and stroke=1 an outer width of 180 leaves 172 for text and
+an automatic single-line height is 22. Reduced inner width can add wrapping and
+increase automatic height. Native UI computes insets from effective run styles;
+local stroke/italic overrides remain intact. No fixed padding is serialized.
+
+Base and named-state choices use ordinary scalar properties, validation, XML
+round trips and history. Removing a state override restores the base value;
+omitted base values retain the actual native construction policy. Returning to
+omission does not write an explicit default. Invalid enum values are rejected.
+
+This KUI capability requires document >=0.15.0 with CLI >=5.2.0 for compiled
+skins or runtime >=0.14.0 for materialization, plus native UI >=5.3.0. Existing
+0.14.x document consumers must explicitly adopt the new 0.15.x range; runtime
+0.13.x consumers must select 0.14.x. Semantic format 2 and old authored values
+remain compatible. The native property already exists in UI 5.3.0.
+
 ## States, clearing and history
 
 ```xml

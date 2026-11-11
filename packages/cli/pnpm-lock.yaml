@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@kurot/ui-document':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.15.0
+        version: 0.15.0
       commander:
         specifier: ^13.0.0
         version: 13.1.0
@@ -357,8 +357,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kurot/ui-document@0.14.0':
-    resolution: {integrity: sha512-fd7YFhikVxQ1qLgn4k7bcjh4dH4yyfyxvnY97ndSWAUvGgTP9gl4X2swIlFRXnGCXGuuriHU+GGfHN52csXFdQ==}
+  '@kurot/ui-document@0.15.0':
+    resolution: {integrity: sha512-Ph8dIF10uV8zwYWtk4uAaUaQ3sh43dFct7coEmnacmxopYzIwn7BmAENu8D37+b5jcGYesTMgHzVjpECrZDn9w==}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -947,7 +947,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kurot/ui-document@0.14.0': {}
+  '@kurot/ui-document@0.15.0': {}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
