@@ -1,7 +1,7 @@
 # Core-only demo
 
 A minimal Kurot entry with one Player and a Sprite root. It installs registry
-Core 3.5.2 and CLI 5.1.2 through its own pnpm lockfile; no UI or Game package is
+Core 3.6.0 and CLI 5.2.0 through its own pnpm lockfile; no UI or Game package is
 required.
 
 ## Run

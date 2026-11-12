@@ -5,6 +5,36 @@ Observations below describe their recorded event. See the [package map](AGENTS.m
 for current versions and the [README](README.md) for usage. Each SDK records
 its changes in its own CHANGELOG.md.
 
+## 2026-11-11 — Examples and Templates adopt Core 3.6.0 / UI 5.3.0 / CLI 5.2.0
+
+- Verify npm latest and adopt Core 3.6.0 and CLI 5.2.0 in demo, game and
+  star-catcher plus Card Booster, MilfMaster, Runaway, Skydive and Tentax.
+  Select UI 5.3.0 and ui-document 0.15.0 wherever already used. Preserve each
+  project's exact/caret styles, other tools and Node 22 requirements; update
+  selected registry locks and current dependency documentation.
+- Native UI/Game/DragonBones/Spine peers share each application's Core instance;
+  CLI and applications share document 0.15.0. Locked SDK integrities match npm.
+  Skydive's existing release-age exceptions add only the selected published
+  versions. No SDK version bump or application/KUI source change is included.
+- Adopt word-first multiline Label shrinking. RichLabel outline layout is
+  available through the matching UI/document/compiler versions, while existing
+  skins retain their omitted defaults and startup settings.
+- All eight strict-peer offline frozen installations, strict development/release
+  builds and full declaration checks pass on Node 22.23.4. All 818 application
+  unit tests and provided architecture/resource checks pass.
+- Demo/Game pass twelve development/release WebGL/Canvas checks with Core 3.6.0.
+  All five Templates pass development WebGL fixtures for native controls,
+  startup, gameplay and teardown. MilfMaster also passes minified Canvas text
+  raster/viewport/scroll-tail checks and development WebGL Slot KUI geometry,
+  constructor identity, spin modes, skin replacement and disposal checks.
+  These fixtures do not use production accounts.
+- Star Catcher passes all six development/release gameplay and lifecycle checks
+  when run without other browser suites. An initial concurrent release test hit
+  its 30-second budget while advancing ten seconds of virtual time (23.3 seconds
+  for that call); the unchanged input case passes alone in 15.6 seconds and the
+  complete serial rerun passes. No source or test-timeout changes were needed.
+  All temporary test pages and servers close after verification.
+
 ## 2026-11-11 — Document 0.15.0 / CLI 5.2.0 / Runtime 0.14.0 release preparation
 
 - Expose RichLabel `outlineLayout` as an optional component-level KUI enum:
